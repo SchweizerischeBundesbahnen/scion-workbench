@@ -1,0 +1,64 @@
+@import '../workbench.constants';
+@import '../workbench.icon';
+
+$severity-border-size: 6px;
+$border-radius: 4px;
+
+:host {
+  display: block;
+  background-color: $notification-bgcolor;
+  color: $notification-fgcolor;
+  font-size: $notification-font-size;
+  border-radius: $border-radius;
+  box-shadow: $popup-box-shadow;
+  width: $notification-width;
+  max-width: calc(100vw - #{2*$notification-margin});
+
+  border-left: $severity-border-size solid transparent;
+  &.info {
+    border-left-color: $info-color;
+  }
+  &.warn {
+    border-left-color: $warn-color;
+  }
+  &.error {
+    border-left-color: $error-color;
+  }
+
+  > div.outline {
+    position: relative; // positioning context
+    border: 1px solid $notification-border-color;
+    border-left: none;
+    padding: 1em 1.5em;
+    border-top-right-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+    font-size: 12px;
+
+    > h1 {
+      font-size: 1em;
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: .75em;
+    }
+
+    > button.close {
+      position: absolute;
+      right: 2px;
+      top: 4px;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      font-size: .75em;
+      color: inherit;
+
+      &::before {
+        @include workbench-font;
+        content: '\e5cd';
+      }
+      &:hover::before {
+        content: '\e5c9';
+      }
+    }
+  }
+}

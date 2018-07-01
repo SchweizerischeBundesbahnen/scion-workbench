@@ -1,0 +1,8 @@
+<wb-searchfield (search)="onFilter($event)"></wb-searchfield>
+<wb-viewport #viewport
+             [style.height.px]="viewportHeight"
+             [viewportCssClass]="'wb-viewport'"
+             [viewportClientCssClass]="'wb-viewport-client'"
+             (viewportChange)="onViewportChange(viewport)">
+  <wb-view-tab *ngFor="let viewRef of filteredViewsRefs" [viewRef]="viewRef" [renderingHint]="'list-item'"></wb-view-tab>
+</wb-viewport>

@@ -1,0 +1,7 @@
+:host {
+  display: flex;
+
+  > wb-view-part-sash-box, > wb-portal-outlet {
+    flex: auto;
+  }
+}

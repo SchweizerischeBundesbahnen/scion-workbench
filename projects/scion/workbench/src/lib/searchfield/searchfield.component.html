@@ -1,0 +1,13 @@
+<input type="text"
+       #input
+       [formControl]="inputControl"
+       [attr.placeholder]="placeholder"
+       [class.has-value]="!!input.value"
+       (focusin)="onFocusIn()"
+       (focusout)="onFocusOut()">
+<button #clear_button
+        type="button"
+        (click)="onClear()"
+        class="clear wb-icon-close">
+</button>
+<span class="search-icon wb-icon-search" (click)="onRequestFocus()"></span>

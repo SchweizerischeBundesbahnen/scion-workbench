@@ -1,0 +1,40 @@
+<!-- Activity Bar -->
+<ul class="activity-bar">
+  <li *ngFor="let activity of activityPartService.activities">
+    <a href=""
+       (click)="onActivate(activity);"
+       [class.active]="activityPartService.isActive(activity)"
+       [ngClass]="activity.cssClass"
+       [attr.title]="activity.title">
+      {{activity.label || ''}}
+    </a>
+    <div class="diamond" *ngIf="activityPartService.isActive(activity)"></div>
+  </li>
+</ul>
+
+<!-- Activity Panel -->
+<div *ngIf="activityPartService.activeActivity as activity"
+     #panel
+     class="activity-panel"
+     [style.width.px]="panelWidth + activity.panelWidthDelta"
+     [@panel-enter-or-leave]>
+
+  <header>
+    <h1>{{activity.title}}</h1>
+    <ul>
+      <li *ngFor="let action of activity.actions" [ngTemplateOutlet]="action"></li>
+    </ul>
+  </header>
+
+  <wb-viewport [viewportCssClass]="'wb-viewport'" [viewportClientCssClass]="'wb-viewport-client'">
+    <wb-router-outlet></wb-router-outlet>
+  </wb-viewport>
+
+  <div class="sash"
+       [wbSash]="'vertical'"
+       (wbSashStart)="onSashStart()"
+       (wbSashChange)="onSash($event)"
+       (wbSashEnd)="onSashEnd()"
+       (wbSashReset)="onSashReset()">
+  </div>
+</div>

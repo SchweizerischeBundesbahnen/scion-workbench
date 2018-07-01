@@ -1,0 +1,9 @@
+<wb-view-part-bar></wb-view-part-bar>
+<wb-portal-outlet [wbPortal]="viewPartService.activeView?.portal"
+                  wbDropZone [wbDropFilter]="filterDropZoneEvent" (wbDrop)="onDrop($event)"
+                  wbDimension (wbDimensionChange)="onPortalDimensionChange($event)">
+</wb-portal-outlet>
+<wb-view-list *ngIf="viewPartService.viewListVisible"
+              [style.max-width.px]="viewportWidth"
+              [style.max-height.px]="viewportHeight">
+</wb-view-list>

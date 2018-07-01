@@ -44,5 +44,5 @@
       }
     }
   },
-  "defaultProject": "scion"
+  "defaultProject": "@scion/workbench"
 }

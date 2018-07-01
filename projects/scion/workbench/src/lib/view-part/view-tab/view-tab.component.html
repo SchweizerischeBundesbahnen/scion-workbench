@@ -1,0 +1,7 @@
+<div class="title">{{view.title}}</div>
+<div class="heading" *ngIf="view.heading as heading">{{heading}}</div>
+<button *ngIf="view.closable && !view.disabled"
+        type="button"
+        class="close"
+        (click)="onClose($event)">
+</button>
