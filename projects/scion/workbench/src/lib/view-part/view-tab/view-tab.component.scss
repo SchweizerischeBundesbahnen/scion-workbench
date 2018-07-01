@@ -1,0 +1,106 @@
+@import '../../workbench.constants';
+@import '../../workbench.icon';
+
+@mixin text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+:host {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+  border: none;
+  padding: .5em 1.5em .5em 1em;
+
+  &.tab-item {
+    border-right: 1px solid $viewpart_tabbar_separator-color;
+    max-width: 200px;
+    min-width: 100px;
+    height: $viewtab-height;
+
+    &.active {
+      background-color: $viewpart_tab-active-bgcolor;
+      box-shadow: -7px 0 10px 0 rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  &.list-item {
+    &:hover {
+      background-color: rgba(239, 239, 239, .5);
+      box-shadow: 0 0 1px 0 rgba(102, 102, 102, .1), 0 0 4px 0 rgba(102, 102, 102, .4);
+    }
+
+    &.hidden {
+      > div.title, > div.heading {
+        font-weight: bold; // hidden viewtabs are bolded in the view list dropdown
+      }
+    }
+
+    &.active {
+      border-top: 1px solid rgba(102, 102, 102, .3);
+      border-bottom: 1px solid rgba(102, 102, 102, .3);
+      background-color: rgba(239, 239, 239, 1);
+    }
+
+    > button.close {
+      right: $scrollbar-size;
+    }
+  }
+
+  &.active {
+    cursor: default;
+    color: $viewpart_tab-active-fgcolor;
+  }
+
+  > div.title {
+    @include text;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  > div.heading {
+    @include text;
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 2em;
+  }
+
+  > button.close {
+    display: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    font-size: .75em;
+    position: absolute;
+    right: 2px;
+    top: 4px;
+    color: inherit;
+
+    &::before {
+      @include workbench-font;
+      content: '\e5cd';
+    }
+    &:hover::before {
+      content: '\e5c9';
+    }
+  }
+}
+
+:host-context(.dirty) {
+  .title::before {
+    @include workbench-font;
+    content: '\e254';
+    padding-right: .2em;
+  }
+}
+
+:host-context:hover, :host-context(.active) {
+  button.close {
+    display: inherit;
+  }
+}

@@ -1,0 +1,16 @@
+<div class="outlet"
+     #overlay_outlet="wbOverlayTemplateOutlet"
+     [wbOverlayTemplateOutlet]="iframe_template"
+     [wbOverlayTemplateOutletAppendFirst]="true">
+</div>
+
+<ng-template #iframe_template>
+  <iframe [src]="url"
+          scrolling="no"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0"
+          [ngStyle]="overlay_outlet.style"
+          [style.pointer-events]="pointerEvents">
+  </iframe>
+</ng-template>

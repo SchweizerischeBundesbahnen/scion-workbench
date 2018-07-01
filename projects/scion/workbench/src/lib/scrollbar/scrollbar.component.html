@@ -1,0 +1,12 @@
+<div class="thumb"
+     [style.top.px]="thumbTop"
+     [style.height.px]="thumbHeight"
+     [style.left.px]="thumbLeft"
+     [style.width.px]="thumbWidth"
+     [class.scrolling]="scrolling"
+     (mousedown)="onMouseDown($event)"
+     (touchstart)="onTouchStart($event)"
+     (touchmove)="onTouchMove($event)"
+     (touchend)="onTouchEnd($event)"
+     (touchcancel)="onTouchEnd($event)">
+</div>

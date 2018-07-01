@@ -1,0 +1,16 @@
+@import '../workbench.constants';
+
+:host {
+  display: flex;
+  flex-flow: column wrap-reverse; // to wrap to previous column (right alignment)
+  max-height: 100%; // constrain max-height to wrap to the previous column
+  align-items: flex-start; // right aligned
+  align-content: flex-start;
+  pointer-events: none;
+
+  > wb-notification {
+    position: relative; // for slide-in notification
+    pointer-events: auto;
+    margin: $notification-margin;
+  }
+}

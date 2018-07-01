@@ -1,0 +1,12 @@
+<div *ngFor="let messageBox of messageBoxes; index as i"
+     class="glasspane"
+     [@leave]
+     (mousedown)="onGlasspaneClick($event, message_box)">
+  <wb-message-box #message_box
+                  [messageBox]="messageBox"
+                  [positionDelta]="i * 10"
+                  [@enter]
+                  (close)="onClose(i, $event)"
+                  (mousedown)="$event.stopPropagation()">
+  </wb-message-box>
+</div>

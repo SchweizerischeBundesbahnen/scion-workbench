@@ -1,0 +1,9 @@
+<div class="outline">
+  <h1 *ngIf="!!title">{{title}}</h1>
+  <span *ngIf="textual; else component_template">{{text}}</span>
+  <button type="button" class="close" (click)="onClose()"></button>
+</div>
+
+<ng-template #component_template>
+  <ng-container *ngComponentOutlet="componentType; injector: injector"></ng-container>
+</ng-template>

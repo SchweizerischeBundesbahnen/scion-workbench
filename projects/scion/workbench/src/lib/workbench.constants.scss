@@ -1,0 +1,50 @@
+$topbar-height: 55px;
+$viewtab-height: $topbar-height;
+$view-list-width: 300px;
+$text-padding: .5em 1em;
+$scrollbar-size: 12px;
+
+$error-color: rgba(255, 55, 55, 1);
+$info-color: rgba(19, 138, 203, 1);
+$warn-color: rgba(240, 173, 78, 1);
+
+$popup-box-shadow: 3px 10px 20px -5px rgba(0, 0, 0, 0.5);
+
+/**
+ * Activity Part
+ */
+$activitypart_toolbar-bgcolor: #333333;
+$activitypart_toolbar-width: 50;
+$activitypart_toolitem-fgcolor: rgba(255, 255, 255, .4);
+$activitypart_toolitem-active-fgcolor: #EFEFEF;
+$activitypart_panel-bgcolor: #FEFEFE;
+$activitypart_panel-title-fgcolor: #252526;
+
+/*
+ * View Part
+ */
+$viewpart_tabbar-bgcolor: #333333;
+$viewpart_tabbar_separator-color: #666666;
+$viewpart_tab-fgcolor: #EFEFEF;
+$viewpart_tab-active-fgcolor: #252526;
+$viewpart_tab-active-bgcolor: #FEFEFE;
+$viewpart_sash-bgcolor: #333333;
+
+/*
+ * Notification
+ */
+$notification-fgcolor: #333333;
+$notification-bgcolor: #FEFEFE;
+$notification-margin: .5em;
+$notification-font-size: 14px;
+$notification-border-color: rgb(204, 204, 204);
+$notification-width: 350px;
+
+/*
+ * Message Box
+ */
+$messagebox-fgcolor: #333333;
+$messagebox-bgcolor: #FEFEFE;
+$messagebox-font-size: 14px;
+$messagebox-border-color: rgb(204, 204, 204);
+$messagebox-max-width: 400px;

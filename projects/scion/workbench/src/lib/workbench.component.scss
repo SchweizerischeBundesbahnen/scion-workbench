@@ -1,0 +1,46 @@
+@mixin position($position, $top, $right, $bottom, $left) {
+  position: $position;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+:host {
+  display: flex;
+  @include position(absolute, 0, 0, 0, 0);
+  overflow: hidden;
+
+  > wb-notification-list {
+    @include position(absolute, 0, 0, 0, 0);
+  }
+
+  > wb-activity-part {
+    flex: none;
+  }
+
+  > wb-view-part-grid {
+    flex: auto;
+    position: relative; // forms a stacking context to show 'box-shadow'
+    box-shadow: -1px 0 2px 0 rgba(0, 0, 0, .4);
+  }
+
+  > wb-message-box-stack {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  &.glasspane {
+    user-select: none;
+    pointer-events: none;
+  }
+}
+
+:host-context(.maximized) {
+  wb-activity-part {
+    display: none;
+  }
+}

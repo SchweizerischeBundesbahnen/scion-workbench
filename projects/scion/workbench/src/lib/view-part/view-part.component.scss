@@ -1,0 +1,34 @@
+@import '../workbench.constants';
+
+:host {
+  position: relative; // positioned anchor
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  width: 100%;
+  height: 100%;
+
+  > wb-view-part-bar {
+    flex: none;
+    height: $viewtab-height;
+  }
+
+  > wb-portal-outlet {
+    flex: auto;
+    background-color: $viewpart_tab-active-bgcolor;
+  }
+
+  > wb-view-list {
+    position: absolute;
+    top: $viewtab-height;
+    right: 0;
+    width: $view-list-width;
+    border: 1px solid $viewpart_tabbar-bgcolor;
+    border-top: none;
+    background-color: $viewpart_tab-active-bgcolor;
+  }
+}
+
+:host-context(.suspend-pointer-events) wb-portal-outlet > ::ng-deep * {
+  pointer-events: none;
+}

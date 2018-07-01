@@ -1,0 +1,30 @@
+<header class="move-handle"
+        wbMove
+        (wbMoveStart)="onMoveStart()"
+        (wbMove)="onMove($event)"
+        (wbMoveEnd)="onMoveEnd()">
+</header>
+<div class="outline">
+  <div class="body">
+    <h1 *ngIf="!!title">{{title}}</h1>
+    <span *ngIf="textual; else component_template">{{text}}</span>
+  </div>
+  <div class="button-bar">
+    <div *ngFor="let action of actions; index as i" class="button-outline">
+      <button #action_button
+              class="action"
+              tabindex="0"
+              (click)="onAction(action)"
+              (keydown.tab)="onTab(i, 'next')"
+              (keydown.arrowRight)="onTab(i, 'next')"
+              (keydown.shift.tab)="onTab(i, 'prev')"
+              (keydown.arrowLeft)="onTab(i, 'prev')">
+        {{getActionLabel(action)}}
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #component_template>
+  <ng-container *ngComponentOutlet="componentType; injector: injector"></ng-container>
+</ng-template>

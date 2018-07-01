@@ -1,0 +1,5 @@
+<wb-notification *ngFor="let notification of notifications; trackBy: trackByFn; index as i"
+                 [notification]="notification"
+                 [@notification-enter-or-leave]
+                 (close)="onNotificationClose(i)">
+</wb-notification>

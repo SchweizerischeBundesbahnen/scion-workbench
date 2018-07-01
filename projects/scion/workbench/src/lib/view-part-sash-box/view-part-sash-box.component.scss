@@ -1,0 +1,25 @@
+@import '../workbench.constants';
+
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+
+  &.split-vertical {
+    flex-direction: row;
+  }
+
+  &.split-horizontal {
+    flex-direction: column;
+  }
+
+  > .splitter {
+    flex: 0 0 3px;
+    background-color: $viewpart_sash-bgcolor;
+  }
+
+  > .sash-1, > .sash-2 {
+    flex: 1 1 0;
+    overflow: hidden;
+  }
+}
