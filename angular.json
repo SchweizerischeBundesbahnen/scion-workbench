@@ -3,6 +3,46 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "@scion/workbench": {
+      "root": "projects/scion/workbench",
+      "sourceRoot": "projects/scion/workbench/src",
+      "projectType": "library",
+      "prefix": "wb",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/scion/workbench/tsconfig.lib.json",
+            "project": "projects/scion/workbench/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/scion/workbench/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/workbench/src/test.ts",
+            "tsConfig": "projects/scion/workbench/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/workbench/tsconfig.lib.json",
+              "projects/scion/workbench/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }
   },
   "defaultProject": "scion"
 }

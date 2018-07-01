@@ -1,0 +1,11 @@
+{
+  "name": "@scion/workbench",
+  "version": "0.0.1",
+  "description": "TODO",
+  "author": "Wiehl Daniel <daniel.wiehl@sbb.ch>; Sacchi Adrian <adrian.sacchi@sbb.ch>",
+  "license": "TODO",
+  "peerDependencies": {
+    "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
+    "@angular/core": "^6.0.0-rc.0 || ^6.0.0"
+  }
+}
