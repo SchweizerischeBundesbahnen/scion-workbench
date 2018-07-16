@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2018 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
+
 import { VIEW_REF_PREFIX } from '../workbench.constants';
 import { IterableChanges, IterableDiffer, IterableDiffers } from '@angular/core';
 import { DefaultUrlSerializer } from '@angular/router';
