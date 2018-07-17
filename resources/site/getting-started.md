@@ -1,8 +1,7 @@
 ![SCION Workbench](/resources/site/logo/scion-workbench-banner.png)
 
-[Overview](/README.md) | [Demo](https://blog.sbb.technology/scion-workbench-demo/#/(view.6:heatmap//view.5:person/79//view.4:person/39//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuNiIsInZpZXcuNiJdLCJzYXNoMiI6WyJ2aWV3cGFydC4zIiwidmlldy40Iiwidmlldy40Iiwidmlldy41Il0sInNwbGl0dGVyIjowLjQ4NTk2MTEyMzExMDE1MTEsImhzcGxpdCI6ZmFsc2V9LCJzcGxpdHRlciI6MC41NTk0MjQzMjY4MzM3OTc1LCJoc3BsaXQiOnRydWV9LCJzcGxpdHRlciI6MC4zMjI2Mjc3MzcyMjYyNzczLCJoc3BsaXQiOmZhbHNlfQ%3D%3D) | [Getting Started](/resources/site/getting-started.md) | [How To](/resources/site/how-to.md) | [Contributing](/resources/site/contributing.md) | [Sponsoring](/resources/site/sponsors.md)
-|---|---|---|---|---|---|
-
+[Overview][menu-overview] | [Demo][menu-demo] | [Download][menu-download] | [Getting Started][menu-getting-started] | [How To][menu-how-to] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
+|---|---|---|---|---|---|---|---|
 
 # Getting Started
 
@@ -76,12 +75,12 @@ This includes the workbench frame, with the activity panel to the left, and the 
 ## Step 4: Add icons and typography
 - Download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/wb-font/fonts.zip" download>here</a>, unzip it and put it into `assets/fonts` folder.
 
-- Import the workbench theme in `styles.scss` and include `wb-theme()` sass mixin. This installs the workbench icon font, and will be used in upcoming releases to style the workbench frame.
+- Import the workbench theme in file `styles.scss` and include `wb-theme()` SASS mixin. This installs the workbench icon font, and will be used in upcoming releases to style the workbench frame.
 
 ```sass
 @import '~@scion/workbench/theming';
 
-@include wb-theme((font-path: 'assets/font/'));
+@include wb-theme();
 ``` 
 
 - Use an icon font to provide activity icons:
@@ -225,3 +224,12 @@ export class PersonComponent implements OnDestroy {
   }
 }
 ```
+
+[menu-overview]: /README.md
+[menu-demo]: https://blog.sbb.technology/scion-workbench-demo/#/(view.6:heatmap//view.5:person/79//view.4:person/39//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuNiIsInZpZXcuNiJdLCJzYXNoMiI6WyJ2aWV3cGFydC4zIiwidmlldy40Iiwidmlldy40Iiwidmlldy41Il0sInNwbGl0dGVyIjowLjQ4NTk2MTEyMzExMDE1MTEsImhzcGxpdCI6ZmFsc2V9LCJzcGxpdHRlciI6MC41NTk0MjQzMjY4MzM3OTc1LCJoc3BsaXQiOnRydWV9LCJzcGxpdHRlciI6MC4zMjI2Mjc3MzcyMjYyNzczLCJoc3BsaXQiOmZhbHNlfQ%3D%3D
+[menu-download]: https://www.npmjs.com/package/@scion/workbench
+[menu-getting-started]: /resources/site/getting-started.md
+[menu-how-to]: /resources/site/how-to.md
+[menu-contributing]: /resources/site/contributing.md
+[menu-sponsoring]: /resources/site/sponsors.md
+[menu-links]: /resources/site/links.md
