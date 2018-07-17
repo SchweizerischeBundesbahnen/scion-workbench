@@ -1,8 +1,7 @@
 ![SCION Workbench](/resources/site/logo/scion-workbench-banner.png)
 
-[Overview](/README.md) | [Demo](https://blog.sbb.technology/scion-workbench-demo/#/(view.6:heatmap//view.5:person/79//view.4:person/39//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuNiIsInZpZXcuNiJdLCJzYXNoMiI6WyJ2aWV3cGFydC4zIiwidmlldy40Iiwidmlldy40Iiwidmlldy41Il0sInNwbGl0dGVyIjowLjQ4NTk2MTEyMzExMDE1MTEsImhzcGxpdCI6ZmFsc2V9LCJzcGxpdHRlciI6MC41NTk0MjQzMjY4MzM3OTc1LCJoc3BsaXQiOnRydWV9LCJzcGxpdHRlciI6MC4zMjI2Mjc3MzcyMjYyNzczLCJoc3BsaXQiOmZhbHNlfQ%3D%3D) | [Getting Started](/resources/site/getting-started.md) | [How To](/resources/site/how-to.md) | [Contributing](/resources/site/contributing.md) | [Sponsoring](/resources/site/sponsors.md)
-|---|---|---|---|---|---|
-
+[Overview][menu-overview] | [Demo][menu-demo] | [Download][menu-download] | [Getting Started][menu-getting-started] | [How To][menu-how-to] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
+|---|---|---|---|---|---|---|---|
 
 # How To
 
@@ -83,7 +82,7 @@ constructor(private wbRouter: WorkbenchRouter) {
 }
 
 public openPerson(id: string): void {
-this.wbRouter.navigate(['persons', id]);
+  this.wbRouter.navigate(['persons', id]);
 }
 ```
 
@@ -310,3 +309,12 @@ Currently, we provide a `RemoteSiteComponent` which accepts a URL to load a remo
 <wb-remote-site [url]="url" (urlChange)="onUrlChange($event)"></wb-remote-site>
 ```
 Future plans are to have a thin 'Workbench guest API', which is included in the micro frontend application to communicate with the host application. It will be a simple protocol to provide a manifest with capabilities and ways to interact with the workbench, like to open views, open message boxes or to show notifications.
+
+[menu-overview]: /README.md
+[menu-demo]: https://blog.sbb.technology/scion-workbench-demo/#/(view.6:heatmap//view.5:person/79//view.4:person/39//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuNiIsInZpZXcuNiJdLCJzYXNoMiI6WyJ2aWV3cGFydC4zIiwidmlldy40Iiwidmlldy40Iiwidmlldy41Il0sInNwbGl0dGVyIjowLjQ4NTk2MTEyMzExMDE1MTEsImhzcGxpdCI6ZmFsc2V9LCJzcGxpdHRlciI6MC41NTk0MjQzMjY4MzM3OTc1LCJoc3BsaXQiOnRydWV9LCJzcGxpdHRlciI6MC4zMjI2Mjc3MzcyMjYyNzczLCJoc3BsaXQiOmZhbHNlfQ%3D%3D
+[menu-download]: https://www.npmjs.com/package/@scion/workbench
+[menu-getting-started]: /resources/site/getting-started.md
+[menu-how-to]: /resources/site/how-to.md
+[menu-contributing]: /resources/site/contributing.md
+[menu-sponsoring]: /resources/site/sponsors.md
+[menu-links]: /resources/site/links.md
