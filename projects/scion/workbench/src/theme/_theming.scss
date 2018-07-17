@@ -1,0 +1,20 @@
+/*!
+ * Copyright (c) 2018 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
+
+// This files contains all all the theming functionality.
+
+@import 'font-theme';
+
+/**
+ * Invoke from `index.scss' to style the SCION workbench frame.
+ */
+@mixin wb-theme($theme: ()) {
+  @include wb-font-theme($theme);
+}

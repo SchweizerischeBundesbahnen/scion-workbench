@@ -1,5 +1,4 @@
 @import '../../workbench.constants';
-@import '../../workbench.icon';
 
 @mixin text {
   text-overflow: ellipsis;
@@ -60,6 +59,10 @@
     @include text;
     font-size: 16px;
     font-weight: 400;
+
+    > span.wb-icon-edit {
+      padding-right: .2em;
+    }
   }
 
   > div.heading {
@@ -82,20 +85,11 @@
     color: inherit;
 
     &::before {
-      @include workbench-font;
       content: '\e5cd';
     }
     &:hover::before {
       content: '\e5c9';
     }
-  }
-}
-
-:host-context(.dirty) {
-  .title::before {
-    @include workbench-font;
-    content: '\e254';
-    padding-right: .2em;
   }
 }
 

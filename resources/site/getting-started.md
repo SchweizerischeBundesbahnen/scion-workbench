@@ -6,7 +6,7 @@
 
 # Getting Started
 
-This 'Getting Started' tutorial explains how to install SCION workbench, configures an activity and shows how to open a view.
+This 'Getting Started' tutorial explains how to install SCION workbench, configures an activity and shows how to open a view. For help getting started with a new Angular app, check out the Angular CLI.
 
 ***
 
@@ -75,6 +75,14 @@ This includes the workbench frame, with the activity panel to the left, and the 
 
 ## Step 4: Add icons and typography
 - Download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/wb-font/fonts.zip" download>here</a>, unzip it and put it into `assets/fonts` folder.
+
+- Import the workbench theme in `styles.scss` and include `wb-theme()` sass mixin. This installs the workbench icon font, and will be used in upcoming releases to style the workbench frame.
+
+```sass
+@import '~@scion/workbench/theming';
+
+@include wb-theme((font-path: 'assets/font/'));
+``` 
 
 - Use an icon font to provide activity icons:
 

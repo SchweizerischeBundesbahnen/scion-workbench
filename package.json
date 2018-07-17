@@ -13,7 +13,7 @@
   },
   "scripts": {
     "ng": "ng",
-    "build": "ng build",
+    "build": "ng build --prod @scion/workbench && cp -r projects/scion/workbench/src/theme/** dist/scion/workbench",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

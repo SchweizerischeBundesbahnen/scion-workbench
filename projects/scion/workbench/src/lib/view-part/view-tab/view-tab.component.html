@@ -1,7 +1,9 @@
-<div class="title">{{view.title}}</div>
+<div class="title">
+  <span *ngIf="dirty" class="wb-icon-edit"></span>
+  {{view.title}}</div>
 <div class="heading" *ngIf="view.heading as heading">{{heading}}</div>
 <button *ngIf="view.closable && !view.disabled"
         type="button"
-        class="close"
+        class="close wb-font"
         (click)="onClose($event)">
 </button>

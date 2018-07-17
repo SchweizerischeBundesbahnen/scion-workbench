@@ -1,0 +1,58 @@
+/*!
+ * Copyright (c) 2018 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
+
+/**
+ * Provides SCION workbench icon font.
+ */
+@mixin wb-font-theme($theme) {
+  $font-path: map-get($theme, font-path);
+  $font-path: 'assets/fonts/' !default;
+
+  @font-face {
+    font-family: 'wb-icon';
+    src: url($font-path +  'wb-icon.eot'); /* IE9 Compat Modes */
+    src: url($font-path + 'wb-icon.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url($font-path + 'wb-icon.woff') format('woff'), /* Pretty Modern Browsers */
+    url($font-path + 'wb-icon.ttf') format('truetype'), /* Safari, Android, iOS */
+    url($font-path + 'wb-icon.svg#wb-icon') format('svg'); /* Legacy iOS */
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  .wb-font {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: wb-icon !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased; // better font rendering
+    -moz-osx-font-smoothing: grayscale; // better font rendering
+  }
+
+  .wb-icon-search::before {
+    @extend .wb-font;
+    content: "\e900";
+  }
+  .wb-icon-cancel::before {
+    @extend .wb-font;
+    content: "\e5c9";
+  }
+  .wb-icon-close::before {
+    @extend .wb-font;
+    content: "\e5cd";
+  }
+  .wb-icon-edit::before {
+    @extend .wb-font;
+    content: "\e254";
+  }
+}
