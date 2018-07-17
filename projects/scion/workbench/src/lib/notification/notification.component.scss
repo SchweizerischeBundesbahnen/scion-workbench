@@ -1,5 +1,4 @@
 @import '../workbench.constants';
-@import '../workbench.icon';
 
 $severity-border-size: 6px;
 $border-radius: 4px;
@@ -53,7 +52,6 @@ $border-radius: 4px;
       color: inherit;
 
       &::before {
-        @include workbench-font;
         content: '\e5cd';
       }
       &:hover::before {
