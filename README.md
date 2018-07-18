@@ -1,6 +1,6 @@
 ![SCION Workbench](/resources/site/logo/scion-workbench-banner.png)
 
-[Overview][menu-overview] | [Demo][menu-demo] | [Download][menu-download] | [Getting Started][menu-getting-started] | [How To][menu-how-to] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
+[Overview][menu-overview] | [Demo][menu-demo] | [Getting&nbsp;Started][menu-getting-started] | [How&nbsp;To][menu-how-to] | [Contributing][menu-contributing] | [Changelog][menu-changelog] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
 |---|---|---|---|---|---|---|---|
 
 # Overview
@@ -50,5 +50,6 @@ We would like to thank SBB which supports open source software and made SCION Wo
 [menu-getting-started]: /resources/site/getting-started.md
 [menu-how-to]: /resources/site/how-to.md
 [menu-contributing]: /resources/site/contributing.md
+[menu-changelog]: /resources/site/changelog.md
 [menu-sponsoring]: /resources/site/sponsors.md
 [menu-links]: /resources/site/links.md
