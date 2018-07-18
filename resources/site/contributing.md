@@ -8,8 +8,10 @@
 
 [Contribution](#contribution)\
 [Build SCION Workbench](#build-scion-workbench)\
+[NPM Versioning Guidelines](#npm-versioning-guidelines)\
+[Release Guidelines](#release-guidelines)\
 [Commit Guidelines](#commit-guidelines)\
-[Coding guidelines](#coding-buidelines)\
+[Coding guidelines](#coding-guidelines)\
 [Line endings](#line-endings)
 
 ***
