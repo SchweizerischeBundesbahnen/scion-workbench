@@ -64,10 +64,13 @@ Whenever you publish a new version to NPM (pre-release, major, minor, patch), pl
   ```
 - Change to `dist/scion/workbench` directory and publish the distribution to NPM registry. For pre-release versions, always use `next` distribution tag.
   ```
+  npm config set registry http://registry.npmjs.org
   npm login
   npm publish --tag next // required for pre-release versions
   npm publish // for major, minor or patch release versions
   ```
+
+  SCION workbench packages are published under `@scion` scope. In order to publish a new version, you must be member of SCION organization, and have 2FA (Two Factor Authentication) enabled in your NPM user account. To get access to SCION organization, please file an issue in the project issue tracker.
 
 ## Commit Guidelines
 We believe in a compact and well written Git commit history. Every commit should be a logically separate changeset.
