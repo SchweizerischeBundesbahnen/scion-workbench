@@ -6,6 +6,6 @@
     - wb.svg
     - wb.ttf
     - wb.woff
-5. Copy CSS classes from './icomoon_generated/style.css' into 'workbench.icon.scss'
+5. Copy CSS classes from './icomoon_generated/style.css' into 'projects/scion/workbench/src/theme/_font-theme.scss'
    >> Use '::' instead of ':' to specify '::before' pseudo-element (valid CSS)
 6. Create 'fonts.zip' and put it to '/resources/wb-font'
