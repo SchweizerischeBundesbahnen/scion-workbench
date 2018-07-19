@@ -26,7 +26,7 @@
     font-style: normal;
   }
 
-  .wb-font {
+  .wb-icons {
     /* use !important to prevent issues with browser extensions that change fonts */
     font-family: wb-icon !important;
     speak: none;
@@ -40,19 +40,19 @@
   }
 
   .wb-icon-search::before {
-    @extend .wb-font;
+    @extend .wb-icons;
     content: "\e900";
   }
   .wb-icon-cancel::before {
-    @extend .wb-font;
+    @extend .wb-icons;
     content: "\e5c9";
   }
   .wb-icon-close::before {
-    @extend .wb-font;
+    @extend .wb-icons;
     content: "\e5cd";
   }
   .wb-icon-edit::before {
-    @extend .wb-font;
+    @extend .wb-icons;
     content: "\e254";
   }
 }
