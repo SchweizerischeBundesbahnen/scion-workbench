@@ -49,7 +49,7 @@ We would like to thank SBB which supports open source software and made SCION Wo
 [menu-download]: https://www.npmjs.com/package/@scion/workbench
 [menu-getting-started]: /resources/site/getting-started.md
 [menu-how-to]: /resources/site/how-to.md
-[menu-contributing]: /resources/site/contributing.md
+[menu-contributing]: /CONTRIBUTING.md
 [menu-changelog]: /resources/site/changelog.md
 [menu-sponsoring]: /resources/site/sponsors.md
 [menu-links]: /resources/site/links.md
