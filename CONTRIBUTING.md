@@ -17,7 +17,9 @@
 ***
 
 ## Contribution
-We encourage other developers to join the project and contribute to make SCION Workbench constantly better and more stable. If you are missing a feature, please create a feature request so we can discuss it and coordinate further development. To report a bug, please check existing issues first, and if found, leave a comment on the issue. Otherwise, file a bug or create a pull request. Please be in mind that large pull requests take a lot of time to review.
+We encourage other developers to join the project and contribute to make SCION Workbench constantly better and more stable. If you are missing a feature, please create a feature request so we can discuss it and coordinate further development. To report a bug, please check existing issues first, and if found, leave a comment on the issue. Otherwise, file a bug or create a pull request.
+
+If creating a pull request, please name the branch in the form 'feature/xyz' with 'xyz' as the name of your pull request and stick to the [Commit Guidelines](#commit-guidelines). Also be in mind that large pull requests take a lot of time to review.
 
 ## Build SCION Workbench
 The project is built with Travis CI and is automatically built, its tests executed and linted as you push it to GitHub.
