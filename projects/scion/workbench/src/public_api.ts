@@ -22,6 +22,8 @@ export { DimensionDirective, Dimension } from './lib/wb-dimension.directive';
 export { RemoteSiteComponent } from './lib/remote-site/remote-site.component';
 export { OverlayHostRef } from './lib/overlay-host-ref.service';
 export { WbActivityDirective } from './lib/activity-part/wb-activity.directive';
+export { ActivityPartComponent } from './lib/activity-part/activity-part.component';
+export { WorkbenchActivityPartService } from './lib/activity-part/workbench-activity-part.service';
 export { WbActivityActionDirective } from './lib/activity-part/wb-activity-action.directive';
 export { Notification, Duration } from './lib/notification/notification';
 export { NotificationService } from './lib/notification/notification.service';
