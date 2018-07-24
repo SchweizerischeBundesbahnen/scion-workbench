@@ -39,24 +39,27 @@ import { WbPortalOutletComponent } from './portal/wb-portal-outlet.component';
 import { ViewPartGridUrlObserver } from './view-part-grid/view-part-grid-url-observer.service';
 import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
-import { WorkbenchRouter } from './routing/workbench-router.service';
+import { InternalWorkbenchRouter, WorkbenchRouter } from './routing/workbench-router.service';
 import { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './routing/wb-router-link.directive';
 import { WorkbenchViewRegistry } from './workbench-view-registry.service';
 import { OverlayHostRef } from './overlay-host-ref.service';
 import { ViewOutletUrlObserver } from './routing/view-outlet-url-observer.service';
-import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
 import { WbActivityActionDirective } from './activity-part/wb-activity-action.directive';
 import { WbActivityDirective } from './activity-part/wb-activity.directive';
 import { MoveDirective } from './move.directive';
 import { WorkbenchConfig } from './workbench.config';
 import { OverlayTemplateOutletDirective } from './overlay-template-outlet.directive';
-import { NLS_DEFAULTS } from './workbench.constants';
+import { ROUTE_REUSE_PROVIDER } from './workbench.constants';
 import { NotificationService } from './notification/notification.service';
 import { NotificationListComponent } from './notification/notification-list.component';
 import { NotificationComponent } from './notification/notification.component';
 import { MessageBoxStackComponent } from './message-box/message-box-stack.component';
 import { MessageBoxComponent } from './message-box/message-box.component';
 import { APP_MESSAGE_BOX_SERVICE, MessageBoxService } from './message-box/message-box.service';
+import { EmptyOutletComponent } from './routing/empty-outlet.component';
+import { ViewRegistrySynchronizer } from './routing/view-registry-synchronizer.service';
+import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
+import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
 
 const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 
@@ -97,6 +100,7 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     MessageBoxComponent,
     MoveDirective,
     OverlayTemplateOutletDirective,
+    EmptyOutletComponent,
   ],
   exports: [
     WorkbenchComponent,
@@ -113,9 +117,9 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 })
 export class WorkbenchModule {
 
-  // Specify services to be loaded eagerly
+  // Specify services to be instantiated eagerly
   constructor(@Optional() @SkipSelf() parentModule: WorkbenchModule,
-              viewRegistry: WorkbenchViewRegistry) {
+              viewRegistrySynchronizer: ViewRegistrySynchronizer) {
     WorkbenchModule.throwIfAlreadyLoaded(parentModule);
   }
 
@@ -141,12 +145,11 @@ export class WorkbenchModule {
    * export class AppModule { }
    * ```
    */
-  public static forRoot(config: WorkbenchConfig = {nls: NLS_DEFAULTS}): ModuleWithProviders {
+  public static forRoot(config: WorkbenchConfig = {}): ModuleWithProviders {
     return {
       ngModule: WorkbenchModule,
       providers: [
         WorkbenchService,
-        WorkbenchRouter,
         WorkbenchLayoutService,
         WorkbenchActivityPartService,
         NotificationService,
@@ -156,7 +159,12 @@ export class WorkbenchModule {
         ViewPartGridUrlObserver,
         WbBeforeDestroyGuard,
         WorkbenchViewRegistry,
+        ViewRegistrySynchronizer,
         OverlayHostRef,
+        InternalWorkbenchRouter,
+        {
+          provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter
+        },
         {
           provide: APP_MESSAGE_BOX_SERVICE,
           useExisting: MessageBoxService
@@ -176,6 +184,16 @@ export class WorkbenchModule {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
           multi: true,
           useValue: ViewComponent
+        },
+        {
+          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
+          multi: true,
+          useValue: EmptyOutletComponent
+        },
+        {
+          provide: ROUTE_REUSE_PROVIDER,
+          multi: true,
+          useClass: WbActivityRouteReuseProvider
         },
         {
           provide: RouteReuseStrategy,

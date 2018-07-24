@@ -109,6 +109,6 @@ export class WbActivityDirective implements OnChanges {
 
     const commands = this.routerLink;
     this._commands = (commands ? (Array.isArray(commands) ? commands : commands.split('/').filter(Boolean)) : []);
-    this._path = this.commands.filter(it => typeof it !== 'object').join();
+    this._path = this.commands.filter(it => typeof it !== 'object').join('/');
   }
 }

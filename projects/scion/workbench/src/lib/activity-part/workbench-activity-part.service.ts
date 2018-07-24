@@ -9,13 +9,13 @@
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { ActivatedRoute, ActivatedRouteSnapshot, NavigationEnd, PRIMARY_OUTLET, Router, Routes, UrlSegment } from '@angular/router';
+import { DefaultUrlSerializer, NavigationEnd, Router, UrlSegment } from '@angular/router';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
-import { WB_ROUTE_REUSE_IDENTITY_PARAM } from '../routing/routing-params.constants';
 import { ACTIVITY_OUTLET_NAME } from '../workbench.constants';
 import { WbActivityDirective } from './wb-activity.directive';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
+import { InternalWorkbenchRouter } from '../routing/workbench-router.service';
+import { UrlSegmentGroup } from '@angular/router/src/url_tree';
 
 @Injectable()
 export class WorkbenchActivityPartService implements OnDestroy {
@@ -24,12 +24,10 @@ export class WorkbenchActivityPartService implements OnDestroy {
   private _activeActivity: WbActivityDirective;
   public activities: WbActivityDirective[] = [];
 
-  constructor(private _router: Router,
-              private _wbRouter: WorkbenchRouter,
-              route: ActivatedRoute) {
+  constructor(private _router: Router, private _wbRouter: InternalWorkbenchRouter) {
     // Register all primary routes as activity auxiliary routes
-    const routes = this.createAuxiliaryRoutes();
-    this.installRoutes([...this._router.config, ...routes]);
+    const routes = this._wbRouter.createAuxiliaryRoutesFor(ACTIVITY_OUTLET_NAME);
+    this._wbRouter.replaceRouterConfig([...this._router.config, ...routes]);
 
     // Subscribe for routing events to open/close activity panel
     this._router.events
@@ -38,11 +36,13 @@ export class WorkbenchActivityPartService implements OnDestroy {
         takeUntil(this._destroy$)
       )
       .subscribe(() => {
-        const activeActivityRoute = route.snapshot.root.children.find(it => it.outlet === ACTIVITY_OUTLET_NAME);
-        this._activeActivity = activeActivityRoute && this.resolveElseThrow(activeActivityRoute) || null;
+        this._activeActivity = this.parseActivityFromUrl(this._router.url);
       });
   }
 
+  /**
+   * Returns the activity which is currently toggled.
+   */
   public get activeActivity(): WbActivityDirective {
     return this._activeActivity;
   }
@@ -73,38 +73,25 @@ export class WorkbenchActivityPartService implements OnDestroy {
     this._destroy$.next();
   }
 
-  private createAuxiliaryRoutes(): Routes {
-    const primaryRoutes = this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
-    return primaryRoutes.map(it => {
-      return {
-        ...it,
-        outlet: ACTIVITY_OUTLET_NAME,
-        data: {
-          ...it.data,
-          [WB_ROUTE_REUSE_IDENTITY_PARAM]: {}, // do not destroy component when switching between activities
-        }
-      };
-    });
-  }
+  private parseActivityFromUrl(url: string): WbActivityDirective {
+    const activitySegmentGroup: UrlSegmentGroup = new DefaultUrlSerializer()
+      .parse(url)
+      .root.children[ACTIVITY_OUTLET_NAME];
 
-  private installRoutes(routes: Routes): void {
-    // Note: Do not use Router.resetConfig(...) which would destroy any currently routed component.
-    this._router.config = routes;
-  }
-
-  /**
-   * Resolves the activity which matches the given URL path, or throws an error if not found.
-   */
-  public resolveElseThrow(route: ActivatedRouteSnapshot): WbActivityDirective {
-    if (route.outlet !== ACTIVITY_OUTLET_NAME) {
-      throw Error('Illegal state: Not in the context of an activity');
+    if (!activitySegmentGroup) {
+      return null; // no activity selected
     }
 
-    const path = route.url.map((segment: UrlSegment) => segment.path).join();
-    const activity = this.activities.find(it => it.path === path);
+    // Resolve the activity
+    const activityPath = activitySegmentGroup.segments.map((it: UrlSegment) => it.path).join('/');
+    const activity = this.activities
+      .filter(it => it.target === 'activity-panel')
+      .find(it => it.path === activityPath);
+
     if (!activity) {
-      throw Error('Illegal state: unknown activity');
+      throw Error(`Illegal state: unknown activity in URL [${activityPath}]`);
     }
+
     return activity;
   }
 }

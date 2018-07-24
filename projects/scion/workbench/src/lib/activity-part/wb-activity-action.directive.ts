@@ -9,7 +9,6 @@
  */
 
 import { Directive, OnDestroy, Optional, TemplateRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { WbActivityDirective } from './wb-activity.directive';
 import { WorkbenchActivityPartService } from './workbench-activity-part.service';
 
@@ -36,13 +35,12 @@ export class WbActivityActionDirective implements OnDestroy {
   private readonly _activity: WbActivityDirective;
 
   constructor(@Optional() private _template: TemplateRef<void>,
-              activityService: WorkbenchActivityPartService,
-              route: ActivatedRoute) {
+              activityService: WorkbenchActivityPartService) {
     if (!this._template) {
       throw Error('Illegal usage: Host element of this modelling directive must be a <ng-template>');
     }
 
-    this._activity = activityService.resolveElseThrow(route.snapshot);
+    this._activity = activityService.activeActivity;
     this._activity.registerAction(this._template);
   }
 
