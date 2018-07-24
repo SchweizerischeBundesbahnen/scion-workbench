@@ -83,7 +83,7 @@ As a general rule, your messages should start with a single line in imperative p
 Example:
 
 ```
-#Issue: Capitalized, short summary of changes in imperative present tense
+Capitalized, short summary of changes in imperative present tense (#issue)
 
 More detailed explanatory text, if necessary.
 ```
