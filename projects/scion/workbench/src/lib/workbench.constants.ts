@@ -9,6 +9,7 @@
  */
 
 import { InjectionToken } from '@angular/core';
+import { WbRouteReuseProvider } from './routing/wb-route-reuse-strategy.service';
 
 /**
  * DI injection token to inject a router outlet name for {WbRouterOutletDirective}.
@@ -16,6 +17,13 @@ import { InjectionToken } from '@angular/core';
  * This is due to a restriction of Angular {RouterOutlet} which does not support for dynamic router outlet names.
  */
 export const ROUTER_OUTLET_NAME = new InjectionToken<string>('ROUTER_OUTLET_NAME');
+
+/**
+ * Multi DI injection token to control which routes to reuse.
+ *
+ * @see WbRouteReuseProvider
+ */
+export const ROUTE_REUSE_PROVIDER = new InjectionToken<WbRouteReuseProvider>('ROUTE_REUSE_PROVIDER');
 
 /**
  * Represents the name of the activity router outlet.

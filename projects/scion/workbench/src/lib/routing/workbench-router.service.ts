@@ -10,17 +10,46 @@
 
 import { Injectable } from '@angular/core';
 import { VIEW_GRID_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
-import { DefaultUrlSerializer, NavigationExtras, Router, UrlSegment } from '@angular/router';
+import { DefaultUrlSerializer, NavigationExtras, PRIMARY_OUTLET, Router, Routes, UrlSegment } from '@angular/router';
 import { WorkbenchService } from '../workbench.service';
 import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { WorkbenchView } from '../workbench.model';
+import { EmptyOutletComponent } from './empty-outlet.component';
 
 /**
  * Provides the workbench view navigation capabilities bases on Angular Router.
  */
+export abstract class WorkbenchRouter {
+
+  /**
+   * Navigate based on the provided array of commands, and is like 'Router.navigate(...)' but with a workbench view as the routing target.
+   *
+   * Use matrix parameters to associate optional data with the view outlet URL.
+   * Matrix parameters are like regular URL parameters, but do not affect route resolution.
+   * Unlike query parameters, matrix parameters are part of the routing path, which makes them suitable for auxiliary routes.
+   * Also, matrix parameters are removed upon destruction of the view outlet, and parameter names must not be qualified with the view identity.
+   *
+   * ### Usage
+   *
+   * ```
+   * router.navigate(['team', 33, 'user', 11]);
+   * router.navigate(['teams', {selection: 33'}]); // matrix parameter 'selection' with the value '33'.
+   * ```
+   *
+   * @see WbRouterLinkDirective
+   */
+  public abstract navigate(commands: any[], extras: WbNavigationExtras): Promise<boolean>;
+
+  /**
+   * Resolves open views which match the given URL path.
+   */
+  public abstract resolve(commands: any[]): WorkbenchView[];
+}
+
 @Injectable()
-export class WorkbenchRouter {
+export class InternalWorkbenchRouter implements WorkbenchRouter {
+
 
   constructor(private _router: Router,
               private _workbench: WorkbenchService,
@@ -108,6 +137,44 @@ export class WorkbenchRouter {
         return this._viewRegistry.getElseThrow(viewRef);
       });
   }
+
+
+  /**
+   * Replaces the router configuration to install or uninstall auxiliary routes.
+   */
+  public replaceRouterConfig(config: Routes): void {
+    // Note: Do not use Router.resetConfig(...) which would destroy any currently routed component because copying all routes.
+    this._router.config = config;
+  }
+
+  /**
+   * Creates a named auxiliary route for every primary route found in the router config.
+   * This allows all primary routes to be used in a named router outlet of the given outlet name.
+   *
+   * @param outlet for which to create named auxiliary routes
+   * @param params optional parametrization of the auxilary route
+   */
+  public createAuxiliaryRoutesFor(outlet: string, params: AuxiliaryRouteParams = {}): Routes {
+    const primaryRoutes = this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
+
+    return primaryRoutes.map(it => {
+      return {
+        ...it,
+        outlet: outlet,
+        component: it.component || EmptyOutletComponent, // used for lazy loading of aux routes; see Angular PR #23459
+        canDeactivate: [...(it.canDeactivate || []), ...(params.canDeactivate || [])],
+      };
+    });
+  }
+}
+
+/**
+ * Controls creation of auxiliary routes for named router outlets.
+ *
+ * @internal
+ */
+export interface AuxiliaryRouteParams {
+  canDeactivate?: any[];
 }
 
 /**

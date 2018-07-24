@@ -17,6 +17,12 @@ export class WorkbenchConfig {
 
   nls?: { [key: string]: string } = NLS_DEFAULTS;
 
+  /**
+   * Specifies whether to reuse routes of activities.
+   * If set to 'true', which is by default, activity components are not destroyed when toggling the activity.
+   */
+  reuseActivityRoutes?: boolean = true; // tslint:disable-line:no-inferrable-types
+
   constructor(config: WorkbenchConfig) {
     Object.keys(config)
       .filter(key => typeof config[key] !== 'undefined')
