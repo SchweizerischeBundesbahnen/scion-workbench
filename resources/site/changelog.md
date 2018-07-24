@@ -5,9 +5,15 @@
 
 # Changelog
 
+<a name="0.0.0-beta.6"></a>
+## [0.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.5...0.0.0-beta.6) (2018-07-24)
+
+### Bug Fixes
+
+* Make parameter 'extras' of method 'WorkbenchRouter.navigate(any[], WbNavigationExtras)' optional ([#5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/5)) ([76544aa](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/76544aa))
+
 <a name="0.0.0-beta.5"></a>
 ## [0.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.4...0.0.0-beta.5) (2018-07-24)
-
 
 ### Bug Fixes
 
