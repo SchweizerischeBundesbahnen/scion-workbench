@@ -15,9 +15,7 @@ import { PortalInjector } from '@angular/cdk/portal';
 import { ViewComponent } from './view/view.component';
 import { WorkbenchService } from './workbench.service';
 import { WbComponentPortal } from './portal/wb-component-portal';
-import { ViewOutletUrlObserver } from './routing/view-outlet-url-observer.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 /**
  * Registry for {WorkbenchView} objects.
@@ -30,39 +28,22 @@ export class WorkbenchViewRegistry implements OnDestroy {
 
   constructor(private _injector: Injector,
               private _componentFactoryResolver: ComponentFactoryResolver,
-              private _workbench: WorkbenchService,
-              viewOutletUrlObserver: ViewOutletUrlObserver) {
-
-    viewOutletUrlObserver.viewOutletAdd$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((viewRef: string) => {
-        this._viewRegistry.set(viewRef, this.createWorkbenchView(viewRef));
-      });
-
-    viewOutletUrlObserver.viewOutletRemove$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((viewRef: string) => {
-        this._viewRegistry.get(viewRef).portal.destroy();
-        this._viewRegistry.delete(viewRef);
-      });
+              private _workbench: WorkbenchService) {
   }
 
-  private createWorkbenchView(viewRef: string): InternalWorkbenchView {
-    const portal = new WbComponentPortal<ViewComponent>(this._componentFactoryResolver, ViewComponent);
-    const view = new InternalWorkbenchView(viewRef, this._workbench, portal);
+  /**
+   * Creates a {WorkbenchView} for the given view reference and adds it to this registry.
+   */
+  public addViewOutlet(viewRef: string): void {
+    this._viewRegistry.set(viewRef, this.createWorkbenchView(viewRef));
+  }
 
-    const injectionTokens = new WeakMap();
-    injectionTokens.set(ROUTER_OUTLET_NAME, viewRef);
-    injectionTokens.set(WorkbenchView, view);
-    injectionTokens.set(InternalWorkbenchView, view);
-
-    portal.init({
-      injector: new PortalInjector(this._injector, injectionTokens),
-      onActivate: (): void => view.activate(true),
-      onDeactivate: (): void => view.activate(false),
-    });
-
-    return view;
+  /**
+   * Destroys the view of the given view reference and removes it from this registry.
+   */
+  public removeViewOutlet(viewRef: string): void {
+    this._viewRegistry.get(viewRef).portal.destroy();
+    this._viewRegistry.delete(viewRef);
   }
 
   /**
@@ -99,5 +80,23 @@ export class WorkbenchViewRegistry implements OnDestroy {
 
   public ngOnDestroy(): void {
     this._destroy$.next();
+  }
+
+  private createWorkbenchView(viewRef: string): InternalWorkbenchView {
+    const portal = new WbComponentPortal<ViewComponent>(this._componentFactoryResolver, ViewComponent);
+    const view = new InternalWorkbenchView(viewRef, this._workbench, portal);
+
+    const injectionTokens = new WeakMap();
+    injectionTokens.set(ROUTER_OUTLET_NAME, viewRef);
+    injectionTokens.set(WorkbenchView, view);
+    injectionTokens.set(InternalWorkbenchView, view);
+
+    portal.init({
+      injector: new PortalInjector(this._injector, injectionTokens),
+      onActivate: (): void => view.activate(true),
+      onDeactivate: (): void => view.activate(false),
+    });
+
+    return view;
   }
 }

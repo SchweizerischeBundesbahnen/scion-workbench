@@ -29,5 +29,6 @@ export { Notification, Duration } from './lib/notification/notification';
 export { NotificationService } from './lib/notification/notification.service';
 export { MessageBox, Action } from './lib/message-box/message-box';
 export { MessageBoxService } from './lib/message-box/message-box.service';
-export { WB_REMOTE_URL_PARAM, WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM, WB_ROUTE_REUSE_IDENTITY_PARAM }  from './lib/routing/routing-params.constants';
-export { Severity, NLS_DEFAULTS } from './lib/workbench.constants';
+export { WB_REMOTE_URL_PARAM, WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM }  from './lib/routing/routing-params.constants';
+export { Severity, NLS_DEFAULTS, ROUTE_REUSE_PROVIDER } from './lib/workbench.constants';
+export { WbRouteReuseProvider, WbRouteReuseStrategy } from './lib/routing/wb-route-reuse-strategy.service';

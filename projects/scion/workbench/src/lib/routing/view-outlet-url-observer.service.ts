@@ -8,12 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { GuardsCheckEnd, NavigationStart, PRIMARY_OUTLET, Route, Router, Routes } from '@angular/router';
+import { GuardsCheckEnd, NavigationStart, Route, Router } from '@angular/router';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Injectable, IterableDiffers, OnDestroy } from '@angular/core';
-import { WbBeforeDestroyGuard } from '../view/wb-before-destroy.guard';
 import { Observable, Subject } from 'rxjs';
 import { ViewOutletDiffer } from './view-outlet-differ';
+import { WbBeforeDestroyGuard } from '../view/wb-before-destroy.guard';
+import { InternalWorkbenchRouter } from './workbench-router.service';
 
 /**
  * Provides the ability to watch for changes being made to view outlets in the URL
@@ -31,7 +32,7 @@ export class ViewOutletUrlObserver implements OnDestroy {
 
   private _undoRouteRegistrationFn: () => void;
 
-  constructor(private _router: Router, differs: IterableDiffers) {
+  constructor(private _router: Router, private _wbRouter: InternalWorkbenchRouter, differs: IterableDiffers) {
     this.installNavigationStartRoutingListener(differs);
     this.installGuardsCheckEndRoutingListener(differs);
   }
@@ -48,16 +49,16 @@ export class ViewOutletUrlObserver implements OnDestroy {
       // Register auxiliary routes for added view outlets.
       const newAuxiliaryRoutes: Route[] = [];
       viewOutletChanges.forEachAddedItem(({item}) => {
-        newAuxiliaryRoutes.push(...this.createAuxiliaryRoutesFor(item));
+        newAuxiliaryRoutes.push(...this._wbRouter.createAuxiliaryRoutesFor(item, {canDeactivate: [WbBeforeDestroyGuard]}));
       });
 
       // Prepare undo action in case navigation is rejected, e.g. by routing guard.
       this._undoRouteRegistrationFn = (): void => {
         differ.diff(this._router.url); // undo stateful differ
-        this.installRoutes(this._router.config.filter(route => !newAuxiliaryRoutes.includes(route)));
+        this._wbRouter.replaceRouterConfig(this._router.config.filter(route => !newAuxiliaryRoutes.includes(route)));
       };
 
-      this.installRoutes([...this._router.config, ...newAuxiliaryRoutes]);
+      this._wbRouter.replaceRouterConfig([...this._router.config, ...newAuxiliaryRoutes]);
     }
   }
 
@@ -88,27 +89,11 @@ export class ViewOutletUrlObserver implements OnDestroy {
         this._viewOutletRemove$.next(item);
       });
 
-      this.installRoutes(routes.filter(route => !discardedRoutes.includes(route)));
+      // Uninstall discarded routes
+      if (discardedRoutes.length > 0) {
+        this._wbRouter.replaceRouterConfig(routes.filter(route => !discardedRoutes.includes(route)));
+      }
     }
-  }
-
-  private installRoutes(routes: Routes): void {
-    // Note: Do not use Router.resetConfig(...) which would destroy any currently routed component.
-    this._router.config = routes;
-  }
-
-  private get primaryRoutes(): Routes {
-    return this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
-  }
-
-  private createAuxiliaryRoutesFor(viewOutlet: string): Routes {
-    return this.primaryRoutes.map(it => {
-      return {
-        ...it,
-        outlet: viewOutlet,
-        canDeactivate: [...it.canDeactivate || [], WbBeforeDestroyGuard]
-      };
-    });
   }
 
   /***

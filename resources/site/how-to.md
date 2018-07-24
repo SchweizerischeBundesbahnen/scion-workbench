@@ -18,7 +18,8 @@ This section contains some guidance how to accomplish some common tasks.
 [How to set an icon for an activity](#how-to-set-an-icon-for-an-activity)\
 [How to pop up a message box](#how-to-pop-up-a-message-box)\
 [How to show a notification](#how-to-show-a-notification)\
-[How to integrate a micro frontend](#how-to-integrate-a-micro-frontend)
+[How to integrate a micro frontend](#how-to-integrate-a-micro-frontend)\
+[How to open activities and views of lazy loaded modules](#how-to-open-activities-and-views-of-lazy-loaded-modules)
 
 ***
 
@@ -309,6 +310,109 @@ Currently, we provide a `RemoteSiteComponent` which accepts a URL to load a remo
 <wb-remote-site [url]="url" (urlChange)="onUrlChange($event)"></wb-remote-site>
 ```
 Future plans are to have a thin 'Workbench guest API', which is included in the micro frontend application to communicate with the host application. It will be a simple protocol to provide a manifest with capabilities and ways to interact with the workbench, like to open views, open message boxes or to show notifications.
+
+## How to open activities and views of lazy loaded modules
+
+There is nothing special in opening views or activities of lazy loaded modules. The magic is done by Angular router.
+
+Follow the steps below to create a feature module and open its activity and views.
+
+### 1. Create a feature module with routing capability using Angular command-line tool
+   
+The following commands create the feature module named 'feature', an activity component and two view components:
+
+```
+ng generate module feature --routing
+
+ng generate component feature/activity
+ng generate component feature/view1
+ng generate component feature/view2
+```
+
+### 2. In `FeatureRoutingModule`, add the routes to the activity component and the two view components
+
+```javascript
+const routes: Routes = [
+  {
+    path: '',
+    component: ActivityComponent
+  },      
+  {
+    path: 'view-1',
+    component: View1Component
+  },
+  {
+    path: 'view-2',
+    component: View2Component
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class FeatureRoutingModule {
+}
+```
+### 3. In `AppRoutingModule`, update the routes array to point to the feature module
+
+```javascript
+const routes: Routes = [
+  {
+    path: 'feature', // base path to the feature module
+    loadChildren: './feature/feature.module#FeatureModule'
+  },      
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+}
+```
+Notice that the lazy loading syntax uses loadChildren followed by a string that is the relative path to the module, a hash mark or #, and the module’s class name. It is important to pass a string instead of a symbol to not load the module eagerly.
+
+### 4. In `app.component.html`, add an activity to open the activity of the feature module
+```html
+<wb-workbench>
+  <wb-activity title="Activity of feature module"
+                label="star_outline"
+                cssClass="material-icons"
+                routerLink="feature">
+  </wb-activity>
+</wb-workbench>
+```
+### 5. To open the views of the feature module, either model them as activities with target `view`, or create an activity component in `AppModule` and use `wbRouterLink`
+  
+  * Option 1: Open views of the feature module via activity buttons:
+ 
+    ```html
+    <wb-workbench>
+      <wb-activity title="View 1 of feature module"
+                   label="view_module"
+                   cssClass="material-icons"
+                   routerLink="feature/view-1"
+                   target="view">
+      </wb-activity>
+      <wb-activity title="View 2 of feature module"
+                   label="dashboard"
+                   cssClass="material-icons"
+                   routerLink="feature/view-2"
+                   target="view">
+      </wb-activity>
+    </wb-workbench>
+    ```
+  * Option 2: Open views of the feature module via workbench router link:
+    
+    If not having an activity in your app module yet, create an activity component using Angular CLI, register a route to that component and add the activity as content child to `<wb-workbench>...</wb-workbench>`.
+    
+    Then, add the following links to the template of the activity component to open the views of the feature module:
+
+    ```html
+    <a wbRouterLink="feature/view-1">Open View 1</a>
+    <a wbRouterLink="feature/view-2">Open View 2</a>
+    ```
 
 [menu-overview]: /README.md
 [menu-demo]: https://blog.sbb.technology/scion-workbench-demo/#/(view.6:heatmap//view.5:person/79//view.4:person/39//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuNiIsInZpZXcuNiJdLCJzYXNoMiI6WyJ2aWV3cGFydC4zIiwidmlldy40Iiwidmlldy40Iiwidmlldy41Il0sInNwbGl0dGVyIjowLjQ4NTk2MTEyMzExMDE1MTEsImhzcGxpdCI6ZmFsc2V9LCJzcGxpdHRlciI6MC41NTk0MjQzMjY4MzM3OTc1LCJoc3BsaXQiOnRydWV9LCJzcGxpdHRlciI6MC4zMjI2Mjc3MzcyMjYyNzczLCJoc3BsaXQiOmZhbHNlfQ%3D%3D

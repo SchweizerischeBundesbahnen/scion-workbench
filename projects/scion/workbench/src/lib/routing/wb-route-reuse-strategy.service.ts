@@ -9,49 +9,93 @@
  */
 
 import { ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy } from '@angular/router';
-import { WB_ROUTE_REUSE_IDENTITY_PARAM } from './routing-params.constants';
+import { Inject, Injectable, Optional } from '@angular/core';
+import { ROUTE_REUSE_PROVIDER } from '../workbench.constants';
 
 /**
- * Like {DefaultRouteReuseStrategy}, but does not destroy the routed component if associated with a re-use identity.
+ * Route reuse strategy which delegates to registered {WbRouteReuseProvider} objects
+ * to control which routes to reuse. Multiple providers may coexist.
  *
- * This strategy is used in workbench activity part to not destroy the activity when switching to another activity.
+ * SCION Workbench registers {WbActivityRouteReuseProvider} to reuse activity routes.
+ *
+ * Providers are registered under DI injection token {ROUTE_REUSE_PROVIDER} with 'multi' flag set to 'true'.
  */
+@Injectable()
 export class WbRouteReuseStrategy implements RouteReuseStrategy {
 
-  private _handleMap = new Map<any, DetachedRouteHandle>();
+  private readonly _routeCache = new Map<any, DetachedRouteHandle>();
+  private readonly _routeReuseProviders: WbRouteReuseProvider[];
 
-  public shouldDetach(route: ActivatedRouteSnapshot): boolean {
-    return this.resolveRouteReuseIdentityElseNull(route) !== null;
+  constructor(@Optional() @Inject(ROUTE_REUSE_PROVIDER) providers: WbRouteReuseProvider[]) {
+    this._routeReuseProviders = providers || [];
   }
 
-  public store(route: ActivatedRouteSnapshot, handle: DetachedRouteHandle): void {
-    const identity = this.resolveRouteReuseIdentityElseNull(route);
-    if (!identity) {
-      return;
-    }
+  /**
+   * Invoke to invalidate routes to be reused, e.g. upon logout.
+   */
+  public invalidate(): void {
+    this._routeCache.clear();
+  }
 
-    if (handle === null) {
-      this._handleMap.delete(identity);
-    } else {
-      this._handleMap.set(identity, handle);
-    }
+  public shouldDetach(route: ActivatedRouteSnapshot): boolean {
+    return this.computeReuseKey(route) !== null;
   }
 
   public shouldAttach(route: ActivatedRouteSnapshot): boolean {
-    const identity = this.resolveRouteReuseIdentityElseNull(route);
-    return identity && this._handleMap.has(identity) || false;
+    const reuseKey = this.computeReuseKey(route);
+    return reuseKey && this._routeCache.has(reuseKey) || false;
+  }
+
+  public store(route: ActivatedRouteSnapshot, handle: DetachedRouteHandle): void {
+    const reuseKey = this.computeReuseKey(route);
+
+    if (handle === null) {
+      this._routeCache.delete(reuseKey);
+    } else {
+      this._routeCache.set(reuseKey, handle);
+    }
   }
 
   public retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle | null {
-    const identity = this.resolveRouteReuseIdentityElseNull(route);
-    return identity && this._handleMap.get(identity) || null;
+    const reuseKey = this.computeReuseKey(route);
+    return this._routeCache.get(reuseKey) || null;
   }
 
   public shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
-    return future.routeConfig === curr.routeConfig;
+    return future.routeConfig === curr.routeConfig; // same as Angular DefaultRouteReuseStrategy
   }
 
-  private resolveRouteReuseIdentityElseNull(route: ActivatedRouteSnapshot): any {
-    return route.data[WB_ROUTE_REUSE_IDENTITY_PARAM] || route.paramMap[WB_ROUTE_REUSE_IDENTITY_PARAM] || null;
+  /**
+   * Computes the reuse key for the given route, or returns 'null' if not to be reused.
+   * The first key returned by any provider is used.
+   */
+  protected computeReuseKey(route: ActivatedRouteSnapshot): string | null {
+    for (const provider of this._routeReuseProviders) {
+      const reuseKey = provider.computeReuseKey(route);
+      if (reuseKey) {
+        return reuseKey;
+      }
+    }
+
+    return null;
   }
+}
+
+/**
+ * Controls which routes to reuse.
+ *
+ *
+ * Example registration:
+ *
+ * providers: [
+ *   ...
+ *   { provide: ROUTE_REUSE_PROVIDER, multi: true, useClass: <your provider class> }
+ * ]
+ */
+export interface WbRouteReuseProvider {
+
+  /**
+   * Computes a reuse key if the given route should be reused, or returns 'null' otherwise.
+   */
+  computeReuseKey(route: ActivatedRouteSnapshot): any;
 }
