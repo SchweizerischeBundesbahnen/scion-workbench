@@ -39,7 +39,7 @@ export abstract class WorkbenchRouter {
    *
    * @see WbRouterLinkDirective
    */
-  public abstract navigate(commands: any[], extras: WbNavigationExtras): Promise<boolean>;
+  public abstract navigate(commands: any[], extras?: WbNavigationExtras): Promise<boolean>;
 
   /**
    * Resolves open views which match the given URL path.
