@@ -15,7 +15,7 @@ import { Router, RouterModule } from '@angular/router';
 import { WorkbenchModule } from './workbench.module';
 import { CommonModule } from '@angular/common';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { advance } from './routing/testing.spec';
+import { advance } from './spec/util/util.spec';
 import { WorkbenchRouter } from './routing/workbench-router.service';
 
 describe('Workbench', () => {

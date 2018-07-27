@@ -10,21 +10,15 @@
 
 import { NgModule } from '@angular/core';
 import { async, inject, TestBed } from '@angular/core/testing';
-import { ViewPartGridSerializerService, ViewPartInfoArray } from './view-part-grid-serializer.service';
-import { ViewPartGrid } from './view-part-grid.model';
+import { ViewPartGridSerializerService, ViewPartInfoArray } from '../view-part-grid/view-part-grid-serializer.service';
+import { ViewPartGrid } from '../view-part-grid/view-part-grid.model';
 
 describe('ViewPartGrid', () => {
-
-  @NgModule({
-    providers: [ViewPartGridSerializerService],
-  })
-  class TestModule {
-  }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      imports: [TestModule]
+      imports: [AppTestModule]
     });
   }));
 
@@ -310,3 +304,13 @@ describe('ViewPartGrid', () => {
     expect(testee.root).toBeNull('Remove ViewPart 1');
   }));
 });
+
+/****************************************************************************************************
+ * Definition of App Test Module                                                                    *
+ ****************************************************************************************************/
+
+@NgModule({
+  providers: [ViewPartGridSerializerService],
+})
+class AppTestModule {
+}

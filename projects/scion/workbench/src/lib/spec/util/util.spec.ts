@@ -1,7 +1,6 @@
 import { ComponentFixture, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement, Type } from '@angular/core';
-import { expect } from '../spec/jasmine-custom-matchers.spec';
+import { Type } from '@angular/core';
 
 /**
  * Simulates the asynchronous passage of time for the timers and detects the fixture for changes.
@@ -10,19 +9,6 @@ export function advance(fixture: ComponentFixture<any>): void {
   tick();
   fixture.detectChanges();
   tick();
-}
-
-/**
- * Asserts that the specified component is showing.
- */
-export function expectComponentShowing(appFixture: ComponentFixture<any>, expected: Type<any>, failureMessage?: string): DebugElement {
-  const componentDebugElement = appFixture.debugElement.query(By.directive(expected));
-  if (!(componentDebugElement)) {
-    const failSuffix = failureMessage ? ` [${failureMessage}]` : '';
-    throw Error(`Expected component not showing [${expected.name}]${failSuffix}`);
-  }
-  expect(true).toBe(true);
-  return componentDebugElement;
 }
 
 /**

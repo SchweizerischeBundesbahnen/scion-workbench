@@ -13,10 +13,11 @@ import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
 import { WorkbenchModule } from '../workbench.module';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
 import { Router, RouterModule } from '@angular/router';
-import { WorkbenchRouter } from './workbench-router.service';
+import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { CommonModule } from '@angular/common';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { advance, clickElement, expectComponentShowing } from './testing.spec';
+import { advance, clickElement } from './util/util.spec';
+import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 
 /**
  * Testsetup:
@@ -57,6 +58,8 @@ import { advance, clickElement, expectComponentShowing } from './testing.spec';
 describe('Router', () => {
 
   beforeEach(async(() => {
+    jasmine.addMatchers(jasmineCustomMatchers);
+
     TestBed.configureTestingModule({
       imports: [AppTestModule]
     });
@@ -64,7 +67,7 @@ describe('Router', () => {
     TestBed.get(Router).initialNavigation();
   }));
 
-  it('allows relative and absolute navigation within and beyond module boundaries', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
+  it('allows for relative and absolute navigation', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
     loader.stubbedModules = {
       './feature-a/feature-a.module#FeatureAModule': FeatureAModule,
       './feature-b/feature-b.module#FeatureBModule': FeatureBModule,
@@ -76,167 +79,167 @@ describe('Router', () => {
     // Navigate to entry component of feature module A
     wbRouter.navigate(['feature-a'], {blankViewPartRef: 'viewpart.1'}).then();
     advance(fixture);
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(1)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(1)');
 
     // Open '/feature-a/view-1' (relative navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="view-1"]', '(2a)');
-    expectComponentShowing(fixture, FeatureA_View1Component, '(2b)');
+    expect(fixture).toShow(FeatureA_View1Component, '(2b)');
 
     // Go back one level '/feature-a' (relative navigation)
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink=".."]', '(3a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(3b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(3b)');
 
     // Open '/feature-a/view-2' (relative navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="./view-2"]', '(4a)');
-    expectComponentShowing(fixture, FeatureA_View2Component, '(4b)');
+    expect(fixture).toShow(FeatureA_View2Component, '(4b)');
 
     // Go back one level to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink=".."]', '(5a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(5b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(5b)');
 
     // Open '/feature-a/view-1' (absolute navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/view-1"]', '(6a)');
-    expectComponentShowing(fixture, FeatureA_View1Component, '(6b)');
+    expect(fixture).toShow(FeatureA_View1Component, '(6b)');
 
     // Go back one level to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink=".."]', '(7a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(7b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(7b)');
 
     // Open '/feature-a/view-2' (absolute navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/view-2"]', '(8a)');
-    expectComponentShowing(fixture, FeatureA_View2Component, '(8b)');
+    expect(fixture).toShow(FeatureA_View2Component, '(8b)');
 
     // Go back one level to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink=".."]', '(9a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(9b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(9b)');
 
     // Open '/feature-a/feature-b' (relative navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="feature-b"]', '(10a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(10b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(10b)');
 
     // Go back one level to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../.."]', '(11a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(11b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(11b)');
 
     // Open '/feature-a/feature-b/view-1' (relative navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="feature-b/view-1"]', '(12a)');
-    expectComponentShowing(fixture, FeatureB_View1Component, '(12b)');
+    expect(fixture).toShow(FeatureB_View1Component, '(12b)');
 
     // Go back two levels to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../.."]', '(13a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(13b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(13b)');
 
     // Open '/feature-a/feature-b/view-2' (relative navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="./feature-b/view-2"]', '(14a)');
-    expectComponentShowing(fixture, FeatureB_View2Component, '(14b)');
+    expect(fixture).toShow(FeatureB_View2Component, '(14b)');
 
     // Go back two levels to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../.."]', '(15a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(15b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(15b)');
 
     // Open '/feature-a/feature-b' (absolute navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b"]', '(16a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(16b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(16b)');
 
     // Go back one level to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../.."]', '(17a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(17b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(17b)');
 
     // Open '/feature-a/feature-b/view-1' (absolute navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-1"]', '(18a)');
-    expectComponentShowing(fixture, FeatureB_View1Component, '(18b)');
+    expect(fixture).toShow(FeatureB_View1Component, '(18b)');
 
     // Go back two levels to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../.."]', '(19a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(19b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(19b)');
 
     // Open '/feature-a/feature-b/view-2' (absolute navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-2"]', '(20a)');
-    expectComponentShowing(fixture, FeatureB_View2Component, '(20b)');
+    expect(fixture).toShow(FeatureB_View2Component, '(20b)');
 
     // Go back two levels to '/feature-a' (relative navigation)
     clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../.."]', '(21a)');
-    expectComponentShowing(fixture, FeatureA_EntryComponent, '(21b)');
+    expect(fixture).toShow(FeatureA_EntryComponent, '(21b)');
 
     // Open '/feature-a/view-1' (relative navigation)
     clickElement(fixture, FeatureA_EntryComponent, 'a[wbRouterLink="view-1"]', '(21a)');
-    expectComponentShowing(fixture, FeatureA_View1Component, '(21b)');
+    expect(fixture).toShow(FeatureA_View1Component, '(21b)');
 
     // Open '/feature-a/view-2' (relative navigation)
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../view-2"]', '(22a)');
-    expectComponentShowing(fixture, FeatureA_View2Component, '(22b)');
+    expect(fixture).toShow(FeatureA_View2Component, '(22b)');
 
     // Open '/feature-a/view-1' (relative navigation)
     clickElement(fixture, FeatureA_View2Component, 'a[wbRouterLink="../view-1"]', '(23a)');
-    expectComponentShowing(fixture, FeatureA_View1Component, '(23b)');
+    expect(fixture).toShow(FeatureA_View1Component, '(23b)');
 
     // Open '/feature-a/feature-b' (relative navigation)
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b"]', '(24a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(24b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(24b)');
 
     // Open '/feature-a/view-1' (relative navigation)
     clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../../view-1"]', '(25a)');
-    expectComponentShowing(fixture, FeatureA_View1Component, '(25b)');
+    expect(fixture).toShow(FeatureA_View1Component, '(25b)');
 
     // Open '/feature-a/feature-b/view-1' (relative navigation)
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b/view-1"]', '(26a)');
-    expectComponentShowing(fixture, FeatureB_View1Component, '(26b)');
+    expect(fixture).toShow(FeatureB_View1Component, '(26b)');
 
     // Open '/feature-a/view-1' (relative navigation)
     clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink="../../view-1"]', '(27a)');
-    expectComponentShowing(fixture, FeatureA_View1Component, '(27b)');
+    expect(fixture).toShow(FeatureA_View1Component, '(27b)');
 
     // Open '/feature-a/feature-b/view-2' (relative navigation)
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b/view-2"]', '(28a)');
-    expectComponentShowing(fixture, FeatureB_View2Component, '(28b)');
+    expect(fixture).toShow(FeatureB_View2Component, '(28b)');
 
     // Open '/feature-a/view-1' (relative navigation)
     clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink="../../view-1"]', '(29a)');
-    expectComponentShowing(fixture, FeatureA_View1Component, '(29b)');
+    expect(fixture).toShow(FeatureA_View1Component, '(29b)');
 
     // Open '/feature-a/feature-b' (absolute navigation)
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="/feature-a/feature-b"]', '(30a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(30b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(30b)');
 
     // Open '/feature-a/feature-b/view-1' (relative navigation)
     clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="view-1"]', '(31a)');
-    expectComponentShowing(fixture, FeatureB_View1Component, '(31b)');
+    expect(fixture).toShow(FeatureB_View1Component, '(31b)');
 
     // Go back one level to '/feature-a/feature-b' (relative navigation)
     clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink=".."]', '(32a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(32b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(32b)');
 
     // Open '/feature-a/feature-b/view-2' (relative navigation)
     clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="./view-2"]', '(33a)');
-    expectComponentShowing(fixture, FeatureB_View2Component, '(33b)');
+    expect(fixture).toShow(FeatureB_View2Component, '(33b)');
 
     // Go back one level to '/feature-a/feature-b' (relative navigation)
     clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink=".."]', '(34a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(34b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(34b)');
 
     // Open '/feature-a/feature-b/view-1' (absolute navigation)
     clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-1"]', '(35a)');
-    expectComponentShowing(fixture, FeatureB_View1Component, '(35b)');
+    expect(fixture).toShow(FeatureB_View1Component, '(35b)');
 
     // Go back one level to '/feature-a/feature-b' (relative navigation)
     clickElement(fixture, FeatureB_View1Component, 'a[wbRouterLink=".."]', '(36a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(36b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(36b)');
 
     // Open '/feature-a/feature-b/view-2' (absolute navigation)
     clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/feature-b/view-2"]', '(37a)');
-    expectComponentShowing(fixture, FeatureB_View2Component, '(37b)');
+    expect(fixture).toShow(FeatureB_View2Component, '(37b)');
 
     // Go back one level to '/feature-a/feature-b' (relative navigation)
     clickElement(fixture, FeatureB_View2Component, 'a[wbRouterLink=".."]', '(38a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(38b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(38b)');
 
     // Open '/feature-a/view-1' (absolute navigation)
     clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="/feature-a/view-1"]', '(39a)');
-    expectComponentShowing(fixture, FeatureA_View1Component, '(39b)');
+    expect(fixture).toShow(FeatureA_View1Component, '(39b)');
 
     // Go back to '/feature-a/feature-b' (relative navigation)
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b"]', '(40a)');
-    expectComponentShowing(fixture, FeatureB_EntryComponent, '(40b)');
+    expect(fixture).toShow(FeatureB_EntryComponent, '(40b)');
 
     tick();
   })));
