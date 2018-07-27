@@ -9,13 +9,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { VIEW_GRID_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
-import { DefaultUrlSerializer, NavigationExtras, PRIMARY_OUTLET, Router, Routes, UrlSegment } from '@angular/router';
+import { ACTIVITY_OUTLET_NAME, VIEW_GRID_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
+import { NavigationExtras, PRIMARY_OUTLET, Router, Routes, UrlSegment } from '@angular/router';
 import { WorkbenchService } from '../workbench.service';
 import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { WorkbenchView } from '../workbench.model';
 import { EmptyOutletComponent } from './empty-outlet.component';
+import { ActivatedRoute } from '@angular/router/src/router_state';
 
 /**
  * Provides the workbench view navigation capabilities bases on Angular Router.
@@ -25,15 +26,20 @@ export abstract class WorkbenchRouter {
   /**
    * Navigate based on the provided array of commands, and is like 'Router.navigate(...)' but with a workbench view as the routing target.
    *
-   * Use matrix parameters to associate optional data with the view outlet URL.
-   * Matrix parameters are like regular URL parameters, but do not affect route resolution.
-   * Unlike query parameters, matrix parameters are part of the routing path, which makes them suitable for auxiliary routes.
-   * Also, matrix parameters are removed upon destruction of the view outlet, and parameter names must not be qualified with the view identity.
+   * By default, navigation is absolute. Make it relative by providing a `relativeTo` route in navigational extras.
+   *
+   * - Target view can be set via {WbNavigationExtras} object.
+   * - Multiple static segments can be merged into one, e.g. `['/team/11/user', userName, {details: true}]`
+   * - The first segment name can be prepended with `/`, `./`, or `../`
+   * - Matrix parameters can be used to associate optional data with the URL, e.g. `['user', userName, {details: true}]`
+   *   Matrix parameters are like regular URL parameters, but do not affect route resolution. Unlike query parameters, matrix parameters
+   *   are not global but part of the routing path, which makes them suitable for auxiliary routes.
    *
    * ### Usage
    *
    * ```
    * router.navigate(['team', 33, 'user', 11]);
+   * router.navigate(['team/11/user', userName, {details: true}]); // multiple static segments can be merged into one
    * router.navigate(['teams', {selection: 33'}]); // matrix parameter 'selection' with the value '33'.
    * ```
    *
@@ -50,31 +56,14 @@ export abstract class WorkbenchRouter {
 @Injectable()
 export class InternalWorkbenchRouter implements WorkbenchRouter {
 
-
   constructor(private _router: Router,
               private _workbench: WorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartGridUrlObserver: ViewPartGridUrlObserver) {
   }
 
-  /**
-   * Navigate based on the provided array of commands, and is like 'Router.navigate(...)' but with a workbench view as the routing target.
-   *
-   * Use matrix parameters to associate optional data with the view outlet URL.
-   * Matrix parameters are like regular URL parameters, but do not affect route resolution.
-   * Unlike query parameters, matrix parameters are part of the routing path, which makes them suitable for auxiliary routes.
-   * Also, matrix parameters are removed upon destruction of the view outlet, and parameter names must not be qualified with the view identity.
-   *
-   * ### Usage
-   *
-   * ```
-   * router.navigate(['team', 33, 'user', 11]);
-   * router.navigate(['teams', {selection: 33'}]); // matrix parameter 'selection' with the value '33'.
-   * ```
-   *
-   * @see WbRouterLinkDirective
-   */
-  public navigate(commands: any[], extras: WbNavigationExtras = {}): Promise<boolean> {
+  public navigate(commandList: any[], extras: WbNavigationExtras = {}): Promise<boolean> {
+    const commands = this.normalizeCommands(commandList, extras.relativeTo);
     const coerceActivate = extras.tryActivateView === undefined && !commands.includes('new') && !commands.includes('create');
 
     // If view is already opened, activate it.
@@ -90,6 +79,7 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
     const routeFn = (outlet: string, serializedGrid: string): Promise<boolean> => {
       return this._router.navigate([{outlets: {[outlet]: commands}}], {
         ...extras as NavigationExtras,
+        relativeTo: null, // commands are absolute because normalized
         queryParams: {...extras.queryParams, [VIEW_GRID_QUERY_PARAM]: serializedGrid},
         queryParamsHandling: 'merge'
       });
@@ -107,9 +97,9 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
           throw Error('Invalid argument: navigation property \'selfViewRef\' required for routing view target \'self\'.');
         }
 
-        const urlTree = new DefaultUrlSerializer().parse(this._router.url);
+        const urlTree = this._router.parseUrl(this._router.url);
         const urlSegmentGroups = urlTree.root.children;
-        if (!Object.keys(urlSegmentGroups).includes(extras.selfViewRef)) {
+        if (!urlSegmentGroups[extras.selfViewRef]) {
           throw Error(`Invalid argument: '${extras.selfViewRef}' is not a valid view outlet.`);
         }
 
@@ -121,12 +111,9 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
     }
   }
 
-  /**
-   * Resolves open views which match the given URL path.
-   */
   public resolve(commands: any[]): WorkbenchView[] {
     const commandsJoined = commands.filter(it => typeof it !== 'object').map(it => encodeURI(it)).join(); // do not match URL matrix parameters
-    const urlTree = new DefaultUrlSerializer().parse(this._router.url);
+    const urlTree = this._router.parseUrl(this._router.url);
     const urlSegmentGroups = urlTree.root.children;
 
     return Object.keys(urlSegmentGroups)
@@ -138,6 +125,37 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
       });
   }
 
+  /**
+   * Normalizes commands to their absolute form.
+   *
+   * ---
+   * As of Angular 6.x, commands which target a named outlet (auxiliary route) are not normalized, meaning that
+   * relative navigational symbols like `/`, `./`, or `../` are not resolved (see `create_url_tree.ts` method: `computeNavigation`).
+   *
+   * Example: router.navigate([{outlets: {[outlet]: commands}}])
+   *
+   * To bypass that restriction, we first create an URL tree without specifying the target outlet. As expected, this translates into an
+   * URL with all navigational symbols resolved. Then, we extract the URL segments of the resolved route and convert it back into commands.
+   * The resulting commands are in their absolute form and may be used for the effective navigation to target a named router outlet.
+   */
+  public normalizeCommands(commands: any[], relativeTo?: ActivatedRoute | null): any[] {
+    const normalizeFn = (outlet: string, extras?: NavigationExtras): any[] => {
+      return this._router.createUrlTree(commands, extras)
+        .root.children[outlet].segments
+        .reduce((acc, p) => [...acc, p.path, ...(Object.keys(p.parameters).length ? [p.parameters] : [])], []);
+    };
+
+    if (!relativeTo) {
+      return normalizeFn(PRIMARY_OUTLET);
+    }
+
+    const targetOutlet = relativeTo.pathFromRoot[1] && relativeTo.pathFromRoot[1].outlet;
+    if (!targetOutlet || (!targetOutlet.startsWith(VIEW_REF_PREFIX) && !targetOutlet.startsWith(ACTIVITY_OUTLET_NAME))) {
+      return normalizeFn(PRIMARY_OUTLET);
+    }
+
+    return normalizeFn(targetOutlet, {relativeTo});
+  }
 
   /**
    * Replaces the router configuration to install or uninstall auxiliary routes.

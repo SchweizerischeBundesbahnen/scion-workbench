@@ -13,11 +13,14 @@ import { WorkbenchView } from '../workbench.model';
 import { WbNavigationExtras, WorkbenchRouter } from './workbench-router.service';
 import { noop } from 'rxjs';
 import { LocationStrategy } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { WorkbenchService } from '../workbench.service';
 
 /**
  * Like 'RouterLink' but with functionality to target a view outlet.
+ *
+ * By default, navigation is relative to the currently activated route, if any.
+ * Prepend the path with a forward slash '/' to navigate absolutely, or set `relativeTo` property in navigational extras to `null`.
  */
 @Directive({selector: ':not(a)[wbRouterLink]'})
 export class WbRouterLinkDirective {
@@ -27,7 +30,7 @@ export class WbRouterLinkDirective {
 
   @Input()
   public set wbRouterLink(commands: any[] | string) {
-    this._commands = (commands ? (Array.isArray(commands) ? commands : commands.split('/').filter(Boolean)) : []);
+    this._commands = (commands ? (Array.isArray(commands) ? commands : [commands]) : []);
   }
 
   @Input('wbRouterLinkExtras') // tslint:disable-line:no-input-rename
@@ -36,6 +39,7 @@ export class WbRouterLinkDirective {
   }
 
   constructor(private _workbenchRouter: WorkbenchRouter,
+              private _route: ActivatedRoute,
               private _workbench: WorkbenchService,
               @Optional() private _view: WorkbenchView) {
   }
@@ -54,9 +58,12 @@ export class WbRouterLinkDirective {
   protected createNavigationExtras(ctrlKey: boolean = false): WbNavigationExtras {
     const currentViewRef = this._view && this._view.viewRef;
     const currentViewPartRef = currentViewRef && this._workbench.resolveContainingViewPartServiceElseThrow(this._view.viewRef).viewPartRef;
+    const isAbsolute = (typeof this._commands[0] === 'string') && this._commands[0].startsWith('/');
+    const relativeTo = (isAbsolute ? null : this._route);
 
     return {
       ...this._extras,
+      relativeTo: this._extras.relativeTo === undefined ? relativeTo : this._extras.relativeTo,
       target: this._extras.target || (this._view && !ctrlKey ? 'self' : 'blank'),
       selfViewRef: this._extras.selfViewRef || currentViewRef,
       blankViewPartRef: this._extras.blankViewPartRef || currentViewPartRef,
@@ -73,9 +80,10 @@ export class WbRouterLinkWithHrefDirective extends WbRouterLinkDirective impleme
   constructor(private _router: Router,
               private _locationStrategy: LocationStrategy,
               workbenchRouter: WorkbenchRouter,
+              route: ActivatedRoute,
               workbench: WorkbenchService,
               @Optional() view: WorkbenchView) {
-    super(workbenchRouter, workbench, view);
+    super(workbenchRouter, route, workbench, view);
   }
 
   private updateTargetUrlAndHref(): void {
