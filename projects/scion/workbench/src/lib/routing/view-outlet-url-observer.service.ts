@@ -115,7 +115,7 @@ export class ViewOutletUrlObserver implements OnDestroy {
   }
 
   private installNavigationStartRoutingListener(differs: IterableDiffers): void {
-    const outletDiffer = new ViewOutletDiffer(differs);
+    const outletDiffer = new ViewOutletDiffer(differs, this._router);
     this._router.events
       .pipe(
         filter(event => event instanceof NavigationStart),
@@ -127,7 +127,7 @@ export class ViewOutletUrlObserver implements OnDestroy {
   }
 
   private installGuardsCheckEndRoutingListener(differs: IterableDiffers): void {
-    const outletDiffer = new ViewOutletDiffer(differs);
+    const outletDiffer = new ViewOutletDiffer(differs, this._router);
     this._router.events
       .pipe(
         filter(event => event instanceof GuardsCheckEnd),
