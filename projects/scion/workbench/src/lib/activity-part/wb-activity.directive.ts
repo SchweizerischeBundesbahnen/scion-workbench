@@ -9,6 +9,7 @@
  */
 
 import { Directive, Input, OnChanges, SimpleChanges, TemplateRef } from '@angular/core';
+import { InternalWorkbenchRouter } from '../routing/workbench-router.service';
 
 /**
  * Use this directive to model an activity as content child of <wb-workbench>.
@@ -82,6 +83,9 @@ export class WbActivityDirective implements OnChanges {
   @Input()
   public target: 'activity-panel' | 'view' = 'activity-panel';
 
+  constructor(private _wbRouter: InternalWorkbenchRouter) {
+  }
+
   public registerAction(action: TemplateRef<void>): void {
     this.actions.push(action);
   }
@@ -108,7 +112,7 @@ export class WbActivityDirective implements OnChanges {
     }
 
     const commands = this.routerLink;
-    this._commands = (commands ? (Array.isArray(commands) ? commands : commands.split('/').filter(Boolean)) : []);
-    this._path = this.commands.filter(it => typeof it !== 'object').join('/');
+    this._commands = this._wbRouter.normalizeCommands(commands ? (Array.isArray(commands) ? commands : [commands]) : []);
+    this._path = this.commands.filter(it => typeof it === 'string').join('/');
   }
 }

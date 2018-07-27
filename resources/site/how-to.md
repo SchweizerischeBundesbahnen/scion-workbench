@@ -60,7 +60,7 @@ The following snippet registers a Material-styled button as activity action. It 
 
 ```html 
 <ng-template wbActivityAction>
-    <button [wbRouterLink]="['person', 'new']" mat-icon-button title="Create person">
+    <button wbRouterLink="/person/new" mat-icon-button title="Create person">
         <mat-icon>add</mat-icon>
     </button>
 </ng-template>
@@ -68,12 +68,12 @@ The following snippet registers a Material-styled button as activity action. It 
 
 ## How to open a view
 Views are opened via Angular routing mechanism.\
-Use `wbRouterLink` directive or  `WorkbenchRouter` service for view-based navigation.
+Use `wbRouterLink` directive or `WorkbenchRouter` service for view-based navigation.
 
 To open a component in a view, it has to be registered as a route in your routing module. Then, create a navigational element like HTML anchor element, decorate it with `wbRouterLink` directive and specify the path to the component.
 
 ```html
-<a [wbRouterLink]="['persons', person.id]">Open person</a>
+<a [wbRouterLink]="['/persons', person.id]">Open person</a>
 ```
 
 Alternatively, navigation can also be done in the component class. For that, inject `WorkbenchRouter` and use its `navigate` method.
@@ -88,9 +88,10 @@ public openPerson(id: string): void {
 ```
 
 > Technically, a view is represented by its separate router outlet in the application URL, and with the outlet path specifying which component to display. That said, a view is simply a container to display any component. By changing the outlet path of a view, you can control which component to display.
->\
->\
+
 > `WorkbenchRouter` and  `wbRouterLink` both navigate based on the provided array of commands, and is like Angular 'Router.navigate(...)', but with a workbench view as the routing target.
+
+> If using `wbRouterLink`, by default, navigation is relative to the currently activated route. Prepend the path with a forward slash '/' to navigate absolutely, or set `relativeTo` property in navigational extras to `null`. Unlike `wbRouterLink`, if using `WorkbenchRouter` service, by default, navigation is always absolute.
 
 ## How to control in which view to open a component
 When navigating to a component, by default, it is first checked if it is already opened in a view. If not opened yet, depending on the 'target' strategy, the content of the current view is replaced, or a new view tab opened otherwise.
@@ -98,7 +99,7 @@ When navigating to a component, by default, it is first checked if it is already
 View activation is based on the routing path, meaning that if a view with a matching path is already opened, that view is activated. To never activate an already opened view, use `WbNavigationExtras` and set `tryActivateView` to `false`.
 
 ```html
-<a [wbRouterLink]="['persons', person.id]" [wbRouterLinkExtras]="{tryActivateView: false}">Open person</a>
+<a [wbRouterLink]="['/persons', person.id]" [wbRouterLinkExtras]="{tryActivateView: false}">Open person</a>
 ```
 
 ```javascript
@@ -108,7 +109,7 @@ wbRouter.navigate(['persons', id], {tryActivateView: false});
 With target strategy, you control whether to replace the content of an existing view, or to open a component  in a new view tab. If using `wbRouterLink` and in the context of a view, by default, the current view content is replaced, unless CTRL keystroke is pressed. However, this behavior can be overwritten via navigation extras, by setting `target` to 'blank' or 'self', respectively.
 
 ```html
-<a [wbRouterLink]="['persons', person.id]" [wbRouterLinkExtras]="{target: 'blank'}">Open person in new view</a>
+<a [wbRouterLink]="['/persons', person.id]" [wbRouterLinkExtras]="{target: 'blank'}">Open person in new view</a>
 ```
 
 > Use matrix parameters to associate optional data with the view outlet URL.\
@@ -410,8 +411,8 @@ Notice that the lazy loading syntax uses loadChildren followed by a string that 
     Then, add the following links to the template of the activity component to open the views of the feature module:
 
     ```html
-    <a wbRouterLink="feature/view-1">Open View 1</a>
-    <a wbRouterLink="feature/view-2">Open View 2</a>
+    <a wbRouterLink="/feature/view-1">Open View 1</a>
+    <a wbRouterLink="/feature/view-2">Open View 2</a>
     ```
 
 [menu-overview]: /README.md
