@@ -13,11 +13,11 @@ import MatchersUtil = jasmine.MatchersUtil;
 import CustomEqualityTester = jasmine.CustomEqualityTester;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import { ComponentFixture } from '@angular/core/testing';
-import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
-import { DebugElement } from '@angular/core';
+import { ViewPartGridComponent } from '../../view-part-grid/view-part-grid.component';
+import { DebugElement, Type } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { AssertException } from './assert-exception.spec';
-import { ACTIVE_VIEW_REF_INDEX, VIEW_PART_REF_INDEX, ViewPartInfoArray, ViewPartSashBox } from '../view-part-grid/view-part-grid-serializer.service';
+import { ACTIVE_VIEW_REF_INDEX, VIEW_PART_REF_INDEX, ViewPartInfoArray, ViewPartSashBox } from '../../view-part-grid/view-part-grid-serializer.service';
 
 /**
  * Extends the Jasmine expect API to support chaining with project specific custom matchers.
@@ -35,17 +35,45 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
   not: CustomMatchers<T>;
 
   /**
-   * Asserts the ViewPart grid as rendered in the DOM.
+   * Expect the given view part grid rendered in the DOM.
    */
   toBeViewPartGrid(expected: ViewPartSashBox | ViewPartInfoArray, expectationFailOutput?: any): boolean;
+
+  /**
+   * Expect a component of the given type to show.
+   */
+  toShow(expectedComponentType: Type<any>, expectationFailOutput?: any): boolean;
 }
 
 /**
  * Provides the implementation of project specific custom matchers.
  */
 export const jasmineCustomMatchers: jasmine.CustomMatcherFactories = {
-  toBeViewPartGrid: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToBeViewPartGridMatcher(util, customEqualityTesters)
+  toBeViewPartGrid: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToBeViewPartGridMatcher(util, customEqualityTesters),
+  toShow: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToDisplayMatcher(util, customEqualityTesters)
 };
+
+function createToDisplayMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
+  return {
+    compare(actualFixture: any, expectedComponentType: Type<any>): CustomMatcherResult {
+      const failOutput = arguments[2];
+      const msgFn = (msg: string): string => [msg, failOutput].filter(Boolean).join(', ');
+
+      // verify correct actual type
+      if (!(actualFixture instanceof ComponentFixture)) {
+        return {
+          pass: false,
+          message: msgFn(`Expected actual to be of type \'ComponentFixture\' [actual=${actualFixture.constructor.name}]`)
+        };
+      }
+
+      const found = !!actualFixture.debugElement.query(By.directive(expectedComponentType));
+      return found ?
+        {pass: true} :
+        {pass: false, message: msgFn(`Expected ${expectedComponentType.name} to show`)};
+    }
+  };
+}
 
 function createToBeViewPartGridMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
   return {
