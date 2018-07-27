@@ -33,8 +33,8 @@ export class WorkbenchComponent implements AfterViewInit, OnDestroy {
   public set activities(queryList: QueryList<WbActivityDirective>) {
     queryList.changes
       .pipe(takeUntil(this._destroy$))
-      .subscribe((activities: WbActivityDirective[]) => {
-        this._activityPartService.activities = activities;
+      .subscribe((activities: QueryList<WbActivityDirective>) => {
+        this._activityPartService.activities = activities.toArray();
       });
   }
 
