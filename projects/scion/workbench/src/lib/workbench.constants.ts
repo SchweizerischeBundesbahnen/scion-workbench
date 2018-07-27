@@ -26,6 +26,11 @@ export const ROUTER_OUTLET_NAME = new InjectionToken<string>('ROUTER_OUTLET_NAME
 export const ROUTE_REUSE_PROVIDER = new InjectionToken<WbRouteReuseProvider>('ROUTE_REUSE_PROVIDER');
 
 /**
+ * DI injection token to ensure `WorkbenchModule.forRoot()` is not used in a lazy context.
+ */
+export const WORKBENCH_FORROOT_GUARD = new InjectionToken<void>('WORKBENCH_FORROOT_GUARD');
+
+/**
  * Represents the name of the activity router outlet.
  */
 export const ACTIVITY_OUTLET_NAME = 'activity';
