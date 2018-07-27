@@ -9,7 +9,7 @@
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { DefaultUrlSerializer, NavigationEnd, Router, UrlSegment } from '@angular/router';
+import { NavigationEnd, Router, UrlSegment } from '@angular/router';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { ACTIVITY_OUTLET_NAME } from '../workbench.constants';
@@ -74,8 +74,8 @@ export class WorkbenchActivityPartService implements OnDestroy {
   }
 
   private parseActivityFromUrl(url: string): WbActivityDirective {
-    const activitySegmentGroup: UrlSegmentGroup = new DefaultUrlSerializer()
-      .parse(url)
+    const activitySegmentGroup: UrlSegmentGroup = this._router
+      .parseUrl(url)
       .root.children[ACTIVITY_OUTLET_NAME];
 
     if (!activitySegmentGroup) {
