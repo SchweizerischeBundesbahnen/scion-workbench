@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ANALYZE_FOR_ENTRY_COMPONENTS, InjectionToken, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
+import { ANALYZE_FOR_ENTRY_COMPONENTS, Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { WorkbenchComponent } from './workbench.component';
@@ -49,7 +49,7 @@ import { WbActivityDirective } from './activity-part/wb-activity.directive';
 import { MoveDirective } from './move.directive';
 import { WorkbenchConfig } from './workbench.config';
 import { OverlayTemplateOutletDirective } from './overlay-template-outlet.directive';
-import { ROUTE_REUSE_PROVIDER } from './workbench.constants';
+import { ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
 import { NotificationService } from './notification/notification.service';
 import { NotificationListComponent } from './notification/notification-list.component';
 import { NotificationComponent } from './notification/notification.component';
@@ -117,10 +117,8 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 })
 export class WorkbenchModule {
 
-  // Specify services to be instantiated eagerly
-  constructor(@Optional() @SkipSelf() parentModule: WorkbenchModule,
-              viewRegistrySynchronizer: ViewRegistrySynchronizer) {
-    WorkbenchModule.throwIfAlreadyLoaded(parentModule);
+  // Note: We are injecting ViewRegistrySynchronizer so it gets created eagerly...
+  constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any, viewRegistrySynchronizer: ViewRegistrySynchronizer) {
   }
 
   /**
@@ -199,6 +197,11 @@ export class WorkbenchModule {
           provide: RouteReuseStrategy,
           useClass: WbRouteReuseStrategy,
         },
+        {
+          provide: WORKBENCH_FORROOT_GUARD,
+          useFactory: provideForRootGuard,
+          deps: [[WorkbenchService, new Optional(), new SkipSelf()]]
+        },
       ]
     };
   }
@@ -212,12 +215,13 @@ export class WorkbenchModule {
       providers: [] // do not register any providers in 'forChild' but in 'forRoot' instead
     };
   }
+}
 
-  private static throwIfAlreadyLoaded(parentModule: any): void {
-    if (parentModule) {
-      throw new Error('WorkbenchModule.forRoot() called twice. Lazy loaded modules should use WorkbenchModule.forChild() instead.');
-    }
+export function provideForRootGuard(workbench: WorkbenchService): any {
+  if (workbench) {
+    throw new Error('WorkbenchModule.forRoot() called twice. Lazy loaded modules should use WorkbenchModule.forChild() instead.');
   }
+  return 'guarded';
 }
 
 export function newConfig(config: WorkbenchConfig): WorkbenchConfig {
