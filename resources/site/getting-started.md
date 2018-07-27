@@ -45,8 +45,8 @@ const appRoutes: Routes = [];
   ],
   imports: [
     WorkbenchModule.forRoot(),
-    RouterModule.forRoot(appRoutes, {useHash: true}), // required by SCION workbench
-    BrowserAnimationsModule, // required by SCION workbench
+    RouterModule.forRoot(appRoutes, {useHash: true}), // module required by SCION Workbench
+    BrowserAnimationsModule, // module required by SCION Workbench
     ...
   ],
   providers: [
