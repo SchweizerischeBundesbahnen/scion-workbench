@@ -9,13 +9,13 @@
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { NavigationEnd, Router, RouterEvent, UrlSegment } from '@angular/router';
+import { NavigationCancel, NavigationError, Router, RouterEvent, RoutesRecognized, UrlSegment } from '@angular/router';
 import { Subject } from 'rxjs';
 import { ACTIVITY_OUTLET_NAME } from '../workbench.constants';
 import { WbActivityDirective } from './wb-activity.directive';
 import { InternalWorkbenchRouter } from '../routing/workbench-router.service';
 import { UrlSegmentGroup } from '@angular/router/src/url_tree';
-import { filter, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 @Injectable()
 export class WorkbenchActivityPartService implements OnDestroy {
@@ -32,12 +32,19 @@ export class WorkbenchActivityPartService implements OnDestroy {
 
     // Compute the active activity when a navigation ends successfully
     this._router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd),
-        takeUntil(this._destroy$)
-      )
+      .pipe(takeUntil(this._destroy$))
       .subscribe((event: RouterEvent) => {
-        this._activeActivityPath = this.parseActivityPathElseNull(event.url);
+        switch (event.constructor) {
+          case RoutesRecognized:
+            // set activity prior to route activation to be available in activity construction, e.g. to contribute activity actions
+            this._activeActivityPath = this.parseActivityPathElseNull(event.url);
+            break;
+          case NavigationCancel:
+          case NavigationError:
+            // unset activity if navigation fails or was cancelled
+            this._activeActivityPath = this.parseActivityPathElseNull(this._router.url);
+            break;
+        }
       });
   }
 
