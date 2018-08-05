@@ -12,13 +12,14 @@ import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { Component, NgModule, OnDestroy } from '@angular/core';
 import { WorkbenchModule } from '../workbench.module';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, RouteReuseStrategy } from '@angular/router';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { advance } from './util/util.spec';
+import { advance, clickElement } from './util/util.spec';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { Subject } from 'rxjs/index';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { ActivityPartComponent } from '../activity-part/activity-part.component';
 
 describe('Activity part', () => {
 
@@ -53,6 +54,40 @@ describe('Activity part', () => {
 
     tick();
   })));
+
+  /**
+   * Test for Angular issue #25313: Router outlet mounts wrong component if using a route reuse strategy and if the router outlet was not instantiated at the time the route got activated
+   * @see https://github.com/angular/angular/issues/25313
+   */
+  it('should mount the correct activity if the router outlet was not instantiated at the time the route got activated (https://github.com/angular/angular/issues/25313)', fakeAsync(inject([Router, RouteReuseStrategy], (router: Router, routeReuseStrategy: RouteReuseStrategy) => {
+    // Setup: set workbench reuse strategy
+    router.routeReuseStrategy = routeReuseStrategy;
+
+    const fixture = TestBed.createComponent(AppComponent);
+    advance(fixture);
+
+    // Open 'activity-1'
+    clickElement(fixture, ActivityPartComponent, 'a.activity-1', '(1a)');
+    expect(fixture).toShow(Activity1Component, '(1b)');
+
+    // Close 'activity-1'
+    clickElement(fixture, ActivityPartComponent, 'a.activity-1', '(2a)');
+    expect(fixture).not.toShow(Activity1Component, '(2b)');
+
+    // Open 'activity-1'
+    clickElement(fixture, ActivityPartComponent, 'a.activity-1', '(3a)');
+    expect(fixture).toShow(Activity1Component, '(3b)');
+
+    // Close 'activity-1'
+    clickElement(fixture, ActivityPartComponent, 'a.activity-1', '(4a)');
+    expect(fixture).not.toShow(Activity1Component, '(4b)');
+
+    // Open 'activity-2'
+    clickElement(fixture, ActivityPartComponent, 'a.activity-2', '(5a)');
+    expect(fixture).toShow(Activity2Component, '(5b)');
+
+    tick();
+  })));
 });
 
 /****************************************************************************************************
@@ -65,6 +100,14 @@ describe('Activity part', () => {
                    cssClass="activity-debug"
                    label="activity-debug"
                    routerLink="activity-debug">
+      </wb-activity>
+      <wb-activity cssClass="activity-1"
+                   label="activity-1"
+                   routerLink="activity-1">
+      </wb-activity>
+      <wb-activity cssClass="activity-2"
+                   label="activity-2"
+                   routerLink="activity-2">
       </wb-activity>
     </wb-workbench>
   `
@@ -96,15 +139,25 @@ class AppComponent implements OnDestroy {
 class ActivityDebugComponent {
 }
 
+@Component({template: 'Activity-1'})
+class Activity1Component {
+}
+
+@Component({template: 'Activity-2'})
+class Activity2Component {
+}
+
 @NgModule({
   imports: [
     WorkbenchModule.forRoot(),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
       {path: 'activity-debug', component: ActivityDebugComponent},
+      {path: 'activity-1', component: Activity1Component},
+      {path: 'activity-2', component: Activity2Component},
     ]),
   ],
-  declarations: [AppComponent, ActivityDebugComponent]
+  declarations: [AppComponent, ActivityDebugComponent, Activity1Component, Activity2Component]
 })
 class AppTestModule {
 }
