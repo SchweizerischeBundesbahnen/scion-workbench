@@ -5,6 +5,17 @@
 
 # Changelog
 
+<a name="0.0.0-beta.7"></a>
+## [0.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.6...0.0.0-beta.7) (2018-08-06)
+
+### Bug Fixes
+
+* Fix check which ensures that `Workbench.forRoot()` is not used in a lazy context ([#5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/5)) ([6f345fc](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6f345fc))
+* Allow to navigate relative to the current activated route ([#5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/5)) ([d0e8211](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d0e8211))
+* Allow initial navigation to a conditionally registered activity ([#8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/8)) ([260a4be](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/260a4be))
+* Render correct actions in the activity part header ([#9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/9)) ([589d742](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/589d742))
+* Display component of currently activated activity ([#10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/10)) ([8a7df7c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/8a7df7c))
+
 <a name="0.0.0-beta.6"></a>
 ## [0.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.5...0.0.0-beta.6) (2018-07-24)
 
