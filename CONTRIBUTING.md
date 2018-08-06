@@ -17,9 +17,23 @@
 ***
 
 ## Contribution
-We encourage other developers to join the project and contribute to make SCION Workbench constantly better and more stable. If you are missing a feature, please create a feature request so we can discuss it and coordinate further development. To report a bug, please check existing issues first, and if found, leave a comment on the issue. Otherwise, file a bug or create a pull request.
+We encourage other developers to join the project and contribute to make SCION Workbench constantly better and more stable. If you are missing a feature, please create a feature request so we can discuss it and coordinate further development. To report a bug, please check existing issues first, and if found, leave a comment on the issue. Otherwise, file a bug or, even better, create a pull request (PR) with a fix.
 
-If creating a pull request, please name the branch in the form 'feature/xyz' with 'xyz' as the name of your pull request and stick to the [Commit Guidelines](#commit-guidelines). Also be in mind that large pull requests take a lot of time to review.
+### Submitting a Pull Request (PR)
+Please follow the guidelines below:
+
+1. Search GitHub for an open or closed PR that relates to your submission.
+2. Login to your GitHub account and fork the `SchweizerischeBundesbahnen/scion-workbench` repo.
+3. Make your changes in a new Git branch. Name your branch in the form 'issue/123' with '123' as the relevant GitHub issue number.
+4. Create your patch and stick to our [Coding guidelines](#coding-guidelines). 
+5. Run all specs using `ng test` command.
+6. Lint source using `ng lint` command.
+7. Commit your changes using a descriptive commit message that follows our [commit message conventions](#commit-guidelines). 
+8. Push your branch to your fork on GitHub
+9. In GitHub, send a pull request to `scion-workbench:master`.
+10. If we suggest changes, please rebase your branch and force push to your GitHub repository.
+
+> Please be in mind that large pull requests take a lot of time to review.
 
 ## Build SCION Workbench
 The project is built with Travis CI and is automatically built, its tests executed and linted as you push it to GitHub.
@@ -95,6 +109,8 @@ Besides linting rules, the following rules apply:
 - we use explicit public or private visibility modifiers (except for constructors) to make code more explicit
 - we use single quotes for string literals or import statements
 - we use 2 spaces per indentation
+- all features or bug fixes related to `routing` or `view grid` must be tested by one or more specs placed in `/projects/scion/workbench/src/lib/spec` directory
+- all public API must be documented
 
 ## Line endings
 This project expects line endings of textual files to be Unix style (LF) only, and which is in the responsibility of the committer. There is no automatic line ending conversation done by Git on checkout nor when indexing files. Instead, configure your editor to use unix-style delimiter for new files and disable auto conversion in Git. However, the linting rule `linebreak-style` enforces a unix-style linebreak style for TypeScript files.
