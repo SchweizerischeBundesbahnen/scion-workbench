@@ -78,7 +78,7 @@ To open a component in a view, it has to be registered as a route in your routin
 
 Alternatively, navigation can also be done in the component class. For that, inject `WorkbenchRouter` and use its `navigate` method.
 
-```javascript
+```typescript
 constructor(private wbRouter: WorkbenchRouter) {
 }
 
@@ -102,7 +102,7 @@ View activation is based on the routing path, meaning that if a view with a matc
 <a [wbRouterLink]="['/persons', person.id]" [wbRouterLinkExtras]="{tryActivateView: false}">Open person</a>
 ```
 
-```javascript
+```typescript
 wbRouter.navigate(['persons', id], {tryActivateView: false});
 ```
 
@@ -119,7 +119,7 @@ Unlike query parameters, matrix parameters are not global and part of the routin
 ## How to set a title of a view tab
 Title and heading of a view tab are set by the component currently displayed in the view. For that, inject `WorkbenchView` to get a handle to interact with the current view.
 
-```javascript
+```typescript
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
@@ -153,7 +153,7 @@ export class PersonComponent implements OnDestroy {
 ## How to close a view?
 A view can be closed in two ways, either by the close button in the view tab, or programmatically. By default, a view is closable via view tab close button, which you can disable by injecting a handle to the view and set `closable` property to 'false'. To programmatically close a view, invoke `close` method of injected `WorkbenchView`.
 
-```javascript
+```typescript
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
@@ -176,7 +176,7 @@ Closing of a view can be intercepted by implementing `WbBeforeDestroy` lifecycle
 
 The following snippet asks the user whether to save changes.
 
-```javascript 
+```typescript 
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
@@ -250,7 +250,7 @@ The content can be as simple as some text, or a component to be displayed. When 
 
 A message box can be application  modal or view modal, which you can control by setting 'modality' property. By default, and if in view context, the message box is view modal.
 
-```javascript
+```typescript
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
@@ -281,7 +281,7 @@ To show a notification, inject `NotificationService` and invoke `notify` method.
 
 The content can be as simple as some text, or a component to be displayed. When specifying a component, do not forget to register it as `entryComponents` in your application module, so it is available at runtime.
 
-```javascript
+```typescript
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
@@ -331,7 +331,7 @@ ng generate component feature/view2
 ```
 
 ### 2. In `FeatureModule`, manifest a dependency to the workbench
-```javascript
+```typescript
 @NgModule({
   imports: [
     CommonModule,
@@ -350,7 +350,7 @@ export class FeatureModule {
 
 ### 3. In `FeatureRoutingModule`, add the routes to the activity component and the two view components
 
-```javascript
+```typescript
 const routes: Routes = [
   {
     path: '',
@@ -375,7 +375,7 @@ export class FeatureRoutingModule {
 ```
 ### 4. In `AppRoutingModule`, update the routes array to point to the feature module
 
-```javascript
+```typescript
 const routes: Routes = [
   {
     path: 'feature', // base path to the feature module
