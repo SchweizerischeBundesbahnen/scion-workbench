@@ -36,7 +36,7 @@ npm install --save @scion/workbench @angular/cdk
 ## Step 2: Import SCION Workbench module
 Open `app.module.ts` and manifest an import dependency to `WorkbenchModule`.
 
-```javascript
+```typescript
 const appRoutes: Routes = [];
 
 @NgModule({
@@ -123,7 +123,7 @@ ng generate component PersonList
 ## Step 6: Register a route for the activity component
 In application routing module, register a route pointing to `PersonListComponent`.
 
-```javascript
+```typescript
 const routes: Routes = [
   {path: 'persons', component: PersonListComponent},
 ];
@@ -168,7 +168,7 @@ ng generate component Person
 ## Step 9: Create a route for the view component
 In application routes, register a route pointing to `PersonComponent`.
 
-  ```javascript
+  ```typescript
   const routes: Routes = [
   {path: 'persons', component: PersonListComponent},
   {path: 'persons/:id', component: PersonComponent},
@@ -194,7 +194,7 @@ When clicking on the link, a new view is opened for the specified person.
 In `PersonComponent` inject Angular `ActivatedRoute` to listen for route parameter changes and to load respective data.\
 By injecting `WorkbenchView`, the view can be set a title.
 
-```javascript
+```typescript
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
