@@ -6,6 +6,7 @@
       "attribute",
       [
         "wb",
+        "sci",
         "spec"
       ],
       "camelCase"
@@ -15,6 +16,7 @@
       "element",
       [
         "wb",
+        "sci",
         "spec"
       ],
       "kebab-case"

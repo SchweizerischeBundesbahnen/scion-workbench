@@ -13,7 +13,7 @@ import { InternalWorkbenchView } from '../workbench.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
-import { ViewportComponent } from '../viewport/viewport.component';
+import { SciViewportComponent } from '../ui/viewport/viewport.component';
 import { WbRouterOutletDirective } from '../routing/wb-router-outlet.directive';
 import { WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
 import { MessageBoxService } from '../message-box/message-box.service';
@@ -37,8 +37,8 @@ export class ViewComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  @ViewChild(ViewportComponent)
-  private _viewport: ViewportComponent;
+  @ViewChild(SciViewportComponent)
+  private _viewport: SciViewportComponent;
 
   @ViewChild('router_outlet')
   public routerOutlet: WbRouterOutletDirective; // specs
@@ -65,7 +65,7 @@ export class ViewComponent implements OnDestroy {
   }
 
   private onActivateView(): void {
-    this._viewport.requestFocus();
+    this._viewport.viewportElement.focus();
     this._viewport.scrollTop = this._view.scrollTop;
     this._viewport.scrollLeft = this._view.scrollLeft;
   }

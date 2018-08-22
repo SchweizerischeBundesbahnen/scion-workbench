@@ -1,0 +1,45 @@
+$scrollbar-size: 12px;
+
+:host {
+  display: block;
+  position: relative; // positioned anchor for viewport and scrollbars
+  overflow: hidden;
+
+  > div.viewport {
+    display: flex; // part of API
+    flex-flow: column nowrap; // part of API
+    position: absolute;
+    outline: none;
+  }
+
+  > sci-scrollbar {
+    position: absolute;
+    transition-duration: 1s;
+    transition-property: opacity;
+    transition-timing-function: ease-out;
+
+    &.vertical {
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: unset;
+      width: $scrollbar-size;
+    }
+
+    &.horizontal {
+      top: unset;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: $scrollbar-size;
+    }
+  }
+}
+
+// Hide emulated scrollbar if all the following conditions are met:
+// - viewport not hovered (mouse navigation)
+// - viewport not active (touch navigation)
+// - not scrolling (ensures the scrollbar to be visible even if dragging the thumb outside of the viewport, :active pseudo-class not working in IE and Firefox)
+:host-context:not(:hover):not(:active) > sci-scrollbar:not(.scrolling) {
+  opacity: 0; // do not use 'display' nor 'visibility' property to fade the scrollbar
+}

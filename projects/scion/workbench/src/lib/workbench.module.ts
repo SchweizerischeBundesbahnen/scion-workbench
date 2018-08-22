@@ -15,15 +15,12 @@ import { WorkbenchComponent } from './workbench.component';
 import { ActivityPartComponent } from './activity-part/activity-part.component';
 import { SashDirective } from './sash.directive';
 import { WorkbenchActivityPartService } from './activity-part/workbench-activity-part.service';
-import { ScrollbarComponent } from './scrollbar/scrollbar.component';
 import { ViewPartComponent } from './view-part/view-part.component';
 import { PortalModule } from '@angular/cdk/portal';
 import { ViewTabComponent } from './view-part/view-tab/view-tab.component';
-import { ViewportComponent } from './viewport/viewport.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SearchfieldComponent } from './searchfield/searchfield.component';
 import { ViewListComponent } from './view-part/view-list/view-list.component';
-import { DimensionDirective } from './wb-dimension.directive';
 import { ViewListButtonComponent } from './view-part/view-list-button/view-list-button.component';
 import { ViewPartBarComponent } from './view-part/view-part-bar/view-part-bar.component';
 import { WorkbenchService } from './workbench.service';
@@ -60,6 +57,8 @@ import { EmptyOutletComponent } from './routing/empty-outlet.component';
 import { ViewRegistrySynchronizer } from './routing/view-registry-synchronizer.service';
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
+import { SciViewportModule } from './ui/viewport/viewport.module';
+import { SciDimensionModule } from './ui/dimension/dimension.module';
 
 const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 
@@ -69,6 +68,8 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     RouterModule.forChild([]),
     PortalModule,
     ReactiveFormsModule,
+    SciViewportModule,
+    SciDimensionModule,
   ],
   declarations: [
     WorkbenchComponent,
@@ -82,12 +83,9 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     ViewListButtonComponent,
     ViewListComponent,
     ViewPartGridComponent,
-    ScrollbarComponent,
-    ViewportComponent,
     SearchfieldComponent,
     SashDirective,
     ViewPartSashBoxComponent,
-    DimensionDirective,
     DropZoneDirective,
     WbPortalOutletComponent,
     RemoteSiteComponent,
@@ -106,10 +104,7 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     WorkbenchComponent,
     WbActivityDirective,
     WbActivityActionDirective,
-    ViewportComponent,
-    ScrollbarComponent,
     SashDirective,
-    DimensionDirective,
     WbRouterLinkDirective,
     WbRouterLinkWithHrefDirective,
     RemoteSiteComponent,

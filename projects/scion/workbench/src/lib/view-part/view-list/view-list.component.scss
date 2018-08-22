@@ -8,20 +8,11 @@
     border-bottom: 1px solid rgba(102, 102, 102, .2);
   }
 
-  > wb-viewport {
+  > sci-viewport {
     flex: auto;
 
-    ::ng-deep .wb-viewport {
-    }
-
-    ::ng-deep .wb-viewport-client {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-
-      > wb-view-tab {
-        flex: none;
-      }
+    wb-view-tab {
+      flex: none;
     }
   }
 }
