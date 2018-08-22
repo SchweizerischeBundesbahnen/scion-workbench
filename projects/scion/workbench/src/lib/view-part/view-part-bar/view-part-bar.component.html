@@ -1,7 +1,6 @@
-<wb-viewport [viewportCssClass]="'wb-viewport'"
-             [viewportClientCssClass]="'wb-viewport-client'"
-             (viewportChange)="onViewportChange()"
-             [overflowAuto]="false">
-  <wb-view-tab *ngFor="let viewRef of viewPartService.viewRefs" [viewRef]="viewRef" [renderingHint]="'tab-item'"></wb-view-tab>
-</wb-viewport>
+<sci-viewport (viewportChange)="onViewportChange()" scrollbarStyle="hidden">
+  <div class="viewport-client">
+    <wb-view-tab *ngFor="let viewRef of viewPartService.viewRefs" [viewRef]="viewRef" [renderingHint]="'tab-item'"></wb-view-tab>
+  </div>
+</sci-viewport>
 <wb-view-list-button></wb-view-list-button>

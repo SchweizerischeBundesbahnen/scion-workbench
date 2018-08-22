@@ -9,7 +9,7 @@
  */
 
 import { AfterViewInit, Component, ElementRef, HostListener, QueryList, ViewChildren } from '@angular/core';
-import { ViewportComponent } from '../../viewport/viewport.component';
+import { SciViewportComponent } from '../../ui/viewport/viewport.component';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { ViewTabComponent } from '../view-tab/view-tab.component';
 import { DomUtil } from '../../dom.util';
@@ -65,8 +65,8 @@ export class ViewListComponent implements AfterViewInit {
       });
   }
 
-  public onViewportChange(viewport: ViewportComponent): void {
-    const viewlistHeight = viewport.viewportClientDimension.offsetHeight;
+  public onViewportChange(viewport: SciViewportComponent): void {
+    const viewlistHeight = viewport.scrollHeight;
     this.viewportHeight = Math.min(viewlistHeight, ViewListComponent.MAX_VIEWLIST_VIEWPORT_HEIGHT);
   }
 

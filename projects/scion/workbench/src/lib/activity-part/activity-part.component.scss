@@ -82,13 +82,15 @@ $diamond-height: 8;
       }
     }
 
-    > wb-viewport {
+    > sci-viewport {
       flex: auto;
 
-      ::ng-deep .wb-viewport-client {
-        display: block;
-        width: 100%;
-        height: 100%;
+      wb-router-outlet {
+        flex: none;
+      }
+
+      wb-router-outlet + ::ng-deep * {
+        flex: 1 1 100%;
       }
     }
 
