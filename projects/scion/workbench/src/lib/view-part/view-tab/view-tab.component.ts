@@ -11,7 +11,7 @@
 import { Component, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
 import { InternalWorkbenchView } from '../../workbench.model';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
-import { ViewportComponent } from '../../viewport/viewport.component';
+import { SciViewportComponent } from '../../ui/viewport/viewport.component';
 import { noop } from 'rxjs';
 import { WorkbenchService } from '../../workbench.service';
 import { VIEW_DRAG_TYPE } from '../../workbench.constants';
@@ -40,7 +40,7 @@ export class ViewTabComponent {
               private _workbench: WorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
               private _workbenchLayout: WorkbenchLayoutService,
-              private _viewport: ViewportComponent,
+              private _viewport: SciViewportComponent,
               private _viewPartService: WorkbenchViewPartService) {
     this._host = host.nativeElement;
   }

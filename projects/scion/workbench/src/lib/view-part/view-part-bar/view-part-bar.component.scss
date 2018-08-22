@@ -5,14 +5,13 @@
   background-color: $viewpart_tabbar-bgcolor;
   color: $viewpart_tab-fgcolor;
 
-  > wb-viewport {
+  > sci-viewport {
     flex: auto;
 
-    ::ng-deep .wb-viewport {
-    }
-
-    ::ng-deep .wb-viewport-client {
+    div.viewport-client {
       display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
 
       > wb-view-tab {
         flex: none;

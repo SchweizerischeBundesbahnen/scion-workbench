@@ -16,9 +16,10 @@ export { WorkbenchView, WorkbenchViewPart, WbBeforeDestroy } from './lib/workben
 export { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './lib/routing/wb-router-link.directive';
 export { WorkbenchRouter } from './lib/routing/workbench-router.service';
 export { WorkbenchComponent } from './lib/workbench.component';
-export { ViewportComponent } from './lib/viewport/viewport.component';
-export { ScrollbarComponent } from './lib/scrollbar/scrollbar.component';
-export { DimensionDirective, Dimension } from './lib/wb-dimension.directive';
+export { SciViewportModule } from './lib/ui/viewport/viewport.module';
+export { SciViewportComponent } from './lib/ui/viewport/viewport.component';
+export { SciDimensionModule } from './lib/ui/dimension/dimension.module';
+export { SciDimensionDirective, SciDimension } from './lib/ui/dimension/dimension.directive';
 export { RemoteSiteComponent } from './lib/remote-site/remote-site.component';
 export { OverlayHostRef } from './lib/overlay-host-ref.service';
 export { WbActivityDirective } from './lib/activity-part/wb-activity.directive';

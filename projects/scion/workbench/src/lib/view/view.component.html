@@ -1,12 +1,9 @@
-<wb-viewport [viewportCssClass]="'wb-viewport'"
-             [viewportClientCssClass]="'wb-viewport-client'"
-             #outlet="wbOverlayTemplateOutlet"
-             [wbOverlayTemplateOutlet]="mbox_stack_template">
+<sci-viewport #outlet="wbOverlayTemplateOutlet" [wbOverlayTemplateOutlet]="mbox_stack_template">
   <wb-router-outlet #router_outlet="outlet"
                     (activate)="onActivateRoute(router_outlet.activatedRoute)"
                     (deactivate)="onDeactivateRoute()">
   </wb-router-outlet>
-</wb-viewport>
+</sci-viewport>
 
 <ng-template #mbox_stack_template>
   <wb-message-box-stack [ngStyle]="outlet.style"></wb-message-box-stack>

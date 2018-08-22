@@ -12,22 +12,22 @@ import { Directive, DoCheck, ElementRef, EventEmitter, Input, NgZone, OnDestroy,
 import { fromEvent, interval, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-export const NULL_DIMENSION: Dimension = {offsetWidth: 0, offsetHeight: 0, clientWidth: 0, clientHeight: 0};
+export const NULL_DIMENSION: SciDimension = {offsetWidth: 0, offsetHeight: 0, clientWidth: 0, clientHeight: 0};
 
 /**
- * Notifies upon a component dimension change.
+ * Notifies upon dimension change of the host element.
  */
 @Directive({
-  selector: '[wbDimension]'
+  selector: '[sciDimension]'
 })
-export class DimensionDirective implements OnInit, DoCheck, OnDestroy {
+export class SciDimensionDirective implements OnInit, DoCheck, OnDestroy {
 
   private _host: HTMLElement;
-  private _dimension: Dimension = NULL_DIMENSION;
+  private _dimension: SciDimension = NULL_DIMENSION;
   private _destroy$ = new Subject<void>();
 
-  @Output()
-  public wbDimensionChange = new EventEmitter<Dimension>();
+  @Output('sciDimensionChange') // tslint:disable-line:no-output-rename
+  public dimensionChange = new EventEmitter<SciDimension>();
 
 
   /**
@@ -37,7 +37,7 @@ export class DimensionDirective implements OnInit, DoCheck, OnDestroy {
    *
    * If so, set this property to 'true' to detect dimension changes when a periodic timer fires.
    */
-  @Input('wbDimensionUseTimer') // tslint:disable-line:no-input-rename
+  @Input('sciDimensionUseTimer') // tslint:disable-line:no-input-rename
   public useTimer: boolean;
 
   constructor(host: ElementRef, private _ngZone: NgZone) {
@@ -85,11 +85,11 @@ export class DimensionDirective implements OnInit, DoCheck, OnDestroy {
     }
 
     this._dimension = newDimension;
-    this._ngZone.run(() => this.wbDimensionChange.emit(this._dimension));
+    this._ngZone.run(() => this.dimensionChange.emit(this._dimension));
   }
 }
 
-export interface Dimension {
+export interface SciDimension {
   offsetWidth: number;
   offsetHeight: number;
   clientWidth: number;

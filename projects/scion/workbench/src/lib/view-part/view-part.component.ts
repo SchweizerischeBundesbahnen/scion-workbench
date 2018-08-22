@@ -16,7 +16,7 @@ import { WorkbenchService } from '../workbench.service';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { takeUntil } from 'rxjs/operators';
 import { VIEW_DRAG_TYPE } from '../workbench.constants';
-import { Dimension } from '../wb-dimension.directive';
+import { SciDimension } from '../ui/dimension/dimension.directive';
 
 @Component({
   selector: 'wb-view-part',
@@ -29,7 +29,7 @@ import { Dimension } from '../wb-dimension.directive';
 export class ViewPartComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  private _portalDimension: Dimension;
+  private _portalDimension: SciDimension;
 
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
@@ -110,7 +110,7 @@ export class ViewPartComponent implements OnDestroy {
     return region !== 'center' ? this.viewPartService.moveViewToNewViewPart(viewRef, region) : Promise.resolve(false);
   }
 
-  public onPortalDimensionChange(dimension: Dimension): void {
+  public onPortalDimensionChange(dimension: SciDimension): void {
     this._portalDimension = dimension;
   }
 
