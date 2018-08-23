@@ -10,6 +10,10 @@ $scrollbar-size: 12px;
     flex-flow: column nowrap; // part of API
     position: absolute;
     outline: none;
+
+    // use momentum-based scrolling so that the viewport client continues to scroll for a while after finishing the scroll gesture
+    // and removing the finger from the touchscreen.
+    -webkit-overflow-scrolling: touch;
   }
 
   > sci-scrollbar {
