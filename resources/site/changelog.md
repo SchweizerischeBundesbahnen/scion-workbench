@@ -5,6 +5,13 @@
 
 # Changelog
 
+<a name="0.0.0-beta.9"></a>
+## [0.0.0-beta.9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.8...0.0.0-beta.9) (2018-08-23)
+
+### Bug Fixes
+
+* Use momentum-based scrolling to continue to scroll after finishing the scroll gesture ([#14](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/14)) ([71c81a5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/71c81a5))
+
 <a name="0.0.0-beta.8"></a>
 ## [0.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.7...0.0.0-beta.8) (2018-08-22)
 
