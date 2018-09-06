@@ -6,3 +6,4 @@
 
 ### Bug Fixes
 
+* Allow lazily-loaded views to inject masked injection tokens ([#21](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/21)) ([xxx](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/xxx))

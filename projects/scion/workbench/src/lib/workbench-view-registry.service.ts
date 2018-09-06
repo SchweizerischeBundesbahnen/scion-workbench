@@ -26,8 +26,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
   private readonly _destroy$ = new Subject<void>();
   private readonly _viewRegistry = new Map<string, InternalWorkbenchView>();
 
-  constructor(private _injector: Injector,
-              private _componentFactoryResolver: ComponentFactoryResolver,
+  constructor(private _componentFactoryResolver: ComponentFactoryResolver,
               private _workbench: WorkbenchService) {
   }
 
@@ -91,8 +90,17 @@ export class WorkbenchViewRegistry implements OnDestroy {
     injectionTokens.set(WorkbenchView, view);
     injectionTokens.set(InternalWorkbenchView, view);
 
+    // We must not use the root injector as parent injector of the portal component element injector.
+    // Otherwise, if tokens of the root injector are masked or extended in lazily loaded modules, they would not be resolved.
+    //
+    // This is by design of Angular injection token resolution rules of not checking module injectors when checking the element hierarchy for a token.
+    // See function `resolveDep` in Angular file `provider.ts`.
+    //
+    // Instead, we use a {NullInjector} which further acts as a barrier to not resolve workbench internal tokens declared somewhere in the element hierarchy.
+    const injector = new PortalInjector(Injector.NULL, injectionTokens);
+
     portal.init({
-      injector: new PortalInjector(this._injector, injectionTokens),
+      injector: injector,
       onActivate: (): void => view.activate(true),
       onDeactivate: (): void => view.activate(false),
     });
