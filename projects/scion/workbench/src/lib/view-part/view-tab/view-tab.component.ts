@@ -8,23 +8,25 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, Input, NgZone, OnDestroy } from '@angular/core';
 import { InternalWorkbenchView } from '../../workbench.model';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { SciViewportComponent } from '../../ui/viewport/viewport.component';
-import { noop } from 'rxjs';
+import { fromEvent, merge, noop, Subject } from 'rxjs';
 import { WorkbenchService } from '../../workbench.service';
 import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { WorkbenchViewRegistry } from '../../workbench-view-registry.service';
+import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'wb-view-tab',
   templateUrl: './view-tab.component.html',
   styleUrls: ['./view-tab.component.scss']
 })
-export class ViewTabComponent {
+export class ViewTabComponent implements OnDestroy {
 
+  private _destroy$: Subject<void> = new Subject<void>();
   private _host: HTMLElement;
   public view: InternalWorkbenchView;
 
@@ -41,8 +43,10 @@ export class ViewTabComponent {
               private _viewRegistry: WorkbenchViewRegistry,
               private _workbenchLayout: WorkbenchLayoutService,
               private _viewport: SciViewportComponent,
-              private _viewPartService: WorkbenchViewPartService) {
+              private _viewPartService: WorkbenchViewPartService,
+              zone: NgZone) {
     this._host = host.nativeElement;
+    this.installMaximizeListener(zone);
   }
 
   @HostBinding('class.active')
@@ -73,12 +77,6 @@ export class ViewTabComponent {
   @HostListener('click')
   public onClick(): void {
     this._viewPartService.activateView(this.viewRef).then(noop);
-  }
-
-  @HostListener('dblclick', ['$event'])
-  public onDoubleClick(event: MouseEvent): void {
-    this._workbenchLayout.toggleMaximized();
-    event.stopPropagation();
   }
 
   @HostBinding('attr.draggable')
@@ -152,5 +150,35 @@ export class ViewTabComponent {
 
   public get viewRef(): string {
     return this.view.viewRef;
+  }
+
+  /**
+   * Listens for 'dblclick' events to maximize or minimize the application main content, unless closing views quickly.
+   */
+  private installMaximizeListener(zone: NgZone): void {
+    // Install listeners outside the Angular zone to not change detect the application upon every mouse event.
+    zone.runOutsideAngular(() => {
+      let enabled = false;
+
+      merge(fromEvent(this._host, 'mouseenter'), fromEvent(this._host, 'mousemove'), fromEvent(this._host, 'mouseleave'))
+        .pipe(takeUntil(this._destroy$))
+        .subscribe((event: Event) => {
+          enabled = (event.type === 'mousemove');
+        });
+
+      fromEvent(this._host, 'dblclick')
+        .pipe(
+          filter(() => enabled),
+          takeUntil(this._destroy$)
+        )
+        .subscribe((event: Event) => {
+          zone.run(() => this._workbenchLayout.toggleMaximized());
+          event.stopPropagation(); // prevent `ViewPartBarComponent` handling the dblclick event which would undo maximization/minimization
+        });
+    });
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }
