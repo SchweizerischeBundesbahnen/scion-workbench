@@ -5,6 +5,13 @@
 
 # Changelog
 
+<a name="0.0.0-beta.10"></a>
+## [0.0.0-beta.10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.9...0.0.0-beta.10) (2018-09-10)
+
+### Bug Fixes
+
+* Allow lazily-loaded views to inject masked injection tokens ([#21](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/21)) ([fe9b530](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/fe9b530))
+
 <a name="0.0.0-beta.9"></a>
 ## [0.0.0-beta.9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.8...0.0.0-beta.9) (2018-08-23)
 
