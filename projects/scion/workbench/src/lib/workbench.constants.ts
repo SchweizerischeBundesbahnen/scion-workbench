@@ -36,6 +36,11 @@ export const WORKBENCH_FORROOT_GUARD = new InjectionToken<void>('WORKBENCH_FORRO
 export const ACTIVITY_OUTLET_NAME = 'activity';
 
 /**
+ * Represents the key which the activity is associated in data params.
+ */
+export const ACTIVITY_DATA_KEY = 'wb.activity';
+
+/**
  * Specifies the drag type to move views.
  */
 export const VIEW_DRAG_TYPE = 'workbench/view';

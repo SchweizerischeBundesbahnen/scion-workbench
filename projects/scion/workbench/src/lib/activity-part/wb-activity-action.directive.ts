@@ -8,9 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, OnDestroy, Optional, TemplateRef } from '@angular/core';
-import { WbActivityDirective } from './wb-activity.directive';
+import { Directive, OnDestroy, TemplateRef } from '@angular/core';
 import { WorkbenchActivityPartService } from './workbench-activity-part.service';
+import { Activity } from './activity';
+import { ActivatedRoute } from '@angular/router';
+import { Disposable } from '../disposable';
 
 /**
  * Use this directive to model an action for an activity, which is displayed
@@ -32,19 +34,21 @@ import { WorkbenchActivityPartService } from './workbench-activity-part.service'
 })
 export class WbActivityActionDirective implements OnDestroy {
 
-  private readonly _activity: WbActivityDirective;
+  private readonly _activity: Activity;
+  private readonly _action: Disposable;
 
-  constructor(@Optional() private _template: TemplateRef<void>,
-              activityService: WorkbenchActivityPartService) {
-    if (!this._template) {
-      throw Error('Illegal usage: Host element of this modelling directive must be a <ng-template>');
+  constructor(private _template: TemplateRef<void>,
+              activityService: WorkbenchActivityPartService,
+              route: ActivatedRoute) {
+    this._activity = activityService.getActivityFromRoutingContext(route.snapshot);
+    if (!this._activity) {
+      throw Error('[RoutingContextError] Route not in the context of an activity');
     }
 
-    this._activity = activityService.activeActivity;
-    this._activity.registerAction(this._template);
+    this._action = this._activity.registerAction(this._template);
   }
 
   public ngOnDestroy(): void {
-    this._activity.unregisterAction(this._template);
+    this._action.dispose();
   }
 }

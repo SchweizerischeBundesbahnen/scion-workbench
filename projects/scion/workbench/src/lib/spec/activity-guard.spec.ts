@@ -19,7 +19,7 @@ import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.sp
 import { ActivityPartComponent } from '../activity-part/activity-part.component';
 import { By } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs/index';
+import { Observable } from 'rxjs';
 
 /**
  *
