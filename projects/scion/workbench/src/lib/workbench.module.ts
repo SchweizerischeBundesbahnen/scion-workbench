@@ -59,6 +59,8 @@ import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
 import { SciViewportModule } from './ui/viewport/viewport.module';
 import { SciDimensionModule } from './ui/dimension/dimension.module';
+import { ActivityResolver } from './routing/activity.resolver';
+import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
 
 const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 
@@ -113,7 +115,9 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 export class WorkbenchModule {
 
   // Note: We are injecting ViewRegistrySynchronizer so it gets created eagerly...
-  constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any, viewRegistrySynchronizer: ViewRegistrySynchronizer) {
+  constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any, viewRegistrySynchronizer: ViewRegistrySynchronizer, auxRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator) {
+    // Register an activity auxiliary route for every primary route
+    auxRoutesRegistrator.registerActivityAuxiliaryRoutes();
   }
 
   /**
@@ -145,6 +149,8 @@ export class WorkbenchModule {
         WorkbenchService,
         WorkbenchLayoutService,
         WorkbenchActivityPartService,
+        WorkbenchAuxiliaryRoutesRegistrator,
+        ActivityResolver,
         NotificationService,
         MessageBoxService,
         ViewPartGridSerializerService,

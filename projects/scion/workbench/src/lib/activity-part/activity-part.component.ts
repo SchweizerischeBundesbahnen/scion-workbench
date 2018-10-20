@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { animate, AnimationBuilder, AnimationPlayer, style, transition, trigger } from '@angular/animations';
 import { WorkbenchActivityPartService } from './workbench-activity-part.service';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { noop, Observable, Subject } from 'rxjs';
 import { ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME } from '../workbench.constants';
-import { WbActivityDirective } from './wb-activity.directive';
+import { Activity } from './activity';
 
 @Component({
   selector: 'wb-activity-part',
@@ -55,7 +55,17 @@ export class ActivityPartComponent {
   constructor(public host: ElementRef<HTMLElement>,
               public activityPartService: WorkbenchActivityPartService,
               private _workbenchLayout: WorkbenchLayoutService,
-              private _animationBuilder: AnimationBuilder) {
+              private _animationBuilder: AnimationBuilder,
+              private _cd: ChangeDetectorRef) {
+  }
+
+  public get activities(): Activity[] {
+    return this.activityPartService.activities.filter(it => it.visible);
+  }
+
+  public get activeActivity(): Activity {
+    const activeActivity = this.activityPartService.activeActivity;
+    return activeActivity && activeActivity.visible ? activeActivity : null;
   }
 
   public set panelWidth(panelWidth: number) {
@@ -71,7 +81,7 @@ export class ActivityPartComponent {
     return this._panelWidth$.asObservable();
   }
 
-  public onActivate(activity: WbActivityDirective): false {
+  public onActivate(activity: Activity): false {
     this.activityPartService.activateActivity(activity).then(noop);
     return false; // prevent UA to follow 'href'
   }
@@ -91,6 +101,10 @@ export class ActivityPartComponent {
 
   public onSashReset(): void {
     this.panelWidth = ActivityPartComponent.PANEL_INITIAL_WIDTH;
+  }
+
+  public onPanelAnimationDone(): void {
+    this._cd.detectChanges();
   }
 
   private ensureMinimalPanelWidth(): void {

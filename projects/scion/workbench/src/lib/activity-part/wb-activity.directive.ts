@@ -8,8 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, Input, OnChanges, SimpleChanges, TemplateRef } from '@angular/core';
-import { InternalWorkbenchRouter } from '../routing/workbench-router.service';
+import { Directive, Input, OnDestroy, OnInit } from '@angular/core';
+import { Activity } from './activity';
+import { WorkbenchActivityPartService } from './workbench-activity-part.service';
 
 /**
  * Use this directive to model an activity as content child of <wb-workbench>.
@@ -28,38 +29,33 @@ import { InternalWorkbenchRouter } from '../routing/workbench-router.service';
  * </wb-workbench>
  */
 @Directive({selector: 'wb-activity', exportAs: 'activity'}) // tslint:disable-line:directive-selector
-export class WbActivityDirective implements OnChanges {
+export class WbActivityDirective implements OnInit, OnDestroy {
 
-  private _commands: any[] = [];
-  private _path: string;
-
-  /**
-   * Actions of this activity.
-   */
-  public actions: TemplateRef<void>[] = [];
-
-  /**
-   * Number of pixels added to the activity panel width if this is the active activity.
-   */
-  public panelWidthDelta = 0;
+  public readonly activity: Activity;
 
   /**
    * Specifies the title of the activity.
    */
   @Input()
-  public title: string;
+  public set title(title: string) {
+    this.activity.title = title;
+  }
 
   /**
    * Use in combination with an icon font to specify the icon.
    */
   @Input()
-  public label: string;
+  public set label(label: string) {
+    this.activity.label = label;
+  }
 
   /**
    * Specifies the CSS class(es) used for the icon, e.g. 'material-icons' when using Angular Material Design.
    */
   @Input()
-  public cssClass: string | string[];
+  public set cssClass(cssClass: string | string[]) {
+    this.activity.cssClass = cssClass;
+  }
 
   /**
    * Specifies the routing commands used by Angular router to navigate when this activity is clicked.
@@ -72,47 +68,45 @@ export class WbActivityDirective implements OnChanges {
    * @see Router
    */
   @Input()
-  public routerLink: any[] | string;
+  public set routerLink(routerLink: any[] | string) {
+    this.activity.routerLink = routerLink;
+  }
 
   /**
-   * Controls where to open the resolved component:
-   *
-   * - activity-panel: component is opened in the activity panel (default)
-   * - view: component is displayed as a view
+   * Controls whether to open this activity in the activity panel or to open it in a separate view.
    */
   @Input()
-  public target: 'activity-panel' | 'view' = 'activity-panel';
-
-  constructor(private _wbRouter: InternalWorkbenchRouter) {
+  public set target(target: 'activity-panel' | 'view') {
+    this.activity.target = target;
   }
 
-  public registerAction(action: TemplateRef<void>): void {
-    this.actions.push(action);
+  /**
+   * Controls whether to show or hide this activity. By default, this activity is showing.
+   *
+   * Use over *ngIf directive to show or hide this activity based on a conditional.
+   */
+  @Input()
+  public set visible(visible: boolean) {
+    this.activity.visible = visible;
   }
 
-  public unregisterAction(action: TemplateRef<void>): void {
-    const index = this.actions.indexOf(action);
-    if (index === -1) {
-      throw Error('Illegal argument: action not contained');
-    }
-    this.actions.splice(index, 1);
+  /**
+   * Specifies where to insert this activity in the list of activities.
+   */
+  @Input()
+  public set position(insertionOrder: number) {
+    this.activity.position = insertionOrder;
   }
 
-  public get path(): string {
-    return this._path;
+  constructor(private _activityPartService: WorkbenchActivityPartService) {
+    this.activity = this._activityPartService.createActivity();
   }
 
-  public get commands(): any[] {
-    return this._commands;
+  public ngOnInit(): void {
+    this._activityPartService.addActivity(this.activity);
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    if (!changes.routerLink) {
-      return;
-    }
-
-    const commands = this.routerLink;
-    this._commands = this._wbRouter.normalizeCommands(commands ? (Array.isArray(commands) ? commands : [commands]) : []);
-    this._path = this.commands.filter(it => typeof it === 'string').join('/');
+  public ngOnDestroy(): void {
+    this._activityPartService.removeActivity(this.activity);
   }
 }

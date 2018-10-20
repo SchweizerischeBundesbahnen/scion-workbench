@@ -1,28 +1,36 @@
 <!-- Activity Bar -->
 <ul class="activity-bar">
-  <li *ngFor="let activity of activityPartService.activities">
+  <li *ngFor="let activity of activities">
     <a href=""
-       (click)="onActivate(activity);"
-       [class.active]="activityPartService.isActive(activity)"
+       (click)="onActivate(activity)"
+       [class.active]="activity.active"
        [ngClass]="activity.cssClass"
        [attr.title]="activity.title">
       {{activity.label || ''}}
     </a>
-    <div class="diamond" *ngIf="activityPartService.isActive(activity)"></div>
+    <div class="diamond" *ngIf="activity.active"></div>
   </li>
 </ul>
 
 <!-- Activity Panel -->
-<div *ngIf="activityPartService.activeActivity as activity"
+<div *ngIf="activeActivity as activity"
      #panel
      class="activity-panel"
      [style.width.px]="panelWidth + activity.panelWidthDelta"
-     [@panel-enter-or-leave]>
+     [@panel-enter-or-leave]
+     (@panel-enter-or-leave.done)="onPanelAnimationDone()">
 
   <header>
     <h1>{{activity.title}}</h1>
     <ul>
-      <li *ngFor="let action of activity.actions" [ngTemplateOutlet]="action"></li>
+      <li *ngFor="let action of activity.actions">
+        <ng-container *ngIf="action.component">
+          <ng-container *ngComponentOutlet="action.component; injector: action.injector"></ng-container>
+        </ng-container>
+        <ng-container *ngIf="action.template">
+          <ng-container *ngTemplateOutlet="action.template"></ng-container>
+        </ng-container>
+      </li>
     </ul>
   </header>
 

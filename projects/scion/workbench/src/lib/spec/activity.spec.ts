@@ -16,7 +16,7 @@ import { ActivatedRoute, ParamMap, Router, RouteReuseStrategy } from '@angular/r
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { advance, clickElement } from './util/util.spec';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { Subject } from 'rxjs/index';
+import { Subject } from 'rxjs';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { ActivityPartComponent } from '../activity-part/activity-part.component';
@@ -29,15 +29,13 @@ describe('Activity part', () => {
     TestBed.configureTestingModule({
       imports: [AppTestModule]
     });
-
-    TestBed.get(Router).initialNavigation();
   }));
 
-  it('does not throw if an unknown activity is given in URL', fakeAsync(inject([Router], (router: Router) => {
-    router.navigateByUrl('(activity:activity-debug)');
-
+  it('does not throw if a hidden activity is given in URL', fakeAsync(inject([Router], (router: Router) => {
     expect((): void => {
       const fixture = TestBed.createComponent(AppComponent);
+      advance(fixture);
+      router.navigateByUrl('(activity:activity-debug)');
       advance(fixture);
     }).not.toThrowError();
 
@@ -45,11 +43,10 @@ describe('Activity part', () => {
   })));
 
   it('supports initial navigation with an activity registered conditionally based on the value of a query parameter', fakeAsync(inject([Router], (router: Router) => {
-    router.navigateByUrl('(activity:activity-debug)?debug=true'); // initial navigation with the `debug` query param set to `true` to register the activity
-
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
-
+    router.navigateByUrl('(activity:activity-debug)?debug=true'); // initial navigation with the `debug` query param set to `true` to show the activity
+    advance(fixture);
     expect(fixture).toShow(ActivityDebugComponent);
 
     tick();
@@ -96,9 +93,9 @@ describe('Activity part', () => {
 @Component({
   template: `
     <wb-workbench style="position: relative; width: 100%; height: 500px">
-      <wb-activity *ngIf="debug"
-                   cssClass="activity-debug"
+      <wb-activity cssClass="activity-debug"
                    label="activity-debug"
+                   [visible]="debug"
                    routerLink="activity-debug">
       </wb-activity>
       <wb-activity cssClass="activity-1"
