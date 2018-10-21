@@ -20,7 +20,6 @@ import { Router } from '@angular/router';
 import { SpecView1Component, SpecView2Component } from './view-part.model.spec';
 import { ViewComponent } from '../view/view.component';
 import { WorkbenchView } from '../workbench.model';
-import { WorkbenchViewPartService } from '../view-part/workbench-view-part.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
@@ -141,7 +140,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).toBeFalsy('(H)');
 
     // Switch to View 1
-    view1DebugElement.viewPartService.activateView('view.1').then();
+    TestBed.get(WorkbenchService).activateView('view.1').then();
     advance(fixture);
 
     view1DebugElement.component.checked = false;
@@ -157,7 +156,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.2').component.destroyed).toBeFalsy('(N)');
 
     // Switch to View 2
-    view1DebugElement.viewPartService.activateView('view.2').then();
+    TestBed.get(WorkbenchService).activateView('view.2').then();
     advance(fixture);
 
     view1DebugElement.component.checked = false;
@@ -197,7 +196,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.activated).toBeTruthy('(F)');
 
     // Switch to View 1
-    view1DebugElement.viewPartService.activateView('view.1').then();
+    TestBed.get(WorkbenchService).activateView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.active).toBeTruthy('(G)');
@@ -206,7 +205,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.activated).toBeFalsy('(J)');
 
     // Switch to View 2
-    view1DebugElement.viewPartService.activateView('view.2').then();
+    TestBed.get(WorkbenchService).activateView('view.2').then();
     advance(fixture);
 
     expect(view1DebugElement.view.active).toBeFalsy('(K)');
@@ -239,7 +238,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.destroyed).toBeFalsy('(F)');
 
     // Destroy to View 2
-    view1DebugElement.viewPartService.destroyView('view.2').then();
+    TestBed.get(WorkbenchService).destroyView('view.2').then();
     advance(fixture);
     expect(view1DebugElement.view.destroyed).toBeFalsy('(G)');
     expect(view1DebugElement.component.destroyed).toBeFalsy('(H)');
@@ -247,7 +246,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.destroyed).toBeTruthy('(J)');
 
     // Destroy to View 1
-    view1DebugElement.viewPartService.destroyView('view.1').then();
+    TestBed.get(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
     expect(view1DebugElement.view.destroyed).toBeTruthy('(K)');
     expect(view1DebugElement.component.destroyed).toBeTruthy('(L)');
@@ -272,7 +271,7 @@ describe('ViewComponent', () => {
 
     // Try destroy to View 1 (prevent)
     view1DebugElement.component.preventDestroy = true;
-    view1DebugElement.viewPartService.destroyView('view.1').then();
+    TestBed.get(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.destroyed).toBeFalsy('(A)');
@@ -281,7 +280,7 @@ describe('ViewComponent', () => {
 
     // Try destroy to View 1 (accept)
     view1DebugElement.component.preventDestroy = false;
-    view1DebugElement.viewPartService.destroyView('view.1').then();
+    TestBed.get(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.destroyed).toBeTruthy('(D)');
@@ -364,16 +363,14 @@ describe('ViewComponent', () => {
     const view = TestBed.get(WorkbenchViewRegistry).getElseThrow(viewRef);
     const viewComponent = view.portal.componentRef.instance as ViewComponent;
     const component = viewComponent.routerOutlet.component as T;
-    const viewPartService = TestBed.get(WorkbenchService).resolveContainingViewPartServiceElseThrow(viewRef);
 
-    return {view, viewComponent, component, viewPartService};
+    return {view, viewComponent, component};
   }
 
   interface ViewDebugElement<T> {
     view: WorkbenchView;
     viewComponent: ViewComponent;
     component: T;
-    viewPartService: WorkbenchViewPartService;
   }
 });
 

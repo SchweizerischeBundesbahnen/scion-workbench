@@ -243,6 +243,50 @@ describe('Router', () => {
 
     tick();
   })));
+
+  it('allows to close views', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
+    loader.stubbedModules = {
+      './feature-a/feature-a.module#FeatureAModule': FeatureAModule,
+      './feature-b/feature-b.module#FeatureBModule': FeatureBModule,
+    };
+
+    const fixture = TestBed.createComponent(AppComponent);
+    advance(fixture);
+
+    // Open /feature-a/view-1
+    wbRouter.navigate(['feature-a']).then();
+    advance(fixture);
+    expect(fixture).toShow(FeatureA_EntryComponent, '(1a)');
+
+    // Close /feature-a/view-1
+    wbRouter.navigate(['feature-a'], {closeIfPresent: true}).then();
+    advance(fixture);
+    expect(fixture).not.toShow(FeatureA_View1Component, '(1b)');
+
+    // Open /feature-a/view-1
+    wbRouter.navigate(['feature-a/view-1']).then();
+    advance(fixture);
+    expect(fixture).toShow(FeatureA_View1Component, '(2a)');
+
+    // Close /feature-a/view-1
+    wbRouter.navigate(['feature-a/view-1'], {closeIfPresent: true}).then();
+    advance(fixture);
+    expect(fixture).not.toShow(FeatureA_View1Component, '(2b)');
+
+    // Open /feature-a/feature-b/view-1
+    wbRouter.navigate(['feature-a/feature-b/view-1']).then();
+    advance(fixture);
+    expect(fixture).toShow(FeatureB_View1Component, '(3a)');
+
+    // Close /feature-a/feature-b/view-1
+    wbRouter.navigate(['feature-a/feature-b/view-1'], {closeIfPresent: true}).then();
+    advance(fixture);
+    expect(fixture).not.toShow(FeatureB_View1Component, '(3b)');
+
+    // Close not present view
+    wbRouter.navigate(['a/b/c'], {closeIfPresent: true}).then();
+    advance(fixture);
+  })));
 });
 
 /****************************************************************************************************

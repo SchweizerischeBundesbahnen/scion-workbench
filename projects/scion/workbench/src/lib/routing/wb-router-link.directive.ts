@@ -57,7 +57,7 @@ export class WbRouterLinkDirective {
 
   protected createNavigationExtras(ctrlKey: boolean = false): WbNavigationExtras {
     const currentViewRef = this._view && this._view.viewRef;
-    const currentViewPartRef = currentViewRef && this._workbench.resolveContainingViewPartServiceElseThrow(this._view.viewRef).viewPartRef;
+    const currentViewPartRef = currentViewRef && this._workbench.resolveViewPart(currentViewRef);
     const isAbsolute = (typeof this._commands[0] === 'string') && this._commands[0].startsWith('/');
     const relativeTo = (isAbsolute ? null : this._route);
 

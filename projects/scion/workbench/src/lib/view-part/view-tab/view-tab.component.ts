@@ -13,7 +13,7 @@ import { InternalWorkbenchView } from '../../workbench.model';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { SciViewportComponent } from '../../ui/viewport/viewport.component';
 import { fromEvent, merge, noop, Subject } from 'rxjs';
-import { WorkbenchService } from '../../workbench.service';
+import { InternalWorkbenchService } from '../../workbench.service';
 import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { WorkbenchViewRegistry } from '../../workbench-view-registry.service';
@@ -39,7 +39,7 @@ export class ViewTabComponent implements OnDestroy {
   public renderingHint: 'tab-item' | 'list-item' = 'tab-item';
 
   constructor(host: ElementRef<HTMLElement>,
-              private _workbench: WorkbenchService,
+              private _workbench: InternalWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
               private _workbenchLayout: WorkbenchLayoutService,
               private _viewport: SciViewportComponent,
@@ -139,7 +139,7 @@ export class ViewTabComponent implements OnDestroy {
 
   public onClose(event: Event): void {
     event.stopPropagation(); // prevent tab activation
-    this._viewPartService.destroyView(this.viewRef).then(noop);
+    this._workbench.destroyView(this.viewRef).then(noop);
   }
 
   /**

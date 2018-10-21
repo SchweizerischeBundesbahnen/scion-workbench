@@ -16,8 +16,9 @@ import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.sp
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
+import { InternalWorkbenchRouter, WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
+import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 
 describe('WbRouter', () => {
 
@@ -31,7 +32,7 @@ describe('WbRouter', () => {
     TestBed.get(Router).initialNavigation();
   }));
 
-  it('resolves views by path', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('resolves present views by path', fakeAsync(inject([WorkbenchRouter, WorkbenchViewRegistry], (wbRouter: InternalWorkbenchRouter, viewRegistry: WorkbenchViewRegistry) => {
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
@@ -41,7 +42,7 @@ describe('WbRouter', () => {
     advance(fixture);
 
     // Add View 1 again
-    wbRouter.navigate(['path', 'to', 'view-1', {[WB_VIEW_TITLE_PARAM]: 'view-1 (B)'}], {blankViewPartRef: 'viewpart.1', tryActivateView: false}).then();
+    wbRouter.navigate(['path', 'to', 'view-1', {[WB_VIEW_TITLE_PARAM]: 'view-1 (B)'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: false}).then();
     advance(fixture);
 
     // Add View 2
@@ -49,16 +50,16 @@ describe('WbRouter', () => {
     advance(fixture);
 
     // Add View 2 again (activate)
-    wbRouter.navigate(['path', 'to', 'view-2', {[WB_VIEW_TITLE_PARAM]: 'view-1 (B)'}], {blankViewPartRef: 'viewpart.1', tryActivateView: true}).then();
+    wbRouter.navigate(['path', 'to', 'view-2', {[WB_VIEW_TITLE_PARAM]: 'view-1 (B)'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
     advance(fixture);
 
     // Add View 3
-    wbRouter.navigate(['path', 'to', 'view-3', {[WB_VIEW_TITLE_PARAM]: 'view-3'}], {blankViewPartRef: 'viewpart.1', tryActivateView: true}).then();
+    wbRouter.navigate(['path', 'to', 'view-3', {[WB_VIEW_TITLE_PARAM]: 'view-3'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
     advance(fixture);
 
-    expect(wbRouter.resolve(['path', 'to', 'view-1']).map(it => it.title).sort()).toEqual(['view-1 (A)', 'view-1 (B)'].sort());
-    expect(wbRouter.resolve(['path', 'to', 'view-2']).map(it => it.title)).toEqual(['view-2 (A)']);
-    expect(wbRouter.resolve(['path', 'to', 'view-3']).map(it => it.title)).toEqual(['view-3']);
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-1']).map(viewRef => viewRegistry.getElseThrow(viewRef).title).sort()).toEqual(['view-1 (A)', 'view-1 (B)'].sort());
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-2']).map(viewRef => viewRegistry.getElseThrow(viewRef).title)).toEqual(['view-2 (A)']);
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-3']).map(viewRef => viewRegistry.getElseThrow(viewRef).title)).toEqual(['view-3']);
 
     tick();
   })));

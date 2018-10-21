@@ -96,14 +96,14 @@ public openPerson(id: string): void {
 ## How to control in which view to open a component
 When navigating to a component, by default, it is first checked if it is already opened in a view. If not opened yet, depending on the 'target' strategy, the content of the current view is replaced, or a new view tab opened otherwise.
 
-View activation is based on the routing path, meaning that if a view with a matching path is already opened, that view is activated. To never activate an already opened view, use `WbNavigationExtras` and set `tryActivateView` to `false`.
+View activation is based on the routing path, meaning that if a view with a matching path is already opened, that view is activated. To never activate an already opened view, use `WbNavigationExtras` and set `activateIfPresent` to `false`.
 
 ```html
-<a [wbRouterLink]="['/persons', person.id]" [wbRouterLinkExtras]="{tryActivateView: false}">Open person</a>
+<a [wbRouterLink]="['/persons', person.id]" [wbRouterLinkExtras]="{activateIfPresent: false}">Open person</a>
 ```
 
 ```typescript
-wbRouter.navigate(['persons', id], {tryActivateView: false});
+wbRouter.navigate(['persons', id], {activateIfPresent: false});
 ```
 
 With target strategy, you control whether to replace the content of an existing view, or to open a component  in a new view tab. If using `wbRouterLink` and in the context of a view, by default, the current view content is replaced, unless CTRL keystroke is pressed. However, this behavior can be overwritten via navigation extras, by setting `target` to 'blank' or 'self', respectively.
