@@ -1,3 +1,5 @@
+@import '../workbench.mixins';
+
 :host {
   position: absolute;
   top: 0;
@@ -15,6 +17,9 @@
 
     wb-router-outlet + ::ng-deep * {
       flex: 1 1 100%;
+      &:not([prevent-pointer-events="true"]) {
+        @include allowPointerEvents;
+      }
     }
   }
 

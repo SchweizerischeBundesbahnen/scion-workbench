@@ -8,7 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, Renderer2 } from '@angular/core';
+import { takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
+import { WorkbenchLayoutService } from '../workbench-layout.service';
 
 /**
  * Adds drop zones to the host element, and fires upon a drop action.
@@ -18,7 +21,7 @@ import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Rende
 @Directive({
   selector: '[wbDropZone]'
 })
-export class DropZoneDirective {
+export class DropZoneDirective implements OnDestroy {
 
   private static readonly NULL_BOUNDS: Bounds = null;
   private static readonly MAX_DROP_ZONE_WIDTH = 150;
@@ -28,6 +31,7 @@ export class DropZoneDirective {
   private _host: HTMLElement;
   private _dropZone1: HTMLElement;
   private _dropZone2: HTMLElement;
+  private _destroy$ = new Subject<void>();
 
   /**
    * Specifies the drop zones to be installed.
@@ -47,7 +51,7 @@ export class DropZoneDirective {
   @Output()
   public wbDrop = new EventEmitter<DropEvent>();
 
-  constructor(host: ElementRef, private _renderer: Renderer2) {
+  constructor(host: ElementRef, private _renderer: Renderer2, private _workbenchLayout: WorkbenchLayoutService) {
     this._host = host.nativeElement as HTMLElement;
 
     this._dropZone1 = this.createDropZone();
@@ -55,6 +59,17 @@ export class DropZoneDirective {
 
     this.renderDropZone(this._dropZone1, DropZoneDirective.NULL_BOUNDS);
     this.renderDropZone(this._dropZone2, DropZoneDirective.NULL_BOUNDS);
+
+    merge(this._workbenchLayout.viewTabDrag$)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((event: 'start' | 'end') => {
+        if (event === 'start') {
+          this._renderer.setStyle(this._host, 'pointer-events', 'auto');
+        }
+        else {
+          this._renderer.removeStyle(this._host, 'pointer-events');
+        }
+      });
   }
 
   @HostListener('dragover', ['$event'])
@@ -206,6 +221,10 @@ export class DropZoneDirective {
     this._renderer.setStyle(dropZone, 'transition-timing-function', 'ease-out');
     this._renderer.appendChild(this._host, dropZone);
     return dropZone;
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }
 

@@ -11,10 +11,14 @@
 import { Injectable, ViewContainerRef } from '@angular/core';
 
 /**
- * Represents the location in the DOM where to append overlays to cover other elements.
+ * Represents the location in the DOM where to append iframes of remote sites.
+ *
+ * Note: This host element is a top-level workbench DOM element, so the iframe is not reparented
+ * upon a workbench layout change. To not cover other parts of the workbench (e.g. sashes or view
+ * dropdown menu), they are placed upfront.
  */
 @Injectable()
-export class OverlayHostRef {
+export class IFrameHostRef {
 
   private _vcr: ViewContainerRef;
 
