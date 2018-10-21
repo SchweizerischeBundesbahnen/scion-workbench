@@ -5,11 +5,11 @@
 </main>
 
 <ng-template #iframe_template>
-  <iframe [src]="url"
+  <iframe [src]="siteUrl"
+          (load)="onSiteLoad($event)"
           scrolling="no"
           frameborder="0"
           marginheight="0"
-          marginwidth="0"
-          [style.pointer-events]="pointerEvents">
+          marginwidth="0">
   </iframe>
 </ng-template>
