@@ -12,6 +12,7 @@
  * Entry point for all public APIs of this package.
  */
 export { WorkbenchModule } from './lib/workbench.module';
+export { WorkbenchService } from './lib/workbench.service';
 export { WorkbenchView, WorkbenchViewPart, WbBeforeDestroy } from './lib/workbench.model';
 export { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './lib/routing/wb-router-link.directive';
 export { WorkbenchRouter, WbNavigationExtras } from './lib/routing/workbench-router.service';
