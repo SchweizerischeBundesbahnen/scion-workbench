@@ -13,7 +13,8 @@
   user-select: none;
   cursor: pointer;
   border: none;
-  padding: .5em 1.5em .5em 1em;
+  padding: .5em 1.5em 0 1em;
+  box-sizing: border-box;
 
   &.tab-item {
     border-right: 1px solid $viewpart_tabbar_separator-color;
