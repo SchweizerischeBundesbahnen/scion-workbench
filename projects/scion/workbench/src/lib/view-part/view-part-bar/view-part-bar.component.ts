@@ -11,7 +11,7 @@
 import { Component, HostListener, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { ViewTabComponent } from '../view-tab/view-tab.component';
-import { WorkbenchService } from '../../workbench.service';
+import { InternalWorkbenchService } from '../../workbench.service';
 import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { takeUntil } from 'rxjs/operators';
@@ -29,7 +29,7 @@ export class ViewPartBarComponent implements OnDestroy {
   @ViewChildren(ViewTabComponent)
   private _viewTabs: QueryList<ViewTabComponent>;
 
-  constructor(private _workbench: WorkbenchService,
+  constructor(private _workbench: InternalWorkbenchService,
               private _workbenchLayout: WorkbenchLayoutService,
               public viewPartService: WorkbenchViewPartService) {
     this._workbenchLayout.afterGridChange$

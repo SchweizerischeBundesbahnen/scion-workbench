@@ -11,20 +11,22 @@
 import { Injectable } from '@angular/core';
 import { ACTIVITY_OUTLET_NAME, VIEW_GRID_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
 import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment } from '@angular/router';
-import { WorkbenchService } from '../workbench.service';
+import { InternalWorkbenchService } from '../workbench.service';
 import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
+import { Defined } from '../defined.util';
 import { WorkbenchView } from '../workbench.model';
 
 /**
- * Provides the workbench view navigation capabilities bases on Angular Router.
+ * Provides workbench view navigation capabilities based on Angular Router.
  */
 export abstract class WorkbenchRouter {
 
   /**
-   * Navigate based on the provided array of commands, and is like 'Router.navigate(...)' but with a workbench view as the routing target.
+   * Navigates based on the provided array of commands, and is like 'Router.navigate(...)' but with a workbench view as the router outlet target.
    *
    * By default, navigation is absolute. Make it relative by providing a `relativeTo` route in navigational extras.
+   * Navigation allows to close present views matching the routing commands if `closeIfPresent` is set in navigational extras.
    *
    * - Target view can be set via {WbNavigationExtras} object.
    * - Multiple static segments can be merged into one, e.g. `['/team/11/user', userName, {details: true}]`
@@ -46,7 +48,9 @@ export abstract class WorkbenchRouter {
   public abstract navigate(commands: any[], extras?: WbNavigationExtras): Promise<boolean>;
 
   /**
-   * Resolves open views which match the given URL path.
+   * Resolves present views which match the given URL path.
+   *
+   * @deprecated to destroy views, use `Router.navigate` and set `closeIfPresent` in `WbNavigationExtras`; will be removed in the next release
    */
   public abstract resolve(commands: any[]): WorkbenchView[];
 }
@@ -55,22 +59,26 @@ export abstract class WorkbenchRouter {
 export class InternalWorkbenchRouter implements WorkbenchRouter {
 
   constructor(private _router: Router,
-              private _workbench: WorkbenchService,
+              private _workbench: InternalWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartGridUrlObserver: ViewPartGridUrlObserver) {
   }
 
   public navigate(commandList: any[], extras: WbNavigationExtras = {}): Promise<boolean> {
     const commands = this.normalizeCommands(commandList, extras.relativeTo);
-    const coerceActivate = extras.tryActivateView === undefined && !commands.includes('new') && !commands.includes('create');
 
-    // If view is already opened, activate it.
-    if (extras.tryActivateView || coerceActivate) {
-      const views = this.resolve(commands);
-      const viewRef = views.length && views[0].viewRef || null;
-      const viewPartService = viewRef && this._workbench.resolveContainingViewPartServiceElseThrow(viewRef);
-      if (viewPartService) {
-        return viewPartService.activateView(viewRef);
+    if (extras.closeIfPresent) {
+      return this._workbench.destroyView(...this.resolvePresentViewRefs(commands));
+    }
+
+    const activateIfPresent = Defined.orElse(extras.activateIfPresent, extras.tryActivateView); // tslint:disable-line:deprecation
+    const coerceActivate = activateIfPresent === undefined && !commands.includes('new') && !commands.includes('create');
+
+    // If view is present, activate it.
+    if (activateIfPresent || coerceActivate) {
+      const presentViewRef = this.resolvePresentViewRefs(commands)[0];
+      if (presentViewRef) {
+        return this._workbench.activateView(presentViewRef);
       }
     }
 
@@ -110,6 +118,13 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
   }
 
   public resolve(commands: any[]): WorkbenchView[] {
+    return this.resolvePresentViewRefs(commands).map(viewRef => this._viewRegistry.getElseThrow(viewRef));
+  }
+
+  /**
+   * Resolves present views which match the given URL path.
+   */
+  public resolvePresentViewRefs(commands: any[]): string[] {
     const commandsJoined = commands.filter(it => typeof it !== 'object').map(it => encodeURI(it)).join(); // do not match URL matrix parameters
     const urlTree = this._router.parseUrl(this._router.url);
     const urlSegmentGroups = urlTree.root.children;
@@ -117,9 +132,6 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
     return Object.keys(urlSegmentGroups)
       .filter(it => {
         return it.startsWith(VIEW_REF_PREFIX) && (urlSegmentGroups[it].segments.map((segment: UrlSegment) => segment.path).join() === commandsJoined);
-      })
-      .map((viewRef: string) => {
-        return this._viewRegistry.getElseThrow(viewRef);
       });
   }
 
@@ -160,31 +172,37 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
  * Represents the extra options used during navigation.
  */
 export interface WbNavigationExtras extends NavigationExtras {
-
   /**
    * If there exists a view with the specified URL in the workbench, that view is activated.
    * Otherwise, depending on the view target strategy, a new workbench view is created, which is by default,
    * or the URL is loaded into the current view.
+   *
+   * @deprecated use 'activateIfPresent'; will be removed in the next release
    */
   tryActivateView?: boolean;
-
   /**
-   * Controls how to open the view.
+   * Activates the view if it is already present.
+   * If not present, the view is opened according to the specified 'target' strategy.
+   */
+  activateIfPresent?: boolean;
+  /**
+   * Closes the view if present. Has no effect if no view is present which matches the qualifier.
+   */
+  closeIfPresent?: boolean;
+  /**
+   * Controls where to open the view.
    *
-   * 'blank':    The URL is loaded into a new workbench view. This is default.
-   *             By default, the workbench view is added to the active view part, which, however, can be controlled with 'blankViewPartRef' navigation property.
-   * 'self':     The URL replaces the content of the workbench view as specified in 'selfViewRef' navigation property, which, by default, is set to the current view context.
-   *             This method throws an error if no workbench view outlet exists with the specified name.
+   * 'blank': opens the view as a new workbench view (which is by default)
+   * 'self':  opens the view in the current workbench view
    */
   target?: 'blank' | 'self';
   /**
-   * Specifies the self target for which to apply the URL.
-   * If not specified and in the context of a workbench view, that workbench view is used as the self target.
+   * Specifies the view which to replace when using 'self' view target strategy.
+   * If not specified and if in the context of a workbench view, that view is used as the self target.
    */
   selfViewRef?: string;
-
   /**
-   * Specifies the 'blankViewPartRef' where to attach the new view when using 'blank' view target strategy.
+   * Specifies the viewpart where to attach the new view when using 'blank' view target strategy.
    * If not specified, the active workbench viewpart is used as the 'blank' target.
    */
   blankViewPartRef?: string;

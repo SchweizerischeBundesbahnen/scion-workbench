@@ -12,7 +12,7 @@ import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
 import { WorkbenchViewPartService } from './workbench-view-part.service';
 import { merge, noop, Subject } from 'rxjs';
 import { DropEvent, Region } from '../view-part-grid/drop-zone.directive';
-import { WorkbenchService } from '../workbench.service';
+import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { takeUntil } from 'rxjs/operators';
 import { VIEW_DRAG_TYPE } from '../workbench.constants';
@@ -40,7 +40,7 @@ export class ViewPartComponent implements OnDestroy {
     return this.viewPartService.viewPartRef; // specs
   }
 
-  constructor(private _workbench: WorkbenchService,
+  constructor(private _workbench: InternalWorkbenchService,
               private _workbenchLayout: WorkbenchLayoutService,
               public viewPartService: WorkbenchViewPartService) {
     // Suspend pointer events for the duration of a workbench layout change,

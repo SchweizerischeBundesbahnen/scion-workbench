@@ -460,7 +460,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Add View 2 again
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1', tryActivateView: true}).then();
+    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid(['viewpart.1', 'view.2', 'view.1', 'view.2']);
@@ -480,7 +480,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Add View 2 again
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1', tryActivateView: false}).then();
+    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1', activateIfPresent: false}).then();
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid(['viewpart.1', 'view.3', 'view.1', 'view.2', 'view.3']);
