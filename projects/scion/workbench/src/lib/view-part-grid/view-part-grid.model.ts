@@ -295,6 +295,17 @@ export class ViewPartGrid {
   }
 
   /**
+   * Tests if the given view is active.
+   *
+   * Throws an error if the view is not found in the grid.
+   */
+  public isViewActive(viewRef: string): boolean {
+    const viewPartRef = this.findContainingViewPartElseThrow(viewRef);
+    const viewPartGridNode = this.getViewPartElseThrow(viewPartRef);
+    return viewPartGridNode.activeViewRef === viewRef;
+  }
+
+  /**
    * Converts this grid into a url string.
    */
   public serialize(): string {

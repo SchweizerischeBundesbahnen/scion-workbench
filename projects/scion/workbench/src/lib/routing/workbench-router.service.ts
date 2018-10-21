@@ -10,13 +10,11 @@
 
 import { Injectable } from '@angular/core';
 import { ACTIVITY_OUTLET_NAME, VIEW_GRID_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
-import { NavigationExtras, PRIMARY_OUTLET, Router, Routes, UrlSegment } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment } from '@angular/router';
 import { WorkbenchService } from '../workbench.service';
 import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { WorkbenchView } from '../workbench.model';
-import { EmptyOutletComponent } from './empty-outlet.component';
-import { ActivatedRoute } from '@angular/router/src/router_state';
 
 /**
  * Provides the workbench view navigation capabilities bases on Angular Router.
@@ -156,47 +154,6 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
 
     return normalizeFn(targetOutlet, {relativeTo});
   }
-
-  /**
-   * Replaces the router configuration to install or uninstall auxiliary routes.
-   */
-  public replaceRouterConfig(config: Routes): void {
-    // Note:
-    //   - Do not use Router.resetConfig(...) which would destroy any currently routed component because copying all routes
-    //   - Do not assign the router a new Routes object (Router.config = ...) to allow resolution of routes added during `NavigationStart` (since Angular 7.x)
-    //     (because Angular uses a reference to the Routes object during route navigation)
-    const newRoutes: Routes = [...config];
-    this._router.config.splice(0, this._router.config.length, ...newRoutes);
-  }
-
-  /**
-   * Creates a named auxiliary route for every primary route found in the router config.
-   * This allows all primary routes to be used in a named router outlet of the given outlet name.
-   *
-   * @param outlet for which to create named auxiliary routes
-   * @param params optional parametrization of the auxilary route
-   */
-  public createAuxiliaryRoutesFor(outlet: string, params: AuxiliaryRouteParams = {}): Routes {
-    const primaryRoutes = this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
-
-    return primaryRoutes.map(it => {
-      return {
-        ...it,
-        outlet: outlet,
-        component: it.component || EmptyOutletComponent, // used for lazy loading of aux routes; see Angular PR #23459
-        canDeactivate: [...(it.canDeactivate || []), ...(params.canDeactivate || [])],
-      };
-    });
-  }
-}
-
-/**
- * Controls creation of auxiliary routes for named router outlets.
- *
- * @internal
- */
-export interface AuxiliaryRouteParams {
-  canDeactivate?: any[];
 }
 
 /**

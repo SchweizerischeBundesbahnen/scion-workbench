@@ -10,7 +10,7 @@
 
 import { WbComponentPortal } from './portal/wb-component-portal';
 import { ViewPartComponent } from './view-part/view-part.component';
-import { Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ViewComponent } from './view/view.component';
 import { WorkbenchService } from './workbench.service';
 
@@ -80,18 +80,22 @@ export class InternalWorkbenchView implements WorkbenchView {
   public scrollTop: number | null;
   public scrollLeft: number | null;
 
-  public active: boolean;
-  public readonly active$ = new ReplaySubject<boolean>(1);
+  public readonly active$: BehaviorSubject<boolean>;
 
   constructor(public readonly viewRef: string,
+              active: boolean,
               public workbench: WorkbenchService,
               public readonly portal: WbComponentPortal<ViewComponent>) {
+    this.active$ = new BehaviorSubject<boolean>(active);
     this.title = viewRef;
     this.closable = true;
   }
 
+  public get active(): boolean {
+    return this.active$.getValue();
+  }
+
   public activate(activate: boolean): void {
-    this.active = activate;
     this.active$.next(activate);
   }
 
@@ -125,5 +129,11 @@ export class InternalWorkbenchViewPart implements WorkbenchViewPart {
  * The return value controls whether destruction should be continued.
  */
 export interface WbBeforeDestroy {
+
+  /**
+   * Lifecycle hook which is called upon view destruction.
+   *
+   * Return a falsy value to prevent view destruction, either as a boolean value or as an observable which emits a boolean value.
+   */
   wbBeforeDestroy(): Observable<boolean> | Promise<boolean> | boolean;
 }

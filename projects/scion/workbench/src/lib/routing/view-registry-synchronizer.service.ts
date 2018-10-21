@@ -1,8 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { ViewOutletUrlObserver } from './view-outlet-url-observer.service';
+import { ViewOutletAddEvent, ViewOutletUrlObserver } from './view-outlet-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/index';
+import { Subject } from 'rxjs';
+import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 
 /**
  * Keeps {WorkbenchViewRegistry} in sync with view outlets as specified in the application URL.
@@ -14,11 +15,12 @@ export class ViewRegistrySynchronizer implements OnDestroy {
 
   private readonly _destroy$ = new Subject<void>();
 
-  constructor(viewOutletUrlObserver: ViewOutletUrlObserver, viewRegistry: WorkbenchViewRegistry) {
+  constructor(viewOutletUrlObserver: ViewOutletUrlObserver, viewRegistry: WorkbenchViewRegistry, gridObserver: ViewPartGridUrlObserver) {
     viewOutletUrlObserver.viewOutletAdd$
       .pipe(takeUntil(this._destroy$))
-      .subscribe((viewRef: string) => {
-        viewRegistry.addViewOutlet(viewRef);
+      .subscribe((event: ViewOutletAddEvent) => {
+        const viewPartGrid = gridObserver.parseUrl(event.activationUrl);
+        viewRegistry.addViewOutlet(event.viewRef, viewPartGrid && viewPartGrid.isViewActive(event.viewRef) || false);
       });
 
     viewOutletUrlObserver.viewOutletRemove$
