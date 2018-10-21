@@ -305,12 +305,13 @@ export class PersonComponent {
 ## How to integrate a micro frontend
 Integration of micro frontends is still at its early stage.
 
-Currently, we provide a `RemoteSiteComponent` which accepts a URL to load a remote site, and a listener to get notified upon URL changes. This allows simple bidirectional communication, but implies the micro frontend to be tightly integrated into the host application. 
+Currently, we provide a `RemoteSiteComponent` which accepts an URL to load a remote site. This component provides an API to bidirectionally communicate with the remote site. The communication is based on `postMessage` and `onmessage` to safely communicate cross-origin.
 
 ```html
 <wb-remote-site [url]="url" (urlChange)="onUrlChange($event)"></wb-remote-site>
 ```
-Future plans are to have a thin 'Workbench guest API', which is included in the micro frontend application to communicate with the host application. It will be a simple protocol to provide a manifest with capabilities and ways to interact with the workbench, like to open views, open message boxes or to show notifications.
+
+We are working on building a `workbench application platform` which extends SCION workbench to seamlessly integrate multiple applications at activity and view level. Each application provides a manifest with its capabilities and intents. A capability is a functionality the application provides, e.g. content about some entity, which another application can request, provided this other application manifests the respective intent. This mechanism decouples the applications because not communicating peer-to-peer by using a qualifier addressing scheme. To interact with the workbench and other applications (e.g. to open a view, spawn a message box or popup a notification), applications may include `workbench application` library. It is written in TypeScript only to not impose a dependency to a web framework. It exposes an API to interact with the `workbench application platform` installed in the host application. If the application uses Angular as its web framework, there is an Angular version of that library, so it feels almost like developing the application as a first level SCION workbench citizen.
 
 ## How to open activities and views of lazy loaded modules
 
