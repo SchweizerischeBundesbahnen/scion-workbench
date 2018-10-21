@@ -33,8 +33,8 @@ export class WorkbenchViewRegistry implements OnDestroy {
   /**
    * Creates a {WorkbenchView} for the given view reference and adds it to this registry.
    */
-  public addViewOutlet(viewRef: string): void {
-    this._viewRegistry.set(viewRef, this.createWorkbenchView(viewRef));
+  public addViewOutlet(viewRef: string, active: boolean): void {
+    this._viewRegistry.set(viewRef, this.createWorkbenchView(viewRef, active));
   }
 
   /**
@@ -61,7 +61,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
   public getElseThrow(viewRef: string): InternalWorkbenchView {
     const view = this._viewRegistry.get(viewRef);
     if (!view) {
-      throw Error('Illegal state: view not contained in view registry');
+      throw Error('[IllegalViewStateError] View not contained in view registry');
     }
     return view;
   }
@@ -81,9 +81,9 @@ export class WorkbenchViewRegistry implements OnDestroy {
     this._destroy$.next();
   }
 
-  private createWorkbenchView(viewRef: string): InternalWorkbenchView {
+  private createWorkbenchView(viewRef: string, active: boolean): InternalWorkbenchView {
     const portal = new WbComponentPortal<ViewComponent>(this._componentFactoryResolver, ViewComponent);
-    const view = new InternalWorkbenchView(viewRef, this._workbench, portal);
+    const view = new InternalWorkbenchView(viewRef, active, this._workbench, portal);
 
     const injectionTokens = new WeakMap();
     injectionTokens.set(ROUTER_OUTLET_NAME, viewRef);
