@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, Component, EventEmitter, Input, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, EmbeddedViewRef, EventEmitter, Input, NgZone, OnDestroy, Output } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { combineLatest, interval, merge, Subject } from 'rxjs';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { distinctUntilChanged, filter, map, takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { WB_REMOTE_URL_PARAM } from '../routing/routing-params.constants';
-import { OverlayTemplateOutletDirective } from '../overlay-template-outlet.directive';
+import { IFrameHostRef } from './iframe-host-ref.service';
 
 /**
  * Displays the content of a remote site in an iframe. WebComponents are not applicable yet, because not providing an isolated scripting context.
@@ -51,14 +51,16 @@ import { OverlayTemplateOutletDirective } from '../overlay-template-outlet.direc
   templateUrl: './remote-site.component.html',
   styleUrls: ['./remote-site.component.scss']
 })
-export class RemoteSiteComponent implements AfterViewInit, OnDestroy {
+export class RemoteSiteComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
+
+  private _whenIframe: Promise<HTMLIFrameElement>;
+  private _iframeResolveFn: (iframe: HTMLIFrameElement) => void;
 
   @Input('url') // tslint:disable-line:no-input-rename
   public set remoteUrl(url: string) {
     this.url = this._sanitizer.bypassSecurityTrustResourceUrl(url);
-    this.overlayOutlet && this.overlayOutlet.viewRef && this.overlayOutlet.viewRef.detectChanges();
   }
 
   /**
@@ -67,16 +69,15 @@ export class RemoteSiteComponent implements AfterViewInit, OnDestroy {
   @Output()
   public urlChange = new EventEmitter<string>();
 
-  @ViewChild('overlay_outlet')
-  private overlayOutlet: OverlayTemplateOutletDirective;
-
   public url: SafeUrl;
   public pointerEvents: string;
 
   constructor(private _sanitizer: DomSanitizer,
               private _zone: NgZone,
+              public iframeHostRef: IFrameHostRef,
               workbenchLayout: WorkbenchLayoutService,
               route: ActivatedRoute) {
+    this._whenIframe = new Promise<HTMLIFrameElement>(resolve => this._iframeResolveFn = resolve); // tslint:disable-line:typedef
     combineLatest(route.params, route.data)
       .pipe(takeUntil(this._destroy$))
       .subscribe(([params, data]) => {
@@ -91,12 +92,14 @@ export class RemoteSiteComponent implements AfterViewInit, OnDestroy {
     merge(workbenchLayout.viewSashDrag$, workbenchLayout.viewTabDrag$, workbenchLayout.messageBoxMove$)
       .pipe(takeUntil(this._destroy$))
       .subscribe(event => this.pointerEvents = (event === 'start' ? 'none' : 'inherit'));
+
+    this._whenIframe.then(iframe => this.installLocationChangeListener(iframe));
   }
 
-  private installLocationChangeListener(rootNodes: any[]): void {
+  private installLocationChangeListener(iframe: HTMLIFrameElement): void {
     // TODO Find solution without polling; MutationObserver not applicable because location is not an attribute; practicable way could be Histroy API
     this._zone.runOutsideAngular(() => {
-      const iframeWindow = (rootNodes[0] as HTMLIFrameElement).contentWindow;
+      const iframeWindow = iframe.contentWindow;
       interval(50)
         .pipe(
           filter(() => this.urlChange.observers.length > 0), // access location only upon first subscription to omit cross-origin failure
@@ -109,8 +112,8 @@ export class RemoteSiteComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  public ngAfterViewInit(): void {
-    this.installLocationChangeListener(this.overlayOutlet.viewRef.rootNodes);
+  public onIframeViewRef(viewRef: EmbeddedViewRef<void>): void {
+    this._iframeResolveFn(viewRef.rootNodes[0]);
   }
 
   public ngOnDestroy(): void {

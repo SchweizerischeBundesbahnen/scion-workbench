@@ -1,8 +1,8 @@
-<div class="outlet"
-     #overlay_outlet="wbOverlayTemplateOutlet"
-     [wbOverlayTemplateOutlet]="iframe_template"
-     [wbOverlayTemplateOutletAppendFirst]="true">
-</div>
+<main wbTemplateHostOverlay
+      [wbTemplate]="iframe_template"
+      [wbOverlayHost]="iframeHostRef.get()"
+      (wbTemplateViewRef)="onIframeViewRef($event)">
+</main>
 
 <ng-template #iframe_template>
   <iframe [src]="url"
@@ -10,7 +10,6 @@
           frameborder="0"
           marginheight="0"
           marginwidth="0"
-          [ngStyle]="overlay_outlet.style"
           [style.pointer-events]="pointerEvents">
   </iframe>
 </ng-template>
