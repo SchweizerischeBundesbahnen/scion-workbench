@@ -1,4 +1,5 @@
 @import '../workbench.constants';
+@import '../workbench.mixins';
 
 :host {
   position: relative; // positioned anchor
@@ -11,14 +12,15 @@
   > wb-view-part-bar {
     flex: none;
     height: $viewtab-height;
+    @include allowPointerEvents;
   }
 
   > wb-portal-outlet {
     flex: auto;
-    background-color: $viewpart_tab-active-bgcolor;
   }
 
   > wb-view-list {
+    @include allowPointerEvents;
     position: absolute;
     top: $viewtab-height;
     right: 0;

@@ -17,6 +17,7 @@ import { SciViewportComponent } from '../ui/viewport/viewport.component';
 import { WbRouterOutletDirective } from '../routing/wb-router-outlet.directive';
 import { WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
 import { MessageBoxService } from '../message-box/message-box.service';
+import { OverlayHostRef } from '../overlay-host-ref.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -54,7 +55,8 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
   }
 
   constructor(private _view: InternalWorkbenchView,
-              private _messageBoxService: MessageBoxService) {
+              private _messageBoxService: MessageBoxService,
+              public messageBoxOverlayHostRef: OverlayHostRef) {
     this._messageBoxService.count$
       .pipe(takeUntil(this._destroy$))
       .subscribe(count => this._view.disabled = count > 0);

@@ -1,4 +1,5 @@
 @import '../workbench.constants';
+@import '../workbench.mixins';
 
 $diamond-height: 8;
 
@@ -11,6 +12,7 @@ $diamond-height: 8;
     margin: 0;
     padding: $topbar-height 0 0;
     width: #{$activitypart_toolbar-width}px;
+    @include allowPointerEvents;
 
     > li {
       position: relative; // positioned anchor for diamond
@@ -37,7 +39,7 @@ $diamond-height: 8;
         top: calc(50% - #{$diamond-height}px);
         border: #{$diamond-height}px solid transparent;
         border-left-width: 0;
-        border-right-color: $activitypart_panel-bgcolor;
+        border-right-color: $background-color;
       }
     }
   }
@@ -47,7 +49,6 @@ $diamond-height: 8;
     flex-direction: column;
     display: flex;
     position: relative; // positioned anchor for sash
-    background-color: $activitypart_panel-bgcolor;
     max-width: calc(100vw - #{$activitypart_toolbar-width}px);
     overflow: hidden;
 
@@ -61,6 +62,7 @@ $diamond-height: 8;
       height: $topbar-height;
       line-height: $topbar-height;
       padding: 0 1em;
+      @include allowPointerEvents;
 
       > h1 {
         font: {
@@ -91,10 +93,15 @@ $diamond-height: 8;
 
       wb-router-outlet + ::ng-deep * {
         flex: 1 1 100%;
+
+        &:not([prevent-pointer-events="true"]) {
+          @include allowPointerEvents;
+        }
       }
     }
 
     > div.sash {
+      @include allowPointerEvents;
       position: absolute;
       right: 0;
       top: 0;

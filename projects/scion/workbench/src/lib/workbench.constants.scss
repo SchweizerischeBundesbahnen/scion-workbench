@@ -1,3 +1,5 @@
+$background-color: #FEFEFE;
+
 $topbar-height: 55px;
 $viewtab-height: $topbar-height;
 $view-list-width: 300px;
@@ -16,7 +18,6 @@ $activitypart_toolbar-bgcolor: #333333;
 $activitypart_toolbar-width: 50;
 $activitypart_toolitem-fgcolor: rgba(255, 255, 255, .4);
 $activitypart_toolitem-active-fgcolor: #EFEFEF;
-$activitypart_panel-bgcolor: #FEFEFE;
 $activitypart_panel-title-fgcolor: #252526;
 
 /*
@@ -26,14 +27,14 @@ $viewpart_tabbar-bgcolor: #333333;
 $viewpart_tabbar_separator-color: #666666;
 $viewpart_tab-fgcolor: #EFEFEF;
 $viewpart_tab-active-fgcolor: #252526;
-$viewpart_tab-active-bgcolor: #FEFEFE;
+$viewpart_tab-active-bgcolor: $background-color;
 $viewpart_sash-bgcolor: #333333;
 
 /*
  * Notification
  */
 $notification-fgcolor: #333333;
-$notification-bgcolor: #FEFEFE;
+$notification-bgcolor: $background-color;
 $notification-margin: .5em;
 $notification-font-size: 14px;
 $notification-border-color: rgb(204, 204, 204);
@@ -43,7 +44,7 @@ $notification-width: 350px;
  * Message Box
  */
 $messagebox-fgcolor: #333333;
-$messagebox-bgcolor: #FEFEFE;
+$messagebox-bgcolor: $background-color;
 $messagebox-font-size: 14px;
 $messagebox-border-color: rgb(204, 204, 204);
 $messagebox-max-width: 400px;
