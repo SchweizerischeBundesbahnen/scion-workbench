@@ -49,11 +49,6 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
     return this._view.viewRef; // specs
   }
 
-  @HostBinding('class.glasspane')
-  public get glasspane(): boolean {
-    return this._messageBoxService.count > 0;
-  }
-
   constructor(private _view: InternalWorkbenchView,
               private _messageBoxService: MessageBoxService,
               public messageBoxOverlayHostRef: OverlayHostRef) {

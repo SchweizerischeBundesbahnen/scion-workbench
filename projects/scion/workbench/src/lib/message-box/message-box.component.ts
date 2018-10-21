@@ -9,12 +9,11 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, HostListener, Injector, Input, OnDestroy, Output, QueryList, ViewChildren } from '@angular/core';
-import { Action, MessageBox, WbMessageBox } from './message-box';
+import { Action, Actions, MessageBox, WbMessageBox } from './message-box';
 import { PortalInjector } from '@angular/cdk/portal';
 import { MoveDelta } from '../move.directive';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { WorkbenchConfig } from '../workbench.config';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 
 @Component({
@@ -26,6 +25,7 @@ import { WorkbenchLayoutService } from '../workbench-layout.service';
 export class MessageBoxComponent implements AfterViewInit, OnDestroy {
 
   private _messageBox: WbMessageBox;
+  private _actions: Actions;
   private _buttons: HTMLButtonElement[];
   private _accDeltaX = 0;
   private _accDeltaY = 0;
@@ -65,6 +65,10 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   public set messageBox(messageBox: WbMessageBox) {
     this._messageBox = messageBox;
     this._messageBox.onPropertyChange = (): void => this._cd.markForCheck();
+    this._actions = messageBox.actions;
+    if (!this._actions || Object.keys(this._actions).length === 0) {
+      this._actions = {'ok': 'OK'};
+    }
 
     this.textual = typeof messageBox.content === 'string';
     if (this.textual) {
@@ -87,7 +91,6 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
 
   constructor(private _injector: Injector,
               private _cd: ChangeDetectorRef,
-              private _config: WorkbenchConfig,
               private _workbenchLayout: WorkbenchLayoutService) {
   }
 
@@ -140,16 +143,6 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
     return this._messageBox.title;
   }
 
-  public get actions(): Action[] {
-    if (!this._messageBox.actions || this._messageBox.actions.length === 0) {
-      return ['ok'];
-    }
-    if (Array.isArray(this._messageBox.actions)) {
-      return this._messageBox.actions;
-    }
-    return [this._messageBox.actions];
-  }
-
   /**
    * Makes the message box blink for some short time.
    */
@@ -169,8 +162,12 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
       });
   }
 
+  public get actions(): Action[] {
+    return Object.keys(this._actions);
+  }
+
   public getActionLabel(action: Action): string {
-    return this._config.text(`messagebox_action_${action}`);
+    return this._actions[action] || '?';
   }
 
   public ngOnDestroy(): void {

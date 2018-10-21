@@ -37,7 +37,7 @@ export abstract class MessageBox {
   /**
    * Specifies which buttons to display on the message box.
    */
-  actions?: Action[] | Action = ['ok'];
+  actions?: Actions;
 
   /**
    * Specifies the optional severity.
@@ -89,4 +89,17 @@ export class WbMessageBox extends MessageBox {
   }
 }
 
-export declare type Action = 'yes' | 'no' | 'cancel' | 'ok' | string;
+/**
+ * Represents a key to confirm a message box.
+ */
+export declare type Action = string;
+
+/**
+ * Dictionary of actions to confirm a message box.
+ *
+ * The key acts a action key, and the value as display text.
+ */
+export interface Actions {
+  [key: string]: string;
+}
+

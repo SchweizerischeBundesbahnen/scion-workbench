@@ -65,12 +65,3 @@ export const VIEW_GRID_QUERY_PARAM = 'viewgrid';
  */
 export type Severity = 'info' | 'warn' | 'error';
 
-/**
- * NLS texts used in Workbench.
- */
-export const NLS_DEFAULTS = {
-  messagebox_action_yes: 'Yes',
-  messagebox_action_no: 'No',
-  messagebox_action_ok: 'OK',
-  messagebox_action_cancel: 'Cancel',
-};

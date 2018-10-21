@@ -39,7 +39,11 @@ export class MessageBoxService {
    *  messageBoxService.open({
    *      content: 'Do you want to continue?',
    *      severity: 'info',
-   *      actions: ['yes', 'no', 'cancel']
+   *      actions: {
+   *        yes: 'Yes',
+   *        no: 'No',
+   *        cancel: 'Cancel'
+   *      }
    * })
    * .then((action: Action) => {
    *   ...

@@ -30,9 +30,9 @@ export { WorkbenchActivityPartService } from './lib/activity-part/workbench-acti
 export { WbActivityActionDirective } from './lib/activity-part/wb-activity-action.directive';
 export { Notification, Duration } from './lib/notification/notification';
 export { NotificationService } from './lib/notification/notification.service';
-export { MessageBox, Action } from './lib/message-box/message-box';
+export { MessageBox, Action, Actions } from './lib/message-box/message-box';
 export { MessageBoxService } from './lib/message-box/message-box.service';
 export { WB_REMOTE_URL_PARAM, WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM }  from './lib/routing/routing-params.constants';
-export { Severity, NLS_DEFAULTS, ROUTE_REUSE_PROVIDER } from './lib/workbench.constants';
+export { Severity, ROUTE_REUSE_PROVIDER } from './lib/workbench.constants';
 export { WbRouteReuseProvider, WbRouteReuseStrategy } from './lib/routing/wb-route-reuse-strategy.service';
 export { Disposable } from './lib/disposable';
