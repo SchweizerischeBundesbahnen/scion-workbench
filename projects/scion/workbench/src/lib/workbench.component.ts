@@ -11,7 +11,6 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef } from '@angular/core';
 import { WorkbenchLayoutService } from './workbench-layout.service';
 import { OverlayHostRef } from './overlay-host-ref.service';
-import { MessageBoxService } from './message-box/message-box.service';
 import { IFrameHostRef } from './remote-site/iframe-host-ref.service';
 
 @Component({
@@ -36,14 +35,8 @@ export class WorkbenchComponent {
     return this._workbenchLayout.maximized;
   }
 
-  @HostBinding('class.glasspane')
-  public get glasspane(): boolean {
-    return this._messageBoxService.count > 0;
-  }
-
   constructor(private _workbenchLayout: WorkbenchLayoutService,
               private _overlayHostRef: OverlayHostRef,
-              private _iframeHostRef: IFrameHostRef,
-              private _messageBoxService: MessageBoxService) {
+              private _iframeHostRef: IFrameHostRef) {
   }
 }
