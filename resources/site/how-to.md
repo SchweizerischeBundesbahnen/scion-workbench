@@ -248,7 +248,7 @@ To popup a message box, inject `MessageBoxService` and invoke `open` method. Pro
 
 The content can be as simple as some text, or a component to be displayed. When specifying a component, do not forget to register it as `entryComponents` in your application module, so it is available at runtime.
 
-A message box can be application  modal or view modal, which you can control by setting 'modality' property. By default, and if in view context, the message box is view modal.
+A message box can be application modal or view modal, which you can control by setting 'modality' property. By default, and if in view context, the message box is view modal.
 
 ```typescript
 @Component({
@@ -266,7 +266,10 @@ export class PersonComponent {
     this.messageBoxService.open({
       content: 'Do you want to close?',
       severity: 'info',
-      actions: ['yes', 'no']
+      actions: {
+        yes: 'Yes',
+        no: 'No',
+      }
     }).then(action => {
       if (action === 'yes') {
         this.view.close();

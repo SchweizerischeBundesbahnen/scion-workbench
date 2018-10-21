@@ -38,11 +38,6 @@
     bottom: 0;
     left: 0;
   }
-
-  &.glasspane {
-    user-select: none;
-    pointer-events: none;
-  }
 }
 
 :host-context(.maximized) {
