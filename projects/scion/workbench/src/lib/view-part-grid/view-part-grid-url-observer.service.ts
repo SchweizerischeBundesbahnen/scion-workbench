@@ -14,7 +14,7 @@ import { ViewPartGrid } from './view-part-grid.model';
 import { ViewPartGridSerializerService } from './view-part-grid-serializer.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { VIEW_GRID_QUERY_PARAM } from '../workbench.constants';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 /**
  * Provides the ability to watch for changes being made to the ViewPart grid in the URL.
@@ -28,7 +28,7 @@ export class ViewPartGridUrlObserver implements OnDestroy {
 
   private _serializedGrid$ = new BehaviorSubject<string>(null);
 
-  constructor(route: ActivatedRoute, private _serializer: ViewPartGridSerializerService) {
+  constructor(route: ActivatedRoute, private _router: Router, private _serializer: ViewPartGridSerializerService) {
     route
       .queryParamMap
       .pipe(
@@ -37,6 +37,14 @@ export class ViewPartGridUrlObserver implements OnDestroy {
         takeUntil(this._destroy$)
       )
       .subscribe(this._serializedGrid$);
+  }
+
+  /**
+   * Parses the given URL for a viewpart grid, or returns `null` if not set.
+   */
+  public parseUrl(url: string): ViewPartGrid {
+    const serializedGrid = this._router.parseUrl(url).queryParamMap.get(VIEW_GRID_QUERY_PARAM);
+    return serializedGrid && this.createViewPartGrid(serializedGrid) || null;
   }
 
   /**

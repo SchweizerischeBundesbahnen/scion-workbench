@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostBinding, OnDestroy, ViewChild } from '@angular/core';
 import { InternalWorkbenchView } from '../workbench.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -33,7 +33,7 @@ import { MessageBoxService } from '../message-box/message-box.service';
   styleUrls: ['./view.component.scss'],
   providers: [MessageBoxService]
 })
-export class ViewComponent implements OnDestroy {
+export class ViewComponent implements AfterViewInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
@@ -55,13 +55,15 @@ export class ViewComponent implements OnDestroy {
 
   constructor(private _view: InternalWorkbenchView,
               private _messageBoxService: MessageBoxService) {
-    this._view.active$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(active => active ? this.onActivateView() : this.onDeactivateView());
-
     this._messageBoxService.count$
       .pipe(takeUntil(this._destroy$))
       .subscribe(count => this._view.disabled = count > 0);
+  }
+
+  public ngAfterViewInit(): void {
+    this._view.active$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(active => active ? this.onActivateView() : this.onDeactivateView());
   }
 
   private onActivateView(): void {

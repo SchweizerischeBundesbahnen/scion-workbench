@@ -13,8 +13,7 @@ import { filter, takeUntil } from 'rxjs/operators';
 import { Injectable, IterableDiffers, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { ViewOutletDiffer } from './view-outlet-differ';
-import { WbBeforeDestroyGuard } from '../view/wb-before-destroy.guard';
-import { InternalWorkbenchRouter } from './workbench-router.service';
+import { WorkbenchAuxiliaryRoutesRegistrator } from './workbench-auxiliary-routes-registrator.service';
 
 /**
  * Provides the ability to watch for changes being made to view outlets in the URL
@@ -27,12 +26,12 @@ import { InternalWorkbenchRouter } from './workbench-router.service';
 export class ViewOutletUrlObserver implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  private _viewOutletAdd$ = new Subject<string>();
+  private _viewOutletAdd$ = new Subject<ViewOutletAddEvent>();
   private _viewOutletRemove$ = new Subject<string>();
 
   private _undoRouteRegistrationFn: () => void;
 
-  constructor(private _router: Router, private _wbRouter: InternalWorkbenchRouter, differs: IterableDiffers) {
+  constructor(private _router: Router, private _auxRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator, differs: IterableDiffers) {
     this.installNavigationStartRoutingListener(differs);
     this.installGuardsCheckEndRoutingListener(differs);
   }
@@ -47,18 +46,15 @@ export class ViewOutletUrlObserver implements OnDestroy {
     const viewOutletChanges = differ.diff(routerEvent.url);
     if (viewOutletChanges) {
       // Register auxiliary routes for added view outlets.
-      const newAuxiliaryRoutes: Route[] = [];
-      viewOutletChanges.forEachAddedItem(({item}) => {
-        newAuxiliaryRoutes.push(...this._wbRouter.createAuxiliaryRoutesFor(item, {canDeactivate: [WbBeforeDestroyGuard]}));
-      });
+      const viewRefs: string[] = [];
+      viewOutletChanges.forEachAddedItem(({item}) => viewRefs.push(item));
+      const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerViewAuxiliaryRoutes(...viewRefs);
 
       // Prepare undo action in case navigation is rejected, e.g. by routing guard.
       this._undoRouteRegistrationFn = (): void => {
         differ.diff(this._router.url); // undo stateful differ
-        this._wbRouter.replaceRouterConfig(this._router.config.filter(route => !newAuxiliaryRoutes.includes(route)));
+        this._auxRoutesRegistrator.replaceRouterConfig(this._router.config.filter(route => !newAuxiliaryRoutes.includes(route)));
       };
-
-      this._wbRouter.replaceRouterConfig([...this._router.config, ...newAuxiliaryRoutes]);
     }
   }
 
@@ -81,7 +77,7 @@ export class ViewOutletUrlObserver implements OnDestroy {
       const discardedRoutes: Route[] = [];
 
       viewOutletChanges.forEachAddedItem(({item}) => {
-        this._viewOutletAdd$.next(item);
+        this._viewOutletAdd$.next({viewRef: item, activationUrl: routerEvent.url});
       });
 
       viewOutletChanges.forEachRemovedItem(({item}) => {
@@ -91,7 +87,7 @@ export class ViewOutletUrlObserver implements OnDestroy {
 
       // Uninstall discarded routes
       if (discardedRoutes.length > 0) {
-        this._wbRouter.replaceRouterConfig(routes.filter(route => !discardedRoutes.includes(route)));
+        this._auxRoutesRegistrator.replaceRouterConfig(routes.filter(route => !discardedRoutes.includes(route)));
       }
     }
   }
@@ -99,7 +95,7 @@ export class ViewOutletUrlObserver implements OnDestroy {
   /***
    * Emits if a new view outlet is detected in the URL.
    */
-  public get viewOutletAdd$(): Observable<string> {
+  public get viewOutletAdd$(): Observable<ViewOutletAddEvent> {
     return this._viewOutletAdd$;
   }
 
@@ -137,4 +133,9 @@ export class ViewOutletUrlObserver implements OnDestroy {
         this.onGuardsCheckEnd(routerEvent, outletDiffer);
       });
   }
+}
+
+export interface ViewOutletAddEvent {
+  viewRef: string;
+  activationUrl: string;
 }
