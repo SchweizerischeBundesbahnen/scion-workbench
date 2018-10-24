@@ -161,8 +161,12 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
    * Replaces the router configuration to install or uninstall auxiliary routes.
    */
   public replaceRouterConfig(config: Routes): void {
-    // Note: Do not use Router.resetConfig(...) which would destroy any currently routed component because copying all routes.
-    this._router.config = config;
+    // Note:
+    //   - Do not use Router.resetConfig(...) which would destroy any currently routed component because copying all routes
+    //   - Do not assign the router a new Routes object (Router.config = ...) to allow resolution of routes added during `NavigationStart` (since Angular 7.x)
+    //     (because Angular uses a reference to the Routes object during route navigation)
+    const newRoutes: Routes = [...config];
+    this._router.config.splice(0, this._router.config.length, ...newRoutes);
   }
 
   /**
