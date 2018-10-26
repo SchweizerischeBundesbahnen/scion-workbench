@@ -5,6 +5,14 @@
 
 # Changelog
 
+<a name="0.0.0-beta.11"></a>
+## [0.0.0-beta.11](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.10...0.0.0-beta.11) (2018-10-26)
+
+### Bug Fixes
+
+* Do not enter maximize mode when closing views quickly ([#24](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/24)) ([a54fb6f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a54fb6f))
+* Upgrade workbench to run with Angular 7 ([#26](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/26)) ([af3c6e7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/af3c6e7))
+
 <a name="0.0.0-beta.10"></a>
 ## [0.0.0-beta.10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.9...0.0.0-beta.10) (2018-09-10)
 
