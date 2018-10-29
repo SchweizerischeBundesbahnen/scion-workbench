@@ -8,13 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostBinding, ViewChild } from '@angular/core';
 import { animate, AnimationBuilder, AnimationPlayer, style, transition, trigger } from '@angular/animations';
 import { WorkbenchActivityPartService } from './workbench-activity-part.service';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { noop, Observable, Subject } from 'rxjs';
 import { ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME } from '../workbench.constants';
 import { Activity } from './activity';
+import { ContentProjectionContext } from '../content-projection/content-projection-context.service';
 
 @Component({
   selector: 'wb-activity-part',
@@ -35,7 +36,8 @@ import { Activity } from './activity';
     )
   ],
   viewProviders: [
-    {provide: ROUTER_OUTLET_NAME, useValue: ACTIVITY_OUTLET_NAME}
+    {provide: ROUTER_OUTLET_NAME, useValue: ACTIVITY_OUTLET_NAME},
+    ContentProjectionContext,
   ]
 })
 export class ActivityPartComponent {
@@ -52,11 +54,17 @@ export class ActivityPartComponent {
   @ViewChild('panel', {read: ElementRef})
   private _panelElementRef: ElementRef;
 
+  @HostBinding('attr.content-projection')
+  public get contentProjectionActive(): boolean {
+    return this._contentProjectionContext.isActive();
+  }
+
   constructor(public host: ElementRef<HTMLElement>,
               public activityPartService: WorkbenchActivityPartService,
               private _workbenchLayout: WorkbenchLayoutService,
               private _animationBuilder: AnimationBuilder,
-              private _cd: ChangeDetectorRef) {
+              private _cd: ChangeDetectorRef,
+              private _contentProjectionContext: ContentProjectionContext) {
   }
 
   public get activities(): Activity[] {

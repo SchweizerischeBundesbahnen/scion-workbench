@@ -11,7 +11,7 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef } from '@angular/core';
 import { WorkbenchLayoutService } from './workbench-layout.service';
 import { OverlayHostRef } from './overlay-host-ref.service';
-import { IFrameHostRef } from './remote-site/iframe-host-ref.service';
+import { ContentHostRef } from './content-projection/content-host-ref.service';
 
 @Component({
   selector: 'wb-workbench',
@@ -25,9 +25,9 @@ export class WorkbenchComponent {
     this._overlayHostRef.set(overlayHost);
   }
 
-  @ViewChild('iframe_host', {read: ViewContainerRef})
-  public set iframeHost(iframeHost: ViewContainerRef) {
-    this._iframeHostRef.set(iframeHost);
+  @ViewChild('content_host', {read: ViewContainerRef})
+  public set contentHost(contentHost: ViewContainerRef) {
+    this._contentHostRef.set(contentHost);
   }
 
   @HostBinding('class.maximized')
@@ -37,6 +37,6 @@ export class WorkbenchComponent {
 
   constructor(private _workbenchLayout: WorkbenchLayoutService,
               private _overlayHostRef: OverlayHostRef,
-              private _iframeHostRef: IFrameHostRef) {
+              private _contentHostRef: ContentHostRef) {
   }
 }

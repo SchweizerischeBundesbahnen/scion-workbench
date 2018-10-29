@@ -45,7 +45,8 @@ import { WbActivityActionDirective } from './activity-part/wb-activity-action.di
 import { WbActivityDirective } from './activity-part/wb-activity.directive';
 import { MoveDirective } from './move.directive';
 import { WorkbenchConfig } from './workbench.config';
-import { TemplateHostOverlayDirective } from './template-host-overlay.directive';
+import { TemplateHostOverlayDirective } from './content-projection/template-host-overlay.directive';
+import { ContentAsOverlayComponent } from './content-projection/content-as-overlay.component';
 import { ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
 import { NotificationService } from './notification/notification.service';
 import { NotificationListComponent } from './notification/notification-list.component';
@@ -60,7 +61,7 @@ import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service'
 import { SciViewportModule } from './ui/viewport/viewport.module';
 import { SciDimensionModule } from './ui/dimension/dimension.module';
 import { ActivityResolver } from './routing/activity.resolver';
-import { IFrameHostRef } from './remote-site/iframe-host-ref.service';
+import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
 
 const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
@@ -102,6 +103,7 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     MoveDirective,
     TemplateHostOverlayDirective,
     EmptyOutletComponent,
+    ContentAsOverlayComponent,
   ],
   exports: [
     WorkbenchComponent,
@@ -111,6 +113,7 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     WbRouterLinkDirective,
     WbRouterLinkWithHrefDirective,
     RemoteSiteComponent,
+    ContentAsOverlayComponent,
   ]
 })
 export class WorkbenchModule {
@@ -161,7 +164,7 @@ export class WorkbenchModule {
         WorkbenchViewRegistry,
         ViewRegistrySynchronizer,
         OverlayHostRef,
-        IFrameHostRef,
+        ContentHostRef,
         InternalWorkbenchRouter,
         {
           provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter
