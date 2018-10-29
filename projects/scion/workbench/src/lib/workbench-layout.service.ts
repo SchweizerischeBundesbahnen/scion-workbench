@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 /**
@@ -17,7 +17,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class WorkbenchLayoutService {
 
-  private _maximized: boolean;
+  private _maximized$ = new BehaviorSubject<boolean>(false);
 
   /**
    * Notifies upon resizing a view by dragging the sashes which separate them.
@@ -47,9 +47,9 @@ export class WorkbenchLayoutService {
    */
   public toggleMaximized(maximize?: boolean): void {
     if (maximize === undefined) {
-      this._maximized = !this._maximized;
+      this._maximized$.next(!this.maximized);
     } else {
-      this._maximized = maximize;
+      this._maximized$.next(maximize);
     }
   }
 
@@ -57,6 +57,13 @@ export class WorkbenchLayoutService {
    * Indicates whether the main content is displayed in full viewport width.
    */
   public get maximized(): boolean {
-    return this._maximized;
+    return this._maximized$.getValue();
+  }
+
+  /**
+   * Emits upon change of main content full viewport mode.
+   */
+  public get maximized$(): Observable<boolean> {
+    return this._maximized$.asObservable();
   }
 }

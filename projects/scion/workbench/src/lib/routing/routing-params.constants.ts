@@ -9,11 +9,6 @@
  */
 
 /**
- * Specifies the name of the optional path or query parameter for a remote URL used in {RemoteSiteComponent}.
- */
-export const WB_REMOTE_URL_PARAM = 'wb.remote-url';
-
-/**
  * Specifies the name of the optional path or query parameter for the view title.
  */
 export const WB_VIEW_TITLE_PARAM = 'wb.title';

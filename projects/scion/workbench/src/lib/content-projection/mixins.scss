@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2018 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
+
+/**
+ * Pointer events are ignored in 'activity part' and 'viewpart-grid' to allow interaction with projected content.
+ * Projected content is out of the element flow and added to a top-level workbench DOM element. It is projected
+ * into respective view or activity bounding box.
+ *
+ * To not cover other parts of the workbench (e.g. sashes), it is placed upfront in the DOM, which requires projection
+ * areas to ignore pointer events and not to use a background color.
+ *
+ * Use this mixin to allow pointer events in selected areas like sashes, activity header or view tabbar.
+ */
+@mixin allowPointerEvents() {
+  pointer-events: auto;
+}
+
+/**
+ * See mixin 'allowPointerEvents'
+ */
+@mixin preventPointerEvents() {
+  pointer-events: none;
+}

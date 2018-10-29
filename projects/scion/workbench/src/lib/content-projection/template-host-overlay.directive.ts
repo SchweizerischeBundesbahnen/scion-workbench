@@ -9,11 +9,12 @@
  */
 
 import { AfterViewInit, Directive, DoCheck, ElementRef, EmbeddedViewRef, EventEmitter, Input, KeyValueDiffer, KeyValueDiffers, OnDestroy, OnInit, Optional, Output, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
-import { WorkbenchView } from './workbench.model';
+import { WorkbenchView } from '../workbench.model';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
-import { WorkbenchActivityPartService } from './activity-part/workbench-activity-part.service';
-import { Subject } from 'rxjs';
+import { WorkbenchActivityPartService } from '../activity-part/workbench-activity-part.service';
+import { combineLatest, Subject } from 'rxjs';
+import { WorkbenchLayoutService } from '../workbench-layout.service';
 
 /**
  * Instantiates an Embedded View based on the {@link TemplateRef `templateRef`}, appends it
@@ -54,13 +55,14 @@ export class TemplateHostOverlayDirective implements OnInit, AfterViewInit, DoCh
               private _renderer: Renderer2,
               @Optional() view: WorkbenchView,
               route: ActivatedRoute,
-              activityPartService: WorkbenchActivityPartService) {
+              activityPartService: WorkbenchActivityPartService,
+              workbenchLayoutService: WorkbenchLayoutService) {
     this._host = host.nativeElement as Element;
     this._positionDiffer = differs.find({}).create();
     this._whenViewRef = new Promise<EmbeddedViewRef<void>>(resolve => this._viewRefResolveFn = resolve); // tslint:disable-line:typedef
 
     this.installViewActiveListener(view);
-    this.installActivityActiveListener(activityPartService, route);
+    this.installActivityActiveListener(activityPartService, route, workbenchLayoutService);
     this.setViewRefStyle({position: 'fixed'});
   }
 
@@ -110,11 +112,11 @@ export class TemplateHostOverlayDirective implements OnInit, AfterViewInit, DoCh
     });
   }
 
-  private installActivityActiveListener(activityService: WorkbenchActivityPartService, route: ActivatedRoute): void {
+  private installActivityActiveListener(activityService: WorkbenchActivityPartService, route: ActivatedRoute, workbenchLayoutService: WorkbenchLayoutService): void {
     const activity = activityService.getActivityFromRoutingContext(route.snapshot);
-    activity && activity.active$
+    activity && combineLatest(activity.active$, workbenchLayoutService.maximized$)
       .pipe(takeUntil(this._destroy$))
-      .subscribe(active => this.setViewRefStyle({display: active ? null : 'none'}));
+      .subscribe(([active, maximized]) => this.setViewRefStyle({display: active && !maximized ? null : 'none'}));
   }
 
   private installViewActiveListener(view: WorkbenchView): void {

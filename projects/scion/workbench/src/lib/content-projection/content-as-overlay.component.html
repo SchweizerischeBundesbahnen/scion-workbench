@@ -1,0 +1,14 @@
+<!-- define area where to project `ng-content` into -->
+<div class="projection-target"
+     wbTemplateHostOverlay
+     [wbTemplate]="ng_content_template"
+     [wbOverlayHost]="contentHost">
+</div>
+
+<!-- make `ng-content` available in the form of a template -->
+<ng-template #ng_content_template>
+  <!-- wrap `ng-content` in a a single element -->
+  <div class="content-as-overlay">
+    <ng-content></ng-content>
+  </div>
+</ng-template>
