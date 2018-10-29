@@ -1,0 +1,12 @@
+:host {
+  display: flex;
+
+  > div.projection-target {
+    flex: auto;
+  }
+}
+
+div.content-as-overlay {
+  display: flex; // public API
+  flex-direction: column; // public API
+}

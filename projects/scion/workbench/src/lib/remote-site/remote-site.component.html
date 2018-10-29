@@ -1,15 +1,7 @@
-<main wbTemplateHostOverlay
-      [wbTemplate]="iframe_template"
-      [wbOverlayHost]="iframeHostRef.get()"
-      (wbTemplateViewRef)="onIframeViewRef($event)">
-</main>
-
-<ng-template #iframe_template>
-  <iframe [src]="siteUrl"
-          (load)="onSiteLoad($event)"
-          scrolling="no"
-          frameborder="0"
-          marginheight="0"
-          marginwidth="0">
-  </iframe>
-</ng-template>
+<iframe [src]="siteUrl"
+        (load)="onSiteLoad($event)"
+        scrolling="no"
+        frameborder="0"
+        marginheight="0"
+        marginwidth="0">
+</iframe>

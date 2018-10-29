@@ -18,6 +18,7 @@ import { WbRouterOutletDirective } from '../routing/wb-router-outlet.directive';
 import { WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
 import { MessageBoxService } from '../message-box/message-box.service';
 import { OverlayHostRef } from '../overlay-host-ref.service';
+import { ContentProjectionContext } from '../content-projection/content-projection-context.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -32,7 +33,7 @@ import { OverlayHostRef } from '../overlay-host-ref.service';
   selector: 'wb-view',
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
-  providers: [MessageBoxService]
+  providers: [MessageBoxService, ContentProjectionContext]
 })
 export class ViewComponent implements AfterViewInit, OnDestroy {
 
@@ -49,8 +50,14 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
     return this._view.viewRef; // specs
   }
 
+  @HostBinding('attr.content-projection')
+  public get contentProjectionActive(): boolean {
+    return this._contentProjectionContext.isActive();
+  }
+
   constructor(private _view: InternalWorkbenchView,
               private _messageBoxService: MessageBoxService,
+              private _contentProjectionContext: ContentProjectionContext,
               public messageBoxOverlayHostRef: OverlayHostRef) {
     this._messageBoxService.count$
       .pipe(takeUntil(this._destroy$))

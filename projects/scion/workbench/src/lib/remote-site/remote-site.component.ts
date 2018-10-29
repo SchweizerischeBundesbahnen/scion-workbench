@@ -8,12 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, EmbeddedViewRef, EventEmitter, Input, NgZone, OnDestroy, Output, Renderer2 } from '@angular/core';
+import { Component, EventEmitter, Input, NgZone, OnDestroy, Output, Renderer2 } from '@angular/core';
 import { combineLatest, from, fromEvent, merge, Observable, of, OperatorFunction, Subject } from 'rxjs';
 import { mergeMap, takeUntil } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
-import { WB_REMOTE_URL_PARAM } from '../routing/routing-params.constants';
-import { IFrameHostRef } from './iframe-host-ref.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 
@@ -21,35 +18,21 @@ import { WorkbenchLayoutService } from '../workbench-layout.service';
  * Displays the content of a remote site in an <iframe>.
  * Web components are not applicable yet, because not providing an isolated scripting context.
  *
- * This component can be used as a child component or as a routing component, meaning that
- * the URL can be set via input properties or routing parameters or routing data.
- *
  * This component provides API to bidirectionally communicate with the remote site.
- * The communication is based on `postMessage` and `onmessage` to safely
- * communicate cross-origin.
+ * The communication is based on `postMessage` and `onmessage` to safely communicate cross-origin.
  *
- * Usage as child component:
- * ---
- * <wb-remote-site [url]="'https://www.google.com/'"></wb-remote-site>
+ * Use this component inside `<wb-content-as-overlay>` element because an iframe reloads if being moved in the DOM
+ * (e.g. when rearranging views in the view grid).
  *
- * Usage as routing component:
- * ---
- * const routes: Routes = [
- *    {
- *      path: 'usatoday',
- *      component: RemoteSiteComponent,
- *      data: {[WB_REMOTE_URL_PARAM]: 'https://www.google.com/', [WB_VIEW_TITLE_PARAM]: 'USA Today', [WB_VIEW_HEADING_PARAM]: 'usatoday.com'}
- *    }
- *  ];
  *
  * ---
- * Note:
+ * Usage:
  *
- * The iframe is not rendered as a view child of this component, but added to a top-level workbench DOM element instead.
- * That way, the the iframe is not moved within the DOM when the workbench views are rearannged.
- * Otherwise, its content would be reloaded once the iframe is reparented.
+ * <wb-content-as-overlay>
+ *   <wb-remote-site [url]="'https://www.google.com/'"></wb-remote-site>
+ * </wb-content-as-overlay>
  *
- * For that reason, the iframe is positioned absolutely and projected into the bounding box of this component.
+ * @see ContentAsOverlayComponent
  */
 @Component({
   selector: 'wb-remote-site',
@@ -90,14 +73,11 @@ export class RemoteSiteComponent implements OnDestroy {
   @Output()
   public load = new EventEmitter<void>();
 
-  constructor(route: ActivatedRoute,
-              public iframeHostRef: IFrameHostRef,
-              private _sanitizer: DomSanitizer,
+  constructor(private _sanitizer: DomSanitizer,
               private _workbenchLayout: WorkbenchLayoutService,
               private _renderer: Renderer2,
               private _zone: NgZone) {
     this._whenIframe = new Promise<HTMLIFrameElement>(resolve => this._iframeResolveFn = resolve); // tslint:disable-line:typedef
-    this.installRouteUrlListener(route);
     this.installWorkbenchLayoutListener();
     this.installIframeMessageListener();
   }
@@ -109,25 +89,14 @@ export class RemoteSiteComponent implements OnDestroy {
     this._whenIframe.then(iframe => iframe.contentWindow.postMessage(message, this._siteOrigin));
   }
 
-  public onIframeViewRef(viewRef: EmbeddedViewRef<void>): void {
-    this._iframeResolveFn(viewRef.rootNodes[0]);
-  }
-
   public onSiteLoad(event: Event): void {
     // If the 'onload' event handler is attached before the iframe is appended to the DOM, webkit browsers fire that event twice.
     // To workaround this issue, the existence of the 'src' field is checked. See https://stackoverflow.com/a/38459639.
     const iframe = event.target as HTMLIFrameElement;
-    iframe.src && this.load.emit();
-  }
-
-  private installRouteUrlListener(route: ActivatedRoute): void {
-    combineLatest(route.params, route.data)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(([params, data]) => {
-        if (params[WB_REMOTE_URL_PARAM] || data[WB_REMOTE_URL_PARAM]) {
-          this.url = params[WB_REMOTE_URL_PARAM] || data[WB_REMOTE_URL_PARAM];
-        }
-      });
+    if (iframe.src) {
+      this._iframeResolveFn(iframe);
+      this.load.emit();
+    }
   }
 
   private installWorkbenchLayoutListener(): void {
@@ -141,8 +110,7 @@ export class RemoteSiteComponent implements OnDestroy {
       .subscribe(([event, iframe]: ['start' | 'end', HTMLIFrameElement]) => {
         if (event === 'start') {
           this._renderer.setStyle(iframe, 'pointer-events', 'none');
-        }
-        else {
+        } else {
           this._renderer.removeStyle(iframe, 'pointer-events');
         }
       });

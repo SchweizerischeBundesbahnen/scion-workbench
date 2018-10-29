@@ -1,5 +1,5 @@
 @import '../workbench.constants';
-@import '../workbench.mixins';
+@import '../content-projection/mixins';
 
 $diamond-height: 8;
 
@@ -93,10 +93,6 @@ $diamond-height: 8;
 
       wb-router-outlet + ::ng-deep * {
         flex: 1 1 100%;
-
-        &:not([prevent-pointer-events="true"]) {
-          @include allowPointerEvents;
-        }
       }
     }
 
@@ -110,3 +106,8 @@ $diamond-height: 8;
     }
   }
 }
+
+:host-context([content-projection="false"]) sci-viewport {
+  @include allowPointerEvents;
+}
+

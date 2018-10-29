@@ -1,4 +1,4 @@
-@import '../workbench.mixins';
+@import '../content-projection/mixins';
 
 :host {
   position: absolute;
@@ -17,9 +17,11 @@
 
     wb-router-outlet + ::ng-deep * {
       flex: 1 1 100%;
-      &:not([prevent-pointer-events="true"]) {
-        @include allowPointerEvents;
-      }
     }
   }
 }
+
+:host-context([content-projection="false"]) sci-viewport {
+  @include allowPointerEvents;
+}
+
