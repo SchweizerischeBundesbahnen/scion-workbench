@@ -16,7 +16,6 @@ import { WorkbenchService } from '../workbench.service';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { takeUntil } from 'rxjs/operators';
 import { VIEW_DRAG_TYPE } from '../workbench.constants';
-import { SciDimension } from '../ui/dimension/dimension.directive';
 
 @Component({
   selector: 'wb-view-part',
@@ -29,7 +28,6 @@ import { SciDimension } from '../ui/dimension/dimension.directive';
 export class ViewPartComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  private _portalDimension: SciDimension;
 
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
@@ -96,8 +94,7 @@ export class ViewPartComponent implements OnDestroy {
 
     if (sourceViewPartService === this.viewPartService && event.region !== 'center' && this.viewPartService.viewCount() > 1) {
       this.moveViewToNewViewPart(sourceViewRef, event.region).then(noop);
-    }
-    else if (sourceViewPartService !== this.viewPartService) {
+    } else if (sourceViewPartService !== this.viewPartService) {
       (event.region === 'center') ? this.moveViewToThisViewPart(sourceViewRef).then(noop) : this.moveViewToNewViewPart(sourceViewRef, event.region).then(noop);
     }
   }
@@ -108,18 +105,6 @@ export class ViewPartComponent implements OnDestroy {
 
   public moveViewToNewViewPart(viewRef: string, region: Region): Promise<boolean> {
     return region !== 'center' ? this.viewPartService.moveViewToNewViewPart(viewRef, region) : Promise.resolve(false);
-  }
-
-  public onPortalDimensionChange(dimension: SciDimension): void {
-    this._portalDimension = dimension;
-  }
-
-  public get viewportWidth(): number {
-    return this._portalDimension.clientWidth;
-  }
-
-  public get viewportHeight(): number {
-    return this._portalDimension.clientHeight;
   }
 
   public ngOnDestroy(): void {

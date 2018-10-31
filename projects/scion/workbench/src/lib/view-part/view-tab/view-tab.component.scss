@@ -7,48 +7,17 @@
 }
 
 :host {
-  display: inline-block;
-  position: relative;
+  display: inline-flex;
   overflow: hidden;
   user-select: none;
   cursor: pointer;
   border: none;
-  padding: .5em 1.5em 0 1em;
   box-sizing: border-box;
 
   &.tab-item {
     border-right: 1px solid $viewpart_tabbar_separator-color;
-    max-width: 200px;
-    min-width: 100px;
+    min-width: $viewtab-min-width;
     height: $viewtab-height;
-
-    &.active {
-      background-color: $viewpart_tab-active-bgcolor;
-      box-shadow: -7px 0 10px 0 rgba(0, 0, 0, 0.4);
-    }
-  }
-
-  &.list-item {
-    &:hover {
-      background-color: rgba(239, 239, 239, .5);
-      box-shadow: 0 0 1px 0 rgba(102, 102, 102, .1), 0 0 4px 0 rgba(102, 102, 102, .4);
-    }
-
-    &.hidden {
-      > div.title, > div.heading {
-        font-weight: bold; // hidden viewtabs are bolded in the view list dropdown
-      }
-    }
-
-    &.active {
-      border-top: 1px solid rgba(102, 102, 102, .3);
-      border-bottom: 1px solid rgba(102, 102, 102, .3);
-      background-color: rgba(239, 239, 239, 1);
-    }
-
-    > button.close {
-      right: 12px;
-    }
   }
 
   &.active {
@@ -56,10 +25,26 @@
     color: $viewpart_tab-active-fgcolor;
   }
 
+  &.active.tab-item {
+    background-color: $viewpart_tab-active-bgcolor;
+    box-shadow: -7px 0 10px 0 rgba(0, 0, 0, 0.4);
+  }
+
+  &:hover.list-item {
+    background-color: rgba(239, 239, 239, .5);
+    box-shadow: 0 0 0 1px $viewlistitem-border-color;
+  }
+}
+
+div.tab-content {
+  flex: auto;
+  padding: .5em 0 .5em 1em;
+
   > div.title {
     @include text;
     font-size: 16px;
     font-weight: 400;
+    max-width: $viewtab-max-width;
 
     > span.wb-icon-edit {
       padding-right: .2em;
@@ -68,34 +53,45 @@
 
   > div.heading {
     @include text;
+    max-width: $viewtab-max-width;
     font-size: 13px;
     font-weight: 300;
     line-height: 2em;
   }
-
-  > button.close {
-    display: none;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    outline: none;
-    font-size: .75em;
-    position: absolute;
-    right: 2px;
-    top: 4px;
-    color: inherit;
-
-    &::before {
-      content: '\e5cd';
-    }
-    &:hover::before {
-      content: '\e5c9';
-    }
-  }
 }
 
-:host-context:hover, :host-context(.active) {
-  button.close {
-    display: inherit;
+button.close {
+  flex: none;
+  align-self: flex-start;
+  padding: 0;
+  margin: 4px 4px 4px .5em;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  font-size: .75em;
+  color: inherit;
+  visibility: hidden;
+
+  &::before {
+    content: '\e5cd';
+  }
+
+  :host-context(.closable.active,.closable:hover):not(.disabled) & {
+    visibility: visible;
+  }
+
+  :host-context(.tab-item) &:hover::before {
+    content: '\e5c9';
+  }
+
+  :host-context(.list-item) & {
+    align-self: center;
+    margin-right: 1em;
+    font-size: 1em;
+
+    &:hover::before {
+      font-weight: bold;
+    }
   }
 }

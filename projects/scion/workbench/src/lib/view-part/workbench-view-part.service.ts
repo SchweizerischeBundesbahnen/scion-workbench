@@ -11,7 +11,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { InternalWorkbenchView, InternalWorkbenchViewPart } from '../workbench.model';
 import { VIEW_GRID_QUERY_PARAM } from '../workbench.constants';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { WorkbenchService } from '../workbench.service';
 import { Router } from '@angular/router';
 import { Region } from '../view-part-grid/drop-zone.directive';
@@ -23,7 +23,7 @@ export class WorkbenchViewPartService implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
   private _hiddenViewTabs = new Set<string>();
-  private _viewListVisible = false;
+  private _hiddenViewTabs$ = new BehaviorSubject<string[]>([]);
 
   constructor(private _workbench: WorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
@@ -129,10 +129,7 @@ export class WorkbenchViewPartService implements OnDestroy {
       .activateView(this._viewPart.viewPartRef, viewRef)
       .serialize();
 
-    return this.navigate([], serializedGrid).then(status => {
-      this.toggleViewList(false);
-      return status;
-    });
+    return this.navigate([], serializedGrid);
   }
 
   /**
@@ -186,24 +183,7 @@ export class WorkbenchViewPartService implements OnDestroy {
   public setHiddenViewTabs(viewRefs: string[]): void {
     this._hiddenViewTabs.clear();
     viewRefs.forEach(viewRef => this._hiddenViewTabs.add(viewRef));
-
-    if (viewRefs.length === 0) {
-      this.toggleViewList(false);
-    }
-  }
-
-  /**
-   * Controls the open state of the view menu list.
-   *
-   * @param open
-   *   If not specified, the menu list is toggled. If 'true', the menu list is opened, or closed otherwise.
-   */
-  public toggleViewList(open?: boolean): void {
-    if (open === undefined) {
-      this._viewListVisible = !this._viewListVisible;
-    } else {
-      this._viewListVisible = open;
-    }
+    this._hiddenViewTabs$.next(viewRefs);
   }
 
   public isViewTabHidden(viewRef: string): boolean {
@@ -214,8 +194,8 @@ export class WorkbenchViewPartService implements OnDestroy {
     return this._hiddenViewTabs.size;
   }
 
-  public get viewListVisible(): boolean {
-    return this._viewListVisible;
+  public get hiddenViewTabs$(): Observable<string[]> {
+    return this._hiddenViewTabs$.asObservable();
   }
 
   /**

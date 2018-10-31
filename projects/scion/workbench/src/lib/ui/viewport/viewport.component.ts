@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, DoCheck, ElementRef, EventEmitter, Input, KeyValueDiffer, KeyValueDiffers, Output, ViewChild } from '@angular/core';
 import { NULL_DIMENSION, SciDimension } from '../dimension/dimension.directive';
 import { DomUtil } from '../../dom.util';
 
@@ -23,10 +23,11 @@ import { DomUtil } from '../../dom.util';
   templateUrl: './viewport.component.html',
   styleUrls: ['./viewport.component.scss']
 })
-export class SciViewportComponent {
+export class SciViewportComponent implements DoCheck {
 
   private _viewport: HTMLDivElement;
   private _viewportDimension: SciDimension = NULL_DIMENSION;
+  private _viewportClientDiffer: KeyValueDiffer<string, any>;
 
   /**
    * @internal
@@ -49,12 +50,20 @@ export class SciViewportComponent {
   @Output()
   public viewportChange = new EventEmitter<void>();
 
+  constructor(differs: KeyValueDiffers) {
+    this._viewportClientDiffer = differs.find({}).create();
+  }
+
   /**
    * @internal
    */
   public onViewportDimensionChange(dimension: SciDimension): void {
     this._viewportDimension = dimension;
     this.viewportChange.emit();
+  }
+
+  public ngDoCheck(): void {
+    this.detectViewportClientDimensionChange() && this.viewportChange.emit();
   }
 
   /**
@@ -186,5 +195,13 @@ export class SciViewportComponent {
     } while (el !== null && el !== this._viewport);
 
     return offset;
+  }
+
+  private detectViewportClientDimensionChange(): boolean {
+    if (!this._viewport) {
+      return false;
+    }
+    const viewportClientSize = {height: this._viewport.scrollHeight, width: this._viewport.scrollWidth};
+    return !!this._viewportClientDiffer.diff(viewportClientSize);
   }
 }

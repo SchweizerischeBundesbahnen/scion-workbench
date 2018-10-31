@@ -1,9 +1,13 @@
-<div class="title">
-  <span *ngIf="dirty" class="wb-icon-edit"></span>
-  {{view.title}}</div>
-<div class="heading" *ngIf="view.heading as heading">{{heading}}</div>
-<button *ngIf="view.closable && !view.disabled"
-        type="button"
+<div class="tab-content">
+  <div class="title">
+    <span *ngIf="dirty" class="wb-icon-edit"></span>
+    {{view.title}}
+  </div>
+  <div class="heading" *ngIf="view.heading as heading">
+    {{heading}}
+  </div>
+</div>
+<button type="button"
         class="close wb-icons"
         (click)="onClose($event)">
 </button>

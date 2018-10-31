@@ -64,6 +64,16 @@ export class ViewTabComponent implements OnDestroy {
     return this.view.dirty;
   }
 
+  @HostBinding('class.closable')
+  public get closable(): boolean {
+    return this.view.closable;
+  }
+
+  @HostBinding('class.disabled')
+  public get disabled(): boolean {
+    return this.view.disabled;
+  }
+
   @HostBinding('class.tab-item')
   public get renderAsTabItem(): boolean {
     return this.renderingHint === 'tab-item';

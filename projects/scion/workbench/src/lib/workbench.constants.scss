@@ -2,7 +2,9 @@ $background-color: #FEFEFE;
 
 $topbar-height: 55px;
 $viewtab-height: $topbar-height;
-$view-list-width: 300px;
+$viewtab-min-width: 100px;
+$viewtab-max-width: 200px;
+$viewlistitem-border-color: rgba(102, 102, 102, .3);
 $text-padding: .5em 1em;
 
 $error-color: rgba(255, 55, 55, 1);
