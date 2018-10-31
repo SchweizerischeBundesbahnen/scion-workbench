@@ -19,7 +19,6 @@ import { ViewPartComponent } from './view-part/view-part.component';
 import { PortalModule } from '@angular/cdk/portal';
 import { ViewTabComponent } from './view-part/view-tab/view-tab.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SearchfieldComponent } from './searchfield/searchfield.component';
 import { ViewListComponent } from './view-part/view-list/view-list.component';
 import { ViewListButtonComponent } from './view-part/view-list-button/view-list-button.component';
 import { ViewPartBarComponent } from './view-part/view-part-bar/view-part-bar.component';
@@ -63,6 +62,7 @@ import { SciDimensionModule } from './ui/dimension/dimension.module';
 import { ActivityResolver } from './routing/activity.resolver';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 
@@ -74,6 +74,7 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     ReactiveFormsModule,
     SciViewportModule,
     SciDimensionModule,
+    OverlayModule,
   ],
   declarations: [
     WorkbenchComponent,
@@ -87,7 +88,6 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     ViewListButtonComponent,
     ViewListComponent,
     ViewPartGridComponent,
-    SearchfieldComponent,
     SashDirective,
     ViewPartSashBoxComponent,
     DropZoneDirective,
@@ -193,6 +193,11 @@ export class WorkbenchModule {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
           multi: true,
           useValue: EmptyOutletComponent
+        },
+        {
+          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
+          multi: true,
+          useValue: ViewListComponent,
         },
         {
           provide: ROUTE_REUSE_PROVIDER,

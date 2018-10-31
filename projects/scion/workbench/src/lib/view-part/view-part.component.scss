@@ -18,17 +18,6 @@
   > wb-portal-outlet {
     flex: auto;
   }
-
-  > wb-view-list {
-    @include allowPointerEvents;
-    position: absolute;
-    top: $viewtab-height;
-    right: 0;
-    width: $view-list-width;
-    border: 1px solid $viewpart_tabbar-bgcolor;
-    border-top: none;
-    background-color: $viewpart_tab-active-bgcolor;
-  }
 }
 
 :host-context(.suspend-pointer-events) wb-portal-outlet > ::ng-deep * {

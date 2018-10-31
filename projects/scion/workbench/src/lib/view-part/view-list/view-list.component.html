@@ -1,6 +1,7 @@
-<wb-searchfield (search)="onFilter($event)"></wb-searchfield>
-<sci-viewport #viewport
-             [style.height.px]="viewportHeight"
-             (viewportChange)="onViewportChange(viewport)">
-  <wb-view-tab *ngFor="let viewRef of filteredViewsRefs" [viewRef]="viewRef" [renderingHint]="'list-item'"></wb-view-tab>
+<sci-viewport>
+  <ul sciDimension (sciDimensionChange)="onViewportClientDimensionChange($event)">
+    <li *ngFor="let hiddenViewTab of hiddenViewTabs">
+      <wb-view-tab [viewRef]="hiddenViewTab" renderingHint="list-item" (click)="onViewTabClick()"></wb-view-tab>
+    </li>
+  </ul>
 </sci-viewport>
