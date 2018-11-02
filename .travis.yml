@@ -20,6 +20,6 @@ before_install:
 install:
   - npm install
 script:
-  - ng lint @scion/workbench
-  - ng test @scion/workbench --watch=false
-  - ng build @scion/workbench --prod
+  - npm run lint
+  - npm run build
+  - npm run test

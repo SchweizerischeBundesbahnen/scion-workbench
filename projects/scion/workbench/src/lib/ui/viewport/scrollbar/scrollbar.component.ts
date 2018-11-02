@@ -11,7 +11,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, DoCheck, ElementRef, HostBinding, Inject, Input, OnDestroy, ViewChild } from '@angular/core';
 import { fromEvent, merge, of, Subject, timer } from 'rxjs';
-import { debounceTime, skipWhile, startWith, takeUntil, takeWhile, withLatestFrom } from 'rxjs/operators';
+import { debounceTime, first, skipWhile, startWith, takeUntil, takeWhile, withLatestFrom } from 'rxjs/operators';
 
 /**
  * Renders a vertical or horizontal scrollbar.
@@ -78,13 +78,13 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
 
   public onTouchStart(event: TouchEvent): void {
     event.preventDefault();
-    this._lastDragPosition = this.vertical ? event.touches[0].pageY : event.touches[0].pageX;
+    this._lastDragPosition = this.vertical ? event.touches[0].screenY : event.touches[0].screenX;
   }
 
   public onTouchMove(event: TouchEvent): void {
     event.preventDefault();
 
-    const newDragPositionPx = this.vertical ? event.touches[0].pageY : event.touches[0].pageX;
+    const newDragPositionPx = this.vertical ? event.touches[0].screenY : event.touches[0].screenX;
     const scrollbarPanPx = newDragPositionPx - this._lastDragPosition;
     const viewportPanPx = this.toViewportPanPx(scrollbarPanPx);
     this._lastDragPosition = newDragPositionPx;
@@ -102,15 +102,15 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
     }
 
     event.preventDefault();
-    this._lastDragPosition = this.vertical ? event.pageY : event.pageX;
+    this._lastDragPosition = this.vertical ? event.screenY : event.screenX;
 
     // Listen for 'mousemove' events
-    const mousemoveListener = fromEvent(this._document, 'mousemove')
+    const mousemoveListener = merge(fromEvent(this._document, 'mousemove'), fromEvent(this._document, 'sci-mousemove'))
       .pipe(takeUntil(this._destroy$))
       .subscribe((mousemoveEvent: MouseEvent) => {
         mousemoveEvent.preventDefault();
 
-        const newDragPositionPx = this.vertical ? mousemoveEvent.pageY : mousemoveEvent.pageX;
+        const newDragPositionPx = this.vertical ? mousemoveEvent.screenY : mousemoveEvent.screenX;
         const scrollbarPanPx = newDragPositionPx - this._lastDragPosition;
         const viewportPanPx = this.toViewportPanPx(scrollbarPanPx);
         this._lastDragPosition = newDragPositionPx;
@@ -118,8 +118,8 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
       });
 
     // Listen for 'mouseup' events; use 'capture phase' and 'stop propagation' to not close overlays
-    fromEvent(this._document, 'mouseup', {capture: true, once: true})
-      .pipe(takeUntil(this._destroy$))
+    merge(fromEvent(this._document, 'mouseup', {capture: true}), fromEvent(this._document, 'sci-mouseup'))
+      .pipe(first(), takeUntil(this._destroy$))
       .subscribe((mouseupEvent: MouseEvent) => {
         mouseupEvent.stopPropagation();
         mousemoveListener.unsubscribe();
