@@ -13,6 +13,7 @@ import { combineLatest, from, fromEvent, merge, Observable, of, OperatorFunction
 import { mergeMap, takeUntil } from 'rxjs/operators';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { installMouseDispatcher, SciMouseDispatcher } from '@scion/mouse-dispatcher';
 
 /**
  * Displays the content of a remote site in an <iframe>.
@@ -45,6 +46,7 @@ export class RemoteSiteComponent implements OnDestroy {
 
   private _whenIframe: Promise<HTMLIFrameElement>;
   private _iframeResolveFn: (iframe: HTMLIFrameElement) => void;
+  private _mouseDispatcher: SciMouseDispatcher;
 
   private _siteOrigin: string;
   public siteUrl: SafeUrl;
@@ -78,8 +80,10 @@ export class RemoteSiteComponent implements OnDestroy {
               private _renderer: Renderer2,
               private _zone: NgZone) {
     this._whenIframe = new Promise<HTMLIFrameElement>(resolve => this._iframeResolveFn = resolve); // tslint:disable-line:typedef
+
     this.installWorkbenchLayoutListener();
     this.installIframeMessageListener();
+    this.installMouseDispatcher();
   }
 
   /**
@@ -97,6 +101,18 @@ export class RemoteSiteComponent implements OnDestroy {
       this._iframeResolveFn(iframe);
       this.load.emit();
     }
+  }
+
+  /**
+   * Installs mouse event dispatching between the application window and the iframe.
+   *
+   * Mouse event dispatching is essential if using custom scrollbars in combination with iframes. It provides
+   * continued delivery of mouse events even when the cursor goes past the boundary of the iframe boundary.
+   */
+  private installMouseDispatcher(): void {
+    this._whenIframe.then(iframe => {
+      this._mouseDispatcher = installMouseDispatcher(iframe.contentWindow, this._siteOrigin);
+    });
   }
 
   private installWorkbenchLayoutListener(): void {
@@ -139,6 +155,7 @@ export class RemoteSiteComponent implements OnDestroy {
 
   public ngOnDestroy(): void {
     this._destroy$.next();
+    this._mouseDispatcher && this._mouseDispatcher.dispose();
   }
 }
 

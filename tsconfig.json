@@ -22,6 +22,12 @@
       ],
       "@scion/workbench/*": [
         "dist/scion/workbench/*"
+      ],
+      "@scion/mouse-dispatcher": [
+        "dist/scion/mouse-dispatcher"
+      ],
+      "@scion/mouse-dispatcher/*": [
+        "dist/scion/mouse-dispatcher/*"
       ]
     }
   }

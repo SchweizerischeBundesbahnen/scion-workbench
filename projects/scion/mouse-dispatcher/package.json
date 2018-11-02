@@ -1,0 +1,25 @@
+{
+  "name": "@scion/mouse-dispatcher",
+  "version": "0.0.0-beta.11",
+  "description": "Dispatches mouse events between the application window and another cross-origin window.",
+  "license": "EPL-2.0",
+  "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
+  "bugs": {
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
+  },
+  "author": {
+    "name": "SCION Workbench contributors",
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
+  },
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "rxjs": "^6.0.0"
+  },
+  "keywords": [
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+  }
+}
