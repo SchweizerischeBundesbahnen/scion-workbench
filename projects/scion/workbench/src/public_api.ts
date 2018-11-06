@@ -18,8 +18,6 @@ export { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './lib/rout
 export { WorkbenchRouter, WbNavigationExtras } from './lib/routing/workbench-router.service';
 export { WorkbenchAuxiliaryRoutesRegistrator } from './lib/routing/workbench-auxiliary-routes-registrator.service';
 export { WorkbenchComponent } from './lib/workbench.component';
-export { SciViewportModule } from './lib/ui/viewport/viewport.module';
-export { SciViewportComponent } from './lib/ui/viewport/viewport.component';
 export { RemoteSiteComponent } from './lib/remote-site/remote-site.component';
 export { OverlayHostRef } from './lib/overlay-host-ref.service';
 export { WbActivityDirective } from './lib/activity-part/wb-activity.directive';

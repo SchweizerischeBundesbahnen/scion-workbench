@@ -11,7 +11,7 @@
 import { Component, ElementRef, HostBinding, HostListener, Input, NgZone, OnDestroy } from '@angular/core';
 import { InternalWorkbenchView } from '../../workbench.model';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
-import { SciViewportComponent } from '../../ui/viewport/viewport.component';
+import { SciViewportComponent } from '@scion/viewport';
 import { fromEvent, merge, noop, Subject } from 'rxjs';
 import { InternalWorkbenchService } from '../../workbench.service';
 import { VIEW_DRAG_TYPE } from '../../workbench.constants';
