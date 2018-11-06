@@ -17,6 +17,15 @@ import { ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME } from '../workbench.constants
 import { Activity } from './activity';
 import { ContentProjectionContext } from '../content-projection/content-projection-context.service';
 
+/**
+ * Specifies the minimal panel width. If smaller, it is expanded to this value
+ */
+const PANEL_MIN_WIDTH = 200;
+/**
+ * Specifies the initial panel width if starting the application.
+ */
+const PANEL_INITIAL_WIDTH = 500;
+
 @Component({
   selector: 'wb-activity-part',
   templateUrl: './activity-part.component.html',
@@ -42,10 +51,7 @@ import { ContentProjectionContext } from '../content-projection/content-projecti
 })
 export class ActivityPartComponent {
 
-  public static readonly PANEL_MIN_WIDTH = 200;
-  public static readonly PANEL_INITIAL_WIDTH = 500;
-
-  private _panelWidth = ActivityPartComponent.PANEL_INITIAL_WIDTH;
+  private _panelWidth = PANEL_INITIAL_WIDTH;
   private _panelWidth$ = new Subject<number>();
 
   @ViewChild('viewport')
@@ -108,7 +114,7 @@ export class ActivityPartComponent {
   }
 
   public onSashReset(): void {
-    this.panelWidth = ActivityPartComponent.PANEL_INITIAL_WIDTH;
+    this.panelWidth = PANEL_INITIAL_WIDTH;
   }
 
   public onPanelAnimationDone(): void {
@@ -116,15 +122,15 @@ export class ActivityPartComponent {
   }
 
   private ensureMinimalPanelWidth(): void {
-    if (this.panelWidth >= ActivityPartComponent.PANEL_MIN_WIDTH) {
+    if (this.panelWidth >= PANEL_MIN_WIDTH) {
       return;
     }
 
     const animation = this._animationBuilder.build([
       style({width: '*'}),
-      animate('75ms ease-out', style({width: `${ActivityPartComponent.PANEL_MIN_WIDTH}px`}))
+      animate('75ms ease-out', style({width: `${PANEL_MIN_WIDTH}px`}))
     ]).create(this._panelElementRef.nativeElement);
-    animation.onDone(() => this.panelWidth = ActivityPartComponent.PANEL_MIN_WIDTH);
+    animation.onDone(() => this.panelWidth = PANEL_MIN_WIDTH);
     ActivityPartComponent.once(animation);
   }
 
