@@ -17,8 +17,7 @@ import { ScrollDispatchModule } from '@angular/cdk/scrolling';
 import { SciDimensionModule } from '@scion/dimension';
 
 /**
- * Provides a viewport with its `<ng-content>` as its native scrollable viewport client
- * with scrollbars that sit on top of the viewport client.
+ * Provides a viewport component with scrollbars that sit on top of the viewport client.
  */
 @NgModule({
   imports: [

@@ -34,6 +34,12 @@
       ],
       "@scion/dimension/*": [
         "dist/scion/dimension/*"
+      ],
+      "@scion/viewport": [
+        "dist/scion/viewport"
+      ],
+      "@scion/viewport/*": [
+        "dist/scion/viewport/*"
       ]
     }
   }
