@@ -13,7 +13,14 @@ import { CommonModule } from '@angular/common';
 import { SciDimensionDirective } from './dimension.directive';
 
 /**
- * {SciDimensionDirective} notifies upon a component dimension change.
+ * Provides a directive for observing changes to host element's size.
+ *
+ * Note:
+ * Web Performance Working Group is working on a W3C recommendation for natively observing changes to Element’s size.
+ * The Web API draft is still work in progress and support limited to Google Chrome and Opera.
+ *
+ * @see https://wicg.github.io/ResizeObserver/
+ * @see https://caniuse.com/#feat=resizeobserver
  */
 @NgModule({
   imports: [

@@ -58,7 +58,7 @@ import { ViewRegistrySynchronizer } from './routing/view-registry-synchronizer.s
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
 import { SciViewportModule } from './ui/viewport/viewport.module';
-import { SciDimensionModule } from './ui/dimension/dimension.module';
+import { SciDimensionModule } from '@scion/dimension';
 import { ActivityResolver } from './routing/activity.resolver';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';

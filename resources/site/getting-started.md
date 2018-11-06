@@ -28,7 +28,7 @@ This 'Getting Started' tutorial explains how to install SCION workbench, configu
 
 Use npm command-line tool to install SCION Workbench and Angular CDK packages.
 ```
-npm install --save @scion/workbench @angular/cdk
+npm install --save @scion/workbench @scion/dimension @angular/cdk
 ```
 
 > SCION Workbench requires Angular CDK to be installed. By using the above commands, Angular CDK is installed as well.

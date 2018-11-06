@@ -1,0 +1,27 @@
+{
+  "name": "@scion/dimension",
+  "version": "0.0.0-beta.11",
+  "description": "Allows observing changes to host element's size.",
+  "license": "EPL-2.0",
+  "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
+  "bugs": {
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
+  },
+  "author": {
+    "name": "SCION Workbench contributors",
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
+  },
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "@angular/common": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
+    "@angular/core": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
+    "rxjs": "^6.0.0"
+  },
+  "keywords": [
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+  }
+}

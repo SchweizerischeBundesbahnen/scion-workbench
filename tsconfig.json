@@ -28,6 +28,12 @@
       ],
       "@scion/mouse-dispatcher/*": [
         "dist/scion/mouse-dispatcher/*"
+      ],
+      "@scion/dimension": [
+        "dist/scion/dimension"
+      ],
+      "@scion/dimension/*": [
+        "dist/scion/dimension/*"
       ]
     }
   }
