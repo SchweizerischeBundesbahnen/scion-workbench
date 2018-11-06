@@ -191,7 +191,11 @@ export class PersonComponent implements WbBeforeDestroy {
     return this.messageBoxService.open({
       content: 'Do you want to save changes?',
       severity: 'info',
-      actions: ['yes', 'no', 'cancel']
+      actions: {
+        yes: 'Yes',
+        no: 'No',
+        cancel: 'Cancel'
+      }      
     }).then(action => {
       switch (action) {
         case 'yes':
