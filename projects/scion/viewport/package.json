@@ -1,7 +1,7 @@
 {
-  "name": "@scion/workbench",
+  "name": "@scion/viewport",
   "version": "0.0.0-beta.11",
-  "description": "SCION Workbench helps to build multi-view web applications and integrates separate micro frontends into a consistent rich web application. Views are shown within tabs which can be flexible arranged and dragged around by the user.",
+  "description": "Provides a viewport component with scrollbars that sit on top of the viewport client.",
   "license": "EPL-2.0",
   "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
   "bugs": {
@@ -12,26 +12,15 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "dependencies": {
-    "@scion/mouse-dispatcher": "0.0.0-beta.11"
   },
   "peerDependencies": {
     "@angular/common": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@angular/core": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@angular/cdk": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
-    "@angular/animations": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
-    "@angular/forms": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
-    "@angular/router": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@scion/dimension": "0.0.0-beta.11",
-    "@scion/viewport": "0.0.0-beta.11",
     "rxjs": "^6.0.0"
   },
   "keywords": [
-    "angular",
-    "workbench",
-    "multi-view web application",
-    "application shell",
-    "application frame",
-    "micro fronted"
   ],
   "repository": {
     "type": "git",

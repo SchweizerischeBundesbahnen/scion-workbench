@@ -9,8 +9,7 @@
  */
 
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
-import { advance } from '../../spec/util/util.spec';
+import { async, ComponentFixture, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { SciNativeScrollbarTrackSize } from './native-scrollbar-track-size';
 
 describe('SciNativeScrollbarTrackSize', () => {
@@ -57,4 +56,13 @@ class AppComponent implements AfterViewInit {
     this.vScrollbarTrackWidth = this.viewport.nativeElement.offsetWidth - this.viewportClient.nativeElement.offsetWidth;
     this.hScrollbarTrackHeight = this.viewport.nativeElement.offsetHeight - this.viewportClient.nativeElement.offsetHeight;
   }
+}
+
+/**
+ * Simulates the asynchronous passage of time for the timers and detects the fixture for changes.
+ */
+export function advance(fixture: ComponentFixture<any>): void {
+  tick();
+  fixture.detectChanges();
+  tick();
 }

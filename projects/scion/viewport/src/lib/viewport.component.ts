@@ -10,13 +10,12 @@
 
 import { Component, DoCheck, ElementRef, EventEmitter, Input, KeyValueDiffer, KeyValueDiffers, Output, ViewChild } from '@angular/core';
 import { NULL_DIMENSION, SciDimension } from '@scion/dimension';
-import { DomUtil } from '../../dom.util';
 
 /**
- * Represents a viewport with its `<ng-content>` as its scrollable viewport client with scrollbars that sit on top
- * of the viewport client.
+ * Represents a viewport with its `<ng-content>` used as its scrollable viewport client and
+ * scrollbars that sit on top of the viewport client.
  *
- * CSS flexbox layout with flex-flow 'column nowrap' is applied to the viewport with `<ng-content>` as its flex item(s).
+ * `ng-content` is added to a flex-box container with `flex-flow` set to 'column nowrap'.
  */
 @Component({
   selector: 'sci-viewport',
@@ -183,7 +182,7 @@ export class SciViewportComponent implements DoCheck {
    * Computes the distance of the element to this viewport's left or top border.
    */
   public computeOffset(element: HTMLElement, border: 'left' | 'top'): number {
-    if (!DomUtil.isChildOf(element, this._viewport)) {
+    if (!isChildOf(element, this._viewport)) {
       throw Error('element not a child of the viewport');
     }
 
@@ -204,4 +203,17 @@ export class SciViewportComponent implements DoCheck {
     const viewportClientSize = {height: this._viewport.scrollHeight, width: this._viewport.scrollWidth};
     return !!this._viewportClientDiffer.diff(viewportClientSize);
   }
+}
+
+/**
+ * Returns 'true' if the given element is a child element of the parent element.
+ */
+function isChildOf(element: Element, parent: Element): boolean {
+  while (element.parentElement !== null) {
+    element = element.parentElement;
+    if (element === parent) {
+      return true;
+    }
+  }
+  return false;
 }

@@ -57,7 +57,7 @@ import { EmptyOutletComponent } from './routing/empty-outlet.component';
 import { ViewRegistrySynchronizer } from './routing/view-registry-synchronizer.service';
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
-import { SciViewportModule } from './ui/viewport/viewport.module';
+import { SciViewportModule } from '@scion/viewport';
 import { SciDimensionModule } from '@scion/dimension';
 import { ActivityResolver } from './routing/activity.resolver';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
