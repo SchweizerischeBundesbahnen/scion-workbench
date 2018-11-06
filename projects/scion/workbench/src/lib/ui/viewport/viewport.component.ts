@@ -9,7 +9,7 @@
  */
 
 import { Component, DoCheck, ElementRef, EventEmitter, Input, KeyValueDiffer, KeyValueDiffers, Output, ViewChild } from '@angular/core';
-import { NULL_DIMENSION, SciDimension } from '../dimension/dimension.directive';
+import { NULL_DIMENSION, SciDimension } from '@scion/dimension';
 import { DomUtil } from '../../dom.util';
 
 /**

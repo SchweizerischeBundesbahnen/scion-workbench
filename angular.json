@@ -80,6 +80,44 @@
           }
         }
       }
+    },
+    "@scion/dimension": {
+      "root": "projects/scion/dimension",
+      "sourceRoot": "projects/scion/dimension/src",
+      "projectType": "library",
+      "prefix": "sci",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/scion/dimension/tsconfig.lib.json",
+            "project": "projects/scion/dimension/ng-package.json"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/dimension/src/test.ts",
+            "tsConfig": "projects/scion/dimension/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/dimension/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/dimension/tsconfig.lib.json",
+              "projects/scion/dimension/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "@scion/workbench"

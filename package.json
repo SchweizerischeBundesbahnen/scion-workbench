@@ -13,14 +13,16 @@
   },
   "scripts": {
     "ng": "ng",
-    "build": "npm run build-mouse-dispatcher && npm run build-workbench",
+    "build": "npm run build-mouse-dispatcher && npm run build-dimension && npm run build-workbench",
     "build-workbench": "ng build --prod @scion/workbench && cp -r projects/scion/workbench/src/theme/** dist/scion/workbench",
     "build-mouse-dispatcher": "ng build --prod @scion/mouse-dispatcher",
+    "build-dimension": "ng build --prod @scion/dimension",
     "test": "npm run test-workbench",
     "test-workbench": "ng test @scion/workbench --watch=false",
-    "lint": "npm run lint-workbench & npm run lint-mouse-dispatcher",
+    "lint": "npm run lint-workbench & npm run lint-mouse-dispatcher & npm run lint-dimension",
     "lint-workbench": "ng lint @scion/workbench",
     "lint-mouse-dispatcher": "ng lint @scion/mouse-dispatcher",
+    "lint-dimension": "ng lint @scion/dimension",
     "e2e": "ng e2e"
   },
   "private": true,

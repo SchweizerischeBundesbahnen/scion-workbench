@@ -14,7 +14,7 @@ import { SciViewportComponent } from './viewport.component';
 import { SciScrollbarComponent } from './scrollbar/scrollbar.component';
 import { SciScrollableDirective } from './scrollable.directive';
 import { ScrollDispatchModule } from '@angular/cdk/scrolling';
-import { SciDimensionModule } from '../dimension/dimension.module';
+import { SciDimensionModule } from '@scion/dimension';
 
 /**
  * Provides a viewport with its `<ng-content>` as its native scrollable viewport client

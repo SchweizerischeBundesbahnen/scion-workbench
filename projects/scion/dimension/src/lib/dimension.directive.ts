@@ -15,7 +15,11 @@ import { takeUntil } from 'rxjs/operators';
 export const NULL_DIMENSION: SciDimension = {offsetWidth: 0, offsetHeight: 0, clientWidth: 0, clientHeight: 0};
 
 /**
- * Notifies upon dimension change of the host element.
+ * Allows observing changes to host element's size.
+ *
+ * ---
+ * Usage:
+ * <div sciDimension (sciDimensionChange)="onDimensionChange($event)"></div>
  */
 @Directive({
   selector: '[sciDimension]'
@@ -89,6 +93,9 @@ export class SciDimensionDirective implements OnInit, DoCheck, OnDestroy {
   }
 }
 
+/**
+ * Emitted upon a host element size change.
+ */
 export interface SciDimension {
   offsetWidth: number;
   offsetHeight: number;

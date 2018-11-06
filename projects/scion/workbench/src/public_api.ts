@@ -20,8 +20,6 @@ export { WorkbenchAuxiliaryRoutesRegistrator } from './lib/routing/workbench-aux
 export { WorkbenchComponent } from './lib/workbench.component';
 export { SciViewportModule } from './lib/ui/viewport/viewport.module';
 export { SciViewportComponent } from './lib/ui/viewport/viewport.component';
-export { SciDimensionModule } from './lib/ui/dimension/dimension.module';
-export { SciDimensionDirective, SciDimension } from './lib/ui/dimension/dimension.directive';
 export { RemoteSiteComponent } from './lib/remote-site/remote-site.component';
 export { OverlayHostRef } from './lib/overlay-host-ref.service';
 export { WbActivityDirective } from './lib/activity-part/wb-activity.directive';
