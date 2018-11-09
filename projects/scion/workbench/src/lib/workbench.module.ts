@@ -233,7 +233,7 @@ export class WorkbenchModule {
 
 export function provideForRootGuard(workbench: WorkbenchService): any {
   if (workbench) {
-    throw new Error('WorkbenchModule.forRoot() called twice. Lazy loaded modules should use WorkbenchModule.forChild() instead.');
+    throw new Error('[ModuleForRootError] WorkbenchModule.forRoot() called twice. Lazy loaded modules should use WorkbenchModule.forChild() instead.');
   }
   return 'guarded';
 }
