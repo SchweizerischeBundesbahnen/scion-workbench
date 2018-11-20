@@ -1,0 +1,5 @@
+<sci-list (filter)="onFilter($event)">
+  <ng-template *ngFor="let manifest of manifests$ | async; trackBy: trackByFn" sciListItem [key]="manifest.symbolicName">
+    <app-application-list-item [manifest]="manifest"></app-application-list-item>
+  </ng-template>
+</sci-list>

@@ -1,0 +1,29 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > sci-popup-shell {
+    flex: auto;
+
+    form {
+      flex: auto;
+      display: grid;
+      grid-template-columns: 100px auto;
+      grid-column-gap: 1em;
+      grid-row-gap: .5em;
+      grid-template-rows: auto;
+      @include grid-container-align-items(center);
+
+      > label[for="message"] {
+        align-self: start;
+      }
+
+      > textarea#message {
+        height: 16em;
+        resize: none;
+      }
+    }
+  }
+}

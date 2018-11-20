@@ -1,0 +1,57 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > sci-popup-shell {
+    flex: auto;
+
+    main {
+      display: flex;
+      flex-direction: column;
+
+      > section {
+        border: 1px solid accentColor(.25);
+        border-radius: 5px;
+        padding: 1em;
+        font-size: .9em;
+
+        > h2 {
+          font-size: 1em;
+          font-weight: bold;
+          margin-top: 0;
+        }
+
+        &.params {
+          flex: none;
+          margin-bottom: 1em;
+        }
+
+        &.query-params {
+          flex: none;
+          margin-bottom: 1em;
+        }
+
+        &.result {
+          flex: auto;
+          display: flex;
+          flex-direction: column;
+
+          > textarea {
+            flex: auto;
+            resize: none;
+            min-height: 5em;
+          }
+
+          > span.validation {
+            color: errorColor();
+            align-self: flex-end;
+            padding: .25em 0;
+            height: 1em;
+          }
+        }
+      }
+    }
+  }
+}

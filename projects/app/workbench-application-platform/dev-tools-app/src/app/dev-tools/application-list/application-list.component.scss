@@ -1,0 +1,10 @@
+@import 'common';
+
+:host {
+  display: flex;
+  padding: app-padding();
+
+  > sci-list {
+    flex: auto;
+  }
+}

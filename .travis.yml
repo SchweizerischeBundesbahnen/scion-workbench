@@ -5,110 +5,256 @@ dist: trusty
 language: node_js
 node_js:
 - '8'
+env:
+  global:
+  - NPM_EMAIL="scion.collaborator@gmail.com"
+  - NPM_TOKEN="FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
+  - secure: "W2MbFhPYKn4nBzW9uV5GlRBU7Bsml3CA2sGapskwHouAW/5KApc8OPirhlu37LdUKaPmJwacWOugK9SPU5Fh2kBEad4ktlyVpbwIbzt3R29EpdolnaeUX2cpGfqUWxSN3EA02mlKyExfTQL7AYJlrysgVc+5D1FyvZQ/Ej4sw8NvbUbuRxUXiOCP9FpZ3GYa3Tprl3cfQpgHPUqxO64kvym1kZZAYXkrLiidGA5riiWyY8b4waBv7cg+tpYzsqkPCSdlnTaisy1Lo5vMaAXsKroWnJHRH6ONPJr8qw1YmffSslpXYeENDKJQNKPdd9i5M56Vq7sV2jHb9vWP8CdOUxO9298pC6ymQ28EJFttEG/0CrLCZdkDbf9HcKy6ZygOyrow/FDOaOCJSilNzecfeNJmF5Av+tt7tg4zSLVK33mKFJSrrPvalG44iIHIgHHWd8LOGAy7k4pzquW1zbTVMqcqctYxUWYTy8s2r/7Nxy/f0bdb5XHwj91TOnp8+mSR1FI8UGgvmc8Y8BuXSwz9cdihX6nM7u+gVpEwgRpelej05dathtmUtuSTAZBdETBspFrCCjzSy7J/9M5/nVXArf875qzqWfj4/KNqqAeg/YNWdI2wlW90JQgt5msOe1awwuWttFVyO3mdT6gvkaPrkpxbDW/yHgr8pXiGIHm1iAE=" # $NOW_TOKEN
 install:
 - npm install
-script:
-- npm run build
 jobs:
   include:
-  - stage: lint and test all packages
+  - stage: "Lint stage"
+    name: "lints all libraries"
+    script:
+      - npm run lint
+  -
+    name: "lints all applications"
+    script:
+      - npm run app:workbench-application-platform:lint
+  - stage: "Build stage"
+    name: "builds all, tests all, deploys demo apps (if branch=master) to 'https://zeit.co/scion', publishes libraries to NPM (if branch=master AND if release tag)"
     script:
     - npm run build
-    - npm run lint
     - npm run test
-  - stage: release mouse-dispatcher package
-    if: tag IS present
-    before_deploy:
-    - cd dist/scion/mouse-dispatcher
-    after_deploy:
-    - cd ../../..
+    - npm run app:workbench-application-platform:build-now
+    - npm run app:workbench-application-platform:e2e
     deploy:
-    - provider: npm
-      email: scion.collaborator@gmail.com
-      api_key:
-        secure: "FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
-      skip_cleanup: true
-      on:
-        tags: true
-        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
-    - provider: npm
-      tag: next
-      email: scion.collaborator@gmail.com
-      api_key:
-        secure: "FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
-      skip_cleanup: true
-      on:
-        tags: true
-        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
-  - stage: release dimension package
-    if: tag IS present
-    before_deploy:
-    - cd dist/scion/dimension
-    after_deploy:
-    - cd ../../..
-    deploy:
-    - provider: npm
-      email: scion.collaborator@gmail.com
-      api_key:
-        secure: "FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
-      skip_cleanup: true
-      on:
-        tags: true
-        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
-    - provider: npm
-      tag: next
-      email: scion.collaborator@gmail.com
-      api_key:
-        secure: "FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
-      skip_cleanup: true
-      on:
-        tags: true
-        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
-  - stage: release viewport package
-    if: tag IS present
-    before_deploy:
-    - cd dist/scion/viewport
-    after_deploy:
-    - cd ../../..
-    deploy:
-    - provider: npm
-      email: scion.collaborator@gmail.com
-      api_key:
-        secure: "FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
-      skip_cleanup: true
-      on:
-        tags: true
-        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
-    - provider: npm
-      tag: next
-      email: scion.collaborator@gmail.com
-      api_key:
-        secure: "FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
-      skip_cleanup: true
-      on:
-        tags: true
-        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
-  - stage: release workbench package
-    if: tag IS present
-    before_deploy:
-    - cd dist/scion/workbench
-    after_deploy:
-    - cd ../../..
-    deploy:
-    - provider: npm
-      email: scion.collaborator@gmail.com
-      api_key:
-        secure: "FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
-      skip_cleanup: true
-      on:
-        tags: true
-        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
-    - provider: npm
-      tag: next
-      email: scion.collaborator@gmail.com
-      api_key:
-        secure: "FbNdERSRydcm38qnM9XV2HRSYhh7yi33JJe5FUSITDwQh8PAHjmxC5yCvyHHg2WBq5bLBS54oeR8NwomcTQXFL0s8d4Pte32sHBVgNnZ34U1IJDQ6Eufy01dZZjtZNfyv+3CeWOKgHWB963aBbCnfTisN2C66FBLQ4cK1cUO7UaMPZ6ux1wjhtFtd/Isih4TYNCmMRYGYZO1cNO+Ua84dm0j3ko8Hwx68Er3Ce3isQKqHKtXA5d0bX4/bYZuiXwWZwM/QQ2YMCALy8XOSBoE8ObBqOUiutO9LCsGEcPP5LiuWp0D1uqSvajdRhlmoTL3TI3/qDoLtkphww70JYzgRI8HJRekzGvg/gNqJrCDDxz51LpHVrH95TFS+pb9yw/OeEnT6HTpk3C0wc1KUx04EP90bJg36do+eixir3bqQsVJnFMZaBCPGOEyNHsHEqJ5tyKtqVW7UQeyynZGpNXhK1QRS+SQmisLP8nlo6QFheSn965Ke7kYoGB2olasUo7YKJko70bK4kCJOCPdbFyRQUBWGxjdFaAk29a9ekSj6RrkhazjqlxtZAUK72FSlj8UzloJKLugsBfhWEGPqorprbhyeK3qZUUj3ammiu4VW057A2FASAsE9Y80yzrO+0dJeIsTjHC6zNIaQj3KxR7jJBLGe0pKMpql75Adne+ThZM="
-      skip_cleanup: true
-      on:
-        tags: true
-        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+      - provider: script
+        script: bash ./travis-scripts/deploy-now.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/host-app $NOW_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+      - provider: script
+        script: bash ./travis-scripts/deploy-now.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/contact-app $NOW_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+      - provider: script
+        script: bash ./travis-scripts/deploy-now.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/communication-app $NOW_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+      - provider: script
+        script: bash ./travis-scripts/deploy-now.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/dev-tools-app $NOW_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+      # Publish @scion/mouse-dispatcher
+      - provider: script
+        script: bash ./travis-scripts/cd.sh $TRAVIS_BUILD_DIR dist/scion/mouse-dispatcher
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+      - provider: npm
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+      - provider: npm
+        tag: next
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+      # Publish @scion/dimension
+      - provider: script
+        script: bash ./travis-scripts/cd.sh $TRAVIS_BUILD_DIR dist/scion/dimension
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+      - provider: npm
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+      - provider: npm
+        tag: next
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+      # Publish @scion/viewport
+      - provider: script
+        script: bash ./travis-scripts/cd.sh $TRAVIS_BUILD_DIR dist/scion/viewport
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+      - provider: npm
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+      - provider: npm
+        tag: next
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+      # Publish @scion/workbench
+      - provider: script
+        script: bash ./travis-scripts/cd.sh $TRAVIS_BUILD_DIR dist/scion/workbench
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+      - provider: npm
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+      - provider: npm
+        tag: next
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+      # Publish @scion/workbench-application-platform.api
+      - provider: script
+        script: bash ./travis-scripts/cd.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application-platform.api
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+      - provider: npm
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+      - provider: npm
+        tag: next
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+      # Publish @scion/workbench-application-platform
+      - provider: script
+        script: bash ./travis-scripts/cd.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application-platform
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+      - provider: npm
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+      - provider: npm
+        tag: next
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+      # Publish @scion/workbench-application.core
+      - provider: script
+        script: bash ./travis-scripts/cd.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application.core
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+      - provider: npm
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+      - provider: npm
+        tag: next
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+      # Publish @scion/workbench-application.angular
+      - provider: script
+        script: bash ./travis-scripts/cd.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application.angular
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+      - provider: npm
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+      - provider: npm
+        tag: next
+        email: $NPM_EMAIL
+        api_key:
+          secure: $NPM_TOKEN
+        skip_cleanup: true
+        on:
+          branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)

@@ -1,0 +1,9 @@
+<ul>
+  <li *ngIf="type" class="type">
+    <span class="type">{{type}}</span>
+  </li>
+  <li *ngFor="let entry of qualifier | keyvalue:qualifierKeyCompareFn">
+    <span class="key">{{entry.key}}</span>
+    <span class="value">{{entry.value}}</span>
+  </li>
+</ul>

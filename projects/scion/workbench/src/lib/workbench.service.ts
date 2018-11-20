@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 /**
  * Root object for the SCION Workbench.
  *
- * It consists of one or more viewparts containing views which can be flexible arranged and dragged around by the user.
+ * It consists of one or more viewparts containing views which can be flexibly arranged and dragged around by the user.
  *
  * The Workbench provides core features of a modern rich web application.
  *

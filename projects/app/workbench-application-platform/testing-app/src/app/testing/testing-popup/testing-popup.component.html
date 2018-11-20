@@ -1,0 +1,25 @@
+<sci-popup-shell [valid]="form.valid">
+  <ng-template sciPopupShellTitle>Testing Popup</ng-template>
+
+  <ng-template sciPopupShellContent>
+    <main>
+      <section class="params">
+        <h2>URL Parameters</h2>
+        <sci-property class="params e2e-url-params" [properties]="params$ | async"></sci-property>
+      </section>
+
+      <section class="query-params">
+        <h2>URL Query Parameters</h2>
+        <sci-property class="query-params e2e-url-query-params" [properties]="queryParams$ | async"></sci-property>
+      </section>
+
+      <section class="result">
+        <h2>Result</h2>
+        <textarea class="e2e-result" [formControl]="form.get(RESULT)" placeholder="Enter JSON here" (keydown.enter)="$event.stopPropagation();"></textarea>
+        <span class="validation"><ng-container *ngIf="form.get(RESULT).invalid">Invalid JSON</ng-container></span>
+      </section>
+    </main>
+  </ng-template>
+
+  <ng-template sciPopupShellButton (click)="onOk()" [cssClass]="'e2e-ok'">OK</ng-template>
+</sci-popup-shell>

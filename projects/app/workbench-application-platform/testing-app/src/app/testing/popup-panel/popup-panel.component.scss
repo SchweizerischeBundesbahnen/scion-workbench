@@ -1,0 +1,36 @@
+@import 'common';
+
+:host {
+  display: grid;
+  grid-row-gap: .5em;
+  font-size: .9em;
+
+  > sci-params-enter {
+    background-color: #FFFFFF;
+  }
+
+  > section {
+    border: 1px solid accentColor(.25);
+    border-radius: 5px;
+    padding: 1em;
+    background-color: #FFFFFF;
+
+    > h2 {
+      font-size: 1em;
+      margin-top: 0;
+      margin-bottom: 1.5em;
+    }
+
+    > form {
+      display: grid;
+      grid-template-columns: 150px minmax(75px, 300px);
+      grid-column-gap: 1em;
+      grid-row-gap: .5em;
+      @include grid-container-align-items(center);
+    }
+  }
+
+  > span.anchor {
+    justify-self: center;
+  }
+}

@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "importHelpers": true,
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
@@ -23,6 +24,30 @@
       "@scion/workbench/*": [
         "dist/scion/workbench/*"
       ],
+      "@scion/workbench-application-platform.api": [
+        "dist/scion/workbench-application-platform.api"
+      ],
+      "@scion/workbench-application-platform.api/*": [
+        "dist/scion/workbench-application-platform.api/*"
+      ],
+      "@scion/workbench-application-platform": [
+        "dist/scion/workbench-application-platform"
+      ],
+      "@scion/workbench-application-platform/*": [
+        "dist/scion/workbench-application-platform/*"
+      ],
+      "@scion/workbench-application.core": [
+        "dist/scion/workbench-application.core"
+      ],
+      "@scion/workbench-application.core/*": [
+        "dist/scion/workbench-application.core/*"
+      ],
+      "@scion/workbench-application.angular": [
+        "dist/scion/workbench-application.angular"
+      ],
+      "@scion/workbench-application.angular/*": [
+        "dist/scion/workbench-application.angular/*"
+      ],
       "@scion/mouse-dispatcher": [
         "dist/scion/mouse-dispatcher"
       ],
@@ -40,7 +65,78 @@
       ],
       "@scion/viewport/*": [
         "dist/scion/viewport/*"
+      ],
+      "@scion/app/common": [
+        "dist/scion/app/common"
+      ],
+      "@scion/app/common/*": [
+        "dist/scion/app/common/*"
       ]
     }
+    //    /*
+    //     * ======================================+
+    //     * | PATH-OVERRIDE-FOR-LOCAL-DEVELOPMENT |
+    //     * |                                     |
+    //     * |   DO NOT ACTIVATE FOR PRODUCTION!   |
+    //     * +=====================================+
+    //     *
+    //     * Note: DO NOT ACTIVATE FOR PRODUCTION!
+    //     */
+    //    "paths": {
+    //      "@scion/workbench": [
+    //        "projects/scion/workbench/src/public_api"
+    //      ],
+    //      "@scion/workbench/*": [
+    //        "projects/scion/workbench/src/*"
+    //      ],
+    //      "@scion/workbench-application-platform.api": [
+    //        "projects/scion/workbench-application-platform.api/src/public_api"
+    //      ],
+    //      "@scion/workbench-application-platform.api/*": [
+    //        "projects/scion/workbench-application-platform.api/src/*"
+    //      ],
+    //      "@scion/workbench-application-platform": [
+    //        "projects/scion/workbench-application-platform/src/public_api"
+    //      ],
+    //      "@scion/workbench-application-platform/*": [
+    //        "projects/scion/workbench-application-platform/src/*"
+    //      ],
+    //      "@scion/workbench-application.core": [
+    //        "projects/scion/workbench-application.core/src/public_api"
+    //      ],
+    //      "@scion/workbench-application.core/*": [
+    //        "projects/scion/workbench-application.core/src/*"
+    //      ],
+    //      "@scion/workbench-application.angular": [
+    //        "projects/scion/workbench-application.angular/src/public_api"
+    //      ],
+    //      "@scion/workbench-application.angular/*": [
+    //        "projects/scion/workbench-application.angular/src/*"
+    //      ],
+    //      "@scion/mouse-dispatcher": [
+    //        "projects/scion/mouse-dispatcher/src/public_api"
+    //      ],
+    //      "@scion/mouse-dispatcher/*": [
+    //        "projects/scion/mouse-dispatcher/src/*"
+    //      ],
+    //      "@scion/dimension": [
+    //        "projects/scion/dimension/src/public_api"
+    //      ],
+    //      "@scion/dimension/*": [
+    //        "projects/scion/dimension/src/*"
+    //      ],
+    //      "@scion/viewport": [
+    //        "projects/scion/viewport/src/public_api"
+    //      ],
+    //      "@scion/viewport/*": [
+    //        "projects/scion/viewport/src/*"
+    //      ],
+    //      "@scion/app/common": [
+    //        "projects/app/workbench-application-platform/common/src/public_api"
+    //      ],
+    //      "@scion/app/common/*": [
+    //        "projects/app/workbench-application-platform/common/src/*"
+    //      ]
+    //    }
   }
 }

@@ -1,0 +1,28 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: app-padding();
+
+  > section {
+    border: 1px solid accentColor(.25);
+    border-radius: 5px;
+    padding: 1em;
+    font-size: .9em;
+    margin-bottom: 1em;
+
+    > h2 {
+      font-size: 1em;
+      font-weight: bold;
+      margin-top: 0;
+    }
+  }
+
+  > section.uuid {
+    display: grid;
+    grid-template-columns: max-content auto;
+    grid-row-gap: .5em;
+    grid-column-gap: 2em;
+  }
+}

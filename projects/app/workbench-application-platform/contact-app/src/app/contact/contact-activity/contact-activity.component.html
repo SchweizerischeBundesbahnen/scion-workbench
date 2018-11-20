@@ -1,0 +1,19 @@
+<sci-list (filter)="onFilter($event)">
+  <ng-container *ngFor="let contact of contacts$ | async; trackBy: trackByFn">
+    <ng-template sciListItem [key]="contact.id" [actions]="delete_action">
+      <a [wbRouterLink]="{'entity': 'contact', 'id': contact.id}">
+        {{contact.firstname}} {{contact.lastname}}, {{contact.city}}
+      </a>
+    </ng-template>
+    <ng-template #delete_action>
+      <button class="material-icons" type="button" (click)="onDelete(contact.id)">delete</button>
+    </ng-template>
+  </ng-container>
+</sci-list>
+
+<ng-container wbPopupOpenActivityAction
+              [label]="'person_add'"
+              [title]="'Create contact'"
+              [cssClass]="'material-icons'"
+              [qualifier]="{'entity': 'contact', 'action': 'create'}">
+</ng-container>

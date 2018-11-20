@@ -1,0 +1,5 @@
+<app-qualifier-chip-list [type]="intent.type" [qualifier]="intent.qualifier"></app-qualifier-chip-list>
+<div class="hints">
+  <span class="implicit" *ngIf="intent.metadata.implicit" title="This is an implicit intent because the application provides the capability itself.">IMPLICIT</span>
+  <span class="not-handled" *ngIf="!anyQualifier && unhandled$ | async" title="No application found to handle this intent.">NOT HANDLED</span>
+</div>

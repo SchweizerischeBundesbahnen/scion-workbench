@@ -34,6 +34,8 @@ export class MessageBoxService {
   /**
    * Displays the specified message to the user.
    *
+   * Returns a promise that resolves to the action key which the user pressed to confirm the message.
+   *
    * Example usage:
    *
    *  messageBoxService.open({

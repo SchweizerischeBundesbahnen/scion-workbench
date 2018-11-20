@@ -16,8 +16,7 @@
             "project": "projects/scion/workbench/ng-package.json"
           },
           "configurations": {
-            "production": {
-            }
+            "production": {}
           }
         },
         "test": {
@@ -42,6 +41,149 @@
         }
       }
     },
+    "@scion/workbench-application-platform": {
+      "root": "projects/scion/workbench-application-platform",
+      "sourceRoot": "projects/scion/workbench-application-platform/src",
+      "projectType": "library",
+      "prefix": "wap",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/scion/workbench-application-platform/tsconfig.lib.json",
+            "project": "projects/scion/workbench-application-platform/ng-package.json"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/workbench-application-platform/src/test.ts",
+            "tsConfig": "projects/scion/workbench-application-platform/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench-application-platform/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/workbench-application-platform/tsconfig.lib.json",
+              "projects/scion/workbench-application-platform/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "@scion/workbench-application-platform.api": {
+      "root": "projects/scion/workbench-application-platform.api",
+      "sourceRoot": "projects/scion/workbench-application-platform.api/src",
+      "projectType": "library",
+      "prefix": "",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/scion/workbench-application-platform.api/tsconfig.lib.json",
+            "project": "projects/scion/workbench-application-platform.api/ng-package.json"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/workbench-application-platform.api/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "@scion/workbench-application.core": {
+      "root": "projects/scion/workbench-application.core",
+      "sourceRoot": "projects/scion/workbench-application.core/src",
+      "projectType": "library",
+      "prefix": "",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/scion/workbench-application.core/tsconfig.lib.json",
+            "project": "projects/scion/workbench-application.core/ng-package.json"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/workbench-application.core/src/test.ts",
+            "tsConfig": "projects/scion/workbench-application.core/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench-application.core/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/workbench-application.core/tsconfig.lib.json",
+              "projects/scion/workbench-application.core/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "@scion/workbench-application.angular": {
+      "root": "projects/scion/workbench-application.angular",
+      "sourceRoot": "projects/scion/workbench-application.angular/src",
+      "projectType": "library",
+      "prefix": "wb",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/scion/workbench-application.angular/tsconfig.lib.json",
+            "project": "projects/scion/workbench-application.angular/ng-package.json"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/workbench-application.angular/src/test.ts",
+            "tsConfig": "projects/scion/workbench-application.angular/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench-application.angular/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/workbench-application.angular/tsconfig.lib.json",
+              "projects/scion/workbench-application.angular/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
     "@scion/mouse-dispatcher": {
       "root": "projects/scion/mouse-dispatcher",
       "sourceRoot": "projects/scion/mouse-dispatcher/src",
@@ -55,8 +197,7 @@
             "project": "projects/scion/mouse-dispatcher/ng-package.json"
           },
           "configurations": {
-            "production": {
-            }
+            "production": {}
           }
         },
         "test": {
@@ -149,6 +290,446 @@
             "tsConfig": [
               "projects/scion/viewport/tsconfig.lib.json",
               "projects/scion/viewport/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "e2e/workbench-application-platform": {
+      "root": "projects/e2e/workbench-application-platform",
+      "projectType": "application",
+      "prefix": "",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/e2e/workbench-application-platform/protractor.conf.js"
+          },
+          "configurations": {
+            "now": {
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "projects/e2e/workbench-application-platform/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "app/workbench-application-platform/host-app": {
+      "root": "projects/app/workbench-application-platform/host-app",
+      "sourceRoot": "projects/app/workbench-application-platform/host-app/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/app/workbench-application-platform/host-app",
+            "index": "projects/app/workbench-application-platform/host-app/src/index.html",
+            "main": "projects/app/workbench-application-platform/host-app/src/main.ts",
+            "polyfills": "projects/app/workbench-application-platform/host-app/src/polyfills.ts",
+            "tsConfig": "projects/app/workbench-application-platform/host-app/tsconfig.app.json",
+            "assets": [
+              "projects/app/workbench-application-platform/host-app/src/assets",
+              "projects/app/workbench-application-platform/host-app/src/now.json",
+              "projects/app/workbench-application-platform/host-app/src/favicon.ico"
+            ],
+            "styles": [
+              "projects/app/workbench-application-platform/host-app/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/app/workbench-application-platform/common/src/lib"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "now": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/workbench-application-platform/host-app/src/environments/environment.ts",
+                  "with": "projects/app/workbench-application-platform/host-app/src/environments/environment.now.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "app/workbench-application-platform/host-app:build"
+          },
+          "configurations": {
+            "now": {
+              "browserTarget": "app/workbench-application-platform/host-app:build:now"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/app/workbench-application-platform/host-app/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "app/workbench-application-platform/contact-app": {
+      "root": "projects/app/workbench-application-platform/contact-app",
+      "sourceRoot": "projects/app/workbench-application-platform/contact-app/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/app/workbench-application-platform/contact-app",
+            "index": "projects/app/workbench-application-platform/contact-app/src/index.html",
+            "main": "projects/app/workbench-application-platform/contact-app/src/main.ts",
+            "polyfills": "projects/app/workbench-application-platform/contact-app/src/polyfills.ts",
+            "tsConfig": "projects/app/workbench-application-platform/contact-app/tsconfig.app.json",
+            "assets": [
+              "projects/app/workbench-application-platform/contact-app/src/assets",
+              "projects/app/workbench-application-platform/contact-app/src/now.json"
+            ],
+            "styles": [
+              "projects/app/workbench-application-platform/contact-app/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/app/workbench-application-platform/common/src/lib"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "now": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/workbench-application-platform/contact-app/src/environments/environment.ts",
+                  "with": "projects/app/workbench-application-platform/contact-app/src/environments/environment.now.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "app/workbench-application-platform/contact-app:build"
+          },
+          "configurations": {
+            "now": {
+              "browserTarget": "app/workbench-application-platform/contact-app:build:now"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/app/workbench-application-platform/contact-app/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "app/workbench-application-platform/communication-app": {
+      "root": "projects/app/workbench-application-platform/communication-app",
+      "sourceRoot": "projects/app/workbench-application-platform/communication-app/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/app/workbench-application-platform/communication-app",
+            "index": "projects/app/workbench-application-platform/communication-app/src/index.html",
+            "main": "projects/app/workbench-application-platform/communication-app/src/main.ts",
+            "polyfills": "projects/app/workbench-application-platform/communication-app/src/polyfills.ts",
+            "tsConfig": "projects/app/workbench-application-platform/communication-app/tsconfig.app.json",
+            "assets": [
+              "projects/app/workbench-application-platform/communication-app/src/assets",
+              "projects/app/workbench-application-platform/communication-app/src/now.json"
+            ],
+            "styles": [
+              "projects/app/workbench-application-platform/communication-app/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/app/workbench-application-platform/common/src/lib"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "now": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/workbench-application-platform/communication-app/src/environments/environment.ts",
+                  "with": "projects/app/workbench-application-platform/communication-app/src/environments/environment.now.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "app/workbench-application-platform/communication-app:build"
+          },
+          "configurations": {
+            "now": {
+              "browserTarget": "app/workbench-application-platform/communication-app:build:now"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/app/workbench-application-platform/communication-app/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "app/workbench-application-platform/dev-tools-app": {
+      "root": "projects/app/workbench-application-platform/dev-tools-app",
+      "sourceRoot": "projects/app/workbench-application-platform/dev-tools-app/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/app/workbench-application-platform/dev-tools-app",
+            "index": "projects/app/workbench-application-platform/dev-tools-app/src/index.html",
+            "main": "projects/app/workbench-application-platform/dev-tools-app/src/main.ts",
+            "polyfills": "projects/app/workbench-application-platform/dev-tools-app/src/polyfills.ts",
+            "tsConfig": "projects/app/workbench-application-platform/dev-tools-app/tsconfig.app.json",
+            "assets": [
+              "projects/app/workbench-application-platform/dev-tools-app/src/assets",
+              "projects/app/workbench-application-platform/dev-tools-app/src/now.json"
+            ],
+            "styles": [
+              "projects/app/workbench-application-platform/dev-tools-app/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/app/workbench-application-platform/common/src/lib"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "now": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/workbench-application-platform/dev-tools-app/src/environments/environment.ts",
+                  "with": "projects/app/workbench-application-platform/dev-tools-app/src/environments/environment.now.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "app/workbench-application-platform/dev-tools-app:build"
+          },
+          "configurations": {
+            "now": {
+              "browserTarget": "app/workbench-application-platform/dev-tools-app:build:now"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/app/workbench-application-platform/dev-tools-app/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "app/workbench-application-platform/testing-app": {
+      "root": "projects/app/workbench-application-platform/testing-app",
+      "sourceRoot": "projects/app/workbench-application-platform/testing-app/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/app/workbench-application-platform/testing-app",
+            "index": "projects/app/workbench-application-platform/testing-app/src/index.html",
+            "main": "projects/app/workbench-application-platform/testing-app/src/main.ts",
+            "polyfills": "projects/app/workbench-application-platform/testing-app/src/polyfills.ts",
+            "tsConfig": "projects/app/workbench-application-platform/testing-app/tsconfig.app.json",
+            "assets": [
+              "projects/app/workbench-application-platform/testing-app/src/assets"
+            ],
+            "styles": [
+              "projects/app/workbench-application-platform/testing-app/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/app/workbench-application-platform/common/src/lib"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "now": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/workbench-application-platform/testing-app/src/environments/environment.ts",
+                  "with": "projects/app/workbench-application-platform/testing-app/src/environments/environment.now.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "app/workbench-application-platform/testing-app:build"
+          },
+          "configurations": {
+            "now": {
+              "browserTarget": "app/workbench-application-platform/testing-app:build:now"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/app/workbench-application-platform/testing-app/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "app/workbench-application-platform/common": {
+      "root": "projects/app/workbench-application-platform/common",
+      "sourceRoot": "projects/app/workbench-application-platform/common/src",
+      "projectType": "library",
+      "prefix": "sci",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/app/workbench-application-platform/common/tsconfig.lib.json",
+            "project": "projects/app/workbench-application-platform/common/ng-package.json"
+          },
+          "configurations": {
+            "now": {}
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/app/workbench-application-platform/common/tsconfig.lib.json"
             ],
             "exclude": [
               "**/node_modules/**"

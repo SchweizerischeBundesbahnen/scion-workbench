@@ -1,0 +1,13 @@
+@import 'common';
+
+:host {
+  @include position(absolute, 0, 0, 0, 0);
+
+  > sci-viewport {
+    @include position(absolute, 0, 0, 0, 0);
+
+    router-outlet {
+      position: absolute; // take router outlet out of the document flow
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "@scion/workbench",
   "version": "0.0.0-beta.12",
-  "description": "SCION Workbench helps to build multi-view web applications and integrates separate micro frontends into a consistent rich web application. Views are shown within tabs which can be flexible arranged and dragged around by the user.",
+  "description": "SCION Workbench provides a lightweight application frame and helps to build multi-view web applications. Views are shown within tabs which can be flexibly arranged and dragged around by the user.",
   "license": "EPL-2.0",
   "private": false,
   "publishConfig": {
@@ -30,12 +30,13 @@
     "rxjs": "^6.0.0"
   },
   "keywords": [
-    "angular",
+    "scion",
     "workbench",
     "multi-view web application",
     "application shell",
     "application frame",
-    "micro fronted"
+    "micro frontend",
+    "angular"
   ],
   "repository": {
     "type": "git",

@@ -19,6 +19,9 @@ import { WorkbenchService } from '../workbench.service';
 /**
  * Like 'RouterLink' but with functionality to target a view outlet.
  *
+ * If in the context of a view and CTRL key is not pressed, by default, navigation replaces the content of the current view.
+ * Override this default behavior by setting a view target strategy in navigational extras.
+ *
  * By default, navigation is relative to the currently activated route, if any.
  * Prepend the path with a forward slash '/' to navigate absolutely, or set `relativeTo` property in navigational extras to `null`.
  */

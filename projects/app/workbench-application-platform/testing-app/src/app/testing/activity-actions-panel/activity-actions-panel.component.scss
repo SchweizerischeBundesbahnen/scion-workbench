@@ -1,0 +1,10 @@
+@import 'common';
+
+:host {
+  display: grid;
+  font-size: .9em;
+  grid-template-columns: max-content auto;
+  grid-column-gap: 1em;
+  grid-row-gap: .5em;
+  @include grid-container-align-items(center);
+}
