@@ -1,0 +1,98 @@
+$diamond-height: 8;
+$border-color: rgb(174, 181, 189);
+$background-color: rgb(255, 255, 255);
+$popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
+
+/**
+ * Provides SCION workbench popup styles.
+ */
+@mixin wb-popup-theme($theme) {
+  .wb-popup {
+    background-color: $background-color;
+    border-radius: 2px;
+    box-shadow: $popup-box-shadow, 0 0 1px $border-color;
+    border: 1px solid $border-color;
+
+    //::before is used as diamond-border
+    //::after is used as diamond-content
+
+    &::before, &::after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      border: #{$diamond-height}px solid transparent;
+    }
+
+    &.wb-north {
+      margin-bottom: #{$diamond-height}px;
+
+      &::before {
+        bottom: -#{$diamond-height}px;
+        left: calc(50% - #{$diamond-height}px);
+        border-bottom-width: 0;
+        border-top-color: $border-color;
+      }
+
+      &::after {
+        bottom: -#{$diamond-height - 1}px;
+        left: calc(50% - #{$diamond-height}px);
+        border-bottom-width: 0;
+        border-top-color: $background-color;
+      }
+    }
+
+    &.wb-south {
+      margin-top: #{$diamond-height}px;
+
+      &::before {
+        top: -#{$diamond-height}px;
+        left: calc(50% - #{$diamond-height}px);
+        border-top-width: 0;
+        border-bottom-color: $border-color;
+      }
+
+      &::after {
+        top: -#{$diamond-height - 1}px;
+        left: calc(50% - #{$diamond-height}px);
+        border-top-width: 0;
+        border-bottom-color: $background-color;
+      }
+    }
+
+    &.wb-east {
+      margin-left: #{$diamond-height}px;
+
+      &::before {
+        left: -#{$diamond-height}px;
+        top: calc(50% - #{$diamond-height}px);
+        border-left-width: 0;
+        border-right-color: $border-color;
+      }
+
+      &::after {
+        left: -#{$diamond-height - 1}px;
+        top: calc(50% - #{$diamond-height}px);
+        border-left-width: 0;
+        border-right-color: $background-color;
+      }
+    }
+
+    &.wb-west {
+      margin-right: #{$diamond-height}px;
+
+      &::before {
+        right: -#{$diamond-height}px;
+        top: calc(50% - #{$diamond-height}px);
+        border-right-width: 0;
+        border-left-color: $border-color;
+      }
+
+      &::after {
+        right: -#{$diamond-height - 1}px;
+        top: calc(50% - #{$diamond-height}px);
+        border-right-width: 0;
+        border-left-color: $background-color;
+      }
+    }
+  }
+}
