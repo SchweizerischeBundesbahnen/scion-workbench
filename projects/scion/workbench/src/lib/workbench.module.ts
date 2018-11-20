@@ -63,6 +63,8 @@ import { ActivityResolver } from './routing/activity.resolver';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { PopupService } from './popup/popup.service';
+import { A11yModule } from '@angular/cdk/a11y';
 
 const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 
@@ -75,6 +77,7 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     SciViewportModule,
     SciDimensionModule,
     OverlayModule,
+    A11yModule,
   ],
   declarations: [
     WorkbenchComponent,
@@ -169,6 +172,7 @@ export class WorkbenchModule {
         OverlayHostRef,
         ContentHostRef,
         InternalWorkbenchRouter,
+        PopupService,
         {
           provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter
         },

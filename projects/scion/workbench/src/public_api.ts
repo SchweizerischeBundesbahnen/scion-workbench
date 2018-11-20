@@ -34,3 +34,5 @@ export { Severity, ROUTE_REUSE_PROVIDER } from './lib/workbench.constants';
 export { WbRouteReuseProvider, WbRouteReuseStrategy } from './lib/routing/wb-route-reuse-strategy.service';
 export { Disposable } from './lib/disposable';
 export { ContentAsOverlayComponent } from './lib/content-projection/content-as-overlay.component';
+export { PopupService } from './lib/popup/popup.service';
+export { Popup, PopupConfig, Position, CloseStrategy } from './lib/popup/metadata';
