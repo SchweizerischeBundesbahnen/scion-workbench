@@ -1,0 +1,703 @@
+{
+  "name": "SCION Workbench Application Platform Testing Application",
+  "baseUrl": "#",
+  "capabilities": [
+    {
+      "type": "activity",
+      "qualifier": {
+        "entity": "testing"
+      },
+      "description": "Provides an activity to test activity functionality.",
+      "properties": {
+        "path": "testing/activity",
+        "title": "Testing Activity",
+        "itemCssClass": [
+          "fab",
+          "fa-android"
+        ],
+        "cssClass": "e2e-testing-activity",
+        "position": 10000000001,
+        "queryParams": {
+          "manifestQueryParam": "manifestQueryParamValue"
+        },
+        "matrixParams": {
+          "manifestMatrixParam": "manifestMatrixParamValue"
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing"
+      },
+      "description": "Provides a view to test view functionality.",
+      "properties": {
+        "path": "testing/view",
+        "title": "Testing View",
+        "heading": "E2E test cases",
+        "cssClass": "e2e-testing-view",
+        "activityItem": {
+          "title": "Testing View",
+          "itemCssClass": [
+            "fab",
+            "fa-android"
+          ],
+          "cssClass": "e2e-open-testing-view",
+          "position": 10000000000
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "0c4fe9e3-view"
+      },
+      "description": "Provides a view for testcase '0c4fe9e3'",
+      "properties": {
+        "path": "testing/view-0c4fe9e3",
+        "title": "e2e-view-0c4fe9e3",
+        "heading": "0c4fe9e3",
+        "cssClass": "e2e-view-0c4fe9e3"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "354aa6da-view"
+      },
+      "description": "Provides a view for testcase '354aa6da'",
+      "private": true,
+      "properties": {
+        "path": "testing/view-354aa6da",
+        "title": "Testing View",
+        "heading": "354aa6da",
+        "cssClass": "e2e-view-354aa6da",
+        "activityItem": {
+          "title": "354aa6da-activity",
+          "itemCssClass": [
+            "fab",
+            "fa-android"
+          ],
+          "cssClass": "e2e-activity-354aa6da",
+          "position": 10000000009
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "85dde646-view"
+      },
+      "description": "Provides a view for testcase '85dde646'",
+      "private": false,
+      "properties": {
+        "path": "testing/view-85dde646",
+        "title": "Testing View",
+        "heading": "85dde646",
+        "cssClass": "e2e-view-85dde646",
+        "activityItem": {
+          "title": "85dde646-activity",
+          "itemCssClass": [
+            "fab",
+            "fa-android"
+          ],
+          "cssClass": "e2e-activity-85dde646",
+          "position": 10000000009
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "56657ad1-view"
+      },
+      "description": "Provides a view for testcase '56657ad1'",
+      "properties": {
+        "path": "testing/view-56657ad1",
+        "title": "Testing View",
+        "heading": "56657ad1",
+        "cssClass": "e2e-view-56657ad1",
+        "activityItem": {
+          "title": "56657ad1-activity",
+          "itemCssClass": [
+            "fab",
+            "fa-android"
+          ],
+          "cssClass": "e2e-activity-56657ad1",
+          "position": 10000000009
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "c8e40918-view"
+      },
+      "description": "Provides a view for testcase 'c8e40918'",
+      "properties": {
+        "path": "testing/view-c8e40918",
+        "title": "Testing View",
+        "heading": "c8e40918",
+        "cssClass": "e2e-view-c8e40918",
+        "matrixParams": {
+          "mp1": "d52f5f88be27",
+          "mp2": "01aa011fb2f4"
+        },
+        "queryParams": {
+          "qp1": "f3227d5926c0",
+          "qp2": "88a9cd0cb937"
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "4a4e6970-view"
+      },
+      "description": "Provides a view for testcase '4a4e6970'",
+      "properties": {
+        "path": "testing/view-4a4e6970",
+        "title": "Testing View",
+        "heading": "4a4e6970",
+        "cssClass": "e2e-view-4a4e6970"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "608aa47c-view"
+      },
+      "description": "Provides a view for testcase '608aa47c'",
+      "properties": {
+        "path": "testing/view-608aa47c",
+        "title": "Testing View",
+        "heading": "608aa47c",
+        "cssClass": "e2e-view-608aa47c"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "f389a9d5-view"
+      },
+      "description": "Provides a view for testcase 'f389a9d5'",
+      "properties": {
+        "path": "testing/view-f389a9d5",
+        "title": "Testing View",
+        "heading": "f389a9d5",
+        "cssClass": "e2e-view-f389a9d5"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "b1dd152a-view"
+      },
+      "description": "Provides a view for testcase 'b1dd152a'",
+      "properties": {
+        "path": "testing/view-b1dd152a",
+        "title": "Testing View",
+        "heading": "b1dd152a",
+        "cssClass": "e2e-view-b1dd152a"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "a686d615-view"
+      },
+      "description": "Provides a view for testcase 'a686d615'",
+      "properties": {
+        "path": "testing/view-a686d615",
+        "title": "Testing View",
+        "heading": "a686d615",
+        "cssClass": "e2e-view-a686d615",
+        "matrixParams": {
+          "mp1": "cb5639803cb6",
+          "mpx": "f406422c77fc"
+        },
+        "queryParams": {
+          "qp1": "dbef2604316a",
+          "qpx": "18c9d6c51b0c"
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "ffd6a78f-view"
+      },
+      "description": "Provides a view for testcase 'ffd6a78f'",
+      "properties": {
+        "path": "testing/view-ffd6a78f",
+        "title": "bd3f2784cf0a",
+        "heading": "5abffe076b58",
+        "cssClass": "e2e-view-ffd6a78f",
+        "closeable": true,
+        "matrixParams": {
+          "mp1": "667b2594253b",
+          "mp2": "74823e27f1f6"
+        },
+        "queryParams": {
+          "qp1": "ccd50ae933f8",
+          "qp2": "fdc1ad050078"
+        },
+        "activityItem": {
+          "title": "a1ebdaf5cb37",
+          "cssClass": "e2e-activity-ffd6a78f",
+          "itemCssClass": [
+            "fab",
+            "fa-android"
+          ],
+          "position": "10000000009"
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "cc977da9-view",
+        "qualifierParam1": "*",
+        "qualifierParam2": "*"
+      },
+      "description": "Provides a view for testcase 'cc977da9'",
+      "properties": {
+        "path": "testing/view-cc977da9/:qualifierParam1/:qualifierParam2",
+        "title": "Testing View",
+        "heading": "cc977da9",
+        "cssClass": "e2e-view-cc977da9"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "b6a8fe23-view",
+        "qualifierParam1": "*",
+        "qualifierParam2": "*"
+      },
+      "description": "Provides a view for testcase 'b6a8fe23'",
+      "properties": {
+        "path": "testing/view-b6a8fe23/:qualifierParam1",
+        "title": "Testing View",
+        "heading": "b6a8fe23",
+        "cssClass": "e2e-view-b6a8fe23",
+        "matrixParams": {
+          "matrixParam1": ":qualifierParam1",
+          "matrixParam2": "eda2e91468e1"
+        },
+        "queryParams": {
+          "queryParam1": ":qualifierParam2",
+          "queryParam2": "1a3d3aaf937e"
+        }
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "28f32b51-view"
+      },
+      "description": "Provides a view for testcase '28f32b51'",
+      "properties": {
+        "path": "testing/view-28f32b51",
+        "title": "Testing View",
+        "heading": "28f32b51",
+        "cssClass": "e2e-view-28f32b51"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "5782ab19-view"
+      },
+      "description": "Provides a view for testcase '5782ab19'",
+      "properties": {
+        "path": "testing/view-5782ab19",
+        "title": "Testing View",
+        "heading": "5782ab19",
+        "cssClass": "e2e-view-5782ab19"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "68f302b4-view",
+        "param": "*"
+      },
+      "description": "Provides a view for testcase '68f302b4'",
+      "properties": {
+        "path": "testing/view-68f302b4/:param",
+        "title": "Testing View",
+        "heading": "68f302b4",
+        "cssClass": "e2e-view-68f302b4"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "be587bd6-view"
+      },
+      "description": "Provides a view for testcase 'be587bd6'",
+      "properties": {
+        "path": "testing/view-be587bd6",
+        "title": "Testing View",
+        "heading": "be587bd6",
+        "cssClass": "e2e-view-be587bd6"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "c91805e8-view"
+      },
+      "description": "Provides a view for testcase 'c91805e8'",
+      "properties": {
+        "path": "testing/view-c91805e8",
+        "title": "Testing View",
+        "heading": "c91805e8",
+        "cssClass": "e2e-view-c91805e8",
+        "activityItem": {
+          "title": "c91805e8-view",
+          "cssClass": "e2e-activity-c91805e8",
+          "itemCssClass": [
+            "fab",
+            "fa-android"
+          ],
+          "position": "10000000009"
+        }
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing"
+      },
+      "description": "Provides a popup to test popup functionality.",
+      "properties": {
+        "path": "testing/popup",
+        "width": "400px",
+        "height": "500px",
+        "cssClass": "e2e-testing-popup"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "1a90c8d2-popup"
+      },
+      "private": true,
+      "description": "Provides a popup for testcase '1a90c8d2'",
+      "properties": {
+        "path": "testing/popup-1a90c8d2",
+        "width": "400px",
+        "height": "500px",
+        "cssClass": "e2e-popup-1a90c8d2"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "7330f506-popup"
+      },
+      "private": false,
+      "description": "Provides a popup for testcase '7330f506'",
+      "properties": {
+        "path": "testing/popup-7330f506",
+        "width": "400px",
+        "height": "500px",
+        "cssClass": "e2e-popup-7330f506"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "9c5319f7-popup"
+      },
+      "description": "Provides a popup for testcase '9c5319f7'",
+      "properties": {
+        "path": "testing/popup-9c5319f7",
+        "width": "400px",
+        "height": "500px",
+        "cssClass": "e2e-popup-9c5319f7"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "45dc693f-popup"
+      },
+      "description": "Provides a popup for testcase '45dc693f'",
+      "properties": {
+        "path": "testing/popup-45dc693f",
+        "width": "400px",
+        "height": "500px",
+        "cssClass": "e2e-popup-45dc693f",
+        "matrixParams": {
+          "mp1": "d52f5f88be27",
+          "mp2": "01aa011fb2f4"
+        },
+        "queryParams": {
+          "qp1": "f3227d5926c0",
+          "qp2": "88a9cd0cb937"
+        }
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "f4286ac4-popup"
+      },
+      "description": "Provides a popup for testcase 'f4286ac4'",
+      "properties": {
+        "path": "testing/popup-f4286ac4",
+        "width": "400px",
+        "height": "500px",
+        "cssClass": "e2e-popup-f4286ac4",
+        "matrixParams": {
+          "mp1": "cb5639803cb6",
+          "mpx": "f406422c77fc"
+        },
+        "queryParams": {
+          "qp1": "dbef2604316a",
+          "qpx": "18c9d6c51b0c"
+        }
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "159913ad-popup",
+        "qualifierParam1": "*",
+        "qualifierParam2": "*"
+      },
+      "description": "Provides a popup for testcase '159913ad'",
+      "properties": {
+        "path": "testing/popup-159913ad/:qualifierParam1/:qualifierParam2",
+        "width": "400px",
+        "height": "500px",
+        "cssClass": "e2e-popup-159913ad"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "8a468258-popup",
+        "qualifierParam1": "*",
+        "qualifierParam2": "*"
+      },
+      "description": "Provides a popup for testcase '8a468258'",
+      "properties": {
+        "path": "testing/popup-8a468258/:qualifierParam1",
+        "width": "400px",
+        "height": "500px",
+        "cssClass": "e2e-popup-8a468258",
+        "matrixParams": {
+          "matrixParam1": ":qualifierParam1",
+          "matrixParam2": "eda2e91468e1"
+        },
+        "queryParams": {
+          "queryParam1": ":qualifierParam2",
+          "queryParam2": "1a3d3aaf937e"
+        }
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "fc077b32-popup"
+      },
+      "description": "Provides a popup for testcase 'fc077b32'",
+      "properties": {
+        "path": "testing/popup-fc077b32",
+        "width": "150px",
+        "height": "75px",
+        "cssClass": "e2e-popup-fc077b32"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "5782ab19-popup"
+      },
+      "description": "Provides a popup for testcase '5782ab19'",
+      "properties": {
+        "path": "testing/popup-5782ab19",
+        "width": "400px",
+        "height": "175px",
+        "cssClass": "e2e-popup-5782ab19"
+      }
+    },
+    {
+      "type": "activity",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "d11be592-activity"
+      },
+      "description": "Provides a activity for testcase 'd11be592'",
+      "properties": {
+        "path": "testing/activity-d11be592",
+        "title": "d29b10b862ae",
+        "itemCssClass": [
+          "fab",
+          "fa-android"
+        ],
+        "cssClass": "e2e-activity-d11be592",
+        "position": 10000000009,
+        "queryParams": {
+          "manifestQueryParam": "manifestQueryParamValue"
+        },
+        "matrixParams": {
+          "manifestMatrixParam": "manifestMatrixParamValue"
+        }
+      }
+    },
+    {
+      "type": "activity",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "4a3a8984-activity"
+      },
+      "description": "Provides a activity for testcase '4a3a8984'",
+      "properties": {
+        "path": "testing/activity-4a3a8984",
+        "title": "e2e-activity-4a3a8984",
+        "itemCssClass": [
+          "fab",
+          "fa-android"
+        ],
+        "cssClass": "e2e-activity-4a3a8984",
+        "position": 10000000009
+      }
+    },
+    {
+      "type": "activity",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "28f32b51-activity"
+      },
+      "description": "Provides a activity for testcase '28f32b51'",
+      "properties": {
+        "path": "testing/activity-28f32b51",
+        "title": "e2e-activity-28f32b51",
+        "itemCssClass": [
+          "fab",
+          "fa-android"
+        ],
+        "cssClass": "e2e-activity-28f32b51",
+        "position": 10000000009
+      }
+    },
+    {
+      "type": "activity",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "6d806bea-activity"
+      },
+      "description": "Provides a activity for testcase '6d806bea'",
+      "properties": {
+        "path": "testing/activity-6d806bea",
+        "title": "e2e-activity-6d806bea",
+        "itemCssClass": [
+          "fab",
+          "fa-android"
+        ],
+        "cssClass": "e2e-activity-6d806bea",
+        "position": 10000000009
+      }
+    },
+    {
+      "type": "activity",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "5782ab19-activity"
+      },
+      "description": "Provides a activity for testcase '5782ab19'",
+      "properties": {
+        "path": "testing/activity-5782ab19",
+        "title": "e2e-activity-5782ab19",
+        "itemCssClass": [
+          "fab",
+          "fa-android"
+        ],
+        "cssClass": "e2e-activity-5782ab19",
+        "position": 10000000009
+      }
+    }
+  ],
+  "intents": [
+    {
+      "type": "messagebox"
+    },
+    {
+      "type": "messagebox",
+      "qualifier": {
+        "type": "list"
+      }
+    },
+    {
+      "type": "notification"
+    },
+    {
+      "type": "notification",
+      "qualifier": {
+        "type": "list"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "communication",
+        "presentation": "list",
+        "contactId": "5"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "communication",
+        "action": "create",
+        "contactId": "5"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "contact",
+        "id": "5"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "contact",
+        "action": "create"
+      }
+    }
+  ]
+}

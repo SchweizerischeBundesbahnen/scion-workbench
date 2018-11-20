@@ -1,0 +1,20 @@
+<input id="show-url-open-activity-action" type="checkbox" [formControl]="form.get(URL_OPEN_ACTIVITY_ACTION)">
+<label for="show-url-open-activity-action">URL open action</label>
+
+<input id="show-custom-activity-action" type="checkbox" [formControl]="form.get(CUSTOM_ACTIVITY_ACTION)">
+<label for="show-custom-activity-action">Show custom activity action (not built-in)</label>
+
+<ng-container wbUrlOpenActivityAction
+              *ngIf="form.get(URL_OPEN_ACTIVITY_ACTION).value"
+              label="open_in_browser"
+              title="Open external site"
+              cssClass="material-icons e2e-url-open-activity-action"
+              url="https://github.com/SchweizerischeBundesbahnen/scion-workbench">
+</ng-container>
+
+<ng-container appCustomActivityAction
+              *ngIf="form.get(CUSTOM_ACTIVITY_ACTION).value"
+              cssClass="e2e-custom-activity-action"
+              title="Shows a notification from a custom activity action"
+              text="This is a notification from a custom activity action">
+</ng-container>

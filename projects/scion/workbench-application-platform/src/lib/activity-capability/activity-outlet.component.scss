@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+
+  > wb-content-as-overlay {
+    flex: auto;
+  }
+}
+
+wb-remote-site {
+  flex: auto;
+}

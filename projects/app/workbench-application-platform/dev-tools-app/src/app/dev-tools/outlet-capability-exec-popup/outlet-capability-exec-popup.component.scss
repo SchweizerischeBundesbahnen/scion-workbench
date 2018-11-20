@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > sci-popup-shell {
+    flex: auto;
+
+    main {
+      display: flex;
+      flex-direction: column;
+
+      > sci-params-enter {
+        flex: none;
+
+        &:not(:last-child) {
+          margin-bottom: 1em;
+        }
+      }
+    }
+  }
+}

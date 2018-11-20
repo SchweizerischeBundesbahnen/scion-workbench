@@ -1,0 +1,54 @@
+@import 'common';
+
+:host {
+
+  > ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+
+    > li {
+      @include chip(accentColor(.25), null, accentColor(1));
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: .25em 1em;
+
+      > span.key {
+        color: accentColor(.75)
+      }
+
+      > span.value {
+        font-size: larger;
+        font-weight: bold;
+        color: accentColor(1)
+      }
+
+      &::before {
+        display: block;
+        content: '«qualifier»';
+        font-size: smaller;
+        margin-bottom: .75em;
+        color: accentColor(.5);
+      }
+    }
+
+    > li.type {
+      @include chip(accentColor(.25), accentColor(.1), accentColor(1));
+      min-width: 75px;
+
+      > span.type {
+        font-size: 1.5em;
+        font-variant: small-caps;
+        font-weight: bold;
+        color: accentColor(1)
+      }
+
+      &::before {
+        content: '«type»';
+      }
+    }
+  }
+}

@@ -61,6 +61,12 @@ export class RemoteSiteComponent implements OnDestroy {
   }
 
   /**
+   * CSS classes to be added to the iframe tag.
+   */
+  @Input()
+  public cssClass: string | string[];
+
+  /**
    * Emits upon the receipt of a message from the remote site.
    *
    * The event is not emitted inside Angular zone.
@@ -74,6 +80,30 @@ export class RemoteSiteComponent implements OnDestroy {
    */
   @Output()
   public load = new EventEmitter<void>();
+
+  /**
+   * Emits when the remote site is about to lose focus.
+   *
+   * Requires the remote site to support this feature.
+   */
+  @Output()
+  public synthFocusout = new EventEmitter<void>();
+
+  /**
+   * Emits when the remote site is about to receive focus.
+   *
+   * Requires the remote site to support this feature.
+   */
+  @Output()
+  public synthFocusin = new EventEmitter<void>();
+
+  /**
+   * Emits when escape keystroke is pressed in the remote site.
+   *
+   * Requires the remote site to support this feature.
+   */
+  @Output()
+  public synthEscape = new EventEmitter<void>();
 
   constructor(private _sanitizer: DomSanitizer,
               private _workbenchLayout: WorkbenchLayoutService,
@@ -125,7 +155,8 @@ export class RemoteSiteComponent implements OnDestroy {
       .subscribe(([event, iframe]: ['start' | 'end', HTMLIFrameElement]) => {
         if (event === 'start') {
           this._renderer.setStyle(iframe, 'pointer-events', 'none');
-        } else {
+        }
+        else {
           this._renderer.removeStyle(iframe, 'pointer-events');
         }
       });
@@ -147,6 +178,21 @@ export class RemoteSiteComponent implements OnDestroy {
             throw Error(`[OriginError] Message of illegal origin received [expected=${this._siteOrigin}, actual=${messageEvent.origin}]`);
           }
 
+          const synthEvent = parseSynthEvent(messageEvent.data);
+          if (synthEvent === 'sci-focusin') {
+            this._zone.run(() => this.synthFocusin.emit());
+            return;
+          }
+          if (synthEvent === 'sci-focusout') {
+            this._zone.run(() => this.synthFocusout.emit());
+            return;
+          }
+          if (synthEvent === 'sci-escape') {
+            this._zone.run(() => this.synthEscape.emit());
+            document.dispatchEvent(new Event(synthEvent));
+            return;
+          }
+
           this.message.emit(messageEvent.data); // public API: do not emit inside Angular zone
         });
     });
@@ -166,4 +212,25 @@ export class RemoteSiteComponent implements OnDestroy {
  */
 function bufferUntil<T, CN>(closingNotifier$: Observable<CN>): OperatorFunction<T, [T, CN]> {
   return mergeMap((item: T) => combineLatest(of(item), closingNotifier$));
+}
+
+/**
+ * Parses synthetic event sent by the remote site.
+ */
+function parseSynthEvent(data: any): string | null {
+  if (isNullOrUndefined(data) || typeof data !== 'object') {
+    return null;
+  }
+  if (data.protocol !== 'sci://workbench/remote-site') {
+    return null;
+  }
+  if (isNullOrUndefined(data.event)) {
+    return null;
+  }
+
+  return data.event;
+}
+
+function isNullOrUndefined(value: any): boolean {
+  return value === null || value === undefined;
 }

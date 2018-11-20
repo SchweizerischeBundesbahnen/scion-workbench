@@ -1,0 +1,134 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: app-padding();
+
+  > section.application {
+    flex: none;
+    display: grid;
+    grid-template-columns: minmax(80px, 120px) auto auto;
+    grid-column-gap: 1em;
+    grid-row-gap: .5em;
+    grid-template-rows: auto;
+    margin-bottom: 1.5em;
+
+    border: 1px solid accentColor(.25);
+    border-radius: 5px;
+    padding: 1em;
+    @include grid-container-align-items(center);
+
+    > label.app-name {
+      grid-column: 1/2;
+      grid-row: 1/2;
+    }
+
+    > span.app-name {
+      grid-column: 2/3;
+      grid-row: 1/2;
+    }
+
+    > label.app-symbolic-name {
+      grid-column: 1/2;
+      grid-row: 2/3;
+    }
+
+    > span.app-symbolic-name {
+      grid-column: 2/3;
+      grid-row: 2/3;
+    }
+
+    > label.app-url {
+      grid-column: 1/2;
+      grid-row: 3/4;
+    }
+
+    > a.app-url {
+      grid-column: 2/3;
+      grid-row: 3/4;
+    }
+
+    > label.manifest-url {
+      grid-column: 1/2;
+      grid-row: 4/5;
+    }
+
+    > a.manifest-url {
+      grid-column: 2/3;
+      grid-row: 4/5;
+    }
+
+    > span.scope-check-disabled {
+      grid-column: 3/4;
+      grid-row: 1/5;
+      align-self: start;
+      justify-self: end;
+      font-weight: bold;
+      @include chip(rgba(255, 0, 0, .75), rgba(255, 0, 0, .1), rgba(255, 0, 0, .75));
+      margin: 0;
+    }
+  }
+
+  > section.sashbox {
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+
+    > section.sash-1, > section.sash-2 {
+      flex: 1 1 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      > h2 {
+        margin-top: 0;
+        font-size: 1.25em;
+        position: relative; // positioning anchor for the badge
+        align-self: flex-start;
+
+        > span.count-badge {
+          $size: 12px;
+          position: absolute;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          right: -1.5em;
+          top: 0;
+          border-radius: $size/2;
+          color: #FFFFFF;
+          font-size: 10px;
+          font-weight: normal;
+          min-height: $size;
+          min-width: $size;
+          background-color: accentColor(.4);
+          user-select: none;
+        }
+      }
+
+      > sci-filter-field {
+        margin-bottom: .2em;
+      }
+
+      > sci-accordion {
+        flex: auto;
+      }
+    }
+
+    > div.splitter {
+      flex: 0 0 auto;
+      margin: .5em 0;
+      width: 20px;
+      align-self: center;
+
+      > div.sash-indicator {
+        background: accentColor();
+        height: 1px;
+
+        &:not(:first-child) {
+          margin-top: 1px;
+        }
+      }
+    }
+  }
+}

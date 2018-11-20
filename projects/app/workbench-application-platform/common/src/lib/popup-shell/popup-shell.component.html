@@ -1,0 +1,20 @@
+<header>
+  <ng-container *ngTemplateOutlet="title?.template"></ng-container>
+</header>
+<sci-viewport>
+  <div class="content">
+    <ng-container *ngTemplateOutlet="content?.template"></ng-container>
+  </div>
+</sci-viewport>
+
+<!-- button bar -->
+<div class="button-bar">
+  <button *ngFor="let button of buttons"
+          (click)="button.onClick($event)"
+          [ngClass]="button.cssClass"
+          [disabled]="button.defaultButton && !valid"
+          type="button">
+    <ng-container *ngTemplateOutlet="button.template"></ng-container>
+  </button>
+</div>
+<button (click)="onClose()" class="close material-icons">close</button>

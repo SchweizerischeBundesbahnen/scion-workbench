@@ -1,0 +1,30 @@
+{
+  "name": "Angular IO",
+  "baseUrl": "https://angular.io/",
+  "capabilities": [
+    {
+      "type": "view",
+      "qualifier": {
+        "resource": "features"
+      },
+      "description": "Shows features & benefits of the Angular project",
+      "properties": {
+        "title": "Angular",
+        "heading": "Features & Benefits",
+        "path": "/features"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "resource": "docs"
+      },
+      "description": "Shows the documentation of the Angular project",
+      "properties": {
+        "title": "Angular",
+        "heading": "Documentation",
+        "path": "/docs"
+      }
+    }
+  ]
+}

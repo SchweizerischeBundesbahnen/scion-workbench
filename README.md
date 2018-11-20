@@ -1,17 +1,18 @@
 ![SCION Workbench](/resources/site/logo/scion-workbench-banner.png)
 
-[Overview][menu-overview] | [Demo][menu-demo] | [Getting&nbsp;Started][menu-getting-started] | [How&nbsp;To][menu-how-to] | [Contributing][menu-contributing] | [Changelog][menu-changelog] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
-|---|---|---|---|---|---|---|---|
+[Overview][menu-overview] | [Workbench][menu-workbench] | [Workbench&nbsp;Application&nbsp;Platform][menu-workbench-application-platform] | [Contributing][menu-contributing] | [Changelog][menu-changelog] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
+|---|---|---|---|---|---|---|
 
 # Overview
 
-SCION Workbench helps to build multi-view web applications and integrates separate micro frontends into a consistent rich web application. Views are shown within tabs which can be flexible arranged and dragged around by the user.
+SCION Workbench helps to build multi-view web applications and integrates separate micro frontends into a consistent rich web application. Views are shown within tabs which can be flexibly arranged and dragged around by the user.
 
 <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/site/pics/workbench-large.png">![SCION Workbench](/resources/site/pics/workbench-small.png)</a>
 
 The Workbench provides core features of a modern rich web application.
 -	Tabbed, movable and stackable views
 -	Activity panel as application entry point
+- Popups
 -	Global notifications 
 -	Global or view-local message boxes
 -	URL encoded navigational state
@@ -44,11 +45,11 @@ We would like to thank SBB which supports open source software and made SCION Wo
 ## Current Project Version
 [![Project version](https://img.shields.io/npm/v/@scion/workbench.svg)][menu-download] [![Project version](https://img.shields.io/npm/v/@scion/workbench/next.svg)][menu-download]
 
-[menu-overview]: /README.md
-[menu-demo]: https://blog.sbb.technology/scion-workbench-demo/#/(view.6:heatmap//view.5:person/79//view.4:person/39//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuNiIsInZpZXcuNiJdLCJzYXNoMiI6WyJ2aWV3cGFydC4zIiwidmlldy40Iiwidmlldy40Iiwidmlldy41Il0sInNwbGl0dGVyIjowLjQ4NTk2MTEyMzExMDE1MTEsImhzcGxpdCI6ZmFsc2V9LCJzcGxpdHRlciI6MC41NTk0MjQzMjY4MzM3OTc1LCJoc3BsaXQiOnRydWV9LCJzcGxpdHRlciI6MC4zMjI2Mjc3MzcyMjYyNzczLCJoc3BsaXQiOmZhbHNlfQ%3D%3D
 [menu-download]: https://www.npmjs.com/package/@scion/workbench
-[menu-getting-started]: /resources/site/getting-started.md
-[menu-how-to]: /resources/site/how-to.md
+
+[menu-overview]: /README.md
+[menu-workbench]: /resources/site/workbench.md
+[menu-workbench-application-platform]: /resources/site/workbench-application-platform.md
 [menu-contributing]: /CONTRIBUTING.md
 [menu-changelog]: /resources/site/changelog.md
 [menu-sponsoring]: /resources/site/sponsors.md

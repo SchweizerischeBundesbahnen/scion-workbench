@@ -1,0 +1,15 @@
+@import 'common';
+
+:host {
+  display: block;
+  padding: app-padding();
+
+  > form {
+    display: grid;
+
+    grid-template-columns: 75px auto;
+    grid-template-rows: max-content;
+    grid-column-gap: 1em;
+    grid-row-gap: 1em;
+  }
+}

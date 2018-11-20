@@ -1,0 +1,21 @@
+<sci-viewport>
+  <div cdkAccordion [multi]="multi">
+    <section #section
+             *ngFor="let item of items; trackBy: trackByFn"
+             class="accordion-item e2e-accordion-item"
+             [class.e2e-expanded]="cdkAccordionItem.expanded"
+             [ngClass]="item.cssClass"
+             cdkAccordionItem #cdkAccordionItem="cdkAccordionItem"
+             [expanded]="item.expanded">
+      <header (click)="onToggle(cdkAccordionItem, section)" class="e2e-accordion-item-header">
+        <div>
+          <ng-container *ngTemplateOutlet="item.template"></ng-container>
+        </div>
+        <span class="toggle material-icons">{{cdkAccordionItem.expanded ? 'expand_less' : 'expand_more'}}</span>
+      </header>
+      <section *ngIf="cdkAccordionItem.expanded" @enter>
+        <ng-container *ngTemplateOutlet="item.panel"></ng-container>
+      </section>
+    </section>
+  </div>
+</sci-viewport>

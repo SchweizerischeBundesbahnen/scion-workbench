@@ -1,0 +1,16 @@
+<sci-popup-shell [valid]="valid">
+  <ng-template sciPopupShellTitle>Add related contact</ng-template>
+
+  <ng-template sciPopupShellContent>
+    <sci-list [style]="'option-item'"
+              (filter)="onFilter($event)"
+              (selection)="onOption($event)">
+      <ng-template *ngFor="let contact of contacts$ | async; trackBy: trackByFn" sciListItem [key]="contact.id">
+        {{contact.firstname}} {{contact.lastname}}<br>
+        <small>{{contact.city}}</small>
+      </ng-template>
+    </sci-list>
+  </ng-template>
+
+  <ng-template sciPopupShellButton (click)="onOk()">OK</ng-template>
+</sci-popup-shell>

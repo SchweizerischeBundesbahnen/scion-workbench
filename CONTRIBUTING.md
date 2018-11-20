@@ -1,18 +1,17 @@
 ![SCION Workbench](/resources/site/logo/scion-workbench-banner.png)
 
-[Overview][menu-overview] | [Demo][menu-demo] | [Getting&nbsp;Started][menu-getting-started] | [How&nbsp;To][menu-how-to] | [Contributing][menu-contributing] | [Changelog][menu-changelog] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
-|---|---|---|---|---|---|---|---|
-
+[Overview][menu-overview] | [Workbench][menu-workbench] | [Workbench&nbsp;Application&nbsp;Platform][menu-workbench-application-platform] | [Contributing][menu-contributing] | [Changelog][menu-changelog] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
+|---|---|---|---|---|---|---|
 
 # Contributing
 
 [Contribution](#contribution)\
-[Build SCION Workbench](#build-scion-workbench)\
+[Build, Test, Lint and Serve](#build-test-lint-and-serve)\
 [Coding guidelines](#coding-guidelines)\
-[Commit Guidelines](#commit-guidelines)\
+[Commit guidelines](#commit-guidelines)\
 [Line endings](#line-endings)\
-[NPM Versioning Guidelines](#npm-versioning-guidelines)\
-[Release Guidelines](#release-guidelines)
+[NPM versioning guidelines](#npm-versioning-guidelines)\
+[Release guidelines](#release-guidelines)
 
 ***
 
@@ -35,12 +34,36 @@ Please follow the guidelines below:
 
 > Please be in mind that large pull requests take a lot of time to review.
 
-## Build SCION Workbench
-The project is built with Travis CI and is automatically built, its tests executed and linted as you push it to GitHub.
+## Build, Test, Lint and Serve
+The project is built with [Travis CI][link-travis-ci]. When pushing to GitHub, the project is built, its tests executed and linted. When merging a PR to the master branch, the demo application is deployed to https://scion-workbench-application-platform.now.sh. When a release tag is added to the master branch, SCION modules are deployed to NPM.
 
 [![Build Status](https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench.svg?token=sT5ouhFsqwt9RmkLsQb8&branch=master)](https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench)
 
-## Coding Guidelines
+For local development, you can uncomment the section `PATH-OVERRIDE-FOR-LOCAL-DEVELOPMENT` in `tsconfig.json`. This allows running tests or serving the demo application without having to build dependent modules first.
+
+Use following commands to build, lint and test the project.
+
+```
+npm run build
+npm run lint
+npm run test
+```
+
+You can serve the demo/test application as follows (SCION Workbench Application Platform):
+```
+npm run app:workbench-application-platform:serve ➀
+```
+
+You can run e2e-tests as follows (SCION Workbench Application Platform):
+```
+npm run app:workbench-application-platform:e2e ➀
+```
+
+|#|Explanation|
+|-|-|
+|➀|If not using path overrides in `tsconfig.json`, the project must first be built using `npm run build` and `npm run app:workbench-application-platform:build-now:common`|
+
+## Coding guidelines
 Besides linting rules, the following rules apply:
 
 - Observable names are suffixed with dollar sign $ to indicate that it represents a stream which must be subscribed to and unsubscribed from
@@ -50,11 +73,11 @@ Besides linting rules, the following rules apply:
 - all features or bug fixes related to `routing` or `view grid` must be tested by one or more specs placed in `/projects/scion/workbench/src/lib/spec` directory
 - all public API must be documented
 
-## Commit Guidelines
+## Commit guidelines
 We believe in a compact and well written Git commit history. Every commit should be a logically separate changeset.
 As a general rule, your messages should start with a single line in imperative present tense and refer a GitHub issue.
 
-### Commit Message Format
+### Commit message format
 Each commit message consists of a **header**, a **body** and a **footer**.  The header has a special format that includes a **type** and a **subject**:
 
 ```
@@ -125,7 +148,7 @@ Run the following command to find files with 'windows-style' line ending:
 find . -type f | xargs file | grep CRLF
 ```
 
-## NPM Versioning Guidelines
+## NPM versioning guidelines
 For SCION Workbench versioning, we stick to the versioning practices of the Angular project.
 
 ### NPM Pre-Releases
@@ -133,7 +156,7 @@ Pre-Releases are early versions of the next major release. They are are named in
 
 > Minor and patch releases do not require to publish pre-releases up front.
 
-### NPM Distribution tags:
+### NPM distribution tags:
 We use NPM distribution tags to differentiate between pre-releases (x.0.0-beta.0, x.0.0-beta.1, x.0.0-rc.0, x.0.0-rc.0, etc) and stable releases (x.x.x). Pre-releases are tagged with the distribution tag `next`, and stable releases with `latest`. The latest tag is automatically updated by NPM whenever you publish without setting a distribution tag.
 
 ### Example for releasing 2.x.x
@@ -152,7 +175,7 @@ We use NPM distribution tags to differentiate between pre-releases (x.0.0-beta.0
 2.1.0 with "latest" distribution tag
 ```
 
-## Release Guidelines
+## Release guidelines
 Whenever you publish a new version to NPM (pre-release, major, minor, patch), please follow the instructions below:
 
 - update all `package.json` files with the new version, e.g. `2.0.0-beta.1`
@@ -174,10 +197,11 @@ npm install -g conventional-changelog-cli
 conventional-changelog -p angular -i resources/site/changelog.md -s
 ```
 
+[link-travis-ci]: https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench
+
 [menu-overview]: /README.md
-[menu-demo]: https://blog.sbb.technology/scion-workbench-demo/#/(view.6:heatmap//view.5:person/79//view.4:person/39//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuNiIsInZpZXcuNiJdLCJzYXNoMiI6WyJ2aWV3cGFydC4zIiwidmlldy40Iiwidmlldy40Iiwidmlldy41Il0sInNwbGl0dGVyIjowLjQ4NTk2MTEyMzExMDE1MTEsImhzcGxpdCI6ZmFsc2V9LCJzcGxpdHRlciI6MC41NTk0MjQzMjY4MzM3OTc1LCJoc3BsaXQiOnRydWV9LCJzcGxpdHRlciI6MC4zMjI2Mjc3MzcyMjYyNzczLCJoc3BsaXQiOmZhbHNlfQ%3D%3D
-[menu-getting-started]: /resources/site/getting-started.md
-[menu-how-to]: /resources/site/how-to.md
+[menu-workbench]: /resources/site/workbench.md
+[menu-workbench-application-platform]: /resources/site/workbench-application-platform.md
 [menu-contributing]: /CONTRIBUTING.md
 [menu-changelog]: /resources/site/changelog.md
 [menu-sponsoring]: /resources/site/sponsors.md

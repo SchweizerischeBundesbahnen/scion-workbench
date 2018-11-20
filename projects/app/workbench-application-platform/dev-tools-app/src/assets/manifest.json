@@ -1,0 +1,97 @@
+{
+  "name": "SCION Workbench Application Platform DevTools",
+  "baseUrl": "#",
+  "capabilities": [
+    {
+      "type": "activity",
+      "qualifier": {
+        "entity": "dev-tools"
+      },
+      "description": "Lists all registered applications and allows to show their manifests.",
+      "properties": {
+        "title": "DevTools",
+        "path": "dev-tools/application-list",
+        "itemText": "apps",
+        "itemCssClass": "material-icons",
+        "position": 9999999999
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "application-list"
+      },
+      "private": false,
+      "description": "Lists all registered applications and allows to show their manifests.",
+      "properties": {
+        "path": "dev-tools/application-list",
+        "title": "Application manifests"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "application",
+        "symbolicName": "*"
+      },
+      "private": false,
+      "description": "Shows the application manifest with all its capabilities, intents and dependent applications.",
+      "properties": {
+        "path": "dev-tools/application/:symbolicName",
+        "title": "Application Manifest"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "capability",
+        "action": "execute",
+        "type": "view",
+        "capabilityId": "*"
+      },
+      "private": false,
+      "description": "Allows to execute a capability of the type 'view'.",
+      "properties": {
+        "path": "dev-tools/view-capability/:capabilityId",
+        "width": "400px",
+        "height": "500px"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "entity": "capability",
+        "action": "execute",
+        "type": "popup",
+        "capabilityId": "*"
+      },
+      "private": false,
+      "description": "Allows to execute a capability of the type 'popup'.",
+      "properties": {
+        "path": "dev-tools/popup-capability/:capabilityId",
+        "width": "400px",
+        "height": "500px"
+      }
+    }
+  ],
+  "intents": [
+    {
+      "type": "manifest-registry"
+    },
+    {
+      "type": "notification"
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "*": "*"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "*": "*"
+      }
+    }
+  ]
+}

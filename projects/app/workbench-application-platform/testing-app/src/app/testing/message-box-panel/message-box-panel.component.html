@@ -1,0 +1,46 @@
+<sci-params-enter [title]="'Qualifier'" [paramsFormArray]="form.get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-qualifier-panel"></sci-params-enter>
+
+<form autocomplete="off">
+  <label for="title">Title</label>
+  <input id="title" [formControl]="form.get(TITLE)">
+  <span class="validation"><ng-container *ngIf="form.get(TITLE).invalid">Invalid</ng-container></span>
+
+  <label for="text">Text</label>
+  <input id="text" [formControl]="form.get(TEXT)">
+  <span class="validation"><ng-container *ngIf="form.get(TEXT).invalid">Invalid</ng-container></span>
+
+  <label for="severity">Severity</label>
+  <select id="severity" [formControl]="form.get(SEVERITY)">
+    <option value="info">info</option>
+    <option value="warn">warn</option>
+    <option value="error">error</option>
+  </select>
+  <span class="validation"><ng-container *ngIf="form.get(SEVERITY).invalid">Invalid</ng-container></span>
+
+  <label for="modality">Modality</label>
+  <select id="modality" [formControl]="form.get(MODALITY)">
+    <option value="view">view</option>
+    <option value="application">application</option>
+  </select>
+  <span class="validation"><ng-container *ngIf="form.get(MODALITY).invalid">Invalid</ng-container></span>
+
+  <label for="content-selectable">Content selectable</label>
+  <input id="content-selectable" type="checkbox" [formControl]="form.get(CONTENT_SELECTABLE)">
+  <span class="validation"><ng-container *ngIf="form.get(CONTENT_SELECTABLE).invalid">Invalid</ng-container></span>
+
+  <label for="css-class">CSS class</label>
+  <input id="css-class" [formControl]="form.get(CSS_CLASS)">
+  <span class="validation"><ng-container *ngIf="form.get(CSS_CLASS).invalid">Invalid</ng-container></span>
+
+  <label for="payload">Payload</label>
+  <textarea id="payload" [formControl]="form.get(PAYLOAD)" placeholder="Enter JSON here"></textarea>
+  <span class="validation"><ng-container *ngIf="form.get(PAYLOAD).invalid">Invalid JSON</ng-container></span>
+</form>
+
+<sci-params-enter [title]="'Actions *'" [paramsFormArray]="form.get(ACTIONS)" [addable]="true" [removable]="true" class="e2e-action-panel"></sci-params-enter>
+
+<button (click)="onOpen()" [disabled]="!form.valid" class="e2e-open">Open</button>
+
+<section class="close-action" *ngIf="closeAction">
+  Close action: <output class="e2e-close-action">{{closeAction}}</output>
+</section>

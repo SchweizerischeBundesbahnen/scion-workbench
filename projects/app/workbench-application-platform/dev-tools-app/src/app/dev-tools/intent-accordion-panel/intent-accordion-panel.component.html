@@ -1,0 +1,12 @@
+<section *ngIf="!anyQualifier">
+  <h2>Handled by following applications</h2>
+  <ul>
+    <li *ngFor="let provider of providers$ | async">
+      <a class="app-name" [wbRouterLink]="{entity: 'application', symbolicName: provider.symbolicName}"
+         [wbRouterLinkExtras]="{target: 'blank'}"
+         [class.self]="provider.symbolicName === intent.metadata.symbolicAppName">
+        {{provider.name}}
+      </a>
+    </li>
+  </ul>
+</section>

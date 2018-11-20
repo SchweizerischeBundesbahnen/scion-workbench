@@ -1,0 +1,44 @@
+@import 'common';
+
+:host {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-column-gap: 1em;
+  grid-row-gap: .5em;
+  grid-template-rows: auto;
+
+  > section.description {
+    grid-column: 1/3;
+    font-style: italic;
+  }
+
+  > section {
+    border: 1px solid accentColor(.25);
+    border-radius: 5px;
+    padding: 1em;
+    background-color: #FFFFFF;
+    font-size: 12px;
+
+    > h2 {
+      font-size: 1.1em;
+      margin-top: 0;
+      margin-bottom: 1em;
+    }
+
+    > ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      > li > a.self {
+        font-style: italic;
+      }
+    }
+  }
+
+  &:not(.has-properties) {
+    > section.used-by {
+      grid-column: 1/3;
+    }
+  }
+}

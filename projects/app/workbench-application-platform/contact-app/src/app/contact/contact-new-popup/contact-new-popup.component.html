@@ -1,0 +1,27 @@
+<sci-popup-shell [valid]="form.valid">
+  <ng-template sciPopupShellTitle>New contact</ng-template>
+
+  <ng-template sciPopupShellContent>
+    <form [formGroup]="form" autocomplete="off">
+      <label for="firstname">Firstname *</label>
+      <input id="firstname" [formControlName]="FIRSTNAME">
+
+      <label for="lastname">Lastname *</label>
+      <input id="lastname" [formControlName]="LASTNAME">
+
+      <label for="street">Street *</label>
+      <input id="street" [formControlName]="STREET">
+
+      <label for="city">City *</label>
+      <input id="city" [formControlName]="CITY">
+
+      <label for="email">Email</label>
+      <input id="email" [formControlName]="EMAIL">
+
+      <label for="phone">Phone</label>
+      <input id="phone" [formControlName]="PHONE">
+    </form>
+  </ng-template>
+
+  <ng-template sciPopupShellButton (click)="onOk()">OK</ng-template>
+</sci-popup-shell>

@@ -1,0 +1,6 @@
+@import 'common';
+
+:host {
+  display: grid;
+  padding: app-padding();
+}

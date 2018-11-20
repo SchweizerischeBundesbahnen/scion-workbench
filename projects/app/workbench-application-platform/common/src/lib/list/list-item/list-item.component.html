@@ -1,0 +1,16 @@
+<!-- radio button for option items -->
+<span *ngIf="optionStyle" class="option material-icons">
+  {{active ? 'radio_button_checked' : 'radio_button_unchecked'}}
+</span>
+
+<!-- item -->
+<div class="item">
+  <ng-container *ngTemplateOutlet="listItem.template"></ng-container>
+</div>
+
+<!-- actions -->
+<ul class="actions" *ngIf="listItem.actionTemplates.length" (click)="$event.stopPropagation()">
+  <li *ngFor="let actionTemplate of listItem.actionTemplates">
+    <ng-container *ngTemplateOutlet="actionTemplate"></ng-container>
+  </li>
+</ul>

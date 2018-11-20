@@ -1,0 +1,16 @@
+<app-qualifier-chip-list [type]="capability.type" [qualifier]="capability.qualifier"></app-qualifier-chip-list>
+<div class="actions">
+  <span *ngIf="!capability.private" class="scope" [title]="'This capability has public scope and can be used by other applications (Public API).'">
+    PUBLIC
+  </span>
+  <span *ngIf="capability.private" class="scope" [title]="'This capability has private scope and is only visible to this application.\nOther applications cannot invoke this capability.'">
+    PRIVATE
+  </span>
+  <button *ngIf="execQualifier"
+          (click)="onCapabilityExecute($event)"
+          [title]="'Execute this capability...'"
+          class="execute material-icons"
+          type="button">
+    play_circle_outline
+  </button>
+</div>

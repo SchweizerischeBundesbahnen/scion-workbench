@@ -1,0 +1,19 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: app-padding();
+
+  > section {
+    display: grid;
+    grid-template-columns: max-content auto;
+    grid-row-gap: .5em;
+    grid-column-gap: 2em;
+
+    border: 1px solid accentColor(.25);
+    border-radius: 5px;
+    padding: 1em;
+    font-size: .9em;
+  }
+}

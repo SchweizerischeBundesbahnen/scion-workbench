@@ -1,0 +1,79 @@
+@import '../common';
+
+$diamond-height: 8;
+$border-color: accentColor(.2);
+$background-color: rgb(249, 249, 249);
+
+:host {
+  display: flex;
+
+  > sci-viewport {
+    flex: auto;
+    border: 1px solid accentColor(.25);
+    border-radius: 5px;
+
+    section.accordion-item {
+      flex: none;
+      padding: 1em;
+
+      &:not(:first-child) {
+        border-top: 1px solid accentColor(.25);
+      }
+
+      &:last-child {
+        border-bottom: 1px solid accentColor(.25);
+      }
+
+      > header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+
+        > div {
+          flex: auto;
+        }
+
+        > span.toggle {
+          flex: none;
+          margin-left: .5em;
+          user-select: none;
+        }
+      }
+
+      > section {
+        position: relative; // positioning anchor for the diamond
+
+        background-color: $background-color;
+        border-radius: 5px;
+        border: 1px solid $border-color;
+        padding: 1em;
+        margin: 1em -.5em -.5em -.5em;
+
+        //::before is used as diamond-border
+        //::after is used as diamond-content
+        &::before, &::after {
+          content: '';
+          display: inline-block;
+          position: absolute;
+          border: #{$diamond-height}px solid transparent;
+        }
+
+        &::before {
+          top: -#{$diamond-height}px;
+          left: calc(50px - #{$diamond-height}px);
+          border-top-width: 0;
+          border-bottom-color: $border-color;
+        }
+
+        &::after {
+          top: -#{$diamond-height - 1}px;
+          left: calc(50px - #{$diamond-height}px);
+          border-top-width: 0;
+          border-bottom-color: $background-color;
+        }
+      }
+    }
+  }
+}
+

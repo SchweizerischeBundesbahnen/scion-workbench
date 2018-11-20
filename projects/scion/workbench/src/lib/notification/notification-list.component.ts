@@ -36,6 +36,7 @@ export class NotificationListComponent implements OnDestroy {
   }
 
   @HostListener('document:keydown.escape')
+  @HostListener('document:sci-escape')
   public onEscape(): void {
     this.notifications.length && this.onNotificationClose(this.notifications.length - 1);
   }
@@ -46,10 +47,11 @@ export class NotificationListComponent implements OnDestroy {
   private onNotification(notification: WbNotification): void {
     // Find potential notification which belongs to the same group.
     const index = notification.group && this.notifications.findIndex(it => it.group === notification.group);
-    if (index >= 0) {
+    if (notification.group && index >= 0) {
       notification.input = notification.groupInputReduceFn(this.notifications[index].input, notification.input);
       this.notifications[index] = notification;
-    } else {
+    }
+    else {
       this.notifications.push(notification);
     }
     this._cd.markForCheck();

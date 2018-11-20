@@ -1,0 +1,56 @@
+<section class="params">
+  <h2>URL Parameters</h2>
+  <sci-property class="params" [properties]="params$ | async"></sci-property>
+</section>
+
+<section class="query-params">
+  <h2>URL Query Parameters</h2>
+  <sci-property class="query-params" [properties]="queryParams$ | async"></sci-property>
+</section>
+
+<sci-accordion>
+  <!-- View Interaction -->
+  <ng-template sciAccordionItem [panel]="view_interaction_panel" [cssClass]="'e2e-view-interaction-panel'">
+    <header>View Interaction</header>
+  </ng-template>
+
+  <ng-template #view_interaction_panel>
+    <app-view-interaction-panel></app-view-interaction-panel>
+  </ng-template>
+
+  <!-- View Navigation -->
+  <ng-template sciAccordionItem [panel]="view_navigation_panel" [cssClass]="'e2e-view-navigation-panel'">
+    <header>View Navigation</header>
+  </ng-template>
+
+  <ng-template #view_navigation_panel>
+    <app-view-navigation-panel></app-view-navigation-panel>
+  </ng-template>
+
+  <!-- Popup -->
+  <ng-template sciAccordionItem [panel]="popup_panel" [cssClass]="'e2e-popup-panel'">
+    <header>Popup</header>
+  </ng-template>
+
+  <ng-template #popup_panel>
+    <app-popup-panel></app-popup-panel>
+  </ng-template>
+
+  <!-- Messagebox -->
+  <ng-template sciAccordionItem [panel]="messagebox_panel" [cssClass]="'e2e-message-box-panel'">
+    <header>Messagebox</header>
+  </ng-template>
+
+  <ng-template #messagebox_panel>
+    <app-message-box-panel></app-message-box-panel>
+  </ng-template>
+
+  <!-- Notification -->
+  <ng-template sciAccordionItem [panel]="notification_panel" [cssClass]="'e2e-notification-panel'">
+    <header>Notification</header>
+  </ng-template>
+
+  <ng-template #notification_panel>
+    <app-notification-panel></app-notification-panel>
+  </ng-template>
+</sci-accordion>

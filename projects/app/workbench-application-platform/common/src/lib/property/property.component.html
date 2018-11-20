@@ -1,0 +1,4 @@
+<ng-container *ngFor="let property of flattenedProperties | keyvalue:keyCompareFn">
+  <span class="key"><span class="e2e-key">{{property.key}}</span>:</span>
+  <span class="value e2e-value">{{property.value}}</span>
+</ng-container>

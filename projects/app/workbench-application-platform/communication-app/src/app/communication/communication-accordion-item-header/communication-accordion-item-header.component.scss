@@ -1,0 +1,18 @@
+:host {
+  display: flex;
+
+  > span.icon {
+    flex: none;
+    width: 30px;
+    font-size: 20px;
+  }
+
+  > span.subject {
+    flex: auto;
+  }
+
+  > span.date {
+    flex: none;
+    font-size: .8em;
+  }
+}

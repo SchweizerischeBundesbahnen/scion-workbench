@@ -1,0 +1,21 @@
+<!-- filter field if positioned at the top -->
+<ng-container *ngIf="filterPosition === 'top'; then filter_template"></ng-container>
+
+<!-- viewport and list items -->
+<sci-viewport (keydown)="onAnyKey($event)">
+  <div>
+    <sci-list-item #item *ngFor="let listItem of listItems; trackBy: trackByFn"
+                   [listItem]="listItem"
+                   [style]="style"
+                   [active]="activeItem === item"
+                   (click)="onItemClick(item)">
+    </sci-list-item>
+  </div>
+</sci-viewport>
+
+<ng-container *ngIf="filterPosition === 'bottom'; then filter_template"></ng-container>
+
+<!-- filter field if positioned at the bottom -->
+<ng-template #filter_template>
+  <sci-filter-field (filter)="onFilter($event)" [ngClass]="filterPosition" [tabindex]="tabindex"></sci-filter-field>
+</ng-template>

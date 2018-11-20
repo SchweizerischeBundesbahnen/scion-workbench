@@ -1,0 +1,28 @@
+@import 'common';
+
+:host {
+  display: grid;
+  justify-content: space-between;
+  @include grid-container-align-items(center);
+  grid-template-columns: auto auto;
+  grid-template-rows: auto;
+  grid-column-gap: 1em;
+
+  > div.actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    > span.scope {
+      font-weight: bold;
+      @include chip(primaryColor(), null, primaryColor());
+      margin: 0;
+    }
+
+    > button.execute {
+      &:not(:first-child) {
+        margin-top: .5em;
+      }
+    }
+  }
+}
