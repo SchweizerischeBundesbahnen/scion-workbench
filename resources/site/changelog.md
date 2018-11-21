@@ -5,6 +5,34 @@
 
 # Changelog
 
+<a name="0.0.0-beta.12"></a>
+## [0.0.0-beta.12](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.11...0.0.0-beta.12) (2018-11-21)
+
+* Allow programmatic registration of activities ([#28] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/28)) ([6b1eddb](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6b1eddb))
+* Register view auxiliary routes via `WorkbenchAuxiliaryRoutesRegistrator` and set view active state upon view creation ([#29] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/29)) ([0c794f1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0c794f1))
+* Add iframes of remote sites beyond workbench grid to not cover other parts of the workbench like sashes or view dropdown menu ([#30] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/30)) ([c359064](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c359064))
+* Allow cross-origin communication with remote sites ([#31] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/31)) ([7282a80](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7282a80))
+* Provide message box action texts when spawning the message box ([#32] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/32)) ([6fd32c3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6fd32c3))
+* Control if workbench part content is capable of being moved in the DOM ([#30] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/30)) ([56d2df1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/56d2df1))
+* Disable vertical scrolling in workbench viewtab bar ([#33] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/33)) ([293115c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/293115c))
+* Use CDK overlay for the dropdown showing hidden view tabs ([#42] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/42)) ([3e91321](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3e91321))
+* Continue scrolling in custom scrollbars even when the cursor enters or goes past the boundary of an iframe ([#41] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/41)) ([6f8fd5f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6f8fd5f))
+* Use a separate routing navigate command when closing multiple views all at once ([#34] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/34)) ([9b6a5fe](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/9b6a5fe))
+* Remove static initializers to be compatible with Angular 6 transpiled with TypeScript 2.x ([#26] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/26)) ([dad912d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/dad912d))
+* Move 'Workbench.forRoot guard' spec into spec directory and simplify spec ([#43] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/43)) ([dc3c2e9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/dc3c2e9))
+* Extract `sci-dimension-module` into a separate NPM library ([#44] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/44)) ([006a19e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/006a19e))
+* Extract `sci-viewport-module` into a separate NPM library ([#45] (https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/45)) ([0174cb0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0174cb0))
+
+### BREAKING CHANGES
+- Use added `visible` property over `ngIf` directive to show or hide an activity based on a conditional <wb-activity [visible]="conditional"></wb-activity>
+- Removed output property to listen for URL changes because not allowed for cross-origin communication and internally using a timer to detect URL changes (as there is no change event emitted natively and `MutationObserver` is not applicable). Use `message` output property instead.
+- Message box action texts are no longer specified when importing the workbench module. Instead, message box texts are provided directly when spawning the message box.
+- removed content projection from `RemoteSiteComponent` and added it to workbench part level\
+  If using a remote site, wrap entire part content in a `<wb-content-as-overlay>` element, which causes it to be added to a top-level workbench DOM element and projected into that component's bounding box.
+- removed support to use `RemoteSiteComponent` as a routing component because must be a child of `<wb-content-as-overlay>` element
+- Workbench requires `@scion/dimension` as its peer-dependency which you can install as following: `npm install --save @scion/dimension`
+- Workbench requires `@scion/viewport` as its peer-dependency which you can install as following: `npm install --save @scion/viewport`
+
 <a name="0.0.0-beta.11"></a>
 ## [0.0.0-beta.11](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.10...0.0.0-beta.11) (2018-10-26)
 
