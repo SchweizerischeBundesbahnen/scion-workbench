@@ -53,7 +53,7 @@ We use NPM distribution tags to differentiate between pre-releases (x.0.0-beta.0
 
 ### Example for releasing 2.x.x
 
-```bash
+```
 2.0.0-beta.0 with "next" distribution tag
 2.0.0-beta.1 with "next" distribution tag
 2.0.0-beta.x with "next" distribution tag
@@ -70,25 +70,14 @@ We use NPM distribution tags to differentiate between pre-releases (x.0.0-beta.0
 ## Release Guidelines
 Whenever you publish a new version to NPM (pre-release, major, minor, patch), please follow the instructions below:
 
-- update `package.json` with the new version, e.g. `2.0.0-beta.1`
+- update all `package.json` files with the new version, e.g. `2.0.0-beta.1`
+- update scion dependencies to the new version in all necessary 'package.json' files
 - update `changelog.md`, if applicable
 - create a Git release commit that consists of the two files and a commit message like 'Release version 2.0.0-beta.1'
 - create a Git release tag pointing to the previously added release commit, and use the exact version as tagname, e.g. `2.0.0-beta.1`.
-- Build the project using NPM command-line tool:
-  ```cmd
-  npm run build
-  ```
-- Change to `dist/scion/workbench` directory and publish the distribution to NPM registry. For pre-release versions, always use `next` distribution tag.
-  ```
-  npm config set registry http://registry.npmjs.org
-  npm login
-  npm publish --tag next --otp=123456 // required for pre-release versions
-  npm publish --otp=123456 // for major, minor or patch release versions
-  ```
+- based on the Git release tag, travis will automatically build & publish the necessary npm packages
 
-  SCION workbench packages are published under `@scion` scope. In order to publish a new version, you must be member of SCION organization, and have 2FA (Two Factor Authentication) enabled in your NPM user account. To get access to SCION organization, please file an issue in the project issue tracker.
-  
-  > Use `otp` flag to add your One-Time Password (OTP) to the publish command, e.g. `--otp=123456`.
+SCION workbench packages are published under `@scion` scope. To get access to SCION organization, please file an issue in the project issue tracker.
 
 ## Commit Guidelines
 We believe in a compact and well written Git commit history. Every commit should be a logically separate changeset.
