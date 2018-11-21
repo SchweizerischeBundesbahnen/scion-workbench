@@ -1,25 +1,119 @@
 # This file contains instructions for the build server Travis
 # The build is running on https://travis-ci.com/.
-
 sudo: required
 dist: trusty
 language: node_js
 node_js:
-  - '8'
-addons:
+- '8'
+addons: 
 apt:
   sources:
-    - google-chrome
+  - google-chrome
   packages:
-    - google-chrome-stable
-    - google-chrome-beta
+  - google-chrome-stable
+  - google-chrome-beta
 before_install:
-  - export CHROME_BIN=chromium-browser
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+- export CHROME_BIN=chromium-browser
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
 install:
-  - npm install
+- npm install
 script:
-  - npm run lint
-  - npm run build
-  - npm run test
+- npm run lint
+- npm run build
+after_success:
+- npm run test
+jobs:
+  include:
+  - stage: release mouse-dispatcher
+    script: skip
+    before_deploy:
+    - cd dist/scion/mouse-dispatcher
+    after_deploy:
+    - cd ../../..
+    deploy:
+    - provider: npm
+      email: "${NPM_EMAIL}"
+      api_key: "${NPM_API_KEY}"
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+    - provider: npm
+      tag: next
+      email: "${NPM_EMAIL}"
+      api_key: "${NPM_API_KEY}"
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+\-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+  - stage: release dimension
+    script: skip
+    before_deploy:
+    - cd dist/scion/dimension
+    after_deploy:
+    - cd ../../..
+    deploy:
+    - provider: npm
+      email: "${NPM_EMAIL}"
+      api_key: "${NPM_API_KEY}"
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+    - provider: npm
+      tag: next
+      email: "${NPM_EMAIL}"
+      api_key: "${NPM_API_KEY}"
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+\-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+  - stage: release viewport
+    script: skip
+    before_deploy:
+    - cd dist/scion/viewport
+    after_deploy:
+    - cd ../../..
+    deploy:
+    - provider: npm
+      email: "${NPM_EMAIL}"
+      api_key: "${NPM_API_KEY}"
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+    - provider: npm
+      tag: next
+      email: "${NPM_EMAIL}"
+      api_key: "${NPM_API_KEY}"
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+\-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+  - stage: release workbench
+    script: skip
+    before_deploy:
+    - cd dist/scion/workbench
+    after_deploy:
+    - cd ../../..
+    deploy:
+    - provider: npm
+      email: "${NPM_EMAIL}"
+      api_key: "${NPM_API_KEY}"
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+    - provider: npm
+      tag: next
+      email: "${NPM_EMAIL}"
+      api_key: "${NPM_API_KEY}"
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+\-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+env:
+  global:
+  - secure: geF/l6PJwPUgvdTybwBZcc7MgHdYZjZmOs0EkKwyM39K5J6o+POJ9dQfVF9woWvsPFAL0x4kew7Aif7T3yifF66tdXHd7P6SHWFWvfLPej4yMROtNvEYwhj1t6k0ZwegD35iMBMFRrTLFxZ7WPzLN1QpvO5Uv9LjYPheK4JUbHfk6nMdyzJP+qqWsPCPvdtOfY+5ury2+xo/LAfi5NJ4GDaM3sLjk3uAe2F6XeK7fU80N5ugQQWBKcBrNWsCQGVAZpwzRq+Sv+FKf3Fyg+bi+9kSnSK94Fid7/VlysH04+ltlyROZnOLE4kMJp4jb4APIn0Gds/vC+MHITEqm/sAn88jsqLC5MaUeXVgE0DQQreKKDsetHK9atpeENqC1JW9Yqt24O9Z5w8Hld4Ed737S3dMmyCqceILmGjW0QmObtcCejSzoHBypFcsyvmd1hyX/Behtgu1zuZzIprW+/iex7Nx71RdLou/jESWEbMFtuCXlPTJd2uBs8qjkG2ZwN3jM7n2bKc0N1RNzsI3jC97tIDdoXc4L5/b20xO3AKvDydU7kB/9Ac6avjUbtLbvKMGnnXT+dqF/QM7QyjsUfY/nLWLdz5l4TJU9x1f3IkGt65IrgdiXam2AyGKa38m8KRjDo9ANK/peFiL7o5/YkJtsAdieehz74+BP6TLxwEEDPo=
+  - secure: BuaXeZ6x5vA56SgvljJ/DTz5+hQ38WNQRokT9Czu7I8PnSKqdvgdMphAMZowV02IRWD05YBcZ3s77oa112/aVmD0cvFg3Uuf0OG6NTDSCTHAM9b6zZ69PUPRQWwlqLWJEe3UhctPqdelvrGj7P0eG5333dSPq0MmKklyOXeccJkCAwcwHSc41ZpbBppYIxuinzNP3/xn8qsFWTWLqb3HfLogbIDsc0ksnIn+oaNNGEb3EAKt+KiKcQ5EHz6p3SHQESw+dAmiw6Fr39ci17DLyx8m6g2iHowuMpC9EqPGso+xaPtNWeSZwjUfDuCJ/O1GYzpwho24sXOfFKBd40zVuYajAzDDAtpHgr2Y6GSuDwPO/LOBsMSopMOAEcEWKoWXgUB6VF6HACBGDTYK7YE2AcvYCkfkfkL2uIvx+rkFT8l5DOGKhUjDB6wkJs+y/R9eUYuMXZdv+GsXd6TOHHCCNqCftUJp6vFoZD4K+n68Wq5LuQZ8sVsISM8KWcSbuhUc50ch8jpR/mEcweKRNYdKd1GFIo2wsOpiWwBzs2VcyoyLVBmb6ChfgsDvGmEfzPEMNGrNcjh6pvPhAQp3ZEHV51nlSyu4Z9UJ5AUbl0sZao0/bMYwZcDGeM2F0X5YhbQDYs6WD4G2UUz24iwfps23s94FTfy9IckWiomVfqije0Y=
