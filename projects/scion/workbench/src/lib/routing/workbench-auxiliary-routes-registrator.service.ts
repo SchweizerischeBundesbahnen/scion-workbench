@@ -13,6 +13,7 @@ import { ResolveData } from '@angular/router/src/config';
 export class WorkbenchAuxiliaryRoutesRegistrator {
 
   constructor(private _router: Router) {
+    this.registerActivityAuxiliaryRoutes();
   }
 
   /**
