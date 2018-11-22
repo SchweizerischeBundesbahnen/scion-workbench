@@ -14,7 +14,7 @@ import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/t
 import { Router } from '@angular/router';
 import { WorkbenchModule } from '../workbench.module';
 
-fdescribe('WorkbenchModule', () => {
+describe('WorkbenchModule', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({

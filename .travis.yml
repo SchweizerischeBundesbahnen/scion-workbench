@@ -5,28 +5,20 @@ dist: trusty
 language: node_js
 node_js:
 - '8'
-addons: 
-apt:
-  sources:
-  - google-chrome
-  packages:
-  - google-chrome-stable
-  - google-chrome-beta
-before_install:
-- export CHROME_BIN=chromium-browser
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start
-install:
-- npm install
-script:
-- npm run lint
-- npm run build
-after_success:
-- npm run test
 jobs:
   include:
-  - stage: release mouse-dispatcher
+  - stage: build and test all packages
+    install:
+    - npm install
+    script:
+    - npm run lint
+    - npm run build
+    after_success:
+    - npm run test
+  - stage: release mouse-dispatcher package
+    if: tag IS present
     script: skip
+    install: skip
     before_deploy:
     - cd dist/scion/mouse-dispatcher
     after_deploy:
@@ -47,8 +39,10 @@ jobs:
       on:
         tags: true
         condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
-  - stage: release dimension
+  - stage: release dimension package
+    if: tag IS present
     script: skip
+    install: skip
     before_deploy:
     - cd dist/scion/dimension
     after_deploy:
@@ -69,8 +63,10 @@ jobs:
       on:
         tags: true
         condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
-  - stage: release viewport
+  - stage: release viewport package
+    if: tag IS present
     script: skip
+    install: skip
     before_deploy:
     - cd dist/scion/viewport
     after_deploy:
@@ -91,8 +87,10 @@ jobs:
       on:
         tags: true
         condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
-  - stage: release workbench
+  - stage: release workbench package
+    if: tag IS present
     script: skip
+    install: skip
     before_deploy:
     - cd dist/scion/workbench
     after_deploy:
