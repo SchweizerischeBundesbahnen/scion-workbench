@@ -46,7 +46,7 @@ export class ViewListButtonComponent {
       hasBackdrop: true,
       backdropClass: null,
       positionStrategy: this._overlay.position()
-        .flexibleConnectedTo(this._host.nativeElement)
+        .flexibleConnectedTo(this._host)
         .withFlexibleDimensions(false)
         .withPositions([ViewListButtonComponent.SOUTH, ViewListButtonComponent.NORTH])
     });
