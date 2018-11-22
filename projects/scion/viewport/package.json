@@ -3,6 +3,10 @@
   "version": "0.0.0-beta.11",
   "description": "Provides a viewport component with scrollbars that sit on top of the viewport client.",
   "license": "EPL-2.0",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
   "bugs": {
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
