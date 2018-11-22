@@ -118,10 +118,10 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 })
 export class WorkbenchModule {
 
-  // Note: We are injecting ViewRegistrySynchronizer so it gets created eagerly...
-  constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any, viewRegistrySynchronizer: ViewRegistrySynchronizer, auxRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator) {
-    // Register an activity auxiliary route for every primary route
-    auxRoutesRegistrator.registerActivityAuxiliaryRoutes();
+  // Note: We are injecting {WorkbenchAuxiliaryRoutesRegistrator} and {ViewRegistrySynchronizer} so they get created eagerly...
+  constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any,
+              auxiliaryRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
+              viewRegistrySynchronizer: ViewRegistrySynchronizer) {
   }
 
   /**
