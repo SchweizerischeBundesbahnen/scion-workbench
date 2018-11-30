@@ -17,7 +17,7 @@ import { InternalWorkbenchService } from '../../workbench.service';
 import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { WorkbenchViewRegistry } from '../../workbench-view-registry.service';
-import { filter, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'wb-view-tab',
@@ -178,12 +178,13 @@ export class ViewTabComponent implements OnDestroy {
 
       fromEvent(this._host, 'dblclick')
         .pipe(
-          filter(() => enabled),
           takeUntil(this._destroy$)
         )
         .subscribe((event: Event) => {
-          zone.run(() => this._workbenchLayout.toggleMaximized());
           event.stopPropagation(); // prevent `ViewPartBarComponent` handling the dblclick event which would undo maximization/minimization
+          if (enabled) {
+            zone.run(() => this._workbenchLayout.toggleMaximized());
+          }
         });
     });
   }
