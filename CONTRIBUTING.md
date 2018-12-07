@@ -8,11 +8,11 @@
 
 [Contribution](#contribution)\
 [Build SCION Workbench](#build-scion-workbench)\
-[NPM Versioning Guidelines](#npm-versioning-guidelines)\
-[Release Guidelines](#release-guidelines)\
-[Commit Guidelines](#commit-guidelines)\
 [Coding guidelines](#coding-guidelines)\
-[Line endings](#line-endings)
+[Commit Guidelines](#commit-guidelines)\
+[Line endings](#line-endings)\
+[NPM Versioning Guidelines](#npm-versioning-guidelines)\
+[Release Guidelines](#release-guidelines)
 
 ***
 
@@ -39,6 +39,91 @@ Please follow the guidelines below:
 The project is built with Travis CI and is automatically built, its tests executed and linted as you push it to GitHub.
 
 [![Build Status](https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench.svg?token=sT5ouhFsqwt9RmkLsQb8&branch=master)](https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench)
+
+## Coding Guidelines
+Besides linting rules, the following rules apply:
+
+- Observable names are suffixed with dollar sign $ to indicate that it represents a stream which must be subscribed to and unsubscribed from
+- we use explicit public or private visibility modifiers (except for constructors) to make code more explicit
+- we use single quotes for string literals or import statements
+- we use 2 spaces per indentation
+- all features or bug fixes related to `routing` or `view grid` must be tested by one or more specs placed in `/projects/scion/workbench/src/lib/spec` directory
+- all public API must be documented
+
+## Commit Guidelines
+We believe in a compact and well written Git commit history. Every commit should be a logically separate changeset.
+As a general rule, your messages should start with a single line in imperative present tense and refer a GitHub issue.
+
+### Commit Message Format
+Each commit message consists of a **header**, a **body** and a **footer**.  The header has a special format that includes a **type** and a **subject**:
+
+```
+<type>: <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+The **header** is mandatory.
+
+Any line of the commit message cannot be longer 100 characters! This allows the message to be easier to read on GitHub as well as in various git tools.
+
+The footer should contain a [closing reference to an issue](https://help.github.com/articles/closing-issues-via-commit-messages/) if any.
+
+Samples:
+
+```
+docs: update changelog to beta.5
+```
+```
+fix: need to depend on latest rxjs and zone.js
+
+The version in our package.json gets copied to the one we publish, and users need the latest of these.
+
+Fixes #xx
+```
+
+### Type
+Must be one of the following:
+
+* **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+* **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+* **docs**: Documentation only changes
+* **feat**: A new feature
+* **fix**: A bug fix
+* **perf**: A code change that improves performance
+* **refactor**: A code change that neither fixes a bug nor adds a feature
+* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+* **test**: Adding missing tests or correcting existing tests
+* **release**: A new release
+
+### Subject
+The subject contains a succinct description of the change:
+
+* use the imperative, present tense: "change" not "changed" nor "changes"
+* don't capitalize the first letter
+* no dot (.) at the end
+
+### Body
+Just as in the **subject**, use the imperative, present tense: "change" not "changed" nor "changes". The body should include the motivation for the change and contrast this with previous behavior.
+
+### Footer
+The footer should contain any information about **Breaking Changes** and is also the place to reference GitHub issues that this commit **Closes**.
+
+**Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
+
+
+## Line endings
+This project expects line endings of textual files to be Unix style (LF) only, and which is in the responsibility of the committer. There is no automatic line ending conversation done by Git on checkout nor when indexing files. Instead, configure your editor to use unix-style delimiter for new files and disable auto conversion in Git. However, the linting rule `linebreak-style` enforces a unix-style linebreak style for TypeScript files.
+
+Global Git settings: `core.autocrlf=false`
+
+Run the following command to find files with 'windows-style' line ending:
+
+```
+find . -type f | xargs file | grep CRLF
+```
 
 ## NPM Versioning Guidelines
 For SCION Workbench versioning, we stick to the versioning practices of the Angular project.
@@ -72,44 +157,21 @@ Whenever you publish a new version to NPM (pre-release, major, minor, patch), pl
 
 - update all `package.json` files with the new version, e.g. `2.0.0-beta.1`
 - update scion dependencies to the new version in all necessary 'package.json' files
-- update `changelog.md`, if applicable
+- generate the new `changelog.md`, if necessary (see below)
+- check if the `changelog.md` looks good (we use a custom header, make sure it stays there)
 - create a Git release commit that consists of the two files and a commit message like 'Release version 2.0.0-beta.1'
-- create a Git release tag pointing to the previously added release commit, and use the exact version as tagname, e.g. `2.0.0-beta.1`.
+- create a Git release tag pointing to the previously added release commit, and use the exact version as tag name, e.g. `2.0.0-beta.1`.
 - based on the Git release tag, travis will automatically build & publish the necessary npm packages
 
 SCION workbench packages are published under `@scion` scope. To get access to SCION organization, please file an issue in the project issue tracker.
 
-## Commit Guidelines
-We believe in a compact and well written Git commit history. Every commit should be a logically separate changeset.
-As a general rule, your messages should start with a single line in imperative present tense and refer a GitHub issue.
+### Generating change logs
+```bash
+# Install the cli
+npm install -g conventional-changelog-cli
 
-Example:
-
-```
-Capitalized, short summary of changes in imperative present tense (#issue)
-
-More detailed explanatory text, if necessary.
-```
-
-## Coding Guidelines
-Besides linting rules, the following rules apply:
-
-- Observable names are suffixed with dollar sign $ to indicate that it represents a stream which must be subscribed to and unsubscribed from
-- we use explicit public or private visibility modifiers (except for constructors) to make code more explicit
-- we use single quotes for string literals or import statements
-- we use 2 spaces per indentation
-- all features or bug fixes related to `routing` or `view grid` must be tested by one or more specs placed in `/projects/scion/workbench/src/lib/spec` directory
-- all public API must be documented
-
-## Line endings
-This project expects line endings of textual files to be Unix style (LF) only, and which is in the responsibility of the committer. There is no automatic line ending conversation done by Git on checkout nor when indexing files. Instead, configure your editor to use unix-style delimiter for new files and disable auto conversion in Git. However, the linting rule `linebreak-style` enforces a unix-style linebreak style for TypeScript files.
-
-Global Git settings: `core.autocrlf=false`
-
-Run the following command to find files with 'windows-style' line ending:
-
-```
-find . -type f | xargs file | grep CRLF
+# Generate the changelog since last release
+conventional-changelog -p angular -i resources/site/changelog.md -s
 ```
 
 [menu-overview]: /README.md
