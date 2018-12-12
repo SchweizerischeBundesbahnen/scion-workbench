@@ -41,18 +41,34 @@
 
   .wb-icon-search::before {
     @extend .wb-icons;
-    content: "\e900";
+    content: '\e900';
   }
   .wb-icon-cancel::before {
     @extend .wb-icons;
-    content: "\e5c9";
+    content: '\e5c9';
   }
   .wb-icon-close::before {
     @extend .wb-icons;
-    content: "\e5cd";
+    content: '\e5cd';
   }
   .wb-icon-edit::before {
     @extend .wb-icons;
-    content: "\e254";
+    content: '\e254';
+  }
+  .wb-icon-enlarge::before {
+    @extend .wb-icons;
+    content: '\e901';
+  }
+  .wb-icon-shrink::before {
+    @extend .wb-icons;
+    content: '\e902';
+  }
+  .wb-icon-backward2:before {
+    @extend .wb-icons;
+    content: '\ea1f';
+  }
+  .wb-icon-forward3:before {
+    @extend .wb-icons;
+    content: '\ea20';
   }
 }

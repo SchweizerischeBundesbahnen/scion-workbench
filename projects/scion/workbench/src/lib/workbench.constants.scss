@@ -50,3 +50,14 @@ $messagebox-bgcolor: $background-color;
 $messagebox-font-size: 14px;
 $messagebox-border-color: rgb(204, 204, 204);
 $messagebox-max-width: 400px;
+
+/*
+ * Full Screen Mode
+ */
+$fullscreen_view-tabs-height: 40px;
+$fullscreen_view-tabs-width: 250px;
+$fullscreen_view-tabs-bgcolor: #CCCCCC;
+$fullscreen_view-tabs_separator-color: #FFFFFF;
+$fullscreen_tab-fgcolor: #333333;
+$fullscreen_tab-active-fgcolor: #252526;
+$fullscreen_tab-active-bgcolor: $background-color;

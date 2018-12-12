@@ -1,0 +1,136 @@
+@import '../workbench.constants';
+
+:host {
+  visibility: hidden;
+  opacity: 0;
+
+  &.full-screen-mode {
+    visibility: visible;
+    display: flex;
+    opacity: 1;
+    transition: opacity 125ms ease-in;
+
+    &.horizontal-tabs {
+      flex-direction: column;
+    }
+  }
+
+  div.view-tabs {
+    display: flex;
+
+    > sci-viewport {
+      flex: auto;
+      background-color: $fullscreen_view-tabs-bgcolor;
+      color: $fullscreen_tab-fgcolor;
+
+      div.viewport-client {
+        display: flex;
+        flex: auto;
+
+        > div.tab {
+          padding: 5px;
+          white-space: nowrap;
+          cursor: pointer;
+
+          &.active {
+            background-color: $fullscreen_tab-active-bgcolor;
+            color: $fullscreen_tab-active-fgcolor;
+            cursor: default;
+          }
+        }
+      }
+    }
+  }
+
+  &.horizontal-tabs > div.view-tabs {
+    height: $fullscreen_view-tabs-height;
+
+    > div.buttons {
+      display: flex;
+      align-content: center;
+      order: 2;
+
+      > button.reduce {
+        display: none;
+      }
+    }
+
+    > sci-viewport {
+      order: 1;
+
+      div.tab {
+        border-right: 1px solid $fullscreen_view-tabs_separator-color;
+      }
+    }
+  }
+
+  &.vertical-list > div.view-tabs {
+    width: $fullscreen_view-tabs-width;
+    flex-direction: column;
+
+    > div.buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    > sci-viewport {
+      div.viewport-client {
+        flex-direction: column;
+
+        div.tab {
+          border-bottom: 1px solid $fullscreen_view-tabs_separator-color;
+        }
+      }
+    }
+
+    &.reduced {
+      width: auto;
+
+      > div.buttons {
+        > button.shrink {
+          display: none;
+        }
+      }
+
+      > sci-viewport {
+        display: none;
+      }
+    }
+  }
+
+  > sci-viewport.full-screen-content {
+    flex: auto;
+  }
+
+  button {
+    background-color: transparent;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    outline: none;
+    font-size: 1em;
+    color: inherit;
+
+    &:hover {
+      font-weight: bold;
+    }
+
+    &.shrink {
+      &::before {
+        content: '\e902';
+      }
+    }
+
+    &.backward {
+      &::before {
+        content: '\ea1f';
+      }
+    }
+
+    &.forward {
+      &::before {
+        content: '\ea20';
+      }
+    }
+  }
+}

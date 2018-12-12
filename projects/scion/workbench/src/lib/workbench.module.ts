@@ -63,6 +63,8 @@ import { ActivityResolver } from './routing/activity.resolver';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { FullScreenModeComponent } from './full-screen-mode/full-screen-mode.component';
+import { FullScreenModeService } from './full-screen-mode/full-screen-mode.service';
 
 const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 
@@ -104,6 +106,7 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     TemplateHostOverlayDirective,
     EmptyOutletComponent,
     ContentAsOverlayComponent,
+    FullScreenModeComponent,
   ],
   exports: [
     WorkbenchComponent,
@@ -168,6 +171,7 @@ export class WorkbenchModule {
         ViewRegistrySynchronizer,
         OverlayHostRef,
         ContentHostRef,
+        FullScreenModeService,
         InternalWorkbenchRouter,
         {
           provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter

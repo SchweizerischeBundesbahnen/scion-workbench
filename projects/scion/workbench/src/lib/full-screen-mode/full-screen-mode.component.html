@@ -1,0 +1,14 @@
+<div class="view-tabs" [class.reduced]="viewTabsReduced">
+  <div class="buttons">
+    <button (click)="leaveFullScreenMode()" type="button" class="shrink wb-icons"></button>
+    <button (click)="toggleReduced()" type="button" class="reduce wb-icons" [ngClass]="viewTabsReduced ? 'forward' : 'backward'"></button>
+  </div>
+  <sci-viewport>
+    <div class="viewport-client">
+      <div class="tab" *ngFor="let view of views" [class.active]="isActive(view)" (click)="changeView(view)">{{view.title}}</div>
+    </div>
+  </sci-viewport>
+</div>
+<sci-viewport class="full-screen-content">
+  <ng-template #fullScreenContent></ng-template>
+</sci-viewport>
