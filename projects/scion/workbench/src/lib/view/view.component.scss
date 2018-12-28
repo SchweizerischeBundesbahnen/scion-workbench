@@ -12,11 +12,7 @@
     height: 100%;
 
     wb-router-outlet {
-      flex: none;
-    }
-
-    wb-router-outlet + ::ng-deep * {
-      flex: 1 1 100%;
+      position: absolute; // take router outlet out of the document flow
     }
   }
 }

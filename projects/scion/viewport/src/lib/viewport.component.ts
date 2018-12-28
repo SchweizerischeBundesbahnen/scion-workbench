@@ -15,7 +15,20 @@ import { NULL_DIMENSION, SciDimension } from '@scion/dimension';
  * Represents a viewport with its `<ng-content>` used as its scrollable viewport client and
  * scrollbars that sit on top of the viewport client.
  *
- * `ng-content` is added to a flex-box container with `flex-flow` set to 'column nowrap'.
+ * `ng-content` is added to a CSS grid container with a single column.
+ *
+ * You can override the following CSS properties:
+ *  --grid-template-columns
+ *  --grid-template-rows
+ *  --gap
+ *
+ *
+ * Example of how to control the CSS grid:
+ *
+ * sci-viewport {
+ *   --grid-template-columns: auto auto; // 2-column grid
+ *   --gap: .5em; // specifies the row and column gap
+ * }
  */
 @Component({
   selector: 'sci-viewport',
