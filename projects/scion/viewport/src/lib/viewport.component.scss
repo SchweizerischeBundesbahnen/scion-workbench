@@ -1,13 +1,20 @@
 $scrollbar-size: 12px;
 
 :host {
+  --grid-template-columns: auto;
+  --grid-template-rows: auto;
+  --gap: 0 0;
+
   display: block;
   position: relative; // positioned anchor for viewport and scrollbars
   overflow: hidden;
 
   > div.viewport {
-    display: flex; // part of API
-    flex-flow: column nowrap; // part of API
+    display: grid; // part of API
+    grid-template-columns: var(--grid-template-columns);
+    grid-template-rows: var(--grid-template-rows);
+    gap: var(--gap);
+
     position: absolute;
     outline: none;
 
