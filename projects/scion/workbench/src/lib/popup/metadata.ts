@@ -59,6 +59,10 @@ export interface PopupConfig {
    * Specifies the max-width of the popup.
    */
   maxWidth?: string;
+  /**
+   * Specifies CSS class(es) added to the popup overlay, e.g. used for e2e testing.
+   */
+  cssClass?: string | string[];
 }
 
 /**
@@ -81,15 +85,15 @@ export abstract class Popup {
  */
 export interface CloseStrategy {
   /**
-   * Specifies if to close the popup on focus lost, which is `true` by defualt.
+   * Specifies if to close the popup on focus lost, which is `true` by default.
    */
   onFocusLost?: boolean;
   /**
-   * Specifies if to close the popup on escape keystroke, which is `true` by defualt.
+   * Specifies if to close the popup on escape keystroke, which is `true` by default.
    */
   onEscape?: boolean;
   /**
-   * Specifies if to close the popup on workbench view grid change, which is `true` by defualt.
+   * Specifies if to close the popup on workbench view grid change, which is `true` by default.
    */
   onGridLayoutChange?: boolean;
 }

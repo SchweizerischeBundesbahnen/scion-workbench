@@ -35,7 +35,7 @@ export class Notification {
   severity?: Severity | null = 'info';
   /**
    * Specifies the optional timeout upon which to close this notification automatically.
-   * If not specified, a 'short' timeout is applied. Use 'Duration.infinite' to not close this notification automatically.
+   * If not specified, a 'medium' timeout is applied. Use 'Duration.infinite' to not close this notification automatically.
    */
   duration?: Duration;
   /**
@@ -43,7 +43,10 @@ export class Notification {
    * If specified, this notification closes all notification of the same group before being presented.
    */
   group?: string;
-
+  /**
+   * Specifies CSS class(es) added to the <wb-notification> element, e.g. used for e2e testing.
+   */
+  cssClass?: string | string[];
   /**
    * Reducer function used in combination with 'group' to combine the inputs of the new and current notification.
    */
@@ -77,6 +80,9 @@ export class WbNotification extends Notification {
     Object.keys(notification)
       .filter(key => typeof notification[key] !== 'undefined')
       .forEach(key => this[key] = notification[key]);
+
+    this.severity = this.severity || 'info';
+    this.duration = this.duration || 'medium';
   }
 }
 

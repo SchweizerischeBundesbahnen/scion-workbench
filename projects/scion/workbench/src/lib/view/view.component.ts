@@ -55,6 +55,11 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
     return this._contentProjectionContext.isActive();
   }
 
+  @HostBinding('attr.class')
+  public get cssClasses(): string {
+    return this._view.cssClasses.join(' ');
+  }
+
   constructor(private _view: InternalWorkbenchView,
               private _messageBoxService: MessageBoxService,
               private _contentProjectionContext: ContentProjectionContext,

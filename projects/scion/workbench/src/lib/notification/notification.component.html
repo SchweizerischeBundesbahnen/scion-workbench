@@ -1,8 +1,12 @@
 <div class="outline">
-  <h1 *ngIf="!!title">{{title}}</h1>
-  <span *ngIf="textual; else component_template">{{text}}</span>
-  <button type="button" class="close wb-icons" (click)="onClose()"></button>
+  <h1 *ngIf="!!title" class="e2e-title">{{title}}</h1>
+  <ng-container *ngIf="textual; then text_template; else component_template"></ng-container>
+  <button type="button" class="close wb-icons e2e-close" (click)="onClose()"></button>
 </div>
+
+<ng-template #text_template>
+  <span class="e2e-text">{{text}}</span>
+</ng-template>
 
 <ng-template #component_template>
   <ng-container *ngComponentOutlet="componentType; injector: injector"></ng-container>

@@ -15,6 +15,7 @@ import { MoveDelta } from '../move.directive';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { Arrays } from '../array.util';
 
 @Component({
   selector: 'wb-message-box',
@@ -40,8 +41,12 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   public injector: Injector;
 
   @HostBinding('attr.class')
-  public get severity(): string {
-    return this._messageBox.severity || 'info';
+  public get cssClass(): string {
+    return [
+      ...Arrays.from(this._messageBox.cssClass),
+      this._messageBox.severity,
+      `e2e-severity-${this._messageBox.severity}`,
+    ].join(' ');
   }
 
   @HostBinding('style.transform')
@@ -73,7 +78,8 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
     this.textual = typeof messageBox.content === 'string';
     if (this.textual) {
       this.text = messageBox.content as string;
-    } else {
+    }
+    else {
       const injectionTokens = new WeakMap();
       injectionTokens.set(MessageBox, messageBox);
       this.injector = new PortalInjector(this._injector, injectionTokens);

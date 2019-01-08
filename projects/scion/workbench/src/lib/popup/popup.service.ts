@@ -17,6 +17,7 @@ import { Popup, PopupConfig } from './metadata';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { Defined } from '../defined.util';
+import { Arrays } from '../array.util';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top'};
@@ -65,7 +66,12 @@ export class PopupService implements OnDestroy {
         }
       })());
     const overlayConfig = new OverlayConfig({
-      panelClass: ['wb-popup', `wb-${position}`],
+      panelClass: [
+        'wb-popup',
+        `wb-${position}`,
+        `e2e-position-${position}`,
+        ...Arrays.from(config.cssClass)
+      ],
       width: config.width,
       height: config.height,
       minWidth: config.minWidth,
