@@ -17,15 +17,21 @@ export abstract class Activity {
   public title: string;
 
   /**
-   * Use in combination with an icon font to specify the icon.
-   */
-  public label: string;
-
-  /**
-   * Specifies the CSS class(es) used for the icon, e.g. 'material-icons' when using Angular Material Design.
+   * Specifies CSS class(es) added to the activity item and activity panel, e.g. used for e2e testing.
    */
   public cssClass: string | string[];
 
+  /**
+   * Specifies the text for the activity item.
+   *
+   * You can use it in combination with `itemCssClass`, e.g. to render an icon glyph by using its textual name.
+   */
+  public itemText: string;
+
+  /**
+   * Specifies CSS class(es) added to the activity item, e.g. used for e2e testing or to set an icon font class.
+   */
+  public itemCssClass: string | string[];
   /**
    * Controls whether to open this activity in the activity panel or to open it in a separate view.
    */
@@ -94,8 +100,11 @@ export class InternalActivity implements Activity {
 
   public panelWidthDelta = 0;
   public title: string;
-  public label: string;
   public cssClass: string | string[];
+
+  public itemText: string;
+  public itemCssClass: string | string[];
+
   public target: 'activity-panel' | 'view' = 'activity-panel';
   public visible = true;
   public position: number;
@@ -136,7 +145,8 @@ export class InternalActivity implements Activity {
     const action = ((): ActivityAction => {
       if (templateOrComponent instanceof TemplateRef) {
         return {template: templateOrComponent, injector: injector};
-      } else {
+      }
+      else {
         const injectionTokens = new WeakMap();
         injectionTokens.set(Activity, this);
         const portalInjector = new PortalInjector(injector || this._injector, injectionTokens);

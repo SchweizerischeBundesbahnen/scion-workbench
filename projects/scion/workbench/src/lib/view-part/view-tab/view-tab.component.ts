@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostBinding, HostListener, Input, NgZone, OnDestroy } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, Input, IterableChanges, IterableDiffers, NgZone, OnDestroy } from '@angular/core';
 import { InternalWorkbenchView } from '../../workbench.model';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { SciViewportComponent } from '@scion/viewport';
@@ -17,7 +17,7 @@ import { InternalWorkbenchService } from '../../workbench.service';
 import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { WorkbenchViewRegistry } from '../../workbench-view-registry.service';
-import { takeUntil } from 'rxjs/operators';
+import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'wb-view-tab',
@@ -28,11 +28,13 @@ export class ViewTabComponent implements OnDestroy {
 
   private _destroy$: Subject<void> = new Subject<void>();
   private _host: HTMLElement;
+  private _viewRefChange$ = new Subject<void>();
   public view: InternalWorkbenchView;
 
   @Input()
   public set viewRef(viewRef: string) {
     this.view = this._viewRegistry.getElseThrow(viewRef);
+    this._viewRefChange$.next();
   }
 
   @Input()
@@ -44,9 +46,11 @@ export class ViewTabComponent implements OnDestroy {
               private _workbenchLayout: WorkbenchLayoutService,
               private _viewport: SciViewportComponent,
               private _viewPartService: WorkbenchViewPartService,
+              private _differs: IterableDiffers,
               zone: NgZone) {
     this._host = host.nativeElement;
     this.installMaximizeListener(zone);
+    this.installViewCssClassListener();
   }
 
   @HostBinding('class.active')
@@ -187,6 +191,25 @@ export class ViewTabComponent implements OnDestroy {
           }
         });
     });
+  }
+
+  /**
+   * Adds view specific CSS classes to the <view-tab>, e.g. used for e2e testing.
+   */
+  private installViewCssClassListener(): void {
+    const differ = this._differs.find([]).create<string>();
+
+    this._viewRefChange$
+      .pipe(
+        switchMap(() => this.view.cssClasses$),
+        map(cssClasses => differ.diff(cssClasses)),
+        filter(Boolean),
+        takeUntil(this._destroy$),
+      )
+      .subscribe((diff: IterableChanges<string>) => {
+        diff.forEachAddedItem(({item}) => this._host.classList.add(item));
+        diff.forEachRemovedItem(({item}) => this._host.classList.remove(item));
+      });
   }
 
   public ngOnDestroy(): void {

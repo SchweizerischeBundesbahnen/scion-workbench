@@ -55,6 +55,10 @@ export abstract class MessageBox {
    * Specifies if the user can select the message box text.
    */
   contentSelectable?: boolean = false; // tslint:disable-line:no-inferrable-types
+  /**
+   * Specifies CSS class(es) added to the <wb-message-box> element, e.g. used for e2e testing.
+   */
+  cssClass?: string | string[];
 }
 
 export class WbMessageBox extends MessageBox {
@@ -86,6 +90,9 @@ export class WbMessageBox extends MessageBox {
     Object.keys(messageBox)
       .filter(key => typeof messageBox[key] !== 'undefined')
       .forEach(key => this[key] = messageBox[key]);
+
+    this.severity = this.severity || 'info';
+    this.modality = this.modality || 'view';
   }
 }
 

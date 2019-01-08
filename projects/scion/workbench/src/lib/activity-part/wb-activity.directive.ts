@@ -42,15 +42,25 @@ export class WbActivityDirective implements OnInit, OnDestroy {
   }
 
   /**
-   * Use in combination with an icon font to specify the icon.
+   * Specifies the text for the activity item.
+   *
+   * You can use it in combination with `itemCssClass`, e.g. to render an icon glyph by using its textual name.
    */
   @Input()
-  public set label(label: string) {
-    this.activity.label = label;
+  public set itemText(itemText: string) {
+    this.activity.itemText = itemText;
   }
 
   /**
-   * Specifies the CSS class(es) used for the icon, e.g. 'material-icons' when using Angular Material Design.
+   * Specifies CSS class(es) added to the activity item, e.g. used for e2e testing or to set an icon font class.
+   */
+  @Input()
+  public set itemCssClass(itemCssClass: string | string[]) {
+    this.activity.itemCssClass = itemCssClass;
+  }
+
+  /**
+   * Specifies CSS class(es) added to the activity item and activity panel, e.g. used for e2e testing.
    */
   @Input()
   public set cssClass(cssClass: string | string[]) {

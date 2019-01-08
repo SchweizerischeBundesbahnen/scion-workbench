@@ -8,11 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Injector, Input, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Injector, Input, NgZone, OnDestroy, Output } from '@angular/core';
 import { Notification, WbNotification } from './notification';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PortalInjector } from '@angular/cdk/portal';
+import { Arrays } from '../array.util';
 
 @Component({
   selector: 'wb-notification',
@@ -41,7 +42,8 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
     this.textual = typeof notification.content === 'string';
     if (this.textual) {
       this.text = notification.content as string;
-    } else {
+    }
+    else {
       const injectionTokens = new WeakMap();
       injectionTokens.set(Notification, notification);
       this.injector = new PortalInjector(this._injector, injectionTokens);
@@ -53,11 +55,16 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
   public close = new EventEmitter<void>();
 
   @HostBinding('attr.class')
-  public get severity(): string {
-    return this._notification.severity || 'info';
+  public get cssClass(): string {
+    return [
+      ...Arrays.from(this._notification.cssClass),
+      this._notification.severity,
+      `e2e-severity-${this._notification.severity}`,
+      `e2e-duration-${this._notification.duration}`,
+    ].join(' ');
   }
 
-  constructor(private _injector: Injector, private _cd: ChangeDetectorRef) {
+  constructor(private _injector: Injector, private _cd: ChangeDetectorRef, private _zone: NgZone) {
   }
 
   public ngAfterViewInit(): void {
@@ -83,7 +90,7 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
     }
 
     const autoCloseTimeout = ((): number => {
-      switch (this._notification.duration || 'medium') {
+      switch (this._notification.duration) {
         case 'short':
           return 7000;
         case 'medium':
@@ -93,12 +100,18 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
       }
     })();
 
-    timer(autoCloseTimeout)
-      .pipe(
-        takeUntil(this._destroy$),
-        takeUntil(this._closeTimerChange$)
-      )
-      .subscribe(() => this.onClose());
+    // Run the timer outside of Angular to allow Protractor tests to continue interacting with the browser.
+    // Otherwise, tests must set 'browser.waitForAngularEnabled(false)' which can cause flaky tests.
+    this._zone.runOutsideAngular(() => {
+      timer(autoCloseTimeout)
+        .pipe(
+          takeUntil(this._destroy$),
+          takeUntil(this._closeTimerChange$)
+        )
+        .subscribe(() => {
+          this._zone.run(() => this.onClose());
+        });
+    });
   }
 
   public get title(): string {

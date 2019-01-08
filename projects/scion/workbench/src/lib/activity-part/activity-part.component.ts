@@ -16,6 +16,7 @@ import { noop, Observable, Subject } from 'rxjs';
 import { ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME } from '../workbench.constants';
 import { Activity } from './activity';
 import { ContentProjectionContext } from '../content-projection/content-projection-context.service';
+import { Arrays } from '../array.util';
 
 /**
  * Specifies the minimal panel width. If smaller, it is expanded to this value
@@ -93,6 +94,13 @@ export class ActivityPartComponent {
 
   public get panelWidth$(): Observable<number> {
     return this._panelWidth$.asObservable();
+  }
+
+  public getCssClassesForActivityItem(activity: Activity): string[] {
+    return [
+      ...Arrays.from(activity.itemCssClass), // CSS class(es) on the item only, e.g. used for styling
+      ...Arrays.from(activity.cssClass), // CSS class(es) on both, the item and the panel, e.g. used for e2e-testing
+    ];
   }
 
   public onActivate(activity: Activity): false {

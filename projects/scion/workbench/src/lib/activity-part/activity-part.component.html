@@ -1,12 +1,14 @@
 <!-- Activity Bar -->
-<ul class="activity-bar">
+<ul class="activity-bar e2e-activity-bar">
   <li *ngFor="let activity of activities">
     <a href=""
+       class="e2e-activity-item"
        (click)="onActivate(activity)"
        [class.active]="activity.active"
-       [ngClass]="activity.cssClass"
+       [class.e2e-active]="activity.active"
+       [ngClass]="getCssClassesForActivityItem(activity)"
        [attr.title]="activity.title">
-      {{activity.label || ''}}
+      {{activity.itemText || ''}}
     </a>
     <div class="diamond" *ngIf="activity.active"></div>
   </li>
@@ -15,14 +17,15 @@
 <!-- Activity Panel -->
 <div *ngIf="activeActivity as activity"
      #panel
-     class="activity-panel"
+     class="activity-panel e2e-activity-panel"
+     [ngClass]="activity.cssClass"
      [style.width.px]="panelWidth + activity.panelWidthDelta"
      [@panel-enter-or-leave]
      (@panel-enter-or-leave.done)="onPanelAnimationDone()">
 
   <header>
-    <h1>{{activity.title}}</h1>
-    <ul>
+    <h1 class="e2e-activity-title">{{activity.title}}</h1>
+    <ul class="e2e-activity-actions">
       <li *ngFor="let action of activity.actions">
         <ng-container *ngIf="action.component">
           <ng-container *ngComponentOutlet="action.component; injector: action.injector"></ng-container>
@@ -38,7 +41,7 @@
     <wb-router-outlet></wb-router-outlet>
   </sci-viewport>
 
-  <div class="sash"
+  <div class="sash e2e-activity-sash"
        [wbSash]="'vertical'"
        (wbSashStart)="onSashStart()"
        (wbSashChange)="onSash($event)"

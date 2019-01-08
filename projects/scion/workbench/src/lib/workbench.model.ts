@@ -13,6 +13,7 @@ import { ViewPartComponent } from './view-part/view-part.component';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ViewComponent } from './view/view.component';
 import { WorkbenchService } from './workbench.service';
+import { Arrays } from './array.util';
 
 /**
  * A view is a visual component within the Workbench to present content,
@@ -34,6 +35,16 @@ export abstract class WorkbenchView {
    * Specifies the sub title to be displayed in the view tab.
    */
   public heading: string;
+
+  /**
+   * Specifies CSS class(es) added to the <wb-view-tab> and <wb-view> elements, e.g. used for e2e testing.
+   */
+  public abstract set cssClass(cssClass: string | string[]);
+
+  /**
+   * Returns CSS classes specified, if any.
+   */
+  public abstract get cssClasses(): string[];
 
   /**
    * Specifies if the content of the current view is dirty.
@@ -81,14 +92,24 @@ export class InternalWorkbenchView implements WorkbenchView {
   public scrollLeft: number | null;
 
   public readonly active$: BehaviorSubject<boolean>;
+  public readonly cssClasses$: BehaviorSubject<string[]>;
 
   constructor(public readonly viewRef: string,
               active: boolean,
               public workbench: WorkbenchService,
               public readonly portal: WbComponentPortal<ViewComponent>) {
     this.active$ = new BehaviorSubject<boolean>(active);
+    this.cssClasses$ = new BehaviorSubject<string[]>([]);
     this.title = viewRef;
     this.closable = true;
+  }
+
+  public set cssClass(cssClass: string | string[]) {
+    this.cssClasses$.next(Arrays.from(cssClass));
+  }
+
+  public get cssClasses(): string[] {
+    return this.cssClasses$.value;
   }
 
   public get active(): boolean {
