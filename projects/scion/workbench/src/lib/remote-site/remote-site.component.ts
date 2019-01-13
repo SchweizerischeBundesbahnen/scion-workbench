@@ -116,9 +116,8 @@ export class RemoteSiteComponent implements OnDestroy {
   }
 
   private installWorkbenchLayoutListener(): void {
-    // Suspend pointer events for the duration of a workbench layout change,
-    // so that pointer events are not swallowed by the iframe.
-    // Otherwise, view drag operation does not work as expected.
+    // Suspend pointer events for the duration of a workbench layout change, so that pointer events are not swallowed by the iframe.
+    // Otherwise, view drag and view sash operation does not work as expected.
     merge(this._workbenchLayout.viewSashDrag$, this._workbenchLayout.viewTabDrag$, this._workbenchLayout.messageBoxMove$)
       .pipe(
         bufferUntil(from<HTMLIFrameElement>(this._whenIframe)),
