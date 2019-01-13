@@ -23,7 +23,7 @@ import { ViewListComponent } from './view-part/view-list/view-list.component';
 import { ViewListButtonComponent } from './view-part/view-list-button/view-list-button.component';
 import { ViewPartBarComponent } from './view-part/view-part-bar/view-part-bar.component';
 import { InternalWorkbenchService, WorkbenchService } from './workbench.service';
-import { DropZoneDirective } from './view-part-grid/drop-zone.directive';
+import { ViewDropZoneDirective } from './view-part/view-drop-zone.directive';
 import { ViewPartGridComponent } from './view-part-grid/view-part-grid.component';
 import { RemoteSiteComponent } from './remote-site/remote-site.component';
 import { WorkbenchLayoutService } from './workbench-layout.service';
@@ -93,7 +93,7 @@ const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
     ViewPartGridComponent,
     SashDirective,
     ViewPartSashBoxComponent,
-    DropZoneDirective,
+    ViewDropZoneDirective,
     WbPortalOutletComponent,
     RemoteSiteComponent,
     WbRouterOutletDirective,

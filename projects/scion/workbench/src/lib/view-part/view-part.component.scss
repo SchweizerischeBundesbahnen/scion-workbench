@@ -20,6 +20,3 @@
   }
 }
 
-:host-context(.suspend-pointer-events) wb-portal-outlet > ::ng-deep * {
-  pointer-events: none;
-}

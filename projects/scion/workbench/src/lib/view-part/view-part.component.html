@@ -1,4 +1,4 @@
 <wb-view-part-bar></wb-view-part-bar>
 <wb-portal-outlet [wbPortal]="viewPartService.activeView?.portal"
-                  wbDropZone [wbDropFilter]="filterDropZoneEvent" (wbDrop)="onDrop($event)">
+                  wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)">
 </wb-portal-outlet>

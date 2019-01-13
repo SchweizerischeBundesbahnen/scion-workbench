@@ -14,7 +14,7 @@ import { VIEW_GRID_QUERY_PARAM } from '../workbench.constants';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { InternalWorkbenchService } from '../workbench.service';
 import { Router } from '@angular/router';
-import { Region } from '../view-part-grid/drop-zone.directive';
+import { Region } from './view-drop-zone.directive';
 import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 

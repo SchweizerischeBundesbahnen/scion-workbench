@@ -10,12 +10,9 @@
 
 import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
 import { WorkbenchViewPartService } from './workbench-view-part.service';
-import { merge, noop, Subject } from 'rxjs';
-import { DropEvent, Region } from '../view-part-grid/drop-zone.directive';
+import { noop, Subject } from 'rxjs';
+import { WbViewDropEvent, Region } from './view-drop-zone.directive';
 import { InternalWorkbenchService } from '../workbench.service';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
-import { takeUntil } from 'rxjs/operators';
-import { VIEW_DRAG_TYPE } from '../workbench.constants';
 
 @Component({
   selector: 'wb-view-part',
@@ -40,15 +37,7 @@ export class ViewPartComponent implements OnDestroy {
     return this.viewPartService.viewPartRef; // specs
   }
 
-  constructor(private _workbench: InternalWorkbenchService,
-              private _workbenchLayout: WorkbenchLayoutService,
-              public viewPartService: WorkbenchViewPartService) {
-    // Suspend pointer events for the duration of a workbench layout change,
-    // so that pointer events are not swallowed by the view content.
-    // Otherwise, view drag operation does not work as expected.
-    merge(this._workbenchLayout.viewSashDrag$, this._workbenchLayout.viewTabDrag$)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(event => this.suspendPointerEvents = (event === 'start'));
+  constructor(private _workbench: InternalWorkbenchService, public viewPartService: WorkbenchViewPartService) {
   }
 
   @HostListener('keydown.control.k', ['$event'])
@@ -81,20 +70,17 @@ export class ViewPartComponent implements OnDestroy {
     this.viewPartService.activate();
   }
 
-  public filterDropZoneEvent(event: DragEvent): boolean {
-    return event.dataTransfer.types.includes(VIEW_DRAG_TYPE);
-  }
-
   /**
    * Method invoked to move a view into this view part.
    */
-  public onDrop(event: DropEvent): void {
+  public onDrop(event: WbViewDropEvent): void {
     const sourceViewRef = this._workbench.activeViewPartService.activeViewRef;
     const sourceViewPartService = this._workbench.activeViewPartService;
 
     if (sourceViewPartService === this.viewPartService && event.region !== 'center' && this.viewPartService.viewCount() > 1) {
       this.moveViewToNewViewPart(sourceViewRef, event.region).then(noop);
-    } else if (sourceViewPartService !== this.viewPartService) {
+    }
+    else if (sourceViewPartService !== this.viewPartService) {
       (event.region === 'center') ? this.moveViewToThisViewPart(sourceViewRef).then(noop) : this.moveViewToNewViewPart(sourceViewRef, event.region).then(noop);
     }
   }

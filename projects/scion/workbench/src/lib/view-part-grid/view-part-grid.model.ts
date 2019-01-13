@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Region } from './drop-zone.directive';
+import { Region } from '../view-part/view-drop-zone.directive';
 import { VIEW_PART_REF_PREFIX } from '../workbench.constants';
 import { ACTIVE_VIEW_REF_INDEX, VIEW_PART_REF_INDEX, VIEW_REFS_START_INDEX, ViewPartGridSerializerService, ViewPartInfoArray, ViewPartSashBox } from './view-part-grid-serializer.service';
 
