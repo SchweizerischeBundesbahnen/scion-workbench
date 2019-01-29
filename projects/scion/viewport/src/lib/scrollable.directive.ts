@@ -8,8 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, ElementRef, Input, OnChanges, Renderer2, SimpleChanges } from '@angular/core';
-import { SciNativeScrollbarTrackSize } from './native-scrollbar-track-size';
+import { Directive, ElementRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges } from '@angular/core';
+import { NativeScrollbarTrackSize, SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-size-provider.service';
+import { map, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 
 /**
  * Makes the host `<div>` natively scrollable and optionally hides native scrollbars.
@@ -20,24 +22,40 @@ import { SciNativeScrollbarTrackSize } from './native-scrollbar-track-size';
 @Directive({
   selector: 'div[sciScrollable]'
 })
-export class SciScrollableDirective implements OnChanges {
+export class SciScrollableDirective implements OnChanges, OnDestroy {
+
+  private _destroy$ = new Subject<void>();
+  private _inputChange$ = new Subject<void>();
 
   /**
-   * Controls whether to display native scrollbars. By default, scrollbars are not displayed.
+   * Controls whether to display native scrollbars.
+   * Has no effect if the native scrollbar sits on top of the content, e.g. in OS X.
    */
-  @Input('sciScrollableScrollbarsVisible') // tslint:disable-line:no-input-rename
-  public scrollbarsVisible: boolean = false; // tslint:disable-line:no-inferrable-types
+  @Input('sciScrollableDisplayNativeScrollbar') // tslint:disable-line:no-input-rename
+  public isDisplayNativeScrollbar: boolean = false; // tslint:disable-line:no-inferrable-types
 
   constructor(private _host: ElementRef<HTMLDivElement>,
               private _renderer: Renderer2,
-              private _nativeTrackSize: SciNativeScrollbarTrackSize) {
+              nativeScrollbarTrackSizeProvider: SciNativeScrollbarTrackSizeProvider) {
+    merge(
+      nativeScrollbarTrackSizeProvider.trackSize$,
+      this._inputChange$.pipe(map(() => nativeScrollbarTrackSizeProvider.trackSize))
+    )
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((nativeScrollbarTrackSize: NativeScrollbarTrackSize) => {
+        if (nativeScrollbarTrackSize === null) { // the native scrollbar sits on top of the content
+          this.useNativeScrollbars();
+        }
+        else {
+          this.isDisplayNativeScrollbar ? this.useNativeScrollbars() : this.shiftNativeScrollbars(nativeScrollbarTrackSize);
+        }
+      });
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.scrollbarsVisible ? this.showNativeScrollbars() : this.hideNativeScrollbars();
-  }
-
-  private showNativeScrollbars(): void {
+  /**
+   * Uses the native scrollbars when content overflows.
+   */
+  private useNativeScrollbars(): void {
     this.setStyle(this._host.nativeElement, {
       overflow: 'auto',
       top: 0,
@@ -47,17 +65,28 @@ export class SciScrollableDirective implements OnChanges {
     });
   }
 
-  private hideNativeScrollbars(): void {
+  /**
+   * Shifts the native scrollbars out of the visible viewport area.
+   */
+  private shiftNativeScrollbars(nativeScrollbarTrackSize: NativeScrollbarTrackSize): void {
     this.setStyle(this._host.nativeElement, {
       overflow: 'scroll',
       top: 0,
-      right: `${-this._nativeTrackSize.vScrollbarTrackWidth}px`, // shift native scrollbar out of the visible viewport range
-      bottom: `${-this._nativeTrackSize.hScrollbarTrackHeight}px`, // shift native scrollbar out of the visible viewport range
+      right: `${-nativeScrollbarTrackSize.vScrollbarTrackWidth}px`,
+      bottom: `${-nativeScrollbarTrackSize.hScrollbarTrackHeight}px`,
       left: 0
     });
   }
 
   private setStyle(element: Element, style: { [key: string]: any }): void {
     Object.keys(style).forEach(key => this._renderer.setStyle(element, key, style[key]));
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    this._inputChange$.next();
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }
