@@ -141,7 +141,9 @@ export class RemoteSiteComponent implements OnDestroy {
    */
   private installMouseDispatcher(): void {
     this._whenIframe.then(iframe => {
-      this._mouseDispatcher = installMouseDispatcher(iframe.contentWindow, this._siteOrigin);
+      this._zone.runOutsideAngular(() => {
+        this._mouseDispatcher = installMouseDispatcher(iframe.contentWindow, this._siteOrigin);
+      });
     });
   }
 
