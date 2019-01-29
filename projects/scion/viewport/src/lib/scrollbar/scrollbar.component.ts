@@ -9,7 +9,7 @@
  */
 
 import { DOCUMENT } from '@angular/common';
-import { Component, DoCheck, ElementRef, HostBinding, Inject, Input, OnDestroy, ViewChild } from '@angular/core';
+import { Component, DoCheck, ElementRef, HostBinding, Inject, Input, NgZone, OnDestroy, ViewChild } from '@angular/core';
 import { fromEvent, merge, of, Subject, timer } from 'rxjs';
 import { debounceTime, first, skipWhile, startWith, takeUntil, takeWhile, withLatestFrom } from 'rxjs/operators';
 
@@ -63,7 +63,7 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
   @Input()
   public viewport: HTMLElement;
 
-  constructor(private _host: ElementRef, @Inject(DOCUMENT) private _document: any) {
+  constructor(private _host: ElementRef, @Inject(DOCUMENT) private _document: any, private _zone: NgZone) {
     fromEvent(window, 'resize')
       .pipe(
         skipWhile(() => !this.viewport),
@@ -105,26 +105,28 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
     this._lastDragPosition = this.vertical ? event.screenY : event.screenX;
 
     // Listen for 'mousemove' events
-    const mousemoveListener = merge(fromEvent(this._document, 'mousemove'), fromEvent(this._document, 'sci-mousemove'))
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((mousemoveEvent: MouseEvent) => {
-        mousemoveEvent.preventDefault();
+    this._zone.runOutsideAngular(() => {
+      const mousemoveListener = merge(fromEvent(this._document, 'mousemove'), fromEvent(this._document, 'sci-mousemove'))
+        .pipe(takeUntil(this._destroy$))
+        .subscribe((mousemoveEvent: MouseEvent) => {
+          mousemoveEvent.preventDefault();
 
-        const newDragPositionPx = this.vertical ? mousemoveEvent.screenY : mousemoveEvent.screenX;
-        const scrollbarPanPx = newDragPositionPx - this._lastDragPosition;
-        const viewportPanPx = this.toViewportPanPx(scrollbarPanPx);
-        this._lastDragPosition = newDragPositionPx;
-        this.moveViewportClient(viewportPanPx);
-      });
+          const newDragPositionPx = this.vertical ? mousemoveEvent.screenY : mousemoveEvent.screenX;
+          const scrollbarPanPx = newDragPositionPx - this._lastDragPosition;
+          const viewportPanPx = this.toViewportPanPx(scrollbarPanPx);
+          this._lastDragPosition = newDragPositionPx;
+          this.moveViewportClient(viewportPanPx);
+        });
 
-    // Listen for 'mouseup' events; use 'capture phase' and 'stop propagation' to not close overlays
-    merge(fromEvent(this._document, 'mouseup', {capture: true}), fromEvent(this._document, 'sci-mouseup'))
-      .pipe(first(), takeUntil(this._destroy$))
-      .subscribe((mouseupEvent: MouseEvent) => {
-        mouseupEvent.stopPropagation();
-        mousemoveListener.unsubscribe();
-        this._lastDragPosition = null;
-      });
+      // Listen for 'mouseup' events; use 'capture phase' and 'stop propagation' to not close overlays
+      merge(fromEvent(this._document, 'mouseup', {capture: true}), fromEvent(this._document, 'sci-mouseup'))
+        .pipe(first(), takeUntil(this._destroy$))
+        .subscribe((mouseupEvent: MouseEvent) => {
+          mouseupEvent.stopPropagation();
+          mousemoveListener.unsubscribe();
+          this._lastDragPosition = null;
+        });
+    });
   }
 
   public onScrollTrackMouseDown(event: MouseEvent, direction: 'up' | 'down'): void {
@@ -163,7 +165,8 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
   private moveViewportClient(viewportPanPx: number): void {
     if (this.vertical) {
       this.viewport.scrollTop += viewportPanPx;
-    } else {
+    }
+    else {
       this.viewport.scrollLeft += viewportPanPx;
     }
   }

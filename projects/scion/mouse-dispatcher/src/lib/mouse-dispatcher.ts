@@ -9,7 +9,7 @@
  */
 
 import { fromEvent, merge, Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { auditTime, filter, takeUntil } from 'rxjs/operators';
 
 /**
  * Indicates that the primary mouse button is pressed (usually left).
@@ -34,14 +34,16 @@ const PRIMARY_MOUSE_BUTTON = 1;
  * @param targetOrigin
  *        Specifies what the origin of `targetWindow` must be for the events to be,
  *        either as the literal string "*" (indicating no preference) or as a URI.
+ * @param options to configure mouse dispatching.
  * @return handle to uninstall mouse dispatching
  */
-export function installMouseDispatcher(targetWindow: Window, targetOrigin: string): SciMouseDispatcher {
+export function installMouseDispatcher(targetWindow: Window, targetOrigin: string, options?: Options): SciMouseDispatcher {
   const destroy$ = new Subject<void>();
 
   // Dispatch native mouse events to the target window
+  const mousemoveThrottleTime = options && options.mousemoveThrottleTime || 20;
   merge(
-    fromEvent<MouseEvent>(document, 'mousemove').pipe(filter(event => event.buttons === PRIMARY_MOUSE_BUTTON)),
+    fromEvent<MouseEvent>(document, 'mousemove').pipe(filter(event => event.buttons === PRIMARY_MOUSE_BUTTON), auditTime(mousemoveThrottleTime)),
     fromEvent<MouseEvent>(document, 'mouseup'),
   )
     .pipe(takeUntil(destroy$))
@@ -136,4 +138,16 @@ export interface SciMouseDispatcher {
    * Invoke to uninstall mouse dispatching.
    */
   dispose(): void;
+}
+
+/**
+ * Options to configure mouse dispatching.
+ */
+export interface Options {
+
+  /**
+   * Sets the throttling duration [ms] to debounce event dispatching of 'mousemove' events.
+   * By default, 20ms is used.
+   */
+  mousemoveThrottleTime?: number;
 }
