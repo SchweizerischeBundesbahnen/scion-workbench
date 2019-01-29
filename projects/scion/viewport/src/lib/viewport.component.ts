@@ -10,6 +10,7 @@
 
 import { Component, DoCheck, ElementRef, EventEmitter, Input, KeyValueDiffer, KeyValueDiffers, Output, ViewChild } from '@angular/core';
 import { NULL_DIMENSION, SciDimension } from '@scion/dimension';
+import { SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-size-provider.service';
 
 /**
  * Represents a viewport with its `<ng-content>` used as its scrollable viewport client and
@@ -62,7 +63,7 @@ export class SciViewportComponent implements DoCheck {
   @Output()
   public viewportChange = new EventEmitter<void>();
 
-  constructor(differs: KeyValueDiffers) {
+  constructor(differs: KeyValueDiffers, public nativeScrollbarTrackSizeProvider: SciNativeScrollbarTrackSizeProvider) {
     this._viewportClientDiffer = differs.find({}).create();
   }
 

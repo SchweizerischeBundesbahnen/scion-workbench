@@ -10,25 +10,25 @@
 
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
-import { SciNativeScrollbarTrackSize } from './native-scrollbar-track-size';
+import { SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-size-provider.service';
 
-describe('SciNativeScrollbarTrackSize', () => {
+describe('SciNativeScrollbarTrackSizeProvider', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [AppComponent],
       providers: [
-        SciNativeScrollbarTrackSize
+        SciNativeScrollbarTrackSizeProvider
       ]
     });
   }));
 
-  it('computes correct scrollbar track sizes', fakeAsync(inject([SciNativeScrollbarTrackSize], (testee: SciNativeScrollbarTrackSize) => {
+  it('computes correct scrollbar track sizes', fakeAsync(inject([SciNativeScrollbarTrackSizeProvider], (testee: SciNativeScrollbarTrackSizeProvider) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
-    expect(testee.vScrollbarTrackWidth).toEqual(fixture.componentInstance.vScrollbarTrackWidth, 'vScrollbarTrackWidth');
-    expect(testee.hScrollbarTrackHeight).toEqual(fixture.componentInstance.hScrollbarTrackHeight, 'hScrollbarTrackHeight');
+    expect(testee.trackSize.vScrollbarTrackWidth).toEqual(fixture.componentInstance.vScrollbarTrackWidth, 'vScrollbarTrackWidth');
+    expect(testee.trackSize.hScrollbarTrackHeight).toEqual(fixture.componentInstance.hScrollbarTrackHeight, 'hScrollbarTrackHeight');
     tick();
   })));
 });
