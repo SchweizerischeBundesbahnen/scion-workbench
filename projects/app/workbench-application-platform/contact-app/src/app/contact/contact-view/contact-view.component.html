@@ -18,11 +18,11 @@
   <input id="phone" class="inline-editable" [formControlName]="PHONE">
 
   <nav *ngIf="!!contact" class="communications">
-    <a href="" (click)="onCommunicationsOpen($event)">
-      Open communications
-    </a>
     <a href="" (click)="onCommunicationAdd($event)" title="Add new communication">
       Add new communication
+    </a>
+    <a href="" (click)="onCommunicationsOpen($event)">
+      Open communications
     </a>
   </nav>
 </form>

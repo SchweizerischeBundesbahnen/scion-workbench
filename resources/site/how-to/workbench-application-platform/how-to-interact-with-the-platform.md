@@ -38,7 +38,7 @@ export class AppModule {
 |➀|Imports `SCION Workbench Application` module for Angular. Optionally, you can configure focus handling, like to have a focus trap or to auto-focus the first focusable element when the application loads.|
 
 #### 3. Interact with the platform
-To interact with the platform, inject respective platform service or workbench handle. Some functionality is even available in the form of an Angular directive.
+To interact with the platform, inject respective platform service or workbench handle. Some functionality is also available in the form of an Angular directive.
 
 See the other how-to's for more detailed instructions.
 

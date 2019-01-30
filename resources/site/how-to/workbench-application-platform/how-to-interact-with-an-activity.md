@@ -22,7 +22,7 @@ export class ContactActivityComponent {
 |➀|Instructs given class to live in the context of an activity.|
 |➁|Injects router to get URL parameters|
 
-This activity handle allows interaction with the activity, e.g. to change properties.
+This activity handle allows interaction with the activity, e.g. to change the activity panel width.
 
 [menu-overview]: /README.md
 [menu-workbench]: /resources/site/workbench.md

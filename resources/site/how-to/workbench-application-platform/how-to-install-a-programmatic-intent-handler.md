@@ -24,7 +24,7 @@ export class HostApp {
 |-|-|
 |➀|Registers the handler as multi provider under DI injection `INTENT_HANDLER`.|
 
-In the handler, implement the interface `IntentHandler`. Set `type` and `qualifier` coordinates to control which intents to handle in this handler.
+In the handler class, implement the interface `IntentHandler`. Set `type` and `qualifier` coordinates to control which intents to handle in this handler.
 
 ```typescript
 @Injectable()
