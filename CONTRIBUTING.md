@@ -182,7 +182,7 @@ Whenever you publish a new version to NPM (pre-release, major, minor, patch), pl
 - update scion dependencies to the new version in all necessary 'package.json' files
 - generate the new `changelog.md`, if necessary (see below)
 - check if the `changelog.md` looks good (we use a custom header, make sure it stays there)
-- create a Git release commit that consists of the two files and a commit message like 'Release version 2.0.0-beta.1'
+- create a Git release commit that consists of the changed files and a commit message like 'Release version 2.0.0-beta.1'
 - create a Git release tag pointing to the previously added release commit, and use the exact version as tag name, e.g. `2.0.0-beta.1`.
 - based on the Git release tag, travis will automatically build & publish the necessary npm packages
 

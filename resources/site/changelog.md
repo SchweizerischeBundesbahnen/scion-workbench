@@ -6,6 +6,39 @@
 # Changelog
 
 
+# [0.0.0-beta.13](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.12...0.0.0-beta.13) (2019-01-30)
+
+
+### Bug Fixes
+
+* compute native scrollbar track size correctly even if not displayed at application startup ([e12718c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e12718c)), closes [#87](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/87)
+* do not enter minimize mode when closing views quickly in maximize mode ([375dace](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/375dace)), closes [#24](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/24)
+* reduce the number of 'mousemove' events dispatched between application windows ([44c40f4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/44c40f4)), closes [#86](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/86)
+* stretch content of `<sci-viewport>` if it overflows horizontally ([31d23d4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/31d23d4)), closes [#77](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/77)
+* use an overlay to render view drop regions to not flicker while dragging views ([c738a1a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c738a1a)), closes [#79](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/79)
+
+
+### Features
+
+* allow giving CSS classes to workbench elements to have stable selectors available in e2e tests ([c985816](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c985816)), closes [#78](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/78)
+* allow to display a component in a popup ([eeb2390](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/eeb2390)), closes [#76](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/76)
+* contribute 'Workbench Application Platform' to allow integrating content from multiple web applications ([84e1f08](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/84e1f08)), closes [#80](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/80)
+
+
+### BREAKING CHANGES
+
+* Properties of `Activity` and `WbActivityDirective` to set the activity label and CSS class(es) have changed as follows:
+  
+  - label => itemText
+  - cssClass => itemCssClass
+* CSS display property of `<sci-viewport>` flex container has changed from `flex` (column nowrap) to `grid` (one column).
+  
+  To migrate:
+  - if having a single content child which stretches vertically by using `flex: auto`, remove that property
+  - if having multiple content children with `flex: none`, wrap them inside a separate flex-container
+
+
+
 # [0.0.0-beta.12](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.11...0.0.0-beta.12) (2018-11-23)
 
 
