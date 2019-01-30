@@ -1,6 +1,6 @@
 {
   "name": "@scion/dimension",
-  "version": "0.0.0-beta.13",
+  "version": "0.0.0-beta.14",
   "description": "Allows observing changes to host element's size.",
   "license": "EPL-2.0",
   "private": false,
