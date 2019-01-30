@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench-application.angular",
-  "version": "0.0.0-beta.12",
+  "version": "0.0.0-beta.13",
   "description": "SCION Workbench Application Platform is an extension of SCION Workbench to integrate content from multiple web applications in a coherent way, thus enabling a micro frontend architecture for allowing different front-end frameworks to co-exist and independent delivery.\\n\\nThe platform provides the mechanics for client-side web application integration. Any web application can be integrated. If the site does not interact with the platform, there is no need for adaptation. For a deeper integration, the platform provides a framework-agnostic guest API.\n\nThis package allows an Angular application to interact with SCION Workbench Application Platform.",
   "license": "EPL-2.0",
   "private": false,
@@ -21,7 +21,7 @@
     "@angular/common": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@angular/core": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@angular/cdk": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
-    "@scion/workbench-application.core": "0.0.0-beta.12",
+    "@scion/workbench-application.core": "0.0.0-beta.13",
     "rxjs": "^6.0.0"
   },
   "keywords": [
