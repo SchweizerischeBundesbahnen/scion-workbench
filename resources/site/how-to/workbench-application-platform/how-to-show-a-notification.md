@@ -66,7 +66,8 @@ notificationService.notify(notification, qualifier);
 |➀|Qualifies the custom notification implementation to show, e.g. `{'type': 'list'}`.|
 |➁|Payload available in the custom notification.|
 
-The custom notification is implemented in the host application. Register a programmatic intent handler to show it.
+The custom notification is implemented in the host application. Hereto, register a programmatic intent handler. When a notification intent is received that matches your qualifier, the handler shows a notification which renders your custom component.
+
 
 ```typescript
 @NgModule({

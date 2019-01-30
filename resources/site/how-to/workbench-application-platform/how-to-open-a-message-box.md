@@ -68,7 +68,7 @@ messageBoxService.open(msgbox, qualifier);
 |➁|Payload available in the custom message box.|
 
 
-The custom message box is implemented in the host application. Register a programmatic intent handler to open it.
+The custom message box is implemented in the host application. Hereto, register a programmatic intent handler. When a `messagebox` intent is received that matches your qualifier, the handler opens a message box which renders your custom component.
 
 ```typescript
 @NgModule({

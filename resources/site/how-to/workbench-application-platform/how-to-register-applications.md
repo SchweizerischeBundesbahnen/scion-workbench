@@ -54,7 +54,7 @@ For dynamic application registration, register an `ApplicationConfigLoader` to l
   imports: [
     WorkbenchModule.forRoot(),
     WorkbenchApplicationPlatformModule.forRoot({
-      applicationConfigLoader: DynamicApplicationConfigLoader,
+      applicationConfigLoader: RemoteApplicationConfigLoader,
     })
   ]
 })
@@ -62,11 +62,11 @@ export class HostAppModule {
 }
 ```
 
-Then, implement the loader to load the application config.
+Then, implement the loader to load the application config, e.g. from the backend.
 
 ```typescript
 @Injectable()
-export class DynamicApplicationConfigLoader implements ApplicationConfigLoader {
+export class RemoteApplicationConfigLoader implements ApplicationConfigLoader {
 
   constructor(private httpClient: HttpClient) {
   }

@@ -5,7 +5,7 @@
 
 ## How to provide a custom activity action
 
-Providing custom activity action is straightforward.
+Providing a custom activity action is straightforward.
 
 ### 1. Create and register a custom ActivityActionProvider (host application)
 
@@ -50,7 +50,7 @@ export class CustomActivityActionProvider implements ActivityActionProvider {
 |➀|Sets the type of your custom action. When adding an activity action of given type, this action is rendered.|
 |➁|Specifies the component to render this action.|
 
-### 2. Create an action interface to describe action properties (if any)
+### 2. Create an action interface to describe action properties (optional)
 
 ```typescript
 export interface CustomActivityAction extends ActivityAction {
@@ -92,6 +92,8 @@ const action: CustomActivityAction = {
 };
 Platform.getService(ActivityService).addAction(action);
 ```
+
+> Alternatively, for Angular applications, you can create a directive similar to the built-in action directives. When constructed, the directive registers the action, and when being destroyed, it unregisters it. For example, see `WorkbenchUrlOpenActivityActionDirective`.
 
 [menu-overview]: /README.md
 [menu-workbench]: /resources/site/workbench.md

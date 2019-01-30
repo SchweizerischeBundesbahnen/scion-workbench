@@ -5,7 +5,7 @@
 
 # Getting Started with SCION Workbench Application Platform
 
-This 'Getting Started' tutorial will guide you through the fundamentals of `SCION Workbench Application Platform`. It starts with an introduction to the core concepts of the platform. Then, a step-by-step guide explains how to build an application which integrates content from other applications. Next, a short introduction to the dev-tools is given to help developers to have a better overview of the applications installed in the platform. By the end of this tutorial, the final application will be a basic version of the demo application you find [here](https://scion-workbench-application-platform.now.sh).
+This 'Getting Started' tutorial will guide you through the fundamentals of `SCION Workbench Application Platform`. It starts with an introduction to the core concepts of the platform. Then, a step-by-step guide explains how to create an application which integrates content from other applications. Next, a short introduction to the dev-tools is given to help developers to have a better overview of the applications installed in the platform. By the end of this tutorial, the final application will be a basic version of the demo application you find [here](https://scion-workbench-application-platform.now.sh).
 
 ***
 - [Core concepts][core-concepts]
@@ -60,7 +60,7 @@ Some capabilities define an entry point URL if showing an application page. Usin
 
 Capabilities can have either public or private scope (which is by default). If having private scope, other applications cannot invoke this capability, unless scope check is disabled for that application (discouraged).
 
-There are some built-in capability types supported by the platform. However, the platform can be extended with other capability types.
+There are some built-in capability types supported by the platform. However, the platform can be extended with additional capability types.
 
 |type|description|
 |-|-|
@@ -105,7 +105,8 @@ In this tutorial, we will integrate two applications. One application provides t
 The host application is trivial. The only things we have to do is to register the applications and to provide the workbench application frame.
 
 #### Step 1: Create the host application
-Use Angular CLI to create a new Angular application which acts as our host application. Do not add routing when the CLI asks to add Angular routing.
+Use Angular CLI to create a new Angular application which acts as our host application. Do not add routing when the CLI asks to add Angular routing. Instead, import `RoutingModule` directly in the `AppModule` without generating a separate module.
+
 ```
 ng new host-app --style scss
 ```
@@ -122,7 +123,7 @@ ng new host-app --style scss
 
   Open `app.module.ts` and import `WorkbenchModule` and `WorkbenchApplicationPlatformModule`. Then, register the applications which you like to integrate.
   
-  > Do not forget to import Angular `BrowserAnimationsModule` which is required by the workbench.
+  > Do not forget to import Angular `BrowserAnimationsModule` and `RouterModule` which are required by the workbench.
 
   ```typescript
   @NgModule({
@@ -289,6 +290,7 @@ As a possible viewport implementation for Angular applications, you can use  `Sc
   ```typescript
   @NgModule({
     imports: [
+      ...
       SciViewportModule,
     ]
   })
@@ -329,11 +331,11 @@ As a possible viewport implementation for Angular applications, you can use  `Sc
   |➂|Takes the router outlet out of the document flow to not affect the positioning of other elements.|
 
 #### Step 5: Download following files to manage contacts
-- Download <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/snippet/contact.service.ts" download>contact.service.ts</a> and put into your `src/app` folder.\
+- Download <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/snippet/contact.service.ts" download>contact.service.ts</a> and put it into your `src/app` folder.\
 It provides session storage CRUD operations for the contact entity.
-- Download <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/snippet/session-storage.service.ts" download>session-storage.service.ts</a> and put into your `src/app` folder.\
+- Download <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/snippet/session-storage.service.ts" download>session-storage.service.ts</a> and put it into your `src/app` folder.\
 It allows interacting with the session storage.
-- Download <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/snippet/contact.data.json" download>contact.data.json</a> and put into your `src/assets` folder.\
+- Download <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/snippet/contact.data.json" download>contact.data.json</a> and put it into your `src/assets` folder.\
 It contains sample contact data.
 
 - Open `app.module.ts` and import `HttpClientModule`
@@ -342,7 +344,10 @@ It contains sample contact data.
 
   ```typescript
   @NgModule({
-    imports: [HttpClientModule]
+    imports: [
+      ...
+      HttpClientModule
+    ]
   })
   export class AppModule {
   }
@@ -369,6 +374,7 @@ It contains sample contact data.
       WorkbenchApplicationModule.forRoot(), ➀
       SciViewportModule,
       AppRoutingModule,
+      HttpClientModule,
     ],
     providers: [],
     bootstrap: [
@@ -519,7 +525,7 @@ Open `manifest.json` and declare the new popup capability as follows:
       "properties": { ➂
         "path": "contact/new",
         "width": "400px",
-        "height": "390px"
+        "height": "200px"
       }
     }
   ]
@@ -542,7 +548,10 @@ Open `manifest.json` and declare the new popup capability as follows:
 
   ```typescript
   @NgModule({
-    imports: [ReactiveFormsModule]
+    imports: [
+      ...
+      ReactiveFormsModule
+    ]
   })
   export class AppModule {
   }
@@ -821,13 +830,13 @@ Open `manifest.json` and declare the new view capability as follows:
   ➀
   <ul>
     <li>
+      <a href="" (click)="onCommunicationAdd($event)">Add new communication</a>
+    </li>
+    <li>
       <a [wbRouterLink]="{entity: 'communication', presentation: 'list', contactId: contact.id}"
          [wbRouterLinkExtras]="{matrixParams: {contactFullName: contact.firstname + ' ' + contact.lastname}}">
         Open communications
       </a>
-    </li>
-    <li>
-      <a href="" (click)="onCommunicationAdd($event)">Add new communication</a>
     </li>
   </ul>
   ```
@@ -916,7 +925,7 @@ Open `manifest.json` and declare our intents as follows:
 This application is already deployed. You registered it in [step 2][host-app-step-2] when created the host application. The application allows creating new communications for a contact and lists the communications of a contact.
 
 ### DevTools
-The DevTools application is like a regular sub-application and helps developers to have a better overview of the applications installed in the platform. DevTools is freely available which you can integrate into your application with minimal effort. Simply register the following application with the platform, and you are done.
+The DevTools application is like a regular application and helps developers to have a better overview of the applications installed in the platform. DevTools is freely available which you can integrate into your application with minimal effort. Simply register the following application with the platform, and you are done.
 
 > https://scion-workbench-application-platform-devtools.now.sh/assets/manifest.json.
 

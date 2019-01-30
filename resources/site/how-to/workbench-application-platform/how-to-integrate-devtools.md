@@ -5,7 +5,7 @@
 
 ## How to integrate DevTools
 
-The DevTools application is like a regular sub-application and helps developers to have a better overview of the applications installed in the platform. DevTools is freely available which you can integrate into your application with minimal effort. Simply register the following application with the platform, and you are done. 
+The DevTools application is like a regular application and helps developers to have a better overview of the applications installed in the platform. DevTools is freely available which you can integrate into your application with minimal effort. Simply register the following application with the platform, and you are done. 
 
 ```typescript
 @NgModule({
