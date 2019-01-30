@@ -5,6 +5,13 @@
 
 # Changelog
 
+# [0.0.0-beta.14](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.13...0.0.0-beta.14) (2019-01-31)
+
+
+### Bug Fixes
+
+* declare `workbench-application.core` as regular dependency of `workbench-application.angular` ([9855241](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/9855241))
+
 
 # [0.0.0-beta.13](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.12...0.0.0-beta.13) (2019-01-30)
 
