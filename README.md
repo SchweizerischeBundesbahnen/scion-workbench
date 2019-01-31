@@ -42,6 +42,9 @@ Further development will mainly focus on stability and performance, micro fronte
 
 We would like to thank SBB which supports open source software and made SCION Workbench possible in the first place.
 
+### Disclaimer
+As for now, the SCION Workbench and the SCION Workbench Application Platform are exclusively optimized and tested on the latest Google Chrome Release. Nevertheless, most things should work fine on other modern browsers like Firefox or Microsoft Edge. We are planning to support and test more browsers in the future.
+
 ## Current Project Version
 [![Project version](https://img.shields.io/npm/v/@scion/workbench.svg)][menu-download] [![Project version](https://img.shields.io/npm/v/@scion/workbench/next.svg)][menu-download]
 
