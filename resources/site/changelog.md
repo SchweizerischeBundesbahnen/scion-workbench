@@ -5,6 +5,15 @@
 
 # Changelog
 
+# [0.0.0-beta.15](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.14...0.0.0-beta.15) (2019-01-31)
+
+
+### Bug Fixes
+
+* re-export core module in `workbench-application.angular` ([ac8b58c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ac8b58c))
+* remove obsolete http dependency from 'workbench-application-platform' ([aea79d7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/aea79d7))
+
+
 # [0.0.0-beta.14](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.13...0.0.0-beta.14) (2019-01-31)
 
 
