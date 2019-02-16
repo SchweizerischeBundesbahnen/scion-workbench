@@ -117,8 +117,8 @@ describe('Lazily loaded view', () => {
 @Component({
   template: `
     <wb-workbench style="position: relative; width: 100%; height: 500px">
-      <wb-activity cssClass="activity"
-                   label="activity"
+      <wb-activity itemCssClass="activity"
+                   itemText="activity"
                    routerLink="feature/activity">
       </wb-activity>
     </wb-workbench>

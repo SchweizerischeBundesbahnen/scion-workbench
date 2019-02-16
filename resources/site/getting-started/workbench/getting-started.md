@@ -141,8 +141,8 @@ For `routerLink` property, specify the routing path to `PersonListComponent` as 
 ```html
 <wb-workbench>
   <wb-activity title="Persons"
-               label="group"
-               cssClass="material-icons"
+               itemText="group"
+               itemCssClass="material-icons"
                routerLink="persons">
   </wb-activity>
 </wb-workbench>
@@ -153,8 +153,8 @@ For Font Awesome Icons, simply specify the CSS class(es) and leave 'label' empty
 
 ```html
 <wb-activity title="Persons"
-              cssClass="fas fa-users"
-              routerLink="persons">
+             itemCssClass="fas fa-users"
+             routerLink="persons">
 </wb-activity>
 ```
 

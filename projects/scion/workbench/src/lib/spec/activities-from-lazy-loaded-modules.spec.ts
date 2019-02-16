@@ -100,12 +100,12 @@ describe('Activities', () => {
   template: `
     <wb-workbench style="position: relative; width: 100%; height: 500px">
       <!-- Activities from feature module A -->
-      <wb-activity cssClass="activity-feature_module_a-1" label="feature_module_a-1" routerLink="feature-a/activity-1"></wb-activity>
-      <wb-activity cssClass="activity-feature_module_a-2" label="feature_module_a-2" routerLink="feature-a/activity-2"></wb-activity>
+      <wb-activity itemCssClass="activity-feature_module_a-1" itemText="feature_module_a-1" routerLink="feature-a/activity-1"></wb-activity>
+      <wb-activity itemCssClass="activity-feature_module_a-2" itemText="feature_module_a-2" routerLink="feature-a/activity-2"></wb-activity>
 
       <!-- Activities from feature module B -->
-      <wb-activity cssClass="activity-feature_module_b-1" label="feature_module_b-1" routerLink="feature-b/activity-1"></wb-activity>
-      <wb-activity cssClass="activity-feature_module_b-2" label="feature_module_b-2" routerLink="feature-b/activity-2"></wb-activity>
+      <wb-activity itemCssClass="activity-feature_module_b-1" itemText="feature_module_b-1" routerLink="feature-b/activity-1"></wb-activity>
+      <wb-activity itemCssClass="activity-feature_module_b-2" itemText="feature_module_b-2" routerLink="feature-b/activity-2"></wb-activity>
     </wb-workbench>
   `
 })
