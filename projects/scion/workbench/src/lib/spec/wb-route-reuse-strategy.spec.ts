@@ -145,16 +145,16 @@ describe('WbRouteReuseStrategy', () => {
   template: `
     <wb-workbench style="position: relative; width: 100%; height: 500px">
       <!-- Activities from app module -->
-      <wb-activity cssClass="app_activity-1" label="app/activity-1" routerLink="app/activity-1"></wb-activity>
-      <wb-activity cssClass="app_activity-2" label="app/activity-2" routerLink="app/activity-2"></wb-activity>
+      <wb-activity itemCssClass="app_activity-1" itemText="app/activity-1" routerLink="app/activity-1"></wb-activity>
+      <wb-activity itemCssClass="app_activity-2" itemText="app/activity-2" routerLink="app/activity-2"></wb-activity>
 
       <!-- Activities from feature module A -->
-      <wb-activity cssClass="feature-a_activity-1" label="feature-a/activity-1" routerLink="feature-a/activity-1"></wb-activity>
-      <wb-activity cssClass="feature-a_activity-2" label="feature-a/activity-2" routerLink="feature-a/activity-2"></wb-activity>
+      <wb-activity itemCssClass="feature-a_activity-1" itemText="feature-a/activity-1" routerLink="feature-a/activity-1"></wb-activity>
+      <wb-activity itemCssClass="feature-a_activity-2" itemText="feature-a/activity-2" routerLink="feature-a/activity-2"></wb-activity>
 
       <!-- Activities from feature module B -->
-      <wb-activity cssClass="feature-b_activity-1" label="feature-b/activity-1" routerLink="feature-b/activity-1"></wb-activity>
-      <wb-activity cssClass="feature-b_activity-2" label="feature-b/activity-2" routerLink="feature-b/activity-2"></wb-activity>
+      <wb-activity itemCssClass="feature-b_activity-1" itemText="feature-b/activity-1" routerLink="feature-b/activity-1"></wb-activity>
+      <wb-activity itemCssClass="feature-b_activity-2" itemText="feature-b/activity-2" routerLink="feature-b/activity-2"></wb-activity>
     </wb-workbench>
   `
 })

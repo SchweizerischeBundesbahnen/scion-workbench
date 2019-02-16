@@ -22,8 +22,8 @@ import { WorkbenchActivityPartService } from './workbench-activity-part.service'
  *
  * <wb-workbench>
  *   <wb-activity title="Users"
- *                label="group"
- *                cssClass="material-icons"
+ *                itemText="group"
+ *                itemCssClass="material-icons"
  *                routerLink="user-account">
  *   </wb-activity>
  * </wb-workbench>

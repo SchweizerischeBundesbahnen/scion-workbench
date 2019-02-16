@@ -93,9 +93,9 @@ describe('Activity part', () => {
 @Component({
   template: `
     <wb-workbench style="position: relative; width: 100%; height: 500px">
-      <wb-activity cssClass="activity-1" label="activity-1" title="Activity 1" routerLink="activity-1"></wb-activity>
-      <wb-activity cssClass="activity-2" label="activity-2" title="Activity 2" routerLink="activity-2"></wb-activity>
-      <wb-activity cssClass="activity-3" label="activity-3" title="Activity 3" routerLink="activity-3"></wb-activity>
+      <wb-activity itemCssClass="activity-1" itemText="activity-1" title="Activity 1" routerLink="activity-1"></wb-activity>
+      <wb-activity itemCssClass="activity-2" itemText="activity-2" title="Activity 2" routerLink="activity-2"></wb-activity>
+      <wb-activity itemCssClass="activity-3" itemText="activity-3" title="Activity 3" routerLink="activity-3"></wb-activity>
     </wb-workbench>
   `
 })
