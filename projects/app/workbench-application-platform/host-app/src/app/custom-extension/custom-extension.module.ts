@@ -15,6 +15,7 @@ import { ACTIVITY_ACTION_PROVIDER, INTENT_HANDLER, MessageBoxIntentHandler, Noti
 import { ListNotificationComponent } from './list-notification/list-notification.component';
 import { CustomNotifyActivityActionComponent } from './custom-notify-activity-action/custom-notify-activity-action.component';
 import { CustomNotifyActivityActionProvider } from './custom-notify-activity-action/custom-notify-activity-action-provider.service';
+import { CustomIntentHandlerService } from './custom-intent/custom-intent-handler.service';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,11 @@ import { CustomNotifyActivityActionProvider } from './custom-notify-activity-act
       useClass: CustomNotifyActivityActionProvider,
       multi: true
     },
+    {
+      provide: INTENT_HANDLER,
+      useClass: CustomIntentHandlerService,
+      multi: true
+    }
   ],
 })
 export class CustomExtensionModule {

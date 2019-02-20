@@ -1,0 +1,5 @@
+<button (click)="onIssueIntent()" class="e2e-issue-intent">Issue Intent</button>
+
+<section class="close-action" *ngIf="result$ | async as result">
+  Result: <output class="e2e-result">{{result}}</output>
+</section>

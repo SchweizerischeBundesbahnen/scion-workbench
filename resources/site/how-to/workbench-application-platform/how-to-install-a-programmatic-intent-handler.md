@@ -54,6 +54,10 @@ export class CustomIntentHandler implements IntentHandler {
 |➄|Optional lifecycle hook that is called after the platform completed registration of applications.<br>Use this method to handle any initialization tasks which require the application or manifest registry.|
 |➅|Method invoked upon the receipt of an intent.|
 
+## How to issue intents to the programmatic intent handler
+
+On how to interact with your own intent handler from the client application, see [How to issue a custom intent](how-to-issue-custom-intent.md)
+
 [menu-overview]: /README.md
 [menu-workbench]: /resources/site/workbench.md
 [menu-workbench-application-platform]: /resources/site/workbench-application-platform.md

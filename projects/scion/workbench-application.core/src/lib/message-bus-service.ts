@@ -25,6 +25,11 @@ export abstract class MessageBus implements Service {
   public abstract get receive$(): Observable<MessageEnvelope>;
 
   /**
+   * Initiates a request and receives replies continuously.
+   */
+  public abstract requestReceive$(envelope: MessageEnvelope): Observable<MessageEnvelope>;
+
+  /**
    * Posts a message to the application platform.
    */
   public abstract postMessage(envelope: MessageEnvelope): void;
@@ -83,24 +88,30 @@ export class DefaultMessageBus implements MessageBus {
       });
   }
 
-  /**
-   * Allows to receive messages of the message bus.
-   */
   public get receive$(): Observable<MessageEnvelope> {
     return this._stream$.asObservable();
   }
 
-  /**
-   * Posts a message to the message bus.
-   */
   public postMessage(envelope: MessageEnvelope): void {
     envelope.protocol = PROTOCOL;
     window.parent.postMessage(envelope, this._ancestorOrigin || '*');
   }
 
-  /**
-   * Initiates a request-reply communication.
-   */
+  public requestReceive$(envelope: MessageEnvelope): Observable<MessageEnvelope> {
+    const replyToUid = UUID.randomUUID();
+    envelope.replyToUid = replyToUid;
+    envelope.protocol = PROTOCOL;
+
+    const reply$ = this._stream$
+      .pipe(
+        filter(env => env.channel === 'reply'),
+        filter(env => env.replyToUid === replyToUid),
+        takeUntil(this._destroy$)
+      );
+    this.postMessage(envelope);
+    return reply$;
+  }
+
   public requestReply(envelope: MessageEnvelope): Promise<MessageEnvelope> {
     const replyToUid = UUID.randomUUID();
     envelope.replyToUid = replyToUid;
