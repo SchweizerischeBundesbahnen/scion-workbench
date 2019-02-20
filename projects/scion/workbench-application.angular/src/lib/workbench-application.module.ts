@@ -14,7 +14,7 @@ import { WorkbenchUrlOpenActivityActionDirective } from './workbench-url-open-ac
 import { WorkbenchRouterLinkDirective, WorkbenchRouterLinkWithHrefDirective } from './workbench-router-link.directive';
 import { WorkbenchApplicationConfig } from './workbench-application.config';
 import { ActivatorService } from './activator.service';
-import { DefaultMessageBus, ManifestRegistryService, MessageBoxService, MessageBus, NotificationService, Platform, PopupService } from '@scion/workbench-application.core';
+import { DefaultMessageBus, IntentService, ManifestRegistryService, MessageBoxService, MessageBus, NotificationService, Platform, PopupService } from '@scion/workbench-application.core';
 import { ForRootGuardService } from './for-root-guard.service';
 import { WorkbenchPopupOpenActivityActionDirective } from './workbench-popup-open-activity-action.directive';
 
@@ -69,6 +69,10 @@ export class WorkbenchApplicationModule {
           useFactory: provideNotificationService
         },
         {
+          provide: IntentService,
+          useFactory: provideIntentService
+        },
+        {
           provide: ManifestRegistryService,
           useFactory: provideManifestRegistryService
         },
@@ -117,6 +121,10 @@ export function provideNotificationService(): NotificationService {
 
 export function provideMessageBoxService(): MessageBoxService {
   return Platform.getService(MessageBoxService);
+}
+
+export function provideIntentService(): IntentService {
+  return Platform.getService(IntentService);
 }
 
 export function provideManifestRegistryService(): ManifestRegistryService {

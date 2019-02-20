@@ -20,6 +20,7 @@ export * from './lib/view.service';
 export * from './lib/activity.service';
 export * from './lib/message-box-service';
 export * from './lib/notification-service';
+export * from './lib/intent-service';
 export * from './lib/popup-service';
 export * from './lib/manifest-registryService';
 export * from './lib/metadata';

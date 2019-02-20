@@ -18,6 +18,7 @@ import { RouterService } from './router.service';
 import { Platform } from './platform';
 import { PopupService } from './popup-service';
 import { PlatformEventBus } from './platform-event-bus-service';
+import { IntentService } from './intent-service';
 
 /**
  * Manages the lifecycle of this workbench application module to communicate with the workbench application platform.
@@ -40,6 +41,7 @@ export class PlatformActivator {
     Platform.register(new NotificationService());
     Platform.register(new PopupService());
     Platform.register(new ManifestRegistryService());
+    Platform.register(new IntentService());
 
     window.addEventListener('beforeunload', () => this.stop(), {once: true});
   }

@@ -13,7 +13,7 @@ This section provides answers to some common questions when integrating applicat
 - [How to register applications](how-to-register-applications.md)
 - [How to configure routing in the host application](how-to-configure-routing-in-the-host-application.md)
 - [How to install a programmatic intent handler](how-to-install-a-programmatic-intent-handler.md)
-- [How to install a custom error handler ](how-to-install-a-custom-error-handler.md)
+- [How to install a custom error handler](how-to-install-a-custom-error-handler.md)
 - [How to provide a custom activity action](how-to-provide-a-custom-activity-action.md)
 - [How to integrate DevTools](how-to-integrate-devtools.md)
 
@@ -38,6 +38,7 @@ This section provides answers to some common questions when integrating applicat
 - [How to prevent view destruction](how-to-prevent-view-destruction.md)
 - [How to make a capability private or public scope](how-to-make-a-capability-private-or-public-scope.md)
 - [How to configure focus handling](how-to-configure-focus-handling.md)
+- [How to issue a custom intent](how-to-issue-custom-intent.md)
 
 
 ***

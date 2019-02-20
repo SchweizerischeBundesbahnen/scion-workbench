@@ -45,6 +45,15 @@
     <app-message-box-panel></app-message-box-panel>
   </ng-template>
 
+  <!-- Custom Intents -->
+  <ng-template sciAccordionItem [panel]="custom_intent_panel" [cssClass]="'e2e-custom-intent-panel'">
+    <header>Custom Intents</header>
+  </ng-template>
+
+  <ng-template #custom_intent_panel>
+    <app-custom-intent-panel></app-custom-intent-panel>
+  </ng-template>
+
   <!-- Notification -->
   <ng-template sciAccordionItem [panel]="notification_panel" [cssClass]="'e2e-notification-panel'">
     <header>Notification</header>

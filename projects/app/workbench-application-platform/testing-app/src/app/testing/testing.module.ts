@@ -58,6 +58,7 @@ import { Activity5782ab19Component } from './activity-5782ab19/activity-5782ab19
 import { ViewOpenActivityActionPanelComponent } from './view-open-activity-action-panel/view-open-activity-action-panel.component';
 import { PopupOpenActivityActionPanelComponent } from './popup-open-activity-action-panel/popup-open-activity-action-panel.component';
 import { ViewC91805e8Component } from './view-c91805e8/view-c91805e8.component';
+import { CustomIntentPanelComponent } from './custom-intent/custom-intent-panel.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { ViewC91805e8Component } from './view-c91805e8/view-c91805e8.component';
     ViewNavigationPanelComponent,
     ViewInterationPanelComponent,
     MessageBoxPanelComponent,
+    CustomIntentPanelComponent,
     NotificationPanelComponent,
     PopupPanelComponent,
     TestingPopupComponent,
