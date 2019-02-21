@@ -5,6 +5,14 @@
 
 # Changelog
 
+# [0.0.0-beta.16](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.15...0.0.0-beta.16) (2019-02-21)
+
+
+### Features
+
+* provide API to simplify issuing custom intents from within client ([6c88558](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6c88558)), closes [#96](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/96)
+
+
 # [0.0.0-beta.15](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.14...0.0.0-beta.15) (2019-01-31)
 
 
