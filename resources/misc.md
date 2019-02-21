@@ -11,7 +11,7 @@ SCION workbench demo application uses a Google API key to access Google Map API.
 |Project ID|scion-angular-workbench|
 |API Key|AIzaSyDY8vv473uSuQyxwFRTs6zTORVaXysyMx8|
 |Restricted API|Maps JavaScript API|
-|Restricted Hosts|localhost, blog.sbb.technology/scion-workbench-demo/*|
+|Restricted Hosts|localhost, https://schweizerischebundesbahnen.github.io/*|
 
 > The key is restricted to HTTP referrers to prevent unauthorized use and quota theft
 
