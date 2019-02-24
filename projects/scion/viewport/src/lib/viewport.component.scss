@@ -8,6 +8,7 @@
   display: block;
   position: relative; // positioned anchor for viewport and scrollbars
   overflow: hidden;
+  outline: none;
   @include hide-scrollbars-when-inactive();
 
   > div.viewport {
@@ -16,7 +17,6 @@
     grid-template-columns: var(--grid-template-columns);
     grid-template-rows: var(--grid-template-rows);
     gap: var(--gap);
-
     outline: none;
     // use momentum-based scrolling so that the viewport client continues to scroll for a while after finishing the scroll gesture
     // and removing the finger from the touchscreen.
