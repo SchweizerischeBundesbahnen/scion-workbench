@@ -32,6 +32,8 @@ import { SciDimensionModule } from '@scion/dimension';
   ],
   exports: [
     SciViewportComponent,
+    SciScrollbarComponent,
+    SciScrollableDirective,
   ],
 })
 export class SciViewportModule {

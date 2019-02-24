@@ -13,3 +13,6 @@
  */
 export { SciViewportModule } from './lib/viewport.module';
 export * from './lib/viewport.component';
+export * from './lib/scrollable.directive';
+export * from './lib/scrollbar/scrollbar.component';
+export * from './lib/native-scrollbar-track-size-provider.service';
