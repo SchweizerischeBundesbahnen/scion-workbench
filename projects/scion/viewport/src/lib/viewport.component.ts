@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, DoCheck, ElementRef, EventEmitter, Input, KeyValueDiffer, KeyValueDiffers, Output, ViewChild } from '@angular/core';
+import { Component, DoCheck, ElementRef, EventEmitter, HostBinding, HostListener, Input, KeyValueDiffer, KeyValueDiffers, Output, ViewChild } from '@angular/core';
 import { NULL_DIMENSION, SciDimension } from '@scion/dimension';
 import { SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-size-provider.service';
 
@@ -42,6 +42,9 @@ export class SciViewportComponent implements DoCheck {
   private _viewportDimension: SciDimension = NULL_DIMENSION;
   private _viewportClientDiffer: KeyValueDiffer<string, any>;
 
+  @HostBinding('attr.tabindex')
+  public tabindex = -1; // make the viewport programmatically focusable but do not include it in the tab order
+
   /**
    * @internal
    */
@@ -65,6 +68,11 @@ export class SciViewportComponent implements DoCheck {
 
   constructor(differs: KeyValueDiffers, public nativeScrollbarTrackSizeProvider: SciNativeScrollbarTrackSizeProvider) {
     this._viewportClientDiffer = differs.find({}).create();
+  }
+
+  @HostListener('focus')
+  public focus(): void { // do not rename to expose the same focus method like `HTMLElement.focus()`.
+    this._viewport && this._viewport.focus();
   }
 
   /**

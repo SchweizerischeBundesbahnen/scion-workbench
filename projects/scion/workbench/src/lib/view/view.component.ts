@@ -76,7 +76,7 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
   }
 
   private onActivateView(): void {
-    this._viewport.viewportElement.focus();
+    this._viewport.focus();
     this._viewport.scrollTop = this._view.scrollTop;
     this._viewport.scrollLeft = this._view.scrollLeft;
   }
