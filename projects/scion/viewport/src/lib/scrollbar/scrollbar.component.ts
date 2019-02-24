@@ -9,9 +9,9 @@
  */
 
 import { DOCUMENT } from '@angular/common';
-import { Component, DoCheck, ElementRef, HostBinding, Inject, Input, NgZone, OnDestroy, ViewChild } from '@angular/core';
-import { fromEvent, merge, of, Subject, timer } from 'rxjs';
-import { debounceTime, first, skipWhile, startWith, takeUntil, takeWhile, withLatestFrom } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { fromEvent, merge, Observable, of, Subject, timer } from 'rxjs';
+import { debounceTime, distinctUntilChanged, first, map, mapTo, startWith, takeUntil, takeWhile, withLatestFrom } from 'rxjs/operators';
 
 /**
  * Renders a vertical or horizontal scrollbar.
@@ -24,11 +24,13 @@ import { debounceTime, first, skipWhile, startWith, takeUntil, takeWhile, withLa
 @Component({
   selector: 'sci-scrollbar',
   templateUrl: './scrollbar.component.html',
-  styleUrls: ['./scrollbar.component.scss']
+  styleUrls: ['./scrollbar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SciScrollbarComponent implements OnDestroy, DoCheck {
+export class SciScrollbarComponent implements OnChanges, OnDestroy {
 
   private _destroy$ = new Subject<void>();
+  private _viewportRefChange$ = new Subject<void>();
   private _viewportSize: number;
   private _viewportClientSize: number;
   private _lastDragPosition: number = null;
@@ -63,13 +65,11 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
   @Input()
   public viewport: HTMLElement;
 
-  constructor(private _host: ElementRef, @Inject(DOCUMENT) private _document: any, private _zone: NgZone) {
-    fromEvent(window, 'resize')
-      .pipe(
-        skipWhile(() => !this.viewport),
-        takeUntil(this._destroy$)
-      )
-      .subscribe(() => this.onWindowResize());
+  constructor(private _host: ElementRef, @Inject(DOCUMENT) private _document: any, private _cd: ChangeDetectorRef, private _zone: NgZone) {
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    changes['viewport'] && this.onViewportRefChange();
   }
 
   public ngOnDestroy(): void {
@@ -136,14 +136,6 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
     this.scrollWhileMouseDown(this.toViewportPanPx(signum * thumbLengthPx), event);
   }
 
-  public onWindowResize(): void {
-    this.computeScrollProperties();
-  }
-
-  public ngDoCheck(): void {
-    this.computeScrollProperties();
-  }
-
   /**
    * Projects the given scrollbar scroll pixels into viewport scroll pixels.
    */
@@ -196,6 +188,41 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
       });
   }
 
+  private onViewportRefChange(): void {
+    this._viewportRefChange$.next();
+
+    this.viewport && this._zone.runOutsideAngular(() => {
+      merge(fromEvent(this.viewport, 'scroll'), this.dimensionChange$(this.viewport))
+        .pipe(takeUntil(merge(this._destroy$, this._viewportRefChange$)))
+        .subscribe(() => {
+          this.computeScrollProperties();
+        });
+    });
+  }
+
+  /**
+   * Emits when the dimension of viewport or viewport-client changes.
+   *
+   * This is a workaround until it is possible to listen for element dimension changes natively.
+   * @see https://wicg.github.io/ResizeObserver/
+   */
+  private dimensionChange$(viewport: HTMLElement): Observable<void> {
+    return merge(
+      this._zone.onUnstable, // When the Angular zone gets instable the dimension of the viewport or viewport-client might have changed.
+      fromEvent(window, 'resize'), // However, when resizing the window, the Angular zone is not necessarily involved.
+    )
+      .pipe(
+        map(() => ({viewportWidth: viewport.clientWidth, viewportHeight: viewport.clientHeight, scrollWidth: viewport.scrollWidth, scrollHeight: viewport.scrollHeight})),
+        distinctUntilChanged((a, b) => {
+          return a.scrollHeight === b.scrollHeight &&
+            a.scrollWidth === b.scrollWidth &&
+            a.viewportHeight === b.viewportHeight &&
+            a.viewportWidth === b.viewportWidth;
+        }),
+        mapTo(undefined),
+      );
+  }
+
   private computeScrollProperties(): void {
     const vertical = this.vertical;
 
@@ -203,6 +230,10 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
     this._viewportClientSize = vertical ? this.viewport.scrollHeight : this.viewport.scrollWidth;
 
     // compute if viewport client overflows, the thumb size and thumb position
+    const prevOverflow = this.overflow;
+    const prevThumbSizeFr = this.thumbSizeFr;
+    const prevThumbPositionFr = this.thumbPositionFr;
+
     this.overflow = (this._viewportClientSize > this._viewportSize);
     if (this.overflow) {
       const scrollTop = vertical ? this.viewport.scrollTop : this.viewport.scrollLeft;
@@ -210,5 +241,10 @@ export class SciScrollbarComponent implements OnDestroy, DoCheck {
       this.thumbSizeFr = this._viewportSize / this._viewportClientSize;
       this.thumbPositionFr = scrollTop / this._viewportClientSize;
     }
+
+    if (this.overflow !== prevOverflow || this.thumbSizeFr !== prevThumbSizeFr || this.thumbPositionFr !== prevThumbPositionFr) {
+      this._zone.run(() => this._cd.markForCheck());
+    }
   }
 }
+
