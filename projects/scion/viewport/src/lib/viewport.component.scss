@@ -1,4 +1,4 @@
-$scrollbar-size: 12px;
+@import '../theme/scrollbar';
 
 :host {
   --grid-template-columns: auto;
@@ -8,49 +8,22 @@ $scrollbar-size: 12px;
   display: block;
   position: relative; // positioned anchor for viewport and scrollbars
   overflow: hidden;
+  @include hide-scrollbars-when-inactive();
 
   > div.viewport {
+    // absolutely positioned by `sciScrollable`
     display: grid; // part of API
     grid-template-columns: var(--grid-template-columns);
     grid-template-rows: var(--grid-template-rows);
     gap: var(--gap);
 
-    position: absolute;
     outline: none;
-
     // use momentum-based scrolling so that the viewport client continues to scroll for a while after finishing the scroll gesture
     // and removing the finger from the touchscreen.
     -webkit-overflow-scrolling: touch;
   }
 
   > sci-scrollbar {
-    position: absolute;
-    transition-duration: 1s;
-    transition-property: opacity;
-    transition-timing-function: ease-out;
-
-    &.vertical {
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: unset;
-      width: $scrollbar-size;
-    }
-
-    &.horizontal {
-      top: unset;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      height: $scrollbar-size;
-    }
+    @include scrollbar();
   }
-}
-
-// Hide emulated scrollbar if all the following conditions are met:
-// - viewport not hovered (mouse navigation)
-// - viewport not active (touch navigation)
-// - not scrolling (ensures the scrollbar to be visible even if dragging the thumb outside of the viewport, :active pseudo-class not working in IE and Firefox)
-:host-context:not(:hover):not(:active) > sci-scrollbar:not(.scrolling) {
-  opacity: 0; // do not use 'display' nor 'visibility' property to fade the scrollbar
 }

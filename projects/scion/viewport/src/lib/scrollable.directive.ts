@@ -14,13 +14,18 @@ import { map, takeUntil } from 'rxjs/operators';
 import { merge, Subject } from 'rxjs';
 
 /**
- * Makes the host `<div>` natively scrollable and optionally hides native scrollbars.
+ * Makes the host element natively scrollable and hides native scrollbars by default, unless native scrollbars
+ * already sit on top of the viewport (e.g. in OS X).
  *
  * Because there is no cross-browser API to hide scrollbars without losing native scroll support, we set 'overflow'
  * to 'scroll' but shift the native scrollbars out of the visible viewport area. The shift offset is computed upfront.
+ *
+ * This directive fully stretches its host element to the bounding box of the nearest positioned parent. The parent
+ * must have its 'overflow' CSS property set to 'hidden' because the native scrollbars are shifted out of the bounding
+ * box of the parent component.
  */
 @Directive({
-  selector: 'div[sciScrollable]'
+  selector: '[sciScrollable]'
 })
 export class SciScrollableDirective implements OnChanges, OnDestroy {
 
@@ -58,6 +63,7 @@ export class SciScrollableDirective implements OnChanges, OnDestroy {
   private useNativeScrollbars(): void {
     this.setStyle(this._host.nativeElement, {
       overflow: 'auto',
+      position: 'absolute',
       top: 0,
       right: 0,
       bottom: 0,
@@ -71,6 +77,7 @@ export class SciScrollableDirective implements OnChanges, OnDestroy {
   private shiftNativeScrollbars(nativeScrollbarTrackSize: NativeScrollbarTrackSize): void {
     this.setStyle(this._host.nativeElement, {
       overflow: 'scroll',
+      position: 'absolute',
       top: 0,
       right: `${-nativeScrollbarTrackSize.vScrollbarTrackWidth}px`,
       bottom: `${-nativeScrollbarTrackSize.hScrollbarTrackHeight}px`,
