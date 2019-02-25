@@ -4,6 +4,7 @@
 |---|---|---|---|---|---|---|
 
 ## How to open a view
+A view is a visual workbench element which the user can flexibile arrange in the view grid. Views are the principal elements to show data to the user.
 
 There are two ways to navigate to a view, either from within the template or in the component.
 

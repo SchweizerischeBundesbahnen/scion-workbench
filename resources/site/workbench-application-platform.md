@@ -9,6 +9,8 @@ SCION Workbench Application Platform is an extension of SCION Workbench to integ
 
 The platform provides the mechanics for client-side web application integration. Any web application can be integrated. If the site does not interact with the platform, there is no need for adaptation. For a deeper integration, the platform provides a framework-agnostic guest API.
 
+A micro frontend architecture should only be implemented if absolutely required. For instance, if the application is developed by different teams, having independent lifecycle or using different web stacks. With micro frontends in place, there come some restrictions and limitations which you should be aware of. See core concepts for more information. For small applications, a micro frontend architecture is most probably overkill, and you should consider using standalone SCION Workbench instead.
+
 ***
 
 - [**Getting started**][link-getting-started]\

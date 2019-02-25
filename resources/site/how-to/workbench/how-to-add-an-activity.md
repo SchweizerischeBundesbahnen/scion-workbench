@@ -4,6 +4,9 @@
 |---|---|---|---|---|---|---|
 
 ## How to add an activity
+
+An activity is a visual workbench element shown at the left-hand side of the workbench frame and acts as an entry point into the application. At any given time, only a single activity can be active.
+
 Activities are modelled in `app.component.html` as content children of `<wb-workbench>` in the form of `<wb-activity>` elements. The activity items are displayed in the activity panel to the left of the workbench frame.
 When clicked, the component registered under the specified router link is opened, either in the activity panel (which is by default), or as a view. Configure this behavior with `target` property.
 

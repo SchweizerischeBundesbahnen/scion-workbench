@@ -114,6 +114,8 @@ This includes the workbench frame, with the activity panel to the left, and the 
     ```
 
 ## Step 5: Create your first activity component
+An activity is a visual workbench element shown at the left-hand side of the workbench frame and acts as an entry point into the application. At any given time, only a single activity can be active.
+
 Use Angular command-line tool to generate a new activity component.
 ```
 ng generate component PersonList
@@ -159,6 +161,8 @@ For Font Awesome Icons, simply specify the CSS class(es) and leave 'label' empty
 ```
 
 ## Step 8: Create your first view component
+A view is a visual workbench element which the user can flexibile arrange in the view grid. Views are the principal elements to show data to the user.
+
 Use Angular command-line tool to generate a new view component.
 ```
 ng generate component Person

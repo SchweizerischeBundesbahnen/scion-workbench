@@ -5,6 +5,8 @@
 
 ## How to provide a view capability
 
+A view is a visual workbench element which the user can flexibile arrange in the view grid. Views are the principal elements to show data to the user.
+
 To provide a view, perform the following steps:
 
 ### 1. Register the view capability in the manifest

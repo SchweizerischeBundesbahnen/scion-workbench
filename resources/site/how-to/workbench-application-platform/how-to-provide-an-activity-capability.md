@@ -4,6 +4,8 @@
 |---|---|---|---|---|---|---|
 
 ## How to provide an activity capability
+An activity is a visual workbench element shown at the left-hand side of the workbench frame and acts as an entry point into the application. At any given time, only a single activity can be active.
+
 To provide an activity, perform the following steps:
 
 ### 1. Register the activity capability in the manifest

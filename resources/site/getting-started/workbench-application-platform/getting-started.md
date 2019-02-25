@@ -102,7 +102,7 @@ The following figure shows a sample setup with a host application that integrate
 In this tutorial, we will integrate two applications. One application provides the user with functionality to manage contacts. This application we will create from scratch to learn how to provide capabilities and how to invoke capabilities of this and other applications. The other application is already deployed and allows creating communications. But first, we create a host application which integrates the two applications.
 
 ### Host application
-The host application is trivial. The only things we have to do is to register the applications and to provide the workbench application frame.
+The host application is very small. The only things we have to do is to register the applications and to provide the workbench application frame.
 
 #### Step 1: Create the host application
 Use Angular CLI to create a new Angular application which acts as our host application. Do not add routing when the CLI asks to add Angular routing. Instead, import `RoutingModule` directly in the `AppModule` without generating a separate module.
@@ -231,7 +231,7 @@ Use Angular CLI to serve the application.
 ng serve --port 5000 --aot
 ```
 
-Open your browser at following URL: http://localhost:5000. You should see the SCION Workbench application shell. In the activity panel on the left side, there you see the `DevTools` activity. If opening it, the `DevTools` application starts and lists all installed applications - that is the `host-app`, the `communication-app` and also the `dev-tools-app`. However, `contact-app` is missing because not available yet. In the following, we start developing the contacts application.
+Open your browser at following URL: http://localhost:5000. You should see the SCION Workbench application shell. In the activity panel on the left side, you see the `DevTools` activity. When opening it, the `DevTools` application starts and lists all installed applications - that is the `host-app`, the `communication-app` and also the `dev-tools-app`. However, `contact-app` is missing because not available yet. In the following, we start developing the contacts application.
 
 ### Contact application (Angular)
 Now we start developing the contacts application. First, we create an activity which provides the user with a list of contacts. Then, we add an activity action to allow creating a new contact in a popup. In the next step, we develop a view to editing contact data. Finally, we invoke the communication application to create new communications.
@@ -387,9 +387,11 @@ It contains sample contact data.
 
 |#|Explanation|
 |-|-|
-|➀|Imports `SCION Workbench Application` module for Angular. Optionally, you can configure focus handling, like to have a focus trap or to auto-focus the first focusable element when the application loads.|
+|➀|Imports `SCION Workbench Application` module for Angular. When providing a config object, you can configure some aspects of the app, like the focus handling.|
 
 #### Step 7: Register your first capability to show a list of contacts in a workbench activity
+An activity is a visual workbench element shown at the left-hand side of the workbench frame and acts as an entry point into the application. At any given time, only a single activity can be active.
+
 - Create the empty file `manifest.json` in `contact-app/src/assets/`. This is the manifest file where you declare your capabilities and intents.
 - Add following lines to the file. It sets application metadata and declares your first capability.
 
@@ -400,6 +402,10 @@ It contains sample contact data.
     "capabilities": [ ➂
       {
         "type": "activity", ➃
+        "qualifier": {
+          "entryPoint": "contacts",
+          "id": "*"
+        },        
          "description": "Lists all contacts and allows to show their personal data.", ➄
          "properties": { ➅
            "title": "Contacts", ➆
@@ -418,7 +424,7 @@ It contains sample contact data.
   |➀|Specifies the name of this application.|
   |➁|Specifies the base URL of this application which is used to resolve entry point paths. Because we are using hash-based routing, we set the base URL to '#'.|
   |➂|Section to specify all capabilities of this application (functionality which this application provides).|
-  |➃|Declares that we provide an activity.|
+  |➃|Declares that we provide an activity and assigns a qualifier to identify it.|
   |➄|Describes what kind of functionality this capability provides.|
   |➅|Specifies activity specific properties.|
   |➆|Sets the tooltip of this activity.|
@@ -535,7 +541,7 @@ Open `manifest.json` and declare the new popup capability as follows:
 |-|-|
 |➀|Declares that we provide a popup.|
 |➁|Specifies the qualifier under which this capability can be invoked|
-|➂|Sets popup specific properties like the URL path under which applications can invoke this capability and the dimension of the popup.|
+|➂|Sets popup specific properties like the URL path pointing to the popup page.|
 
 #### Step 11: Create the popup component for the previously registered capability
 - Use Angular command-line tool to generate a new component.
@@ -607,8 +613,8 @@ Open `manifest.json` and declare the new popup capability as follows:
   |➀|Instructs given class to live in the context of a popup.|
   |➁|Injects a handle to interact with the popup, e.g. to close the popup.|
   |➂|Injects Workbench router to navigate to views.|
-  |➃|Navigates to the contact detail view. It is similar to using Angular Router, except that you provide a qualifier instead of path commands. Optionally, you can provide query parameters or matrix parameters, or options to control the navigation. |
-  |➄|Closes this popup. Optionally, you can return a result to the caller. |
+  |➃|Navigates to the contact detail view. It is similar to using Angular Router, except that you provide a qualifier instead of path commands. Optionally, you can provide query parameters or matrix parameters, or options to control the navigation.|
+  |➄|Closes this popup.|
 
 - Open the template and add following content:
 
@@ -681,6 +687,8 @@ ng serve --aot
 However, if creating the contact, an error shows up because no application provides a capability to show the contact yet. Let us change that.
 
 #### Step 13: Register a capability to show a contact in a view
+A view is a visual workbench element which the user can flexibile arrange in the view grid. Views are the principal elements to show data to the user.
+
 Open `manifest.json` and declare the new view capability as follows:
 
 ```javascript
@@ -707,7 +715,7 @@ Open `manifest.json` and declare the new view capability as follows:
 |➀|Declares that we provide a view.|
 |➁|Specifies the qualifier under which this capability can be invoked|
 |➂|Makes this a public capability. By default, capabilities have private scope. If private, other application cannot invoke this capability.|
-|➃|Sets view specific properties like the URL path under which applications can invoke this capability and the title displayed in the view tab.|
+|➃|Sets view specific properties like the URL path pointing to the view page.|
 
 #### Step 14: Create the view component for the previously registered capability
 - Use Angular command-line tool to generate a new component.

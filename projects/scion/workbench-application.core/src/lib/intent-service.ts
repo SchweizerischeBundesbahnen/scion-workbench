@@ -20,8 +20,11 @@ import { map } from 'rxjs/operators';
  */
 export class IntentService implements Service {
   /**
-   * Issues an intent to the application platform and returns a stream of replies.
-   * The returned observable never completes. It is up to the caller to unsubscribe from the stream.
+   * Issues an intent to the application platform and receives a series of replies.
+   *
+   * The returned Observable never completes. It is up to the caller to unsubscribe from the stream.
+   * E.g., use the pipeable operator `first` if expecting a single response.
+   *
    * @returns a stream of replies.
    */
   public issueIntent$<T>(type: string, qualifier?: Qualifier, payload?: any): Observable<T> {
@@ -32,7 +35,7 @@ export class IntentService implements Service {
   }
 
   /**
-   * Issues an intent to the application platform without returning a reply.
+   * Issues an intent to the application platform.
    */
   public issueIntent(type: string, qualifier?: Qualifier, payload?: any): void {
     const intentMessage: IntentMessage = {type, qualifier, payload};
