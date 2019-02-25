@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench",
-  "version": "0.0.0-beta.16",
+  "version": "0.0.0-beta.17",
   "description": "SCION Workbench provides a lightweight application frame and helps to build multi-view web applications. Views are shown within tabs which can be flexibly arranged and dragged around by the user.",
   "license": "EPL-2.0",
   "private": false,
@@ -16,7 +16,7 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "dependencies": {
-    "@scion/mouse-dispatcher": "0.0.0-beta.16"
+    "@scion/mouse-dispatcher": "0.0.0-beta.17"
   },
   "peerDependencies": {
     "@angular/common": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
@@ -25,8 +25,8 @@
     "@angular/animations": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@angular/forms": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@angular/router": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
-    "@scion/dimension": "0.0.0-beta.16",
-    "@scion/viewport": "0.0.0-beta.16",
+    "@scion/dimension": "0.0.0-beta.17",
+    "@scion/viewport": "0.0.0-beta.17",
     "rxjs": "^6.0.0"
   },
   "keywords": [
