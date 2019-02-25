@@ -5,6 +5,15 @@
 
 # Changelog
 
+# [0.0.0-beta.17](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.16...0.0.0-beta.17) (2019-02-25)
+
+
+### Features
+
+* allow scrollbars to be used in an 'on-push' change detection context ([3b876fc](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3b876fc)), closes [#100](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/100)
+* allow to focus the viewport programmatically ([36e1387](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/36e1387))
+* export viewport scrollbars as public api ([ff865fc](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ff865fc)), closes [#100](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/100)
+
 # [0.0.0-beta.16](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.15...0.0.0-beta.16) (2019-02-21)
 
 
