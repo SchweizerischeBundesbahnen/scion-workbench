@@ -5,7 +5,7 @@
 
 ## How to configure routing in the sub application
 
-The platform recommends using hash-based over HTML5 push-state routing for applications integrated into the platform - this for the reason to have faster in-view navigation. It is because the platform does not use HTML5 History API to change the URL. Instead, it sets the URL from outside the application. If not using hash-based routing, the application would start anew.
+The platform recommends using hash-based over HTML5 push-state routing for applications integrated into the platform. This for the reason that the platform sets the URL externally, which, when navigating within the same app, would cause the application to start anew.
 
 For Angular application, open `AppRoutingModule` and enable `HashLocationStrategy` as follows:
 

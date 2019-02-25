@@ -5,7 +5,7 @@
 
 ## How to provide a custom activity action
 
-Providing a custom activity action is straightforward.
+This section explains how you can add actions like a create button to an activity. When the activity is activated, the platform displays its registered actions in the activity header to the right of the activity title.
 
 ### 1. Create and register a custom ActivityActionProvider (host application)
 

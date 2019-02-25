@@ -7,6 +7,8 @@
 
 SCION Workbench provides a lightweight application frame and helps to build multi-view Angular applications. It allows showing content in views, activities or popups and offers features like message boxes and notifications. It is based on Angular and Angular CDK. One of its goals is seamless integration with Angular and smallest possible dependency of your project to SCION Workbench.
 
+SCION Workbench helps to develop a SPA (Single Page Application) based on Angular. If you plan to implement a micro frontend architecture, head over to SCION Workbench Application Platform.
+
 ***
 
 - [**Getting started**][link-getting-started]\
