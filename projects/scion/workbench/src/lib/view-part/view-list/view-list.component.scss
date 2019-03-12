@@ -10,6 +10,9 @@
     width: 100%;
     height: 100%;
 
+    // Sets the viewport client (<ul>) to its smallest height to shrink the overlay when closing views.
+    --grid-template-rows: min-content;
+
     ul {
       list-style: none;
       padding: 0;

@@ -10,7 +10,7 @@
 
 import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
 import { WorkbenchViewPartService } from './workbench-view-part.service';
-import { noop, Subject } from 'rxjs';
+import { combineLatest, noop, Subject } from 'rxjs';
 import { Region, WbViewDropEvent } from './view-drop-zone.directive';
 import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewPart } from '../workbench.model';
@@ -27,6 +27,7 @@ export class ViewPartComponent implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   public hasViews: boolean;
+  public hasActions: boolean;
 
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
@@ -40,10 +41,11 @@ export class ViewPartComponent implements OnDestroy {
   }
 
   constructor(viewPart: WorkbenchViewPart, private _workbench: InternalWorkbenchService, public viewPartService: WorkbenchViewPartService) {
-    viewPart.viewRefs$
+    combineLatest(this._workbench.viewPartActions$, viewPart.actions$, viewPart.viewRefs$)
       .pipe(takeUntil(this._destroy$))
-      .subscribe(viewRefs => {
+      .subscribe(([globalActions, localActions, viewRefs]) => {
         this.hasViews = viewRefs.length > 0;
+        this.hasActions = globalActions.length > 0 || localActions.length > 0;
       });
   }
 

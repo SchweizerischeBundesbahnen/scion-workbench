@@ -14,6 +14,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ViewComponent } from './view/view.component';
 import { WorkbenchService } from './workbench.service';
 import { Arrays } from './array.util';
+import { Injector, TemplateRef } from '@angular/core';
+import { Disposable } from './disposable';
+import { ComponentType } from '@angular/cdk/portal';
 
 /**
  * A view is a visual component within the Workbench to present content,
@@ -139,11 +142,27 @@ export abstract class WorkbenchViewPart {
   public abstract get activeViewRef$(): Observable<string | null>;
 
   public abstract get viewRefs$(): Observable<string[]>;
+
+  /**
+   * Emits the actions added to this viewpart.
+   *
+   * Upon subscription, the currently added actions are emitted, and then emits continuously
+   * when new actions are added or removed. It never completes.
+   */
+  public abstract get actions$(): Observable<WorkbenchViewPartAction[]>;
+
+  /**
+   * Adds given viewpart action to this viewpart.
+   *
+   * Viewpart actions are displayed next to the opened view tabs.
+   */
+  public abstract registerViewPartAction(action: WorkbenchViewPartAction): Disposable;
 }
 
 export class InternalWorkbenchViewPart implements WorkbenchViewPart {
 
   public readonly viewRefs$ = new BehaviorSubject<string[]>([]);
+  public readonly actions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
   public readonly activeViewRef$ = new BehaviorSubject<string | null>(null);
 
   public set viewRefs(viewRefs: string[]) {
@@ -169,6 +188,13 @@ export class InternalWorkbenchViewPart implements WorkbenchViewPart {
   constructor(public readonly viewPartRef: string,
               public readonly portal: WbComponentPortal<ViewPartComponent>) {
   }
+
+  public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
+    this.actions$.next([...this.actions$.value, action]);
+    return {
+      dispose: (): void => this.actions$.next(this.actions$.value.filter(it => it !== action))
+    };
+  }
 }
 
 /**
@@ -184,4 +210,35 @@ export interface WbBeforeDestroy {
    * Return a falsy value to prevent view destruction, either as a boolean value or as an observable which emits a boolean value.
    */
   wbBeforeDestroy(): Observable<boolean> | Promise<boolean> | boolean;
+}
+
+/**
+ * Action to be added to an action bar.
+ */
+export interface WorkbenchAction {
+  /**
+   * Specifies either a template or a component to render this action.
+   */
+  templateOrComponent: TemplateRef<void> | { component: ComponentType<any>; injector: Injector };
+
+  /**
+   * Specifies where to place this action.
+   */
+  align?: 'start' | 'end';
+}
+
+/**
+ * Represents a viewpart action added to the viewpart action bar.
+ */
+
+/**
+ * Represents a viewpart action added to the viewpart action bar. Viewpart actions are displayed next to the view tabs.
+ */
+export interface WorkbenchViewPartAction extends WorkbenchAction {
+  /**
+   * Sticks this action to given view.
+   *
+   * If set, the action is only visible if the specified view is the active view in the viewpart.
+   */
+  viewRef?: string;
 }

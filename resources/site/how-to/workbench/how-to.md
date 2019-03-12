@@ -20,6 +20,7 @@ This section provides answers to some common questions when developing an applic
 - [How to set an icon for an activity](how-to-set-an-icon-for-an-activity.md)
 - [How to show a message box](how-to-show-a-message-box.md)
 - [How to show a notification](how-to-show-a-notification.md)
+- [How to provide a viewpart action](how-to-provide-a-viewpart-action.md)
 - [How to open activities or views of lazy loaded modules](how-to-open-activities-or-views-of-lazy-loaded-modules.md)
 
 ***

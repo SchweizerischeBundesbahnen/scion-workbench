@@ -16,6 +16,7 @@ import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { SciDimension } from '@scion/dimension';
 
 @Component({
   selector: 'wb-view-part-bar',
@@ -28,6 +29,8 @@ export class ViewPartBarComponent implements OnDestroy {
 
   @ViewChildren(ViewTabComponent)
   private _viewTabs: QueryList<ViewTabComponent>;
+
+  public viewTabsWidthPx: number;
 
   constructor(private _workbench: InternalWorkbenchService,
               private _workbenchLayout: WorkbenchLayoutService,
@@ -62,13 +65,11 @@ export class ViewPartBarComponent implements OnDestroy {
     this.viewPartService.moveViewToThisViewPart(sourceViewRef).then();
   }
 
-  public onViewportChange(): void {
-    if (!this._viewTabs) {
-      return;
-    }
+  public onViewTabsDimensionChange(dimension: SciDimension): void {
+    this.viewTabsWidthPx = dimension.clientWidth;
 
     // Compute tabs which are not visible in the viewtabs viewport.
-    this.viewPartService.setHiddenViewTabs(this._viewTabs
+    this._viewTabs && this.viewPartService.setHiddenViewTabs(this._viewTabs
       .filter(viewTab => !viewTab.isVisibleInViewport())
       .map(viewTab => viewTab.viewRef));
   }

@@ -54,6 +54,7 @@ export class ViewTabComponent implements OnDestroy {
   }
 
   @HostBinding('class.active')
+  @HostBinding('class.e2e-active')
   public get active(): boolean {
     return this._viewPartService.isViewActive(this.view.viewRef);
   }

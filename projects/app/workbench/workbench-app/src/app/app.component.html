@@ -11,4 +11,10 @@
                itemCssClass="material-icons"
                routerLink="activity-1a90c8d31-2">
   </wb-activity>
+
+  <ng-template wbViewPartAction *ngIf="showOpenNewViewTabAction">
+    <button [wbRouterLink]="'/welcome'" class="material-icons e2e-open-new-tab" [wbRouterLinkExtras]="{activateIfPresent: false}">
+      add
+    </button>
+  </ng-template>
 </wb-workbench>

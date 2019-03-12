@@ -10,11 +10,12 @@ SCION Workbench helps to build multi-view web applications and integrates separa
 <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/site/pics/workbench-large.png">![SCION Workbench](/resources/site/pics/workbench-small.png)</a>
 
 The Workbench provides core features of a modern rich web application.
--	Tabbed, movable and stackable views
--	Activity panel as application entry point
-- Popups
--	Global notifications 
--	Global or view-local message boxes
+-	tabbed, movable and stackable views
+-	activity panel as application entry point
+- popups
+-	global notifications 
+-	global or view-local message boxes
+- global or view-local viewpart actions
 -	URL encoded navigational state
 
 <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/site/pics/workbench-sketch-large.png">![SCION Workbench Features](/resources/site/pics/workbench-sketch-small.png)</a>
