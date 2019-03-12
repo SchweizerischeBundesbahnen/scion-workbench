@@ -25,4 +25,28 @@ export class Arrays {
     }
     return Array.isArray(value) ? value : [value];
   }
+
+  /**
+   * Compares items of given arrays for reference equality.
+   *
+   * Use the parameter `exactOrder` to control if the item order must be equal.
+   */
+  public static equal(array1: any[], array2: any[], exactOrder: boolean = true): boolean {
+    if (array1 === array2) {
+      return true;
+    }
+
+    if (array1.length !== array2.length) {
+      return false;
+    }
+
+    return array1.every((item, index) => {
+      if (exactOrder) {
+        return item === array2[index];
+      }
+      else {
+        return array2.includes(item);
+      }
+    });
+  }
 }

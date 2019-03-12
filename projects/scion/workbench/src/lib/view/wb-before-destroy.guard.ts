@@ -24,7 +24,7 @@ export class WbBeforeDestroyGuard implements CanDeactivate<any> {
                        currentState: RouterStateSnapshot,
                        nextState?: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     const it = component as WbBeforeDestroy;
-    if (typeof it.wbBeforeDestroy === 'function') {
+    if (it && typeof it.wbBeforeDestroy === 'function') {
       return component.wbBeforeDestroy();
     }
 

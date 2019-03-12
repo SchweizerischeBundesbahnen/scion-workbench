@@ -11,20 +11,22 @@
 import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
 import { WorkbenchViewPartService } from './workbench-view-part.service';
 import { noop, Subject } from 'rxjs';
-import { WbViewDropEvent, Region } from './view-drop-zone.directive';
+import { Region, WbViewDropEvent } from './view-drop-zone.directive';
 import { InternalWorkbenchService } from '../workbench.service';
+import { WorkbenchViewPart } from '../workbench.model';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'wb-view-part',
   templateUrl: './view-part.component.html',
   styleUrls: ['./view-part.component.scss'],
-  providers: [
-    WorkbenchViewPartService
-  ]
+  providers: [WorkbenchViewPartService]
 })
 export class ViewPartComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
+
+  public hasViews: boolean;
 
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
@@ -37,7 +39,12 @@ export class ViewPartComponent implements OnDestroy {
     return this.viewPartService.viewPartRef; // specs
   }
 
-  constructor(private _workbench: InternalWorkbenchService, public viewPartService: WorkbenchViewPartService) {
+  constructor(viewPart: WorkbenchViewPart, private _workbench: InternalWorkbenchService, public viewPartService: WorkbenchViewPartService) {
+    viewPart.viewRefs$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(viewRefs => {
+        this.hasViews = viewRefs.length > 0;
+      });
   }
 
   @HostListener('keydown.control.k', ['$event'])
@@ -74,8 +81,8 @@ export class ViewPartComponent implements OnDestroy {
    * Method invoked to move a view into this view part.
    */
   public onDrop(event: WbViewDropEvent): void {
-    const sourceViewRef = this._workbench.activeViewPartService.activeViewRef;
     const sourceViewPartService = this._workbench.activeViewPartService;
+    const sourceViewRef = sourceViewPartService.activeViewRef;
 
     if (sourceViewPartService === this.viewPartService && event.region !== 'center' && this.viewPartService.viewCount() > 1) {
       this.moveViewToNewViewPart(sourceViewRef, event.region).then(noop);

@@ -13,6 +13,8 @@ import { Activity1a90c8d32Component } from './activity-1a90c8d3/activity-1a90c8d
     AppComponent,
     Activity1a90c8d31Component,
     Activity1a90c8d32Component,
+    WelcomePageComponent,
+    ViewComponent,
   ],
   imports: [
     BrowserModule,

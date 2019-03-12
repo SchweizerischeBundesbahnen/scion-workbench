@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ANALYZE_FOR_ENTRY_COMPONENTS, Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
+import { ANALYZE_FOR_ENTRY_COMPONENTS, Inject, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { WorkbenchComponent } from './workbench.component';
@@ -46,7 +46,7 @@ import { MoveDirective } from './move.directive';
 import { WorkbenchConfig } from './workbench.config';
 import { TemplateHostOverlayDirective } from './content-projection/template-host-overlay.directive';
 import { ContentAsOverlayComponent } from './content-projection/content-as-overlay.component';
-import { ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
+import { ROUTE_REUSE_PROVIDER, VIEW_COMPONENT_TYPE, VIEW_PART_COMPONENT_TYPE, WORKBENCH, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
 import { NotificationService } from './notification/notification.service';
 import { NotificationListComponent } from './notification/notification-list.component';
 import { NotificationComponent } from './notification/notification.component';
@@ -120,10 +120,11 @@ import { TaskScheduler } from './task-scheduler.service';
 })
 export class WorkbenchModule {
 
-  // Note: We are injecting {WorkbenchAuxiliaryRoutesRegistrator} and {ViewRegistrySynchronizer} so they get created eagerly...
+  // Note: Inject services which should be created eagerly.
   constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any,
               auxiliaryRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
               viewRegistrySynchronizer: ViewRegistrySynchronizer) {
+    auxiliaryRoutesRegistrator.registerActivityAuxiliaryRoutes();
   }
 
   /**
@@ -154,8 +155,18 @@ export class WorkbenchModule {
       providers: [
         InternalWorkbenchService,
         {
-          provide: WorkbenchService, useExisting: InternalWorkbenchService
+          provide: WorkbenchService, useExisting: InternalWorkbenchService,
         },
+        {
+          provide: WORKBENCH, useExisting: InternalWorkbenchService,
+        },
+        {
+          provide: VIEW_PART_COMPONENT_TYPE, useValue: ViewPartComponent,
+        },
+        {
+          provide: VIEW_COMPONENT_TYPE, useValue: ViewComponent,
+        },
+
         WorkbenchLayoutService,
         WorkbenchActivityPartService,
         WorkbenchAuxiliaryRoutesRegistrator,

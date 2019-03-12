@@ -13,7 +13,6 @@ import { ResolveData } from '@angular/router/src/config';
 export class WorkbenchAuxiliaryRoutesRegistrator {
 
   constructor(private _router: Router) {
-    this.registerActivityAuxiliaryRoutes();
   }
 
   /**
@@ -44,16 +43,18 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
   private registerAuxiliaryRoutesFor(outlet: string, params: AuxiliaryRouteParams = {}): Routes {
     const primaryRoutes = this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
 
-    const auxRoutes: Routes = primaryRoutes.map(it => {
-      return {
-        ...it,
-        outlet: outlet,
-        component: it.component || EmptyOutletComponent, // used for lazy loading of aux routes; see Angular PR #23459
-        canDeactivate: [...(it.canDeactivate || []), ...(params.canDeactivate || [])],
-        data: {...it.data, ...params.data},
-        resolve: {...it.resolve, ...params.resolve},
-      };
-    });
+    const auxRoutes: Routes = primaryRoutes
+      .filter(primaryRoute => primaryRoute.path !== '') // skip empty path routes because not supported in named outlets
+      .map(it => {
+        return {
+          ...it,
+          outlet: outlet,
+          component: it.component || EmptyOutletComponent, // used for lazy loading of aux routes; see Angular PR #23459
+          canDeactivate: [...(it.canDeactivate || []), ...(params.canDeactivate || [])],
+          data: {...it.data, ...params.data},
+          resolve: {...it.resolve, ...params.resolve},
+        };
+      });
 
     this.replaceRouterConfig([
       ...this._router.config.filter(route => route.outlet !== outlet), // all registered routes, except auxiliary routes of the outlet

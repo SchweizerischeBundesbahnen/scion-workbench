@@ -18,5 +18,11 @@
   > wb-portal-outlet {
     flex: auto;
   }
+
+  > main {
+    flex: auto;
+    overflow: hidden;
+    @include allowPointerEvents;
+  }
 }
 

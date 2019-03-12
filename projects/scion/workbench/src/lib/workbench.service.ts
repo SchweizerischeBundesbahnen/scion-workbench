@@ -9,10 +9,11 @@
  */
 
 import { Injectable } from '@angular/core';
-import { WorkbenchViewPartService } from './view-part/workbench-view-part.service';
 import { ViewPartGridUrlObserver } from './view-part-grid/view-part-grid-url-observer.service';
+import { WorkbenchViewPartService } from './view-part/workbench-view-part.service';
 import { VIEW_GRID_QUERY_PARAM } from './workbench.constants';
 import { Router } from '@angular/router';
+import { WorkbenchViewRegistry } from './workbench-view-registry.service';
 
 /**
  * Root object for the SCION Workbench.
@@ -55,8 +56,16 @@ export abstract class WorkbenchService {
    * Throws an error if no viewpart contains the view.
    */
   public abstract resolveViewPart(viewRef: string): string;
-}
 
+  /**
+   * Emits the views opened in the workbench.
+   *
+   * Upon subscription, the currently opened views are emitted, and then emits continuously
+   * when new views are opened or existing views closed. It never completes.
+   */
+  public abstract get views$(): Observable<string[]>;
+
+}
 
 @Injectable()
 export class InternalWorkbenchService implements WorkbenchService {
@@ -64,7 +73,9 @@ export class InternalWorkbenchService implements WorkbenchService {
   private _activeViewPartService: WorkbenchViewPartService;
   private _viewPartServices: WorkbenchViewPartService[] = [];
 
-  constructor(private _viewPartGridUrlObserver: ViewPartGridUrlObserver, private _router: Router) {
+  constructor(private _viewPartGridUrlObserver: ViewPartGridUrlObserver,
+              private _router: Router,
+              private _viewRegistry: WorkbenchViewRegistry) {
   }
 
   public destroyView(...viewRefs: string[]): Promise<boolean> {
@@ -121,12 +132,13 @@ export class InternalWorkbenchService implements WorkbenchService {
   }
 
   /**
-   * Returns the currently active viewpart service for this workbench.
+   * Returns the active viewpart service for this workbench, or `null` if no viewpart is currently active.
    */
   public get activeViewPartService(): WorkbenchViewPartService {
-    if (!this._activeViewPartService) {
-      throw Error('No active ViewPart');
-    }
     return this._activeViewPartService;
+  }
+
+  public get views$(): Observable<string[]> {
+    return this._viewRegistry.viewRefs$;
   }
 }

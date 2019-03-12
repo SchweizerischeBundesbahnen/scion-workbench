@@ -8,8 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { InjectionToken } from '@angular/core';
+import { InjectionToken, Type } from '@angular/core';
 import { WbRouteReuseProvider } from './routing/wb-route-reuse-strategy.service';
+import { InternalWorkbenchService } from './workbench.service';
+import { ViewPartComponent } from './view-part/view-part.component';
+import { ViewComponent } from './view/view.component';
 
 /**
  * DI injection token to inject a router outlet name for {WbRouterOutletDirective}.
@@ -29,6 +32,27 @@ export const ROUTE_REUSE_PROVIDER = new InjectionToken<WbRouteReuseProvider>('RO
  * DI injection token to ensure `WorkbenchModule.forRoot()` is not used in a lazy context.
  */
 export const WORKBENCH_FORROOT_GUARD = new InjectionToken<void>('WORKBENCH_FORROOT_GUARD');
+
+/**
+ * DI injection token to inject {WorkbenchService}.
+ *
+ * Use this token in classes referenced by {WorkbenchService} to avoid causing a dependency circle.
+ */
+export const WORKBENCH = new InjectionToken<InternalWorkbenchService>('WORKBENCH');
+
+/**
+ * DI injection token representing {ViewPartComponent} type.
+ *
+ * Use this token if injecting the effective type would cause a dependency circle, e.g. when creating portals.
+ */
+export const VIEW_PART_COMPONENT_TYPE = new InjectionToken<Type<ViewPartComponent>>('VIEW_PART_COMPONENT_TYPE');
+
+/**
+ * DI injection token representing {ViewComponent} type.
+ *
+ * Use this token if injecting the effective type would cause a dependency circle, e.g. when creating portals.
+ */
+export const VIEW_COMPONENT_TYPE = new InjectionToken<Type<ViewComponent>>('VIEW_COMPONENT_TYPE');
 
 /**
  * Represents the name of the activity router outlet.
