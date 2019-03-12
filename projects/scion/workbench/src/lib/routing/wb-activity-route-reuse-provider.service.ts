@@ -14,6 +14,7 @@ import { ACTIVITY_OUTLET_NAME } from '../workbench.constants';
 import { WbRouteReuseProvider } from './wb-route-reuse-strategy.service';
 import { Injectable } from '@angular/core';
 import { WorkbenchConfig } from '../workbench.config';
+import { Defined } from '../defined.util';
 
 /**
  * Provides reuse keys for activity routes to not destroy associated activity component
@@ -25,7 +26,7 @@ export class WbActivityRouteReuseProvider implements WbRouteReuseProvider {
   private readonly _active: boolean;
 
   constructor(config: WorkbenchConfig) {
-    this._active = config.reuseActivityRoutes;
+    this._active = Defined.orElse(config.reuseActivityRoutes, true);
   }
 
   public computeReuseKey(route: ActivatedRouteSnapshot): any {

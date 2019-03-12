@@ -11,17 +11,11 @@
 /**
  * Configuration for the Workbench.
  */
-export class WorkbenchConfig {
+export abstract class WorkbenchConfig {
 
   /**
    * Specifies whether to reuse routes of activities.
    * If set to 'true', which is by default, activity components are not destroyed when toggling the activity.
    */
-  reuseActivityRoutes?: boolean = true; // tslint:disable-line:no-inferrable-types
-
-  constructor(config: WorkbenchConfig) {
-    Object.keys(config)
-      .filter(key => typeof config[key] !== 'undefined')
-      .forEach(key => this[key] = config[key]);
-  }
+  abstract reuseActivityRoutes?: boolean;
 }

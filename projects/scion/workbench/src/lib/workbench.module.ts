@@ -67,8 +67,6 @@ import { PopupService } from './popup/popup.service';
 import { A11yModule } from '@angular/cdk/a11y';
 import { TaskScheduler } from './task-scheduler.service';
 
-const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
-
 @NgModule({
   imports: [
     CommonModule,
@@ -182,12 +180,7 @@ export class WorkbenchModule {
           provide: APP_MESSAGE_BOX_SERVICE,
           useExisting: MessageBoxService
         },
-        {provide: CONFIG, useValue: config}, // required because function calls not supported in AOT build
-        {
-          provide: WorkbenchConfig,
-          useFactory: newConfig,
-          deps: [CONFIG]
-        },
+        {provide: WorkbenchConfig, useValue: config},
         {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
           multi: true,
@@ -244,6 +237,3 @@ export function provideForRootGuard(workbench: WorkbenchService): any {
   return 'guarded';
 }
 
-export function newConfig(config: WorkbenchConfig): WorkbenchConfig {
-  return new WorkbenchConfig(config);
-}
