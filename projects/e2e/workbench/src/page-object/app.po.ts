@@ -9,59 +9,56 @@
  */
 
 import { $, $$, browser, ElementFinder, protractor } from 'protractor';
-import { getCssClasses, switchToMainContext } from '../util/testing.util';
+import { getCssClasses } from '../util/testing.util';
 import { Duration, Severity } from '@scion/workbench-application-platform.api';
 import { ISize } from 'selenium-webdriver';
+import { WelcomePagePO } from './welcome-page.po';
 
-export class HostAppPO {
+export class AppPO {
 
   /**
-   * Finds the view tab which has given CSS class set.
-   * If not found, the promise resolves to `null`.
+   * Returns a handle representing the view tab which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public async findViewTab(cssClass: string): Promise<ViewTabPO | null> {
-    await switchToMainContext();
+  public findViewTab(cssClass: string): ViewTabPO {
     const viewTabFinder = $(`wb-view-tab.${cssClass}`);
 
-    const exists = await viewTabFinder.isPresent();
-    if (!exists) {
-      return null;
-    }
-
     return new class implements ViewTabPO {
+      async isPresent(): Promise<boolean> {
+        return viewTabFinder.isPresent();
+      }
+
       async click(): Promise<void> {
-        await switchToMainContext();
         await viewTabFinder.click();
       }
 
       async close(): Promise<void> {
-        await switchToMainContext();
-
         // hover the view-tab to make the close button visible
         await browser.actions().mouseMove(viewTabFinder).perform();
         await viewTabFinder.$('.e2e-close').click();
       }
 
       async getTitle(): Promise<string> {
-        await switchToMainContext();
         return viewTabFinder.$('.e2e-title').getText();
       }
 
       async getHeading(): Promise<string> {
-        await switchToMainContext();
         return viewTabFinder.$('.e2e-heading').getText();
       }
 
       async isDirty(): Promise<boolean> {
-        await switchToMainContext();
         const element = viewTabFinder.$('.e2e-dirty');
         return await element.isPresent() && await element.isDisplayed();
       }
 
       async isClosable(): Promise<boolean> {
-        await switchToMainContext();
         const element = viewTabFinder.$('.e2e-close');
         return await element.isPresent() && await element.isDisplayed();
+      }
+
+      async isActive(): Promise<boolean> {
+        const cssClasses = await getCssClasses(viewTabFinder);
+        return cssClasses.includes('e2e-active');
       }
     };
   }
@@ -70,7 +67,6 @@ export class HostAppPO {
    * Returns the number of view tabs.
    */
   public async getViewTabCount(): Promise<number> {
-    await switchToMainContext();
     return $$('wb-view-tab').count();
   }
 
@@ -78,37 +74,51 @@ export class HostAppPO {
    * Returns the number of notifications.
    */
   public async getNotificationCount(): Promise<number> {
-    await switchToMainContext();
     return $$('wb-notification').count();
   }
 
   /**
-   * Finds the notification which has given CSS class set.
-   * If not found, the promise resolves to `null`.
+   * Returns `true` if the activity bar is showing, or `false` otherwise.
    */
-  public async findNotification(cssClass: string): Promise<NotificationPO | null> {
-    await switchToMainContext();
+  public async isActivityBarShowing(): Promise<boolean> {
+    return $('wb-workbench').$('wb-activity-part').isPresent();
+  }
+
+  /**
+   * Returns `true` if the entry point page is showing, or `false` otherwise.
+   */
+  public async isEntryPointPageShowing(componentSelector: string): Promise<boolean> {
+    return $('wb-workbench').$('main').$(componentSelector).isPresent();
+  }
+
+  /**
+   * Returns `true` if the view tab bar is showing, or `false` otherwise.
+   */
+  public async isViewTabBarShowing(): Promise<boolean> {
+    return $('wb-workbench').$('wb-view-part-bar').isPresent();
+  }
+
+  /**
+   * Returns a handle representing the notification which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
+   */
+  public findNotification(cssClass: string): NotificationPO {
     const notificationFinder = $(`wb-notification.${cssClass}`);
 
-    const exists = await notificationFinder.isPresent();
-    if (!exists) {
-      return null;
-    }
-
     return new class implements NotificationPO {
+      async isPresent(): Promise<boolean> {
+        return notificationFinder.isPresent();
+      }
+
       async getTitle(): Promise<string> {
-        await switchToMainContext();
         return notificationFinder.$('.e2e-title').getText();
       }
 
       async getText(): Promise<string> {
-        await switchToMainContext();
         return notificationFinder.$('.e2e-text').getText();
       }
 
       async getSeverity(): Promise<Severity> {
-        await switchToMainContext();
-
         const cssClasses = await getCssClasses(notificationFinder);
         if (cssClasses.includes('e2e-severity-info')) {
           return 'info';
@@ -123,8 +133,6 @@ export class HostAppPO {
       }
 
       async getDuration(): Promise<Duration> {
-        await switchToMainContext();
-
         const cssClasses = await getCssClasses(notificationFinder);
         if (cssClasses.includes('e2e-duration-short')) {
           return 'short';
@@ -142,7 +150,6 @@ export class HostAppPO {
       }
 
       async close(): Promise<void> {
-        await switchToMainContext();
         await notificationFinder.$('.e2e-close').click();
         // wait until the animation completes
         await browser.wait(protractor.ExpectedConditions.stalenessOf(notificationFinder), 5000);
@@ -151,31 +158,26 @@ export class HostAppPO {
   }
 
   /**
-   * Finds the message box which has given CSS class set.
-   * If not found, the promise resolves to `null`.
+   * Returns a handle representing the message box which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public async findMessageBox(cssClass: string): Promise<MessageBoxPO | null> {
-    await switchToMainContext();
+  public findMessageBox(cssClass: string): MessageBoxPO {
     const msgboxFinder = $(`wb-message-box.${cssClass}`);
 
-    const exists = await msgboxFinder.isPresent();
-    if (!exists) {
-      return null;
-    }
-
     return new class implements MessageBoxPO {
+      async isPresent(): Promise<boolean> {
+        return msgboxFinder.isPresent();
+      }
+
       async getTitle(): Promise<string> {
-        await switchToMainContext();
         return msgboxFinder.$('.e2e-title').getText();
       }
 
       async getText(): Promise<string> {
-        await switchToMainContext();
         return msgboxFinder.$('.e2e-text').getText();
       }
 
       async getSeverity(): Promise<Severity | null> {
-        await switchToMainContext();
         const cssClasses = await getCssClasses(msgboxFinder);
         if (cssClasses.includes('e2e-severity-info')) {
           return 'info';
@@ -190,7 +192,6 @@ export class HostAppPO {
       }
 
       async getModality(): Promise<'application' | 'view' | null> {
-        await switchToMainContext();
         const cssClasses = await getCssClasses(msgboxFinder);
         if (cssClasses.includes('e2e-modality-application')) {
           return 'application';
@@ -202,8 +203,6 @@ export class HostAppPO {
       }
 
       async isContentSelectable(): Promise<boolean> {
-        await switchToMainContext();
-
         const text = await msgboxFinder.$('.e2e-text').getText();
 
         await browser.actions().mouseMove(msgboxFinder.$('.e2e-text')).perform();
@@ -214,7 +213,6 @@ export class HostAppPO {
       }
 
       async getActions(): Promise<{ [key: string]: string }> {
-        await switchToMainContext();
         const actions: { [key: string]: string } = {};
 
         const actionsFinder = msgboxFinder.$$('button.e2e-action');
@@ -230,15 +228,40 @@ export class HostAppPO {
       }
 
       async close(action: string): Promise<void> {
-        await switchToMainContext();
         await msgboxFinder.$(`button.e2e-action.e2e-action-key-${action}`).click();
         // wait until the animation completes
         await browser.wait(protractor.ExpectedConditions.stalenessOf(msgboxFinder), 5000);
       }
 
       async isDisplayed(): Promise<boolean> {
-        await switchToMainContext();
         return msgboxFinder.isDisplayed();
+      }
+    };
+  }
+
+  /**
+   * Opens a new view tab.
+   */
+  public async openNewViewTab(): Promise<WelcomePagePO> {
+    const viewPartActionPO = this.findViewPartAction('e2e-open-new-tab');
+    await viewPartActionPO.click();
+    return new WelcomePagePO();
+  }
+
+  /**
+   * Returns a handle representing the viewpart action which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
+   */
+  public findViewPartAction(buttonCssClass: string): ViewPartActionPO {
+    const actionFinder = $(`wb-workbench wb-view-part wb-view-part-action-bar button.${buttonCssClass}`);
+
+    return new class implements ViewPartActionPO {
+      async isPresent(): Promise<boolean> {
+        return actionFinder.isPresent();
+      }
+
+      public async click(): Promise<void> {
+        return actionFinder.click();
       }
     };
   }
@@ -249,9 +272,8 @@ export class HostAppPO {
    * The promise returned is rejected if not found.
    */
   public async clickActivityItem(cssClass: string): Promise<void> {
-    await switchToMainContext();
-    const activityItemPO = await this.findActivityItem(cssClass);
-    if (activityItemPO === null) {
+    const activityItemPO = this.findActivityItem(cssClass);
+    if (!await activityItemPO.isPresent()) {
       return Promise.reject(`Activity item not found [cssClass=${cssClass}]`);
     }
     await activityItemPO.click();
@@ -263,47 +285,39 @@ export class HostAppPO {
    * The promise returned is rejected if not found.
    */
   public async clickViewTab(cssClass: string): Promise<void> {
-    await switchToMainContext();
-    const viewTabPO = await this.findViewTab(cssClass);
-    if (viewTabPO === null) {
+    const viewTabPO = this.findViewTab(cssClass);
+    if (!await viewTabPO.isPresent()) {
       return Promise.reject(`View tab not found [cssClass=${cssClass}]`);
     }
     await viewTabPO.click();
   }
 
   /**
-   * Finds the activity item which has given CSS class set.
-   * If not found, the promise resolves to `null`.
+   * Returns a handle representing the activity item which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public async findActivityItem(cssClass: string): Promise<ActivityItemPO | null> {
-    await switchToMainContext();
+  public findActivityItem(cssClass: string): ActivityItemPO {
     const activityItemFinder = $(`wb-activity-part .e2e-activity-bar a.e2e-activity-item.${cssClass}`);
     const activityPanelFinder = $(`wb-activity-part .e2e-activity-panel.${cssClass}`);
 
-    const exists = await activityItemFinder.isPresent();
-    if (!exists) {
-      return null;
-    }
-
     return new class implements ActivityItemPO {
+      async isPresent(): Promise<boolean> {
+        return activityItemFinder.isPresent();
+      }
+
       async getTitle(): Promise<string> {
-        await switchToMainContext();
         return await activityItemFinder.getAttribute('title');
       }
 
       async getText(): Promise<string> {
-        await switchToMainContext();
         return await activityItemFinder.getText();
       }
 
       async getCssClasses(): Promise<string[]> {
-        await switchToMainContext();
         return await getCssClasses(activityItemFinder);
       }
 
       async click(): Promise<void> {
-        await switchToMainContext();
-
         const cssClasses = await this.getCssClasses();
         const closePanel = cssClasses.includes('e2e-active');
         await activityItemFinder.click();
@@ -314,31 +328,26 @@ export class HostAppPO {
   }
 
   /**
-   * Finds the activity panel which has given CSS class set.
-   * If not found, the promise resolves to `null`.
+   * Returns a handle representing the activity panel which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public async findActivityPanel(cssClass: string): Promise<ActivityPanelPO | null> {
-    await switchToMainContext();
+  public findActivityPanel(cssClass: string): ActivityPanelPO {
     const activityPanelFinder = $(`wb-activity-part .e2e-activity-panel.${cssClass}`);
 
-    const exists = await activityPanelFinder.isPresent();
-    if (!exists) {
-      return null;
-    }
-
     return new class implements ActivityPanelPO {
+      async isPresent(): Promise<boolean> {
+        return activityPanelFinder.isPresent();
+      }
+
       async getTitle(): Promise<string> {
-        await switchToMainContext();
         return activityPanelFinder.$('.e2e-activity-title').getText();
       }
 
       async getSize(): Promise<ISize> {
-        await switchToMainContext();
         return activityPanelFinder.getSize();
       }
 
       async getCssClasses(): Promise<string[]> {
-        await switchToMainContext();
         return getCssClasses(activityPanelFinder);
       }
     };
@@ -348,7 +357,6 @@ export class HostAppPO {
    * Enlarges or shrinks the activity panel.
    */
   public async moveActivitySash(delta: number): Promise<void> {
-    await switchToMainContext();
     await browser.actions().mouseMove($('div.e2e-activity-sash'), {x: 0, y: 0}).perform();
     await browser.actions()
       .mouseDown()
@@ -358,19 +366,18 @@ export class HostAppPO {
   }
 
   /**
-   * Finds the activity action which has given CSS class set.
+   * Returns a handle representing the activity action which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public async findActivityAction(cssClass: string): Promise<ActivityActionPO> {
+  public findActivityAction(cssClass: string): ActivityActionPO {
     const actionFinder = $(`wb-activity-part .e2e-activity-actions .${cssClass}`);
 
     return new class implements ActivityActionPO {
       async isPresent(): Promise<boolean> {
-        await switchToMainContext();
         return actionFinder.isPresent();
       }
 
       async click(): Promise<void> {
-        await switchToMainContext();
         await actionFinder.click();
       }
     };
@@ -378,6 +385,8 @@ export class HostAppPO {
 }
 
 export interface ViewTabPO {
+  isPresent(): Promise<boolean>;
+
   getTitle(): Promise<string>;
 
   getHeading(): Promise<string>;
@@ -389,9 +398,13 @@ export interface ViewTabPO {
   close(): Promise<void>;
 
   click(): Promise<void>;
+
+  isActive(): Promise<boolean>;
 }
 
 export interface NotificationPO {
+  isPresent(): Promise<boolean>;
+
   getTitle(): Promise<string>;
 
   getText(): Promise<string>;
@@ -404,6 +417,8 @@ export interface NotificationPO {
 }
 
 export interface MessageBoxPO {
+  isPresent(): Promise<boolean>;
+
   getTitle(): Promise<string>;
 
   getText(): Promise<string>;
@@ -425,6 +440,8 @@ export interface MessageBoxPO {
  * Represents an activity item in the activity bar.
  */
 export interface ActivityItemPO {
+  isPresent(): Promise<boolean>;
+
   getTitle(): Promise<string>;
 
   getText(): Promise<string>;
@@ -438,6 +455,8 @@ export interface ActivityItemPO {
  * Represents an activity panel in the activity part.
  */
 export interface ActivityPanelPO {
+  isPresent(): Promise<boolean>;
+
   getTitle(): Promise<string>;
 
   getSize(): Promise<ISize>;
@@ -449,6 +468,12 @@ export interface ActivityPanelPO {
 * Represents a clickable activity action
 */
 export interface ActivityActionPO {
+  isPresent(): Promise<boolean>;
+
+  click(): Promise<void>;
+}
+
+export interface ViewPartActionPO {
   isPresent(): Promise<boolean>;
 
   click(): Promise<void>;
