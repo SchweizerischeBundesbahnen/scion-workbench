@@ -15,7 +15,7 @@ import { WorkbenchModule } from '../workbench.module';
 import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ViewPartGridService } from '../view-part-grid/view-part-grid.service';
+import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
 
@@ -37,7 +37,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -66,7 +66,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -95,7 +95,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -124,7 +124,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -153,7 +153,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -176,8 +176,8 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const gridService = fixture.componentRef.injector.get(ViewPartGridService);
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPartRegistry = fixture.componentRef.injector.get(WorkbenchViewPartRegistry);
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -195,7 +195,7 @@ describe('ViewPartGridComponent', () => {
     viewPart1Component.moveViewToNewViewPart('view.3', 'east').then();
     advance(fixture);
 
-    const viewPart2 = gridService.resolveViewPartElseThrow('viewpart.2');
+    const viewPart2 = viewPartRegistry.getElseThrow('viewpart.2');
     const viewPart2Component = viewPart2.portal.componentRef.instance;
 
     // Move View 2 to the new ViewPart
@@ -224,7 +224,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -263,7 +263,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -302,7 +302,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -341,7 +341,7 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -380,8 +380,8 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const gridService = fixture.componentRef.injector.get(ViewPartGridService);
-    const viewPart1Component = gridComponent.rootAsViewPartPortal.componentRef.instance;
+    const viewPartRegistry = fixture.componentRef.injector.get(WorkbenchViewPartRegistry);
+    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -409,7 +409,7 @@ describe('ViewPartGridComponent', () => {
     });
 
     // Move View 2 to a new ViewPart in the south of ViewPart 2
-    const viewPart2Component = gridService.resolveViewPartElseThrow('viewpart.2').portal.componentRef.instance;
+    const viewPart2Component = viewPartRegistry.getElseThrow('viewpart.2').portal.componentRef.instance;
     expect(viewPart2Component).toBeTruthy();
 
     viewPart2Component.moveViewToNewViewPart('view.2', 'south').then();

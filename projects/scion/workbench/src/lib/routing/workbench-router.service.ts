@@ -12,10 +12,10 @@ import { Injectable } from '@angular/core';
 import { ACTIVITY_OUTLET_NAME, VIEW_GRID_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
 import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment } from '@angular/router';
 import { InternalWorkbenchService } from '../workbench.service';
-import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { Defined } from '../defined.util';
 import { WorkbenchView } from '../workbench.model';
+import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -61,7 +61,7 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
   constructor(private _router: Router,
               private _workbench: InternalWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _viewPartGridUrlObserver: ViewPartGridUrlObserver) {
+              private _viewPartRegistry: WorkbenchViewPartRegistry) {
   }
 
   public navigate(commandList: any[], extras: WbNavigationExtras = {}): Promise<boolean> {
@@ -93,10 +93,10 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
 
     switch (extras.target || 'blank') {
       case 'blank': {
+        const viewPartGrid = this._viewPartRegistry.grid;
         const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
-        const viewPartRef = extras.blankViewPartRef || (this._workbench.activeViewPartService && this._workbench.activeViewPartService.viewPartRef) || this._viewPartGridUrlObserver.snapshot.viewPartRefs()[0];
-        const grid = this._viewPartGridUrlObserver.snapshot.addView(viewPartRef, newViewRef).serialize();
-        return routeFn(newViewRef, grid);
+        const viewPartRef = extras.blankViewPartRef || (this._workbench.activeViewPartService && this._workbench.activeViewPartService.viewPartRef) || viewPartGrid.viewPartRefs()[0];
+        return routeFn(newViewRef, viewPartGrid.addView(viewPartRef, newViewRef).serialize());
       }
       case 'self': {
         if (!extras.selfViewRef) {
@@ -109,7 +109,7 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
           throw Error(`Invalid argument: '${extras.selfViewRef}' is not a valid view outlet.`);
         }
 
-        return routeFn(extras.selfViewRef, this._viewPartGridUrlObserver.snapshot.serialize());
+        return routeFn(extras.selfViewRef, this._viewPartRegistry.grid.serialize());
       }
       default: {
         throw Error('Not supported routing view target.');

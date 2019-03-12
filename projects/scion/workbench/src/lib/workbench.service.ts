@@ -9,11 +9,11 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ViewPartGridUrlObserver } from './view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewPartService } from './view-part/workbench-view-part.service';
 import { VIEW_GRID_QUERY_PARAM } from './workbench.constants';
 import { Router } from '@angular/router';
 import { WorkbenchViewRegistry } from './workbench-view-registry.service';
+import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
 
 /**
  * Root object for the SCION Workbench.
@@ -73,14 +73,14 @@ export class InternalWorkbenchService implements WorkbenchService {
   private _activeViewPartService: WorkbenchViewPartService;
   private _viewPartServices: WorkbenchViewPartService[] = [];
 
-  constructor(private _viewPartGridUrlObserver: ViewPartGridUrlObserver,
-              private _router: Router,
+  constructor(private _router: Router,
+              private _viewPartRegistry: WorkbenchViewPartRegistry,
               private _viewRegistry: WorkbenchViewRegistry) {
   }
 
   public destroyView(...viewRefs: string[]): Promise<boolean> {
     const destroyViewFn = (viewRef: string): Promise<boolean> => {
-      const serializedGrid = this._viewPartGridUrlObserver.snapshot
+      const serializedGrid = this._viewPartRegistry.grid
         .removeView(viewRef)
         .serialize();
       return this._router.navigate([{outlets: {[viewRef]: null}}], {

@@ -12,9 +12,8 @@ import { Component, ElementRef, HostBinding, Input, OnDestroy } from '@angular/c
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { ViewPartComponent } from '../view-part/view-part.component';
-import { ViewPartGridService } from '../view-part-grid/view-part-grid.service';
+import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { VIEW_PART_REF_INDEX, ViewPartSashBox } from '../view-part-grid/view-part-grid-serializer.service';
-import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { VIEW_GRID_QUERY_PARAM } from '../workbench.constants';
 import { Router } from '@angular/router';
 import { debounceTime, takeUntil } from 'rxjs/operators';
@@ -47,9 +46,8 @@ export class ViewPartSashBoxComponent implements OnDestroy {
   }
 
   constructor(private _host: ElementRef,
-              private _viewPartGridService: ViewPartGridService,
+              private _viewPartRegistry: WorkbenchViewPartRegistry,
               private _workbenchLayout: WorkbenchLayoutService,
-              private _viewPartGridUrlObserver: ViewPartGridUrlObserver,
               private _router: Router) {
     this.installSashListener();
   }
@@ -75,7 +73,7 @@ export class ViewPartSashBoxComponent implements OnDestroy {
 
   public sashAsViewPartPortal(which: 'sash1' | 'sash2'): WbComponentPortal<ViewPartComponent> {
     const sash = (which === 'sash1' ? this.sashBox.sash1 : this.sashBox.sash2);
-    return Array.isArray(sash) ? this._viewPartGridService.resolveViewPartElseThrow(sash[VIEW_PART_REF_INDEX]).portal : null;
+    return Array.isArray(sash) ? this._viewPartRegistry.getElseThrow(sash[VIEW_PART_REF_INDEX]).portal : null;
   }
 
   public sashAsSashBox(which: 'sash1' | 'sash2'): ViewPartSashBox {
@@ -94,7 +92,7 @@ export class ViewPartSashBoxComponent implements OnDestroy {
         debounceTime(500)
       )
       .subscribe(() => {
-        const serializedGrid = this._viewPartGridUrlObserver.snapshot
+        const serializedGrid = this._viewPartRegistry.grid
           .splitPosition(this.sashBox.id, this.sashBox.splitter)
           .serialize();
 

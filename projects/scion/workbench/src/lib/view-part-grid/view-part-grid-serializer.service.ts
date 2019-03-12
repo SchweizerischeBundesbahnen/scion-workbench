@@ -17,11 +17,11 @@ import { VIEW_PART_REF_PREFIX } from '../workbench.constants';
 @Injectable()
 export class ViewPartGridSerializerService {
 
-  public parseGrid(serializedGrid: string): ViewPartSashBox | ViewPartInfoArray {
+  public parseGrid(serializedGrid: string): ViewPartSashBox | ViewPartInfoArray | null {
     return serializedGrid && JSON.parse(atob(serializedGrid)) || null;
   }
 
-  public serializeGrid(grid: ViewPartSashBox | ViewPartInfoArray): string {
+  public serializeGrid(grid: ViewPartSashBox | ViewPartInfoArray): string | null {
     return grid && btoa(JSON.stringify(grid)) || null;
   }
 

@@ -15,13 +15,16 @@ import { ACTIVE_VIEW_REF_INDEX, VIEW_PART_REF_INDEX, VIEW_REFS_START_INDEX, View
 /**
  * Represents the arrangement of viewparts in a grid and provides methods to modify the grid.
  *
- * The grid is serializable into a URL string.
- * It is a tree which consists of sash boxes {ViewPartSashBox} and viewpart information {ViewPartInfoArray}.
+ * {ViewPartGrid} is an immutable object, meaning that modifications have no side effect. The grid is serializable into a URL string.
+ *
+ * The grid is a tree of {ViewPartSashBox} and {ViewPartInfoArray} objects.
  */
 export class ViewPartGrid {
 
-  constructor(private _root: ViewPartSashBox | ViewPartInfoArray,
-              private _serializer: ViewPartGridSerializerService) {
+  private _root: ViewPartSashBox | ViewPartInfoArray;
+
+  constructor(serializedGrid: string, private _serializer: ViewPartGridSerializerService) {
+    this._root = this._serializer.parseGrid(serializedGrid || this._serializer.emptySerializedGrid());
   }
 
   /**
@@ -32,9 +35,78 @@ export class ViewPartGrid {
   }
 
   /**
-   * Adds a view to the specified viewpart, and activates it.
+   * Returns a new copy of this grid.
    */
-  public addView(viewPartRef: string, viewRef: string): this {
+  public clone(): ViewPartGrid {
+    const serializedGrid = this._serializer.serializeGrid(this._root);
+    return new ViewPartGrid(serializedGrid, this._serializer);
+  }
+
+  /**
+   * Adds a view to the specified viewpart, and activates it.
+   *
+   * Returns a copy of this grid with the specified view added.
+   */
+  public addView(viewPartRef: string, viewRef: string): ViewPartGrid {
+    return this.clone()._addView(viewPartRef, viewRef);
+  }
+
+  /**
+   * Removes a view and activates the preceding view.
+   * In case the view was the last view of the viewpart, the viewpart is removed as well.
+   *
+   * Returns a copy of this grid with the specified view removed.
+   */
+  public removeView(viewRef: string): ViewPartGrid {
+    return this.clone()._removeView(viewRef);
+  }
+
+  /**
+   * Swaps two views of the specified viewpart.
+   *
+   * Returns a copy of this grid with the specified views switched.
+   */
+  public swapViews(viewPartRef: string, viewRef1: string, viewRef2: string): ViewPartGrid {
+    return this.clone()._swapViews(viewPartRef, viewRef1, viewRef2);
+  }
+
+  /**
+   * Activates a view of the specified viewpart.
+   *
+   * Returns a copy of this grid with the specified view activated.
+   */
+  public activateView(viewPartRef: string, viewRef: string): ViewPartGrid {
+    return this.clone()._activateView(viewPartRef, viewRef);
+  }
+
+  /**
+   * Sets the splitter position.
+   *
+   * Returns a copy of this grid with the specified splitter position changed.
+   */
+  public splitPosition(sashBoxId: number, splitter: number): ViewPartGrid {
+    return this.clone()._splitPosition(sashBoxId, splitter);
+  }
+
+  /**
+   * Adds a new viewpart as a sibling of another viewpart in the region as specified.
+   *
+   * Returns a copy of this grid with the specified viewpart added.
+   */
+  public addSiblingViewPart(region: Region, anchorViewPartRef: string, newViewPartRef: string): ViewPartGrid {
+    return this.clone()._addSiblingViewPart(region, anchorViewPartRef, newViewPartRef);
+  }
+
+  /**
+   * Removes a viewpart from the grid.
+   *
+   * Returns a copy of this grid with the specified viewpart removed.
+   */
+  public removeViewPart(viewPartRef: string): ViewPartGrid {
+    return this.clone()._removeViewPart(viewPartRef);
+  }
+
+  private _addView(viewPartRef: string, viewRef: string): this {
     const viewPartInfoArray = this.getViewPartElseThrow(viewPartRef).viewPartInfoArray;
 
     // Add the view and make it the active view
@@ -44,11 +116,7 @@ export class ViewPartGrid {
     return this;
   }
 
-  /**
-   * Removes a view and activates the preceding view.
-   * In case the view was the last view of the viewpart, the viewpart is removed as well.
-   */
-  public removeView(viewRef: string): this {
+  private _removeView(viewRef: string): this {
     const viewPartRef = this.findContainingViewPartElseThrow(viewRef);
     const viewPartInfoArray = this.getViewPartElseThrow(viewPartRef).viewPartInfoArray;
 
@@ -72,16 +140,13 @@ export class ViewPartGrid {
     // Remove viewpart if its last view is closed.
     const lastView = !(viewPartInfoArray.length > VIEW_REFS_START_INDEX);
     if (lastView) {
-      this.removeViewPart(viewPartRef);
+      this._removeViewPart(viewPartRef);
     }
 
     return this;
   }
 
-  /**
-   * Swaps two views of the specified viewpart.
-   */
-  public swapViews(viewPartRef: string, viewRef1: string, viewRef2: string): this {
+  private _swapViews(viewPartRef: string, viewRef1: string, viewRef2: string): this {
     const viewPartInfoArray = this.getViewPartElseThrow(viewPartRef).viewPartInfoArray;
 
     const view1Index = viewPartInfoArray.indexOf(viewRef1, VIEW_REFS_START_INDEX);
@@ -98,10 +163,7 @@ export class ViewPartGrid {
     return this;
   }
 
-  /**
-   * Activates a view of the specified viewpart.
-   */
-  public activateView(viewPartRef: string, viewRef: string): this {
+  private _activateView(viewPartRef: string, viewRef: string): this {
     const viewPartInfoArray = this.getViewPartElseThrow(viewPartRef).viewPartInfoArray;
     if (viewPartInfoArray.indexOf(viewRef, VIEW_REFS_START_INDEX) === -1) {
       throw Error(`Illegal argument. View not found in viewpart [viewPartRef=${viewPartRef}, viewRef=${viewRef}]`);
@@ -110,10 +172,7 @@ export class ViewPartGrid {
     return this;
   }
 
-  /**
-   * Sets the splitter position.
-   */
-  public splitPosition(sashBoxId: number, splitter: number): this {
+  private _splitPosition(sashBoxId: number, splitter: number): this {
     let sashBox: ViewPartSashBox;
     this.visit(() => true, (it: ViewPartSashBox): boolean => {
       if (it.id === sashBoxId) {
@@ -131,10 +190,7 @@ export class ViewPartGrid {
     return this;
   }
 
-  /**
-   * Adds a new viewpart as a sibling of another viewpart in the region as specified.
-   */
-  public addSiblingViewPart(region: Region, anchorViewPartRef: string, newViewPartRef: string): this {
+  private _addSiblingViewPart(region: Region, anchorViewPartRef: string, newViewPartRef: string): this {
     if (!anchorViewPartRef) {
       throw Error('anchor viewpart must not be null');
     }
@@ -158,19 +214,18 @@ export class ViewPartGrid {
     // Insert the new sash box into the grid
     if (parentSashBox === null) {
       this._root = newSashBox;
-    } else if (parentSashBox.sash1 === anchorViewPartInfoArray) {
+    }
+    else if (parentSashBox.sash1 === anchorViewPartInfoArray) {
       parentSashBox.sash1 = newSashBox;
-    } else {
+    }
+    else {
       parentSashBox.sash2 = newSashBox;
     }
 
     return this;
   }
 
-  /**
-   * Removes a viewpart from the grid.
-   */
-  public removeViewPart(viewPartRef: string): this {
+  private _removeViewPart(viewPartRef: string): this {
     const viewPartNode = this.getViewPartElseThrow(viewPartRef);
     const viewPartInfoArray = viewPartNode.viewPartInfoArray;
     if (this._root === viewPartInfoArray) {
@@ -185,9 +240,11 @@ export class ViewPartGrid {
     const parentSashBox = viewPartNode.path[viewPartNode.path.length - 2] || null;
     if (parentSashBox === null) {
       this._root = siblingSash;
-    } else if (parentSashBox.sash1 === containingSashBox) {
+    }
+    else if (parentSashBox.sash1 === containingSashBox) {
       parentSashBox.sash1 = siblingSash;
-    } else {
+    }
+    else {
       parentSashBox.sash2 = siblingSash;
     }
 
