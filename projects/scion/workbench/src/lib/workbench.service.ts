@@ -12,7 +12,10 @@ import { Injectable } from '@angular/core';
 import { WorkbenchViewPartService } from './view-part/workbench-view-part.service';
 import { VIEW_GRID_QUERY_PARAM } from './workbench.constants';
 import { Router } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { WorkbenchViewRegistry } from './workbench-view-registry.service';
+import { Disposable } from './disposable';
+import { WorkbenchViewPartAction } from './workbench.model';
 import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
 
 /**
@@ -65,6 +68,12 @@ export abstract class WorkbenchService {
    */
   public abstract get views$(): Observable<string[]>;
 
+  /**
+   * Adds given viewpart action to every viewpart.
+   *
+   * Viewpart actions are displayed next to the opened view tabs.
+   */
+  public abstract registerViewPartAction(action: WorkbenchViewPartAction): Disposable;
 }
 
 @Injectable()
@@ -72,6 +81,7 @@ export class InternalWorkbenchService implements WorkbenchService {
 
   private _activeViewPartService: WorkbenchViewPartService;
   private _viewPartServices: WorkbenchViewPartService[] = [];
+  public readonly viewPartActions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
 
   constructor(private _router: Router,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
@@ -140,5 +150,12 @@ export class InternalWorkbenchService implements WorkbenchService {
 
   public get views$(): Observable<string[]> {
     return this._viewRegistry.viewRefs$;
+  }
+
+  public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
+    this.viewPartActions$.next([...this.viewPartActions$.value, action]);
+    return {
+      dispose: (): void => this.viewPartActions$.next(this.viewPartActions$.value.filter(it => it !== action))
+    };
   }
 }

@@ -48,6 +48,10 @@ export class WorkbenchViewPartService implements OnDestroy {
     return this._viewPart.activeViewRef;
   }
 
+  public get activeViewRef$(): Observable<string | null> {
+    return this._viewPart.activeViewRef$;
+  }
+
   public get activeView(): InternalWorkbenchView | null {
     return this._viewRegistry.getElseNull(this._viewPart.activeViewRef);
   }

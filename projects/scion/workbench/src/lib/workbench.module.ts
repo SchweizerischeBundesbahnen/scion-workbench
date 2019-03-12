@@ -63,6 +63,8 @@ import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxilia
 import { OverlayModule } from '@angular/cdk/overlay';
 import { PopupService } from './popup/popup.service';
 import { A11yModule } from '@angular/cdk/a11y';
+import { ViewPartActionDirective } from './view-part/view-part-action-bar/view-part-action.directive';
+import { ViewPartActionBarComponent } from './view-part/view-part-action-bar/view-part-action-bar.component';
 import { TaskScheduler } from './task-scheduler.service';
 import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
 
@@ -105,6 +107,8 @@ import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-
     TemplateHostOverlayDirective,
     EmptyOutletComponent,
     ContentAsOverlayComponent,
+    ViewPartActionDirective,
+    ViewPartActionBarComponent,
   ],
   exports: [
     WorkbenchComponent,
@@ -115,6 +119,7 @@ import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-
     WbRouterLinkWithHrefDirective,
     RemoteSiteComponent,
     ContentAsOverlayComponent,
+    ViewPartActionDirective,
   ]
 })
 export class WorkbenchModule {

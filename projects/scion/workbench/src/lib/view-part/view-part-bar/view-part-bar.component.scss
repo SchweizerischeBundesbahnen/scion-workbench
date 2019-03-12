@@ -6,7 +6,11 @@
   color: $viewpart_tab-fgcolor;
 
   > sci-viewport {
-    flex: auto;
+    flex: initial;
+
+    // Sets the viewport client (<div.viewport-client>) to its smallest width, so that view-tabs do not overflow.
+    // This allows view actions to stick to the right of the viewport, even if closing view tabs.
+    --grid-template-columns: min-content;
 
     div.viewport-client {
       display: flex;
@@ -17,6 +21,10 @@
         flex: none;
       }
     }
+  }
+
+  > wb-view-part-action-bar {
+    flex: auto;
   }
 
   > wb-view-list-button {

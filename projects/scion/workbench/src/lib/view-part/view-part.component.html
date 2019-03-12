@@ -1,4 +1,4 @@
-<wb-view-part-bar *ngIf="hasViews"></wb-view-part-bar>
+<wb-view-part-bar *ngIf="hasViews || hasActions"></wb-view-part-bar>
 <wb-portal-outlet *ngIf="hasViews; else entry_point_template"
                   [wbPortal]="viewPartService.activeView?.portal"
                   wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)">

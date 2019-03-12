@@ -2,7 +2,7 @@
 @import '../content-projection/mixins';
 
 :host {
-  position: relative; // positioned anchor
+  position: absolute; // absolutely positioned anchor so that '<wb-view-part-bar>' does not overflow horizontally
   display: flex;
   flex-direction: column;
   outline: none;
