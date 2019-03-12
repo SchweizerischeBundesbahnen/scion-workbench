@@ -132,12 +132,39 @@ export class InternalWorkbenchView implements WorkbenchView {
 export abstract class WorkbenchViewPart {
 
   public abstract readonly viewPartRef: string;
+
+  /**
+   * Emits the currently active view in this viewpart.
+   */
+  public abstract get activeViewRef$(): Observable<string | null>;
+
+  public abstract get viewRefs$(): Observable<string[]>;
 }
 
 export class InternalWorkbenchViewPart implements WorkbenchViewPart {
 
-  public viewRefs: string[] = [];
-  public activeViewRef: string;
+  public readonly viewRefs$ = new BehaviorSubject<string[]>([]);
+  public readonly activeViewRef$ = new BehaviorSubject<string | null>(null);
+
+  public set viewRefs(viewRefs: string[]) {
+    if (!Arrays.equal(viewRefs, this.viewRefs, false)) {
+      this.viewRefs$.next(viewRefs);
+    }
+  }
+
+  public get viewRefs(): string[] {
+    return this.viewRefs$.value;
+  }
+
+  public set activeViewRef(viewRef: string) {
+    if (viewRef !== this.activeViewRef) {
+      this.activeViewRef$.next(viewRef);
+    }
+  }
+
+  public get activeViewRef(): string {
+    return this.activeViewRef$.value;
+  }
 
   constructor(public readonly viewPartRef: string,
               public readonly portal: WbComponentPortal<ViewPartComponent>) {

@@ -94,7 +94,7 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
     switch (extras.target || 'blank') {
       case 'blank': {
         const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
-        const viewPartRef = extras.blankViewPartRef || this._workbench.activeViewPartService.viewPartRef;
+        const viewPartRef = extras.blankViewPartRef || (this._workbench.activeViewPartService && this._workbench.activeViewPartService.viewPartRef) || this._viewPartGridUrlObserver.snapshot.viewPartRefs()[0];
         const grid = this._viewPartGridUrlObserver.snapshot.addView(viewPartRef, newViewRef).serialize();
         return routeFn(newViewRef, grid);
       }

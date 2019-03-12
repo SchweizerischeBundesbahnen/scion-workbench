@@ -8,6 +8,7 @@
 This section provides answers to some common questions when developing an application with SCION Workbench.
 
 ***
+- [How to specify a default page or default view](how-to-specify-a-default-page-or-default-view.md)
 - [How to add an activity](how-to-add-an-activity.md)
 - [How to add an action to an activity](how-to-add-an-action-to-an-activity.md)
 - [How to open a view](how-to-open-a-view.md)
