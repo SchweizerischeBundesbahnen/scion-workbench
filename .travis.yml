@@ -22,12 +22,14 @@ jobs:
   -
     name: "lints all applications"
     script:
+      - npm run app:workbench:lint
       - npm run app:workbench-application-platform:lint
   - stage: "Build stage"
     name: "builds all, tests all, deploys demo apps (if branch=master) to 'https://zeit.co/scion', publishes libraries to NPM (if branch=master AND if release tag)"
     script:
     - npm run build
     - npm run test
+    - npm run app:workbench:e2e
     - npm run app:workbench-application-platform:build-now
     - npm run app:workbench-application-platform:e2e
     deploy:

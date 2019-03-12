@@ -39,6 +39,10 @@
     "lint:dimension": "ng lint @scion/dimension",
     "lint:viewport": "ng lint @scion/viewport",
 
+    "app:workbench:e2e": "ng e2e e2e/workbench",
+    "app:workbench:lint": "ng lint app/workbench/workbench-app && ng lint e2e/workbench",
+    "app:workbench:serve": "ng serve app/workbench/workbench-app --aot",
+
     "app:workbench-application-platform:e2e": "run-p -r app:workbench-application-platform:serve app:workbench-application-platform:await-then-e2e",
     "app:workbench-application-platform:await-then-e2e": "run-s app:workbench-application-platform:await app:workbench-application-platform:e2e:specs",
     "app:workbench-application-platform:build-now": "run-s app:workbench-application-platform:build-now:*",
