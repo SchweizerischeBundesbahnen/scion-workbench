@@ -24,11 +24,14 @@
     flex: none;
   }
 
+  > wb-activity-part + wb-view-part-grid {
+    position: relative; // forms a stacking context to show 'box-shadow'
+    box-shadow: -1px 0 2px 0 rgba(0, 0, 0, .4);
+  }
+
   > wb-view-part-grid {
     @include preventPointerEvents;
     flex: auto;
-    position: relative; // forms a stacking context to show 'box-shadow'
-    box-shadow: -1px 0 2px 0 rgba(0, 0, 0, .4);
   }
 
   > wb-message-box-stack {

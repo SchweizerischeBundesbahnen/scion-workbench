@@ -13,11 +13,12 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME } from '../workbench.constants';
 import { InternalWorkbenchRouter } from '../routing/workbench-router.service';
 import { Activity, InternalActivity } from './activity';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable()
 export class WorkbenchActivityPartService {
 
-  private _activities: Activity[] = [];
+  private _activities$ = new BehaviorSubject<Activity[]>([]);
 
   constructor(private _router: Router,
               private _wbRouter: InternalWorkbenchRouter,
@@ -28,7 +29,14 @@ export class WorkbenchActivityPartService {
    * Returns the list of activities.
    */
   public get activities(): Activity[] {
-    return this._activities;
+    return this._activities$.value;
+  }
+
+  /**
+   * Returns the list of activities as {Observable}, which emits when activities are added or removed.
+   */
+  public get activities$(): Observable<Activity[]> {
+    return this._activities$;
   }
 
   /**
@@ -42,7 +50,7 @@ export class WorkbenchActivityPartService {
    * Returns the activity which is currently active, or `null` otherwise.
    */
   public get activeActivity(): Activity | null {
-    return this._activities.find(it => it.active) || null;
+    return this.activities.find(it => it.active) || null;
   }
 
   /**
@@ -55,8 +63,9 @@ export class WorkbenchActivityPartService {
       return this._router.navigate([{outlets: {[ACTIVITY_OUTLET_NAME]: activity.active ? null : activity.commands}}], {
         queryParamsHandling: 'preserve'
       });
-    } else if (activity.target === 'view') {
-      return this._wbRouter.navigate(activity.commands);
+    }
+    else if (activity.target === 'view') {
+      return this._wbRouter.navigate(activity.commands, {activateIfPresent: false});
     }
     throw Error('[IllegalActivityTargetError] Target must be \'activity-panel\' or \'view\'');
   }
@@ -65,19 +74,16 @@ export class WorkbenchActivityPartService {
    * Adds an activity to the activity bar.
    */
   public addActivity(activity: Activity): void {
-    this._activities.push(activity);
-    this._activities.sort((a1, a2) => (a1.position || 0) - (a2.position || 0));
+    const activities = [...this.activities, activity].sort((a1, a2) => (a1.position || 0) - (a2.position || 0));
+    this._activities$.next(activities);
   }
 
   /**
    * Removes an activity from the activity bar.
    */
   public removeActivity(activity: Activity): void {
-    const index = this._activities.findIndex(it => it === activity);
-    if (index === -1) {
-      throw Error('[IllegalStateError] Activity not registered');
-    }
-    this._activities.splice(index, 1);
+    const activities = this.activities.filter(it => it !== activity);
+    this._activities$.next(activities);
   }
 
   /**

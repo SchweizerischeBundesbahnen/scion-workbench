@@ -9,7 +9,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ApplicationManifest, HOST_APPLICATION_SYMBOLIC_NAME, ApplicationConfig } from './metadata';
+import { ApplicationConfig, ApplicationManifest, HOST_APPLICATION_SYMBOLIC_NAME } from './metadata';
 import { Defined } from './defined.util';
 import { ManifestRegistry } from './manifest-registry.service';
 import { Application } from '@scion/workbench-application-platform.api';

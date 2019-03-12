@@ -57,7 +57,7 @@ export class ActivityResolver implements Resolve<Activity>, OnDestroy {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         filter(() => !this._router.routerState.snapshot.root.children.some(it => it.outlet === ACTIVITY_OUTLET_NAME)),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe(() => {
         this.deactivateActivity();
