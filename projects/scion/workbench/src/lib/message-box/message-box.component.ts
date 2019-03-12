@@ -16,6 +16,7 @@ import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { Arrays } from '../array.util';
+import { TaskScheduler } from '../task-scheduler.service';
 
 @Component({
   selector: 'wb-message-box',
@@ -97,13 +98,14 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
 
   constructor(private _injector: Injector,
               private _cd: ChangeDetectorRef,
-              private _workbenchLayout: WorkbenchLayoutService) {
+              private _workbenchLayout: WorkbenchLayoutService,
+              private _taskScheduler: TaskScheduler) {
   }
 
   public ngAfterViewInit(): void {
     // Initiate manual change detection cycle because property may change during custom component construction.
     if (this._messageBox.content) {
-      setTimeout(() => this._cd.markForCheck());
+      this._taskScheduler.scheduleMacrotask(() => this._cd.markForCheck());
     }
   }
 

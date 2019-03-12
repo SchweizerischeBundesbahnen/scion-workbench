@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import { Region } from './view-drop-zone.directive';
 import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
+import { TaskScheduler } from '../task-scheduler.service';
 
 @Injectable()
 export class WorkbenchViewPartService implements OnDestroy {
@@ -29,7 +30,8 @@ export class WorkbenchViewPartService implements OnDestroy {
               private _viewRegistry: WorkbenchViewRegistry,
               private _router: Router,
               private _viewPartGridUrlObserver: ViewPartGridUrlObserver,
-              private _viewPart: InternalWorkbenchViewPart) {
+              private _viewPart: InternalWorkbenchViewPart,
+              private _taskScheduler: TaskScheduler) {
     this._workbench.registerViewPartService(this);
     this.activate();
   }
@@ -190,9 +192,10 @@ export class WorkbenchViewPartService implements OnDestroy {
 
     if (async) {
       return new Promise<boolean>((resolve: (status: boolean) => void, reject: (reason?: any) => void): void => {
-        setTimeout(() => navigateFn().then(resolve).catch(reject));
+        this._taskScheduler.scheduleMacrotask(() => navigateFn().then(resolve).catch(reject));
       });
-    } else {
+    }
+    else {
       return navigateFn();
     }
   }

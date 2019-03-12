@@ -65,6 +65,7 @@ import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxilia
 import { OverlayModule } from '@angular/cdk/overlay';
 import { PopupService } from './popup/popup.service';
 import { A11yModule } from '@angular/cdk/a11y';
+import { TaskScheduler } from './task-scheduler.service';
 
 const CONFIG = new InjectionToken<WorkbenchConfig>('WORKBENCH_CONFIG');
 
@@ -173,6 +174,7 @@ export class WorkbenchModule {
         ContentHostRef,
         InternalWorkbenchRouter,
         PopupService,
+        TaskScheduler,
         {
           provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter
         },
