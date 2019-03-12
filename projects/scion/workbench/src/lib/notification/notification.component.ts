@@ -14,6 +14,7 @@ import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PortalInjector } from '@angular/cdk/portal';
 import { Arrays } from '../array.util';
+import { TaskScheduler } from '../task-scheduler.service';
 
 @Component({
   selector: 'wb-notification',
@@ -64,13 +65,13 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
     ].join(' ');
   }
 
-  constructor(private _injector: Injector, private _cd: ChangeDetectorRef, private _zone: NgZone) {
+  constructor(private _injector: Injector, private _cd: ChangeDetectorRef, private _zone: NgZone, private _taskScheduler: TaskScheduler) {
   }
 
   public ngAfterViewInit(): void {
     // Initiate manual change detection cycle because property may change during custom component construction.
     if (this._notification.content) {
-      setTimeout(() => this._cd.markForCheck());
+      this._taskScheduler.scheduleMacrotask(() => this._cd.markForCheck());
     }
   }
 
