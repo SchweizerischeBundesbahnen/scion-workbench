@@ -309,8 +309,7 @@
             "protractorConfig": "projects/e2e/workbench-application-platform/protractor.conf.js"
           },
           "configurations": {
-            "now": {
-            }
+            "now": {}
           }
         },
         "lint": {
@@ -331,7 +330,7 @@
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "styleext": "scss"
+          "style": "scss"
         }
       },
       "architect": {
@@ -409,7 +408,7 @@
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "styleext": "scss"
+          "style": "scss"
         }
       },
       "architect": {
@@ -486,7 +485,7 @@
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "styleext": "scss"
+          "style": "scss"
         }
       },
       "architect": {
@@ -563,7 +562,7 @@
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "styleext": "scss"
+          "style": "scss"
         }
       },
       "architect": {
@@ -640,7 +639,7 @@
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "styleext": "scss"
+          "style": "scss"
         }
       },
       "architect": {
@@ -731,6 +730,106 @@
             "tsConfig": [
               "projects/app/workbench-application-platform/common/tsconfig.lib.json"
             ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "app/workbench/workbench-app": {
+      "root": "projects/app/workbench/workbench-app",
+      "sourceRoot": "projects/app/workbench/workbench-app/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/app/workbench/workbench-app",
+            "index": "projects/app/workbench/workbench-app/src/index.html",
+            "main": "projects/app/workbench/workbench-app/src/main.ts",
+            "polyfills": "projects/app/workbench/workbench-app/src/polyfills.ts",
+            "tsConfig": "projects/app/workbench/workbench-app/tsconfig.app.json",
+            "assets": [
+              "projects/app/workbench/workbench-app/src/favicon.ico",
+              "projects/app/workbench/workbench-app/src/assets"
+            ],
+            "styles": [
+              "projects/app/workbench/workbench-app/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/workbench/workbench-app/src/environments/environment.ts",
+                  "with": "projects/app/workbench/workbench-app/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "app/workbench/workbench-app:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "app/workbench/workbench-app:build:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/app/workbench/workbench-app/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "e2e/workbench": {
+      "root": "projects/e2e/workbench",
+      "projectType": "application",
+      "prefix": "",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/e2e/workbench/protractor.conf.js",
+            "devServerTarget": "app/workbench/workbench-app:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "app/workbench/workbench-app:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "projects/e2e/workbench/tsconfig.e2e.json",
             "exclude": [
               "**/node_modules/**"
             ]
