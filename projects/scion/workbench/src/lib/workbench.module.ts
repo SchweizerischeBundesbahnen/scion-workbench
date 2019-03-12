@@ -32,14 +32,13 @@ import { WbRouterOutletDirective } from './routing/wb-router-outlet.directive';
 import { ViewPartSashBoxComponent } from './view-part-sash-box/view-part-sash-box.component';
 import { ViewPartGridSerializerService } from './view-part-grid/view-part-grid-serializer.service';
 import { WbPortalOutletComponent } from './portal/wb-portal-outlet.component';
-import { ViewPartGridUrlObserver } from './view-part-grid/view-part-grid-url-observer.service';
 import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
 import { InternalWorkbenchRouter, WorkbenchRouter } from './routing/workbench-router.service';
 import { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './routing/wb-router-link.directive';
 import { WorkbenchViewRegistry } from './workbench-view-registry.service';
 import { OverlayHostRef } from './overlay-host-ref.service';
-import { ViewOutletUrlObserver } from './routing/view-outlet-url-observer.service';
+import { WorkbenchUrlObserver } from './workbench-url-observer.service';
 import { WbActivityActionDirective } from './activity-part/wb-activity-action.directive';
 import { WbActivityDirective } from './activity-part/wb-activity.directive';
 import { MoveDirective } from './move.directive';
@@ -54,7 +53,6 @@ import { MessageBoxStackComponent } from './message-box/message-box-stack.compon
 import { MessageBoxComponent } from './message-box/message-box.component';
 import { APP_MESSAGE_BOX_SERVICE, MessageBoxService } from './message-box/message-box.service';
 import { EmptyOutletComponent } from './routing/empty-outlet.component';
-import { ViewRegistrySynchronizer } from './routing/view-registry-synchronizer.service';
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
 import { SciViewportModule } from '@scion/viewport';
@@ -66,6 +64,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { PopupService } from './popup/popup.service';
 import { A11yModule } from '@angular/cdk/a11y';
 import { TaskScheduler } from './task-scheduler.service';
+import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
 
 @NgModule({
   imports: [
@@ -123,7 +122,7 @@ export class WorkbenchModule {
   // Note: Inject services which should be created eagerly.
   constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any,
               auxiliaryRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
-              viewRegistrySynchronizer: ViewRegistrySynchronizer) {
+              workbenchUrlObserver: WorkbenchUrlObserver) {
     auxiliaryRoutesRegistrator.registerActivityAuxiliaryRoutes();
   }
 
@@ -174,11 +173,10 @@ export class WorkbenchModule {
         NotificationService,
         MessageBoxService,
         ViewPartGridSerializerService,
-        ViewOutletUrlObserver,
-        ViewPartGridUrlObserver,
+        WorkbenchUrlObserver,
         WbBeforeDestroyGuard,
         WorkbenchViewRegistry,
-        ViewRegistrySynchronizer,
+        WorkbenchViewPartRegistry,
         OverlayHostRef,
         ContentHostRef,
         InternalWorkbenchRouter,

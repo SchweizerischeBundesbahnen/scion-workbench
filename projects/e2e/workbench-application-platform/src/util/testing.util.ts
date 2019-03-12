@@ -1,4 +1,4 @@
-import { $, browser, ElementFinder } from 'protractor';
+import { $, browser, ElementFinder, protractor } from 'protractor';
 
 /**
  * Switches browser testing context to the main document.
@@ -115,10 +115,18 @@ export async function expectActivityToShow(expected: { symbolicAppName: string; 
   const ctx = `app=${expected.symbolicAppName}, activityCssClass=${expected.activityCssClass}, component=${expected.componentSelector}`;
 
   await switchToMainContext();
-  await expect($(`wb-activity-part .e2e-activity-panel.${expected.activityCssClass}`).isDisplayed()).toBeTruthy(`Expected 'e2e-activity-panel' to show [${ctx}]`);
-  await expect($(`iframe.e2e-activity.e2e-${expected.symbolicAppName}.${expected.activityCssClass}`).isDisplayed()).toBeTruthy(`Expected <iframe> to be displayed [${ctx}]`);
+
+  // wait until activity panel animation completed
+  const panelFinder = $(`wb-activity-part .e2e-activity-panel.${expected.activityCssClass}`);
+  await browser.wait(protractor.ExpectedConditions.presenceOf(panelFinder), 5000);
+  const iframeFinder = $(`iframe.e2e-activity.e2e-${expected.symbolicAppName}.${expected.activityCssClass}`);
+  await browser.wait(protractor.ExpectedConditions.presenceOf(iframeFinder), 5000);
+
+  await expect(panelFinder.isDisplayed()).toBeTruthy(`Expected 'e2e-activity-panel' to show [${ctx}]`);
+  await expect(iframeFinder.isDisplayed()).toBeTruthy(`Expected <iframe> to be displayed [${ctx}]`);
 
   await switchToIFrameContext([`e2e-${expected.symbolicAppName}`, 'e2e-activity', expected.activityCssClass]);
+
   await expect($(expected.componentSelector).isDisplayed()).toBeTruthy(`Expected component <${expected.componentSelector}> to show [${ctx}]`);
 }
 

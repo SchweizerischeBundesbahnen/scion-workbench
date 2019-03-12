@@ -15,8 +15,8 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { InternalWorkbenchService } from '../workbench.service';
 import { Router } from '@angular/router';
 import { Region } from './view-drop-zone.directive';
-import { ViewPartGridUrlObserver } from '../view-part-grid/view-part-grid-url-observer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
+import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { TaskScheduler } from '../task-scheduler.service';
 
 @Injectable()
@@ -28,8 +28,8 @@ export class WorkbenchViewPartService implements OnDestroy {
 
   constructor(private _workbench: InternalWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
+              private _viewPartRegistry: WorkbenchViewPartRegistry,
               private _router: Router,
-              private _viewPartGridUrlObserver: ViewPartGridUrlObserver,
               private _viewPart: InternalWorkbenchViewPart,
               private _taskScheduler: TaskScheduler) {
     this._workbench.registerViewPartService(this);
@@ -91,7 +91,7 @@ export class WorkbenchViewPartService implements OnDestroy {
       return Promise.resolve(true);
     }
 
-    const serializedGrid = this._viewPartGridUrlObserver.snapshot
+    const serializedGrid = this._viewPartRegistry.grid
       .swapViews(this._viewPart.viewPartRef, viewRef1, viewRef2)
       .serialize();
 
@@ -108,7 +108,7 @@ export class WorkbenchViewPartService implements OnDestroy {
       return Promise.resolve(true);
     }
 
-    const serializedGrid = this._viewPartGridUrlObserver.snapshot
+    const serializedGrid = this._viewPartRegistry.grid
       .activateView(this._viewPart.viewPartRef, viewRef)
       .serialize();
 
@@ -121,7 +121,7 @@ export class WorkbenchViewPartService implements OnDestroy {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public moveViewToThisViewPart(viewRef: string): Promise<boolean> {
-    const grid = this._viewPartGridUrlObserver.snapshot;
+    const grid = this._viewPartRegistry.grid;
 
     const serializedGrid = grid
       .removeView(viewRef)
@@ -138,7 +138,7 @@ export class WorkbenchViewPartService implements OnDestroy {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public moveViewToNewViewPart(viewRef: string, region: Region): Promise<boolean> {
-    const grid = this._viewPartGridUrlObserver.snapshot;
+    const grid = this._viewPartRegistry.grid;
     const newViewPartRef = grid.computeNextViewPartIdentity();
 
     const serializedGrid = grid

@@ -24,14 +24,15 @@ describe('ViewPartGrid', () => {
 
   it('allows to set a root viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
     const rootViewPart: ViewPartInfoArray = ['viewPart-root'];
-    const testee = new ViewPartGrid(rootViewPart, serializer);
+
+    const testee = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer);
     expect(testee.root).toBe(rootViewPart);
   }));
 
   it('allows to add a sibling viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
     const leftViewPart: ViewPartInfoArray = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
 
-    const testee = new ViewPartGrid(leftViewPart, serializer);
+    const testee = new ViewPartGrid(serializer.serializeGrid(leftViewPart), serializer);
     testee.addSiblingViewPart('east', 'viewPart-left', 'viewPart-right');
 
     expect(testee.root).toEqual({
@@ -47,13 +48,13 @@ describe('ViewPartGrid', () => {
     const leftViewPart = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
     const rightViewPart = ['viewPart-right', 'view-5', 'view-4', 'view-5', 'view-6'];
 
-    const testee = new ViewPartGrid({
+    const testee = new ViewPartGrid(serializer.serializeGrid({
       id: 1,
       sash1: leftViewPart,
       sash2: rightViewPart,
       splitter: .5,
       hsplit: false
-    }, serializer);
+    }), serializer);
 
     testee.removeViewPart('viewPart-left');
     expect(testee.root).toEqual(rightViewPart);
@@ -63,13 +64,13 @@ describe('ViewPartGrid', () => {
     const leftViewPart = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
     const rightViewPart = ['viewPart-right', 'view-5', 'view-4', 'view-5', 'view-6'];
 
-    const testee = new ViewPartGrid({
+    const testee = new ViewPartGrid(serializer.serializeGrid({
       id: 1,
       sash1: leftViewPart,
       sash2: rightViewPart,
       splitter: .5,
       hsplit: false
-    }, serializer);
+    }), serializer);
 
     testee.removeViewPart('viewPart-right');
     expect(testee.root).toEqual(leftViewPart);
@@ -77,7 +78,7 @@ describe('ViewPartGrid', () => {
 
   it('allows to remove the root viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
     const rootViewPart = ['viewPart-root', 'view-2', 'view-1', 'view-2', 'view-3'];
-    const testee = new ViewPartGrid(rootViewPart, serializer);
+    const testee = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer);
 
     testee.removeViewPart('viewPart-root');
 
@@ -106,7 +107,7 @@ describe('ViewPartGrid', () => {
     const viewPart_6 = ['viewPart-6'];
 
     // Set ViewPart 1 as root viewpart
-    const testee = new ViewPartGrid(viewPart_1, serializer);
+    const testee = new ViewPartGrid(serializer.serializeGrid(viewPart_1), serializer);
     expect(testee.root).toEqual(viewPart_1, 'Add ViewPart 1');
 
     // Add ViewPart 2 to the east of ViewPart 2

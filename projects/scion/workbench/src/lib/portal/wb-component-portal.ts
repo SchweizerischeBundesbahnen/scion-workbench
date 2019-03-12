@@ -62,7 +62,7 @@ export class WbComponentPortal<T> {
     }
 
     if (this.isDestroyed) {
-      throw Error('Invalid state: component is destroyed');
+      throw Error('[IllegalStateError] component is destroyed');
     }
 
     this.detachFromComponentTree();
