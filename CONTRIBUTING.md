@@ -44,24 +44,43 @@ For local development, you can uncomment the section `PATH-OVERRIDE-FOR-LOCAL-DE
 Use following commands to build, lint and test the project.
 
 ```
-npm run build
-npm run lint
+npm run build-all
+npm run lint-all
 npm run test
 ```
-
-You can serve the demo/test application as follows (SCION Workbench Application Platform):
+You can serve SCION Workbench test application as follows:
 ```
+npm run build ➀
+npm run app:common:build ➀
+npm run app:workbench:serve
+```
+Then, open your browser at following URL: http://localhost:4200.
+
+You can serve SCION Workbench Application Platform test application as follows:
+```
+npm run build ➀
+npm run app:common:build ➀
 npm run app:workbench-application-platform:serve ➀
 ```
+Then, open your browser at following URL: http://localhost:5000.
 
-You can run e2e-tests as follows (SCION Workbench Application Platform):
+You can run e2e-tests for SCION Workbench as follows:
 ```
-npm run app:workbench-application-platform:e2e ➀
+npm run build ➀
+npm run app:common:build ➀
+npm run app:workbench:e2e
+```
+
+You can run e2e-tests for SCION Workbench Application Platform as follows:
+```
+npm run build ➀
+npm run app:common:build ➀
+npm run app:workbench-application-platform:e2e
 ```
 
 |#|Explanation|
 |-|-|
-|➀|If not using path overrides in `tsconfig.json`, the project must first be built using `npm run build` and `npm run app:workbench-application-platform:build-now:common`|
+|➀|If not using path overrides in `tsconfig.json`, the project and common lib must first be built.|
 
 ## Coding guidelines
 Besides linting rules, the following rules apply:

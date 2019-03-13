@@ -132,10 +132,10 @@
     //        "projects/scion/viewport/src/*"
     //      ],
     //      "@scion/app/common": [
-    //        "projects/app/workbench-application-platform/common/src/public_api"
+    //        "projects/app/common/src/public_api"
     //      ],
     //      "@scion/app/common/*": [
-    //        "projects/app/workbench-application-platform/common/src/*"
+    //        "projects/app/common/src/*"
     //      ]
     //    }
   }
