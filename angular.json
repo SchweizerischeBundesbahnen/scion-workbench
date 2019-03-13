@@ -298,6 +298,35 @@
         }
       }
     },
+    "app/common": {
+      "root": "projects/app/common",
+      "sourceRoot": "projects/app/common/src",
+      "projectType": "library",
+      "prefix": "sci",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/app/common/tsconfig.lib.json",
+            "project": "projects/app/common/ng-package.json"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/app/common/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
     "e2e/workbench-application-platform": {
       "root": "projects/e2e/workbench-application-platform",
       "projectType": "application",
@@ -352,7 +381,7 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/app/workbench-application-platform/common/src/lib"
+                "projects/app/common/src/lib"
               ]
             },
             "scripts": []
@@ -429,7 +458,7 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/app/workbench-application-platform/common/src/lib"
+                "projects/app/common/src/lib"
               ]
             },
             "scripts": []
@@ -506,7 +535,7 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/app/workbench-application-platform/common/src/lib"
+                "projects/app/common/src/lib"
               ]
             },
             "scripts": []
@@ -583,7 +612,7 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/app/workbench-application-platform/common/src/lib"
+                "projects/app/common/src/lib"
               ]
             },
             "scripts": []
@@ -659,7 +688,7 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/app/workbench-application-platform/common/src/lib"
+                "projects/app/common/src/lib"
               ]
             },
             "scripts": []
@@ -708,35 +737,6 @@
         }
       }
     },
-    "app/workbench-application-platform/common": {
-      "root": "projects/app/workbench-application-platform/common",
-      "sourceRoot": "projects/app/workbench-application-platform/common/src",
-      "projectType": "library",
-      "prefix": "sci",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/app/workbench-application-platform/common/tsconfig.lib.json",
-            "project": "projects/app/workbench-application-platform/common/ng-package.json"
-          },
-          "configurations": {
-            "now": {}
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/app/workbench-application-platform/common/tsconfig.lib.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
     "app/workbench/workbench-app": {
       "root": "projects/app/workbench/workbench-app",
       "sourceRoot": "projects/app/workbench/workbench-app/src",
@@ -763,6 +763,11 @@
             "styles": [
               "projects/app/workbench/workbench-app/src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/app/common/src/lib"
+              ]
+            },
             "scripts": []
           },
           "configurations": {
