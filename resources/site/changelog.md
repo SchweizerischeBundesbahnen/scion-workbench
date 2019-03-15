@@ -5,6 +5,26 @@
 
 # Changelog
 
+# [0.0.0-beta.18](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.17...0.0.0-beta.18) (2019-03-15)
+
+
+### Bug Fixes
+
+* allow using `sciDimension` directive in 'OnPush' change detection context ([cc15561](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/cc15561)), closes [#106](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/106)
+
+
+### Features
+
+* allow adding actions to the viewpart action bar ([0b31ca3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0b31ca3)), closes [#104](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/104)
+* allow scheduling tasks in micro or macro task queue ([58c643b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/58c643b))
+* allow showing an entry page when no view is showing ([cd674d5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/cd674d5)), closes [#105](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/105)
+* hide activity part if no activities are registered ([3d4d92e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3d4d92e)), closes [#107](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/107)
+
+
+### BREAKING CHANGES
+
+* Removed input property `useTimer` because no longer required as now working in the context of 'OnPush' change detection context.
+
 # [0.0.0-beta.17](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.16...0.0.0-beta.17) (2019-02-25)
 
 
