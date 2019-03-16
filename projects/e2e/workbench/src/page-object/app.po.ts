@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { $, $$, browser, ElementFinder, protractor } from 'protractor';
+import { $, $$, browser, ElementFinder, Key, protractor } from 'protractor';
 import { getCssClasses } from '../util/testing.util';
 import { Duration, Severity } from '@scion/workbench-application-platform.api';
 import { ISize } from 'selenium-webdriver';
@@ -65,8 +65,13 @@ export class AppPO {
 
   /**
    * Returns the number of view tabs.
+   *
+   * Optionally, provide a CSS class to only count view tabs of given view.
    */
-  public async getViewTabCount(): Promise<number> {
+  public async getViewTabCount(viewCssClass?: string): Promise<number> {
+    if (viewCssClass) {
+      return $$(`wb-view-tab.${viewCssClass}`).count();
+    }
     return $$('wb-view-tab').count();
   }
 
@@ -246,6 +251,13 @@ export class AppPO {
     const viewPartActionPO = this.findViewPartAction('e2e-open-new-tab');
     await viewPartActionPO.click();
     return new WelcomePagePO();
+  }
+
+  /**
+   * Closes all views of all viewparts.
+   */
+  public async closeAllViewTabs(): Promise<void> {
+    return $$('wb-view-part').sendKeys(Key.chord(Key.CONTROL, Key.SHIFT, 'k'));
   }
 
   /**

@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { GuardsCheckEnd, NavigationEnd, NavigationStart, Route, Router } from '@angular/router';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Injectable, IterableDiffers, OnDestroy } from '@angular/core';
+import { GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Route, Router } from '@angular/router';
+import { filter, take, takeUntil } from 'rxjs/operators';
+import { Injectable, IterableChanges, IterableDiffers, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ViewOutletDiffer } from './routing/view-outlet-differ';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
@@ -41,7 +41,6 @@ export class WorkbenchUrlObserver implements OnDestroy {
               differs: IterableDiffers) {
     this.installNavigationStartRoutingListener(differs);
     this.installGuardsCheckEndRoutingListener(differs);
-    this.installNavigationEndRoutingListener(differs);
   }
 
   /**
@@ -78,38 +77,56 @@ export class WorkbenchUrlObserver implements OnDestroy {
       return;
     }
 
-    // Discard routes of closed views.
     const viewOutletChanges = differ.diff(routerEvent.url);
-    if (viewOutletChanges) {
-      const routes = this._router.config;
-      const discardedRoutes: Route[] = [];
 
-      viewOutletChanges.forEachRemovedItem(({item}) => {
-        discardedRoutes.push(...routes.filter(route => route.outlet === item));
-      });
+    this.discardRoutesOfClosedViews(viewOutletChanges);
 
-      if (discardedRoutes.length > 0) {
-        this._auxRoutesRegistrator.replaceRouterConfig(routes.filter(route => !discardedRoutes.includes(route)));
-      }
-    }
-  }
-
-  private onNavigationEnd(routerEvent: NavigationEnd, differ: ViewOutletDiffer): void {
-    // Update viewpart registry.
+    // Parse the ViewPartGrid from the URL.
     const serializedViewPartGrid = this._router.parseUrl(routerEvent.url).queryParamMap.get(VIEW_GRID_QUERY_PARAM);
     const viewPartGrid = new ViewPartGrid(serializedViewPartGrid, this._viewPartGridSerializer);
 
-    // Update view registry.
-    const viewOutletChanges = differ.diff(routerEvent.url);
+    // Update the view registry with added or removed view outlets.
+    //
+    // Note:
+    // Must be done after 'GuardsCheckEnd' and not after 'NavigationEnd' for the following reason:
+    // When registering new view outlets, respective view router outlets are instantiated. Later in the routing process,
+    // while Angular router activates routes, already instantiated router outlets are activated and their components mounted.
+    // If the outlets would not be instantiated yet, they would get activated only once attached to the DOM.
+    //
+    // Early activation is important for inactive views to set their view title, e.g. when reloading the application.
+    this.updateViewRegistry(viewOutletChanges, viewPartGrid);
+
+    // Update the grid after routing completed to not run into following error: 'Cannot activate an already activated outlet'.
+    this.whenNavigatedThen(() => this._viewPartRegistry.setGrid(viewPartGrid));
+  }
+
+  private discardRoutesOfClosedViews(viewOutletChanges: IterableChanges<string>): void {
+    if (!viewOutletChanges) {
+      return;
+    }
+
+    const routes = this._router.config;
+    const discardedRoutes: Route[] = [];
+
+    viewOutletChanges.forEachRemovedItem(({item}) => {
+      discardedRoutes.push(...routes.filter(route => route.outlet === item));
+    });
+
+    if (discardedRoutes.length > 0) {
+      this._auxRoutesRegistrator.replaceRouterConfig(routes.filter(route => !discardedRoutes.includes(route)));
+    }
+  }
+
+  private updateViewRegistry(viewOutletChanges: IterableChanges<string>, viewPartGrid: ViewPartGrid): void {
     if (viewOutletChanges) {
       viewOutletChanges.forEachAddedItem(({item}) => {
+        // Note: registering a view outlet instantiates a new 'ViewComponent' with the view's named router outlet
         this._viewRegistry.addViewOutlet(item, viewPartGrid.isViewActive(item));
       });
       viewOutletChanges.forEachRemovedItem(({item}) => {
         this._viewRegistry.removeViewOutlet(item);
       });
     }
-    this._viewPartRegistry.setGrid(viewPartGrid);
   }
 
   /**
@@ -143,17 +160,19 @@ export class WorkbenchUrlObserver implements OnDestroy {
   }
 
   /**
-   * Delegates `NavigationEnd` events to `onNavigationEnd` method.
+   * Runs given function once navigation completed successfully.
    */
-  private installNavigationEndRoutingListener(differs: IterableDiffers): void {
-    const outletDiffer = new ViewOutletDiffer(differs, this._router);
+  private whenNavigatedThen(thenFn: () => void): void {
     this._router.events
       .pipe(
-        filter(event => event instanceof NavigationEnd),
+        filter(event => event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError),
+        take(1),
         takeUntil(this._destroy$),
       )
-      .subscribe((routerEvent: NavigationEnd) => {
-        this.onNavigationEnd(routerEvent, outletDiffer);
+      .subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          thenFn();
+        }
       });
   }
 
