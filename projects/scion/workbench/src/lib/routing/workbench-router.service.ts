@@ -16,6 +16,7 @@ import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { Defined } from '../defined.util';
 import { WorkbenchView } from '../workbench.model';
 import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
+import { Arrays } from '../array.util';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -122,17 +123,16 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
   }
 
   /**
-   * Resolves present views which match the given URL path.
+   * Resolves present views which match the given commands.
    */
   public resolvePresentViewRefs(commands: any[]): string[] {
-    const commandsJoined = commands.filter(it => typeof it !== 'object').map(it => encodeURI(it)).join(); // do not match URL matrix parameters
+    const serializeCommands = this.serializeCommands(commands);
     const urlTree = this._router.parseUrl(this._router.url);
     const urlSegmentGroups = urlTree.root.children;
 
     return Object.keys(urlSegmentGroups)
-      .filter(it => {
-        return it.startsWith(VIEW_REF_PREFIX) && (urlSegmentGroups[it].segments.map((segment: UrlSegment) => segment.path).join() === commandsJoined);
-      });
+      .filter(outletName => outletName.startsWith(VIEW_REF_PREFIX))
+      .filter(outletName => Arrays.equal(serializeCommands, urlSegmentGroups[outletName].segments.map((segment: UrlSegment) => segment.toString())));
   }
 
   /**
@@ -165,6 +165,31 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
     }
 
     return normalizeFn(targetOutlet, {relativeTo});
+  }
+
+  /**
+   * Serializes given commands into valid URL segments.
+   */
+  private serializeCommands(commands: any[]): string[] {
+    const serializedCommands = [];
+
+    commands.forEach(cmd => {
+      // if matrix param, append it to the last segment
+      if (typeof cmd === 'object') {
+        serializedCommands.push(serializedCommands.pop() + this.serializeMatrixParams(cmd));
+      }
+      else {
+        serializedCommands.push(encodeURIComponent(cmd));
+      }
+    });
+
+    return serializedCommands;
+  }
+
+  private serializeMatrixParams(params: { [key: string]: string }): string {
+    return Object.keys(params)
+      .map(key => `;${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .join('');
   }
 }
 

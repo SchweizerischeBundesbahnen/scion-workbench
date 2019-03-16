@@ -1,1 +1,9 @@
-<h2>{{view.title}}</h2>
+<section class="params">
+  <h2>URL Parameters</h2>
+  <sci-property class="params" [properties]="params$ | async"></sci-property>
+</section>
+
+<section class="query-params">
+  <h2>URL Query Parameters</h2>
+  <sci-property class="query-params" [properties]="queryParams$ | async"></sci-property>
+</section>

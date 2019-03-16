@@ -10,6 +10,7 @@ export class WelcomePageComponent {
 
   constructor(@Optional() view: WorkbenchView) {
     if (view) {
+      view.title = 'Welcome';
       view.cssClass = 'e2e-welcome-page';
     }
   }

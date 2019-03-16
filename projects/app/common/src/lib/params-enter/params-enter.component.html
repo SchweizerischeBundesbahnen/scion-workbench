@@ -9,7 +9,7 @@
   <!-- value -->
   <input [formControl]="paramGroup.get(PARAM_VALUE)" class="e2e-value">
   <!-- 'remove' button -->
-  <button *ngIf="removable" class="material-icons" type="button" (click)="onRemove(i)">remove</button>
+  <button *ngIf="removable" class="material-icons e2e-remove" type="button" (click)="onRemove(i)">remove</button>
 
   <ng-template #label_readonly>
     <label>{{paramGroup.get(PARAM_NAME).value}}</label>
