@@ -26,12 +26,18 @@ $dark-green: #3e7f62;
       margin: 1em;
       padding: 1em;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       text-decoration: none;
       color: white;
       font-size: 24px;
       text-align: center;
+
+      > small {
+        margin-top: 1em;
+        font-size: 16px;
+      }
     }
   }
 }

@@ -10,6 +10,9 @@ import { Activity1a90c8d32Component } from './activity-1a90c8d3/activity-1a90c8d
 import { WelcomePageComponent } from './welcome-page/welcome-page.component';
 import { ViewComponent } from './view/view.component';
 import { View4a3a8932Component } from './view-4a3a8932/view-4a3a8932.component';
+import { ViewNavigationComponent } from './view-navigation/view-navigation.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SciParamsEnterModule, SciPropertyModule } from '@scion/app/common';
 
 @NgModule({
   declarations: [
@@ -19,12 +22,17 @@ import { View4a3a8932Component } from './view-4a3a8932/view-4a3a8932.component';
     WelcomePageComponent,
     ViewComponent,
     View4a3a8932Component,
+    ViewNavigationComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     WorkbenchModule.forRoot(),
     BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    SciParamsEnterModule,
+    SciPropertyModule,
   ],
   providers: [],
   bootstrap: [
