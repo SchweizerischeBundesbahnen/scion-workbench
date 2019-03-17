@@ -12,7 +12,7 @@ import { Injectable } from '@angular/core';
 import { ApplicationConfig, ApplicationManifest, HOST_APPLICATION_SYMBOLIC_NAME } from './metadata';
 import { Defined } from './defined.util';
 import { ManifestRegistry } from './manifest-registry.service';
-import { Application } from '@scion/workbench-application-platform.api';
+import { Application, Capability, PlatformCapabilityTypes } from '@scion/workbench-application-platform.api';
 import { Url } from './url.util';
 
 /**
@@ -52,18 +52,41 @@ export class ApplicationRegistry {
       throw Error(`[ApplicationRegistrationError] Symbolic name must be unique [symbolicName='${applicationConfig.symbolicName}'].`);
     }
 
-    const scopeCheckDisabled = applicationConfig.scopeCheckDisabled || false;
+    const scopeCheckDisabled = Defined.orElse(applicationConfig.scopeCheckDisabled, false);
+
     this._applications.set(applicationConfig.symbolicName, {
       symbolicName: applicationConfig.symbolicName,
       name: manifest.name,
       baseUrl: this.computeBaseUrl(applicationConfig, manifest),
       manifestUrl: new URL(applicationConfig.manifestUrl, Url.isAbsoluteUrl(applicationConfig.manifestUrl) ? applicationConfig.manifestUrl : window.origin).toString(),
       scopeCheckDisabled: scopeCheckDisabled,
+      restrictions: applicationConfig.restrictions,
     });
 
-    this._manifestRegistry.registerCapability(applicationConfig.symbolicName, manifest.capabilities);
+    this._manifestRegistry.registerCapability(applicationConfig.symbolicName, this.filterCapabilities(manifest.capabilities, applicationConfig));
     this._manifestRegistry.registerIntents(applicationConfig.symbolicName, manifest.intents);
     scopeCheckDisabled && this._manifestRegistry.disableScopeChecks(applicationConfig.symbolicName);
+  }
+
+  /**
+   * Filters capabilities which given application is not allowed to provide.
+   */
+  private filterCapabilities(capabilities: Capability[], applicationConfig: ApplicationConfig): Capability[] {
+    const restrictions = applicationConfig.restrictions;
+    const activityContributionAllowed = Defined.orElse(restrictions && restrictions.activityContributionAllowed, true);
+
+    if (!activityContributionAllowed) {
+      return capabilities
+        .filter(capability => capability.type !== PlatformCapabilityTypes.Activity)
+        .map(capability => {
+          if (capability.type === PlatformCapabilityTypes.View) {
+            return ({...capability, properties: {...capability.properties, activityItem: null}});
+          }
+          return capability;
+        });
+    }
+
+    return capabilities;
   }
 
   public getApplication(symbolicName: string): Application {

@@ -51,6 +51,17 @@ export interface ApplicationConfig {
    * By default, scope check is enabled.
    */
   scopeCheckDisabled?: boolean;
+  /**
+   * Defines restrictions for this application, e.g. to not contribute activities.
+   *
+   * By default, the app has no restrictions.
+   */
+  restrictions?: {
+    /**
+     * Controls if this application is allowed to contribute activities.
+     */
+    activityContributionAllowed: boolean;
+  };
 }
 
 /**

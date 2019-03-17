@@ -124,4 +124,8 @@ export interface Manifest {
    * Indicates whether or not capability scope check is disabled for this application.
    */
   scopeCheckDisabled: boolean;
+  /**
+   * Defines restrictions for this application.
+   */
+  restrictions: any;
 }

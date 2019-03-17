@@ -150,6 +150,7 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
       baseUrl: application.baseUrl,
       manifestUrl: application.manifestUrl,
       scopeCheckDisabled: application.scopeCheckDisabled,
+      restrictions: application.restrictions,
       intents: this._manifestRegistry.getIntentsByApplication(application.symbolicName),
       capabilities: this._manifestRegistry.getCapabilitiesByApplication(application.symbolicName)
         .filter(capability => !capability.metadata.proxy),

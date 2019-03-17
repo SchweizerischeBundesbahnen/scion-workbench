@@ -14,6 +14,7 @@ Following properties are supported:
 |manifestUrl|string|✓|URL to the application manifest.|
 |exclude|boolean||Excludes the application from registration, e.g. to not register it in a specific environment.|
 |scopeCheckDisabled|boolean||Sets whether or not capability scope check is disabled for this application.<p>With scope check disabled (discouraged), the application can invoke private capabilities of other applications.<p>By default, scope check is enabled.|
+|restrictions|{activityContributionAllowed: boolean}||Defines restrictions for this application, e.g. to not contribute activities.<p>By default, the app has no restrictions.|
 
 ### Static application registration
   

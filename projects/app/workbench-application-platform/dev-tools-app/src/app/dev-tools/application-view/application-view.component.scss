@@ -21,47 +21,47 @@
 
     > label.app-name {
       grid-column: 1/2;
-      grid-row: 1/2;
     }
 
     > span.app-name {
       grid-column: 2/3;
-      grid-row: 1/2;
     }
 
     > label.app-symbolic-name {
       grid-column: 1/2;
-      grid-row: 2/3;
     }
 
     > span.app-symbolic-name {
       grid-column: 2/3;
-      grid-row: 2/3;
     }
 
     > label.app-url {
       grid-column: 1/2;
-      grid-row: 3/4;
     }
 
     > a.app-url {
       grid-column: 2/3;
-      grid-row: 3/4;
     }
 
     > label.manifest-url {
       grid-column: 1/2;
-      grid-row: 4/5;
     }
 
     > a.manifest-url {
       grid-column: 2/3;
-      grid-row: 4/5;
+    }
+
+    > label.restrictions {
+      grid-column: 1/2;
+    }
+
+    > sci-property.restrictions {
+      grid-column: 2/3;
     }
 
     > span.scope-check-disabled {
       grid-column: 3/4;
-      grid-row: 1/5;
+      grid-row: 1/6;
       align-self: start;
       justify-self: end;
       font-weight: bold;
