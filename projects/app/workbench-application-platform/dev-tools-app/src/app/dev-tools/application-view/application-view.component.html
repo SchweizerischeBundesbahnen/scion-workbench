@@ -13,6 +13,11 @@
     <a class="manifest-url" [href]="manifest.manifestUrl" target="_blank">{{manifest.manifestUrl}}</a>
   </ng-container>
 
+  <ng-container *ngIf="manifest?.restrictions">
+    <label class="restrictions">Restrictions:</label>
+    <sci-property [properties]="manifest.restrictions" class="restrictions"></sci-property>
+  </ng-container>
+
   <span *ngIf="manifest?.scopeCheckDisabled" class="scope-check-disabled"
         [title]="'Scope check is disabled for this application.\nThis application can use private capabilities of other applications.'">
     SCOPE CHECK DISABLED
