@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench-application-platform.api",
-  "version": "0.0.0-beta.18",
+  "version": "0.0.0-beta.19",
   "description": "SCION Workbench Application Platform is an extension of SCION Workbench to integrate content from multiple web applications in a coherent way, thus enabling a micro frontend architecture for allowing different front-end frameworks to co-exist and independent delivery.\n\nThe platform provides the mechanics for client-side web application integration. Any web application can be integrated. If the site does not interact with the platform, there is no need for adaptation. For a deeper integration, the platform provides a framework-agnostic guest API.\n\nThis package contains data transfer objects to pass data between the platform and the application.",
   "license": "EPL-2.0",
   "private": false,
