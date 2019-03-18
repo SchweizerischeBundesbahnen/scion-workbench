@@ -1,6 +1,6 @@
 {
   "name": "scion",
-  "version": "0.0.0-beta.18",
+  "version": "0.0.0-beta.19",
   "description": "SCION Workbench helps to build multi-view web applications and integrates separate micro frontends into a consistent rich web application.",
   "license": "EPL-2.0",
   "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",

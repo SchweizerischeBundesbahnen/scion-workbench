@@ -5,6 +5,20 @@
 
 # Changelog
 
+# [0.0.0-beta.19](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.18...0.0.0-beta.19) (2019-03-18)
+
+
+### Bug Fixes
+
+* match matrix params when resolving views for activation or closing ([65ba4f0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/65ba4f0)), closes [#120](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/120)
+* re-export workbench-application-platform.api in workbench-application-platform bundle ([34cd8de](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/34cd8de)), closes [#118](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/118)
+* show view tab title of inactive views when reloading the application ([f011b5b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f011b5b)), closes [#121](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/121)
+
+
+### Features
+
+* control if an application is allowed to contribute activities ([dd9b81c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/dd9b81c)), closes [#122](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/122)
+
 # [0.0.0-beta.18](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.17...0.0.0-beta.18) (2019-03-15)
 
 
