@@ -59,6 +59,7 @@ import { ViewOpenActivityActionPanelComponent } from './view-open-activity-actio
 import { PopupOpenActivityActionPanelComponent } from './popup-open-activity-action-panel/popup-open-activity-action-panel.component';
 import { ViewC91805e8Component } from './view-c91805e8/view-c91805e8.component';
 import { CustomIntentPanelComponent } from './custom-intent/custom-intent-panel.component';
+import { ViewCba33eafComponent } from './view-cba33eaf/view-cba33eaf.component';
 
 @NgModule({
   declarations: [
@@ -94,6 +95,7 @@ import { CustomIntentPanelComponent } from './custom-intent/custom-intent-panel.
     View68f302b4Component,
     ViewBe587bd6Component,
     ViewC91805e8Component,
+    ViewCba33eafComponent,
     Popup1a90c8d2Component,
     Popup7330f506Component,
     Popup9c5319f7Component,
@@ -120,7 +122,7 @@ import { CustomIntentPanelComponent } from './custom-intent/custom-intent-panel.
     WorkbenchApplicationModule.forChild(),
   ],
   exports: [],
-  providers: []
+  providers: [],
 })
 export class TestingModule {
 }

@@ -8,10 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, EventEmitter, Input, NgZone, OnDestroy, Output, Renderer2 } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, isDevMode, NgZone, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { combineLatest, from, fromEvent, merge, Observable, of, OperatorFunction, Subject } from 'rxjs';
 import { mergeMap, takeUntil } from 'rxjs/operators';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { installMouseDispatcher, SciMouseDispatcher } from '@scion/mouse-dispatcher';
 
@@ -38,26 +37,44 @@ import { installMouseDispatcher, SciMouseDispatcher } from '@scion/mouse-dispatc
 @Component({
   selector: 'wb-remote-site',
   templateUrl: './remote-site.component.html',
-  styleUrls: ['./remote-site.component.scss']
+  styleUrls: ['./remote-site.component.scss'],
 })
 export class RemoteSiteComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  private _whenIframe: Promise<HTMLIFrameElement>;
-  private _iframeResolveFn: (iframe: HTMLIFrameElement) => void;
-  private _mouseDispatcher: SciMouseDispatcher;
+  private _whenIframe = new Promise<HTMLIFrameElement>(resolve => this._whenIframeResolveFn = resolve); // tslint:disable-line:typedef
+  private _whenIframeResolveFn: (iframe: HTMLIFrameElement) => void;
 
-  private _siteOrigin: string;
-  public siteUrl: SafeUrl;
+  private _whenSiteLoaded: Promise<HTMLIFrameElement>;
+
+  private _siteUrl: URL;
+  private _mouseDispatcher: SciMouseDispatcher;
 
   /**
    * Sets the URL of the remote site to display.
    */
   @Input()
   public set url(url: string) {
-    this.siteUrl = this._sanitizer.bypassSecurityTrustResourceUrl(url);
-    this._siteOrigin = new URL(url).origin;
+    const siteUrl = new URL(url);
+
+    // Determine if setting given URL causes a new page to be loaded into the iframe. A 'page load' is not caused if only the URL fragment changes.
+    // When the page loads anew, posting of messages to that site must be delayed until loading completed, so the site is ready to receive them.
+    const isPageAboutToLoad = !this._siteUrl || !this._siteUrl.hash || !siteUrl.hash || toUrlWithoutFragment(this._siteUrl) !== toUrlWithoutFragment(siteUrl);
+    if (isPageAboutToLoad) {
+      this.installSiteLoadPromise();
+      this.installMouseDispatcher();
+      this._whenSiteLoaded.then(() => this.load.emit());
+    }
+
+    this._siteUrl = siteUrl;
+
+    // Set the iframe URL via `Location.replace` instead of modifying the iframe src attribute.
+    // Otherwise, if changing the src attribute of an already attached iframe, a history entry would be added to the browser's history,
+    // which would compromise the browser's history back functionality. Removing the iframe from the DOM before setting the src attribute
+    // is also not applicable as this always causes the page to load anew, which is not the desired effect if using hash-based routing
+    // and navigating within the same site.
+    this._whenIframe.then(iframe => iframe.contentWindow.location.replace(url));
   }
 
   /**
@@ -75,8 +92,8 @@ export class RemoteSiteComponent implements OnDestroy {
   public message = new EventEmitter<any>();
 
   /**
-   * Emits if the remote site finished loading.
-   * Messages to the remote site are only transported after this event is emitted.
+   * Emits after the remote site finished loading, and every time
+   * after loading a new document, e.g. due to an URL change.
    */
   @Output()
   public load = new EventEmitter<void>();
@@ -105,32 +122,42 @@ export class RemoteSiteComponent implements OnDestroy {
   @Output()
   public synthEscape = new EventEmitter<void>();
 
-  constructor(private _sanitizer: DomSanitizer,
-              private _workbenchLayout: WorkbenchLayoutService,
+  @ViewChild('iframe')
+  public set setIframe(iframe: ElementRef<HTMLIFrameElement>) {
+    this._whenIframeResolveFn(iframe.nativeElement);
+  }
+
+  constructor(private _workbenchLayout: WorkbenchLayoutService,
               private _renderer: Renderer2,
               private _zone: NgZone) {
-    this._whenIframe = new Promise<HTMLIFrameElement>(resolve => this._iframeResolveFn = resolve); // tslint:disable-line:typedef
-
     this.installWorkbenchLayoutListener();
     this.installIframeMessageListener();
-    this.installMouseDispatcher();
   }
 
   /**
    * Posts a message to the remote site via 'window.postMessage()' mechanism (cross-origin).
+   *
+   * This method requires a site URL to be set.
    */
   public postMessage(message: any): void {
-    this._whenIframe.then(iframe => iframe.contentWindow.postMessage(message, this._siteOrigin));
+    if (!this._whenSiteLoaded && isDevMode() && console && console.error) {
+      console.error('Cannot post a message to a remote site because its URL is not set yet.');
+      return;
+    }
+
+    this._whenSiteLoaded.then(iframe => iframe.contentWindow.postMessage(message, this._siteUrl.origin));
   }
 
-  public onSiteLoad(event: Event): void {
-    // If the 'onload' event handler is attached before the iframe is appended to the DOM, webkit browsers fire that event twice.
-    // To workaround this issue, the existence of the 'src' field is checked. See https://stackoverflow.com/a/38459639.
-    const iframe = event.target as HTMLIFrameElement;
-    if (iframe.src) {
-      this._iframeResolveFn(iframe);
-      this.load.emit();
-    }
+  /**
+   * Sets the `whenSiteLoaded` promise which resolves once the site finished loading.
+   */
+  private installSiteLoadPromise(): void {
+    let resolveFn: (iframe: HTMLIFrameElement) => void;
+    this._whenSiteLoaded = new Promise<HTMLIFrameElement>(resolve => resolveFn = resolve); // tslint:disable-line:typedef
+
+    this._whenIframe.then(iframe => {
+      iframe.addEventListener('load', () => resolveFn(iframe), {once: true});
+    });
   }
 
   /**
@@ -140,9 +167,12 @@ export class RemoteSiteComponent implements OnDestroy {
    * continued delivery of mouse events even when the cursor goes past the boundary of the iframe boundary.
    */
   private installMouseDispatcher(): void {
-    this._whenIframe.then(iframe => {
+    this._mouseDispatcher && this._mouseDispatcher.dispose();
+    this._mouseDispatcher = null;
+
+    this._whenSiteLoaded.then(iframe => {
       this._zone.runOutsideAngular(() => {
-        this._mouseDispatcher = installMouseDispatcher(iframe.contentWindow, this._siteOrigin);
+        this._mouseDispatcher = installMouseDispatcher(iframe.contentWindow, this._siteUrl.origin);
       });
     });
   }
@@ -169,15 +199,15 @@ export class RemoteSiteComponent implements OnDestroy {
       fromEvent<MessageEvent>(window, 'message')
         .pipe(
           bufferUntil(from(this._whenIframe)),
-          takeUntil(this._destroy$)
+          takeUntil(this._destroy$),
         )
         .subscribe(([messageEvent, iframe]: [MessageEvent, HTMLIFrameElement]) => {
           if (messageEvent.source !== iframe.contentWindow) {
             return;
           }
 
-          if (messageEvent.origin !== this._siteOrigin) {
-            throw Error(`[OriginError] Message of illegal origin received [expected=${this._siteOrigin}, actual=${messageEvent.origin}]`);
+          if (messageEvent.origin !== this._siteUrl.origin) {
+            throw Error(`[OriginError] Message of illegal origin received [expected=${this._siteUrl.origin}, actual=${messageEvent.origin}]`);
           }
 
           const synthEvent = parseSynthEvent(messageEvent.data);
@@ -236,3 +266,13 @@ function parseSynthEvent(data: any): string | null {
 function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined;
 }
+
+/**
+ * Returns given URL without its fragment.
+ */
+function toUrlWithoutFragment(url: URL): string {
+  const href = url.href;
+  const fragmentIndex = href.indexOf('#');
+  return (fragmentIndex === -1) ? href : href.substring(0, fragmentIndex);
+}
+

@@ -521,7 +521,7 @@ describe('View', () => {
         entity: 'testing',
         testcase: 'cc977da9-view',
         qualifierParam1: 'e82bf49c4768',
-        qualifierParam2: '1b84a4a926f7'
+        qualifierParam2: '1b84a4a926f7',
       });
       await viewNavigationPO.selectTarget('self');
       await viewNavigationPO.execute();
@@ -563,7 +563,7 @@ describe('View', () => {
       const urlQueryParams = await viewPO.getUrlQueryParameters();
       await expect(urlQueryParams).toEqual({
         queryParam1: 'e60c81360bee',
-        queryParam2: '1a3d3aaf937e'
+        queryParam2: '1a3d3aaf937e',
       });
     });
 
@@ -597,6 +597,59 @@ describe('View', () => {
       await viewTab.close();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
       await expectViewToNotExist({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-be587bd6'});
+    });
+
+    it('should not add an entry to the browser\'s history when navigating within the same app [testcase: cba33eaf-view]', async () => {
+      await testingViewPO.navigateTo();
+      const testingViewUrl = await hostAppPO.getCurrentBrowserUrl();
+
+      const viewNavigationPO = await testingViewPO.openViewNavigationPanel();
+      await viewNavigationPO.enterQualifier({
+        entity: 'testing',
+        testcase: 'cba33eaf-view',
+      });
+
+      await viewNavigationPO.selectTarget('self');
+      await viewNavigationPO.checkActivateIfPresent(false);
+      await viewNavigationPO.execute();
+
+      await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-cba33eaf', componentSelector: 'app-view-cba33eaf'});
+
+      // Hit browser back button
+      await hostAppPO.navigateBack();
+
+      await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
+      await expect(hostAppPO.getCurrentBrowserUrl()).toEqual(testingViewUrl);
+
+      // expect no 'postMessage' error to be thrown
+      await expect(hostAppPO.hasBrowserError('Failed to execute \'postMessage\' on \'DOMWindow\'')).toBeFalsy();
+    });
+
+    it('should not add an entry to the browser\'s history when navigating to another app [testcase: cba33eaf-view]', async () => {
+      await testingViewPO.navigateTo();
+      const testingViewUrl = await hostAppPO.getCurrentBrowserUrl();
+
+      const viewNavigationPO = await testingViewPO.openViewNavigationPanel();
+      await viewNavigationPO.enterQualifier({
+        entity: 'communication',
+        presentation: 'list',
+        contactId: '5',
+      });
+
+      await viewNavigationPO.selectTarget('self');
+      await viewNavigationPO.checkActivateIfPresent(false);
+      await viewNavigationPO.execute();
+
+      await expectViewToShow({symbolicAppName: 'communication-app', viewCssClass: 'e2e-communication-list', componentSelector: 'app-communication-view'});
+
+      // Hit browser back button
+      await hostAppPO.navigateBack();
+
+      await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
+      await expect(hostAppPO.getCurrentBrowserUrl()).toEqual(testingViewUrl);
+
+      // expect no 'postMessage' error to be thrown
+      await expect(hostAppPO.hasBrowserError('Failed to execute \'postMessage\' on \'DOMWindow\'')).toBeFalsy();
     });
   });
 

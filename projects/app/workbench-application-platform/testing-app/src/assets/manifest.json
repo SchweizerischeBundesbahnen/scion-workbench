@@ -385,6 +385,20 @@
       }
     },
     {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
+        "testcase": "cba33eaf-view"
+      },
+      "description": "Provides a view for testcase 'cba33eaf'",
+      "properties": {
+        "path": "testing/view-cba33eaf",
+        "title": "Testing View",
+        "heading": "cba33eaf",
+        "cssClass": "e2e-view-cba33eaf"
+      }
+    },
+    {
       "type": "popup",
       "qualifier": {
         "entity": "testing"

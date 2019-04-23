@@ -375,6 +375,22 @@ export class HostAppPO {
       }
     };
   }
+
+  public async hasBrowserError(error: string): Promise<boolean> {
+    await switchToMainContext();
+    const logs = await browser.manage().logs().get('browser');
+    return logs.some(log => log.message.includes(error));
+  }
+
+  public async getCurrentBrowserUrl(): Promise<string> {
+    await switchToMainContext();
+    return browser.getCurrentUrl();
+  }
+
+  public async navigateBack(): Promise<void> {
+    await switchToMainContext();
+    await browser.navigate().back();
+  }
 }
 
 export interface ViewTabPO {
