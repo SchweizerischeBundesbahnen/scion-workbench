@@ -1,6 +1,6 @@
 {
   "name": "@scion/viewport",
-  "version": "0.0.0-beta.19",
+  "version": "0.0.0-beta.20",
   "description": "Provides a viewport component with scrollbars that sit on top of the viewport client.",
   "license": "EPL-2.0",
   "private": false,
@@ -21,7 +21,7 @@
     "@angular/common": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@angular/core": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
     "@angular/cdk": "^6.0.0-rc.0 || ^6.0.0 || ^7.0.0-rc.0 || ^7.0.0",
-    "@scion/dimension": "0.0.0-beta.19",
+    "@scion/dimension": "0.0.0-beta.20",
     "rxjs": "^6.0.0"
   },
   "keywords": [

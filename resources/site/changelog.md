@@ -5,6 +5,31 @@
 
 # Changelog
 
+# [0.0.0-beta.20](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.19...0.0.0-beta.20) (2019-04-24)
+
+
+### Bug Fixes
+
+* change the iframe url without adding an entry to the browser's history ([4ff1a6b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4ff1a6b)), closes [#128](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/128)
+
+
+### Features
+
+* allow providing custom properties when loading app config via config loader ([64219b1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/64219b1)), closes [#133](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/133)
+
+
+### BREAKING CHANGES
+
+* Replaced `ApplicationConfigLoader` with `PlatformConfigLoader` to load a remote configuration for the workbench application platform.
+
+To migrate (if loading platform config via config loader):
+- change your loader to implement `PlatformConfigLoader` instead of `ApplicationConfigLoader`
+- register your loader in `WorkbenchApplicationPlatformModule.forRoot(...)` config via `platformConfigLoader` instead of `applicationConfigLoader` property
+- change your config json to return a `PlatformConfig` object instead of an array of `ApplicationConfig` objects
+
+See https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/resources/site/how-to/workbench-application-platform/how-to-register-applications.md for more information.
+
+
 # [0.0.0-beta.19](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.18...0.0.0-beta.19) (2019-03-18)
 
 
