@@ -4,7 +4,7 @@
 |---|---|---|---|---|---|---|
 
 ## How to register applications
-Applications are registered in the host application when importing the `WorkbenchApplicationPlatformModule` module. They can be registered statically, or dynamically via `ApplicationConfigLoader`.
+Applications are registered in the host application when importing the `WorkbenchApplicationPlatformModule` module. They can be registered statically, or dynamically via `PlatformConfigLoader`.
 
 Following properties are supported:
 
@@ -47,15 +47,14 @@ export class HostAppModule {
 ```
 
 ### Dynamic application registration
-
-For dynamic application registration, register an `ApplicationConfigLoader` to load the application config e.g. from a server.
+For dynamic application registration, register a `PlatformConfigLoader` to load the platform and application configuration e.g. from a server.
 
 ```typescript
 @NgModule({
   imports: [
     WorkbenchModule.forRoot(),
     WorkbenchApplicationPlatformModule.forRoot({
-      applicationConfigLoader: RemoteApplicationConfigLoader,
+      platformConfigLoader: RemotePlatformConfigLoader,
     })
   ]
 })
@@ -63,17 +62,47 @@ export class HostAppModule {
 }
 ```
 
-Then, implement the loader to load the application config, e.g. from the backend.
+Then, implement the loader to load the platform config.
 
 ```typescript
 @Injectable()
-export class RemoteApplicationConfigLoader implements ApplicationConfigLoader {
+export class RemotePlatformConfigLoader implements PlatformConfigLoader {
 
   constructor(private httpClient: HttpClient) {
   }
 
-  public load$(): Observable<ApplicationConfig[]> {
-    return this.httpClient.get<ApplicationConfig[]>('/assets/app-config.json');
+  public load$(): Observable<PlatformConfig> {
+    return this.httpClient.get<PlatformConfig>('/assets/platform-config.json');
+  }
+}
+```
+
+#### Custom properties 
+
+It is possible to provide custom properties in `PlatformConfig`. The properties are then available via `PlatformProperties` service.
+
+```json
+{
+  "apps": [...], ➀
+  "properties": { ➁
+    "custom-prop-1": "value",
+    "custom-prop-2": {
+
+    },
+  };
+}
+```
+|#|Explanation|
+|-|-|
+|➀|Array of `ApplicationConfig` objects representing registered applications|
+|➁|Optional properties available via `PlatformProperties` service|
+
+```typescript
+@Component(...)
+export class AppComponent  {
+
+  constructor(platformProperties: PlatformProperties) {
+    platformProperties.get('custom-prop-1');
   }
 }
 ```

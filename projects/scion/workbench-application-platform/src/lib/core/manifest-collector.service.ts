@@ -12,10 +12,12 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { forkJoin, of, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError, filter, mergeMap, takeUntil, tap } from 'rxjs/operators';
-import { ApplicationConfigLoader, ApplicationManifest } from './metadata';
+import { ApplicationManifest, PlatformConfigLoader } from './metadata';
 import { ApplicationRegistry } from './application-registry.service';
 import { Logger } from './logger.service';
 import { ManifestRegistry } from './manifest-registry.service';
+import { PlatformProperties } from './platform-properties.service';
+import { Defined } from './defined.util';
 
 /**
  * Collects manifests of registered applications and registers application capabilities and intents.
@@ -26,11 +28,11 @@ export class ManifestCollector implements OnDestroy {
   private _destroy$ = new Subject<void>();
   private _collectPromise: Promise<ManifestRegistry>;
 
-
-  constructor(private _applicationConfigLoader: ApplicationConfigLoader,
+  constructor(private _platformConfigLoader: PlatformConfigLoader,
               private _httpClient: HttpClient,
               private _applicationRegistry: ApplicationRegistry,
               private _manifestRegistry: ManifestRegistry,
+              private _platformProperties: PlatformProperties,
               private _logger: Logger) {
   }
 
@@ -39,8 +41,8 @@ export class ManifestCollector implements OnDestroy {
    *
    * @return Promise to wait until collecting manifests completes.
    */
-  public collectAndRegister(): Promise<ManifestRegistry> {
-    return this._collectPromise || (this._collectPromise = this.collect());
+  public collectAndRegister(): Promise<void> {
+    return this._collectPromise || (this._collectPromise = this.collect()).then(() => undefined);
   }
 
   /**
@@ -51,23 +53,28 @@ export class ManifestCollector implements OnDestroy {
   }
 
   private collect(): Promise<ManifestRegistry> {
-    const applicationManifests$ = this._applicationConfigLoader.load$()
+    const applicationManifests$ = this._platformConfigLoader.load$()
       .pipe(
-        mergeMap(appConfigurations => of(...appConfigurations)),
-        filter(appConfig => !appConfig.exclude),
-        mergeMap(appConfig => {
+        tap(platformConfig => {
+          Defined.orElseThrow(platformConfig, () => Error('[PlatformConfigError] No platform config provided.'));
+          Defined.orElseThrow(platformConfig.apps, () => Error('[PlatformConfigError] Missing \'apps\' property in platform config. Did you forget to register applications?'));
+        }),
+        tap(platformConfig => this._platformProperties.registerProperties(platformConfig.properties)),
+        mergeMap(platformConfig => of(...platformConfig.apps)),
+        filter(app => !app.exclude),
+        mergeMap(app => {
           // fetch the manifest
-          return this._httpClient.get<ApplicationManifest>(appConfig.manifestUrl).pipe(
+          return this._httpClient.get<ApplicationManifest>(app.manifestUrl).pipe(
             tap((applicationManifest: ApplicationManifest) => {
-              this._applicationRegistry.registerApplication(appConfig, applicationManifest);
-              this._logger.info(`Application '${appConfig.symbolicName}' registered as workbench application`, this._applicationRegistry.getApplication(appConfig.symbolicName));
+              this._applicationRegistry.registerApplication(app, applicationManifest);
+              this._logger.info(`Application '${app.symbolicName}' registered as workbench application`, this._applicationRegistry.getApplication(app.symbolicName));
             }),
             catchError(error => {
-              this._logger.warn(`Application '${appConfig.symbolicName}' is not available.`, appConfig, error);
+              this._logger.warn(`Application '${app.symbolicName}' is not available.`, app, error);
               return of(undefined); // do not use {EMPTY}, otherwise 'forkJoin' would not wait for all Observables to complete.
             }),
           );
-        })
+        }),
       );
 
     return forkJoin(applicationManifests$)

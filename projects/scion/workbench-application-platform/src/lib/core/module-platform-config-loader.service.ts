@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ApplicationConfig, ApplicationConfigLoader } from './metadata';
+import { PlatformConfig, PlatformConfigLoader } from './metadata';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { WorkbenchApplicationPlatformConfig } from '../workbench-application-platform.config';
@@ -18,16 +18,18 @@ import { Logger } from './logger.service';
  * Loads applications as configured in `WorkbenchApplicationPlatformModule.forRoot({applicationConfig: {...}})`.
  */
 @Injectable()
-export class ModuleApplicationConfigLoader implements ApplicationConfigLoader {
+export class ModulePlatformConfigLoader implements PlatformConfigLoader {
 
   constructor(private _platformConfig: WorkbenchApplicationPlatformConfig, private _logger: Logger) {
   }
 
-  public load$(): Observable<ApplicationConfig[]> {
+  public load$(): Observable<PlatformConfig> {
     if (!this._platformConfig.applicationConfig) {
       this._logger.error('Missing application config in `WorkbenchApplicationPlatformModule`. Did you forget to register applications when calling \'WorkbenchApplicationPlatformModule.forRoot(...)\'?');
-      return of([]);
+      return of({apps: []});
     }
-    return of(this._platformConfig.applicationConfig);
+    return of({
+      apps: this._platformConfig.applicationConfig,
+    });
   }
 }
