@@ -25,7 +25,17 @@ export const INTENT_HANDLER = new InjectionToken<IntentHandler[]>('INTENT_HANDLE
 export const HOST_APPLICATION_SYMBOLIC_NAME = 'host';
 
 /**
- * Metadata that describes the application to register in the platform.
+ * Configuration of the platform with all its applications and optional platform properties.
+ */
+export interface PlatformConfig {
+  apps: ApplicationConfig[];
+  properties?: {
+    [key: string]: any;
+  };
+}
+
+/**
+ * Describes an application to register in the platform.
  */
 export interface ApplicationConfig {
   /**
@@ -200,10 +210,10 @@ export abstract class ErrorHandler {
 /**
  * Loads applications running in the platform.
  */
-export abstract class ApplicationConfigLoader {
+export abstract class PlatformConfigLoader {
 
   /**
    * Loads applications running in the platform.
    */
-  public abstract load$(): Observable<ApplicationConfig[]>;
+  public abstract load$(): Observable<PlatformConfig>;
 }

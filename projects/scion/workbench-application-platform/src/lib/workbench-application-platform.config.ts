@@ -9,7 +9,7 @@
  */
 
 import { Type } from '@angular/core/core';
-import { ApplicationConfig, ApplicationConfigLoader, ErrorHandler } from './core/metadata';
+import { ApplicationConfig, PlatformConfigLoader, ErrorHandler } from './core/metadata';
 
 /**
  * Configuration for the Workbench Application Platform.
@@ -19,20 +19,20 @@ export abstract class WorkbenchApplicationPlatformConfig {
   /**
    * Registers the applications running in the platform.
    *
-   * To load the application configuration from a server, use property `applicationConfigLoader` instead.
+   * To load the application configuration from a server, use property `platformConfigLoader` instead.
    *
-   * @see applicationConfigLoader
+   * @see platformConfigLoader
    */
   abstract applicationConfig?: ApplicationConfig[];
 
   /**
-   * Allows loading application configuration from a server.
+   * Allows loading platform and application configuration from a server.
    *
    * If set, the `applicationConfig` is ignored.
    *
    * @see applicationConfig
    */
-  abstract applicationConfigLoader?: Type<ApplicationConfigLoader>;
+  abstract platformConfigLoader?: Type<PlatformConfigLoader>;
 
   /**
    * Overwrites the default error handler which shows errors as notifications to the user.

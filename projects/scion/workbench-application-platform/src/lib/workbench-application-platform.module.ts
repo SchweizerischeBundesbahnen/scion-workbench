@@ -13,7 +13,7 @@ import { WorkbenchModule } from '@scion/workbench';
 import { WorkbenchApplicationPlatformConfig } from './workbench-application-platform.config';
 import { ForRootGuardService } from './for-root-guard.service';
 import { FORROOT_GUARD } from './workbench-application-platform.constants';
-import { ApplicationConfigLoader, ErrorHandler } from './core/metadata';
+import { ErrorHandler, PlatformConfigLoader } from './core/metadata';
 import { DefaultErrorHandler } from './core/default-error-handler.service';
 import { CoreModule } from './core/core.module';
 import { ViewCapabilityModule } from './view-capability/view-capability.module';
@@ -22,7 +22,7 @@ import { MessageBoxCapabilityModule } from './messagebox-capability/message-box-
 import { NotificationCapabilityModule } from './notification-capability/notification-capability.module';
 import { ManifestCapabilityModule } from './manifest-capability/manifest-capability.module';
 import { PopupCapabilityModule } from './popup-capability/popup-capability.module';
-import { ModuleApplicationConfigLoader } from './core/module-application-config-loader.service';
+import { ModulePlatformConfigLoader } from './core/module-platform-config-loader.service';
 
 @NgModule({
   imports: [
@@ -52,14 +52,14 @@ export class WorkbenchApplicationPlatformModule {
       providers: [
         ForRootGuardService,
         {provide: ErrorHandler, useClass: config.errorHandler || DefaultErrorHandler},
-        {provide: ApplicationConfigLoader, useClass: config.applicationConfigLoader || ModuleApplicationConfigLoader},
+        {provide: PlatformConfigLoader, useClass: config.platformConfigLoader || ModulePlatformConfigLoader},
         {provide: WorkbenchApplicationPlatformConfig, useValue: config},
         {
           provide: FORROOT_GUARD,
           useFactory: provideForRootGuard,
-          deps: [[ForRootGuardService, new Optional(), new SkipSelf()]]
+          deps: [[ForRootGuardService, new Optional(), new SkipSelf()]],
         },
-      ]
+      ],
     };
   }
 }

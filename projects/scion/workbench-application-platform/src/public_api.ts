@@ -23,5 +23,6 @@ export * from './lib/messagebox-capability/message-box-intent-handler.service';
 export * from './lib/notification-capability/notification-intent-handler.service';
 export * from './lib/core/metadata';
 export * from './lib/activity-capability/metadata';
+export * from './lib/core/platform-properties.service';
 
 export * from '@scion/workbench-application-platform.api';

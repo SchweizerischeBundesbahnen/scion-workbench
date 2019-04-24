@@ -17,6 +17,7 @@ import { Logger } from './logger.service';
 import { MessageBus } from './message-bus.service';
 import { IntentHandlerRegistrator } from './intent-handler-registrator.service';
 import { AppOutletDirective } from './app-outlet.directive';
+import { PlatformProperties } from './platform-properties.service';
 
 /**
  * Core functionality of workbench application platform.
@@ -38,12 +39,13 @@ import { AppOutletDirective } from './app-outlet.directive';
     ManifestRegistry,
     MessageBus,
     IntentHandlerRegistrator,
+    PlatformProperties,
     {
       provide: APP_INITIALIZER,
       multi: true,
       useFactory: provideModuleInitializerFn,
-      deps: [Injector, Logger]
-    }
+      deps: [Injector, Logger],
+    },
   ],
 })
 export class CoreModule {

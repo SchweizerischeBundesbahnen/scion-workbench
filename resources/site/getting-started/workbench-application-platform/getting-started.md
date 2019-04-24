@@ -169,7 +169,7 @@ ng new host-app --style scss
   |-|-|
   |➀|Imports `SCION Workbench` module|
   |➁|Imports `SCION Workbench Application Platform` module and configures the applications to integrate|
-  |➂|Registers the applications running in the platform. Alternatively, you can configure an `ApplicationConfigLoader` to load the application configuration from a server.|
+  |➂|Registers the applications running in the platform. Alternatively, you can configure a `PlatformConfigLoader` to load the application configuration from a server.|
   |➃|Registers the `contact-app` application|
   |➄|Registers the `communication-app` application. This application is already deployed.|
   |➅|Registers the `dev-tools` application.<br>This application is already deployed and provides an overview of all applications installed, lists their capabilities and intents, and shows inter-application dependencies.<br>Please note that it requires scope checks to be disabled, so it can invoke private capabilities of other applications.|
