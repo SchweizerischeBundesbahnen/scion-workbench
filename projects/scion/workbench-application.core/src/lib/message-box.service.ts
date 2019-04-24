@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { MessageBus } from './message-bus-service';
+import { MessageBus } from './message-bus.service';
 import { Service } from './metadata';
 import { Platform } from './platform';
 import { MessageBox, MessageBoxIntentMessage, PlatformCapabilityTypes, Qualifier } from '@scion/workbench-application-platform.api';

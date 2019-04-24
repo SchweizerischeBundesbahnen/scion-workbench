@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { MessageBus } from './message-bus-service';
+import { MessageBus } from './message-bus.service';
 import { Service, Type } from './metadata';
 
 const serviceRegistry = new Map<Type<Service>, Service>();

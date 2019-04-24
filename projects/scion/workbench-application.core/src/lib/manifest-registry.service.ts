@@ -9,7 +9,7 @@
  */
 
 import { Service } from './metadata';
-import { MessageBus } from './message-bus-service';
+import { MessageBus } from './message-bus.service';
 import { from, Observable } from 'rxjs';
 import { Platform } from './platform';
 import { Application, Capability, Manifest, ManifestQueries, ManifestRegistryIntentMessages, NilQualifier, PlatformCapabilityTypes, Qualifier } from '@scion/workbench-application-platform.api';

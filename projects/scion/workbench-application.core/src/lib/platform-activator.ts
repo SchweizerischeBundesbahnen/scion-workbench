@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { DefaultMessageBus, MessageBus } from './message-bus-service';
+import { DefaultMessageBus, MessageBus } from './message-bus.service';
 import { ViewService } from './view.service';
-import { MessageBoxService } from './message-box-service';
-import { NotificationService } from './notification-service';
+import { MessageBoxService } from './message-box.service';
+import { NotificationService } from './notification.service';
 import { ActivityService } from './activity.service';
-import { ManifestRegistryService } from './manifest-registryService';
+import { ManifestRegistryService } from './manifest-registry.service';
 import { RouterService } from './router.service';
 import { Platform } from './platform';
-import { PopupService } from './popup-service';
-import { PlatformEventBus } from './platform-event-bus-service';
-import { IntentService } from './intent-service';
+import { PopupService } from './popup.service';
+import { PlatformEventBus } from './platform-event-bus.service';
+import { IntentService } from './intent.service';
 
 /**
  * Manages the lifecycle of this workbench application module to communicate with the workbench application platform.

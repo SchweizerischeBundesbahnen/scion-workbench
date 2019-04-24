@@ -9,7 +9,7 @@
  */
 
 import { Service } from './metadata';
-import { MessageBus } from './message-bus-service';
+import { MessageBus } from './message-bus.service';
 import { Platform } from './platform';
 import { PlatformCapabilityTypes, Qualifier, ViewIntentMessage } from '@scion/workbench-application-platform.api';
 
