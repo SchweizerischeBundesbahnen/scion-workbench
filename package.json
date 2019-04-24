@@ -51,7 +51,7 @@
 
     "app:workbench-application-platform:e2e": "run-p -r app:workbench-application-platform:serve app:workbench-application-platform:await-then-e2e",
     "app:workbench-application-platform:await-then-e2e": "run-s app:workbench-application-platform:await app:workbench-application-platform:e2e:specs",
-    "app:workbench-application-platform:build-now": "run-p -r app:workbench-application-platform:build-now:*",
+    "app:workbench-application-platform:build-now": "run-p --aggregate-output app:workbench-application-platform:build-now:*",
     "app:workbench-application-platform:lint": "run-p app:workbench-application-platform:lint:*",
     "app:workbench-application-platform:serve": "run-p -r app:workbench-application-platform:serve:*",
     "app:workbench-application-platform:await": "run-s app:workbench-application-platform:await:*",
