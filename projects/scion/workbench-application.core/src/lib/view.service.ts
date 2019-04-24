@@ -9,7 +9,7 @@
  */
 
 import { Service } from './metadata';
-import { MessageBus } from './message-bus-service';
+import { MessageBus } from './message-bus.service';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Platform } from './platform';

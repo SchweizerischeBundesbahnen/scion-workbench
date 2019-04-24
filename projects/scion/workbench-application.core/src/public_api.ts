@@ -13,16 +13,16 @@
  */
 export * from './lib/platform-activator';
 export * from './lib/platform';
-export * from './lib/message-bus-service';
+export * from './lib/message-bus.service';
 export * from './lib/router.service';
 export * from './lib/uuid.util';
 export * from './lib/view.service';
 export * from './lib/activity.service';
-export * from './lib/message-box-service';
-export * from './lib/notification-service';
-export * from './lib/intent-service';
-export * from './lib/popup-service';
-export * from './lib/manifest-registryService';
+export * from './lib/message-box.service';
+export * from './lib/notification.service';
+export * from './lib/intent.service';
+export * from './lib/popup.service';
+export * from './lib/manifest-registry.service';
 export * from './lib/metadata';
 
 export * from '@scion/workbench-application-platform.api';
