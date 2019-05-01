@@ -87,7 +87,8 @@ export class SciDimensionDirective implements OnDestroy {
     return merge(
       timer(0, asapScheduler), // Notify after directive construction to emit the initial dimension
       this._ngZone.onStable, // When the Angular zone gets stable the dimension of the host element might have changed.
-      fromEvent(window, 'resize'), // However, when resizing the window, the Angular zone is not necessarily involved.
+      fromEvent(window, 'resize'), // When receiving a window size change, the Angular zone is not necessarily involved.
+      fromEvent(window, 'orientationchange'), // When receiving a window orientation change, the Angular zone is not necessarily involved.
     )
       .pipe(
         map(() => this.dimension),
