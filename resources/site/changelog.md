@@ -5,6 +5,16 @@
 
 # Changelog
 
+
+# [0.0.0-beta.21](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.20...0.0.0-beta.21) (2019-05-01)
+
+### Bug Fixes
+
+* emit the host element's initial size ([c41509a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c41509a)), closes [#137](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/137)
+* emit when the dimension changes due to a window orientation change ([c04a4f6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c04a4f6)), closes [#137](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/137)
+* update angular and rxjs dependencies ([870b377](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/870b377))
+
+
 # [0.0.0-beta.20](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.19...0.0.0-beta.20) (2019-04-24)
 
 
