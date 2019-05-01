@@ -197,13 +197,14 @@ We use NPM distribution tags to differentiate between pre-releases (x.0.0-beta.0
 ## Release guidelines
 Whenever you publish a new version to NPM (pre-release, major, minor, patch), please follow the instructions below:
 
-- update all `package.json` files with the new version, e.g. `2.0.0-beta.1`
-- update scion dependencies to the new version in all necessary 'package.json' files
-- generate the new `changelog.md`, if necessary (see below)
-- check if the `changelog.md` looks good (we use a custom header, make sure it stays there)
-- create a Git release commit that consists of the changed files and a commit message like 'release: version 2.0.0-beta.1'
-- create a Git release tag pointing to the previously added release commit, and use the exact version as tag name, e.g. `2.0.0-beta.1`.
-- based on the Git release tag, travis will automatically build & publish the necessary npm packages
+- update all `package.json` files with the new version, e.g. `0.0.0-beta.22` (search and replace "0.0.0-beta.21" -> "0.0.0-beta.22")
+- run `npm i` to update the version in `package-lock.json`
+- generate the new `changelog.md` ([see below](#generating-change-logs))
+- correct the generated `changelog.md`: move the header to the top
+- create a release commit that consists of the changed files and a commit message like 'release: version 0.0.0-beta.22'
+- push the changes to a new branch e.g. `release/0.0.0-beta.22` and create a pull request (no comments needed)
+- once merged to the master, tag your release commit with the exact version as tag name (e.g. `0.0.0-beta.22`).
+- based on the release tag, travis will automatically build & publish the necessary npm packages
 
 SCION workbench packages are published under `@scion` scope. To get access to SCION organization, please file an issue in the project issue tracker.
 
