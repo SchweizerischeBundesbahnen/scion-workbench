@@ -9,8 +9,8 @@
  */
 
 import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, Output } from '@angular/core';
-import { asapScheduler, fromEvent, merge, Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, map, startWith, takeUntil } from 'rxjs/operators';
+import { asapScheduler, fromEvent, merge, Observable, Subject, timer } from 'rxjs';
+import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 
 export const NULL_DIMENSION: SciDimension = {offsetWidth: 0, offsetHeight: 0, clientWidth: 0, clientHeight: 0};
 
@@ -71,7 +71,7 @@ export class SciDimensionDirective implements OnDestroy {
       clientWidth: this._host.clientWidth,
       clientHeight: this._host.clientHeight,
       offsetWidth: this._host.offsetWidth,
-      offsetHeight: this._host.offsetHeight
+      offsetHeight: this._host.offsetHeight,
     };
   }
 
@@ -85,12 +85,12 @@ export class SciDimensionDirective implements OnDestroy {
     NgZone.assertNotInAngularZone();
 
     return merge(
+      timer(0, asapScheduler), // Notify after directive construction to emit the initial dimension
       this._ngZone.onStable, // When the Angular zone gets stable the dimension of the host element might have changed.
       fromEvent(window, 'resize'), // However, when resizing the window, the Angular zone is not necessarily involved.
     )
       .pipe(
         map(() => this.dimension),
-        startWith(NULL_DIMENSION, asapScheduler),
         distinctUntilChanged((a, b) => {
           return a.clientWidth === b.clientWidth &&
             a.clientHeight === b.clientHeight &&
