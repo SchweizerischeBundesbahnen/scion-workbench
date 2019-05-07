@@ -60,7 +60,7 @@ export class RemoteSiteComponent implements OnDestroy {
 
     // Determine if setting given URL causes a new page to be loaded into the iframe. A 'page load' is not caused if only the URL fragment changes.
     // When the page loads anew, posting of messages to that site must be delayed until loading completed, so the site is ready to receive them.
-    const isPageAboutToLoad = !this._siteUrl || !this._siteUrl.hash || !siteUrl.hash || toUrlWithoutFragment(this._siteUrl) !== toUrlWithoutFragment(siteUrl);
+    const isPageAboutToLoad = !this._siteUrl || !siteUrl.hash || toUrlWithoutFragment(this._siteUrl) !== toUrlWithoutFragment(siteUrl);
     if (isPageAboutToLoad) {
       this.installSiteLoadPromise();
       this.installMouseDispatcher();

@@ -1,0 +1,7 @@
+<input class="e2e-ping-message" #input placeholder="Enter ping message."/>
+
+<button (click)="onPing(input.value)" class="e2e-ping">Ping</button>
+
+<section *ngIf="result$ | async as result">
+  Result: <output class="e2e-result">{{result}}</output>
+</section>

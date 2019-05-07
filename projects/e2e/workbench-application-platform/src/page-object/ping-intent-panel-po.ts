@@ -11,9 +11,9 @@
 import { $ } from 'protractor';
 import { switchToIFrameContext } from '../util/testing.util';
 
-export class CustomIntentPanelPO {
+export class PingIntentPanelPO {
 
-  private _panel = $('app-custom-intent-panel');
+  private _panel = $('app-ping-intent-panel');
 
   constructor(public iframeContext: string[]) {
   }
@@ -23,8 +23,14 @@ export class CustomIntentPanelPO {
     return this._panel.$('output.e2e-result').getText();
   }
 
-  public async issueIntent(): Promise<void> {
+  public async clickPingButton(): Promise<void> {
     await switchToIFrameContext(this.iframeContext);
-    await this._panel.$('button.e2e-issue-intent').click();
+    await this._panel.$('button.e2e-ping').click();
+  }
+
+  public async enterPingMessage(message: string): Promise<void> {
+    await switchToIFrameContext(this.iframeContext);
+    await this._panel.$('input.e2e-ping-message').click();
+    await this._panel.$('input.e2e-ping-message').sendKeys(message);
   }
 }

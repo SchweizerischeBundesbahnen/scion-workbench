@@ -15,7 +15,9 @@ import { AppComponent } from './app.component';
 import { WorkbenchApplicationModule } from '@scion/workbench-application.angular';
 import { SciViewportModule } from '@scion/viewport';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SciParamsEnterModule } from '@scion/app/common';
 import { AppRoutingModule } from './app-routing.module';
+
 
 @NgModule({
   declarations: [
@@ -27,6 +29,7 @@ import { AppRoutingModule } from './app-routing.module';
     SciViewportModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    SciParamsEnterModule
   ],
   providers: [],
   bootstrap: [
