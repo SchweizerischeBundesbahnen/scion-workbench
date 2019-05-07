@@ -20,9 +20,10 @@ describe('CustomIntent', () => {
 
   it('should return result when custom intent is dispatched', async () => {
     await testingViewPO.navigateTo();
-    const panelPO = await testingViewPO.openCustomIntentPanel();
+    const panelPO = await testingViewPO.openPingIntentPanel();
 
-    await panelPO.issueIntent();
-    await expect(panelPO.getResult()).toEqual('custom-intent-payload');
+    await panelPO.enterPingMessage('Nobody calls me chicken!');
+    await panelPO.clickPingButton();
+    await expect(panelPO.getResult()).toEqual('Nobody calls me chicken!');
   });
 });

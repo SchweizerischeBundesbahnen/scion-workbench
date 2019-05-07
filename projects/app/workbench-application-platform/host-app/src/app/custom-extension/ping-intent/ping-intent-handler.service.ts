@@ -3,12 +3,12 @@ import { IntentHandler, MessageBus } from '@scion/workbench-application-platform
 import { NilQualifier, IntentMessage, MessageEnvelope } from '@scion/workbench-application-platform.api';
 
 @Injectable()
-export class CustomIntentHandlerService implements IntentHandler {
+export class PingIntentHandler implements IntentHandler {
 
-  public readonly type = 'custom';
+  public readonly type = 'ping';
   public readonly qualifier = NilQualifier;
 
-  public readonly description = 'Handles intents of type custom';
+  public readonly description = 'Replies to ping requests.';
 
   constructor(private _messageBus: MessageBus) {
   }

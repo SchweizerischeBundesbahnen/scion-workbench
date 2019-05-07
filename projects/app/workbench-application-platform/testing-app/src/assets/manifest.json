@@ -65,6 +65,30 @@
       "type": "view",
       "qualifier": {
         "entity": "testing",
+        "testcase": "c985a55b-view"
+      },
+      "description": "Provides a view for testcase 'c985a55b'",
+      "properties": {
+        "path": "",
+        "title": "e2e-view-c985a55b",
+        "heading": "c985a55b",
+        "cssClass": "e2e-view-c985a55b",
+        "activityItem": {
+          "title": "c985a55b-activity",
+          "itemCssClass": [
+            "fab",
+            "fa-android"
+          ],
+          "cssClass": "e2e-activity-c985a55b",
+          "position": 10000000042
+        }
+
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
+        "entity": "testing",
         "testcase": "354aa6da-view"
       },
       "description": "Provides a view for testcase '354aa6da'",
@@ -666,7 +690,7 @@
   ],
   "intents": [
     {
-      "type": "custom"
+      "type": "ping"
     },
     {
       "type": "messagebox"

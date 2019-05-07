@@ -21,6 +21,7 @@ import { TestcaseCc977da9ViewPO } from './page-object/testcase-cc977da9-view.po'
 import { TestcaseB6a8fe23ViewPO } from './page-object/testcase-b6a8fe23-view.po';
 import { Testcase5782ab19ViewPO } from './page-object/testcase-5782ab19-view.po';
 import { Testcase68f302b4ViewPO } from './page-object/testcase-68f302b4-view-po';
+import { TestcaseC985a55bViewPO } from './page-object/testcase-c985a55b-view.po';
 
 describe('View', () => {
 
@@ -650,6 +651,33 @@ describe('View', () => {
 
       // expect no 'postMessage' error to be thrown
       await expect(hostAppPO.hasBrowserError('Failed to execute \'postMessage\' on \'DOMWindow\'')).toBeFalsy();
+    });
+
+    it('should allow an application to interact with the host application once navigated away from its root page [testcase: c985a55bViewPO-view, issue: #141]', async () => {
+      const viewPO = new TestcaseC985a55bViewPO();
+      await viewPO.navigateTo();
+
+      // send a ping request from the application root page
+      const pingPanelPO = viewPO.getPingPanelPO();
+      await pingPanelPO.enterPingMessage('Yeah, well I\'m busy.');
+      await pingPanelPO.clickPingButton();
+      await expect(pingPanelPO.getResult()).toEqual('Yeah, well I\'m busy.');
+
+      // navigate to a sub page of this application (hash-based routing)
+      const viewNavigationPanelPO = viewPO.getViewNavigationPanelPO();
+      await viewNavigationPanelPO.enterQualifier({
+        entity: 'testing'
+      });
+      await viewNavigationPanelPO.selectTarget('self');
+      await viewNavigationPanelPO.checkActivateIfPresent(false);
+      await viewNavigationPanelPO.execute();
+      await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
+
+      // send a ping request from the sub page and expect to receive the reply
+      const testingViewPingPanelPO = await new TestingViewPO().openPingIntentPanel();
+      await testingViewPingPanelPO.enterPingMessage('As for you, I\'ll be back up here in an hour, so you\'d better not be!');
+      await testingViewPingPanelPO.clickPingButton();
+      await expect(testingViewPingPanelPO.getResult()).toEqual('As for you, I\'ll be back up here in an hour, so you\'d better not be!');
     });
   });
 

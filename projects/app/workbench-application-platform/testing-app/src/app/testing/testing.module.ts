@@ -58,8 +58,9 @@ import { Activity5782ab19Component } from './activity-5782ab19/activity-5782ab19
 import { ViewOpenActivityActionPanelComponent } from './view-open-activity-action-panel/view-open-activity-action-panel.component';
 import { PopupOpenActivityActionPanelComponent } from './popup-open-activity-action-panel/popup-open-activity-action-panel.component';
 import { ViewC91805e8Component } from './view-c91805e8/view-c91805e8.component';
-import { CustomIntentPanelComponent } from './custom-intent/custom-intent-panel.component';
+import { PingIntentPanelComponent } from './ping-intent/ping-intent-panel.component';
 import { ViewCba33eafComponent } from './view-cba33eaf/view-cba33eaf.component';
+import { ViewC985a55bComponent } from './view-c985a55b/view-c985a55b.component';
 
 @NgModule({
   declarations: [
@@ -67,7 +68,7 @@ import { ViewCba33eafComponent } from './view-cba33eaf/view-cba33eaf.component';
     ViewNavigationPanelComponent,
     ViewInterationPanelComponent,
     MessageBoxPanelComponent,
-    CustomIntentPanelComponent,
+    PingIntentPanelComponent,
     NotificationPanelComponent,
     PopupPanelComponent,
     TestingPopupComponent,
@@ -96,6 +97,7 @@ import { ViewCba33eafComponent } from './view-cba33eaf/view-cba33eaf.component';
     ViewBe587bd6Component,
     ViewC91805e8Component,
     ViewCba33eafComponent,
+    ViewC985a55bComponent,
     Popup1a90c8d2Component,
     Popup7330f506Component,
     Popup9c5319f7Component,

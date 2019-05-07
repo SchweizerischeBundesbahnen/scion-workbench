@@ -10,14 +10,16 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ViewC985a55bComponent } from './testing/view-c985a55b/view-c985a55b.component';
 
 const routes: Routes = [
+  {path: '', component: ViewC985a55bComponent},
   {path: 'testing', loadChildren: './testing/testing.module#TestingModule'},
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {useHash: true})],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {
 }

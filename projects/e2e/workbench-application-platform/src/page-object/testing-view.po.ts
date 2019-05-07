@@ -17,7 +17,7 @@ import { SciAccordionPO } from './sci-accordion-p.o';
 import { switchToIFrameContext } from '../util/testing.util';
 import { MessageBoxPanelPO } from './message-box-panel.po';
 import { NotificationPanelPO } from './notification-panel.po';
-import { CustomIntentPanelPO } from './custom-intent-panel.po';
+import { PingIntentPanelPO } from './ping-intent-panel-po';
 
 const E2E_TESTING_VIEW_CONTEXT: string[] = ['e2e-testing-app', 'e2e-view', 'e2e-testing-view'];
 
@@ -58,10 +58,10 @@ export class TestingViewPO {
     return new MessageBoxPanelPO(E2E_TESTING_VIEW_CONTEXT);
   }
 
-  public async openCustomIntentPanel(): Promise<CustomIntentPanelPO> {
+  public async openPingIntentPanel(): Promise<PingIntentPanelPO> {
     await switchToIFrameContext(E2E_TESTING_VIEW_CONTEXT);
-    await new SciAccordionPO().toggle(this._component.$('sci-accordion'), 'e2e-custom-intent-panel', true);
-    return new CustomIntentPanelPO(E2E_TESTING_VIEW_CONTEXT);
+    await new SciAccordionPO().toggle(this._component.$('sci-accordion'), 'e2e-ping-intent-panel', true);
+    return new PingIntentPanelPO(E2E_TESTING_VIEW_CONTEXT);
   }
 
   public async openNotificationPanel(): Promise<NotificationPanelPO> {
