@@ -5,6 +5,12 @@
 
 # Changelog
 
+# [0.0.0-beta.22](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.21...0.0.0-beta.22) (2019-05-08)
+
+### Bug Fixes
+
+* allow interaction with the platform once navigated away from an application's root page ([80ddeab](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/80ddeab)), closes [#141](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/141)
+
 
 # [0.0.0-beta.21](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.20...0.0.0-beta.21) (2019-05-01)
 

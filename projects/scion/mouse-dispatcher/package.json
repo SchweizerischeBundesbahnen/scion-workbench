@@ -1,6 +1,6 @@
 {
   "name": "@scion/mouse-dispatcher",
-  "version": "0.0.0-beta.21",
+  "version": "0.0.0-beta.22",
   "description": "Dispatches mouse events between the application window and another cross-origin window.",
   "license": "EPL-2.0",
   "private": false,
