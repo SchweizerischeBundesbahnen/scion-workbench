@@ -85,12 +85,43 @@ npm run app:workbench-application-platform:e2e
 ## Coding guidelines
 Besides linting rules, the following rules apply:
 
-- Observable names are suffixed with dollar sign $ to indicate that it represents a stream which must be subscribed to and unsubscribed from
-- we use explicit public or private visibility modifiers (except for constructors) to make code more explicit
-- we use single quotes for string literals or import statements
-- we use 2 spaces per indentation
-- all features or bug fixes related to `routing` or `view grid` must be tested by one or more specs placed in `/projects/scion/workbench/src/lib/spec` directory
-- all public API must be documented
+We believe in the [Best practices for a clean and performant Angular application](https://medium.freecodecamp.org/best-practices-for-a-clean-and-performant-angular-application-288e7b39eb6f) and the [Angular Style Guide](https://angular.io/guide/styleguide).
+
+Furthermore, we have the following rules:
+
+- We expect line endings of textual files to be Unix style (LF) only.
+- Observable names are suffixed with the dollar sign $ to indicate that it represents a stream which must be subscribed to and unsubscribed from.
+- We use explicit public or private visibility modifiers (except for constructors) to make the code more explicit.
+- We prefix private members with an underscore.
+- We use single quotes for string literals or import statements.
+- We use two spaces per indentation.
+- All features or bug fixes related to `routing` or `view grid` must be tested by one or more specs.
+- We write each RxJS operator on a new line, except when piping a single RxJS operator. Then, we write it on the same line as the pipe method.
+```javascript
+// single operator
+observable$
+    .pipe(map(it => ...))
+    .subscribe(...);
+
+// multiple operators
+observable$
+    .pipe(
+      map(it => ...),
+      takeUntil(...),
+    )
+    .subscribe(...);
+```
+- We subscribe via Angular `async` pipe whenever possible, unless not practical.
+- We use the `takeUntil` unsubscribe pattern whenever possible, unless not practical.
+- We avoid nested RxJS subscriptions.
+- We document all public API methods, constants, functions, classes or interfaces.
+- We format our code with the code style settings from `.editorconfig.intellij.xml`.
+- We prefer `const` vs `let` variables.
+- We avoid using the `any` type.
+- If a component is configured with the default change detection strategy, we avoid binding its template values to expensive methods or getter calls.
+- We structure the CSS selectors in CSS files similar to the structure of the companion HTML file, except if there are good reasons not to do it. This gives us a visual by only reading the CSS file.
+- When referencing CSS classes from within E2E tests, we prefix them with `e2e-`. If there is already a CSS class present on an element, we still add such a prefixed CSS class. This underlines that its purpose is not for styling but testing reason instead.
+- Tests have their dedicated test resources (unless not practical) to simplify identifying its resources and not having eagerly coupled tests. Therefore, we name the test resources with the first 8 digits from a UUID, e.g., generated with [Online UUID Generator](https://www.uuidgenerator.net/).
 
 ## Commit guidelines
 We believe in a compact and well written Git commit history. Every commit should be a logically separate changeset.
