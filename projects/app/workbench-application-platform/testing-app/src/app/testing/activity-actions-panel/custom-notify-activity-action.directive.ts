@@ -13,7 +13,6 @@ import { Disposable } from '@scion/workbench-application.core';
 import { WorkbenchActivity } from '@scion/workbench-application.angular';
 import { CustomActivityActionTypes, CustomNotifyActivityAction } from '@scion/app/common';
 
-
 /**
  * Use this directive to model an activity action which shows a notification to the user.
  *
@@ -25,7 +24,7 @@ import { CustomActivityActionTypes, CustomNotifyActivityAction } from '@scion/ap
  */
 @Directive({
   selector: 'ng-container[appCustomActivityAction]',
-  exportAs: 'activityAction'
+  exportAs: 'activityAction',
 })
 export class CustomNotifyActivityActionDirective implements OnInit, OnDestroy {
 

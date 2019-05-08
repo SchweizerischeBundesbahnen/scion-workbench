@@ -20,8 +20,8 @@ import { Contact } from '../contact.model';
   templateUrl: './contact-activity.component.html',
   styleUrls: ['./contact-activity.component.scss'],
   providers: [
-    provideWorkbenchActivity(ContactActivityComponent)
-  ]
+    provideWorkbenchActivity(ContactActivityComponent),
+  ],
 })
 export class ContactActivityComponent implements OnDestroy {
 

@@ -30,7 +30,7 @@ import { Arrays } from '../core/array.util';
 @Component({
   selector: 'wap-activity-outlet',
   templateUrl: './activity-outlet.component.html',
-  styleUrls: ['./activity-outlet.component.scss']
+  styleUrls: ['./activity-outlet.component.scss'],
 })
 export class ActivityOutletComponent implements OnDestroy {
 
@@ -66,7 +66,7 @@ export class ActivityOutletComponent implements OnDestroy {
     this._activity.active$
       .pipe(
         distinctUntilChanged(),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((active: boolean) => {
         this._whenAppOutlet.then(appOutlet => appOutlet.postHostMessage({type: ActivityHostMessageTypes.Active, payload: active}));

@@ -13,5 +13,5 @@ export const environment = {
   contact_app_manifest_url: 'https://scion-workbench-application-platform-contact.now.sh/assets/manifest.json',
   communication_app_manifest_url: 'https://scion-workbench-application-platform-communication.now.sh/assets/manifest.json',
   devtools_app_manifest_url: 'https://scion-workbench-application-platform-devtools.now.sh/assets/manifest.json',
-  testing_app_manifest_url: ''
+  testing_app_manifest_url: '',
 };

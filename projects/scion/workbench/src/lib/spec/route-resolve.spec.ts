@@ -26,7 +26,7 @@ describe('WbRouter', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -88,8 +88,8 @@ class View3Component {
       {path: 'path/to/view-1', component: View1Component},
       {path: 'path/to/view-2', component: View2Component},
       {path: 'path/to/view-3', component: View3Component},
-    ])
-  ]
+    ]),
+  ],
 })
 class AppTestModule {
 }

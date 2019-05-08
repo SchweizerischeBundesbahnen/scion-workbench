@@ -118,7 +118,7 @@ export class ManifestRegistry {
           id: sha256(JSON.stringify({application: symbolicName, type: it.type, ...it.qualifier})).substr(0, 7), // use the first 7 digits of the capability hash as capability id
           symbolicAppName: symbolicName,
           proxy: proxy,
-        }
+        },
       };
 
       this._capabilitiesById.set(capability.metadata.id, capability);
@@ -148,7 +148,7 @@ export class ManifestRegistry {
           id: sha256(JSON.stringify({application: symbolicName, type: it.type, ...it.qualifier})).substr(0, 7), // use the first 7 digits of the intent hash as intent id
           symbolicAppName: symbolicName,
           implicit: implicit,
-        }
+        },
       };
 
       this._intentsById.set(intent.metadata.id, intent);

@@ -94,7 +94,7 @@ export class ViewIntentHandler implements IntentHandler {
           path: `${application.symbolicName}/view/:${VIEW_CAPABILITY_ID_PARAM}/:${VIEW_PATH_PARAM}`,
           component: ViewOutletComponent,
         };
-      })
+      }),
     ]);
   }
 
@@ -129,7 +129,7 @@ export class ViewIntentHandler implements IntentHandler {
       'view',
       viewCapability.metadata.id, // capabilityId
       Url.substitutePathVariables(viewCapability.properties.path, qualifier).join('/') || '/', // path as single parameter
-      ...(matrixParamObject ? [matrixParamObject] : [])
+      ...(matrixParamObject ? [matrixParamObject] : []),
     ];
   }
 }

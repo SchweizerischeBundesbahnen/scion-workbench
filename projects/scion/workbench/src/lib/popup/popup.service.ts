@@ -70,7 +70,7 @@ export class PopupService implements OnDestroy {
         'wb-popup',
         `wb-${position}`,
         `e2e-position-${position}`,
-        ...Arrays.from(config.cssClass)
+        ...Arrays.from(config.cssClass),
       ],
       width: config.width,
       height: config.height,

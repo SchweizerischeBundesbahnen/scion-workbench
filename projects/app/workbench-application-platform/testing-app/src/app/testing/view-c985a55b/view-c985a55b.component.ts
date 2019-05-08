@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
-import {provideWorkbenchView} from '@scion/workbench-application.angular';
+import { Component } from '@angular/core';
+import { provideWorkbenchView } from '@scion/workbench-application.angular';
 
 @Component({
   selector: 'app-view-c8e40918',
   templateUrl: './view-c985a55b.component.html',
   styles: [':host { padding: 1em }'],
   providers: [
-    provideWorkbenchView(ViewC985a55bComponent)
-  ]
+    provideWorkbenchView(ViewC985a55bComponent),
+  ],
 })
 export class ViewC985a55bComponent {
 }

@@ -25,7 +25,7 @@ import { merge, Subject } from 'rxjs';
  * box of the parent component.
  */
 @Directive({
-  selector: '[sciScrollable]'
+  selector: '[sciScrollable]',
 })
 export class SciScrollableDirective implements OnChanges, OnDestroy {
 
@@ -44,7 +44,7 @@ export class SciScrollableDirective implements OnChanges, OnDestroy {
               nativeScrollbarTrackSizeProvider: SciNativeScrollbarTrackSizeProvider) {
     merge(
       nativeScrollbarTrackSizeProvider.trackSize$,
-      this._inputChange$.pipe(map(() => nativeScrollbarTrackSizeProvider.trackSize))
+      this._inputChange$.pipe(map(() => nativeScrollbarTrackSizeProvider.trackSize)),
     )
       .pipe(takeUntil(this._destroy$))
       .subscribe((nativeScrollbarTrackSize: NativeScrollbarTrackSize) => {
@@ -67,7 +67,7 @@ export class SciScrollableDirective implements OnChanges, OnDestroy {
       top: 0,
       right: 0,
       bottom: 0,
-      left: 0
+      left: 0,
     });
   }
 
@@ -81,7 +81,7 @@ export class SciScrollableDirective implements OnChanges, OnDestroy {
       top: 0,
       right: `${-nativeScrollbarTrackSize.vScrollbarTrackWidth}px`,
       bottom: `${-nativeScrollbarTrackSize.hScrollbarTrackHeight}px`,
-      left: 0
+      left: 0,
     });
   }
 

@@ -162,7 +162,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
     timer(500)
       .pipe(
         takeUntil(this._cancelBlinkTimer$),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe(() => {
         this.blinking = false;

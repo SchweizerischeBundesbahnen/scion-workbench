@@ -72,7 +72,7 @@ export class WbNotification extends Notification {
         },
         get: (): any => {
           return this[`_${property}`];
-        }
+        },
       });
     });
 

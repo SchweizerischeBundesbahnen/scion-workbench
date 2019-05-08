@@ -95,7 +95,7 @@ export class InternalWorkbenchService implements WorkbenchService {
         .serialize();
       return this._router.navigate([{outlets: {[viewRef]: null}}], {
         queryParams: {[VIEW_GRID_QUERY_PARAM]: serializedGrid},
-        queryParamsHandling: 'merge'
+        queryParamsHandling: 'merge',
       });
     };
 
@@ -155,7 +155,7 @@ export class InternalWorkbenchService implements WorkbenchService {
   public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
     this.viewPartActions$.next([...this.viewPartActions$.value, action]);
     return {
-      dispose: (): void => this.viewPartActions$.next(this.viewPartActions$.value.filter(it => it !== action))
+      dispose: (): void => this.viewPartActions$.next(this.viewPartActions$.value.filter(it => it !== action)),
     };
   }
 }

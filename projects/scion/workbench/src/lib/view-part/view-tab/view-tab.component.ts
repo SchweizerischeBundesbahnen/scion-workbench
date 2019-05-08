@@ -22,7 +22,7 @@ import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'wb-view-tab',
   templateUrl: './view-tab.component.html',
-  styleUrls: ['./view-tab.component.scss']
+  styleUrls: ['./view-tab.component.scss'],
 })
 export class ViewTabComponent implements OnDestroy {
 
@@ -183,7 +183,7 @@ export class ViewTabComponent implements OnDestroy {
 
       fromEvent(this._host, 'dblclick')
         .pipe(
-          takeUntil(this._destroy$)
+          takeUntil(this._destroy$),
         )
         .subscribe((event: Event) => {
           event.stopPropagation(); // prevent `ViewPartBarComponent` handling the dblclick event which would undo maximization/minimization

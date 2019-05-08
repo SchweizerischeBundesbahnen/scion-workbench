@@ -190,7 +190,7 @@ export class WorkbenchViewPartService implements OnDestroy {
     const navigateFn = ((): Promise<boolean> => {
       return this._router.navigate(commands, {
         queryParams: {[VIEW_GRID_QUERY_PARAM]: serializedGrid},
-        queryParamsHandling: 'merge'
+        queryParamsHandling: 'merge',
       });
     });
 

@@ -29,7 +29,7 @@ import { WorkbenchApplicationModule } from '@scion/workbench-application.angular
     BrowserAnimationsModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {
 }

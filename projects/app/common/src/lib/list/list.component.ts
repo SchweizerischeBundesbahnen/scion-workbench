@@ -119,7 +119,7 @@ export class SciListComponent implements AfterViewInit, OnDestroy {
       .pipe(
         map(index => this.listItems.toArray()[index]),
         filter(Boolean),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((listItem: SciListItemDirective) => {
         this.selection.emit(listItem.key);

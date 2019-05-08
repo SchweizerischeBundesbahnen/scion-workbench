@@ -48,6 +48,6 @@ function combineAndFilterViewPartActions(align: 'start' | 'end'): OperatorFuncti
       return [...localActions, ...globalActions]
         .filter(action => (action.align || 'start') === align)
         .filter(action => !action.viewRef || action.viewRef === activeViewRef);
-    }
+    },
   );
 }

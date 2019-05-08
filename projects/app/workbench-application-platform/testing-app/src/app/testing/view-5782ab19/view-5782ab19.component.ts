@@ -16,8 +16,8 @@ import { provideWorkbenchView } from '@scion/workbench-application.angular';
   templateUrl: './view-5782ab19.component.html',
   styleUrls: ['./view-5782ab19.component.scss'],
   providers: [
-    provideWorkbenchView(View5782ab19Component)
-  ]
+    provideWorkbenchView(View5782ab19Component),
+  ],
 })
 export class View5782ab19Component {
 }

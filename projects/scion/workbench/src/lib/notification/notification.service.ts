@@ -35,7 +35,8 @@ export class NotificationService {
     const note = ((): WbNotification => {
       if (typeof notification === 'string') {
         return new WbNotification({content: notification});
-      } else {
+      }
+      else {
         return new WbNotification(notification);
       }
     })();

@@ -31,8 +31,8 @@ const RELATED_PERSON_IDS = 'related-contact-ids';
   templateUrl: './contact-view.component.html',
   styleUrls: ['./contact-view.component.scss'],
   providers: [
-    provideWorkbenchView(ContactViewComponent)
-  ]
+    provideWorkbenchView(ContactViewComponent),
+  ],
 })
 export class ContactViewComponent implements OnDestroy {
 
@@ -97,7 +97,7 @@ export class ContactViewComponent implements OnDestroy {
         this.form.controls[PHONE].setValue(contact.phone, {emitEvent: false});
         this.form.controls[RELATED_PERSON_IDS].setValue(contact.relatedContactIds, {emitEvent: false});
         this.relatedContacts$ = combineLatest(this._relatedContactFilter$, this._contactService.contacts$(contact.relatedContactIds)).pipe(filterContacts());
-      })
+      }),
     );
   }
 
@@ -137,13 +137,13 @@ export class ContactViewComponent implements OnDestroy {
     this._router.navigate({
         entity: 'communication',
         presentation: 'list',
-        contactId: this.contact.id
+        contactId: this.contact.id,
       },
       {
         matrixParams: {
-          contactFullName: `${this.contact.firstname} ${this.contact.lastname}`
-        }
-      }
+          contactFullName: `${this.contact.firstname} ${this.contact.lastname}`,
+        },
+      },
     );
   }
 
@@ -156,7 +156,7 @@ export class ContactViewComponent implements OnDestroy {
     this._popupService.open(popup, {
       entity: 'communication',
       action: 'create',
-      contactId: this.contact.id
+      contactId: this.contact.id,
     });
   }
 

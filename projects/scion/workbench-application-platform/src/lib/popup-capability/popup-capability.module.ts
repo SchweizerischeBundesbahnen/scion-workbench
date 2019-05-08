@@ -26,7 +26,7 @@ import { PopupIntentHandler } from './popup-intent-handler.service';
   imports: [
     CommonModule,
     CoreModule,
-    WorkbenchModule.forChild()
+    WorkbenchModule.forChild(),
   ],
   providers: [
     {provide: INTENT_HANDLER, useClass: PopupIntentHandler, multi: true},

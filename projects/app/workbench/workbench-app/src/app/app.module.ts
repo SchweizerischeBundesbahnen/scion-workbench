@@ -36,7 +36,7 @@ import { SciParamsEnterModule, SciPropertyModule } from '@scion/app/common';
   ],
   providers: [],
   bootstrap: [
-    AppComponent
+    AppComponent,
   ],
 })
 export class AppModule {

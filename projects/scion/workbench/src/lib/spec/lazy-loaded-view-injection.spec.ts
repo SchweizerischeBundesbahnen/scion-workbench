@@ -49,7 +49,7 @@ describe('Lazily loaded view', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -122,7 +122,7 @@ describe('Lazily loaded view', () => {
                    routerLink="feature/activity">
       </wb-activity>
     </wb-workbench>
-  `
+  `,
 })
 class AppComponent {
 }
@@ -144,7 +144,7 @@ export class FeatureService {
   declarations: [AppComponent],
   providers: [
     {provide: DI_TOKEN, useValue: 'root-injector-value'},
-  ]
+  ],
 })
 class AppTestModule {
 }
@@ -171,17 +171,17 @@ class Feature_View_Component {
     CommonModule,
     RouterModule.forChild([
       {path: 'activity', component: Feature_Activity_Component},
-      {path: 'view', component: Feature_View_Component}
+      {path: 'view', component: Feature_View_Component},
     ]),
   ],
   declarations: [
     Feature_Activity_Component,
-    Feature_View_Component
+    Feature_View_Component,
   ],
   providers: [
     {provide: DI_TOKEN, useValue: 'child-injector-value'},
     FeatureService,
-  ]
+  ],
 })
 class FeatureModule {
 }

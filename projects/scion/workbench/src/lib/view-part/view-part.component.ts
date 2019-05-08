@@ -20,7 +20,7 @@ import { takeUntil } from 'rxjs/operators';
   selector: 'wb-view-part',
   templateUrl: './view-part.component.html',
   styleUrls: ['./view-part.component.scss'],
-  providers: [WorkbenchViewPartService]
+  providers: [WorkbenchViewPartService],
 })
 export class ViewPartComponent implements OnDestroy {
 

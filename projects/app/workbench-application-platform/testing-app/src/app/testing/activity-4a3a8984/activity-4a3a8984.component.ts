@@ -17,8 +17,8 @@ import { UUID } from '@scion/workbench-application.core';
   templateUrl: './activity-4a3a8984.component.html',
   styleUrls: ['./activity-4a3a8984.component.scss'],
   providers: [
-    provideWorkbenchActivity(Activity4a3a8984Component)
-  ]
+    provideWorkbenchActivity(Activity4a3a8984Component),
+  ],
 })
 export class Activity4a3a8984Component {
 

@@ -21,8 +21,8 @@ import { Contact } from '../contact.model';
   templateUrl: './related-contact-add-popup.component.html',
   styleUrls: ['./related-contact-add-popup.component.scss'],
   providers: [
-    provideWorkbenchPopup(RelatedContactAddPopupComponent)
-  ]
+    provideWorkbenchPopup(RelatedContactAddPopupComponent),
+  ],
 })
 export class RelatedContactAddPopupComponent implements OnDestroy {
 

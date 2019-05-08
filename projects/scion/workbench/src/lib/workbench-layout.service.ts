@@ -48,7 +48,8 @@ export class WorkbenchLayoutService {
   public toggleMaximized(maximize?: boolean): void {
     if (maximize === undefined) {
       this._maximized$.next(!this.maximized);
-    } else {
+    }
+    else {
       this._maximized$.next(maximize);
     }
   }

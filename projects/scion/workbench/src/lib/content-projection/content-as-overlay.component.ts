@@ -17,7 +17,6 @@ import { Subject } from 'rxjs';
 import { WorkbenchActivityPartService } from '../activity-part/workbench-activity-part.service';
 import { ActivatedRoute } from '@angular/router';
 
-
 /**
  * Structural component which adds its `ng-content` to a top-level workbench DOM element and projects it into this component's bounding box.
  *
@@ -54,7 +53,7 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'wb-content-as-overlay',
   templateUrl: './content-as-overlay.component.html',
-  styleUrls: ['./content-as-overlay.component.scss']
+  styleUrls: ['./content-as-overlay.component.scss'],
 })
 export class ContentAsOverlayComponent implements OnDestroy {
 

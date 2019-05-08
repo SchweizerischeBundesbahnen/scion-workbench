@@ -162,7 +162,7 @@ export class InternalActivity implements Activity {
           throw Error('[IllegalStateError] Action not registered in activity');
         }
         this._actions.splice(index, 1);
-      }
+      },
     };
   }
 }

@@ -61,7 +61,7 @@ describe('Router', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -304,7 +304,7 @@ class AppComponent {
       {path: 'feature-a', loadChildren: './feature-a/feature-a.module#FeatureAModule'},
     ]),
   ],
-  declarations: [AppComponent]
+  declarations: [AppComponent],
 })
 class AppTestModule {
 }
@@ -330,7 +330,7 @@ class AppTestModule {
       <li><a wbRouterLink="/feature-a/feature-b/view-1">feature-b/view-1</a></li>
       <li><a wbRouterLink="/feature-a/feature-b/view-2">feature-b/view-2</a></li>
     </ul>
-  `
+  `,
 })
 class FeatureA_EntryComponent {
 }
@@ -348,7 +348,7 @@ class FeatureA_EntryComponent {
 
       <li><a wbRouterLink="/feature-a/feature-b">/feature-a/feature-b</a></li>
     </ul>
-  `
+  `,
 })
 class FeatureA_View1Component {
 }
@@ -360,7 +360,7 @@ class FeatureA_View1Component {
       <li><a wbRouterLink="..">go 1 level back</a></li>
       <li><a wbRouterLink="../view-1">view-1</a></li>
     </ul>
-  `
+  `,
 })
 class FeatureA_View2Component {
 }
@@ -376,7 +376,7 @@ class FeatureA_View2Component {
       {path: 'feature-b', loadChildren: './feature-b/feature-b.module#FeatureBModule'},
     ]),
   ],
-  declarations: [FeatureA_EntryComponent, FeatureA_View1Component, FeatureA_View2Component]
+  declarations: [FeatureA_EntryComponent, FeatureA_View1Component, FeatureA_View2Component],
 })
 export class FeatureAModule {
 }
@@ -400,7 +400,7 @@ export class FeatureAModule {
 
       <li><a wbRouterLink="/feature-a/view-1">/feature-a/view-1</a></li>
     </ul>
-  `
+  `,
 })
 class FeatureB_EntryComponent {
 }
@@ -413,7 +413,7 @@ class FeatureB_EntryComponent {
       <li><a wbRouterLink="../..">go 2 levels back</a></li>
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
-  `
+  `,
 })
 class FeatureB_View1Component {
 }
@@ -426,7 +426,7 @@ class FeatureB_View1Component {
       <li><a wbRouterLink="../..">go 2 levels back</a></li>
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
-  `
+  `,
 })
 class FeatureB_View2Component {
 }
@@ -441,7 +441,7 @@ class FeatureB_View2Component {
       {path: 'view-2', component: FeatureB_View2Component},
     ]),
   ],
-  declarations: [FeatureB_EntryComponent, FeatureB_View1Component, FeatureB_View2Component]
+  declarations: [FeatureB_EntryComponent, FeatureB_View1Component, FeatureB_View2Component],
 })
 export class FeatureBModule {
 }

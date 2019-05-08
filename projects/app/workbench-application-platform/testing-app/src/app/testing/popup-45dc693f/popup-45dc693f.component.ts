@@ -18,8 +18,8 @@ import { ActivatedRoute, Params } from '@angular/router';
   templateUrl: './popup-45dc693f.component.html',
   styleUrls: ['./popup-45dc693f.component.scss'],
   providers: [
-    provideWorkbenchPopup(Popup45dc693fComponent)
-  ]
+    provideWorkbenchPopup(Popup45dc693fComponent),
+  ],
 })
 export class Popup45dc693fComponent {
 

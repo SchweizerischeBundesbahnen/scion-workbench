@@ -120,7 +120,7 @@ import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-
     RemoteSiteComponent,
     ContentAsOverlayComponent,
     ViewPartActionDirective,
-  ]
+  ],
 })
 export class WorkbenchModule {
 
@@ -188,27 +188,27 @@ export class WorkbenchModule {
         PopupService,
         TaskScheduler,
         {
-          provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter
+          provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter,
         },
         {
           provide: APP_MESSAGE_BOX_SERVICE,
-          useExisting: MessageBoxService
+          useExisting: MessageBoxService,
         },
         {provide: WorkbenchConfig, useValue: config},
         {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
           multi: true,
-          useValue: ViewPartComponent
+          useValue: ViewPartComponent,
         },
         {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
           multi: true,
-          useValue: ViewComponent
+          useValue: ViewComponent,
         },
         {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
           multi: true,
-          useValue: EmptyOutletComponent
+          useValue: EmptyOutletComponent,
         },
         {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
@@ -218,7 +218,7 @@ export class WorkbenchModule {
         {
           provide: ROUTE_REUSE_PROVIDER,
           multi: true,
-          useClass: WbActivityRouteReuseProvider
+          useClass: WbActivityRouteReuseProvider,
         },
         {
           provide: RouteReuseStrategy,
@@ -227,9 +227,9 @@ export class WorkbenchModule {
         {
           provide: WORKBENCH_FORROOT_GUARD,
           useFactory: provideForRootGuard,
-          deps: [[WorkbenchService, new Optional(), new SkipSelf()]]
+          deps: [[WorkbenchService, new Optional(), new SkipSelf()]],
         },
-      ]
+      ],
     };
   }
 
@@ -239,7 +239,7 @@ export class WorkbenchModule {
   public static forChild(): ModuleWithProviders {
     return {
       ngModule: WorkbenchModule,
-      providers: [] // do not register any providers in 'forChild' but in 'forRoot' instead
+      providers: [], // do not register any providers in 'forChild' but in 'forRoot' instead
     };
   }
 }

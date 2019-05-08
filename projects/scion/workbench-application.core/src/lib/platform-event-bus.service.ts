@@ -55,7 +55,7 @@ export class PlatformEventBus implements Service {
     fromEvent<KeyboardEvent>(document, 'keydown')
       .pipe(
         filter((event: KeyboardEvent) => event.key === 'Escape'),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe(() => {
         window.parent.postMessage({

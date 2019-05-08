@@ -18,7 +18,7 @@ import { ReactiveFormsModule } from '@angular/forms';
  */
 @NgModule({
   declarations: [
-    SciParamsEnterComponent
+    SciParamsEnterComponent,
   ],
   exports: [
     SciParamsEnterComponent,
@@ -26,7 +26,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-  ]
+  ],
 })
 export class SciParamsEnterModule {
 }

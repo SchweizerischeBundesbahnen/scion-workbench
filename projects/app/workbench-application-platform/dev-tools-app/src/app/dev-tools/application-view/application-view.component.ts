@@ -21,8 +21,8 @@ import { toFilterRegExp } from '@scion/app/common';
   templateUrl: './application-view.component.html',
   styleUrls: ['./application-view.component.scss'],
   providers: [
-    provideWorkbenchView(ApplicationViewComponent)
-  ]
+    provideWorkbenchView(ApplicationViewComponent),
+  ],
 })
 export class ApplicationViewComponent implements OnDestroy {
 
@@ -52,10 +52,10 @@ export class ApplicationViewComponent implements OnDestroy {
         tap(manifest => !manifest && notificationService.notify({
           severity: 'error',
           title: 'Application not found',
-          text: `No application found with given symbolic name '${route.snapshot.params['symbolicName']}'`
+          text: `No application found with given symbolic name '${route.snapshot.params['symbolicName']}'`,
         })),
         filter(Boolean),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((manifest: Manifest) => {
         const capabilities: Capability[] = [...manifest.capabilities].sort((c1, c2) => c1.type.localeCompare(c2.type));
@@ -104,7 +104,7 @@ function filterCapabilities(): OperatorFunction<[string, Capability[]], Capabili
       filterRegExp.test(capability.type) ||
       filterRegExp.test(capability.private ? 'private' : 'public') ||
       Object.keys(capability.qualifier || {}).some(key => filterRegExp.test(key)) ||
-      Object.values(capability.qualifier || {}).some(value => filterRegExp.test(`${value}`)))
+      Object.values(capability.qualifier || {}).some(value => filterRegExp.test(`${value}`))),
     );
   });
 }
@@ -120,7 +120,7 @@ function filterIntents(): OperatorFunction<[string, Intent[]], Intent[]> {
       filterRegExp.test(intent.type) ||
       filterRegExp.test(intent.metadata.implicit ? 'implicit' : 'explicit') ||
       Object.keys(intent.qualifier || {}).some(key => filterRegExp.test(key)) ||
-      Object.values(intent.qualifier || {}).some(value => filterRegExp.test(`${value}`)))
+      Object.values(intent.qualifier || {}).some(value => filterRegExp.test(`${value}`))),
     );
   });
 }

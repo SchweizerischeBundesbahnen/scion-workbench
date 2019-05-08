@@ -24,7 +24,7 @@ import { SciPropertyComponent } from './property.component';
   ],
   imports: [
     CommonModule,
-  ]
+  ],
 })
 export class SciPropertyModule {
 }

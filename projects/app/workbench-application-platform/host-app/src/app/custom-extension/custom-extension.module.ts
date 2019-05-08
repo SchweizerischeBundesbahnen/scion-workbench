@@ -45,13 +45,13 @@ import { PingIntentHandler } from './ping-intent/ping-intent-handler.service';
     {
       provide: ACTIVITY_ACTION_PROVIDER,
       useClass: CustomNotifyActivityActionProvider,
-      multi: true
+      multi: true,
     },
     {
       provide: INTENT_HANDLER,
       useClass: PingIntentHandler,
-      multi: true
-    }
+      multi: true,
+    },
   ],
 })
 export class CustomExtensionModule {

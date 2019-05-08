@@ -169,7 +169,6 @@ export class SciScrollbarComponent implements OnChanges, OnDestroy {
   private scrollWhileMouseDown(viewportScrollPx: number, mousedownEvent: MouseEvent): void {
     const scrollTrackElement = mousedownEvent.target;
 
-
     // scroll continously every 50ms after an initial delay of 250ms
     timer(250, 50)
       .pipe(

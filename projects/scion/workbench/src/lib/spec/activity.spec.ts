@@ -27,7 +27,7 @@ describe('Activity part', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
   }));
 
@@ -107,7 +107,7 @@ describe('Activity part', () => {
                    routerLink="activity-2">
       </wb-activity>
     </wb-workbench>
-  `
+  `,
 })
 class AppComponent implements OnDestroy {
 
@@ -120,7 +120,7 @@ class AppComponent implements OnDestroy {
       .pipe(
         map((paramMap: ParamMap) => coerceBooleanProperty(paramMap.get('debug'))),
         distinctUntilChanged(),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((debug: boolean) => {
         this.debug = debug;
@@ -154,7 +154,7 @@ class Activity2Component {
       {path: 'activity-2', component: Activity2Component},
     ]),
   ],
-  declarations: [AppComponent, ActivityDebugComponent, Activity1Component, Activity2Component]
+  declarations: [AppComponent, ActivityDebugComponent, Activity1Component, Activity2Component],
 })
 class AppTestModule {
 }

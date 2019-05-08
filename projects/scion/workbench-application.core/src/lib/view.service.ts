@@ -31,7 +31,7 @@ export class ViewService implements Service {
     Platform.getService(MessageBus).receive$
       .pipe(
         filter((envelope: MessageEnvelope) => envelope.channel === 'host'),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((envelope: MessageEnvelope) => {
         this.onHostMessage(envelope);
@@ -57,7 +57,7 @@ export class ViewService implements Service {
   public setProperties(properties: ViewProperties): void {
     Platform.getService(MessageBus).postMessage({
       channel: 'host',
-      message: {type: ViewHostMessageTypes.PropertiesWrite, payload: properties} as HostMessage
+      message: {type: ViewHostMessageTypes.PropertiesWrite, payload: properties} as HostMessage,
     });
   }
 
@@ -129,7 +129,7 @@ export class ViewService implements Service {
       channel: 'reply',
       replyToUid: envelope.replyToUid,
       replyTo: envelope.sender,
-      message: doit
+      message: doit,
     }));
   }
 }

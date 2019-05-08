@@ -18,7 +18,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SciParamsEnterModule } from '@scion/app/common';
 import { AppRoutingModule } from './app-routing.module';
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,12 +28,12 @@ import { AppRoutingModule } from './app-routing.module';
     SciViewportModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    SciParamsEnterModule
+    SciParamsEnterModule,
   ],
   providers: [],
   bootstrap: [
     AppComponent,
-  ]
+  ],
 })
 export class AppModule {
 }

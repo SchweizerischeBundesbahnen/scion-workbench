@@ -20,7 +20,7 @@ import { HostMessage, MessageEnvelope, parseMessageEnvelopeElseNull, PROTOCOL } 
  * Extends {RemoteSiteComponent} to interact with the application which is showing as a remote site.
  */
 @Directive({
-  selector: 'wb-remote-site[wapAppOutlet]'
+  selector: 'wb-remote-site[wapAppOutlet]',
 })
 export class AppOutletDirective implements OnInit, OnDestroy {
 
@@ -93,7 +93,7 @@ export class AppOutletDirective implements OnInit, OnDestroy {
     this._site.postMessage({
       protocol: PROTOCOL,
       channel: 'host',
-      message: message
+      message: message,
     });
   }
 
@@ -123,7 +123,7 @@ export class AppOutletDirective implements OnInit, OnDestroy {
       channel: 'host',
       sender: this.symbolicName,
       replyToUid: replyToUid,
-      message: message
+      message: message,
     };
     this._site.postMessage(request);
 

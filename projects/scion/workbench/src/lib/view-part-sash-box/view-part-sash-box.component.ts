@@ -25,7 +25,7 @@ import { noop, Subject } from 'rxjs';
 @Component({
   selector: 'wb-view-part-sash-box',
   templateUrl: './view-part-sash-box.component.html',
-  styleUrls: ['./view-part-sash-box.component.scss']
+  styleUrls: ['./view-part-sash-box.component.scss'],
 })
 export class ViewPartSashBoxComponent implements OnDestroy {
 
@@ -89,7 +89,7 @@ export class ViewPartSashBoxComponent implements OnDestroy {
     this._sash$
       .pipe(
         takeUntil(this._destroy$),
-        debounceTime(500)
+        debounceTime(500),
       )
       .subscribe(() => {
         const serializedGrid = this._viewPartRegistry.grid
@@ -98,7 +98,7 @@ export class ViewPartSashBoxComponent implements OnDestroy {
 
         this._router.navigate([], {
           queryParams: {[VIEW_GRID_QUERY_PARAM]: serializedGrid},
-          queryParamsHandling: 'merge'
+          queryParamsHandling: 'merge',
         }).then(noop);
       });
   }

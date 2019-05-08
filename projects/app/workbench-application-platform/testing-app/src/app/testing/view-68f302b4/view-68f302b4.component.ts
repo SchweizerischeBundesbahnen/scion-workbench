@@ -20,12 +20,12 @@ import { UUID } from '@scion/workbench-application.core';
   templateUrl: './view-68f302b4.component.html',
   styleUrls: ['./view-68f302b4.component.scss'],
   providers: [
-    provideWorkbenchView(View68f302b4Component)
-  ]
+    provideWorkbenchView(View68f302b4Component),
+  ],
 })
 export class View68f302b4Component {
 
-  public uuid  = UUID.randomUUID();
+  public uuid = UUID.randomUUID();
   public params$: Observable<Params>;
   public queryParams$: Observable<Params>;
 

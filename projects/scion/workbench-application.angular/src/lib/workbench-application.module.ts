@@ -37,7 +37,7 @@ export const FORROOT_GUARD = new InjectionToken<void>('WORKBENCH_APPLICATION_FOR
     WorkbenchUrlOpenActivityActionDirective,
     WorkbenchRouterLinkDirective,
     WorkbenchRouterLinkWithHrefDirective,
-  ]
+  ],
 })
 export class WorkbenchApplicationModule {
 
@@ -62,38 +62,38 @@ export class WorkbenchApplicationModule {
         // make core services of `workbench-application.core` available to dependency injection
         {
           provide: MessageBoxService,
-          useFactory: provideMessageBoxService
+          useFactory: provideMessageBoxService,
         },
         {
           provide: NotificationService,
-          useFactory: provideNotificationService
+          useFactory: provideNotificationService,
         },
         {
           provide: IntentService,
-          useFactory: provideIntentService
+          useFactory: provideIntentService,
         },
         {
           provide: ManifestRegistryService,
-          useFactory: provideManifestRegistryService
+          useFactory: provideManifestRegistryService,
         },
         {
           provide: PopupService,
-          useFactory: providePopupService
+          useFactory: providePopupService,
         },
         // prevent usage of this module in a lazy context
         {
           provide: FORROOT_GUARD,
           useFactory: provideForRootGuard,
-          deps: [[ForRootGuardService, new Optional(), new SkipSelf()]]
+          deps: [[ForRootGuardService, new Optional(), new SkipSelf()]],
         },
         // start the platform
         {
           provide: APP_INITIALIZER,
           multi: true,
           useFactory: provideModuleInitializerFn,
-          deps: [ActivatorService]
-        }
-      ]
+          deps: [ActivatorService],
+        },
+      ],
     };
   }
 
@@ -103,7 +103,7 @@ export class WorkbenchApplicationModule {
   public static forChild(): ModuleWithProviders {
     return {
       ngModule: WorkbenchApplicationModule,
-      providers: [] // do not register any providers in 'forChild' but in 'forRoot' instead
+      providers: [], // do not register any providers in 'forChild' but in 'forRoot' instead
     };
   }
 }

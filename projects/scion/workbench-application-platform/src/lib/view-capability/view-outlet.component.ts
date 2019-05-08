@@ -13,7 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 import { noop, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { VIEW_CAPABILITY_ID_PARAM, VIEW_PATH_PARAM } from './metadata';
-import { WbBeforeDestroy, WorkbenchView, } from '@scion/workbench';
+import { WbBeforeDestroy, WorkbenchView } from '@scion/workbench';
 import { ApplicationRegistry } from '../core/application-registry.service';
 import { MessageBus } from '../core/message-bus.service';
 import { Url } from '../core/url.util';
@@ -29,7 +29,7 @@ import { HostMessage, MessageEnvelope, ViewCapability, ViewHostMessageTypes, Vie
 @Component({
   selector: 'wap-view-outlet',
   templateUrl: './view-outlet.component.html',
-  styleUrls: ['./view-outlet.component.scss']
+  styleUrls: ['./view-outlet.component.scss'],
 })
 export class ViewOutletComponent implements OnDestroy, WbBeforeDestroy {
 
@@ -65,7 +65,7 @@ export class ViewOutletComponent implements OnDestroy, WbBeforeDestroy {
     this._view.active$
       .pipe(
         distinctUntilChanged(),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((active: boolean) => {
         this._whenAppOutlet.then(appOutlet => appOutlet.postHostMessage({type: ViewHostMessageTypes.Active, payload: active}));

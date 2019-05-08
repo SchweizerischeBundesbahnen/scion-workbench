@@ -30,7 +30,7 @@ describe('ViewComponent', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -385,8 +385,8 @@ describe('ViewComponent', () => {
     RouterTestingModule.withRoutes([
       {path: 'view-1', component: SpecView1Component},
       {path: 'view-2', component: SpecView2Component},
-    ])
-  ]
+    ]),
+  ],
 })
 class AppTestModule {
 }

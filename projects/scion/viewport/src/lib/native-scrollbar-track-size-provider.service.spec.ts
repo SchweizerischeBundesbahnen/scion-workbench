@@ -18,8 +18,8 @@ describe('SciNativeScrollbarTrackSizeProvider', () => {
     TestBed.configureTestingModule({
       declarations: [AppComponent],
       providers: [
-        SciNativeScrollbarTrackSizeProvider
-      ]
+        SciNativeScrollbarTrackSizeProvider,
+      ],
     });
   }));
 
@@ -39,7 +39,7 @@ describe('SciNativeScrollbarTrackSizeProvider', () => {
       <div #viewport_client style="width: 100%; height: 100%;">
       </div>
     </div>
-  `
+  `,
 })
 class AppComponent implements AfterViewInit {
 

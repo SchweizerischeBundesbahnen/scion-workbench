@@ -26,7 +26,7 @@ describe('MessageBus', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
   }));
 
@@ -40,7 +40,7 @@ describe('MessageBus', () => {
 
     it('should be published if the publishing app manifests a respective intention', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}],
       });
       registerApp({name: 'app-2', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}]});
 
@@ -51,7 +51,7 @@ describe('MessageBus', () => {
 
     it('should be published if qualified implicitly because the publishing app provides the respective capability', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}],
       });
 
       const envelope = createIntentEnvelope({type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}});
@@ -61,7 +61,7 @@ describe('MessageBus', () => {
 
     it('should be published if the publishing app manifests a matching wildcard intention', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}, private: false}],
       });
       registerApp({name: 'app-2', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}}]});
 
@@ -75,7 +75,7 @@ describe('MessageBus', () => {
         name: 'app-1', capability: [
           {type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false},
           {type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}, private: false},
-        ]
+        ],
       });
       registerApp({name: 'app-2', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}]});
 
@@ -85,7 +85,7 @@ describe('MessageBus', () => {
 
     it('should not be published if there is no public capability handling the intent [NullProviderError]', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}, private: true}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}, private: true}],
       });
       registerApp({name: 'app-2', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}}]});
 
@@ -107,7 +107,7 @@ describe('MessageBus', () => {
 
     it('should be received by the app which provides a capability handling the intent', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}],
       });
       registerApp({name: 'app-2', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}]});
 
@@ -125,10 +125,10 @@ describe('MessageBus', () => {
 
     it('should not be received by an app which does not provide a capability handling the intent', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}],
       });
       registerApp({
-        name: 'app-2', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}, private: false}]
+        name: 'app-2', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}, private: false}],
       });
       registerApp({name: 'app-3', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}}]});
 
@@ -149,10 +149,10 @@ describe('MessageBus', () => {
 
     it('should only be received by public capability providers, unless the publishing app provides the private capability itself (1/2)', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: true}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: true}],
       });
       registerApp({
-        name: 'app-2', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}]
+        name: 'app-2', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}],
       });
       registerApp({name: 'app-3', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}]});
 
@@ -193,7 +193,7 @@ describe('MessageBus', () => {
     it('should implicitly be received by the publishing app if it provides a capability to handle the intent', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
         name: 'app-1',
-        capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: true}]
+        capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: true}],
       });
 
       // capture intent
@@ -210,22 +210,22 @@ describe('MessageBus', () => {
 
     it('should be received by apps which provide a capability that match the intent\'s qualifier (wildcard)', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, private: false}],
       });
       registerApp({
-        name: 'app-2', capability: [{type: PlatformCapabilityTypes.View, qualifier: {'*': '*'}, private: false}]
+        name: 'app-2', capability: [{type: PlatformCapabilityTypes.View, qualifier: {'*': '*'}, private: false}],
       });
       registerApp({
-        name: 'app-3', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', '*': '*'}, private: false}]
+        name: 'app-3', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', '*': '*'}, private: false}],
       });
       registerApp({
-        name: 'app-4', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'company', '*': '*'}, private: false}]
+        name: 'app-4', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'company', '*': '*'}, private: false}],
       });
       registerApp({
-        name: 'app-5', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}, private: false}]
+        name: 'app-5', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}, private: false}],
       });
       registerApp({
-        name: 'app-6', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}]
+        name: 'app-6', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}],
       });
 
       // capture intent
@@ -257,7 +257,7 @@ describe('MessageBus', () => {
 
     it('should be published if the publishing app manifests a respective capability', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}],
       });
 
       const envelope = createCapabilityEnvelope({type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}});
@@ -267,7 +267,7 @@ describe('MessageBus', () => {
 
     it('should be published if the publishing app manifests a matching wildcard capability', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}, private: false}],
       });
 
       const envelope = createCapabilityEnvelope({type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}});
@@ -277,7 +277,7 @@ describe('MessageBus', () => {
 
     it('should not be published if the publishing app does not manifest a respective capability [NotQualifiedError]', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}]
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}],
       });
 
       const envelope = createCapabilityEnvelope({type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'employment-info'}});
@@ -322,7 +322,7 @@ describe('MessageBus', () => {
     it('should implicitly be received by the publishing app', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
         name: 'app-1',
-        capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: true}]
+        capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: true}],
       });
 
       // capture provider message
@@ -341,7 +341,7 @@ describe('MessageBus', () => {
       registerApp({
         name: 'app-1',
         capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: true}],
-        intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}]
+        intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}],
       });
       registerApp({name: 'app-2', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}}]});
 
@@ -362,22 +362,22 @@ describe('MessageBus', () => {
 
     it('should be received by apps which manifest an intention that match the capability message\'s qualifier (wildcard)', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
-        name: 'app-1', intents: [{type: PlatformCapabilityTypes.View}]
+        name: 'app-1', intents: [{type: PlatformCapabilityTypes.View}],
       });
       registerApp({
-        name: 'app-2', intents: [{type: PlatformCapabilityTypes.View, qualifier: {'*': '*'}}]
+        name: 'app-2', intents: [{type: PlatformCapabilityTypes.View, qualifier: {'*': '*'}}],
       });
       registerApp({
-        name: 'app-3', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', '*': '*'}}]
+        name: 'app-3', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', '*': '*'}}],
       });
       registerApp({
-        name: 'app-4', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'company', '*': '*'}}]
+        name: 'app-4', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'company', '*': '*'}}],
       });
       registerApp({
-        name: 'app-5', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}}]
+        name: 'app-5', intents: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}}],
       });
       registerApp({
-        name: 'app-6', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}]
+        name: 'app-6', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'personal-info'}, private: false}],
       });
 
       // capture provider message
@@ -434,7 +434,7 @@ describe('MessageBus', () => {
     appRegistry.registerApplication({symbolicName: app.name, manifestUrl: `http://${app.name}/manifest`}, {
       name: app.name,
       capabilities: app.capability,
-      intents: app.intents
+      intents: app.intents,
     });
   }
 
@@ -443,8 +443,8 @@ describe('MessageBus', () => {
       channel: 'intent',
       message: {
         type: msg.type,
-        qualifier: msg.qualifier
-      }
+        qualifier: msg.qualifier,
+      },
     };
   }
 
@@ -453,8 +453,8 @@ describe('MessageBus', () => {
       channel: 'capability',
       message: {
         type: msg.type,
-        qualifier: msg.qualifier
-      }
+        qualifier: msg.qualifier,
+      },
     };
   }
 });
@@ -468,8 +468,8 @@ describe('MessageBus', () => {
     MessageBus,
     ManifestRegistry,
     ApplicationRegistry,
-    {provide: ErrorHandler, useClass: NullErrorHandler}
-  ]
+    {provide: ErrorHandler, useClass: NullErrorHandler},
+  ],
 })
 class AppTestModule {
 }

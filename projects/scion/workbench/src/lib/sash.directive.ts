@@ -17,7 +17,7 @@ import { first, takeUntil } from 'rxjs/operators';
  * Provides functionality to sash the host element.
  */
 @Directive({
-  selector: '[wbSash]'
+  selector: '[wbSash]',
 })
 export class SashDirective implements OnDestroy, OnChanges {
 
@@ -70,7 +70,7 @@ export class SashDirective implements OnDestroy, OnChanges {
     // Listen for 'mousemove' events
     const mousemoveListener = fromEvent(this._document, 'mousemove')
       .pipe(
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((mousemoveEvent: MouseEvent) => {
         mousemoveEvent.preventDefault();
@@ -84,7 +84,7 @@ export class SashDirective implements OnDestroy, OnChanges {
     fromEvent(this._document, 'mouseup')
       .pipe(
         first(),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe(() => {
         mousemoveListener.unsubscribe();

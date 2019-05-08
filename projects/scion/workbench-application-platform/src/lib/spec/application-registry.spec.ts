@@ -19,7 +19,7 @@ describe('ApplicationRegistry', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
   }));
 
@@ -154,7 +154,7 @@ describe('ApplicationRegistry', () => {
         name: app.name,
         capabilities: [],
         intents: [],
-        baseUrl: app.baseUrl
+        baseUrl: app.baseUrl,
       });
     }
   });
@@ -194,8 +194,8 @@ describe('ApplicationRegistry', () => {
 @NgModule({
   providers: [
     ManifestRegistry,
-    ApplicationRegistry
-  ]
+    ApplicationRegistry,
+  ],
 })
 class AppTestModule {
 }

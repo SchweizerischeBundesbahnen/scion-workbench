@@ -88,7 +88,7 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
         ...extras as NavigationExtras,
         relativeTo: null, // commands are absolute because normalized
         queryParams: {...extras.queryParams, [VIEW_GRID_QUERY_PARAM]: serializedGrid},
-        queryParamsHandling: 'merge'
+        queryParamsHandling: 'merge',
       });
     };
 

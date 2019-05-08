@@ -61,7 +61,7 @@ export class WorkbenchActivityPartService {
   public activateActivity(activity: Activity): Promise<boolean> {
     if (activity.target === 'activity-panel') {
       return this._router.navigate([{outlets: {[ACTIVITY_OUTLET_NAME]: activity.active ? null : activity.commands}}], {
-        queryParamsHandling: 'preserve'
+        queryParamsHandling: 'preserve',
       });
     }
     else if (activity.target === 'view') {

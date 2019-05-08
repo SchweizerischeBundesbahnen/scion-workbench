@@ -110,7 +110,7 @@ describe('Popup', () => {
       const popupPanelPO = await testingViewPO.openPopupPanel();
       await popupPanelPO.enterQualifier({
         entity: 'testing',
-        testcase: '9c5319f7-popup'
+        testcase: '9c5319f7-popup',
       });
       await popupPanelPO.enterMatrixParams({
         mp1: '41ecdefec0a3',
@@ -209,7 +209,7 @@ describe('Popup', () => {
         entity: 'testing',
         testcase: '159913ad-popup',
         qualifierParam1: 'e82bf49c4768',
-        qualifierParam2: '1b84a4a926f7'
+        qualifierParam2: '1b84a4a926f7',
       });
       await popupPanelPO.execute();
       await expectPopupToShow({symbolicAppName: 'testing-app', popupCssClass: 'e2e-popup-159913ad', componentSelector: 'app-popup-159913ad'});
@@ -249,7 +249,7 @@ describe('Popup', () => {
       const urlQueryParams = await popupPO.getUrlQueryParameters();
       await expect(urlQueryParams).toEqual({
         queryParam1: 'e60c81360bee',
-        queryParam2: '1a3d3aaf937e'
+        queryParam2: '1a3d3aaf937e',
       });
     });
   });
@@ -262,7 +262,7 @@ describe('Popup', () => {
       const popupPanelPO = await testingViewPO.openPopupPanel();
       await popupPanelPO.enterQualifier({
         entity: 'testing',
-        testcase: 'fc077b32-popup'
+        testcase: 'fc077b32-popup',
       });
 
       await popupPanelPO.selectPosition('north');

@@ -53,7 +53,7 @@ export class ActivityRegistrator {
             component: ActivityOutletComponent,
             data: {[ACTIVITY_CAPABILITY_ROUTE_DATA_KEY]: activityCapability},
           };
-        })
+        }),
     ]);
 
     // Register auxiliary routes for all primary routes.

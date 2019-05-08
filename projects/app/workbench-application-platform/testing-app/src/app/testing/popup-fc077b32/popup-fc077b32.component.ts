@@ -16,8 +16,8 @@ import { provideWorkbenchPopup, WorkbenchPopup } from '@scion/workbench-applicat
   templateUrl: './popup-fc077b32.component.html',
   styleUrls: ['./popup-fc077b32.component.scss'],
   providers: [
-    provideWorkbenchPopup(PopupFc077b32Component)
-  ]
+    provideWorkbenchPopup(PopupFc077b32Component),
+  ],
 })
 export class PopupFc077b32Component {
 

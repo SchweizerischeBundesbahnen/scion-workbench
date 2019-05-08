@@ -14,12 +14,15 @@ $border-radius: 4px;
   max-width: calc(100vw - #{2*$notification-margin});
 
   border-left: $severity-border-size solid transparent;
+
   &.info {
     border-left-color: $info-color;
   }
+
   &.warn {
     border-left-color: $warn-color;
   }
+
   &.error {
     border-left-color: $error-color;
   }
@@ -54,6 +57,7 @@ $border-radius: 4px;
       &::before {
         content: '\e5cd';
       }
+
       &:hover::before {
         content: '\e5c9';
       }

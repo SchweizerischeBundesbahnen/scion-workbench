@@ -29,8 +29,8 @@ const PHONE = 'phone';
   templateUrl: './contact-new-popup.component.html',
   styleUrls: ['./contact-new-popup.component.scss'],
   providers: [
-    provideWorkbenchPopup(ContactNewPopupComponent)
-  ]
+    provideWorkbenchPopup(ContactNewPopupComponent),
+  ],
 })
 export class ContactNewPopupComponent implements OnDestroy {
 

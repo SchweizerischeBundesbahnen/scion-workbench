@@ -21,7 +21,7 @@ import { SciDimension } from '@scion/dimension';
 @Component({
   selector: 'wb-view-part-bar',
   templateUrl: './view-part-bar.component.html',
-  styleUrls: ['./view-part-bar.component.scss']
+  styleUrls: ['./view-part-bar.component.scss'],
 })
 export class ViewPartBarComponent implements OnDestroy {
 
