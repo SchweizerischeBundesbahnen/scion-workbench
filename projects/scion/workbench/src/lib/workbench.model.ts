@@ -192,7 +192,7 @@ export class InternalWorkbenchViewPart implements WorkbenchViewPart {
   public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
     this.actions$.next([...this.actions$.value, action]);
     return {
-      dispose: (): void => this.actions$.next(this.actions$.value.filter(it => it !== action))
+      dispose: (): void => this.actions$.next(this.actions$.value.filter(it => it !== action)),
     };
   }
 }

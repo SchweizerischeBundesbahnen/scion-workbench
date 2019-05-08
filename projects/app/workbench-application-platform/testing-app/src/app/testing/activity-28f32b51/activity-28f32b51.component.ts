@@ -18,8 +18,8 @@ import { map, scan } from 'rxjs/operators';
   templateUrl: './activity-28f32b51.component.html',
   styleUrls: ['./activity-28f32b51.component.scss'],
   providers: [
-    provideWorkbenchActivity(Activity28f32b51Component)
-  ]
+    provideWorkbenchActivity(Activity28f32b51Component),
+  ],
 })
 export class Activity28f32b51Component {
 

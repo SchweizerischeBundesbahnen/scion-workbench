@@ -22,7 +22,7 @@ describe('WorkbenchModule', () => {
         WorkbenchModule.forRoot(),
         RouterTestingModule.withRoutes([{path: 'lazy-module-forroot', loadChildren: './lazy-forroot.module#LazyForRootModule'}]),
         RouterTestingModule.withRoutes([{path: 'lazy-module-forchild', loadChildren: './lazy-forchild.module#LazyForChildModule'}]),
-      ]
+      ],
     });
   });
 
@@ -30,8 +30,8 @@ describe('WorkbenchModule', () => {
     // Use forRoot() in a lazy context
     @NgModule({
       imports: [
-        WorkbenchModule.forRoot()
-      ]
+        WorkbenchModule.forRoot(),
+      ],
     })
     class LazyForRootModule {
     }
@@ -39,8 +39,8 @@ describe('WorkbenchModule', () => {
     // Use forChild() in a lazy context
     @NgModule({
       imports: [
-        WorkbenchModule.forChild()
-      ]
+        WorkbenchModule.forChild(),
+      ],
     })
     class LazyForChildModule {
     }

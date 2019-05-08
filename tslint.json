@@ -77,7 +77,10 @@
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": true,
     "no-unnecessary-initializer": true,
-    "no-unused-expression": [true, "allow-fast-null-checks"],
+    "no-unused-expression": [
+      true,
+      "allow-fast-null-checks"
+    ],
     "no-use-before-declare": false,
     "no-var-keyword": true,
     "object-literal-sort-keys": false,
@@ -131,7 +134,10 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
-    "linebreak-style": [true, "LF"],
+    "linebreak-style": [
+      true,
+      "LF"
+    ],
     "no-unused-variable": true,
     "typedef": [
       true,

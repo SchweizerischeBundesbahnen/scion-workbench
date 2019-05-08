@@ -16,7 +16,7 @@ import { CustomNotifyActivityAction } from '@scion/app/common';
 @Component({
   selector: 'app-custom-notify-activity-action',
   templateUrl: './custom-notify-activity-action.component.html',
-  styleUrls: ['./custom-notify-activity-action.component.scss']
+  styleUrls: ['./custom-notify-activity-action.component.scss'],
 })
 export class CustomNotifyActivityActionComponent {
 

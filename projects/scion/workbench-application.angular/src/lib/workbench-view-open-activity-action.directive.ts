@@ -30,7 +30,7 @@ import { Params } from '@angular/router';
  */
 @Directive({
   selector: 'ng-container[wbViewOpenActivityAction]',
-  exportAs: 'activityAction'
+  exportAs: 'activityAction',
 })
 export class WorkbenchViewOpenActivityActionDirective implements OnInit, OnDestroy {
 

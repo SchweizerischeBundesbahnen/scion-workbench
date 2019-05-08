@@ -17,8 +17,8 @@ import { MessageBoxService } from '@scion/workbench-application.core';
   selector: 'app-view-0c4fe9e3',
   template: '',
   providers: [
-    provideWorkbenchView(View0c4fe9e3Component)
-  ]
+    provideWorkbenchView(View0c4fe9e3Component),
+  ],
 })
 export class View0c4fe9e3Component implements WbBeforeDestroy {
 
@@ -32,7 +32,7 @@ export class View0c4fe9e3Component implements WbBeforeDestroy {
       actions: {
         'e2e-yes': 'Yes',
         'e2e-no': 'No',
-      }
+      },
     }).then(result => (result === 'e2e-yes'));
   }
 }

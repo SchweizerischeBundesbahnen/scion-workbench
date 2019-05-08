@@ -18,8 +18,8 @@ import { Observable } from 'rxjs';
   templateUrl: './view-a686d615.component.html',
   styleUrls: ['./view-a686d615.component.scss'],
   providers: [
-    provideWorkbenchView(ViewA686d615Component)
-  ]
+    provideWorkbenchView(ViewA686d615Component),
+  ],
 })
 export class ViewA686d615Component {
 

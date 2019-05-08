@@ -32,7 +32,7 @@ export class ActivityService implements Service {
     Platform.getService(MessageBus).receive$
       .pipe(
         filter((envelope: MessageEnvelope) => envelope.channel === 'host'),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((envelope: MessageEnvelope) => {
         this.onHostMessage(envelope);
@@ -54,7 +54,7 @@ export class ActivityService implements Service {
   public setProperties(properties: ActivityProperties): void {
     Platform.getService(MessageBus).postMessage({
       channel: 'host',
-      message: {type: ActivityHostMessageTypes.PropertiesWrite, payload: properties} as HostMessage
+      message: {type: ActivityHostMessageTypes.PropertiesWrite, payload: properties} as HostMessage,
     });
   }
 
@@ -80,7 +80,7 @@ export class ActivityService implements Service {
 
     Platform.getService(MessageBus).postMessage({
       channel: 'host',
-      message: {type: ActivityHostMessageTypes.ActionAdd, payload: action} as HostMessage
+      message: {type: ActivityHostMessageTypes.ActionAdd, payload: action} as HostMessage,
     });
 
     const disposable = ({
@@ -88,9 +88,9 @@ export class ActivityService implements Service {
         this._disposables.delete(disposable);
         Platform.getService(MessageBus).postMessage({
           channel: 'host',
-          message: {type: ActivityHostMessageTypes.ActionRemove, payload: actionId} as HostMessage
+          message: {type: ActivityHostMessageTypes.ActionRemove, payload: actionId} as HostMessage,
         });
-      }
+      },
     });
     this._disposables.add(disposable);
     return disposable;

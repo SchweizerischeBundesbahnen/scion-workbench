@@ -17,7 +17,7 @@ import { first, takeUntil } from 'rxjs/operators';
  * Provides functionality to move the host element.
  */
 @Directive({
-  selector: '[wbMove]'
+  selector: '[wbMove]',
 })
 export class MoveDirective implements OnDestroy {
 
@@ -71,7 +71,7 @@ export class MoveDirective implements OnDestroy {
     fromEvent(this._document, 'mouseup')
       .pipe(
         first(),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe(() => {
         mousemoveListener.unsubscribe();

@@ -57,8 +57,8 @@ import { environment } from '../environments/environment';
     CustomExtensionModule,
   ],
   bootstrap: [
-    AppComponent
-  ]
+    AppComponent,
+  ],
 })
 export class AppModule {
 }

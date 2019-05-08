@@ -20,7 +20,6 @@ import { advance, clickElement } from './util/util.spec';
 import { ActivityPartComponent } from '../activity-part/activity-part.component';
 import { By } from '@angular/platform-browser';
 
-
 /**
  *
  * Testsetup:
@@ -56,7 +55,7 @@ describe('WbRouteReuseStrategy', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -156,7 +155,7 @@ describe('WbRouteReuseStrategy', () => {
       <wb-activity itemCssClass="feature-b_activity-1" itemText="feature-b/activity-1" routerLink="feature-b/activity-1"></wb-activity>
       <wb-activity itemCssClass="feature-b_activity-2" itemText="feature-b/activity-2" routerLink="feature-b/activity-2"></wb-activity>
     </wb-workbench>
-  `
+  `,
 })
 class AppComponent {
 }
@@ -180,7 +179,7 @@ class App_Activity2_Component {
       {path: 'feature-b', loadChildren: './feature-b/feature-b.module#FeatureBModule'},
     ]),
   ],
-  declarations: [AppComponent, App_Activity1_Component, App_Activity2_Component]
+  declarations: [AppComponent, App_Activity1_Component, App_Activity2_Component],
 })
 class AppTestModule {
 }
@@ -201,10 +200,10 @@ class FeatureA_Activity2_Component {
     CommonModule,
     RouterModule.forChild([
       {path: 'activity-1', component: FeatureA_Activity1_Component},
-      {path: 'activity-2', component: FeatureA_Activity2_Component}
+      {path: 'activity-2', component: FeatureA_Activity2_Component},
     ]),
   ],
-  declarations: [FeatureA_Activity1_Component, FeatureA_Activity2_Component]
+  declarations: [FeatureA_Activity1_Component, FeatureA_Activity2_Component],
 })
 export class FeatureAModule {
 }
@@ -225,10 +224,10 @@ class FeatureB_Activity2_Component {
     CommonModule,
     RouterModule.forChild([
       {path: 'activity-1', component: FeatureB_Activity1_Component},
-      {path: 'activity-2', component: FeatureB_Activity2_Component}
+      {path: 'activity-2', component: FeatureB_Activity2_Component},
     ]),
   ],
-  declarations: [FeatureB_Activity1_Component, FeatureB_Activity2_Component]
+  declarations: [FeatureB_Activity1_Component, FeatureB_Activity2_Component],
 })
 export class FeatureBModule {
 }

@@ -38,7 +38,7 @@ export class ViewOpenActivityActionComponent {
         queryParams: this.action.properties.queryParams,
         matrixParams: this.action.properties.matrixParams,
         activateIfPresent: this.action.properties.activateIfPresent,
-        closeIfPresent: this.action.properties.closeIfPresent
+        closeIfPresent: this.action.properties.closeIfPresent,
       },
     };
 

@@ -14,7 +14,7 @@ import { Communication } from '../communication.model';
 @Component({
   selector: 'app-communication-accordion-item-header',
   templateUrl: './communication-accordion-item-header.component.html',
-  styleUrls: ['./communication-accordion-item-header.component.scss']
+  styleUrls: ['./communication-accordion-item-header.component.scss'],
 })
 export class CommunicationAccordionItemHeaderComponent {
 

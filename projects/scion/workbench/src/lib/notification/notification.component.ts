@@ -20,7 +20,7 @@ import { TaskScheduler } from '../task-scheduler.service';
   selector: 'wb-notification',
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationComponent implements AfterViewInit, OnDestroy {
 
@@ -107,7 +107,7 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
       timer(autoCloseTimeout)
         .pipe(
           takeUntil(this._destroy$),
-          takeUntil(this._closeTimerChange$)
+          takeUntil(this._closeTimerChange$),
         )
         .subscribe(() => {
           this._zone.run(() => this.onClose());

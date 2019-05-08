@@ -28,8 +28,8 @@ const MESSAGE = 'message';
   templateUrl: './communication-new-popup.component.html',
   styleUrls: ['./communication-new-popup.component.scss'],
   providers: [
-    provideWorkbenchPopup(CommunicationNewPopupComponent)
-  ]
+    provideWorkbenchPopup(CommunicationNewPopupComponent),
+  ],
 })
 export class CommunicationNewPopupComponent implements OnDestroy {
 
@@ -62,7 +62,7 @@ export class CommunicationNewPopupComponent implements OnDestroy {
       channel: this.form.get(CHANNEL).value,
       date: this.form.get(DATE).value,
       subject: this.form.get(SUBJECT).value,
-      message: this.form.get(MESSAGE).value
+      message: this.form.get(MESSAGE).value,
     };
 
     this._communicationService.create$(communication)

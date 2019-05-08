@@ -61,7 +61,7 @@ export class WorkbenchRouterLinkDirective {
 export class WorkbenchRouterLinkWithHrefDirective extends WorkbenchRouterLinkDirective {
 
   @HostBinding('href')
-  public href = '' ;
+  public href = '';
 
   constructor(workbenchRouter: WorkbenchRouter, @Optional() view: WorkbenchView) {
     super(workbenchRouter, view);

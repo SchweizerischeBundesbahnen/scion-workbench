@@ -18,7 +18,7 @@ describe('ViewPartGrid', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
   }));
 
@@ -40,7 +40,7 @@ describe('ViewPartGrid', () => {
       sash1: leftViewPart,
       sash2: ['viewPart-right'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
   }));
 
@@ -53,7 +53,7 @@ describe('ViewPartGrid', () => {
       sash1: leftViewPart,
       sash2: rightViewPart,
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }), serializer);
 
     testee.removeViewPart('viewPart-left');
@@ -69,7 +69,7 @@ describe('ViewPartGrid', () => {
       sash1: leftViewPart,
       sash2: rightViewPart,
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }), serializer);
 
     testee.removeViewPart('viewPart-right');
@@ -117,7 +117,7 @@ describe('ViewPartGrid', () => {
       sash1: viewPart_1,
       sash2: viewPart_2,
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Add ViewPart 2');
 
     // Add ViewPart 3 to the east of ViewPart 3
@@ -130,10 +130,10 @@ describe('ViewPartGrid', () => {
         sash1: viewPart_2,
         sash2: viewPart_3,
         splitter: .5,
-        hsplit: false
+        hsplit: false,
       },
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Add ViewPart 3');
 
     // Add ViewPart 4 to the south of ViewPart 2
@@ -148,14 +148,14 @@ describe('ViewPartGrid', () => {
           sash1: viewPart_2,
           sash2: viewPart_4,
           splitter: .5,
-          hsplit: true
+          hsplit: true,
         },
         sash2: viewPart_3,
         splitter: .5,
-        hsplit: false
+        hsplit: false,
       },
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Add ViewPart 4');
 
     // Add ViewPart 5 to the south of ViewPart 1
@@ -167,7 +167,7 @@ describe('ViewPartGrid', () => {
         sash1: viewPart_1,
         sash2: viewPart_5,
         splitter: .5,
-        hsplit: true
+        hsplit: true,
       },
       sash2: {
         id: 2,
@@ -176,14 +176,14 @@ describe('ViewPartGrid', () => {
           sash1: viewPart_2,
           sash2: viewPart_4,
           splitter: .5,
-          hsplit: true
+          hsplit: true,
         },
         sash2: viewPart_3,
         splitter: .5,
-        hsplit: false
+        hsplit: false,
       },
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Add ViewPart 5');
 
     // Add ViewPart 6 to the east of ViewPart 5
@@ -198,10 +198,10 @@ describe('ViewPartGrid', () => {
           sash1: viewPart_5,
           sash2: viewPart_6,
           splitter: .5,
-          hsplit: false
+          hsplit: false,
         },
         splitter: .5,
-        hsplit: true
+        hsplit: true,
       },
       sash2: {
         id: 2,
@@ -210,14 +210,14 @@ describe('ViewPartGrid', () => {
           sash1: viewPart_2,
           sash2: viewPart_4,
           splitter: .5,
-          hsplit: true
+          hsplit: true,
         },
         sash2: viewPart_3,
         splitter: .5,
-        hsplit: false
+        hsplit: false,
       },
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Add ViewPart 6');
 
     // Remove ViewPart 6
@@ -229,7 +229,7 @@ describe('ViewPartGrid', () => {
         sash1: viewPart_1,
         sash2: viewPart_5,
         splitter: .5,
-        hsplit: true
+        hsplit: true,
       },
       sash2: {
         id: 2,
@@ -238,14 +238,14 @@ describe('ViewPartGrid', () => {
           sash1: viewPart_2,
           sash2: viewPart_4,
           splitter: .5,
-          hsplit: true
+          hsplit: true,
         },
         sash2: viewPart_3,
         splitter: .5,
-        hsplit: false
+        hsplit: false,
       },
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Remove ViewPart 6');
 
     // Remove ViewPart 5
@@ -260,14 +260,14 @@ describe('ViewPartGrid', () => {
           sash1: viewPart_2,
           sash2: viewPart_4,
           splitter: .5,
-          hsplit: true
+          hsplit: true,
         },
         sash2: viewPart_3,
         splitter: .5,
-        hsplit: false
+        hsplit: false,
       },
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Remove ViewPart 5');
 
     // Remove ViewPart 4
@@ -280,10 +280,10 @@ describe('ViewPartGrid', () => {
         sash1: viewPart_2,
         sash2: viewPart_3,
         splitter: .5,
-        hsplit: false
+        hsplit: false,
       },
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Remove ViewPart 4');
 
     // Remove ViewPart 3
@@ -293,7 +293,7 @@ describe('ViewPartGrid', () => {
       sash1: viewPart_1,
       sash2: viewPart_2,
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     }, 'Remove ViewPart 3');
 
     // Remove ViewPart 2

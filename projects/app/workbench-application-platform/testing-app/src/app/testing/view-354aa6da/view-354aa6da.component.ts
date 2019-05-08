@@ -15,8 +15,8 @@ import { provideWorkbenchView } from '@scion/workbench-application.angular';
   selector: 'app-view-354aa6da',
   template: '',
   providers: [
-    provideWorkbenchView(View354aa6daComponent)
-  ]
+    provideWorkbenchView(View354aa6daComponent),
+  ],
 })
 export class View354aa6daComponent {
 }

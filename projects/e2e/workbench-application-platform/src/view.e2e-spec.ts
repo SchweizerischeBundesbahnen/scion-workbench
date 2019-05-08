@@ -666,7 +666,7 @@ describe('View', () => {
       // navigate to a sub page of this application (hash-based routing)
       const viewNavigationPanelPO = viewPO.getViewNavigationPanelPO();
       await viewNavigationPanelPO.enterQualifier({
-        entity: 'testing'
+        entity: 'testing',
       });
       await viewNavigationPanelPO.selectTarget('self');
       await viewNavigationPanelPO.checkActivateIfPresent(false);

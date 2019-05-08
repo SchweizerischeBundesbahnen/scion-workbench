@@ -14,7 +14,7 @@ import { Notification } from '@scion/workbench';
 @Component({
   selector: 'app-list-notification',
   templateUrl: './list-notification.component.html',
-  styleUrls: ['./list-notification.component.scss']
+  styleUrls: ['./list-notification.component.scss'],
 })
 export class ListNotificationComponent {
 

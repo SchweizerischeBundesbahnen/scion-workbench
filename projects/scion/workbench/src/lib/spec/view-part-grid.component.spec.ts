@@ -25,7 +25,7 @@ describe('ViewPartGridComponent', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -56,7 +56,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.2', 'view.2', 'view.2'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
   })));
 
@@ -85,7 +85,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.2', 'view.2', 'view.2'],
       sash2: ['viewpart.1', 'view.1', 'view.1'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
   })));
 
@@ -114,7 +114,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.2', 'view.2', 'view.2'],
       sash2: ['viewpart.1', 'view.1', 'view.1'],
       splitter: .5,
-      hsplit: true
+      hsplit: true,
     });
   })));
 
@@ -143,7 +143,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.2', 'view.2', 'view.2'],
       splitter: .5,
-      hsplit: true
+      hsplit: true,
     });
   })));
 
@@ -207,7 +207,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.2', 'view.2', 'view.3', 'view.2'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
 
     // Move View 1 to the new ViewPart
@@ -216,7 +216,6 @@ describe('ViewPartGridComponent', () => {
 
     expect(fixture).toBeViewPartGrid(['viewpart.2', 'view.1', 'view.3', 'view.2', 'view.1']);
   })));
-
 
   it('allows to move the last view of another viewpart to a new viewpart in the east', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(ViewPartGridComponent);
@@ -242,7 +241,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.2', 'view.2', 'view.2'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
 
     // Move View 2 to a new ViewPart in the east of ViewPart 1
@@ -253,7 +252,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.3', 'view.2', 'view.2'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
   })));
 
@@ -281,7 +280,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.2', 'view.2', 'view.2'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
 
     // Move View 2 to a new ViewPart in the west of ViewPart 1
@@ -292,7 +291,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.3', 'view.2', 'view.2'],
       sash2: ['viewpart.1', 'view.1', 'view.1'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
   })));
 
@@ -320,7 +319,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.2', 'view.2', 'view.2'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
 
     // Move View 2 to a new ViewPart in the north of ViewPart 1
@@ -331,7 +330,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.3', 'view.2', 'view.2'],
       sash2: ['viewpart.1', 'view.1', 'view.1'],
       splitter: .5,
-      hsplit: true
+      hsplit: true,
     });
   })));
 
@@ -359,7 +358,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.2', 'view.2', 'view.2'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
 
     // Move View 2 to a new ViewPart in the south of ViewPart 1
@@ -370,7 +369,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.1', 'view.1'],
       sash2: ['viewpart.3', 'view.2', 'view.2'],
       splitter: .5,
-      hsplit: true
+      hsplit: true,
     });
   })));
 
@@ -405,7 +404,7 @@ describe('ViewPartGridComponent', () => {
       sash1: ['viewpart.1', 'view.2', 'view.1', 'view.2'],
       sash2: ['viewpart.2', 'view.3', 'view.3'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
 
     // Move View 2 to a new ViewPart in the south of ViewPart 2
@@ -422,10 +421,10 @@ describe('ViewPartGridComponent', () => {
         sash1: ['viewpart.2', 'view.3', 'view.3'],
         sash2: ['viewpart.3', 'view.2', 'view.2'],
         splitter: .5,
-        hsplit: true
+        hsplit: true,
       },
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
 
     // Move View 2 to a new ViewPart in the south of ViewPart 1
@@ -438,11 +437,11 @@ describe('ViewPartGridComponent', () => {
         sash1: ['viewpart.1', 'view.1', 'view.1'],
         sash2: ['viewpart.4', 'view.2', 'view.2'],
         splitter: .5,
-        hsplit: true
+        hsplit: true,
       },
       sash2: ['viewpart.2', 'view.3', 'view.3'],
       splitter: .5,
-      hsplit: false
+      hsplit: false,
     });
   })));
 
@@ -510,8 +509,8 @@ class View3Component {
       {path: 'view-1', component: View1Component},
       {path: 'view-2', component: View2Component},
       {path: 'view-3', component: View3Component},
-    ])
-  ]
+    ]),
+  ],
 })
 class AppTestModule {
 }

@@ -19,7 +19,7 @@ import { SciDimension } from '@scion/dimension';
 @Component({
   selector: 'wb-view-list',
   templateUrl: './view-list.component.html',
-  styleUrls: ['./view-list.component.scss']
+  styleUrls: ['./view-list.component.scss'],
 })
 export class ViewListComponent implements OnDestroy {
 
@@ -57,7 +57,7 @@ export class ViewListComponent implements OnDestroy {
   private animateComponentHeightChange(): void {
     const animation = this._animationBuilder.build([
       style({height: '*'}),
-      animate('.2s ease-out', style({height: `${this.componentHeight}px`}))
+      animate('.2s ease-out', style({height: `${this.componentHeight}px`})),
     ]).create(this._host.nativeElement);
     animation.onDone(() => {
       animation.destroy();

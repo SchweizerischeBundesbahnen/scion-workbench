@@ -36,19 +36,19 @@ const PANEL_INITIAL_WIDTH = 500;
       'panel-enter-or-leave', [
         transition(':enter', [
           style({width: '0'}),
-          animate('75ms ease-out', style({width: '*'}))
+          animate('75ms ease-out', style({width: '*'})),
         ]),
         transition(':leave', [
           style({width: '*'}),
-          animate('75ms ease-out', style({width: 0}))
-        ])
-      ]
-    )
+          animate('75ms ease-out', style({width: 0})),
+        ]),
+      ],
+    ),
   ],
   viewProviders: [
     {provide: ROUTER_OUTLET_NAME, useValue: ACTIVITY_OUTLET_NAME},
     ContentProjectionContext,
-  ]
+  ],
 })
 export class ActivityPartComponent {
 
@@ -136,7 +136,7 @@ export class ActivityPartComponent {
 
     const animation = this._animationBuilder.build([
       style({width: '*'}),
-      animate('75ms ease-out', style({width: `${PANEL_MIN_WIDTH}px`}))
+      animate('75ms ease-out', style({width: `${PANEL_MIN_WIDTH}px`})),
     ]).create(this._panelElementRef.nativeElement);
     animation.onDone(() => this.panelWidth = PANEL_MIN_WIDTH);
     ActivityPartComponent.once(animation);

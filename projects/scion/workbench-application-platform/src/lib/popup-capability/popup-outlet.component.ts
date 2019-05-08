@@ -22,7 +22,7 @@ import { Arrays } from '../core/array.util';
 @Component({
   selector: 'wap-popup-outlet',
   templateUrl: './popup-outlet.component.html',
-  styleUrls: ['./popup-outlet.component.scss']
+  styleUrls: ['./popup-outlet.component.scss'],
 })
 export class PopupOutletComponent {
 

@@ -17,7 +17,7 @@ describe('ManifestRegistry', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
   }));
 
@@ -236,7 +236,7 @@ describe('ManifestRegistry', () => {
  ****************************************************************************************************/
 
 @NgModule({
-  providers: [ManifestRegistry]
+  providers: [ManifestRegistry],
 })
 class AppTestModule {
 }

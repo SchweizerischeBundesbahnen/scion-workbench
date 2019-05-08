@@ -73,6 +73,7 @@ $border-radius: 4px;
         display: flex;
         background-color: rgb(250, 250, 250);
         border-top: 1px solid $messagebox-border-color;
+
         &:not(:first-child) {
           border-left: 1px solid $messagebox-border-color;
         }
@@ -100,12 +101,15 @@ $border-radius: 4px;
   &.info {
     @include message-box-theme($info-color);
   }
+
   &.warn {
     @include message-box-theme($warn-color);
   }
+
   &.error {
     @include message-box-theme($error-color);
   }
+
   &.blinking {
     animation-duration: .125s;
     animation-iteration-count: infinite;
@@ -120,6 +124,7 @@ $border-radius: 4px;
       }
     }
   }
+
   &.text-selectable {
     > div.outline > div.body {
       user-select: text;

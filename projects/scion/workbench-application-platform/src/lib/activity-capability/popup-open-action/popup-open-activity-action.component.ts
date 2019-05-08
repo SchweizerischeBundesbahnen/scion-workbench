@@ -8,7 +8,6 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-
 import { Component, Inject, Injector } from '@angular/core';
 import { ACTIVITY_ACTION } from '../metadata';
 import { MessageBus } from '../../core/message-bus.service';
@@ -46,7 +45,7 @@ export class PopupOpenActivityActionComponent {
           onFocusLost: closeStrategy && closeStrategy.onFocusLost,
           onEscape: closeStrategy && closeStrategy.onEscape,
           onGridLayoutChange: closeStrategy && closeStrategy.onGridLayoutChange,
-        }
+        },
       },
     };
 

@@ -21,8 +21,8 @@ import { provideWorkbenchView, WorkbenchView } from '@scion/workbench-applicatio
   templateUrl: './communication-view.component.html',
   styleUrls: ['./communication-view.component.scss'],
   providers: [
-    provideWorkbenchView(CommunicationViewComponent)
-  ]
+    provideWorkbenchView(CommunicationViewComponent),
+  ],
 })
 export class CommunicationViewComponent {
 

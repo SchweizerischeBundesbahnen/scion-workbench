@@ -33,7 +33,7 @@ import { ContentProjectionContext } from '../content-projection/content-projecti
   selector: 'wb-view',
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
-  providers: [MessageBoxService, ContentProjectionContext]
+  providers: [MessageBoxService, ContentProjectionContext],
 })
 export class ViewComponent implements AfterViewInit, OnDestroy {
 

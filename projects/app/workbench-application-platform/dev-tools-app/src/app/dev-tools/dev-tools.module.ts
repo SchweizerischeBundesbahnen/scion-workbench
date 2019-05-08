@@ -52,7 +52,7 @@ import { OutletCapabilityExecPopupComponent } from './outlet-capability-exec-pop
     SciPropertyModule,
   ],
   exports: [],
-  providers: []
+  providers: [],
 })
 export class DevToolsModule {
 }

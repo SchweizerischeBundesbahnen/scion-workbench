@@ -50,7 +50,7 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
  */
 export const jasmineCustomMatchers: jasmine.CustomMatcherFactories = {
   toBeViewPartGrid: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToBeViewPartGridMatcher(util, customEqualityTesters),
-  toShow: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToDisplayMatcher(util, customEqualityTesters)
+  toShow: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToDisplayMatcher(util, customEqualityTesters),
 };
 
 function createToDisplayMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
@@ -63,7 +63,7 @@ function createToDisplayMatcher(util: MatchersUtil, customEqualityTesters: Custo
       if (!(actualFixture instanceof ComponentFixture)) {
         return {
           pass: false,
-          message: msgFn(`Expected actual to be of type \'ComponentFixture\' [actual=${actualFixture.constructor.name}]`)
+          message: msgFn(`Expected actual to be of type \'ComponentFixture\' [actual=${actualFixture.constructor.name}]`),
         };
       }
 
@@ -71,7 +71,7 @@ function createToDisplayMatcher(util: MatchersUtil, customEqualityTesters: Custo
       return found ?
         {pass: true} :
         {pass: false, message: msgFn(`Expected ${expectedComponentType.name} to show`)};
-    }
+    },
   };
 }
 
@@ -85,7 +85,7 @@ function createToBeViewPartGridMatcher(util: MatchersUtil, customEqualityTesters
       if (!(actualViewPartGridFixture instanceof ComponentFixture)) {
         return {
           pass: false,
-          message: msgFn(`Expected actual to be of type \'ComponentFixture\' [actual=${Object.getOwnPropertyNames(actualViewPartGridFixture)}]`)
+          message: msgFn(`Expected actual to be of type \'ComponentFixture\' [actual=${Object.getOwnPropertyNames(actualViewPartGridFixture)}]`),
         };
       }
 
@@ -99,17 +99,17 @@ function createToBeViewPartGridMatcher(util: MatchersUtil, customEqualityTesters
 
         // Verify DOM representation
         assertRenderedGridInDom(expectedViewPartGrid, actualGridFixture.debugElement.query(By.css('wb-view-part-sash-box')) || actualGridFixture.debugElement);
-      }
-      catch (error) {
+      } catch (error) {
         if (error instanceof AssertException) {
           return {pass: false, message: msgFn(error.message)};
-        } else {
+        }
+        else {
           throw error;
         }
       }
 
       return {pass: true};
-    }
+    },
   };
 
   /**

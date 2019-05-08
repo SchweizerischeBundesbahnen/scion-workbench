@@ -15,8 +15,8 @@ import { provideWorkbenchPopup } from '@scion/workbench-application.angular';
   selector: 'app-popup-1a90c8d2',
   template: '',
   providers: [
-    provideWorkbenchPopup(Popup1a90c8d2Component)
-  ]
+    provideWorkbenchPopup(Popup1a90c8d2Component),
+  ],
 })
 export class Popup1a90c8d2Component {
 }

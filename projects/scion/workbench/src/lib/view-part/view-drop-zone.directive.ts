@@ -24,7 +24,7 @@ const NULL_BOUNDS: Bounds = null;
  * east, south, west or in the center.
  */
 @Directive({
-  selector: '[wbViewDropZone]'
+  selector: '[wbViewDropZone]',
 })
 export class ViewDropZoneDirective implements OnInit, OnDestroy {
 
@@ -110,7 +110,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
       default: {
         this.renderDropRegions(
           {
-            top: '0', right: '0', bottom: '0', left: '0', background: DROP_REGION_BGCOLOR
+            top: '0', right: '0', bottom: '0', left: '0', background: DROP_REGION_BGCOLOR,
           },
           NULL_BOUNDS,
         );
@@ -155,7 +155,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
     this._workbenchLayout.viewTabDrag$
       .pipe(
         filter(event => event === 'start'),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe(() => {
         this.activateDropZone();
@@ -165,7 +165,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
     this._workbenchLayout.viewTabDrag$
       .pipe(
         filter(event => event === 'end'),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe(() => {
         this.deactivateDropZone();
@@ -175,7 +175,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
     fromEvent<DragEvent>(this._dropZoneOverlay, 'dragover')
       .pipe(
         filter(event => this.isViewDragEvent(event)),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((dragEvent: DragEvent) => {
         dragEvent.preventDefault(); // `preventDefault` to allow drop
@@ -191,7 +191,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
     fromEvent<DragEvent>(this._dropZoneOverlay, 'drop')
       .pipe(
         filter(event => this.isViewDragEvent(event)),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe((dragEvent: DragEvent) => {
         this.onDrop(dragEvent);
@@ -212,7 +212,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
         'bottom': '0',
         'left': '0',
         'z-index': '1',
-      }
+      },
     });
 
     // Create the two drop regions which are moved depending on the computed region.

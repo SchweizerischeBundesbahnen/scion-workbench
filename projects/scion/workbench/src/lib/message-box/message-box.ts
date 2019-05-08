@@ -82,7 +82,7 @@ export class WbMessageBox extends MessageBox {
         },
         get: (): any => {
           return this[`_${property}`];
-        }
+        },
       });
     });
 

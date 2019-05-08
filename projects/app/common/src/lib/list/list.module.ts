@@ -36,7 +36,7 @@ import { CommonModule } from '@angular/common';
     SciViewportModule,
     SciFilterFieldModule,
     A11yModule,
-  ]
+  ],
 })
 export class SciListModule {
 }

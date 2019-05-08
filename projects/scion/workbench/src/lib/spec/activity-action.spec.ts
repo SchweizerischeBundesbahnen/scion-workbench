@@ -41,7 +41,7 @@ describe('Activity part', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule, CommonModule]
+      imports: [AppTestModule, CommonModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -91,7 +91,7 @@ describe('Activity part', () => {
       <wb-activity itemCssClass="activity-2" itemText="activity-2" routerLink="activity-2"></wb-activity>
       <wb-activity itemCssClass="activity-3" itemText="activity-3" routerLink="activity-3"></wb-activity>
     </wb-workbench>
-  `
+  `,
 })
 class AppComponent {
 }
@@ -104,7 +104,7 @@ class AppComponent {
       <span class="action activity-1 action-a">activity-1/action-a</span>
       <span class="action activity-1 action-b">activity-1/action-b</span>
     </ng-template>
-  `
+  `,
 })
 class Activity1Component {
 }
@@ -118,7 +118,7 @@ class Activity1Component {
       <span class="action activity-2 action-b">activity-2/action-b</span>
       <span class="action activity-2 action-c">activity-2/action-c</span>
     </ng-template>
-  `
+  `,
 })
 class Activity2Component {
 }
@@ -142,8 +142,8 @@ class Activity3Component {
     AppComponent,
     Activity1Component,
     Activity2Component,
-    Activity3Component
-  ]
+    Activity3Component,
+  ],
 })
 class AppTestModule {
 }

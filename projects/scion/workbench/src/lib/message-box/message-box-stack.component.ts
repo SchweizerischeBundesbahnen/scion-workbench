@@ -24,8 +24,8 @@ import { MessageBoxComponent } from './message-box.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('enter', MessageBoxStackComponent.provideEnterAnimation()),
-    trigger('leave', MessageBoxStackComponent.provideLeaveAnimation())
-  ]
+    trigger('leave', MessageBoxStackComponent.provideLeaveAnimation()),
+  ],
 })
 export class MessageBoxStackComponent implements OnDestroy {
 
@@ -74,7 +74,7 @@ export class MessageBoxStackComponent implements OnDestroy {
     return [
       transition(':enter', [
         style({opacity: 0, bottom: '100%', top: 'unset'}),
-        animate('.1s ease-out', style({opacity: 1, bottom: '*'}))
+        animate('.1s ease-out', style({opacity: 1, bottom: '*'})),
       ]),
     ];
   }
@@ -85,8 +85,8 @@ export class MessageBoxStackComponent implements OnDestroy {
   private static provideLeaveAnimation(): AnimationMetadata[] {
     return [
       transition(':leave', [
-        animate('.3s ease-out', style({opacity: 0}))
-      ])
+        animate('.3s ease-out', style({opacity: 0})),
+      ]),
     ];
   }
 }

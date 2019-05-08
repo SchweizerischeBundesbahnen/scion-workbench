@@ -22,7 +22,7 @@ describe('ManifestCollector', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
   }));
 
@@ -92,9 +92,9 @@ function createApplicationManifest(app: { appName: string }): ApplicationManifes
         {symbolicName: 'app-1', manifestUrl: 'http://www.app-1/manifest'},
         {symbolicName: 'app-2', manifestUrl: 'http://www.app-2/manifest'},
         {symbolicName: 'app-3', manifestUrl: 'http://www.app-3/manifest'},
-      ]
-    })
-  ]
+      ],
+    }),
+  ],
 })
 class AppTestModule {
 }

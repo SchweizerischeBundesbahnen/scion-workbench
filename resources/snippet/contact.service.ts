@@ -34,7 +34,7 @@ export class ContactService implements OnDestroy {
       .pipe(
         options && options.once ? take(1) : tap(),
         map(dictionary => dictionary[id]),
-        filter(Boolean)
+        filter(Boolean),
       );
   }
 
@@ -112,7 +112,6 @@ function deleteContact(storage: SciSessionStorageService, id: string): MonoTypeO
 function once<T>(): MonoTypeOperatorFunction<T> {
   return take(1);
 }
-
 
 export interface Contact {
   id: string;

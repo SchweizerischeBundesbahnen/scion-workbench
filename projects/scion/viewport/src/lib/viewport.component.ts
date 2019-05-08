@@ -34,7 +34,7 @@ import { SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-si
 @Component({
   selector: 'sci-viewport',
   templateUrl: './viewport.component.html',
-  styleUrls: ['./viewport.component.scss']
+  styleUrls: ['./viewport.component.scss'],
 })
 export class SciViewportComponent implements DoCheck {
 

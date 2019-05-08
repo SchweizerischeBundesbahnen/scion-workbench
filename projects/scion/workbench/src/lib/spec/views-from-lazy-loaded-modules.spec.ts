@@ -49,7 +49,7 @@ describe('Views', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -104,7 +104,7 @@ class AppComponent {
       {path: 'feature-b', loadChildren: './feature-b/feature-b.module#FeatureBModule'},
     ]),
   ],
-  declarations: [AppComponent]
+  declarations: [AppComponent],
 })
 class AppTestModule {
 }
@@ -125,10 +125,10 @@ class FeatureA_View2_Component {
     CommonModule,
     RouterModule.forChild([
       {path: 'view-1', component: FeatureA_View1_Component},
-      {path: 'view-2', component: FeatureA_View2_Component}
+      {path: 'view-2', component: FeatureA_View2_Component},
     ]),
   ],
-  declarations: [FeatureA_View1_Component, FeatureA_View2_Component]
+  declarations: [FeatureA_View1_Component, FeatureA_View2_Component],
 })
 export class FeatureAModule {
 }
@@ -149,10 +149,10 @@ class FeatureB_View2_Component {
     CommonModule,
     RouterModule.forChild([
       {path: 'view-1', component: FeatureB_View1_Component},
-      {path: 'view-2', component: FeatureB_View2_Component}
+      {path: 'view-2', component: FeatureB_View2_Component},
     ]),
   ],
-  declarations: [FeatureB_View1_Component, FeatureB_View2_Component]
+  declarations: [FeatureB_View1_Component, FeatureB_View2_Component],
 })
 export class FeatureBModule {
 }

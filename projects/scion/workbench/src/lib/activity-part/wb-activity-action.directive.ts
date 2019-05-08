@@ -30,7 +30,7 @@ import { Disposable } from '../disposable';
  */
 @Directive({
   selector: 'ng-template[wbActivityAction]',
-  exportAs: 'activityAction'
+  exportAs: 'activityAction',
 })
 export class WbActivityActionDirective implements OnDestroy {
 

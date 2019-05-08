@@ -289,7 +289,6 @@ describe('Activity', () => {
       const actionPanelPO = await testingActivityPO.openActivityActionsPanel();
       await actionPanelPO.checkCustomActivityAction(true);
 
-
       const customAction = await hostAppPO.findActivityAction('e2e-custom-activity-action');
       await customAction.click();
 
@@ -562,7 +561,6 @@ describe('Activity', () => {
         await expect(hostAppPO.getViewTabCount()).toBe(2);
       });
 
-
       it('should allow to close an opened view (closeIfPresent=true) [testcase: 608aa47c-view]', async () => {
         // Open testing view to open '4a4e6970-view'
         const testingViewPO = new TestingViewPO();
@@ -598,7 +596,6 @@ describe('Activity', () => {
         await expect(hostAppPO.getViewTabCount()).toBe(1);
       });
 
-
       it('should substitute path parameters with values from the intent qualifier [testcase: cc977da9-view]', async () => {
         const testingActivityPO = new TestingActivityPO(E2E_TESTING_ACTIVITY_CONTEXT);
         await testingActivityPO.navigateTo();
@@ -610,7 +607,7 @@ describe('Activity', () => {
           entity: 'testing',
           testcase: 'cc977da9-view',
           qualifierParam1: 'e82bf49c4768',
-          qualifierParam2: '1b84a4a926f7'
+          qualifierParam2: '1b84a4a926f7',
         });
         await panelPO.addAction();
 
@@ -663,7 +660,7 @@ describe('Activity', () => {
         const urlQueryParams = await viewPO.getUrlQueryParameters();
         await expect(urlQueryParams).toEqual({
           queryParam1: 'e60c81360bee',
-          queryParam2: '1a3d3aaf937e'
+          queryParam2: '1a3d3aaf937e',
         });
       });
     });
@@ -787,7 +784,7 @@ describe('Activity', () => {
         await panelPO.enterTitle('testcase: 9c5319f7-popup');
         await panelPO.enterQualifier({
           entity: 'testing',
-          testcase: '9c5319f7-popup'
+          testcase: '9c5319f7-popup',
         });
         await panelPO.enterMatrixParams({
           mp1: '41ecdefec0a3',
@@ -907,7 +904,7 @@ describe('Activity', () => {
           entity: 'testing',
           testcase: '159913ad-popup',
           qualifierParam1: 'e82bf49c4768',
-          qualifierParam2: '1b84a4a926f7'
+          qualifierParam2: '1b84a4a926f7',
         });
         await panelPO.addAction();
 
@@ -960,10 +957,9 @@ describe('Activity', () => {
         const urlQueryParams = await popupPO.getUrlQueryParameters();
         await expect(urlQueryParams).toEqual({
           queryParam1: 'e60c81360bee',
-          queryParam2: '1a3d3aaf937e'
+          queryParam2: '1a3d3aaf937e',
         });
       });
-
 
       it('should close on focus lost [testcase: 9002887a395c]', async () => {
         const testingActivityPO = new TestingActivityPO(E2E_TESTING_ACTIVITY_CONTEXT);

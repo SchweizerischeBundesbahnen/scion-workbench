@@ -42,7 +42,7 @@ describe('Activity part', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule, CommonModule]
+      imports: [AppTestModule, CommonModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -97,7 +97,7 @@ describe('Activity part', () => {
       <wb-activity itemCssClass="activity-2" itemText="activity-2" title="Activity 2" routerLink="activity-2"></wb-activity>
       <wb-activity itemCssClass="activity-3" itemText="activity-3" title="Activity 3" routerLink="activity-3"></wb-activity>
     </wb-workbench>
-  `
+  `,
 })
 class AppComponent {
 }
@@ -139,11 +139,11 @@ class Activity2CanActivate implements CanActivate {
     AppComponent,
     Activity1Component,
     Activity2Component,
-    Activity3Component
+    Activity3Component,
   ],
   providers: [
-    Activity2CanActivate
-  ]
+    Activity2CanActivate,
+  ],
 })
 class AppTestModule {
 }

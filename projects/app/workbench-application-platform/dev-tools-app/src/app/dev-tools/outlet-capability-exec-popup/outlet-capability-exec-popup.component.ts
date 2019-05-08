@@ -27,8 +27,8 @@ const MATRIX_PARAMS = 'matrixParams';
   templateUrl: './outlet-capability-exec-popup.component.html',
   styleUrls: ['./outlet-capability-exec-popup.component.scss'],
   providers: [
-    provideWorkbenchPopup(OutletCapabilityExecPopupComponent)
-  ]
+    provideWorkbenchPopup(OutletCapabilityExecPopupComponent),
+  ],
 })
 export class OutletCapabilityExecPopupComponent implements OnDestroy {
 
@@ -64,7 +64,7 @@ export class OutletCapabilityExecPopupComponent implements OnDestroy {
         tap(manifest => !manifest && notificationService.notify({
           severity: 'error',
           title: 'Capability not found',
-          text: `No capability found with given id '${route.snapshot.params['id']}'`
+          text: `No capability found with given id '${route.snapshot.params['id']}'`,
         })),
         filter(Boolean),
         takeUntil(this._destroy$),
@@ -103,7 +103,7 @@ export class OutletCapabilityExecPopupComponent implements OnDestroy {
         this._workbenchRouter.navigate(qualifier, {
           target: 'blank',
           matrixParams,
-          queryParams
+          queryParams,
         });
         break;
       }
@@ -112,7 +112,7 @@ export class OutletCapabilityExecPopupComponent implements OnDestroy {
           position: 'east',
           anchor: event.target as Element,
           queryParams: queryParams,
-          matrixParams: matrixParams
+          matrixParams: matrixParams,
         }, qualifier);
         break;
       }

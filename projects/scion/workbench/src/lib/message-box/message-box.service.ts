@@ -60,7 +60,8 @@ export class MessageBoxService {
     const msgBox: WbMessageBox = ((): WbMessageBox => {
       if (typeof messageBox === 'string') {
         return new WbMessageBox({content: messageBox});
-      } else {
+      }
+      else {
         return new WbMessageBox(messageBox);
       }
     })();

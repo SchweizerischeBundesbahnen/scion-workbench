@@ -51,7 +51,8 @@ export class WbRouteReuseStrategy implements RouteReuseStrategy {
 
     if (handle === null) {
       this._routeCache.delete(reuseKey);
-    } else {
+    }
+    else {
       this._routeCache.set(reuseKey, handle);
     }
   }

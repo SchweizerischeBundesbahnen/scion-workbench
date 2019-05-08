@@ -43,8 +43,8 @@ import { ContactService } from './contact.service';
   ],
   exports: [],
   providers: [
-    ContactService
-  ]
+    ContactService,
+  ],
 })
 export class ContactModule {
 }

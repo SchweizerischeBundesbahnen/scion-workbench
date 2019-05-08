@@ -74,9 +74,9 @@ export class SciSessionStorageService {
           return supplierIfAbsentFn$()
             .pipe(
               tap(it => this.put(key, it)),
-              switchMap(it => of(it))
+              switchMap(it => of(it)),
             );
-        })
+        }),
       );
   }
 }

@@ -58,7 +58,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
 
     this.replaceRouterConfig([
       ...this._router.config.filter(route => route.outlet !== outlet), // all registered routes, except auxiliary routes of the outlet
-      ...auxRoutes
+      ...auxRoutes,
     ]);
 
     return auxRoutes;

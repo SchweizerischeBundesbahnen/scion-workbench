@@ -19,7 +19,7 @@ import { Subject } from 'rxjs';
 @Component({
   selector: 'sci-filter-field',
   templateUrl: './filter-field.component.html',
-  styleUrls: ['./filter-field.component.scss']
+  styleUrls: ['./filter-field.component.scss'],
 })
 export class SciFilterFieldComponent implements OnDestroy {
 

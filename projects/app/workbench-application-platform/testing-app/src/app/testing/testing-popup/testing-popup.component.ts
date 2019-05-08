@@ -22,8 +22,8 @@ const RESULT = 'result';
   templateUrl: './testing-popup.component.html',
   styleUrls: ['./testing-popup.component.scss'],
   providers: [
-    provideWorkbenchPopup(TestingPopupComponent)
-  ]
+    provideWorkbenchPopup(TestingPopupComponent),
+  ],
 })
 export class TestingPopupComponent {
 

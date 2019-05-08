@@ -16,8 +16,8 @@ import { provideWorkbenchActivity } from '@scion/workbench-application.angular';
   templateUrl: './activity-5782ab19.component.html',
   styleUrls: ['./activity-5782ab19.component.scss'],
   providers: [
-    provideWorkbenchActivity(Activity5782ab19Component)
-  ]
+    provideWorkbenchActivity(Activity5782ab19Component),
+  ],
 })
 export class Activity5782ab19Component {
 }

@@ -30,7 +30,7 @@ import { Params } from '@angular/router';
  */
 @Directive({
   selector: 'ng-container[wbPopupOpenActivityAction]',
-  exportAs: 'activityAction'
+  exportAs: 'activityAction',
 })
 export class WorkbenchPopupOpenActivityActionDirective implements OnInit, OnDestroy {
 
@@ -114,7 +114,7 @@ export class WorkbenchPopupOpenActivityActionDirective implements OnInit, OnDest
           onFocusLost: this.onFocusLost,
           onEscape: this.onEscape,
           onGridLayoutChange: this.onGridLayoutChange,
-        }
+        },
       },
     };
     this._action = this._activity.addAction(action);

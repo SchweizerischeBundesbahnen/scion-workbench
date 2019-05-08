@@ -29,7 +29,7 @@ import { Disposable, PlatformActivityActionTypes, UrlOpenActivityAction } from '
  */
 @Directive({
   selector: 'ng-container[wbUrlOpenActivityAction]',
-  exportAs: 'activityAction'
+  exportAs: 'activityAction',
 })
 export class WorkbenchUrlOpenActivityActionDirective implements OnInit, OnDestroy {
 

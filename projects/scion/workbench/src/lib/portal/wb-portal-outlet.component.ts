@@ -16,7 +16,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'wb-portal-outlet',
   template: '<ng-template></ng-template>',
-  styleUrls: ['./wb-portal-outlet.component.scss']
+  styleUrls: ['./wb-portal-outlet.component.scss'],
 })
 export class WbPortalOutletComponent implements AfterViewInit, OnDestroy {
 

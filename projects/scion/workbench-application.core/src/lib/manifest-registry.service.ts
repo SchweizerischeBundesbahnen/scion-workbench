@@ -27,8 +27,8 @@ export class ManifestRegistryService implements Service {
       type: PlatformCapabilityTypes.ManifestRegistry,
       qualifier: NilQualifier,
       payload: {
-        query: ManifestQueries.FindManifests
-      }
+        query: ManifestQueries.FindManifests,
+      },
     };
 
     return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
@@ -45,7 +45,7 @@ export class ManifestRegistryService implements Service {
       payload: {
         query: ManifestQueries.FindManifest,
         symbolicAppName: symbolicName,
-      }
+      },
     };
 
     return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
@@ -62,7 +62,7 @@ export class ManifestRegistryService implements Service {
       payload: {
         query: ManifestQueries.FindCapabilityProviders,
         intentId: intentId,
-      }
+      },
     };
 
     return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
@@ -79,7 +79,7 @@ export class ManifestRegistryService implements Service {
       payload: {
         query: ManifestQueries.FindCapabilityConsumers,
         capabilityId: capabilityId,
-      }
+      },
     };
 
     return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
@@ -96,7 +96,7 @@ export class ManifestRegistryService implements Service {
       payload: {
         query: ManifestQueries.FindCapability,
         capabilityId: capabilityId,
-      }
+      },
     };
 
     return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
@@ -116,7 +116,7 @@ export class ManifestRegistryService implements Service {
         query: ManifestQueries.FindCapabilities,
         type: type,
         qualifier: qualifier,
-      }
+      },
     };
 
     return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})

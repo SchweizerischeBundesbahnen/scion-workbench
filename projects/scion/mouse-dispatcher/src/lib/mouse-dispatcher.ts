@@ -58,7 +58,7 @@ export function installMouseDispatcher(targetWindow: Window, targetOrigin: strin
   // Dispatch synthetic mouse events to the target window (unless emitted itself)
   merge(
     fromEvent<SciMouseEvent>(document, 'sci-mousemove'),
-    fromEvent<SciMouseEvent>(document, 'sci-mouseup')
+    fromEvent<SciMouseEvent>(document, 'sci-mouseup'),
   )
     .pipe(
       filter((event: SciMouseEvent) => event.source !== targetWindow),
@@ -71,7 +71,6 @@ export function installMouseDispatcher(targetWindow: Window, targetOrigin: strin
         screenY: event.screenY,
       }, targetOrigin);
     });
-
 
   // Dispatch synthetic mouse events received from the target window to this document's event bus
   fromEvent<MessageEvent>(window, 'message')
@@ -90,7 +89,7 @@ export function installMouseDispatcher(targetWindow: Window, targetOrigin: strin
     });
 
   return {
-    dispose: (): void => destroy$.next()
+    dispose: (): void => destroy$.next(),
   };
 }
 

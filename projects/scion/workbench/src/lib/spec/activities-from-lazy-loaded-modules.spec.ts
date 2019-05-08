@@ -19,7 +19,6 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { advance, clickElement } from './util/util.spec';
 import { ActivityPartComponent } from '../activity-part/activity-part.component';
 
-
 /**
  *
  * Testsetup:
@@ -50,7 +49,7 @@ describe('Activities', () => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
-      imports: [AppTestModule]
+      imports: [AppTestModule],
     });
 
     TestBed.get(Router).initialNavigation();
@@ -107,7 +106,7 @@ describe('Activities', () => {
       <wb-activity itemCssClass="activity-feature_module_b-1" itemText="feature_module_b-1" routerLink="feature-b/activity-1"></wb-activity>
       <wb-activity itemCssClass="activity-feature_module_b-2" itemText="feature_module_b-2" routerLink="feature-b/activity-2"></wb-activity>
     </wb-workbench>
-  `
+  `,
 })
 class AppComponent {
 }
@@ -121,7 +120,7 @@ class AppComponent {
       {path: 'feature-b', loadChildren: './feature-b/feature-b.module#FeatureBModule'},
     ]),
   ],
-  declarations: [AppComponent]
+  declarations: [AppComponent],
 })
 class AppTestModule {
 }
@@ -142,10 +141,10 @@ class FeatureA_Activity2_Component {
     CommonModule,
     RouterModule.forChild([
       {path: 'activity-1', component: FeatureA_Activity1_Component},
-      {path: 'activity-2', component: FeatureA_Activity2_Component}
+      {path: 'activity-2', component: FeatureA_Activity2_Component},
     ]),
   ],
-  declarations: [FeatureA_Activity1_Component, FeatureA_Activity2_Component]
+  declarations: [FeatureA_Activity1_Component, FeatureA_Activity2_Component],
 })
 export class FeatureAModule {
 }
@@ -166,10 +165,10 @@ class FeatureB_Activity2_Component {
     CommonModule,
     RouterModule.forChild([
       {path: 'activity-1', component: FeatureB_Activity1_Component},
-      {path: 'activity-2', component: FeatureB_Activity2_Component}
+      {path: 'activity-2', component: FeatureB_Activity2_Component},
     ]),
   ],
-  declarations: [FeatureB_Activity1_Component, FeatureB_Activity2_Component]
+  declarations: [FeatureB_Activity1_Component, FeatureB_Activity2_Component],
 })
 export class FeatureBModule {
 }

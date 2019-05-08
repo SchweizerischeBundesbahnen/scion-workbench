@@ -29,7 +29,7 @@ describe('url.util', () => {
 
   it('should serialize \'matrix and query params\' into a \'matrix param\' and parse it from the routed path params', () => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([])]
+      imports: [RouterTestingModule.withRoutes([])],
     });
 
     const matrixParam = Url.writeMatrixParamObject({
@@ -40,7 +40,7 @@ describe('url.util', () => {
       matrixParams: {
         matrixParam1: 'matrixParam1Value',
         matrixParam2: 'matrixParam2Value',
-      }
+      },
     });
 
     const urlTree = TestBed.get(Router).createUrlTree(['foo', matrixParam]);
@@ -63,7 +63,7 @@ describe('url.util', () => {
 
   it('should not fail if \'matrix and query params\' are not given in routed path params', () => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([])]
+      imports: [RouterTestingModule.withRoutes([])],
     });
 
     const urlTree = TestBed.get(Router).createUrlTree(['foo']);
@@ -93,7 +93,7 @@ describe('url.util', () => {
       path: ['foo', 'bar'],
       queryParams: {
         'queryParam1': 'queryParam1Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar?queryParam1=queryParam1Value', '(4)');
 
     expect(Url.createUrl({
@@ -101,7 +101,7 @@ describe('url.util', () => {
       path: ['foo', 'bar'],
       queryParams: {
         'queryParam1': 'queryParam1Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar?queryParam1=queryParam1Value', '(5)');
 
     expect(Url.createUrl({
@@ -109,7 +109,7 @@ describe('url.util', () => {
       path: ['', ''],
       queryParams: {
         'queryParam1': 'queryParam1Value',
-      }
+      },
     })).toEqual('http://localhost:8080?queryParam1=queryParam1Value', '(6)');
 
     expect(Url.createUrl({
@@ -117,7 +117,7 @@ describe('url.util', () => {
       path: ['', ''],
       queryParams: {
         'queryParam1': 'queryParam1Value',
-      }
+      },
     })).toEqual('http://localhost:8080?queryParam1=queryParam1Value', '(7)');
 
     expect(Url.createUrl({
@@ -126,7 +126,7 @@ describe('url.util', () => {
       queryParams: {
         'queryParam1': 'queryParam1Value',
         'queryParam2': 'queryParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar?queryParam1=queryParam1Value&queryParam2=queryParam2Value', '(8)');
 
     expect(Url.createUrl({
@@ -134,7 +134,7 @@ describe('url.util', () => {
       path: ['foo', 'bar'],
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar;matrixParam1=matrixParam1Value', '(9)');
 
     expect(Url.createUrl({
@@ -142,7 +142,7 @@ describe('url.util', () => {
       path: ['foo', 'bar'],
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar;matrixParam1=matrixParam1Value', '(10)');
 
     expect(Url.createUrl({
@@ -150,7 +150,7 @@ describe('url.util', () => {
       path: ['', ''],
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
-      }
+      },
     })).toEqual('http://localhost:8080;matrixParam1=matrixParam1Value', '(11)');
 
     expect(Url.createUrl({
@@ -158,7 +158,7 @@ describe('url.util', () => {
       path: ['', ''],
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
-      }
+      },
     })).toEqual('http://localhost:8080;matrixParam1=matrixParam1Value', '(12)');
 
     expect(Url.createUrl({
@@ -167,7 +167,7 @@ describe('url.util', () => {
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
         'matrixParam2': 'matrixParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar;matrixParam1=matrixParam1Value;matrixParam2=matrixParam2Value', '(13)');
 
     expect(Url.createUrl({
@@ -180,7 +180,7 @@ describe('url.util', () => {
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
         'matrixParam2': 'matrixParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar;matrixParam1=matrixParam1Value;matrixParam2=matrixParam2Value?queryParam1=queryParam1Value&queryParam2=queryParam2Value', '(14)');
 
     expect(Url.createUrl({
@@ -193,7 +193,7 @@ describe('url.util', () => {
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
         'matrixParam2': 'matrixParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar;matrixParam1=matrixParam1Value;matrixParam2=matrixParam2Value?queryParam1=queryParam1Value&queryParam2=queryParam2Value', '(15)');
 
     expect(Url.createUrl({
@@ -206,7 +206,7 @@ describe('url.util', () => {
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
         'matrixParam2': 'matrixParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080/foo/bar;matrixParam1=matrixParam1Value;matrixParam2=matrixParam2Value?queryParam1=queryParam1Value&queryParam2=queryParam2Value', '(16)');
 
     expect(Url.createUrl({
@@ -219,7 +219,7 @@ describe('url.util', () => {
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
         'matrixParam2': 'matrixParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080;matrixParam1=matrixParam1Value;matrixParam2=matrixParam2Value?queryParam1=queryParam1Value&queryParam2=queryParam2Value', '(17)');
 
     expect(Url.createUrl({
@@ -232,7 +232,7 @@ describe('url.util', () => {
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
         'matrixParam2': 'matrixParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080;matrixParam1=matrixParam1Value;matrixParam2=matrixParam2Value?queryParam1=queryParam1Value&queryParam2=queryParam2Value', '(18)');
 
     expect(Url.createUrl({
@@ -245,7 +245,7 @@ describe('url.util', () => {
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
         'matrixParam2': 'matrixParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080;matrixParam1=matrixParam1Value;matrixParam2=matrixParam2Value?queryParam1=queryParam1Value&queryParam2=queryParam2Value', '(19)');
 
     expect(Url.createUrl({
@@ -258,7 +258,7 @@ describe('url.util', () => {
       matrixParams: {
         'matrixParam1': 'matrixParam1Value',
         'matrixParam2': 'matrixParam2Value',
-      }
+      },
     })).toEqual('http://localhost:8080;matrixParam1=matrixParam1Value;matrixParam2=matrixParam2Value?queryParam1=queryParam1Value&queryParam2=queryParam2Value', '(20)');
   });
 

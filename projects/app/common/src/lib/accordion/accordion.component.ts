@@ -43,7 +43,7 @@ import { CdkAccordionItem } from '@angular/cdk/accordion';
   styleUrls: ['./accordion.component.scss'],
   animations: [
     trigger('enter', SciAccordionComponent.provideEnterAnimation()),
-  ]
+  ],
 })
 export class SciAccordionComponent {
 
@@ -75,7 +75,7 @@ export class SciAccordionComponent {
     return [
       transition(':enter', [
         style({opacity: 0, height: 0, overflow: 'hidden'}),
-        animate('125ms ease-out', style({opacity: 1, height: '*'}))
+        animate('125ms ease-out', style({opacity: 1, height: '*'})),
       ]),
     ];
   }

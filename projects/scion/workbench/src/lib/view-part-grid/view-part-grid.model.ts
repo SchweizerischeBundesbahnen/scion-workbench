@@ -208,7 +208,7 @@ export class ViewPartGrid {
       sash1: addBefore ? newViewPartInfoArray : anchorViewPartInfoArray,
       sash2: addBefore ? anchorViewPartInfoArray : newViewPartInfoArray,
       splitter: .5,
-      hsplit: ['north', 'south'].includes(region)
+      hsplit: ['north', 'south'].includes(region),
     };
 
     // Insert the new sash box into the grid
@@ -340,7 +340,7 @@ export class ViewPartGrid {
           viewPartRef: it[VIEW_PART_REF_INDEX],
           activeViewRef: it[ACTIVE_VIEW_REF_INDEX],
           viewRefs: it.slice(VIEW_REFS_START_INDEX),
-          viewPartInfoArray: it
+          viewPartInfoArray: it,
         });
       }
 

@@ -95,7 +95,7 @@ export class TemplateHostOverlayDirective implements OnInit, AfterViewInit, DoCh
       top: `${position.top}px`,
       left: `${position.left}px`,
       width: `${position.width}px`,
-      height: `${position.height}px`
+      height: `${position.height}px`,
     };
 
     // Performance optimization: set new style object only if its content changed

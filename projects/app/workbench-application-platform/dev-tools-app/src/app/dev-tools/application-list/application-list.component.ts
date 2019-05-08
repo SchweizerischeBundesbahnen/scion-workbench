@@ -29,7 +29,7 @@ export class ApplicationListComponent {
     this.manifests$ = combineLatest(this._filter$, this._manifestRegistryService.manifests$)
       .pipe(
         filterManifests(),
-        sortManifests()
+        sortManifests(),
       );
   }
 

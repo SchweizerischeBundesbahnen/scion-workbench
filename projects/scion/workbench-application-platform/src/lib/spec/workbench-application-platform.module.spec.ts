@@ -24,7 +24,7 @@ describe('WorkbenchApplicationPlatform', () => {
         WorkbenchModule.forRoot(),
         WorkbenchApplicationPlatformModule.forRoot({errorHandler: NullErrorHandler, applicationConfig: []}),
         RouterTestingModule.withRoutes([{path: 'lazy-module', loadChildren: './lazy.module#LazyModule'}]),
-      ]
+      ],
     });
   });
 
@@ -32,8 +32,8 @@ describe('WorkbenchApplicationPlatform', () => {
     // Use forRoot() in a lazy context
     @NgModule({
       imports: [
-        WorkbenchApplicationPlatformModule.forRoot({errorHandler: NullErrorHandler, applicationConfig: []})
-      ]
+        WorkbenchApplicationPlatformModule.forRoot({errorHandler: NullErrorHandler, applicationConfig: []}),
+      ],
     })
     class LazyModule {
     }

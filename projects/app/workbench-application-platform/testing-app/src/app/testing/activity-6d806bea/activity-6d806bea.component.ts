@@ -15,8 +15,8 @@ import { provideWorkbenchActivity } from '@scion/workbench-application.angular';
   selector: 'app-activity-6d806bea',
   template: '',
   providers: [
-    provideWorkbenchActivity(Activity6d806beaComponent)
-  ]
+    provideWorkbenchActivity(Activity6d806beaComponent),
+  ],
 })
 export class Activity6d806beaComponent {
 }

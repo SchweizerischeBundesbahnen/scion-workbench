@@ -16,8 +16,8 @@ import { provideWorkbenchPopup } from '@scion/workbench-application.angular';
   templateUrl: './popup-5782ab19.component.html',
   styleUrls: ['./popup-5782ab19.component.scss'],
   providers: [
-    provideWorkbenchPopup(Popup5782ab19Component)
-  ]
+    provideWorkbenchPopup(Popup5782ab19Component),
+  ],
 })
 export class Popup5782ab19Component {
 }

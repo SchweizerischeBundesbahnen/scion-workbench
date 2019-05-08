@@ -17,7 +17,7 @@ import { ViewListComponent } from '../view-list/view-list.component';
 @Component({
   selector: 'wb-view-list-button',
   templateUrl: './view-list-button.component.html',
-  styleUrls: ['./view-list-button.component.scss']
+  styleUrls: ['./view-list-button.component.scss'],
 })
 export class ViewListButtonComponent {
 
@@ -48,7 +48,7 @@ export class ViewListButtonComponent {
       positionStrategy: this._overlay.position()
         .flexibleConnectedTo(this._host)
         .withFlexibleDimensions(false)
-        .withPositions([ViewListButtonComponent.SOUTH, ViewListButtonComponent.NORTH])
+        .withPositions([ViewListButtonComponent.SOUTH, ViewListButtonComponent.NORTH]),
     });
     config['disposeOnNavigation'] = true; // added in CDK 7.x
 

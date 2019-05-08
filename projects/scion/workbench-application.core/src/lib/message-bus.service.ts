@@ -106,7 +106,7 @@ export class DefaultMessageBus implements MessageBus {
       .pipe(
         filter(env => env.channel === 'reply'),
         filter(env => env.replyToUid === replyToUid),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       );
     this.postMessage(envelope);
     return reply$;
@@ -122,7 +122,7 @@ export class DefaultMessageBus implements MessageBus {
         filter(env => env.channel === 'reply'),
         filter(env => env.replyToUid === replyToUid),
         first(),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       ).toPromise();
     this.postMessage(envelope);
     return replyPromise;
