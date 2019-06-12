@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Swiss Federal Railways
+ * Copyright (c) 2018-2019 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms from the Eclipse Public License 2.0
