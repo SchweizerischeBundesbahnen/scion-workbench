@@ -11,7 +11,6 @@
 import { ChangeDetectorRef, ComponentFactoryResolver, Directive, Inject, ViewContainerRef } from '@angular/core';
 import { ChildrenOutletContexts, RouterOutlet } from '@angular/router';
 import { ROUTER_OUTLET_NAME } from '../workbench.constants';
-import { OutletContext } from '@angular/router/src/router_outlet_context';
 
 /**
  * Like 'RouterOutlet' but with functionality to dynamically set the router outlet name via {ROUTER_OUTLET_NAME} injection token.
@@ -26,19 +25,5 @@ export class WbRouterOutletDirective extends RouterOutlet {
     resolver: ComponentFactoryResolver,
     changeDetector: ChangeDetectorRef) {
     super(parentContexts, location, resolver, outlet, changeDetector);
-    WbRouterOutletDirective.installWorkaroundForAngularIssue25313(parentContexts.getContext(outlet));
-  }
-
-  /**
-   * Installs a workaround for Angular issue 'https://github.com/angular/angular/issues/25313'.
-   * TODO[Angular 7.0]: Remove if fixed.
-   *
-   * Issue #25313: Router outlet mounts wrong component if using a route reuse strategy and if the router
-   *               outlet was not instantiated at the time the route got activated.
-   */
-  private static installWorkaroundForAngularIssue25313(context: OutletContext): void {
-    if (context.attachRef && context.route.component !== context.attachRef.componentType) {
-      context.attachRef = null;
-    }
   }
 }
