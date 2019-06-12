@@ -14,7 +14,6 @@ import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment } 
 import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { Defined } from '../defined.util';
-import { WorkbenchView } from '../workbench.model';
 import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { Arrays } from '../array.util';
 
@@ -47,13 +46,6 @@ export abstract class WorkbenchRouter {
    * @see WbRouterLinkDirective
    */
   public abstract navigate(commands: any[], extras?: WbNavigationExtras): Promise<boolean>;
-
-  /**
-   * Resolves present views which match the given URL path.
-   *
-   * @deprecated to destroy views, use `Router.navigate` and set `closeIfPresent` in `WbNavigationExtras`; will be removed in the next release
-   */
-  public abstract resolve(commands: any[]): WorkbenchView[];
 }
 
 @Injectable()
@@ -72,11 +64,9 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
       return this._workbench.destroyView(...this.resolvePresentViewRefs(commands));
     }
 
-    const activateIfPresent = Defined.orElse(extras.activateIfPresent, extras.tryActivateView); // tslint:disable-line:deprecation
-    const coerceActivate = activateIfPresent === undefined && !commands.includes('new') && !commands.includes('create');
-
-    // If view is present, activate it.
-    if (activateIfPresent || coerceActivate) {
+    const activateIfPresent = Defined.orElse(extras.activateIfPresent, !commands.includes('new') && !commands.includes('create') /* coerce activation based on command segment names */);
+    // If the view is present, activate it.
+    if (activateIfPresent) {
       const presentViewRef = this.resolvePresentViewRefs(commands)[0];
       if (presentViewRef) {
         return this._workbench.activateView(presentViewRef);
@@ -116,10 +106,6 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
         throw Error('Not supported routing view target.');
       }
     }
-  }
-
-  public resolve(commands: any[]): WorkbenchView[] {
-    return this.resolvePresentViewRefs(commands).map(viewRef => this._viewRegistry.getElseThrow(viewRef));
   }
 
   /**
@@ -171,12 +157,12 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
    * Serializes given commands into valid URL segments.
    */
   private serializeCommands(commands: any[]): string[] {
-    const serializedCommands = [];
+    const serializedCommands: string[] = [];
 
     commands.forEach(cmd => {
       // if matrix param, append it to the last segment
       if (typeof cmd === 'object') {
-        serializedCommands.push(serializedCommands.pop() + this.serializeMatrixParams(cmd));
+        serializedCommands.push(new UrlSegment(serializedCommands.pop(), cmd).toString());
       }
       else {
         serializedCommands.push(encodeURIComponent(cmd));
@@ -185,26 +171,12 @@ export class InternalWorkbenchRouter implements WorkbenchRouter {
 
     return serializedCommands;
   }
-
-  private serializeMatrixParams(params: { [key: string]: string }): string {
-    return Object.keys(params)
-      .map(key => `;${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-      .join('');
-  }
 }
 
 /**
  * Represents the extra options used during navigation.
  */
 export interface WbNavigationExtras extends NavigationExtras {
-  /**
-   * If there exists a view with the specified URL in the workbench, that view is activated.
-   * Otherwise, depending on the view target strategy, a new workbench view is created, which is by default,
-   * or the URL is loaded into the current view.
-   *
-   * @deprecated use 'activateIfPresent'; will be removed in the next release
-   */
-  tryActivateView?: boolean;
   /**
    * Activates the view if it is already present.
    * If not present, the view is opened according to the specified 'target' strategy.
