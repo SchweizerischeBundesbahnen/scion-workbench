@@ -5,6 +5,28 @@
 
 # Changelog
 
+# [0.0.0-beta.23](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.22...0.0.0-beta.23) (2019-06-12)
+
+
+### Bug Fixes
+
+* remove deprecated API ([24c6929](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/24c6929))
+* remove workaround for Angular issue [#25313](https://github.com/angular/angular/issues/25313) ([5ba0d16](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5ba0d16))
+
+
+### Features
+
+* remove support for Angular 7 ([6dda04e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6dda04e)), closes [#147](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/147)
+* support Angular 8 ([cbceba2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/cbceba2)), closes [#147](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/147) [#37](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/37)
+
+
+### BREAKING CHANGES
+
+* SCION Workbench no longer supports Angular 6 and Angular 7. Migrate your project to run with Angular 8.
+  See Angular Update Guide for detailed instructions on how to upgrade to a newer Angular version.
+* removed WorkbenchRouter.resolve:  use `Router.navigate` and set `closeIfPresent` in `WbNavigationExtras`
+* removed WbNavigationExtras.tryActivateView: use `WbNavigationExtras.activateIfPresent` instead
+
 # [0.0.0-beta.22](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.21...0.0.0-beta.22) (2019-05-08)
 
 ### Bug Fixes
