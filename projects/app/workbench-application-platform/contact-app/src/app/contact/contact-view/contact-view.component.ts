@@ -96,7 +96,7 @@ export class ContactViewComponent implements OnDestroy {
         this.form.controls[EMAIL].setValue(contact.email, {emitEvent: false});
         this.form.controls[PHONE].setValue(contact.phone, {emitEvent: false});
         this.form.controls[RELATED_PERSON_IDS].setValue(contact.relatedContactIds, {emitEvent: false});
-        this.relatedContacts$ = combineLatest(this._relatedContactFilter$, this._contactService.contacts$(contact.relatedContactIds)).pipe(filterContacts());
+        this.relatedContacts$ = combineLatest([this._relatedContactFilter$, this._contactService.contacts$(contact.relatedContactIds)]).pipe(filterContacts());
       }),
     );
   }

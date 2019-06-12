@@ -46,10 +46,10 @@ class AppComponent implements AfterViewInit {
   public vScrollbarTrackWidth: number;
   public hScrollbarTrackHeight: number;
 
-  @ViewChild('viewport')
+  @ViewChild('viewport', {static: true})
   public viewport: ElementRef<HTMLElement>;
 
-  @ViewChild('viewport_client')
+  @ViewChild('viewport_client', {static: true})
   public viewportClient: ElementRef<HTMLElement>;
 
   public ngAfterViewInit(): void {

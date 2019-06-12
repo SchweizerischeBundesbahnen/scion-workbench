@@ -26,16 +26,17 @@ describe('ViewPartGrid', () => {
     const rootViewPart: ViewPartInfoArray = ['viewPart-root'];
 
     const testee = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer);
-    expect(testee.root).toBe(rootViewPart);
+    expect(testee.root).toEqual(rootViewPart);
   }));
 
   it('allows to add a sibling viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
     const leftViewPart: ViewPartInfoArray = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
 
-    const testee = new ViewPartGrid(serializer.serializeGrid(leftViewPart), serializer);
-    testee.addSiblingViewPart('east', 'viewPart-left', 'viewPart-right');
+    const grid1 = new ViewPartGrid(serializer.serializeGrid(leftViewPart), serializer);
+    const grid2 = grid1.addSiblingViewPart('east', 'viewPart-left', 'viewPart-right');
 
-    expect(testee.root).toEqual({
+    expect(grid1.root).toEqual(leftViewPart); // expect that grid1 did not change (immutable)
+    expect(grid2.root).toEqual({
       id: 1,
       sash1: leftViewPart,
       sash2: ['viewPart-right'],
@@ -48,23 +49,30 @@ describe('ViewPartGrid', () => {
     const leftViewPart = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
     const rightViewPart = ['viewPart-right', 'view-5', 'view-4', 'view-5', 'view-6'];
 
-    const testee = new ViewPartGrid(serializer.serializeGrid({
+    const grid1 = new ViewPartGrid(serializer.serializeGrid({
       id: 1,
       sash1: leftViewPart,
       sash2: rightViewPart,
       splitter: .5,
       hsplit: false,
     }), serializer);
+    const grid2 = grid1.removeViewPart('viewPart-left');
 
-    testee.removeViewPart('viewPart-left');
-    expect(testee.root).toEqual(rightViewPart);
+    expect(grid1.root).toEqual({ // expect that grid1 did not change (immutable)
+      id: 1,
+      sash1: leftViewPart,
+      sash2: rightViewPart,
+      splitter: .5,
+      hsplit: false,
+    });
+    expect(grid2.root).toEqual(rightViewPart);
   }));
 
   it('allows to remove the left sibling viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
     const leftViewPart = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
     const rightViewPart = ['viewPart-right', 'view-5', 'view-4', 'view-5', 'view-6'];
 
-    const testee = new ViewPartGrid(serializer.serializeGrid({
+    const grid1 = new ViewPartGrid(serializer.serializeGrid({
       id: 1,
       sash1: leftViewPart,
       sash2: rightViewPart,
@@ -72,17 +80,25 @@ describe('ViewPartGrid', () => {
       hsplit: false,
     }), serializer);
 
-    testee.removeViewPart('viewPart-right');
-    expect(testee.root).toEqual(leftViewPart);
+    const grid2 = grid1.removeViewPart('viewPart-right');
+
+    expect(grid1.root).toEqual({ // expect that grid1 did not change (immutable)
+      id: 1,
+      sash1: leftViewPart,
+      sash2: rightViewPart,
+      splitter: .5,
+      hsplit: false,
+    });
+    expect(grid2.root).toEqual(leftViewPart);
   }));
 
   it('allows to remove the root viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
     const rootViewPart = ['viewPart-root', 'view-2', 'view-1', 'view-2', 'view-3'];
-    const testee = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer);
+    const grid1 = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer);
+    const grid2 = grid1.removeViewPart('viewPart-root');
 
-    testee.removeViewPart('viewPart-root');
-
-    expect(testee.root).toBeNull();
+    expect(grid1.root).toEqual(rootViewPart); // expect that grid1 did not change (immutable)
+    expect(grid2.root).toBeNull();
   }));
 
   /**
@@ -107,22 +123,22 @@ describe('ViewPartGrid', () => {
     const viewPart_6 = ['viewPart-6'];
 
     // Set ViewPart 1 as root viewpart
-    const testee = new ViewPartGrid(serializer.serializeGrid(viewPart_1), serializer);
-    expect(testee.root).toEqual(viewPart_1, 'Add ViewPart 1');
+    const grid1 = new ViewPartGrid(serializer.serializeGrid(viewPart_1), serializer);
+    const expectedGrid1 = viewPart_1;
 
     // Add ViewPart 2 to the east of ViewPart 2
-    testee.addSiblingViewPart('east', 'viewPart-1', 'viewPart-2');
-    expect(testee.root).toEqual({
+    const grid2 = grid1.addSiblingViewPart('east', 'viewPart-1', 'viewPart-2');
+    const expectedGrid2 = {
       id: 1,
       sash1: viewPart_1,
       sash2: viewPart_2,
       splitter: .5,
       hsplit: false,
-    }, 'Add ViewPart 2');
+    };
 
     // Add ViewPart 3 to the east of ViewPart 3
-    testee.addSiblingViewPart('east', 'viewPart-2', 'viewPart-3');
-    expect(testee.root).toEqual({
+    const grid3 = grid2.addSiblingViewPart('east', 'viewPart-2', 'viewPart-3');
+    const expectedGrid3 = {
       id: 1,
       sash1: viewPart_1,
       sash2: {
@@ -134,11 +150,11 @@ describe('ViewPartGrid', () => {
       },
       splitter: .5,
       hsplit: false,
-    }, 'Add ViewPart 3');
+    };
 
     // Add ViewPart 4 to the south of ViewPart 2
-    testee.addSiblingViewPart('south', 'viewPart-2', 'viewPart-4');
-    expect(testee.root).toEqual({
+    const grid4 = grid3.addSiblingViewPart('south', 'viewPart-2', 'viewPart-4');
+    const expectedGrid4 = {
       id: 1,
       sash1: viewPart_1,
       sash2: {
@@ -156,11 +172,11 @@ describe('ViewPartGrid', () => {
       },
       splitter: .5,
       hsplit: false,
-    }, 'Add ViewPart 4');
+    };
 
     // Add ViewPart 5 to the south of ViewPart 1
-    testee.addSiblingViewPart('south', 'viewPart-1', 'viewPart-5');
-    expect(testee.root).toEqual({
+    const grid5 = grid4.addSiblingViewPart('south', 'viewPart-1', 'viewPart-5');
+    const expectedGrid5 = {
       id: 1,
       sash1: {
         id: 4,
@@ -184,11 +200,11 @@ describe('ViewPartGrid', () => {
       },
       splitter: .5,
       hsplit: false,
-    }, 'Add ViewPart 5');
+    };
 
     // Add ViewPart 6 to the east of ViewPart 5
-    testee.addSiblingViewPart('east', 'viewPart-5', 'viewPart-6');
-    expect(testee.root).toEqual({
+    const grid6 = grid5.addSiblingViewPart('east', 'viewPart-5', 'viewPart-6');
+    const expectedGrid6 = {
       id: 1,
       sash1: {
         id: 4,
@@ -218,11 +234,11 @@ describe('ViewPartGrid', () => {
       },
       splitter: .5,
       hsplit: false,
-    }, 'Add ViewPart 6');
+    };
 
     // Remove ViewPart 6
-    testee.removeViewPart('viewPart-6');
-    expect(testee.root).toEqual({
+    const grid7 = grid6.removeViewPart('viewPart-6');
+    const expectedGrid7 = {
       id: 1,
       sash1: {
         id: 4,
@@ -246,11 +262,11 @@ describe('ViewPartGrid', () => {
       },
       splitter: .5,
       hsplit: false,
-    }, 'Remove ViewPart 6');
+    };
 
     // Remove ViewPart 5
-    testee.removeViewPart('viewPart-5');
-    expect(testee.root).toEqual({
+    const grid8 = grid7.removeViewPart('viewPart-5');
+    const expectedGrid8 = {
       id: 1,
       sash1: viewPart_1,
       sash2: {
@@ -268,11 +284,11 @@ describe('ViewPartGrid', () => {
       },
       splitter: .5,
       hsplit: false,
-    }, 'Remove ViewPart 5');
+    };
 
     // Remove ViewPart 4
-    testee.removeViewPart('viewPart-4');
-    expect(testee.root).toEqual({
+    const grid9 = grid8.removeViewPart('viewPart-4');
+    const expectedGrid9 = {
       id: 1,
       sash1: viewPart_1,
       sash2: {
@@ -284,25 +300,38 @@ describe('ViewPartGrid', () => {
       },
       splitter: .5,
       hsplit: false,
-    }, 'Remove ViewPart 4');
+    };
 
     // Remove ViewPart 3
-    testee.removeViewPart('viewPart-3');
-    expect(testee.root).toEqual({
+    const grid10 = grid9.removeViewPart('viewPart-3');
+    const expectedGrid10 = {
       id: 1,
       sash1: viewPart_1,
       sash2: viewPart_2,
       splitter: .5,
       hsplit: false,
-    }, 'Remove ViewPart 3');
+    };
 
     // Remove ViewPart 2
-    testee.removeViewPart('viewPart-2');
-    expect(testee.root).toEqual(viewPart_1, 'Remove ViewPart 2');
+    const grid11 = grid10.removeViewPart('viewPart-2');
+    const expectedGrid11 = viewPart_1;
 
     // Remove ViewPart 1
-    testee.removeViewPart('viewPart-1');
-    expect(testee.root).toBeNull('Remove ViewPart 1');
+    const grid12 = grid11.removeViewPart('viewPart-1');
+
+    // assert grids and that previous grids did not change (immutability)
+    expect(grid1.root).toEqual(expectedGrid1);
+    expect(grid2.root).toEqual(expectedGrid2);
+    expect(grid3.root).toEqual(expectedGrid3);
+    expect(grid4.root).toEqual(expectedGrid4);
+    expect(grid5.root).toEqual(expectedGrid5);
+    expect(grid6.root).toEqual(expectedGrid6);
+    expect(grid7.root).toEqual(expectedGrid7);
+    expect(grid8.root).toEqual(expectedGrid8);
+    expect(grid9.root).toEqual(expectedGrid9);
+    expect(grid10.root).toEqual(expectedGrid10);
+    expect(grid11.root).toEqual(expectedGrid11);
+    expect(grid12.root).toBeNull();
   }));
 });
 

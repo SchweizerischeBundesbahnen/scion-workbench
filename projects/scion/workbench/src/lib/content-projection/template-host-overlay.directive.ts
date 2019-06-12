@@ -114,7 +114,7 @@ export class TemplateHostOverlayDirective implements OnInit, AfterViewInit, DoCh
 
   private installActivityActiveListener(activityService: WorkbenchActivityPartService, route: ActivatedRoute, workbenchLayoutService: WorkbenchLayoutService): void {
     const activity = activityService.getActivityFromRoutingContext(route.snapshot);
-    activity && combineLatest(activity.active$, workbenchLayoutService.maximized$)
+    activity && combineLatest([activity.active$, workbenchLayoutService.maximized$])
       .pipe(takeUntil(this._destroy$))
       .subscribe(([active, maximized]) => this.setViewRefStyle({display: active && !maximized ? null : 'none'}));
   }

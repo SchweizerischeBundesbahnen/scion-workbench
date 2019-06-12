@@ -61,10 +61,14 @@ describe('WbRouteReuseStrategy', () => {
     TestBed.get(Router).initialNavigation();
   }));
 
+  // TODO [Angular 9]:
+  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
+  // See Angular internal tests in `integration.spec.ts` file.
+  // tslint:disable-next-line:deprecation
   it('reuses activity routes', fakeAsync(inject([Router, NgModuleFactoryLoader, RouteReuseStrategy], (router: Router, loader: SpyNgModuleFactoryLoader, routeReuseStrategy: RouteReuseStrategy) => {
     loader.stubbedModules = {
-      './feature-a/feature-a.module#FeatureAModule': FeatureAModule,
-      './feature-b/feature-b.module#FeatureBModule': FeatureBModule,
+      './feature-a/feature-a.module': FeatureAModule,
+      './feature-b/feature-b.module': FeatureBModule,
     };
 
     // Configure to use reuse strategy
@@ -175,8 +179,8 @@ class App_Activity2_Component {
     RouterTestingModule.withRoutes([
       {path: 'app/activity-1', component: App_Activity1_Component},
       {path: 'app/activity-2', component: App_Activity2_Component},
-      {path: 'feature-a', loadChildren: './feature-a/feature-a.module#FeatureAModule'},
-      {path: 'feature-b', loadChildren: './feature-b/feature-b.module#FeatureBModule'},
+      {path: 'feature-a', loadChildren: './feature-a/feature-a.module'},
+      {path: 'feature-b', loadChildren: './feature-b/feature-b.module'},
     ]),
   ],
   declarations: [AppComponent, App_Activity1_Component, App_Activity2_Component],

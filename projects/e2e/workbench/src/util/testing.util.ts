@@ -1,4 +1,6 @@
-import { $, ElementFinder } from 'protractor';
+import { $, browser, ElementFinder, logging } from 'protractor';
+import Level = logging.Level;
+import Entry = logging.Entry;
 
 /**
  * Allows to check or uncheck a checkbox.
@@ -77,4 +79,14 @@ export async function expectActivityToShow(expected: { activityCssClass: string;
 export async function getCssClasses(elementFinder: ElementFinder): Promise<string[]> {
   const classAttr: string = await elementFinder.getAttribute('class');
   return classAttr.split(/\s+/);
+}
+
+export async function browserErrors(): Promise<Entry[]> {
+  const logs = await browser.manage().logs().get('browser');
+  return logs.filter(log => log.level === Level.SEVERE);
+}
+
+export async function hasBrowserError(error: string): Promise<boolean> {
+  const logs = await this.browserErrors();
+  return logs.some(log => log.message.includes(error));
 }

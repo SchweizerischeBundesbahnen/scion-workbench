@@ -45,7 +45,7 @@ export class ActivityOutletComponent implements OnDestroy {
   private _activity: Activity;
   private _actionDisposeMap = new Map<string, Disposable>();
 
-  @ViewChild(AppOutletDirective)
+  @ViewChild(AppOutletDirective, {static: true})
   public set setAppOutlet(appOutlet: AppOutletDirective) {
     this._appOutletResolveFn(appOutlet);
   }

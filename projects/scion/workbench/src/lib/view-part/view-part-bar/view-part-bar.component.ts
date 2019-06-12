@@ -40,8 +40,8 @@ export class ViewPartBarComponent implements OnDestroy {
       .subscribe(() => this.scrollActiveViewTabIntoViewport());
   }
 
-  @HostListener('dblclick')
-  public onDoubleClick(): void {
+  @HostListener('dblclick', ['$event'])
+  public onDoubleClick(event: MouseEvent): void {
     this._workbenchLayout.toggleMaximized(false);
     event.stopPropagation();
   }

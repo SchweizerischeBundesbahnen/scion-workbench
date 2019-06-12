@@ -31,7 +31,7 @@ export class ContactActivityComponent implements OnDestroy {
   public contacts$: Observable<Contact[]>;
 
   constructor(private _contactService: ContactService) {
-    this.contacts$ = combineLatest(this._filter$, this._contactService.contacts$()).pipe(filterContacts());
+    this.contacts$ = combineLatest([this._filter$, this._contactService.contacts$()]).pipe(filterContacts());
   }
 
   public onDelete(contactId: string): void {

@@ -24,7 +24,7 @@ SCION Workbench helps to develop a SPA (Single Page Application) based on Angula
 
 [link-getting-started]:/resources/site/getting-started/workbench/getting-started.md
 [link-how-to]: /resources/site/how-to/workbench/how-to.md
-[link-demo]: https://schweizerischebundesbahnen.github.io/scion-workbench-demo/#/(view.6:heatmap//view.5:person/79//view.4:person/39//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuNiIsInZpZXcuNiJdLCJzYXNoMiI6WyJ2aWV3cGFydC4zIiwidmlldy40Iiwidmlldy40Iiwidmlldy41Il0sInNwbGl0dGVyIjowLjQ4NTk2MTEyMzExMDE1MTEsImhzcGxpdCI6ZmFsc2V9LCJzcGxpdHRlciI6MC41NTk0MjQzMjY4MzM3OTc1LCJoc3BsaXQiOnRydWV9LCJzcGxpdHRlciI6MC4zMjI2Mjc3MzcyMjYyNzczLCJoc3BsaXQiOmZhbHNlfQ%3D%3D
+[link-demo]: https://schweizerischebundesbahnen.github.io/scion-workbench-demo/#/(view.24:person/64//view.22:person/32//view.5:person/79//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuMjQiLCJ2aWV3LjI0Il0sInNhc2gyIjpbInZpZXdwYXJ0LjMiLCJ2aWV3LjIyIiwidmlldy41Iiwidmlldy4yMiJdLCJzcGxpdHRlciI6MC41MTk0Mzg0NDQ5MjQ0MDY2LCJoc3BsaXQiOmZhbHNlfSwic3BsaXR0ZXIiOjAuNTU5NDI0MzI2ODMzNzk3NSwiaHNwbGl0Ijp0cnVlfSwic3BsaXR0ZXIiOjAuMzIyNjI3NzM3MjI2Mjc3MywiaHNwbGl0IjpmYWxzZX0%3D
 
 [menu-overview]: /README.md
 [menu-workbench]: /resources/site/workbench.md

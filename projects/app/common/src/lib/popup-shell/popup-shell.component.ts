@@ -50,10 +50,10 @@ export class SciPopupShellComponent implements AfterViewInit {
   @Input()
   public valid: boolean;
 
-  @ContentChild(SciPopupShellTitleDirective)
+  @ContentChild(SciPopupShellTitleDirective, {static: false})
   public title: SciPopupShellTitleDirective;
 
-  @ContentChild(SciPopupShellContentDirective)
+  @ContentChild(SciPopupShellContentDirective, {static: false})
   public content: SciPopupShellContentDirective;
 
   @ContentChildren(SciPopupShellButtonDirective)

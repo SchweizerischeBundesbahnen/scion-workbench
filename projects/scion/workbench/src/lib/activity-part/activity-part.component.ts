@@ -55,10 +55,10 @@ export class ActivityPartComponent {
   private _panelWidth = PANEL_INITIAL_WIDTH;
   private _panelWidth$ = new Subject<number>();
 
-  @ViewChild('viewport')
+  @ViewChild('viewport', {static: false})
   public viewport: ElementRef;
 
-  @ViewChild('panel', {read: ElementRef})
+  @ViewChild('panel', {read: ElementRef, static: false})
   private _panelElementRef: ElementRef;
 
   @HostBinding('attr.content-projection')

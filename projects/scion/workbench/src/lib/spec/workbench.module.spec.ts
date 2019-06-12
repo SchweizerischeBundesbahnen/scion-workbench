@@ -20,14 +20,18 @@ describe('WorkbenchModule', () => {
     TestBed.configureTestingModule({
       imports: [
         WorkbenchModule.forRoot(),
-        RouterTestingModule.withRoutes([{path: 'lazy-module-forroot', loadChildren: './lazy-forroot.module#LazyForRootModule'}]),
-        RouterTestingModule.withRoutes([{path: 'lazy-module-forchild', loadChildren: './lazy-forchild.module#LazyForChildModule'}]),
+        RouterTestingModule.withRoutes([{path: 'lazy-module-forroot', loadChildren: './lazy-forroot.module'}]),
+        RouterTestingModule.withRoutes([{path: 'lazy-module-forchild', loadChildren: './lazy-forchild.module'}]),
       ],
     });
   });
 
+  // TODO [Angular 9]:
+  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
+  // See Angular internal tests in `integration.spec.ts` file.
+  // tslint:disable-next-line:deprecation
   it('throws an error when forRoot() is used in a lazy context', fakeAsync(inject([Router, NgModuleFactoryLoader], async (router: Router, loader: SpyNgModuleFactoryLoader) => {
-    // Use forRoot() in a lazy context
+    // Use forRoot() in a lazy context (illegal)
     @NgModule({
       imports: [
         WorkbenchModule.forRoot(),
@@ -46,8 +50,8 @@ describe('WorkbenchModule', () => {
     }
 
     loader.stubbedModules = {
-      './lazy-forroot.module#LazyForRootModule': LazyForRootModule,
-      './lazy-forchild.module#LazyForChildModule': LazyForChildModule,
+      './lazy-forroot.module': LazyForRootModule,
+      './lazy-forchild.module': LazyForChildModule,
     };
 
     // Navigate to LazyForRootModule

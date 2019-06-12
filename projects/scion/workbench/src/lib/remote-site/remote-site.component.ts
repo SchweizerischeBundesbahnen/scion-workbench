@@ -122,7 +122,7 @@ export class RemoteSiteComponent implements OnDestroy {
   @Output()
   public synthEscape = new EventEmitter<void>();
 
-  @ViewChild('iframe')
+  @ViewChild('iframe', {static: true})
   public set setIframe(iframe: ElementRef<HTMLIFrameElement>) {
     this._whenIframeResolveFn(iframe.nativeElement);
   }
@@ -182,7 +182,7 @@ export class RemoteSiteComponent implements OnDestroy {
     // Otherwise, view drag and view sash operation does not work as expected.
     merge(this._workbenchLayout.viewSashDrag$, this._workbenchLayout.viewTabDrag$, this._workbenchLayout.messageBoxMove$)
       .pipe(
-        bufferUntil(from<HTMLIFrameElement>(this._whenIframe)),
+        bufferUntil(from(this._whenIframe)),
         takeUntil(this._destroy$))
       .subscribe(([event, iframe]: ['start' | 'end', HTMLIFrameElement]) => {
         if (event === 'start') {
@@ -243,7 +243,7 @@ export class RemoteSiteComponent implements OnDestroy {
  * Returns an Observables which combines the latest values from the source Observable and the closing notifier.
  */
 function bufferUntil<T, CN>(closingNotifier$: Observable<CN>): OperatorFunction<T, [T, CN]> {
-  return mergeMap((item: T) => combineLatest(of(item), closingNotifier$));
+  return mergeMap((item: T) => combineLatest([of(item), closingNotifier$]));
 }
 
 /**

@@ -47,7 +47,7 @@ import { CdkAccordionItem } from '@angular/cdk/accordion';
 })
 export class SciAccordionComponent {
 
-  @ViewChild(SciViewportComponent)
+  @ViewChild(SciViewportComponent, {static: true})
   private _viewport: SciViewportComponent;
 
   @ContentChildren(SciAccordionItemDirective)

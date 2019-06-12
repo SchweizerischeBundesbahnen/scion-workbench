@@ -38,7 +38,7 @@ export class SciFilterFieldComponent implements OnDestroy {
   @Output()
   public filter = new EventEmitter<string>();
 
-  @ViewChild('input')
+  @ViewChild('input', {static: true})
   private _inputElement: ElementRef<HTMLInputElement>;
 
   @HostBinding('attr.tabindex')

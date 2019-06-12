@@ -9,7 +9,7 @@
  */
 
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
-import { NgModule } from '@angular/core';
+import { NgModule, Type } from '@angular/core';
 import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
 import { WorkbenchModule } from '../workbench.module';
 import { WorkbenchService } from '../workbench.service';
@@ -140,7 +140,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).toBeFalsy('(H)');
 
     // Switch to View 1
-    TestBed.get(WorkbenchService).activateView('view.1').then();
+    getWorkbenchService().activateView('view.1').then();
     advance(fixture);
 
     view1DebugElement.component.checked = false;
@@ -156,7 +156,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.2').component.destroyed).toBeFalsy('(N)');
 
     // Switch to View 2
-    TestBed.get(WorkbenchService).activateView('view.2').then();
+    getWorkbenchService().activateView('view.2').then();
     advance(fixture);
 
     view1DebugElement.component.checked = false;
@@ -196,7 +196,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.activated).toBeTruthy('(F)');
 
     // Switch to View 1
-    TestBed.get(WorkbenchService).activateView('view.1').then();
+    getWorkbenchService().activateView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.active).toBeTruthy('(G)');
@@ -205,7 +205,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.activated).toBeFalsy('(J)');
 
     // Switch to View 2
-    TestBed.get(WorkbenchService).activateView('view.2').then();
+    getWorkbenchService().activateView('view.2').then();
     advance(fixture);
 
     expect(view1DebugElement.view.active).toBeFalsy('(K)');
@@ -238,7 +238,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.destroyed).toBeFalsy('(F)');
 
     // Destroy to View 2
-    TestBed.get(WorkbenchService).destroyView('view.2').then();
+    getWorkbenchService().destroyView('view.2').then();
     advance(fixture);
     expect(view1DebugElement.view.destroyed).toBeFalsy('(G)');
     expect(view1DebugElement.component.destroyed).toBeFalsy('(H)');
@@ -246,7 +246,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.destroyed).toBeTruthy('(J)');
 
     // Destroy to View 1
-    TestBed.get(WorkbenchService).destroyView('view.1').then();
+    getWorkbenchService().destroyView('view.1').then();
     advance(fixture);
     expect(view1DebugElement.view.destroyed).toBeTruthy('(K)');
     expect(view1DebugElement.component.destroyed).toBeTruthy('(L)');
@@ -271,7 +271,7 @@ describe('ViewComponent', () => {
 
     // Try destroy to View 1 (prevent)
     view1DebugElement.component.preventDestroy = true;
-    TestBed.get(WorkbenchService).destroyView('view.1').then();
+    getWorkbenchService().destroyView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.destroyed).toBeFalsy('(A)');
@@ -280,7 +280,7 @@ describe('ViewComponent', () => {
 
     // Try destroy to View 1 (accept)
     view1DebugElement.component.preventDestroy = false;
-    TestBed.get(WorkbenchService).destroyView('view.1').then();
+    getWorkbenchService().destroyView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.destroyed).toBeTruthy('(D)');
@@ -389,4 +389,9 @@ describe('ViewComponent', () => {
   ],
 })
 class AppTestModule {
+}
+
+function getWorkbenchService(): WorkbenchService {
+  // TODO [Angular 9]: remove type cast for abstract symbols once the following issue is fixed: https://github.com/angular/angular/issues/29905
+  return TestBed.get(WorkbenchService as Type<WorkbenchService>);
 }

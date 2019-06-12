@@ -38,7 +38,7 @@ export class SciScrollbarComponent implements OnChanges, OnDestroy {
   public thumbSizeFr: number;
   public thumbPositionFr: number;
 
-  @ViewChild('thumb_handle')
+  @ViewChild('thumb_handle', {static: true})
   public thumbElement: ElementRef<HTMLDivElement>;
 
   @HostBinding('class.overflow')

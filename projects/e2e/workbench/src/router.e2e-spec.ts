@@ -11,6 +11,7 @@
 import { AppPO } from './page-object/app.po';
 import { ViewNavigationPO } from './page-object/view-navigation.po';
 import { browser } from 'protractor';
+import { browserErrors } from './util/testing.util';
 
 describe('Workbench Router', () => {
 
@@ -137,7 +138,7 @@ describe('Workbench Router', () => {
     await expect(appPO.findViewTab('e2e-view-2').isActive()).toBeTruthy();
     await expect(appPO.findViewTab('e2e-view-2').getTitle()).toEqual('view-2-title');
 
-    await expect((await browser.manage().logs().get('browser')).length).toEqual(0);
+    await expect((await browserErrors())).toEqual([]);
   });
 
   it('should not throw outlet activation error when opening a new view tab once a view tab was closed', async () => {
@@ -155,13 +156,13 @@ describe('Workbench Router', () => {
     await appPO.openNewViewTab();
     await expect(appPO.getViewTabCount('e2e-welcome-page')).toEqual(1);
     // expect no error to be thrown
-    await expect(browser.manage().logs().get('browser')).toEqual([]);
+    await expect((await browserErrors())).toEqual([]);
 
     // open view tab
     await appPO.openNewViewTab();
     await expect(appPO.getViewTabCount('e2e-welcome-page')).toEqual(2);
     // expect no error to be thrown
-    await expect(browser.manage().logs().get('browser')).toEqual([]);
+    await expect((await browserErrors())).toEqual([]);
   });
 
   it('should close all views in a row', async () => {
@@ -184,6 +185,6 @@ describe('Workbench Router', () => {
     await expect(appPO.getViewTabCount()).toEqual(0);
 
     // expect no error to be thrown
-    await expect(browser.manage().logs().get('browser')).toEqual([]);
+    await expect((await browserErrors())).toEqual([]);
   });
 });

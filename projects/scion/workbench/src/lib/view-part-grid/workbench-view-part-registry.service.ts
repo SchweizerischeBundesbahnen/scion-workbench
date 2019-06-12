@@ -16,6 +16,7 @@ import { InternalWorkbenchViewPart, WorkbenchViewPart } from '../workbench.model
 import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { VIEW_PART_COMPONENT_TYPE } from '../workbench.constants';
+import { filter } from 'rxjs/operators';
 
 /**
  * Registry for {WorkbenchViewPart} objects.
@@ -86,10 +87,10 @@ export class WorkbenchViewPartRegistry {
   /**
    * Emits the viewpart grid.
    *
-   * Upon subscription, the current grid is emitted, or `null` if not set yet, and then emits continuously when the grid changes. It never completes.
+   * Upon subscription, the current grid is emitted, if any, and then emits continuously when the grid changes. It never completes.
    */
   public get grid$(): Observable<ViewPartGrid> {
-    return this._grid$;
+    return this._grid$.pipe(filter(Boolean));
   }
 
   private createWorkbenchViewPart(viewPartRef: string): InternalWorkbenchViewPart {

@@ -46,8 +46,10 @@ We would like to thank SBB which supports open source software and made SCION Wo
 ### Disclaimer
 As for now, the SCION Workbench and the SCION Workbench Application Platform are exclusively optimized and tested on the latest Google Chrome Release. Nevertheless, most things should work fine on other modern browsers like Firefox or Microsoft Edge. We are planning to support and test more browsers in the future.
 
-## Current Project Version
+## Current Version
 [![Project version](https://img.shields.io/npm/v/@scion/workbench.svg)][menu-download] [![Project version](https://img.shields.io/npm/v/@scion/workbench/next.svg)][menu-download]
+
+SCION Workbench `v0.0.0-beta.23` and newer is only compatible with Angular version 8.x.
 
 [menu-download]: https://www.npmjs.com/package/@scion/workbench
 

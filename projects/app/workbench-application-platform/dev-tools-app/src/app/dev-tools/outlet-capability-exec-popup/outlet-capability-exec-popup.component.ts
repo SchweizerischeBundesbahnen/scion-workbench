@@ -93,7 +93,7 @@ export class OutletCapabilityExecPopupComponent implements OnDestroy {
     focusTrap.focusInitialElementWhenReady().finally(() => focusTrap.destroy());
   }
 
-  public onExecute(): void {
+  public onExecute(event: MouseEvent): void {
     const qualifier: Qualifier = SciParamsEnterComponent.toParams(this.form.get(QUALIFIER) as FormArray);
     const queryParams: Params = SciParamsEnterComponent.toParams(this.form.get(QUERY_PARAMS) as FormArray);
     const matrixParams: Params = SciParamsEnterComponent.toParams(this.form.get(MATRIX_PARAMS) as FormArray);

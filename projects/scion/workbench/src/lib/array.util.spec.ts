@@ -10,7 +10,7 @@
 
 import { Arrays } from './array.util';
 
-fdescribe('Arrays', () => {
+describe('Arrays', () => {
 
   describe('Arrays.equal', () => {
 

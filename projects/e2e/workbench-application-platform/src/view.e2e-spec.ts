@@ -137,7 +137,7 @@ describe('View', () => {
       await expectViewToNotExist({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-0c4fe9e3'});
     });
 
-    // // TODO testcase not working because routing bug
+    // // TODO testcase not working because of a routing bug
     // // TODO dwie add issue number
     // // TODO see https://github.com/angular/angular/pull/25740
     // // TODO `First, we will no longer have multiple navigations running at the same time.`

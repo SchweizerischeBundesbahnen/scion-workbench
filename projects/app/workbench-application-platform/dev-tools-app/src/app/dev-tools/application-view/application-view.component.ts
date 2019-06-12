@@ -37,7 +37,7 @@ export class ApplicationViewComponent implements OnDestroy {
   private _capabilityFilter$ = new BehaviorSubject<string>(null);
   private _intentFilter$ = new BehaviorSubject<string>(null);
 
-  @ViewChild('sashbox')
+  @ViewChild('sashbox', {static: true})
   private _sashbox: ElementRef<HTMLElement>;
 
   constructor(route: ActivatedRoute,
@@ -65,8 +65,8 @@ export class ApplicationViewComponent implements OnDestroy {
         view.heading = 'Application Manifest';
 
         this.manifest = manifest;
-        this.capabilities$ = combineLatest(this._capabilityFilter$, of(capabilities)).pipe(filterCapabilities());
-        this.intents$ = combineLatest(this._intentFilter$, of(intents)).pipe(filterIntents());
+        this.capabilities$ = combineLatest([this._capabilityFilter$, of(capabilities)]).pipe(filterCapabilities());
+        this.intents$ = combineLatest([this._intentFilter$, of(intents)]).pipe(filterIntents());
       });
   }
 

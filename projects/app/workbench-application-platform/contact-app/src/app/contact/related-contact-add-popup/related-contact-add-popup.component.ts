@@ -35,7 +35,7 @@ export class RelatedContactAddPopupComponent implements OnDestroy {
   constructor(private _route: ActivatedRoute,
               private _popup: WorkbenchPopup,
               private _contactService: ContactService) {
-    this.contacts$ = combineLatest(this._filter$, this._contactService.contacts$()).pipe(filterContacts());
+    this.contacts$ = combineLatest([this._filter$, this._contactService.contacts$()]).pipe(filterContacts());
   }
 
   public onOption(relatedContactId: string): void {
