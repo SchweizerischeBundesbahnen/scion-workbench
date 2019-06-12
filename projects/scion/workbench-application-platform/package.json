@@ -20,10 +20,10 @@
     "@scion/workbench-application-platform.api": "0.0.0-beta.22"
   },
   "peerDependencies": {
-    "@angular/common": "^7.0.0-rc.0 || ^7.0.0 || ^8.0.0-rc.0 || ^8.0.0",
-    "@angular/core": "^7.0.0-rc.0 || ^7.0.0 || ^8.0.0-rc.0 || ^8.0.0",
-    "@angular/cdk": "^7.0.0-rc.0 || ^7.0.0 || ^8.0.0-rc.0 || ^8.0.0",
-    "@angular/router": "^7.0.0-rc.0 || ^7.0.0 || ^8.0.0-rc.0 || ^8.0.0",
+    "@angular/common": "^8.0.0-rc.0 || ^8.0.0",
+    "@angular/core": "^8.0.0-rc.0 || ^8.0.0",
+    "@angular/cdk": "^8.0.0-rc.0 || ^8.0.0",
+    "@angular/router": "^8.0.0-rc.0 || ^8.0.0",
     "@scion/workbench": "0.0.0-beta.22",
     "rxjs": "^6.0.0"
   },
