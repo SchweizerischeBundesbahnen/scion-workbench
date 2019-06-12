@@ -25,12 +25,12 @@ export class WorkbenchComponent {
 
   public activitiesVisible$: Observable<boolean>;
 
-  @ViewChild('overlay_host', {read: ViewContainerRef})
+  @ViewChild('overlay_host', {read: ViewContainerRef, static: true})
   public set overlayHost(overlayHost: ViewContainerRef) {
     this._overlayHostRef.set(overlayHost);
   }
 
-  @ViewChild('content_host', {read: ViewContainerRef})
+  @ViewChild('content_host', {read: ViewContainerRef, static: true})
   public set contentHost(contentHost: ViewContainerRef) {
     this._contentHostRef.set(contentHost);
   }

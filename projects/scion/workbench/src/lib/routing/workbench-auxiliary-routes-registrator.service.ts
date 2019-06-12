@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Data, PRIMARY_OUTLET, Router, Routes } from '@angular/router';
+import { Data, PRIMARY_OUTLET, ResolveData, Router, Routes } from '@angular/router';
 import { ActivityResolver } from './activity.resolver';
 import { ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME } from '../workbench.constants';
 import { EmptyOutletComponent } from './empty-outlet.component';
 import { WbBeforeDestroyGuard } from '../view/wb-before-destroy.guard';
-import { ResolveData } from '@angular/router/src/config';
 
 /**
  * Registers auxiliary routes for views and activities.

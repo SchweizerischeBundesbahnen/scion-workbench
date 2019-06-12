@@ -4,9 +4,9 @@
   "newProjectRoot": "projects",
   "projects": {
     "@scion/workbench": {
+      "projectType": "library",
       "root": "projects/scion/workbench",
       "sourceRoot": "projects/scion/workbench/src",
-      "projectType": "library",
       "prefix": "wb",
       "architect": {
         "build": {
@@ -42,9 +42,9 @@
       }
     },
     "@scion/workbench-application-platform": {
+      "projectType": "library",
       "root": "projects/scion/workbench-application-platform",
       "sourceRoot": "projects/scion/workbench-application-platform/src",
-      "projectType": "library",
       "prefix": "wap",
       "architect": {
         "build": {
@@ -80,9 +80,9 @@
       }
     },
     "@scion/workbench-application-platform.api": {
+      "projectType": "library",
       "root": "projects/scion/workbench-application-platform.api",
       "sourceRoot": "projects/scion/workbench-application-platform.api/src",
-      "projectType": "library",
       "prefix": "",
       "architect": {
         "build": {
@@ -109,9 +109,9 @@
       }
     },
     "@scion/workbench-application.core": {
+      "projectType": "library",
       "root": "projects/scion/workbench-application.core",
       "sourceRoot": "projects/scion/workbench-application.core/src",
-      "projectType": "library",
       "prefix": "",
       "architect": {
         "build": {
@@ -147,9 +147,9 @@
       }
     },
     "@scion/workbench-application.angular": {
+      "projectType": "library",
       "root": "projects/scion/workbench-application.angular",
       "sourceRoot": "projects/scion/workbench-application.angular/src",
-      "projectType": "library",
       "prefix": "wb",
       "architect": {
         "build": {
@@ -185,9 +185,9 @@
       }
     },
     "@scion/mouse-dispatcher": {
+      "projectType": "library",
       "root": "projects/scion/mouse-dispatcher",
       "sourceRoot": "projects/scion/mouse-dispatcher/src",
-      "projectType": "library",
       "prefix": "sci",
       "architect": {
         "build": {
@@ -223,9 +223,9 @@
       }
     },
     "@scion/dimension": {
+      "projectType": "library",
       "root": "projects/scion/dimension",
       "sourceRoot": "projects/scion/dimension/src",
-      "projectType": "library",
       "prefix": "sci",
       "architect": {
         "build": {
@@ -261,9 +261,9 @@
       }
     },
     "@scion/viewport": {
+      "projectType": "library",
       "root": "projects/scion/viewport",
       "sourceRoot": "projects/scion/viewport/src",
-      "projectType": "library",
       "prefix": "sci",
       "architect": {
         "build": {
@@ -299,9 +299,9 @@
       }
     },
     "app/common": {
+      "projectType": "library",
       "root": "projects/app/common",
       "sourceRoot": "projects/app/common/src",
-      "projectType": "library",
       "prefix": "sci",
       "architect": {
         "build": {
@@ -328,8 +328,8 @@
       }
     },
     "e2e/workbench-application-platform": {
-      "root": "projects/e2e/workbench-application-platform",
       "projectType": "application",
+      "root": "projects/e2e/workbench-application-platform",
       "prefix": "",
       "architect": {
         "e2e": {
@@ -353,9 +353,9 @@
       }
     },
     "app/workbench-application-platform/host-app": {
+      "projectType": "application",
       "root": "projects/app/workbench-application-platform/host-app",
       "sourceRoot": "projects/app/workbench-application-platform/host-app/src",
-      "projectType": "application",
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
@@ -371,6 +371,7 @@
             "main": "projects/app/workbench-application-platform/host-app/src/main.ts",
             "polyfills": "projects/app/workbench-application-platform/host-app/src/polyfills.ts",
             "tsConfig": "projects/app/workbench-application-platform/host-app/tsconfig.app.json",
+            "aot": true,
             "assets": [
               "projects/app/workbench-application-platform/host-app/src/assets",
               "projects/app/workbench-application-platform/host-app/src/now.json",
@@ -431,9 +432,9 @@
       }
     },
     "app/workbench-application-platform/contact-app": {
+      "projectType": "application",
       "root": "projects/app/workbench-application-platform/contact-app",
       "sourceRoot": "projects/app/workbench-application-platform/contact-app/src",
-      "projectType": "application",
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
@@ -508,9 +509,9 @@
       }
     },
     "app/workbench-application-platform/communication-app": {
+      "projectType": "application",
       "root": "projects/app/workbench-application-platform/communication-app",
       "sourceRoot": "projects/app/workbench-application-platform/communication-app/src",
-      "projectType": "application",
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
@@ -585,9 +586,9 @@
       }
     },
     "app/workbench-application-platform/dev-tools-app": {
+      "projectType": "application",
       "root": "projects/app/workbench-application-platform/dev-tools-app",
       "sourceRoot": "projects/app/workbench-application-platform/dev-tools-app/src",
-      "projectType": "application",
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
@@ -662,9 +663,9 @@
       }
     },
     "app/workbench-application-platform/testing-app": {
+      "projectType": "application",
       "root": "projects/app/workbench-application-platform/testing-app",
       "sourceRoot": "projects/app/workbench-application-platform/testing-app/src",
-      "projectType": "application",
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
@@ -738,9 +739,9 @@
       }
     },
     "app/workbench/workbench-app": {
+      "projectType": "application",
       "root": "projects/app/workbench/workbench-app",
       "sourceRoot": "projects/app/workbench/workbench-app/src",
-      "projectType": "application",
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
@@ -801,6 +802,19 @@
             }
           }
         },
+        "serve-aot": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "app/workbench/workbench-app:build",
+            "aot": true,
+            "progress": false
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "app/workbench/workbench-app:build:production"
+            }
+          }
+        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -815,15 +829,15 @@
       }
     },
     "e2e/workbench": {
-      "root": "projects/e2e/workbench",
       "projectType": "application",
+      "root": "projects/e2e/workbench",
       "prefix": "",
       "architect": {
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "projects/e2e/workbench/protractor.conf.js",
-            "devServerTarget": "app/workbench/workbench-app:serve"
+            "devServerTarget": "app/workbench/workbench-app:serve-aot"
           },
           "configurations": {
             "production": {

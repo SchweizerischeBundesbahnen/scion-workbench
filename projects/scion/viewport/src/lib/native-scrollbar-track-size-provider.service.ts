@@ -93,7 +93,7 @@ export class SciNativeScrollbarTrackSizeProvider implements OnDestroy {
       fromEvent(window, 'resize')
         .pipe(
           debounceTime(5),
-          startWith(null), // trigger the initial computation
+          startWith(null as number), // trigger the initial computation
           map((): NativeScrollbarTrackSize => this.computeTrackSize()),
           distinctUntilChanged((t1: NativeScrollbarTrackSize, t2: NativeScrollbarTrackSize) => JSON.stringify(t1) === JSON.stringify(t2)),
           takeUntil(this._destroy$),

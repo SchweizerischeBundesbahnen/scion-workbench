@@ -26,7 +26,7 @@ export class ApplicationListComponent {
   public manifests$: Observable<Manifest[]>;
 
   constructor(private _manifestRegistryService: ManifestRegistryService) {
-    this.manifests$ = combineLatest(this._filter$, this._manifestRegistryService.manifests$)
+    this.manifests$ = combineLatest([this._filter$, this._manifestRegistryService.manifests$])
       .pipe(
         filterManifests(),
         sortManifests(),

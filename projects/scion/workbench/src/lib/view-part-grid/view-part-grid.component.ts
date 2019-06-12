@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { WorkbenchViewPartRegistry } from './workbench-view-part-registry.service';
 import { VIEW_PART_REF_INDEX, ViewPartInfoArray, ViewPartSashBox } from './view-part-grid-serializer.service';
 import { ViewPartComponent } from '../view-part/view-part.component';
 import { noop, Subject } from 'rxjs';
-import { pairwise, takeUntil } from 'rxjs/operators';
+import { pairwise, startWith, takeUntil } from 'rxjs/operators';
 import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
 
 /**
@@ -28,7 +28,7 @@ import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
   templateUrl: './view-part-grid.component.html',
   styleUrls: ['./view-part-grid.component.scss'],
 })
-export class ViewPartGridComponent implements OnDestroy {
+export class ViewPartGridComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
@@ -50,9 +50,13 @@ export class ViewPartGridComponent implements OnDestroy {
    */
   public sashBox: ViewPartSashBox;
 
-  constructor(private _viewPartRegistry: WorkbenchViewPartRegistry, cd: ChangeDetectorRef) {
+  constructor(private _viewPartRegistry: WorkbenchViewPartRegistry, private _cd: ChangeDetectorRef) {
+  }
+
+  public ngOnInit(): void {
     this._viewPartRegistry.grid$
       .pipe(
+        startWith(null as ViewPartGrid), // start with a null grid to initialize the 'pairwise' operator, so it emits once the grid is set.
         pairwise(),
         takeUntil(this._destroy$),
       )
@@ -67,7 +71,7 @@ export class ViewPartGridComponent implements OnDestroy {
         this.viewPartPortal = Array.isArray(this.root) ? this._viewPartRegistry.getElseThrow(this.root[VIEW_PART_REF_INDEX]).portal : null;
 
         // Trigger a change detection cycle to flush the new grid to the DOM.
-        cd.detectChanges();
+        this._cd.detectChanges();
 
         // Re-attach detached portals.
         reattachFn();

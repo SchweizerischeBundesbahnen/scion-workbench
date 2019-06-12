@@ -67,10 +67,14 @@ describe('Router', () => {
     TestBed.get(Router).initialNavigation();
   }));
 
+  // TODO [Angular 9]:
+  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
+  // See Angular internal tests in `integration.spec.ts` file.
+  // tslint:disable-next-line:deprecation
   it('allows for relative and absolute navigation', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
     loader.stubbedModules = {
-      './feature-a/feature-a.module#FeatureAModule': FeatureAModule,
-      './feature-b/feature-b.module#FeatureBModule': FeatureBModule,
+      './feature-a/feature-a.module': FeatureAModule,
+      './feature-b/feature-b.module': FeatureBModule,
     };
 
     const fixture = TestBed.createComponent(AppComponent);
@@ -244,10 +248,14 @@ describe('Router', () => {
     tick();
   })));
 
+  // TODO [Angular 9]:
+  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
+  // See Angular internal tests in `integration.spec.ts` file.
+  // tslint:disable-next-line:deprecation
   it('allows to close views', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
     loader.stubbedModules = {
-      './feature-a/feature-a.module#FeatureAModule': FeatureAModule,
-      './feature-b/feature-b.module#FeatureBModule': FeatureBModule,
+      './feature-a/feature-a.module': FeatureAModule,
+      './feature-b/feature-b.module': FeatureBModule,
     };
 
     const fixture = TestBed.createComponent(AppComponent);
@@ -301,7 +309,7 @@ class AppComponent {
     WorkbenchModule.forRoot(),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
-      {path: 'feature-a', loadChildren: './feature-a/feature-a.module#FeatureAModule'},
+      {path: 'feature-a', loadChildren: './feature-a/feature-a.module'},
     ]),
   ],
   declarations: [AppComponent],
@@ -373,7 +381,7 @@ class FeatureA_View2Component {
       {path: '', component: FeatureA_EntryComponent},
       {path: 'view-1', component: FeatureA_View1Component},
       {path: 'view-2', component: FeatureA_View2Component},
-      {path: 'feature-b', loadChildren: './feature-b/feature-b.module#FeatureBModule'},
+      {path: 'feature-b', loadChildren: './feature-b/feature-b.module'},
     ]),
   ],
   declarations: [FeatureA_EntryComponent, FeatureA_View1Component, FeatureA_View2Component],

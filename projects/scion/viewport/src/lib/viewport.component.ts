@@ -48,7 +48,7 @@ export class SciViewportComponent implements DoCheck {
   /**
    * @internal
    */
-  @ViewChild('viewport')
+  @ViewChild('viewport', {static: true})
   public set setViewport(viewport: ElementRef<HTMLDivElement>) {
     this._viewport = viewport.nativeElement;
   }

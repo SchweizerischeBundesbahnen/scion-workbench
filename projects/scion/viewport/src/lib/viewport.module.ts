@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { SciViewportComponent } from './viewport.component';
 import { SciScrollbarComponent } from './scrollbar/scrollbar.component';
 import { SciScrollableDirective } from './scrollable.directive';
-import { ScrollDispatchModule } from '@angular/cdk/scrolling';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SciDimensionModule } from '@scion/dimension';
 
 /**
@@ -22,7 +22,7 @@ import { SciDimensionModule } from '@scion/dimension';
 @NgModule({
   imports: [
     CommonModule,
-    ScrollDispatchModule,
+    ScrollingModule,
     SciDimensionModule,
   ],
   declarations: [

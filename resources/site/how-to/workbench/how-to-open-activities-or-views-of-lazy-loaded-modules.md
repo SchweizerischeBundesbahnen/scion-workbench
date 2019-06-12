@@ -70,7 +70,7 @@ export class FeatureRoutingModule {
 const routes: Routes = [
   {
     path: 'feature', // base path to the feature module
-    loadChildren: './feature/feature.module#FeatureModule'
+    loadChildren: () => import('./feature/feature.module').then(m => m.FeatureModule)
   },      
 ];
 
@@ -81,7 +81,7 @@ const routes: Routes = [
 export class AppRoutingModule {
 }
 ```
-Notice that the lazy loading syntax uses loadChildren followed by a string that is the relative path to the module, a hash mark or #, and the module’s class name. It is important to pass a string instead of a symbol to not load the module eagerly.
+Notice that the lazy loading syntax uses loadChildren followed by the standard ES2015 dynamic import statement (since Angular 8).
 
 ### 5. Open activities or views of the feature module
 

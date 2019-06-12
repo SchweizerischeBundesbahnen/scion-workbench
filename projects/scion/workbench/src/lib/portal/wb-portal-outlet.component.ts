@@ -24,7 +24,7 @@ export class WbPortalOutletComponent implements AfterViewInit, OnDestroy {
   private _portalChange$ = new Subject<void>();
   private _destroy$ = new Subject<void>();
 
-  @ViewChild(TemplateRef, {read: ViewContainerRef})
+  @ViewChild(TemplateRef, {read: ViewContainerRef, static: true})
   private _viewContainerRef: ViewContainerRef;
 
   @Input('wbPortal') // tslint:disable-line:no-input-rename

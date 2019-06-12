@@ -39,10 +39,10 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  @ViewChild(SciViewportComponent)
+  @ViewChild(SciViewportComponent, {static: true})
   private _viewport: SciViewportComponent;
 
-  @ViewChild('router_outlet')
+  @ViewChild('router_outlet', {static: true})
   public routerOutlet: WbRouterOutletDirective; // specs
 
   @HostBinding('attr.id')

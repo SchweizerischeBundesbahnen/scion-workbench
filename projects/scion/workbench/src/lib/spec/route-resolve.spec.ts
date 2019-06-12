@@ -15,10 +15,10 @@ import { WorkbenchModule } from '../workbench.module';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
-import { WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
 import { InternalWorkbenchRouter, WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
+import { WorkbenchView } from '../workbench.model';
 
 describe('WbRouter', () => {
 
@@ -38,28 +38,61 @@ describe('WbRouter', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['path', 'to', 'view-1', {[WB_VIEW_TITLE_PARAM]: 'view-1 (A)'}], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['path', 'to', 'view-1'], {blankViewPartRef: 'viewpart.1'}).then();
     advance(fixture);
 
     // Add View 1 again
-    wbRouter.navigate(['path', 'to', 'view-1', {[WB_VIEW_TITLE_PARAM]: 'view-1 (B)'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: false}).then();
+    wbRouter.navigate(['path', 'to', 'view-1'], {blankViewPartRef: 'viewpart.1', activateIfPresent: false}).then();
     advance(fixture);
 
     // Add View 2
-    wbRouter.navigate(['path', 'to', 'view-2', {[WB_VIEW_TITLE_PARAM]: 'view-2 (A)'}], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['path', 'to', 'view-2'], {blankViewPartRef: 'viewpart.1'}).then();
     advance(fixture);
 
     // Add View 2 again (activate)
-    wbRouter.navigate(['path', 'to', 'view-2', {[WB_VIEW_TITLE_PARAM]: 'view-1 (B)'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
+    wbRouter.navigate(['path', 'to', 'view-2'], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
     advance(fixture);
 
     // Add View 3
-    wbRouter.navigate(['path', 'to', 'view-3', {[WB_VIEW_TITLE_PARAM]: 'view-3'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
+    wbRouter.navigate(['path', 'to', 'view-3'], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
     advance(fixture);
 
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-1']).map(viewRef => viewRegistry.getElseThrow(viewRef).title).sort()).toEqual(['view-1 (A)', 'view-1 (B)'].sort());
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-2']).map(viewRef => viewRegistry.getElseThrow(viewRef).title)).toEqual(['view-2 (A)']);
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-3']).map(viewRef => viewRegistry.getElseThrow(viewRef).title)).toEqual(['view-3']);
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-1']).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-2'])).toEqual(['view.3']);
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-3'])).toEqual(['view.4']);
+
+    tick();
+  })));
+
+  it('resolves present views by path and matrix params', fakeAsync(inject([WorkbenchRouter, WorkbenchViewRegistry], (wbRouter: InternalWorkbenchRouter, viewRegistry: WorkbenchViewRegistry) => {
+    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View 1
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'A'}], {blankViewPartRef: 'viewpart.1'}).then();
+    advance(fixture);
+
+    // Add View 1 again
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'A'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: false}).then();
+    advance(fixture);
+
+    // Add View 2
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'B'}], {blankViewPartRef: 'viewpart.1'}).then();
+    advance(fixture);
+
+    // Add View 2 again (activate)
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'B'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
+    advance(fixture);
+
+    // Add View 3
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'C'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
+    advance(fixture);
+
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view'])).toEqual([]);
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'A'}]).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(['view.3'].sort());
+    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(['view.4'].sort());
 
     tick();
   })));
@@ -68,26 +101,22 @@ describe('WbRouter', () => {
 /****************************************************************************************************
  * Definition of App Test Module                                                                    *
  ****************************************************************************************************/
-@Component({selector: 'spec-view1', template: 'View 1'})
-class View1Component {
-}
+@Component({selector: 'spec-view', template: '{{view.viewRef}}'})
+class ViewComponent {
 
-@Component({selector: 'spec-view2', template: 'View 2'})
-class View2Component {
-}
-
-@Component({selector: 'spec-view3', template: 'View 3'})
-class View3Component {
+  constructor(public view: WorkbenchView) {
+  }
 }
 
 @NgModule({
-  declarations: [View1Component, View2Component, View3Component],
+  declarations: [ViewComponent],
   imports: [
     WorkbenchModule.forRoot(),
     RouterTestingModule.withRoutes([
-      {path: 'path/to/view-1', component: View1Component},
-      {path: 'path/to/view-2', component: View2Component},
-      {path: 'path/to/view-3', component: View3Component},
+      {path: 'path/to/view', component: ViewComponent},
+      {path: 'path/to/view-1', component: ViewComponent},
+      {path: 'path/to/view-2', component: ViewComponent},
+      {path: 'path/to/view-3', component: ViewComponent},
     ]),
   ],
 })

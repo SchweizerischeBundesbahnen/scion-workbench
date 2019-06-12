@@ -55,9 +55,13 @@ describe('Lazily loaded view', () => {
     TestBed.get(Router).initialNavigation();
   }));
 
+  // TODO [Angular 9]:
+  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
+  // See Angular internal tests in `integration.spec.ts` file.
+  // tslint:disable-next-line:deprecation
   it('should get services injected from its child injector', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
     loader.stubbedModules = {
-      './feature/feature.module#FeatureModule': FeatureModule,
+      './feature/feature.module': FeatureModule,
     };
 
     const fixture = TestBed.createComponent(AppComponent);
@@ -84,10 +88,15 @@ describe('Lazily loaded view', () => {
 
   /**
    * Verifies that a service provided in the lazily loaded module should be preferred over the service provided in the root module.
+   *
+   * TODO [Angular 9]:
+   * As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
+   * See Angular internal tests in `integration.spec.ts` file.
    */
+  // tslint:disable-next-line:deprecation
   it('should get services injected from its child injector prior to from the root injector', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
     loader.stubbedModules = {
-      './feature/feature.module#FeatureModule': FeatureModule,
+      './feature/feature.module': FeatureModule,
     };
 
     const fixture = TestBed.createComponent(AppComponent);
@@ -138,7 +147,7 @@ export class FeatureService {
     WorkbenchModule.forRoot(),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
-      {path: 'feature', loadChildren: './feature/feature.module#FeatureModule'},
+      {path: 'feature', loadChildren: './feature/feature.module'},
     ]),
   ],
   declarations: [AppComponent],

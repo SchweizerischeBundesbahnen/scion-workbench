@@ -28,8 +28,8 @@ export class ViewPartActionBarComponent {
   public endActions$: Observable<WorkbenchViewPartAction[]>;
 
   constructor(private _viewPart: WorkbenchViewPart, workbenchService: InternalWorkbenchService, viewPartService: WorkbenchViewPartService) {
-    this.startActions$ = combineLatest(this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewRef$).pipe(combineAndFilterViewPartActions('start'));
-    this.endActions$ = combineLatest(this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewRef$).pipe(combineAndFilterViewPartActions('end'));
+    this.startActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewRef$]).pipe(combineAndFilterViewPartActions('start'));
+    this.endActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewRef$]).pipe(combineAndFilterViewPartActions('end'));
   }
 
   public isTemplate(action: WorkbenchViewPartAction): boolean {

@@ -46,7 +46,7 @@ export class ViewOutletComponent implements OnDestroy, WbBeforeDestroy {
   public siteCssClasses: string[];
   public symbolicName: string;
 
-  @ViewChild(AppOutletDirective)
+  @ViewChild(AppOutletDirective, {static: false})
   public set setAppOutlet(appOutlet: AppOutletDirective) {
     appOutlet && this._appOutletResolveFn(appOutlet);
   }

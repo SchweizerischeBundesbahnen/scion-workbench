@@ -4,7 +4,7 @@ sudo: required
 dist: trusty
 language: node_js
 node_js:
-- '8'
+- '10.16.0'
 env:
   global:
   - BETA_RC_TAG_REGEX="^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
@@ -28,10 +28,10 @@ jobs:
     name: "builds all, tests all, deploys demo apps (if branch=master) to 'https://zeit.co/scion', publishes libraries to NPM (if branch=master AND if release tag)"
     script:
     - npm run build
-    - npm run test
+    - npm run test-headless
     - npm run app:common:build
-    - npm run app:workbench:e2e
-    - npm run app:workbench-application-platform:e2e
+    - npm run app:workbench:e2e-headless
+    - npm run app:workbench-application-platform:e2e-headless
     - npm run app:workbench-application-platform:build-now
     deploy:
       - provider: script

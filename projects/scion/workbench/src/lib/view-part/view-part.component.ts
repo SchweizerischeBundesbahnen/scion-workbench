@@ -41,7 +41,7 @@ export class ViewPartComponent implements OnDestroy {
   }
 
   constructor(viewPart: WorkbenchViewPart, private _workbench: InternalWorkbenchService, public viewPartService: WorkbenchViewPartService) {
-    combineLatest(this._workbench.viewPartActions$, viewPart.actions$, viewPart.viewRefs$)
+    combineLatest([this._workbench.viewPartActions$, viewPart.actions$, viewPart.viewRefs$])
       .pipe(takeUntil(this._destroy$))
       .subscribe(([globalActions, localActions, viewRefs]) => {
         this.hasViews = viewRefs.length > 0;

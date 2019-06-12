@@ -11,8 +11,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+// TODO [Angular 9]: Remove 'tslint:disable:typedef' as the import(...) restriction will be relaxed with the release of Ivy.
+// As of Angular 8 ngc (Angular compiler) does not allow to have a typedef in the arrow-call-signature.
+// Allowed syntax: https://github.com/angular/angular-cli/blob/a491b09800b493fe01301387fa9a025f7c7d4808/packages/ngtools/webpack/src/transformers/import_factory.ts#L104-L113
+// tslint:disable:typedef
 const routes: Routes = [
-  {path: 'dev-tools', loadChildren: './dev-tools/dev-tools.module#DevToolsModule'},
+  {path: 'dev-tools', loadChildren: () => import('./dev-tools/dev-tools.module').then(mod => mod.DevToolsModule)},
 ];
 
 @NgModule({
