@@ -36,7 +36,13 @@
  * Only required if AnimationBuilder is used within the application and using IE/Edge or Safari.
  * Standard animation support in Angular DOES NOT require any polyfills (as of Angular 6.0).
  */
-import 'web-animations-js';  // Run `npm install --save web-animations-js`.
+
+// TODO [Angular 8.X]:
+// Importing 'web-animations-js' polyfill currently breaks the app.
+// This problem is addressed in issue #152 and https://github.com/angular/angular-cli/issues/14518.
+// Once fixed, 'web-animations-js' polyfill can be imported.
+
+// import 'web-animations-js';  // Run `npm install --save web-animations-js`.
 
 /**
  * By default, zone.js will patch all possible macroTask and DomEvents
