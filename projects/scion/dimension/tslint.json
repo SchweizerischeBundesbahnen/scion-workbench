@@ -13,7 +13,8 @@
       true,
       "element",
       [
-        "sci"
+        "sci",
+        "spec"
       ],
       "kebab-case"
     ]

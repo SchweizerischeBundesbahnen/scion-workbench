@@ -1,14 +1,11 @@
 <!-- scrolltrack to move the viewport client upwards (paging) -->
-<div [style.flex-grow]="thumbPositionFr"
-     (mousedown)="onScrollTrackMouseDown($event, 'up')">
-</div>
+<div class="scrolltrack-start" (mousedown)="onScrollTrackMouseDown($event, 'up')"></div>
 
 <!-- scrollthumb -->
 <div #thumb_handle
      class="thumb-handle"
      [class.vertical]="vertical"
      [class.horizontal]="horizontal"
-     [style.flex-grow]="thumbSizeFr"
      (mousedown)="onMouseDown($event)"
      (touchstart)="onTouchStart($event)"
      (touchmove)="onTouchMove($event)"
@@ -21,6 +18,4 @@
 </div>
 
 <!-- scrolltrack to move the viewport client downwards (paging) -->
-<div [style.flex-grow]="1 - (thumbPositionFr + thumbSizeFr)"
-     (mousedown)="onScrollTrackMouseDown($event, 'down')">
-</div>
+<div class="scrolltrack-end" (mousedown)="onScrollTrackMouseDown($event, 'down')"></div>

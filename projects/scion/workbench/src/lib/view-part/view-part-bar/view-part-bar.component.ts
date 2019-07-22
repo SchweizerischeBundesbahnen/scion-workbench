@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostListener, OnDestroy, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { ViewTabComponent } from '../view-tab/view-tab.component';
 import { InternalWorkbenchService } from '../../workbench.service';
@@ -16,7 +16,6 @@ import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { SciDimension } from '@scion/dimension';
 
 @Component({
   selector: 'wb-view-part-bar',
@@ -29,6 +28,9 @@ export class ViewPartBarComponent implements OnDestroy {
 
   @ViewChildren(ViewTabComponent)
   private _viewTabs: QueryList<ViewTabComponent>;
+
+  @ViewChild('viewport_client', {static: true})
+  private _viewportClient: ElementRef<HTMLElement>;
 
   public viewTabsWidthPx: number;
 
@@ -65,8 +67,20 @@ export class ViewPartBarComponent implements OnDestroy {
     this.viewPartService.moveViewToThisViewPart(sourceViewRef).then();
   }
 
-  public onViewTabsDimensionChange(dimension: SciDimension): void {
-    this.viewTabsWidthPx = dimension.clientWidth;
+  public onViewportChange(): void {
+    this.layout();
+  }
+
+  public onViewportClientChange(): void {
+    this.layout();
+  }
+
+  public onScroll(): void {
+    this.layout();
+  }
+
+  private layout(): void {
+    this.viewTabsWidthPx = this._viewportClient.nativeElement.clientWidth;
 
     // Compute tabs which are not visible in the viewtabs viewport.
     this._viewTabs && this.viewPartService.setHiddenViewTabs(this._viewTabs
