@@ -12,4 +12,6 @@
  * Entry point for all public APIs of this package.
  */
 export { SciDimensionModule } from './lib/dimension.module';
-export * from './lib/dimension.directive';
+export { SciDimensionDirective } from './lib/dimension.directive';
+export { SciMutationService } from './lib/mutation.service';
+export { SciDimensionService, SciDimension } from './lib/dimension.service';

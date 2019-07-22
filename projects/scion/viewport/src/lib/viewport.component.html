@@ -2,11 +2,12 @@
 <div #viewport
      class="viewport"
      tabindex="-1"
-     sciDimension (sciDimensionChange)="onViewportDimensionChange($event)"
      sciScrollable [sciScrollableDisplayNativeScrollbar]="scrollbarStyle === 'native'"
      cdkScrollable
-     (scroll)="onScroll()">
-  <ng-content></ng-content>
+     (scroll)="onScroll($event)">
+  <div #viewport_client class="viewport-client">
+    <ng-content></ng-content>
+  </div>
 </div>
 
 <!-- render emulated scrollbars which sit on-top -->

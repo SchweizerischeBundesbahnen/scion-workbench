@@ -11,6 +11,8 @@ $thumb-color: rgb(78, 78, 78);
   display: flex;
   border: 2px solid transparent;
   box-sizing: border-box;
+  --thumbPositionFr: 0;
+  --thumbSizeFr: 0;
 
   &.vertical {
     flex-direction: column;
@@ -20,9 +22,14 @@ $thumb-color: rgb(78, 78, 78);
     flex-direction: row;
   }
 
+  > div.scrolltrack-start {
+    flex-grow: var(--thumbPositionFr)
+  }
+
   > div.thumb-handle {
     flex-basis: $thumb-base-height;
     display: flex;
+    flex-grow: var(--thumbSizeFr);
     align-items: center;
 
     &.vertical {
@@ -49,6 +56,10 @@ $thumb-color: rgb(78, 78, 78);
         height: $thumb-default-size;
       }
     }
+  }
+
+  > div.scrolltrack-end {
+    flex-grow: calc(1 - (var(--thumbPositionFr) + var(--thumbSizeFr)));
   }
 }
 

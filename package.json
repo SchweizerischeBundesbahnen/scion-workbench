@@ -31,6 +31,7 @@
     "test:workbench-application-platform": "ng test @scion/workbench-application-platform",
     "test:workbench-application.core": "ng test @scion/workbench-application.core",
     "test:workbench-application.angular": "ng test @scion/workbench-application.angular",
+    "test:dimension": "ng test @scion/dimension",
     "test:viewport": "ng test @scion/viewport",
 
     "lint": "run-p lint:*",

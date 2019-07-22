@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, DoCheck, ElementRef, EventEmitter, HostBinding, HostListener, Input, KeyValueDiffer, KeyValueDiffers, Output, ViewChild } from '@angular/core';
-import { NULL_DIMENSION, SciDimension } from '@scion/dimension';
+import { Component, ElementRef, EventEmitter, HostBinding, HostListener, Input, Output, ViewChild } from '@angular/core';
 import { SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-size-provider.service';
+import { coerceElement } from '@angular/cdk/coercion';
 
 /**
  * Represents a viewport with its `<ng-content>` used as its scrollable viewport client and
@@ -18,16 +18,18 @@ import { SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-si
  *
  * `ng-content` is added to a CSS grid container with a single column.
  *
- * You can override the following CSS properties:
+ * You can override the following CSS properties to control the grid:
  *  --grid-template-columns
  *  --grid-template-rows
+ *  --grid-auto-columns
+ *  --grid-auto-rows
  *  --gap
  *
  *
  * Example of how to control the CSS grid:
  *
  * sci-viewport {
- *   --grid-template-columns: auto auto; // 2-column grid
+ *   --grid-auto-rows: min-content;
  *   --gap: .5em; // specifies the row and column gap
  * }
  */
@@ -36,11 +38,10 @@ import { SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-si
   templateUrl: './viewport.component.html',
   styleUrls: ['./viewport.component.scss'],
 })
-export class SciViewportComponent implements DoCheck {
+export class SciViewportComponent {
 
   private _viewport: HTMLDivElement;
-  private _viewportDimension: SciDimension = NULL_DIMENSION;
-  private _viewportClientDiffer: KeyValueDiffer<string, any>;
+  private _viewportClient: HTMLDivElement;
 
   @HostBinding('attr.tabindex')
   public tabindex = -1; // make the viewport programmatically focusable but do not include it in the tab order
@@ -50,7 +51,15 @@ export class SciViewportComponent implements DoCheck {
    */
   @ViewChild('viewport', {static: true})
   public set setViewport(viewport: ElementRef<HTMLDivElement>) {
-    this._viewport = viewport.nativeElement;
+    this._viewport = coerceElement(viewport);
+  }
+
+  /**
+   * @internal
+   */
+  @ViewChild('viewport_client', {static: true})
+  public set setViewportClient(viewportClient: ElementRef<HTMLDivElement>) {
+    this._viewportClient = coerceElement(viewportClient);
   }
 
   /**
@@ -61,13 +70,14 @@ export class SciViewportComponent implements DoCheck {
   public scrollbarStyle: 'native' | 'on-top' | 'hidden' = 'on-top';
 
   /**
-   * Emits upon a dimension change or a scroll event.
+   * Emits upon a scroll event.
+   *
+   * You can add [sciDimension] directive to the viewport or viewport client to be notified about layout changes.
    */
   @Output()
-  public viewportChange = new EventEmitter<void>();
+  public scroll = new EventEmitter<Event>();
 
-  constructor(differs: KeyValueDiffers, public nativeScrollbarTrackSizeProvider: SciNativeScrollbarTrackSizeProvider) {
-    this._viewportClientDiffer = differs.find({}).create();
+  constructor(public nativeScrollbarTrackSizeProvider: SciNativeScrollbarTrackSizeProvider) {
   }
 
   @HostListener('focus')
@@ -78,27 +88,8 @@ export class SciViewportComponent implements DoCheck {
   /**
    * @internal
    */
-  public onViewportDimensionChange(dimension: SciDimension): void {
-    this._viewportDimension = dimension;
-    this.viewportChange.emit();
-  }
-
-  public ngDoCheck(): void {
-    this.detectViewportClientDimensionChange() && this.viewportChange.emit();
-  }
-
-  /**
-   * @internal
-   */
-  public onScroll(): void {
-    this.viewportChange.emit();
-  }
-
-  /**
-   * Returns the dimension of this viewport.
-   */
-  public get viewportDimension(): SciDimension {
-    return this._viewportDimension;
+  public onScroll(event: Event): void {
+    this.scroll.emit(event);
   }
 
   /**
@@ -156,17 +147,26 @@ export class SciViewportComponent implements DoCheck {
   }
 
   /**
-   * Returns the actual viewport {HTMLElement}.
+   * Returns the viewport {HTMLElement}.
    */
   public get viewportElement(): HTMLElement {
     return this._viewport;
   }
 
   /**
+   * Returns the viewport client {HTMLElement}.
+   */
+  public get viewportClientElement(): HTMLElement {
+    return this._viewportClient;
+  }
+
+  /**
    * Checks if the specified element is scrolled into the viewport.
    *
-   * @element the element to check if scrolled into the viewport
-   * @fit specifies whether the element must fully or partially fit into the viewport.
+   * @param element
+   *        the element to be checked
+   * @param fit
+   *        control if the element must fully or partially fit into the viewport
    */
   public isElementInView(element: HTMLElement, fit: 'full' | 'partial'): boolean {
     const elLeft = this.computeOffset(element, 'left');
@@ -192,8 +192,10 @@ export class SciViewportComponent implements DoCheck {
   /**
    * Scrolls the specified element into the viewport.
    *
-   * @element the element to scroll into the viewport
-   * @offset the gap between the element and the viewport
+   * @param element
+   *        the element to scroll into the viewport
+   * @param offset
+   *        the gap between the element and the viewport
    */
   public scrollIntoView(element: HTMLElement, offset: number = 50): void {
     this._viewport.scrollTop = this.computeOffset(element, 'top') - offset;
@@ -216,14 +218,6 @@ export class SciViewportComponent implements DoCheck {
     } while (el !== null && el !== this._viewport);
 
     return offset;
-  }
-
-  private detectViewportClientDimensionChange(): boolean {
-    if (!this._viewport) {
-      return false;
-    }
-    const viewportClientSize = {height: this._viewport.scrollHeight, width: this._viewport.scrollWidth};
-    return !!this._viewportClientDiffer.diff(viewportClientSize);
   }
 }
 
