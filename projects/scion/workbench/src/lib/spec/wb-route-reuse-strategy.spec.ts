@@ -10,7 +10,6 @@
 
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
-import { WorkbenchModule } from '../workbench.module';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
 import { Router, RouteReuseStrategy, RouterModule } from '@angular/router';
@@ -19,6 +18,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { advance, clickElement } from './util/util.spec';
 import { ActivityPartComponent } from '../activity-part/activity-part.component';
 import { By } from '@angular/platform-browser';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 /**
  *
@@ -174,7 +174,7 @@ class App_Activity2_Component {
 
 @NgModule({
   imports: [
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
       {path: 'app/activity-1', component: App_Activity1_Component},

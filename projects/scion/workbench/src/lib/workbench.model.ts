@@ -17,6 +17,7 @@ import { Arrays } from './array.util';
 import { Injector, TemplateRef } from '@angular/core';
 import { Disposable } from './disposable';
 import { ComponentType } from '@angular/cdk/portal';
+import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 
 /**
  * A view is a visual component within the Workbench to present content,
@@ -93,6 +94,7 @@ export class InternalWorkbenchView implements WorkbenchView {
   public disabled: boolean;
   public scrollTop: number | null;
   public scrollLeft: number | null;
+  public activationInstant: number;
 
   public readonly active$: BehaviorSubject<boolean>;
   public readonly cssClasses$: BehaviorSubject<string[]>;
@@ -100,7 +102,8 @@ export class InternalWorkbenchView implements WorkbenchView {
   constructor(public readonly viewRef: string,
               active: boolean,
               public workbench: WorkbenchService,
-              public readonly portal: WbComponentPortal<ViewComponent>) {
+              public readonly portal: WbComponentPortal<ViewComponent>,
+              private _viewActivationInstantProvider: ViewActivationInstantProvider) {
     this.active$ = new BehaviorSubject<boolean>(active);
     this.cssClasses$ = new BehaviorSubject<string[]>([]);
     this.title = viewRef;
@@ -120,6 +123,9 @@ export class InternalWorkbenchView implements WorkbenchView {
   }
 
   public activate(activate: boolean): void {
+    if (activate) {
+      this.activationInstant = this._viewActivationInstantProvider.instant;
+    }
     this.active$.next(activate);
   }
 

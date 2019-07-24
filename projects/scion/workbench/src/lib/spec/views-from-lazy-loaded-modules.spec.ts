@@ -10,7 +10,6 @@
 
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
-import { WorkbenchModule } from '../workbench.module';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
 import { Router, RouterModule } from '@angular/router';
@@ -18,6 +17,7 @@ import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { CommonModule } from '@angular/common';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { advance } from './util/util.spec';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 /**
  *
@@ -101,7 +101,7 @@ class AppComponent {
 
 @NgModule({
   imports: [
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
       {path: 'feature-a', loadChildren: './feature-a/feature-a.module'},

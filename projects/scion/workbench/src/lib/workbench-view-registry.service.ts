@@ -17,6 +17,7 @@ import { asapScheduler, AsyncSubject, merge, Observable, Subject } from 'rxjs';
 import { delay, filter, map, take, takeUntil } from 'rxjs/operators';
 import { TaskScheduler } from './task-scheduler.service';
 import { NavigationEnd, Router } from '@angular/router';
+import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 
 /**
  * Registry for {WorkbenchView} objects.
@@ -31,7 +32,8 @@ export class WorkbenchViewRegistry implements OnDestroy {
   constructor(private _componentFactoryResolver: ComponentFactoryResolver,
               private _taskScheduler: TaskScheduler,
               private _router: Router,
-              private _injector: Injector) {
+              private _injector: Injector,
+              private _viewActivationInstantProvider: ViewActivationInstantProvider) {
   }
 
   /**
@@ -99,7 +101,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
 
   private createWorkbenchView(viewRef: string, active: boolean): InternalWorkbenchView {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_COMPONENT_TYPE));
-    const view = new InternalWorkbenchView(viewRef, active, this._injector.get(WORKBENCH), portal);
+    const view = new InternalWorkbenchView(viewRef, active, this._injector.get(WORKBENCH), portal, this._viewActivationInstantProvider);
 
     const injectionTokens = new WeakMap();
     injectionTokens.set(ROUTER_OUTLET_NAME, viewRef);

@@ -13,10 +13,10 @@ import { NgModule } from '@angular/core';
 import { WorkbenchApplicationPlatformModule } from '../workbench-application-platform.module';
 import { NullErrorHandler } from '../core/null-error-handler.service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { WorkbenchModule } from '@scion/workbench';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ApplicationRegistry } from '../core/application-registry.service';
 import { ApplicationManifest } from '../core/metadata';
+import { WorkbenchTestingModule } from '@scion/workbench';
 
 describe('ManifestCollector', () => {
 
@@ -85,7 +85,7 @@ function createApplicationManifest(app: { appName: string }): ApplicationManifes
   imports: [
     HttpClientTestingModule,
     RouterTestingModule.withRoutes([]),
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     WorkbenchApplicationPlatformModule.forRoot({
       errorHandler: NullErrorHandler,
       applicationConfig: [

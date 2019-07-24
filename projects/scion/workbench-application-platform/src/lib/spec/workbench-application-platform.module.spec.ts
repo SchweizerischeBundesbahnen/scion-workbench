@@ -12,16 +12,16 @@ import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { NgModule, NgModuleFactoryLoader } from '@angular/core';
 import { WorkbenchApplicationPlatformModule } from '../workbench-application-platform.module';
 import { NullErrorHandler } from '../core/null-error-handler.service';
-import { WorkbenchModule } from '@scion/workbench';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
 import { Router } from '@angular/router';
+import { WorkbenchTestingModule } from '@scion/workbench';
 
 describe('WorkbenchApplicationPlatform', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        WorkbenchModule.forRoot(),
+        WorkbenchTestingModule.forRoot(),
         WorkbenchApplicationPlatformModule.forRoot({errorHandler: NullErrorHandler, applicationConfig: []}),
         RouterTestingModule.withRoutes([{path: 'lazy-module-forroot', loadChildren: './lazy-forroot.module'}]),
       ],

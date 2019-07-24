@@ -11,13 +11,13 @@
 import { async, fakeAsync, inject, TestBed } from '@angular/core/testing';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { Component, NgModule } from '@angular/core';
-import { WorkbenchModule } from '../workbench.module';
 import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 describe('ViewPartGridComponent', () => {
 
@@ -504,7 +504,7 @@ class View3Component {
 @NgModule({
   declarations: [View1Component, View2Component, View3Component],
   imports: [
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     RouterTestingModule.withRoutes([
       {path: 'view-1', component: View1Component},
       {path: 'view-2', component: View2Component},

@@ -12,6 +12,9 @@ import { NgModule } from '@angular/core';
 import { async, inject, TestBed } from '@angular/core/testing';
 import { ViewPartGridSerializerService, ViewPartInfoArray } from '../view-part-grid/view-part-grid-serializer.service';
 import { ViewPartGrid } from '../view-part-grid/view-part-grid.model';
+import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 describe('ViewPartGrid', () => {
 
@@ -22,17 +25,17 @@ describe('ViewPartGrid', () => {
     });
   }));
 
-  it('allows to set a root viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
+  it('allows to set a root viewpart', inject([ViewPartGridSerializerService, WorkbenchViewRegistry], (serializer: ViewPartGridSerializerService, registry: WorkbenchViewRegistry) => {
     const rootViewPart: ViewPartInfoArray = ['viewPart-root'];
 
-    const testee = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer);
+    const testee = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer, registry);
     expect(testee.root).toEqual(rootViewPart);
   }));
 
-  it('allows to add a sibling viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
+  it('allows to add a sibling viewpart', inject([ViewPartGridSerializerService, WorkbenchViewRegistry], (serializer: ViewPartGridSerializerService, registry: WorkbenchViewRegistry) => {
     const leftViewPart: ViewPartInfoArray = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
 
-    const grid1 = new ViewPartGrid(serializer.serializeGrid(leftViewPart), serializer);
+    const grid1 = new ViewPartGrid(serializer.serializeGrid(leftViewPart), serializer, registry);
     const grid2 = grid1.addSiblingViewPart('east', 'viewPart-left', 'viewPart-right');
 
     expect(grid1.root).toEqual(leftViewPart); // expect that grid1 did not change (immutable)
@@ -45,7 +48,7 @@ describe('ViewPartGrid', () => {
     });
   }));
 
-  it('allows to remove the right sibling viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
+  it('allows to remove the right sibling viewpart', inject([ViewPartGridSerializerService, WorkbenchViewRegistry], (serializer: ViewPartGridSerializerService, registry: WorkbenchViewRegistry) => {
     const leftViewPart = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
     const rightViewPart = ['viewPart-right', 'view-5', 'view-4', 'view-5', 'view-6'];
 
@@ -55,7 +58,7 @@ describe('ViewPartGrid', () => {
       sash2: rightViewPart,
       splitter: .5,
       hsplit: false,
-    }), serializer);
+    }), serializer, registry);
     const grid2 = grid1.removeViewPart('viewPart-left');
 
     expect(grid1.root).toEqual({ // expect that grid1 did not change (immutable)
@@ -68,7 +71,7 @@ describe('ViewPartGrid', () => {
     expect(grid2.root).toEqual(rightViewPart);
   }));
 
-  it('allows to remove the left sibling viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
+  it('allows to remove the left sibling viewpart', inject([ViewPartGridSerializerService, WorkbenchViewRegistry], (serializer: ViewPartGridSerializerService, registry: WorkbenchViewRegistry) => {
     const leftViewPart = ['viewPart-left', 'view-2', 'view-1', 'view-2', 'view-3'];
     const rightViewPart = ['viewPart-right', 'view-5', 'view-4', 'view-5', 'view-6'];
 
@@ -78,7 +81,7 @@ describe('ViewPartGrid', () => {
       sash2: rightViewPart,
       splitter: .5,
       hsplit: false,
-    }), serializer);
+    }), serializer, registry);
 
     const grid2 = grid1.removeViewPart('viewPart-right');
 
@@ -92,9 +95,9 @@ describe('ViewPartGrid', () => {
     expect(grid2.root).toEqual(leftViewPart);
   }));
 
-  it('allows to remove the root viewpart', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
+  it('allows to remove the root viewpart', inject([ViewPartGridSerializerService, WorkbenchViewRegistry], (serializer: ViewPartGridSerializerService, registry: WorkbenchViewRegistry) => {
     const rootViewPart = ['viewPart-root', 'view-2', 'view-1', 'view-2', 'view-3'];
-    const grid1 = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer);
+    const grid1 = new ViewPartGrid(serializer.serializeGrid(rootViewPart), serializer, registry);
     const grid2 = grid1.removeViewPart('viewPart-root');
 
     expect(grid1.root).toEqual(rootViewPart); // expect that grid1 did not change (immutable)
@@ -114,7 +117,7 @@ describe('ViewPartGrid', () => {
    * +---+---+---+---+
    *
    */
-  it('allows to create a grid which consists of 6 viewparts', inject([ViewPartGridSerializerService], (serializer: ViewPartGridSerializerService) => {
+  it('allows to create a grid which consists of 6 viewparts', inject([ViewPartGridSerializerService, WorkbenchViewRegistry], (serializer: ViewPartGridSerializerService, registry: WorkbenchViewRegistry) => {
     const viewPart_1 = ['viewPart-1'];
     const viewPart_2 = ['viewPart-2'];
     const viewPart_3 = ['viewPart-3'];
@@ -123,7 +126,7 @@ describe('ViewPartGrid', () => {
     const viewPart_6 = ['viewPart-6'];
 
     // Set ViewPart 1 as root viewpart
-    const grid1 = new ViewPartGrid(serializer.serializeGrid(viewPart_1), serializer);
+    const grid1 = new ViewPartGrid(serializer.serializeGrid(viewPart_1), serializer, registry);
     const expectedGrid1 = viewPart_1;
 
     // Add ViewPart 2 to the east of ViewPart 2
@@ -340,7 +343,10 @@ describe('ViewPartGrid', () => {
  ****************************************************************************************************/
 
 @NgModule({
-  providers: [ViewPartGridSerializerService],
+  imports: [
+    WorkbenchTestingModule.forRoot(),
+    RouterTestingModule,
+  ],
 })
 class AppTestModule {
 }

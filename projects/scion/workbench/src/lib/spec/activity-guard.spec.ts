@@ -10,7 +10,6 @@
 
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { Component, Injectable, NgModule } from '@angular/core';
-import { WorkbenchModule } from '../workbench.module';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouteReuseStrategy, RouterStateSnapshot } from '@angular/router';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -20,6 +19,7 @@ import { ActivityPartComponent } from '../activity-part/activity-part.component'
 import { By } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 /**
  *
@@ -126,7 +126,7 @@ class Activity2CanActivate implements CanActivate {
 
 @NgModule({
   imports: [
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     NoopAnimationsModule,
     CommonModule,
     RouterTestingModule.withRoutes([

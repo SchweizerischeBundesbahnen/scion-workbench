@@ -10,7 +10,6 @@
 
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { Component, NgModule } from '@angular/core';
-import { WorkbenchModule } from '../workbench.module';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router, RouteReuseStrategy } from '@angular/router';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -19,6 +18,7 @@ import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.sp
 import { ActivityPartComponent } from '../activity-part/activity-part.component';
 import { By } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 /**
  *
@@ -129,7 +129,7 @@ class Activity3Component {
 
 @NgModule({
   imports: [
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     NoopAnimationsModule,
     CommonModule,
     RouterTestingModule.withRoutes([
