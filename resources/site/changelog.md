@@ -5,6 +5,23 @@
 
 # Changelog
 
+
+# [0.0.0-beta.24](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.23...0.0.0-beta.24) (2019-07-22)
+
+
+### Bug Fixes
+
+* observe element dimension changes natively ([f53f4b3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f53f4b3)), closes [#156](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/156)
+* remove 'web-animations-js' polyfill from host-app as it breaks the app ([2c55f2f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/2c55f2f)), closes [#152](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/152)
+
+
+### BREAKING CHANGES
+
+* removed 'viewportChange' output property from `<sci-viewport>` component.\
+  Migration: Add the dimension directive `[sciDimension]` to the viewport 
+  and/or viewport client, and/or listen for viewport scroll events with 'scroll' output property.
+
+
 # [0.0.0-beta.23](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.22...0.0.0-beta.23) (2019-06-12)
 
 
