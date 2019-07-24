@@ -10,7 +10,6 @@
 
 import { async, fakeAsync, inject, TestBed } from '@angular/core/testing';
 import { Component, Inject, Injectable, InjectionToken, NgModule, NgModuleFactoryLoader, Optional } from '@angular/core';
-import { WorkbenchModule } from '../workbench.module';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
 import { Router, RouterModule } from '@angular/router';
@@ -20,6 +19,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { advance, clickElement } from './util/util.spec';
 import { ActivityPartComponent } from '../activity-part/activity-part.component';
 import { By } from '@angular/platform-browser';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 /**
  *
@@ -144,7 +144,7 @@ export class FeatureService {
 
 @NgModule({
   imports: [
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
       {path: 'feature', loadChildren: './feature/feature.module'},

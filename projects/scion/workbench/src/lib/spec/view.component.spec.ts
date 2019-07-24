@@ -11,7 +11,6 @@
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { NgModule, Type } from '@angular/core';
 import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
-import { WorkbenchModule } from '../workbench.module';
 import { WorkbenchService } from '../workbench.service';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { By } from '@angular/platform-browser';
@@ -23,6 +22,7 @@ import { WorkbenchView } from '../workbench.model';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 describe('ViewComponent', () => {
 
@@ -381,7 +381,7 @@ describe('ViewComponent', () => {
 @NgModule({
   declarations: [SpecView1Component, SpecView2Component],
   imports: [
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     RouterTestingModule.withRoutes([
       {path: 'view-1', component: SpecView1Component},
       {path: 'view-2', component: SpecView2Component},

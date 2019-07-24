@@ -11,7 +11,6 @@
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { Component, NgModule } from '@angular/core';
 import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
-import { WorkbenchModule } from '../workbench.module';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
@@ -19,6 +18,7 @@ import { InternalWorkbenchRouter, WorkbenchRouter } from '../routing/workbench-r
 import { advance } from './util/util.spec';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { WorkbenchView } from '../workbench.model';
+import { WorkbenchTestingModule } from './workbench-testing.module';
 
 describe('WbRouter', () => {
 
@@ -111,7 +111,7 @@ class ViewComponent {
 @NgModule({
   declarations: [ViewComponent],
   imports: [
-    WorkbenchModule.forRoot(),
+    WorkbenchTestingModule.forRoot(),
     RouterTestingModule.withRoutes([
       {path: 'path/to/view', component: ViewComponent},
       {path: 'path/to/view-1', component: ViewComponent},

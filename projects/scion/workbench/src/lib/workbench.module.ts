@@ -67,6 +67,7 @@ import { ViewPartActionDirective } from './view-part/view-part-action-bar/view-p
 import { ViewPartActionBarComponent } from './view-part/view-part-action-bar/view-part-action-bar.component';
 import { TaskScheduler } from './task-scheduler.service';
 import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
+import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 
 @NgModule({
   imports: [
@@ -187,6 +188,7 @@ export class WorkbenchModule {
         InternalWorkbenchRouter,
         PopupService,
         TaskScheduler,
+        ViewActivationInstantProvider,
         {
           provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter,
         },

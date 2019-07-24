@@ -11,6 +11,7 @@
 import { Region } from '../view-part/view-drop-zone.directive';
 import { VIEW_PART_REF_PREFIX } from '../workbench.constants';
 import { ACTIVE_VIEW_REF_INDEX, VIEW_PART_REF_INDEX, VIEW_REFS_START_INDEX, ViewPartGridSerializerService, ViewPartInfoArray, ViewPartSashBox } from './view-part-grid-serializer.service';
+import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 
 /**
  * Represents the arrangement of viewparts in a grid and provides methods to modify the grid.
@@ -23,7 +24,7 @@ export class ViewPartGrid {
 
   private _root: ViewPartSashBox | ViewPartInfoArray;
 
-  constructor(serializedGrid: string, private _serializer: ViewPartGridSerializerService) {
+  constructor(serializedGrid: string, private _serializer: ViewPartGridSerializerService, private _viewRegistry: WorkbenchViewRegistry) {
     this._root = this._serializer.parseGrid(serializedGrid || this._serializer.emptySerializedGrid());
   }
 
@@ -39,7 +40,7 @@ export class ViewPartGrid {
    */
   public clone(): ViewPartGrid {
     const serializedGrid = this._serializer.serializeGrid(this._root);
-    return new ViewPartGrid(serializedGrid, this._serializer);
+    return new ViewPartGrid(serializedGrid, this._serializer, this._viewRegistry);
   }
 
   /**
@@ -130,11 +131,8 @@ export class ViewPartGrid {
 
     // Activate next view if this view was active
     if (viewPartInfoArray[ACTIVE_VIEW_REF_INDEX] === viewRef) {
-      viewPartInfoArray[ACTIVE_VIEW_REF_INDEX] = null;
-
-      if (viewPartInfoArray.length > VIEW_REFS_START_INDEX) {
-        viewPartInfoArray[ACTIVE_VIEW_REF_INDEX] = viewPartInfoArray[viewIndex] || viewPartInfoArray[viewIndex - 1];
-      }
+      const viewRefs = viewPartInfoArray.slice(VIEW_REFS_START_INDEX);
+      viewPartInfoArray[ACTIVE_VIEW_REF_INDEX] = this.findMostRecentView(viewRefs);
     }
 
     // Remove viewpart if its last view is closed.
@@ -144,6 +142,14 @@ export class ViewPartGrid {
     }
 
     return this;
+  }
+
+  private findMostRecentView(viewRefs: string[]): string | null {
+    const viewsSorted = viewRefs
+      .map(viewRef => this._viewRegistry.getElseThrow(viewRef))
+      .sort((view1, view2) => view2.activationInstant - view1.activationInstant);
+
+    return viewsSorted.length > 0 ? viewsSorted[0].viewRef : null;
   }
 
   private _swapViews(viewPartRef: string, viewRef1: string, viewRef2: string): this {

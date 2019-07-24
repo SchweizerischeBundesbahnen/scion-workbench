@@ -83,7 +83,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
 
     // Parse the ViewPartGrid from the URL.
     const serializedViewPartGrid = this._router.parseUrl(routerEvent.url).queryParamMap.get(VIEW_GRID_QUERY_PARAM);
-    const viewPartGrid = new ViewPartGrid(serializedViewPartGrid, this._viewPartGridSerializer);
+    const viewPartGrid = new ViewPartGrid(serializedViewPartGrid, this._viewPartGridSerializer, this._viewRegistry);
 
     // Update the view registry with added or removed view outlets.
     //
