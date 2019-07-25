@@ -1,8 +1,7 @@
-<sci-viewport [style.width.px]="viewTabsWidthPx"
-              scrollbarStyle="hidden"
+<sci-viewport scrollbarStyle="hidden"
               sciDimension (sciDimensionChange)="onViewportChange()"
               (scroll)="onScroll()">
-  <div #viewport_client class="viewport-client" sciDimension (sciDimensionChange)="onViewportClientChange()">
+  <div class="viewport-client" sciDimension (sciDimensionChange)="onViewportClientChange($event)">
     <wb-view-tab *ngFor="let viewRef of viewPartService.viewRefs" [viewRef]="viewRef" [renderingHint]="'tab-item'"></wb-view-tab>
   </div>
 </sci-viewport>

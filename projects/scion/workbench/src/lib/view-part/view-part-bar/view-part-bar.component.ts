@@ -16,6 +16,8 @@ import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { SciViewportComponent } from '@scion/viewport';
+import { SciDimension } from '@scion/dimension';
 
 @Component({
   selector: 'wb-view-part-bar',
@@ -29,10 +31,8 @@ export class ViewPartBarComponent implements OnDestroy {
   @ViewChildren(ViewTabComponent)
   private _viewTabs: QueryList<ViewTabComponent>;
 
-  @ViewChild('viewport_client', {static: true})
-  private _viewportClient: ElementRef<HTMLElement>;
-
-  public viewTabsWidthPx: number;
+  @ViewChild(SciViewportComponent, {static: true, read: ElementRef})
+  private _viewport: ElementRef<HTMLElement>;
 
   constructor(private _workbench: InternalWorkbenchService,
               private _workbenchLayout: WorkbenchLayoutService,
@@ -68,20 +68,23 @@ export class ViewPartBarComponent implements OnDestroy {
   }
 
   public onViewportChange(): void {
-    this.layout();
+    this.computeHiddenViewTabs();
   }
 
-  public onViewportClientChange(): void {
-    this.layout();
+  public onViewportClientChange(dimension: SciDimension): void {
+    // The viewport is set to 'flex: initial' with its width set equal to the viewport client width. It shrinks if there is not enough space available.
+    // The viewport is not set to 'flex: auto' to render left-aligned actions right after the view tabs.
+
+    // The width is set directly to the viewport DOM element not to waste a change detection cycle when computing the hidden view tabs.
+    this._viewport.nativeElement.style.width = `${dimension.clientWidth}px`;
+    this.computeHiddenViewTabs();
   }
 
   public onScroll(): void {
-    this.layout();
+    this.computeHiddenViewTabs();
   }
 
-  private layout(): void {
-    this.viewTabsWidthPx = this._viewportClient.nativeElement.clientWidth;
-
+  private computeHiddenViewTabs(): void {
     // Compute tabs which are not visible in the viewtabs viewport.
     this._viewTabs && this.viewPartService.setHiddenViewTabs(this._viewTabs
       .filter(viewTab => !viewTab.isVisibleInViewport())
