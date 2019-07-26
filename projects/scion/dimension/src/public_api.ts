@@ -14,4 +14,4 @@
 export { SciDimensionModule } from './lib/dimension.module';
 export { SciDimensionDirective } from './lib/dimension.directive';
 export { SciMutationService } from './lib/mutation.service';
-export { SciDimensionService, SciDimension } from './lib/dimension.service';
+export { SciDimensionService, SciDimension, USE_NATIVE_RESIZE_OBSERVER } from './lib/dimension.service';
