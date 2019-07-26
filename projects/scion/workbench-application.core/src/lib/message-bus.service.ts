@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fromEvent, Observable, Subject } from 'rxjs';
+import { fromEvent, merge, Observable, Observer, Subject, TeardownLogic } from 'rxjs';
 import { filter, first, takeUntil } from 'rxjs/operators';
 import { UUID } from './uuid.util';
 import { Service } from './metadata';
@@ -102,14 +102,22 @@ export class DefaultMessageBus implements MessageBus {
     envelope.replyToUid = replyToUid;
     envelope.protocol = PROTOCOL;
 
-    const reply$ = this._stream$
-      .pipe(
-        filter(env => env.channel === 'reply'),
-        filter(env => env.replyToUid === replyToUid),
-        takeUntil(this._destroy$),
-      );
-    this.postMessage(envelope);
-    return reply$;
+    return new Observable((observer: Observer<MessageEnvelope>): TeardownLogic => {
+      const destroy$ = new Subject<void>();
+      this._stream$
+        .pipe(
+          filter(env => env.channel === 'reply'),
+          filter(env => env.replyToUid === replyToUid),
+          takeUntil(merge(destroy$, this._destroy$)),
+        )
+        .subscribe(observer);
+
+      this.postMessage(envelope);
+
+      return (): void => {
+        destroy$.next();
+      };
+    });
   }
 
   public requestReply(envelope: MessageEnvelope): Promise<MessageEnvelope> {
