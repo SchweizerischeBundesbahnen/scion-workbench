@@ -19,6 +19,9 @@ import { SciDimensionDirective } from './dimension.directive';
  * Web Performance Working Group is working on a W3C recommendation for natively observing changes to Element’s size.
  * The Web API draft is still work in progress and support limited to Google Chrome and Opera.
  *
+ * You can control if to use the native {ResizeObserver} by default with {USE_NATIVE_RESIZE_OBSERVER} DI injection token.
+ * If not provided, the native resize observable is used, unless explicitly set via options object when creating the resize observable.
+ *
  * @see https://wicg.github.io/ResizeObserver/
  * @see https://caniuse.com/#feat=resizeobserver
  */

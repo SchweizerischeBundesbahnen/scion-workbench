@@ -10,9 +10,20 @@
 
 import { concat, fromEvent, Observable, Observer, of, ReplaySubject, Subject, TeardownLogic } from 'rxjs';
 import { map, multicast, refCount, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Injectable } from '@angular/core';
+import { Injectable, InjectionToken, Injector } from '@angular/core';
 
+/**
+ * CSS class added to the HTML <object> element emitting resize events if not using the native {ResizeObserver}.
+ */
 const SYNTH_RESIZE_OBSERVABLE_OBJECT_MARKER = 'synth-resize-observable';
+
+/**
+ * DI injection token to control if to use the native {ResizeObserver} by default.
+ * If not provided, the native resize observable is used, unless explicitly set via options object when creating the resize observable.
+ *
+ * This flag is only evaluated if the user agent supports {ResizeObserver}.
+ */
+export const USE_NATIVE_RESIZE_OBSERVER = new InjectionToken<boolean>('USE_NATIVE_RESIZE_OBSERVER');
 
 /**
  * Allows observing the dimension of an element.
@@ -37,6 +48,9 @@ export class SciDimensionService {
    */
   public _objectObservableRegistry = new Map<HTMLElement, Observable<SciDimension>>();
 
+  constructor(private _injector: Injector) {
+  }
+
   /**
    * Upon subscription, it emits the element's dimension, and then continuously emits when the dimension of the element changes. It never completes.
    *
@@ -48,9 +62,12 @@ export class SciDimensionService {
    *          By default, this flag is enabled.
    */
   public dimension$(target: HTMLElement, options?: { useNativeResizeObserver: boolean }): Observable<SciDimension> {
-    const useNativeResizeObserver = !options || options.useNativeResizeObserver === undefined || options.useNativeResizeObserver === true;
+    options = {
+      useNativeResizeObserver: this._injector.get(USE_NATIVE_RESIZE_OBSERVER, true),
+      ...options,
+    };
 
-    if (useNativeResizeObserver && supportsNativeResizeObserver()) {
+    if (options.useNativeResizeObserver && supportsNativeResizeObserver()) {
       return createNativeResizeObservable$(target);
     }
 
