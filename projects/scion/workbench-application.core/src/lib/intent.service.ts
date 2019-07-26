@@ -19,6 +19,7 @@ import { map } from 'rxjs/operators';
  * Allows issuing an intent to interact with the platform.
  */
 export class IntentService implements Service {
+
   /**
    * Issues an intent to the application platform and receives a series of replies.
    *
