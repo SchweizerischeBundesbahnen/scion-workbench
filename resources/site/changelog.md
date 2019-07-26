@@ -6,6 +6,21 @@
 # Changelog
 
 
+# [0.0.0-beta.25](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.24...0.0.0-beta.25) (2019-07-26)
+
+
+### Bug Fixes
+
+* post the request in request-receive communication when subscribing to the observable ([f8a7f8c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f8a7f8c)), closes [#160](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/160)
+* show the view dropdown only if some view tabs overflow ([ab57d4b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ab57d4b)), closes [#159](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/159)
+
+
+### Features
+
+* activate the most recent view when closing a view ([7896583](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7896583)), closes [#74](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/74)
+* control if to use native resize observable unless explicitly specified via options object ([0594320](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0594320)), closes [#156](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/156)
+
+
 # [0.0.0-beta.24](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.23...0.0.0-beta.24) (2019-07-22)
 
 
