@@ -36,7 +36,7 @@ export class MessageBoxPanelPO {
 
   public async enterText(text: string): Promise<void> {
     await switchToIFrameContext(this.iframeContext);
-    const inputField = this._panel.$('input#text');
+    const inputField = this._panel.$('textarea#text');
     await inputField.clear();
     await inputField.sendKeys(text);
     return Promise.resolve();

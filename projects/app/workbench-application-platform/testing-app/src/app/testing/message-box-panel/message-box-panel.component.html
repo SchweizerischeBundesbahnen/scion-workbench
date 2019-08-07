@@ -6,7 +6,7 @@
   <span class="validation"><ng-container *ngIf="form.get(TITLE).invalid">Invalid</ng-container></span>
 
   <label for="text">Text</label>
-  <input id="text" [formControl]="form.get(TEXT)">
+  <textarea id="text" [formControl]="form.get(TEXT)"></textarea>
   <span class="validation"><ng-container *ngIf="form.get(TEXT).invalid">Invalid</ng-container></span>
 
   <label for="severity">Severity</label>
