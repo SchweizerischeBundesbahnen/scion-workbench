@@ -153,3 +153,13 @@ export async function getCssClasses(elementFinder: ElementFinder): Promise<strin
   const classAttr: string = await elementFinder.getAttribute('class');
   return classAttr.split(/\s+/);
 }
+
+/**
+ * Clicks the given element while pressing the specified key.
+ */
+export async function clickElement(elementFinder: ElementFinder, pressKey: string): Promise<void> {
+  await browser.actions().mouseMove(elementFinder).perform();
+
+  // It is important to release the pressed key by {@link #keyUp} in order to avoid side effects in other tests.
+  await browser.actions().keyDown(pressKey).click().keyUp(pressKey).perform();
+}

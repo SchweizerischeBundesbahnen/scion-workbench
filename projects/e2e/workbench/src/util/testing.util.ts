@@ -90,3 +90,13 @@ export async function hasBrowserError(error: string): Promise<boolean> {
   const logs = await this.browserErrors();
   return logs.some(log => log.message.includes(error));
 }
+
+/**
+ * Clicks the given element while pressing the specified key.
+ */
+export async function clickElement(elementFinder: ElementFinder, pressKey: string): Promise<void> {
+  await browser.actions().mouseMove(elementFinder).perform();
+
+  // It is important to release the pressed key by {@link #keyUp} in order to avoid side effects in other tests.
+  await browser.actions().keyDown(pressKey).click().keyUp(pressKey).perform();
+}
