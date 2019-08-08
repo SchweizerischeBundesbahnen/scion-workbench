@@ -18,7 +18,7 @@ import { Qualifier } from '@scion/workbench-application.core';
  *
  * This directive is like 'RouterLink' but with functionality to target a workbench view outlet.
  *
- * If in the context of a view and CTRL key is not pressed, by default, navigation replaces the content of the current view.
+ * If in the context of a view and CTRL or META (Mac: ⌘, Windows: ⊞) key is not pressed, by default, navigation replaces the content of the current view.
  * Override this default behavior by setting a view target strategy in navigational extras.
  */
 @Directive({selector: ':not(a)[wbRouterLink]'})
@@ -36,23 +36,23 @@ export class WorkbenchRouterLinkDirective {
     this._viewContext = !!view;
   }
 
-  @HostListener('click', ['$event.button', '$event.ctrlKey'])
-  public onClick(button: number, ctrlKey: boolean): boolean {
+  @HostListener('click', ['$event.button', '$event.ctrlKey', '$event.metaKey'])
+  public onClick(button: number, ctrlKey: boolean, metaKey: boolean): boolean {
     if (button !== 0) { // not main button pressed
       return true;
     }
 
-    const extras = this.createNavigationExtras(ctrlKey);
+    const extras = this.createNavigationExtras(ctrlKey, metaKey);
     this._workbenchRouter.navigate(this.qualifier, extras);
     return false;
   }
 
-  protected createNavigationExtras(ctrlKey: boolean = false): WbNavigationExtras {
+  protected createNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): WbNavigationExtras {
     const extras = this.extras || {};
 
     return {
       ...extras,
-      target: extras.target || (this._viewContext && !ctrlKey ? 'self' : 'blank'),
+      target: extras.target || (this._viewContext && !ctrlKey && !metaKey ? 'self' : 'blank'),
     };
   }
 }

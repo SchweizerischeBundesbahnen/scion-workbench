@@ -6,6 +6,7 @@ import { WelcomePageComponent } from './welcome-page/welcome-page.component';
 import { ViewComponent } from './view/view.component';
 import { View4a3a8932Component } from './view-4a3a8932/view-4a3a8932.component';
 import { ViewNavigationComponent } from './view-navigation/view-navigation.component';
+import { ViewBb9700a6Component } from './view-bb9700a6/view-bb9700a6.component';
 
 const routes: Routes = [
   {path: '', component: WelcomePageComponent},
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path: 'activity-1a90c8d31-2', component: Activity1a90c8d32Component},
   {path: 'view', component: ViewComponent},
   {path: 'view-4a3a8932', component: View4a3a8932Component},
+  {path: 'view-bb9700a6', component: ViewBb9700a6Component},
   {path: 'view-navigation', component: ViewNavigationComponent},
 ];
 

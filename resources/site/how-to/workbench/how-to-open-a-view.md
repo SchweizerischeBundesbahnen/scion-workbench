@@ -26,7 +26,7 @@ There are two ways to navigate to a view, either from within the template or in 
     ```
 
     > Default behavior if using [wbRouterLink]:\
-    If in the context of a view and CTRL key is pressed, by default, the view is opened in a new view tab (or activated if present). If CTRL key is not pressed, by default, the content of the current view is replaced.
+    If in the context of a view and CTRL or META (Mac: ⌘, Windows: ⊞) key is pressed, by default, the view is opened in a new view tab (or activated if present). If CTRL / META key is not pressed, by default, the content of the current view is replaced.
 
 
 - **Navigate in the component**

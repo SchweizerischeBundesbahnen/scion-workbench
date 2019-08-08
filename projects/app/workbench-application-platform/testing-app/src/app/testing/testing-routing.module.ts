@@ -45,6 +45,7 @@ import { Activity6d806beaComponent } from './activity-6d806bea/activity-6d806bea
 import { Activity5782ab19Component } from './activity-5782ab19/activity-5782ab19.component';
 import { ViewC91805e8Component } from './view-c91805e8/view-c91805e8.component';
 import { ViewCba33eafComponent } from './view-cba33eaf/view-cba33eaf.component';
+import { ViewB8bbbb11Component } from './view-b8bbbb11/view-b8bbbb11.component';
 
 const routes: Routes = [
   {path: 'view', component: TestingViewComponent},
@@ -69,6 +70,7 @@ const routes: Routes = [
   {path: 'view-be587bd6', component: ViewBe587bd6Component},
   {path: 'view-c91805e8', component: ViewC91805e8Component},
   {path: 'view-cba33eaf', component: ViewCba33eafComponent},
+  {path: 'view-b8bbbb11', component: ViewB8bbbb11Component},
   {path: 'popup-1a90c8d2', component: Popup1a90c8d2Component},
   {path: 'popup-7330f506', component: Popup7330f506Component},
   {path: 'popup-9c5319f7', component: Popup9c5319f7Component},

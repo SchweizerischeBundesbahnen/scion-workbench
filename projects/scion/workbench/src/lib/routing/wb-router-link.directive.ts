@@ -19,7 +19,7 @@ import { WorkbenchService } from '../workbench.service';
 /**
  * Like 'RouterLink' but with functionality to target a view outlet.
  *
- * If in the context of a view and CTRL key is not pressed, by default, navigation replaces the content of the current view.
+ * If in the context of a view and CTRL or META (Mac: ⌘, Windows: ⊞) key is not pressed, by default, navigation replaces the content of the current view.
  * Override this default behavior by setting a view target strategy in navigational extras.
  *
  * By default, navigation is relative to the currently activated route, if any.
@@ -47,18 +47,18 @@ export class WbRouterLinkDirective {
               @Optional() private _view: WorkbenchView) {
   }
 
-  @HostListener('click', ['$event.button', '$event.ctrlKey'])
-  public onClick(button: number, ctrlKey: boolean): boolean {
+  @HostListener('click', ['$event.button', '$event.ctrlKey', '$event.metaKey'])
+  public onClick(button: number, ctrlKey: boolean, metaKey: boolean): boolean {
     if (button !== 0) { // not main button pressed
       return true;
     }
 
-    const extras = this.createNavigationExtras(ctrlKey);
+    const extras = this.createNavigationExtras(ctrlKey, metaKey);
     this._workbenchRouter.navigate(this._commands, extras).then(noop);
     return false;
   }
 
-  protected createNavigationExtras(ctrlKey: boolean = false): WbNavigationExtras {
+  protected createNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): WbNavigationExtras {
     const currentViewRef = this._view && this._view.viewRef;
     const currentViewPartRef = currentViewRef && this._workbench.resolveViewPart(currentViewRef);
     const isAbsolute = (typeof this._commands[0] === 'string') && this._commands[0].startsWith('/');
@@ -67,7 +67,7 @@ export class WbRouterLinkDirective {
     return {
       ...this._extras,
       relativeTo: this._extras.relativeTo === undefined ? relativeTo : this._extras.relativeTo,
-      target: this._extras.target || (this._view && !ctrlKey ? 'self' : 'blank'),
+      target: this._extras.target || (this._view && !ctrlKey && !metaKey ? 'self' : 'blank'),
       selfViewRef: this._extras.selfViewRef || currentViewRef,
       blankViewPartRef: this._extras.blankViewPartRef || currentViewPartRef,
     };
