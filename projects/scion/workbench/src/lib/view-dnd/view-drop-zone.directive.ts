@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
+import { asapScheduler, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { createElement, ElementCreateOptions, setStyle } from '../dom.util';
 import { ViewDragData, ViewDragService } from './view-drag.service';
@@ -22,6 +22,9 @@ const NULL_BOUNDS: Bounds = null;
 /**
  * Adds a view drop zone to the host element allowing the view to be dropped either in the north,
  * east, south, west or in the center.
+ *
+ * The drop zone is aligned with the target's bounds, thus requires the element to define a positioning context.
+ * If not positioned, the element is changed to be positioned relative.
  */
 @Directive({
   selector: '[wbViewDropZone]',
@@ -38,6 +41,12 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
   private _dropRegion: Region;
 
   /**
+   * Specifies which drop regions to allow. If not specified, all regions are allowed.
+   */
+  @Input()
+  public wbViewDropZoneRegions: Region[];
+
+  /**
    * Emits upon a view drop action.
    */
   @Output()
@@ -45,6 +54,9 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
 
   constructor(host: ElementRef<HTMLElement>, private _viewDragService: ViewDragService, private _zone: NgZone) {
     this._host = host.nativeElement;
+
+    // Ensure the host element to define a positioning context (after element creation)
+    asapScheduler.schedule(() => ensureHostElementPositioned(this._host));
   }
 
   public ngOnInit(): void {
@@ -54,9 +66,14 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
 
   private onDragOver(event: DragEvent): void {
     NgZone.assertNotInAngularZone();
-    event.preventDefault(); // allow view drop
 
     const dropRegion = this.computeDropRegion(event);
+    if (dropRegion === undefined) {
+      this.renderDropRegions(NULL_BOUNDS, NULL_BOUNDS);
+      return;
+    }
+
+    event.preventDefault(); // allow view drop
     if (dropRegion === this._dropRegion) {
       return; // drop region did not change
     }
@@ -234,29 +251,43 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
     }
   }
 
-  private computeDropRegion(event: DragEvent): Region {
+  private computeDropRegion(event: DragEvent): Region | undefined {
     const horizontalDropZoneWidth = Math.min(DROP_REGION_MAX_SIZE, this._host.clientWidth / 3);
     const verticalDropZoneHeight = Math.min(DROP_REGION_MAX_SIZE, this._host.clientHeight / 3);
     const offsetX = event.pageX - this._host.getBoundingClientRect().left;
     const offsetY = event.pageY - this._host.getBoundingClientRect().top;
 
-    if (offsetX < horizontalDropZoneWidth) {
+    if (this.supportsRegion('west') && offsetX < horizontalDropZoneWidth) {
       return 'west';
     }
-    if (offsetX > this._host.clientWidth - horizontalDropZoneWidth) {
+    if (this.supportsRegion('east') && offsetX > this._host.clientWidth - horizontalDropZoneWidth) {
       return 'east';
     }
-    if (offsetY < verticalDropZoneHeight) {
+    if (this.supportsRegion('north') && offsetY < verticalDropZoneHeight) {
       return 'north';
     }
-    if (offsetY > this._host.clientHeight - verticalDropZoneHeight) {
+    if (this.supportsRegion('south') && offsetY > this._host.clientHeight - verticalDropZoneHeight) {
       return 'south';
     }
-    return 'center';
+    if (this.supportsRegion('center')) {
+      return 'center';
+    }
+
+    return undefined;
+  }
+
+  private supportsRegion(region: Region): boolean {
+    return !this.wbViewDropZoneRegions || this.wbViewDropZoneRegions.includes(region);
   }
 
   public ngOnDestroy(): void {
     this._destroy$.next();
+  }
+}
+
+function ensureHostElementPositioned(element: HTMLElement): void {
+  if (getComputedStyle(element).position === 'static') {
+    element.style.position = 'relative';
   }
 }
 

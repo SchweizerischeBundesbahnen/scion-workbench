@@ -18,6 +18,7 @@ import { Injector, TemplateRef, Type } from '@angular/core';
 import { Disposable } from './disposable';
 import { ComponentType } from '@angular/cdk/portal';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
+import { Router, UrlSegment } from '@angular/router';
 
 /**
  * A view is a visual component within the Workbench to present content,
@@ -95,6 +96,13 @@ export abstract class WorkbenchView {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public abstract close(): Promise<boolean>;
+
+  /**
+   * Returns the URL segments of this view.
+   *
+   * A {@link UrlSegment} is a part of a URL between the two slashes. It contains a path and the matrix parameters associated with the segment.
+   */
+  public abstract get urlSegments(): UrlSegment[];
 }
 
 export class InternalWorkbenchView implements WorkbenchView {
@@ -118,7 +126,8 @@ export class InternalWorkbenchView implements WorkbenchView {
               active: boolean,
               public workbench: WorkbenchService,
               public readonly portal: WbComponentPortal<ViewComponent>,
-              private _viewActivationInstantProvider: ViewActivationInstantProvider) {
+              private _viewActivationInstantProvider: ViewActivationInstantProvider,
+              private _router: Router) {
     this.active$ = new BehaviorSubject<boolean>(active);
     this.cssClasses$ = new BehaviorSubject<string[]>([]);
     this.title = viewRef;
@@ -152,6 +161,18 @@ export class InternalWorkbenchView implements WorkbenchView {
 
   public close(): Promise<boolean> {
     return this.workbench.destroyView(this.viewRef);
+  }
+
+  public get urlSegments(): UrlSegment[] {
+    const urlTree = this._router.parseUrl(this._router.url);
+    const urlSegmentGroups = urlTree.root.children;
+
+    const viewOutlet = urlSegmentGroups[this.viewRef];
+    if (!viewOutlet) {
+      throw Error(`[ViewOutletNotFoundError] View outlet not part of the URL [outlet=${this.viewRef}]`);
+    }
+
+    return viewOutlet.segments;
   }
 
   public get destroyed(): boolean {

@@ -16,6 +16,7 @@ import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewPart } from '../workbench.model';
 import { takeUntil } from 'rxjs/operators';
 import { ViewDragService } from '../view-dnd/view-drag.service';
+import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 
 @Component({
   selector: 'wb-view-part',
@@ -44,6 +45,7 @@ export class ViewPartComponent implements OnDestroy {
   constructor(private _workbench: InternalWorkbenchService,
               private _viewDragService: ViewDragService,
               private _viewPart: WorkbenchViewPart,
+              private _viewRegistry: WorkbenchViewRegistry,
               public viewPartService: WorkbenchViewPartService) {
     combineLatest([this._workbench.viewPartActions$, this._viewPart.actions$, this._viewPart.viewRefs$])
       .pipe(takeUntil(this._destroy$))
@@ -73,11 +75,13 @@ export class ViewPartComponent implements OnDestroy {
       return;
     }
 
+    const activeView = this._viewRegistry.getElseThrow(this._viewPart.activeViewRef);
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: this._workbench.appInstanceId,
         viewPartRef: this._viewPart.viewPartRef,
-        viewRef: this._viewPart.activeViewRef,
+        viewRef: activeView.viewRef,
+        viewUrlSegments: activeView.urlSegments,
       },
       target: {
         appInstanceId: this._workbench.appInstanceId,
@@ -104,6 +108,7 @@ export class ViewPartComponent implements OnDestroy {
         appInstanceId: event.dragData.appInstanceId,
         viewPartRef: event.dragData.viewPartRef,
         viewRef: event.dragData.viewRef,
+        viewUrlSegments: event.dragData.viewUrlSegments,
       },
       target: {
         appInstanceId: this._workbench.appInstanceId,

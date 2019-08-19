@@ -14,6 +14,7 @@ import { coerceArray } from '@angular/cdk/coercion';
 import { filter, take, takeUntil } from 'rxjs/operators';
 import { BroadcastChannelService } from '../broadcast-channel.service';
 import { Defined } from '../defined.util';
+import { UrlSegment } from '@angular/router';
 
 /**
  * Events fired during view drag and drop operation.
@@ -211,6 +212,7 @@ export interface ViewDragData {
   viewTabPointerOffsetY: number;
   viewRef: string;
   viewTitle: string;
+  viewUrlSegments: UrlSegment[];
   viewHeading: string;
   viewClosable: boolean;
   viewDirty: boolean;
@@ -227,6 +229,7 @@ export interface ViewMoveEvent {
   source: {
     viewRef: string;
     viewPartRef: string;
+    viewUrlSegments: UrlSegment[],
     appInstanceId: string;
   };
   target: {

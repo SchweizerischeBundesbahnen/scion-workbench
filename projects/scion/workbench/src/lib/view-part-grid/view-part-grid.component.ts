@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, isDevMode, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { WorkbenchViewPartRegistry } from './workbench-view-part-registry.service';
 import { VIEW_PART_REF_INDEX, ViewPartInfoArray, ViewPartSashBox } from './view-part-grid-serializer.service';
@@ -17,7 +17,10 @@ import { noop, Subject } from 'rxjs';
 import { pairwise, startWith, takeUntil } from 'rxjs/operators';
 import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
 import { ViewDragService, ViewMoveEvent } from '../view-dnd/view-drag.service';
+import { InternalWorkbenchService } from '../workbench.service';
+import { UrlSegment } from '@angular/router';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
+import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 
 /**
  * Allows the arrangement of viewparts in a grid.
@@ -52,7 +55,9 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
    */
   public sashBox: ViewPartSashBox;
 
-  constructor(private _viewOutletNavigator: ViewOutletNavigator,
+  constructor(private _workbench: InternalWorkbenchService,
+              private _viewOutletNavigator: ViewOutletNavigator,
+              private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
               private _viewDragService: ViewDragService,
               private _cd: ChangeDetectorRef) {
@@ -130,36 +135,94 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
   }
 
   private installViewMoveListener(): void {
+    const appInstanceId = this._workbench.appInstanceId;
+
     this._viewDragService.viewMove$
       .pipe(takeUntil(this._destroy$))
       .subscribe((event: ViewMoveEvent) => {
-        if (event.source.appInstanceId !== event.target.appInstanceId) {
-          isDevMode() && console && console.warn && console.warn('[UnsupportedOperationError] Dragging views between different browsing contexts not supported yet');
+        // Check if this app instance takes part in the view drag operation. If not, do nothing.
+        if (event.source.appInstanceId !== appInstanceId && event.target.appInstanceId !== appInstanceId) {
           return;
         }
 
-        if (event.source.viewPartRef === event.target.viewPartRef && event.target.viewPartRegion === 'center') {
+        const crossAppInstanceViewDrag = (event.source.appInstanceId !== event.target.appInstanceId);
+
+        // Check if the user dropped the viewtab at the same location. If so, do nothing.
+        if (!crossAppInstanceViewDrag && event.source.viewPartRef === event.target.viewPartRef && event.target.viewPartRegion === 'center') {
           return;
         }
 
-        if (!event.target.viewPartRegion || event.target.viewPartRegion === 'center') {
-          this._viewOutletNavigator.navigate({
-            viewGrid: this._viewPartRegistry.grid
-              .moveView(event.source.viewRef, event.target.viewPartRef, event.target.insertionIndex)
-              .serialize(),
-          }).then();
+        // Check if to remove the view from this app instance if being moved to another app instance.
+        if (crossAppInstanceViewDrag && event.source.appInstanceId === appInstanceId) {
+          this.removeView(event);
         }
+        // Check if to add the view to this app instance if being moved from another app instance to this app instance.
+        else if (crossAppInstanceViewDrag && event.target.appInstanceId === appInstanceId) {
+          this.addView(event);
+        }
+        // Move the view within the same app instance.
         else {
-          const grid = this._viewPartRegistry.grid;
-          const newViewPartRef = grid.computeNextViewPartIdentity();
-
-          this._viewOutletNavigator.navigate({
-            viewGrid: grid
-              .addSiblingViewPart(event.target.viewPartRegion, event.target.viewPartRef, newViewPartRef)
-              .moveView(event.source.viewRef, newViewPartRef)
-              .serialize(),
-          }).then();
+          this.moveView(event);
         }
       });
+  }
+
+  private addView(event: ViewMoveEvent): void {
+    const addToNewViewPart = (event.target.viewPartRegion || 'center') !== 'center';
+
+    // Transform URL segments into an array of commands.
+    const commands = event.source.viewUrlSegments.reduce((acc: any[], segment: UrlSegment) => {
+      return acc.concat(
+        segment.path || [],
+        segment.parameters && Object.keys(segment.parameters).length ? segment.parameters : [],
+      );
+    }, []);
+
+    if (addToNewViewPart) {
+      const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
+      const newViewPartRef = this._viewPartRegistry.grid.computeNextViewPartIdentity();
+      this._viewOutletNavigator.navigate({
+        viewOutlet: {name: newViewRef, commands},
+        viewGrid: this._viewPartRegistry.grid
+          .addSiblingViewPart(event.target.viewPartRegion, event.target.viewPartRef, newViewPartRef)
+          .addView(newViewPartRef, newViewRef)
+          .serialize(),
+      }).then();
+    }
+    else {
+      const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
+      this._viewOutletNavigator.navigate({
+        viewOutlet: {name: newViewRef, commands},
+        viewGrid: this._viewPartRegistry.grid
+          .addView(event.target.viewPartRef, newViewRef, event.target.insertionIndex)
+          .serialize(),
+      }).then();
+    }
+  }
+
+  private removeView(event: ViewMoveEvent): void {
+    this._workbench.destroyView(event.source.viewRef).then();
+  }
+
+  private moveView(event: ViewMoveEvent): void {
+    const addToNewViewPart = (event.target.viewPartRegion || 'center') !== 'center';
+    const grid = this._viewPartRegistry.grid;
+
+    if (addToNewViewPart) {
+      const newViewPartRef = grid.computeNextViewPartIdentity();
+      this._viewOutletNavigator.navigate({
+        viewGrid: grid
+          .addSiblingViewPart(event.target.viewPartRegion, event.target.viewPartRef, newViewPartRef)
+          .moveView(event.source.viewRef, newViewPartRef)
+          .serialize(),
+      }).then();
+    }
+    else {
+      this._viewOutletNavigator.navigate({
+        viewGrid: grid
+          .moveView(event.source.viewRef, event.target.viewPartRef, event.target.insertionIndex)
+          .serialize(),
+      }).then();
+    }
   }
 }
