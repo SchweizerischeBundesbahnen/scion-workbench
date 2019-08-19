@@ -5,7 +5,7 @@
 </wb-portal-outlet>
 
 <ng-template #entry_point_template>
-  <main>
+  <main wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)" [wbViewDropZoneRegions]="['center']">
     <router-outlet></router-outlet>
   </main>
 </ng-template>

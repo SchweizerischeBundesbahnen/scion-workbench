@@ -18,6 +18,7 @@ import { ViewTabContentComponent } from '../view-part/view-tab-content/view-tab-
 import { WorkbenchView } from '../workbench.model';
 import { WorkbenchConfig } from '../workbench.config';
 import { VIEW_TAB_CONTEXT } from '../workbench.constants';
+import { UrlSegment } from '@angular/router';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 
@@ -191,6 +192,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly active = true;
   public readonly blocked = false;
   public readonly cssClasses = [];
+  public readonly urlSegments: UrlSegment[];
 
   constructor(dragData: ViewDragData) {
     this.viewRef = dragData.viewRef;
@@ -198,6 +200,7 @@ class DragImageWorkbenchView implements WorkbenchView {
     this.heading = dragData.viewHeading;
     this.closable = dragData.viewClosable;
     this.dirty = dragData.viewDirty;
+    this.urlSegments = dragData.viewUrlSegments;
   }
 
   public close(): Promise<boolean> {

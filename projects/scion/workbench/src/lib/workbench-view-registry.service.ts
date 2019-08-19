@@ -98,7 +98,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
 
   private createWorkbenchView(viewRef: string, active: boolean): InternalWorkbenchView {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_COMPONENT_TYPE));
-    const view = new InternalWorkbenchView(viewRef, active, this._injector.get(WORKBENCH), portal, this._viewActivationInstantProvider);
+    const view = new InternalWorkbenchView(viewRef, active, this._injector.get(WORKBENCH), portal, this._viewActivationInstantProvider, this._router);
 
     portal.init({
       injectorTokens: new WeakMap()

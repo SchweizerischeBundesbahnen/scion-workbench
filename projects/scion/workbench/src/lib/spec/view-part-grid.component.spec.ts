@@ -12,7 +12,7 @@ import { async, fakeAsync, TestBed } from '@angular/core/testing';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { AbstractType, Component, InjectionToken, NgModule, Type } from '@angular/core';
 import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
-import { Router } from '@angular/router';
+import { Router, UrlSegment } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
@@ -58,6 +58,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -102,6 +103,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -146,6 +148,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -190,6 +193,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -234,6 +238,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -276,6 +281,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.3',
+        viewUrlSegments: [new UrlSegment('view-3', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -291,6 +297,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -317,6 +324,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.1',
+        viewUrlSegments: [new UrlSegment('view-1', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -356,6 +364,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -380,6 +389,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.2',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -423,6 +433,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -447,6 +458,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.2',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -490,6 +502,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -514,6 +527,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.2',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -557,6 +571,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -581,6 +596,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.2',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -632,6 +648,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.3',
+        viewUrlSegments: [new UrlSegment('view-3', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -660,6 +677,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.1',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -691,6 +709,7 @@ describe('ViewPartGridComponent', () => {
         appInstanceId: workbench.appInstanceId,
         viewPartRef: 'viewpart.3',
         viewRef: 'view.2',
+        viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
         appInstanceId: workbench.appInstanceId,
@@ -803,3 +822,4 @@ class AppTestModule {
 function getService<T>(token: Type<T> | AbstractType<T> | InjectionToken<T>): T {
   return TestBed.get(token as Type<T>);
 }
+

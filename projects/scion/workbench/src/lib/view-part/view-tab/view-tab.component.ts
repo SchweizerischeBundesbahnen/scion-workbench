@@ -107,6 +107,7 @@ export class ViewTabComponent implements OnDestroy {
         viewHeading: this.view.heading,
         viewClosable: this.view.closable,
         viewDirty: this.view.dirty,
+        viewUrlSegments: this.view.urlSegments,
         viewPartRef: this.view.viewPart.viewPartRef,
         viewTabPointerOffsetX: event.offsetX,
         viewTabPointerOffsetY: event.offsetY,

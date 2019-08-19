@@ -234,6 +234,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
         appInstanceId: this.dragData.appInstanceId,
         viewPartRef: this.dragData.viewPartRef,
         viewRef: this.dragData.viewRef,
+        viewUrlSegments: this.dragData.viewUrlSegments,
       },
       target: {
         appInstanceId: this._workbench.appInstanceId,
