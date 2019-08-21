@@ -20,7 +20,7 @@ describe('Workbench Router', () => {
 
   it('should match matrix params when resolving views for activation or closing', async () => {
     await viewNavigationPO.navigateTo();
-    await expect(appPO.getViewTabCount()).toEqual(1);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
 
     // open view-1
     await viewNavigationPO.enterPath('view');
@@ -29,8 +29,8 @@ describe('Workbench Router', () => {
     await viewNavigationPO.selectTarget('blank');
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-1').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(2);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(2);
 
     // open view-2
     await viewNavigationPO.activateViewTab();
@@ -40,8 +40,8 @@ describe('Workbench Router', () => {
     await viewNavigationPO.selectTarget('blank');
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-2').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(3);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(3);
 
     // open view-3
     await viewNavigationPO.activateViewTab();
@@ -51,8 +51,8 @@ describe('Workbench Router', () => {
     await viewNavigationPO.selectTarget('blank');
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-3').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(4);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-3'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(4);
 
     // activate view-1
     await viewNavigationPO.activateViewTab();
@@ -61,8 +61,8 @@ describe('Workbench Router', () => {
     await viewNavigationPO.checkActivateIfPresent(true);
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-1').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(4);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(4);
 
     // activate view-2
     await viewNavigationPO.activateViewTab();
@@ -71,8 +71,8 @@ describe('Workbench Router', () => {
     await viewNavigationPO.checkActivateIfPresent(true);
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-2').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(4);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(4);
 
     // activate view-3
     await viewNavigationPO.activateViewTab();
@@ -81,8 +81,8 @@ describe('Workbench Router', () => {
     await viewNavigationPO.checkActivateIfPresent(true);
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-3').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(4);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-3'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(4);
 
     // close view-1
     await viewNavigationPO.activateViewTab();
@@ -92,7 +92,7 @@ describe('Workbench Router', () => {
     await viewNavigationPO.navigate();
 
     await expect(viewNavigationPO.isActiveViewTab).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(3);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(3);
 
     // close view-2
     await viewNavigationPO.activateViewTab();
@@ -102,7 +102,7 @@ describe('Workbench Router', () => {
     await viewNavigationPO.navigate();
 
     await expect(viewNavigationPO.isActiveViewTab).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(2);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(2);
 
     // close view-3
     await viewNavigationPO.activateViewTab();
@@ -112,7 +112,7 @@ describe('Workbench Router', () => {
     await viewNavigationPO.navigate();
 
     await expect(viewNavigationPO.isActiveViewTab).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(1);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
   });
 
   it('should show title of inactive views when reloading the application', async () => {
@@ -132,11 +132,11 @@ describe('Workbench Router', () => {
     // reload the application
     await browser.refresh();
 
-    await expect(appPO.findViewTab('e2e-view-1').isActive()).toBeFalsy();
-    await expect(appPO.findViewTab('e2e-view-1').getTitle()).toEqual('view-1-title');
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).isActive()).toBeFalsy();
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).getTitle()).toEqual('view-1-title');
 
-    await expect(appPO.findViewTab('e2e-view-2').isActive()).toBeTruthy();
-    await expect(appPO.findViewTab('e2e-view-2').getTitle()).toEqual('view-2-title');
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).isActive()).toBeTruthy();
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).getTitle()).toEqual('view-2-title');
 
     await expect((await browserErrors())).toEqual([]);
   });
@@ -146,21 +146,21 @@ describe('Workbench Router', () => {
 
     // open view tab
     await appPO.openNewViewTab();
-    await expect(appPO.getViewTabCount('e2e-welcome-page')).toEqual(1);
+    await expect(appPO.getViewTabCount('viewpart.1', 'e2e-welcome-page')).toEqual(1);
 
     // close view tab
-    await appPO.findViewTab('e2e-welcome-page').close();
-    await expect(appPO.getViewTabCount('e2e-welcome-page')).toEqual(0);
+    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-welcome-page'}).close();
+    await expect(appPO.getViewTabCount('viewpart.1', 'e2e-welcome-page')).toEqual(0);
 
     // open view tab
     await appPO.openNewViewTab();
-    await expect(appPO.getViewTabCount('e2e-welcome-page')).toEqual(1);
+    await expect(appPO.getViewTabCount('viewpart.1', 'e2e-welcome-page')).toEqual(1);
     // expect no error to be thrown
     await expect((await browserErrors())).toEqual([]);
 
     // open view tab
     await appPO.openNewViewTab();
-    await expect(appPO.getViewTabCount('e2e-welcome-page')).toEqual(2);
+    await expect(appPO.getViewTabCount('viewpart.1', 'e2e-welcome-page')).toEqual(2);
     // expect no error to be thrown
     await expect((await browserErrors())).toEqual([]);
   });
@@ -182,7 +182,7 @@ describe('Workbench Router', () => {
     // close all view tabs
     await appPO.closeAllViewTabs();
 
-    await expect(appPO.getViewTabCount()).toEqual(0);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(0);
 
     // expect no error to be thrown
     await expect((await browserErrors())).toEqual([]);

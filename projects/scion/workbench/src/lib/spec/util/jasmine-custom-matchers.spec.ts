@@ -126,14 +126,14 @@ function createToBeViewPartGridMatcher(util: MatchersUtil, customEqualityTesters
       const expectedViewPartRef = expectedGridElement[VIEW_PART_REF_INDEX];
       const expectedActiveViewRef = expectedGridElement[ACTIVE_VIEW_REF_INDEX];
 
-      const actualViewPartElement = actualDom.query(By.css(`wb-view-part#${expectedViewPartRef.replace('\.', '\\.')}`));
+      const actualViewPartElement = actualDom.query(By.css(`wb-view-part[viewpartref="${expectedViewPartRef}"]`));
       if (!actualViewPartElement) {
-        throw new AssertException(`DOM: Expected element <wb-view-part id=${expectedViewPartRef}> not found for view '${expectedActiveViewRef}'`);
+        throw new AssertException(`DOM: Expected element <wb-view-part viewpartref="${expectedViewPartRef}"> not found for view '${expectedActiveViewRef}'`);
       }
 
-      const actualActiveViewDebugElement = actualViewPartElement.query(By.css(`wb-view#${expectedActiveViewRef.replace('\.', '\\.')}`));
+      const actualActiveViewDebugElement = actualViewPartElement.query(By.css(`wb-view[viewref="${expectedActiveViewRef}"]`));
       if (!actualActiveViewDebugElement) {
-        throw new AssertException(`DOM: Expected element <wb-view id=${expectedActiveViewRef}> not found for view '${expectedActiveViewRef}'`);
+        throw new AssertException(`DOM: Expected element <wb-view viewref="${expectedActiveViewRef}"> not found for view '${expectedActiveViewRef}'`);
       }
     }
   }

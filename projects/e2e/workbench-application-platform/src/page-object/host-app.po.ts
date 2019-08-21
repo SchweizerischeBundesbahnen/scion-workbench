@@ -16,19 +16,18 @@ import { ISize } from 'selenium-webdriver';
 export class HostAppPO {
 
   /**
-   * Finds the view tab which has given CSS class set.
-   * If not found, the promise resolves to `null`.
+   * Returns a handle representing the view tab of given `viewRef` or which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public async findViewTab(cssClass: string): Promise<ViewTabPO | null> {
-    await switchToMainContext();
-    const viewTabFinder = $(`wb-view-tab.${cssClass}`);
-
-    const exists = await viewTabFinder.isPresent();
-    if (!exists) {
-      return null;
-    }
+  public findViewTab(viewPartRef: string, findBy: { viewRef?: string, cssClass?: string }): ViewTabPO {
+    const viewTabFinder = createViewTabFinder(viewPartRef, findBy);
 
     return new class implements ViewTabPO {
+      async isPresent(): Promise<boolean> {
+        await switchToMainContext();
+        return viewTabFinder.isPresent();
+      }
+
       async click(): Promise<void> {
         await switchToMainContext();
         await viewTabFinder.click();
@@ -69,9 +68,9 @@ export class HostAppPO {
   /**
    * Returns the number of view tabs.
    */
-  public async getViewTabCount(): Promise<number> {
+  public async getViewTabCount(viewPartRef: string): Promise<number> {
     await switchToMainContext();
-    return $$('wb-view-tab').count();
+    return createViewPartBarFinder(viewPartRef).$$('wb-view-tab').count();
   }
 
   /**
@@ -258,20 +257,6 @@ export class HostAppPO {
   }
 
   /**
-   * Clicks the view tab which has given CSS class set.
-   *
-   * The promise returned is rejected if not found.
-   */
-  public async clickViewTab(cssClass: string): Promise<void> {
-    await switchToMainContext();
-    const viewTabPO = await this.findViewTab(cssClass);
-    if (viewTabPO === null) {
-      return Promise.reject(`View tab not found [cssClass=${cssClass}]`);
-    }
-    await viewTabPO.click();
-  }
-
-  /**
    * Finds the activity item which has given CSS class set.
    * If not found, the promise resolves to `null`.
    */
@@ -394,6 +379,8 @@ export class HostAppPO {
 }
 
 export interface ViewTabPO {
+  isPresent(): Promise<boolean>;
+
   getTitle(): Promise<string>;
 
   getHeading(): Promise<string>;
@@ -468,4 +455,20 @@ export interface ActivityActionPO {
   isPresent(): Promise<boolean>;
 
   click(): Promise<void>;
+}
+
+function createViewPartBarFinder(viewPartRef: string): ElementFinder {
+  return $(`wb-view-part[viewpartref="${viewPartRef}"] wb-view-part-bar`);
+}
+
+function createViewTabFinder(viewPartRef: string, findBy: { viewRef?: string, cssClass?: string }): ElementFinder {
+  const viewPartBarFinder = createViewPartBarFinder(viewPartRef);
+
+  if (findBy.viewRef !== undefined) {
+    return viewPartBarFinder.$(`wb-view-tab[viewref="${findBy.viewRef}"]`);
+  }
+  else if (findBy.cssClass !== undefined) {
+    return viewPartBarFinder.$(`wb-view-tab.${findBy.cssClass}`);
+  }
+  throw Error('[IllegalArgumentError] \'viewRef\' or \'cssClass\' required to find a view tab');
 }
