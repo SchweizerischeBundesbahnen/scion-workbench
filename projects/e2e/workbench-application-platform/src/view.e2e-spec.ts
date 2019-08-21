@@ -9,7 +9,7 @@
  */
 
 import { TestingViewPO } from './page-object/testing-view.po';
-import { HostAppPO, ViewTabPO } from './page-object/host-app.po';
+import { HostAppPO } from './page-object/host-app.po';
 import { browser } from 'protractor';
 import { expectViewToExistButHidden, expectViewToNotExist, expectViewToShow } from './util/testing.util';
 import { TestcaseFfd6a78fViewPO } from './page-object/testcase-ffd6a78f-view.po';
@@ -43,7 +43,7 @@ describe('View', () => {
       await activityItemPO.click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-ffd6a78f', componentSelector: 'app-view-ffd6a78f'});
 
-      const viewTabPO: ViewTabPO = await hostAppPO.findViewTab('e2e-view-ffd6a78f');
+      const viewTabPO = hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-ffd6a78f'});
       await expect(viewTabPO.getTitle()).toEqual('bd3f2784cf0a');
       await expect(viewTabPO.getHeading()).toEqual('5abffe076b58');
       await expect(viewTabPO.isClosable()).toBeTruthy('closable');
@@ -60,8 +60,8 @@ describe('View', () => {
       await testingViewPO.navigateTo();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
 
-      const viewTab: ViewTabPO = await hostAppPO.findViewTab('e2e-testing-view');
-      await expect(viewTab).not.toBeNull('ViewTab not found: e2e-testing-view');
+      const viewTab = hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'});
+      await expect(viewTab.isPresent()).toBeTruthy('ViewTab not found: e2e-testing-view');
 
       const viewInteractionPO = await testingViewPO.openViewInteractionPanel();
 
@@ -90,19 +90,19 @@ describe('View', () => {
       const viewInteractionPO = await testingViewPO.openViewInteractionPanel();
       await viewInteractionPO.close();
 
-      await expect(hostAppPO.findViewTab('e2e-testing-view')).toBeNull('ViewTab still open: e2e-testing-view');
+      await expect(hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).isPresent()).toBeFalsy('ViewTab still open: e2e-testing-view');
     });
 
     it('should allow to close the view via \'view-tab\' close button', async () => {
       await testingViewPO.navigateTo();
 
-      const viewTab: ViewTabPO = await hostAppPO.findViewTab('e2e-testing-view');
-      await expect(viewTab).not.toBeNull('ViewTab not found: e2e-testing-view');
+      const viewTab = hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'});
+      await expect(viewTab.isPresent).toBeTruthy('ViewTab not found: e2e-testing-view');
 
       const viewInteractionPO = await testingViewPO.openViewInteractionPanel();
       await viewInteractionPO.setClosable(true);
       await viewTab.close();
-      await expect(hostAppPO.findViewTab('e2e-testing-view')).toBeNull('ViewTab still open: e2e-testing-view');
+      await expect(hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).isPresent()).toBeFalsy('ViewTab still open: e2e-testing-view');
     });
 
     it('should allow to prevent closing the view if closed via close button [testcase: 0c4fe9e3-view]', async () => {
@@ -118,7 +118,7 @@ describe('View', () => {
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-0c4fe9e3', componentSelector: 'app-view-0c4fe9e3'});
 
       // Close the view
-      const viewTabPO: ViewTabPO = await hostAppPO.findViewTab('e2e-view-0c4fe9e3');
+      const viewTabPO = hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-0c4fe9e3'});
 
       // Click close button but cancel closing
       await viewTabPO.close();
@@ -203,10 +203,10 @@ describe('View', () => {
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-28f32b51', componentSelector: 'app-view-28f32b51'});
       await expect(viewPO.readActiveLog()).toEqual([true]);
 
-      await hostAppPO.clickViewTab('e2e-testing-view');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
 
-      await hostAppPO.clickViewTab('e2e-view-28f32b51');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-28f32b51'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-28f32b51', componentSelector: 'app-view-28f32b51'});
       await expect(viewPO.readActiveLog()).toEqual([true, false, true]);
     });
@@ -404,13 +404,13 @@ describe('View', () => {
       await viewNavigationPO.selectTarget('blank');
       await viewNavigationPO.execute();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-4a4e6970', componentSelector: 'app-view-4a4e6970'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
       // Go back to the testing view
-      const testingViewTabPO: ViewTabPO = await hostAppPO.findViewTab('e2e-testing-view');
+      const testingViewTabPO = hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'});
       await testingViewTabPO.click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
       // Navigate to already opened view 'e2e-view-4a4e6970'
       await viewNavigationPO.enterQualifier({
@@ -421,12 +421,12 @@ describe('View', () => {
       await viewNavigationPO.checkActivateIfPresent(true);
       await viewNavigationPO.execute();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-4a4e6970', componentSelector: 'app-view-4a4e6970'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
       // Go back to the testing view
       await testingViewTabPO.click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
       // Navigate to new 'e2e-view-4a4e6970' view
       await viewNavigationPO.enterQualifier({
@@ -436,7 +436,7 @@ describe('View', () => {
       await viewNavigationPO.selectTarget('blank');
       await viewNavigationPO.checkActivateIfPresent(false);
       await viewNavigationPO.execute();
-      await expect(hostAppPO.getViewTabCount()).toBe(3);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(3);
     });
 
     it('should activate an already opened view even if using \'self\' target strategy (activateIfPresent=true, target=self) [testcase: b1dd152a-view]', async () => {
@@ -450,13 +450,13 @@ describe('View', () => {
       await viewNavigationPO.selectTarget('blank');
       await viewNavigationPO.execute();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-b1dd152a', componentSelector: 'app-view-b1dd152a'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
       // Go back to the testing view
-      const testingViewTabPO: ViewTabPO = await hostAppPO.findViewTab('e2e-testing-view');
+      const testingViewTabPO = hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'});
       await testingViewTabPO.click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
       // Navigate to already opened view 'e2e-view-b1dd152a'
       await viewNavigationPO.enterQualifier({
@@ -467,7 +467,7 @@ describe('View', () => {
       await viewNavigationPO.checkActivateIfPresent(true);
       await viewNavigationPO.execute();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-b1dd152a', componentSelector: 'app-view-b1dd152a'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
     });
 
     it('should allow to close an opened view (closeIfPresent=true) [testcase: 608aa47c-view]', async () => {
@@ -481,13 +481,13 @@ describe('View', () => {
       await viewNavigationPO.selectTarget('blank');
       await viewNavigationPO.execute();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-608aa47c', componentSelector: 'app-view-608aa47c'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
       // Go back to the testing view
-      const testingViewTabPO: ViewTabPO = await hostAppPO.findViewTab('e2e-testing-view');
+      const testingViewTabPO = hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'});
       await testingViewTabPO.click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
-      await expect(hostAppPO.getViewTabCount()).toBe(2);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
       // Close the view 'e2e-view-608aa47c' via navigation
       await viewNavigationPO.enterQualifier({
@@ -497,7 +497,7 @@ describe('View', () => {
       await viewNavigationPO.checkCloseIfPresent(true);
       await viewNavigationPO.execute();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
-      await expect(hostAppPO.getViewTabCount()).toBe(1);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(1);
     });
 
     it('should allow to open another view in the same view outlet (target=self) [testcase: f389a9d5-view]', async () => {
@@ -511,7 +511,7 @@ describe('View', () => {
       await viewNavigationPO.selectTarget('self');
       await viewNavigationPO.execute();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-f389a9d5', componentSelector: 'app-view-f389a9d5'});
-      await expect(hostAppPO.getViewTabCount()).toBe(1);
+      await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(1);
     });
 
     it('should substitute path parameters with values from the intent qualifier [testcase: cc977da9-view]', async () => {
@@ -584,17 +584,17 @@ describe('View', () => {
       await expectViewToExistButHidden({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view'});
 
       // Go to to testing view
-      await hostAppPO.clickViewTab('e2e-testing-view');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
       await expectViewToExistButHidden({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-be587bd6'});
 
       // // Go to be587bd6 view
-      await hostAppPO.clickViewTab('e2e-view-be587bd6');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-be587bd6'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-be587bd6', componentSelector: 'app-view-be587bd6'});
       await expectViewToExistButHidden({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view'});
       //
       // // Close be587bd6 view
-      const viewTab = await hostAppPO.findViewTab('e2e-view-be587bd6');
+      const viewTab = hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-be587bd6'});
       await viewTab.close();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
       await expectViewToNotExist({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-be587bd6'});
@@ -745,10 +745,10 @@ describe('View', () => {
       await viewPO.pressTab();
       await expect(viewPO.isActiveElement('field-2')).toBeTruthy('(2)');
 
-      await hostAppPO.clickViewTab('e2e-testing-view');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
 
-      await hostAppPO.clickViewTab('e2e-view-5782ab19');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-5782ab19'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-5782ab19', componentSelector: 'app-view-5782ab19'});
       await expect(viewPO.isActiveElement('field-2')).toBeTruthy('(3)');
     });
@@ -904,11 +904,11 @@ describe('View', () => {
       const componentInstanceUuid = await viewPO.getComponentInstanceUuid();
 
       // activate testing view
-      await hostAppPO.clickViewTab('e2e-testing-view');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
 
       // activate 68f302b4-view
-      await hostAppPO.clickViewTab('e2e-view-68f302b4');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-68f302b4'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-68f302b4', componentSelector: 'app-view-68f302b4'});
 
       await expect(viewPO.getAppInstanceUuid()).toEqual(appInstanceUuid);

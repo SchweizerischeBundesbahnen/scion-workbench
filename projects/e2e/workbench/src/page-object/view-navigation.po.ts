@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { $, browser } from 'protractor';
+import { $, browser, Key } from 'protractor';
 import { checkCheckbox, selectOption } from '../util/testing.util';
 import { Params } from '@angular/router';
 import { SciParamsEnterPanelPO } from './sci-params-enter.po';
@@ -25,11 +25,11 @@ export class ViewNavigationPO {
   }
 
   public async activateViewTab(): Promise<void> {
-    await new AppPO().clickViewTab('e2e-view-navigation');
+    await new AppPO().findViewTab('viewpart.1', {cssClass: 'e2e-view-navigation'}).click();
   }
 
   public async isActiveViewTab(): Promise<boolean> {
-    return new AppPO().findViewTab('e2e-view-navigation').isActive();
+    return new AppPO().findViewTab('viewpart.1', {cssClass: 'e2e-view-navigation'}).isActive();
   }
 
   public async enterPath(path: string): Promise<void> {
@@ -59,6 +59,10 @@ export class ViewNavigationPO {
 
   public async selectTarget(value: 'self' | 'blank'): Promise<void> {
     await selectOption(value, this._viewFinder.$('select#target'));
+  }
+
+  public async setInsertionIndex(value: number | 'start' | 'end' | undefined): Promise<void> {
+    await this._viewFinder.$('input#insertionIndex').sendKeys(Key.chord(Key.CONTROL, 'a'), value);
   }
 
   public async navigate(): Promise<void> {

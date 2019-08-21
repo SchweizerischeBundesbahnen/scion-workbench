@@ -535,9 +535,9 @@ describe('Activity', () => {
         await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-4a4e6970', componentSelector: 'app-view-4a4e6970'});
 
         // Go back to the testing view
-        await hostAppPO.clickViewTab('e2e-testing-view');
+        await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).click();
         await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
-        await expect(hostAppPO.getViewTabCount()).toBe(2);
+        await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
 
         // Add activity action to activate the testing view
         const testingActivityPO = new TestingActivityPO(E2E_TESTING_ACTIVITY_CONTEXT);
@@ -558,7 +558,7 @@ describe('Activity', () => {
         await action.click();
 
         await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-view-4a4e6970', componentSelector: 'app-view-4a4e6970'});
-        await expect(hostAppPO.getViewTabCount()).toBe(2);
+        await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
       });
 
       it('should allow to close an opened view (closeIfPresent=true) [testcase: 608aa47c-view]', async () => {
@@ -593,7 +593,7 @@ describe('Activity', () => {
         await action.click();
 
         await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
-        await expect(hostAppPO.getViewTabCount()).toBe(1);
+        await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(1);
       });
 
       it('should substitute path parameters with values from the intent qualifier [testcase: cc977da9-view]', async () => {

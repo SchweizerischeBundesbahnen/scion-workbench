@@ -45,9 +45,9 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
   @ViewChild('router_outlet', {static: true})
   public routerOutlet: WbRouterOutletDirective; // specs
 
-  @HostBinding('attr.id')
-  public get id(): string {
-    return this._view.viewRef; // specs
+  @HostBinding('attr.viewref')
+  public get viewRef(): string {
+    return this._view.viewRef;
   }
 
   @HostBinding('attr.content-projection')

@@ -36,9 +36,9 @@ export class ViewPartComponent implements OnDestroy {
   @HostBinding('class.suspend-pointer-events')
   public suspendPointerEvents = false;
 
-  @HostBinding('attr.id')
-  public get id(): string {
-    return this.viewPartService.viewPartRef; // specs
+  @HostBinding('attr.viewpartref')
+  public get viewPartRef(): string {
+    return this.viewPartService.viewPartRef;
   }
 
   constructor(private _workbench: InternalWorkbenchService,

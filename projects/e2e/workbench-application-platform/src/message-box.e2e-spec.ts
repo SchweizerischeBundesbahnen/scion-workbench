@@ -133,7 +133,7 @@ describe('MessageBox', () => {
 
     // switch to disabled view
     {
-      await hostAppPO.clickViewTab('e2e-testing-view');
+      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
       const msgboxPO = await hostAppPO.findMessageBox('e2e-dfa87d85eb1f-msgbox');
       await expect(msgboxPO.isDisplayed()).toBeTruthy('expected messagebox to be displayed');

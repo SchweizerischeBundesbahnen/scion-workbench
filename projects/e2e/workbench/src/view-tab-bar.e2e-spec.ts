@@ -26,34 +26,34 @@ describe('ViewTabBar', () => {
   it('should not show if no views are open and no viewpart actions present', async () => {
     await browser.get('/#/?show-open-new-view-tab-action=false');
 
-    await expect(appPO.getViewTabCount()).toEqual(0);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(0);
     await expect(appPO.isViewTabBarShowing()).toBeFalsy();
 
     await welcomePagePO.clickTile('e2e-tile-view-1');
-    await expect(appPO.getViewTabCount()).toEqual(1);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
 
-    await appPO.findViewTab('e2e-tile-view-1').close();
-    await expect(appPO.getViewTabCount()).toEqual(0);
+    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-tile-view-1'}).close();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(0);
     await expect(appPO.isViewTabBarShowing()).toBeFalsy();
 
     await browser.get('/#/?show-open-new-view-tab-action=true');
 
-    await expect(appPO.getViewTabCount()).toEqual(0);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(0);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
 
     await welcomePagePO.clickTile('e2e-tile-view-1');
-    await expect(appPO.getViewTabCount()).toEqual(1);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
 
-    await appPO.findViewTab('e2e-tile-view-1').close();
-    await expect(appPO.getViewTabCount()).toEqual(0);
+    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-tile-view-1'}).close();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(0);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
   });
 
   it('should activate the most recent view when closing a view', async () => {
     await viewNavigationPO.navigateTo();
-    await expect(appPO.getViewTabCount()).toEqual(1);
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
 
     // open view-1
     await viewNavigationPO.enterPath('view');
@@ -62,8 +62,8 @@ describe('ViewTabBar', () => {
     await viewNavigationPO.selectTarget('blank');
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-1').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(2);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(2);
 
     // open view-2
     await viewNavigationPO.activateViewTab();
@@ -73,8 +73,8 @@ describe('ViewTabBar', () => {
     await viewNavigationPO.selectTarget('blank');
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-2').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(3);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(3);
 
     // open view-3
     await viewNavigationPO.activateViewTab();
@@ -84,32 +84,33 @@ describe('ViewTabBar', () => {
     await viewNavigationPO.selectTarget('blank');
     await viewNavigationPO.navigate();
 
-    await expect(appPO.findViewTab('e2e-view-3').isActive()).toBeTruthy();
-    await expect(appPO.getViewTabCount()).toEqual(4);
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-3'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(4);
 
     // activate view-2
-    await appPO.findViewTab('e2e-view-2').click();
+    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).click();
 
-    await expect(appPO.findViewTab('e2e-view-2').isActive()).toBeTruthy();
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).isActive()).toBeTruthy();
 
     // activate view-1
-    await appPO.findViewTab('e2e-view-1').click();
+    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).click();
 
-    await expect(appPO.findViewTab('e2e-view-1').isActive()).toBeTruthy();
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).isActive()).toBeTruthy();
 
     // activate view-3
-    await appPO.findViewTab('e2e-view-3').click();
+    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-3'}).click();
 
-    await expect(appPO.findViewTab('e2e-view-3').isActive()).toBeTruthy();
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-3'}).isActive()).toBeTruthy();
 
     // close view-3
-    await appPO.findViewTab('e2e-view-3').close();
+    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-3'}).close();
 
-    await expect(appPO.findViewTab('e2e-view-1').isActive()).toBeTruthy();
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).isActive()).toBeTruthy();
 
     // close view-1
-    await appPO.findViewTab('e2e-view-1').close();
+    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-1'}).close();
 
-    await expect(appPO.findViewTab('e2e-view-2').isActive()).toBeTruthy();
+    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).isActive()).toBeTruthy();
+  });
   });
 });

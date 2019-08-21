@@ -17,11 +17,11 @@ import { WelcomePagePO } from './welcome-page.po';
 export class AppPO {
 
   /**
-   * Returns a handle representing the view tab which has given CSS class set.
+   * Returns a handle representing the view tab of given `viewRef` or which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public findViewTab(cssClass: string): ViewTabPO {
-    const viewTabFinder = $(`wb-view-tab.${cssClass}`);
+  public findViewTab(viewPartRef: string, findBy: { viewRef?: string, cssClass?: string }): ViewTabPO {
+    const viewTabFinder = createViewTabFinder(viewPartRef, findBy);
 
     return new class implements ViewTabPO {
       async isPresent(): Promise<boolean> {
@@ -64,15 +64,16 @@ export class AppPO {
   }
 
   /**
-   * Returns the number of view tabs.
+   * Returns the number of view tabs in the specified viewpart.
    *
    * Optionally, provide a CSS class to only count view tabs of given view.
    */
-  public async getViewTabCount(viewCssClass?: string): Promise<number> {
+  public async getViewTabCount(viewPartRef: string, viewCssClass?: string): Promise<number> {
     if (viewCssClass) {
-      return $$(`wb-view-tab.${viewCssClass}`).count();
+      return createViewPartBarFinder(viewPartRef).$$(`wb-view-tab.${viewCssClass}`).count();
     }
-    return $$('wb-view-tab').count();
+    return createViewPartBarFinder(viewPartRef).$$('wb-view-tab').count();
+  }
   }
 
   /**
@@ -292,19 +293,6 @@ export class AppPO {
   }
 
   /**
-   * Clicks the view tab which has given CSS class set.
-   *
-   * The promise returned is rejected if not found.
-   */
-  public async clickViewTab(cssClass: string): Promise<void> {
-    const viewTabPO = this.findViewTab(cssClass);
-    if (!await viewTabPO.isPresent()) {
-      return Promise.reject(`View tab not found [cssClass=${cssClass}]`);
-    }
-    await viewTabPO.click();
-  }
-
-  /**
    * Returns a handle representing the activity item which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
@@ -489,4 +477,20 @@ export interface ViewPartActionPO {
   isPresent(): Promise<boolean>;
 
   click(): Promise<void>;
+}
+
+function createViewPartBarFinder(viewPartRef: string): ElementFinder {
+  return $(`wb-view-part[viewpartref="${viewPartRef}"] wb-view-part-bar`);
+}
+
+function createViewTabFinder(viewPartRef: string, findBy: { viewRef?: string, cssClass?: string }): ElementFinder {
+  const viewPartBarFinder = createViewPartBarFinder(viewPartRef);
+
+  if (findBy.viewRef !== undefined) {
+    return viewPartBarFinder.$(`wb-view-tab[viewref="${findBy.viewRef}"]`);
+  }
+  else if (findBy.cssClass !== undefined) {
+    return viewPartBarFinder.$(`wb-view-tab.${findBy.cssClass}`);
+  }
+  throw Error('[IllegalArgumentError] \'viewRef\' or \'cssClass\' required to find a view tab');
 }
