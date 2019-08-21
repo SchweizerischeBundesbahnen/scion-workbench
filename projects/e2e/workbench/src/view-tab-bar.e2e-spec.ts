@@ -112,5 +112,153 @@ describe('ViewTabBar', () => {
 
     await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-2'}).isActive()).toBeTruthy();
   });
+
+  it('should insert a new view tab into the tabbar after the active view tab by default', async () => {
+    await viewNavigationPO.navigateTo();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1']);
+
+    // open view.2
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.2'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.2']);
+
+    // open view.3
+    await viewNavigationPO.activateViewTab();
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.3'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.3', 'view.2']);
+
+    // open view.4
+    await viewNavigationPO.activateViewTab();
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.4'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
+  });
+
+  it('should insert a new view tab into the tabbar at the end', async () => {
+    await viewNavigationPO.navigateTo();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1']);
+
+    // open view.2
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex('end');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.2'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.2']);
+
+    // open view.3
+    await viewNavigationPO.activateViewTab();
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex('end');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.3'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.2', 'view.3']);
+
+    // open view.4
+    await viewNavigationPO.activateViewTab();
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex('end');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.4'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
+  });
+
+  it('should insert a new view tab into the tabbar at the start', async () => {
+    await viewNavigationPO.navigateTo();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1']);
+
+    // open view.2
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex('start');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.2'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.2', 'view.1']);
+
+    // open view.3
+    await viewNavigationPO.activateViewTab();
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex('start');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.3'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.3', 'view.2', 'view.1']);
+
+    // open view.4
+    await viewNavigationPO.activateViewTab();
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex('start');
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.4'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.4', 'view.3', 'view.2', 'view.1']);
+  });
+
+  it('should insert a new view tab into the tabbar at a custom position', async () => {
+    await viewNavigationPO.navigateTo();
+    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1']);
+
+    // open view.2
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex(1);
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.2'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.2']);
+
+    // open view.3
+    await viewNavigationPO.activateViewTab();
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex(1);
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.3'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.3', 'view.2']);
+
+    // open view.4
+    await viewNavigationPO.activateViewTab();
+    await viewNavigationPO.enterPath('view');
+    await viewNavigationPO.checkActivateIfPresent(false);
+    await viewNavigationPO.selectTarget('blank');
+    await viewNavigationPO.setInsertionIndex(1);
+    await viewNavigationPO.navigate();
+
+    await expect(appPO.findViewTab('viewpart.1', {viewRef: 'view.4'}).isActive()).toBeTruthy();
+    await expect(appPO.getViewTabs('viewpart.1')).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
   });
 });

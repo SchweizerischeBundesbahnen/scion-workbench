@@ -13,6 +13,7 @@ import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { SciParamsEnterComponent } from '@scion/app/common';
 import { WbNavigationExtras, WorkbenchRouter, WorkbenchView } from '@scion/workbench';
 import { Params } from '@angular/router';
+import { coerceNumberProperty } from '@angular/cdk/coercion';
 
 const PATH = 'path';
 const QUERY_PARAMS = 'queryParams';
@@ -20,6 +21,7 @@ const MATRIX_PARAMS = 'matrixParams';
 const ACTIVATE_IF_PRESENT = 'activateIfPresent';
 const CLOSE_IF_PRESENT = 'closeIfPresent';
 const TARGET = 'target';
+const INSERTION_INDEX = 'insertionIndex';
 
 @Component({
   selector: 'app-view-navigation',
@@ -34,6 +36,7 @@ export class ViewNavigationComponent {
   public readonly ACTIVATE_IF_PRESENT = ACTIVATE_IF_PRESENT;
   public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
   public readonly TARGET = TARGET;
+  public readonly INSERTION_INDEX = INSERTION_INDEX;
 
   public form: FormGroup;
 
@@ -48,6 +51,7 @@ export class ViewNavigationComponent {
       [ACTIVATE_IF_PRESENT]: formBuilder.control(true),
       [CLOSE_IF_PRESENT]: formBuilder.control(false),
       [TARGET]: formBuilder.control('blank'),
+      [INSERTION_INDEX]: formBuilder.control(''),
     });
   }
 
@@ -59,6 +63,7 @@ export class ViewNavigationComponent {
       closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
       target: this.form.get(TARGET).value,
       selfViewRef: this._view.viewRef,
+      blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
     };
 
     const commands: any[] = String(this.form.get(PATH).value).split('/');
@@ -66,6 +71,17 @@ export class ViewNavigationComponent {
       commands.push(matrixParams);
     }
 
-    this._router.navigate(commands, extras);
+    this._router.navigate(commands, extras).then();
   }
 }
+
+function coerceInsertionIndex(value: any): number | 'start' | 'end' | undefined {
+  if (value === '') {
+    return undefined;
+  }
+  if (value === 'start' || value === 'end' || value === undefined) {
+    return value;
+  }
+  return coerceNumberProperty(value);
+}
+

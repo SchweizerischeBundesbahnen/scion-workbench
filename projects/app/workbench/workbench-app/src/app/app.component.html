@@ -13,7 +13,7 @@
   </wb-activity>
 
   <ng-template wbViewPartAction *ngIf="showOpenNewViewTabAction">
-    <button [wbRouterLink]="'/welcome'" class="material-icons e2e-open-new-tab" [wbRouterLinkExtras]="{activateIfPresent: false}">
+    <button [wbRouterLink]="'/welcome'" class="material-icons e2e-open-new-tab" [wbRouterLinkExtras]="{activateIfPresent: false, blankInsertionIndex: 'end'}">
       add
     </button>
   </ng-template>

@@ -74,6 +74,15 @@ export class AppPO {
     }
     return createViewPartBarFinder(viewPartRef).$$('wb-view-tab').count();
   }
+
+  /**
+   * Returns the view tab view references in the order as displayed in the view tab bar.
+   */
+  public async getViewTabs(viewPartRef: string): Promise<string[]> {
+    const viewTabsFinder = createViewPartBarFinder(viewPartRef).$$('wb-view-tab');
+    return viewTabsFinder.reduce((acc: string[], viewTabFinder: ElementFinder) => {
+      return viewTabFinder.getAttribute('viewref').then(viewRef => acc.concat(viewRef));
+    }, []);
   }
 
   /**
