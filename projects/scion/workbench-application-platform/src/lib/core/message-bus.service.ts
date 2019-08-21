@@ -116,7 +116,8 @@ export class MessageBus implements OnDestroy {
         first(),
         takeUntil(this._destroy$),
         takeUntil(requestError$),
-      ).toPromise();
+      )
+      .toPromise();
 
     try {
       this.publishMessageIfQualified(envelope, sender, options);
@@ -177,7 +178,8 @@ export class MessageBus implements OnDestroy {
   public receiveReplyMessagesForApplication$(symbolicName: string): Observable<MessageEnvelope> {
     return this._stream$.pipe(
       filterByChannel('reply'),
-      filter(envelope => envelope.replyTo === symbolicName));
+      filter(envelope => envelope.replyTo === symbolicName)
+    );
   }
 
   public get stream$(): Observable<MessageEnvelope> {

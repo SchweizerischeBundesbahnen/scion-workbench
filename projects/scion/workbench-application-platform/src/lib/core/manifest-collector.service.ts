@@ -53,31 +53,33 @@ export class ManifestCollector implements OnDestroy {
   }
 
   private collect(): Promise<ManifestRegistry> {
-    const applicationManifests$: Observable<ApplicationManifest[]> = this._platformConfigLoader.load$().pipe(
-      tap(platformConfig => {
-        Defined.orElseThrow(platformConfig, () => Error('[PlatformConfigError] No platform config provided.'));
-        Defined.orElseThrow(platformConfig.apps, () => Error('[PlatformConfigError] Missing \'apps\' property in platform config. Did you forget to register applications?'));
-      }),
-      tap(platformConfig => {
-        this._platformProperties.registerProperties(platformConfig.properties);
-      }),
-      mergeMap((platformConfig: PlatformConfig): Observable<ApplicationManifest[]> => {
-        return forkJoin(platformConfig.apps
-          .filter(app => !app.exclude)
-          .map((app: ApplicationConfig): Observable<ApplicationManifest> => {
-            return this._httpClient.get<ApplicationManifest>(app.manifestUrl).pipe(
-              tap((applicationManifest: ApplicationManifest) => {
-                this._applicationRegistry.registerApplication(app, applicationManifest);
-                this._logger.info(`Application '${app.symbolicName}' registered as workbench application`, this._applicationRegistry.getApplication(app.symbolicName));
-              }),
-              catchError(error => {
-                this._logger.warn(`Application '${app.symbolicName}' is not available.`, app, error);
-                return of(undefined); // do not use {EMPTY}, otherwise 'forkJoin' would not wait for all Observables to complete.
-              }),
-            );
-          }));
-      }),
-    );
+    const applicationManifests$: Observable<ApplicationManifest[]> = this._platformConfigLoader.load$()
+      .pipe(
+        tap(platformConfig => {
+          Defined.orElseThrow(platformConfig, () => Error('[PlatformConfigError] No platform config provided.'));
+          Defined.orElseThrow(platformConfig.apps, () => Error('[PlatformConfigError] Missing \'apps\' property in platform config. Did you forget to register applications?'));
+        }),
+        tap(platformConfig => {
+          this._platformProperties.registerProperties(platformConfig.properties);
+        }),
+        mergeMap((platformConfig: PlatformConfig): Observable<ApplicationManifest[]> => {
+          return forkJoin(platformConfig.apps
+            .filter(app => !app.exclude)
+            .map((app: ApplicationConfig): Observable<ApplicationManifest> => {
+              return this._httpClient.get<ApplicationManifest>(app.manifestUrl)
+                .pipe(
+                  tap((applicationManifest: ApplicationManifest) => {
+                    this._applicationRegistry.registerApplication(app, applicationManifest);
+                    this._logger.info(`Application '${app.symbolicName}' registered as workbench application`, this._applicationRegistry.getApplication(app.symbolicName));
+                  }),
+                  catchError(error => {
+                    this._logger.warn(`Application '${app.symbolicName}' is not available.`, app, error);
+                    return of(undefined); // do not use {EMPTY}, otherwise 'forkJoin' would not wait for all Observables to complete.
+                  }),
+                );
+            }));
+        }),
+      );
 
     return applicationManifests$
       .pipe(takeUntil(this._destroy$))

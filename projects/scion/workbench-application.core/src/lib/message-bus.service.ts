@@ -131,7 +131,8 @@ export class DefaultMessageBus implements MessageBus {
         filter(env => env.replyToUid === replyToUid),
         first(),
         takeUntil(this._destroy$),
-      ).toPromise();
+      )
+      .toPromise();
     this.postMessage(envelope);
     return replyPromise;
   }
