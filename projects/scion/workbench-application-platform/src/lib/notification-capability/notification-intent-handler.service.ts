@@ -56,7 +56,7 @@ export class NotificationIntentHandler implements IntentHandler {
   public onIntent(envelope: MessageEnvelope<NotificationIntentMessage>): void {
     const notification: Notification = envelope.message.payload;
 
-    const notificationService: NotificationService = envelope._injector.get(NotificationService as Type<NotificationService>);
+    const notificationService: NotificationService = envelope._injector.get(NotificationService);
     notificationService.notify({
       title: notification.title,
       content: this._component || notification.text,

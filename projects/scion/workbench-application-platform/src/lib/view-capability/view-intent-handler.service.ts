@@ -65,7 +65,7 @@ export class ViewIntentHandler implements IntentHandler {
       })
       .forEach((viewCapability: ViewCapability) => {
         const intentMessage: ViewIntentMessage = envelope.message;
-        const view = envelope._injector.get(WorkbenchView as Type<WorkbenchView>, null);
+        const view = envelope._injector.get(WorkbenchView as Type<WorkbenchView>, null); // TODO [Angular 9]: remove type cast for abstract symbols once 'angular/issues/29905' and 'angular/issues/23611' are fixed
 
         const matrixParamObject = Url.writeMatrixParamObject({
           matrixParams: Url.substituteParamVariables({...viewCapability.properties.matrixParams, ...intentMessage.payload.matrixParams}, envelope.message.qualifier),
