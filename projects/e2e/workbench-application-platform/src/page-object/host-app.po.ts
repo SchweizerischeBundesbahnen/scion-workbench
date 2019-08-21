@@ -54,8 +54,8 @@ export class HostAppPO {
 
       async isDirty(): Promise<boolean> {
         await switchToMainContext();
-        const element = viewTabFinder.$('.e2e-dirty');
-        return await element.isPresent() && await element.isDisplayed();
+        const cssClasses = await getCssClasses(viewTabFinder);
+        return cssClasses.includes('e2e-dirty');
       }
 
       async isClosable(): Promise<boolean> {

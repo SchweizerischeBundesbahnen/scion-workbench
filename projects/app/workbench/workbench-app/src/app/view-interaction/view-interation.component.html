@@ -1,0 +1,43 @@
+<section>
+  <h2>Info</h2>
+  <form autocomplete="off">
+    <label>ViewRef:</label><span>{{view.viewRef}}</span>
+    <label>ViewPartRef:</label><span>{{view.viewPart.viewPartRef}}</span>
+  </form>
+</section>
+
+<section>
+  <h2>Properties</h2>
+  <form autocomplete="off">
+    <label for="title">Title</label>
+    <input id="title" [(ngModel)]="view.title" name="title">
+
+    <label for="heading">Heading</label>
+    <input id="heading" [(ngModel)]="view.heading" name="heading">
+
+    <label for="dirty">Dirty</label>
+    <input id="dirty" type="checkbox" [(ngModel)]="view.dirty" name="dirty">
+
+    <label for="closable">Closable</label>
+    <input id="closable" type="checkbox" [(ngModel)]="view.closable" name="closable">
+
+    <label for="blocked">Blocked</label>
+    <input id="blocked" type="checkbox" [(ngModel)]="view.blocked" name="blocked">
+
+    <label for="active-log">Active log</label>
+    <textarea id="active-log" [ngModel]="activeLog$ | async" name="active-log" readonly></textarea>
+  </form>
+</section>
+
+<section class="actions">
+  <h2>Actions</h2>
+  <button id="close" (click)="view.close()">Close</button>
+</section>
+
+<section>
+  <h2>Miscellaneous</h2>
+  <form autocomplete="off">
+    <label for="text">Text</label>
+    <input id="text">
+  </form>
+</section>

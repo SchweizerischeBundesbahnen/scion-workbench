@@ -14,6 +14,7 @@ import { ViewNavigationComponent } from './view-navigation/view-navigation.compo
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SciParamsEnterModule, SciPropertyModule } from '@scion/app/common';
 import { ViewBb9700a6Component } from './view-bb9700a6/view-bb9700a6.component';
+import { ViewInterationComponent } from './view-interaction/view-interation.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { ViewBb9700a6Component } from './view-bb9700a6/view-bb9700a6.component';
     View4a3a8932Component,
     ViewBb9700a6Component,
     ViewNavigationComponent,
+    ViewInterationComponent,
   ],
   imports: [
     BrowserModule,

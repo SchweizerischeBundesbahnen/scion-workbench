@@ -11,11 +11,9 @@
 import { ComponentFactoryResolver, Injectable, Injector, OnDestroy } from '@angular/core';
 import { ROUTER_OUTLET_NAME, VIEW_COMPONENT_TYPE, VIEW_REF_PREFIX, WORKBENCH } from './workbench.constants';
 import { InternalWorkbenchView, WorkbenchView } from './workbench.model';
-import { PortalInjector } from '@angular/cdk/portal';
 import { WbComponentPortal } from './portal/wb-component-portal';
 import { asapScheduler, AsyncSubject, merge, Observable, Subject } from 'rxjs';
 import { delay, filter, map, take, takeUntil } from 'rxjs/operators';
-import { TaskScheduler } from './task-scheduler.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 
@@ -30,7 +28,6 @@ export class WorkbenchViewRegistry implements OnDestroy {
   private readonly _viewRegistryChange$ = new Subject<void>();
 
   constructor(private _componentFactoryResolver: ComponentFactoryResolver,
-              private _taskScheduler: TaskScheduler,
               private _router: Router,
               private _injector: Injector,
               private _viewActivationInstantProvider: ViewActivationInstantProvider) {
@@ -41,7 +38,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
    */
   public addViewOutlet(viewRef: string, active: boolean): void {
     this._viewRegistry.set(viewRef, this.createWorkbenchView(viewRef, active));
-    this._taskScheduler.scheduleMicrotask(() => this._viewRegistryChange$.next()); // emit outside routing
+    asapScheduler.schedule(() => this._viewRegistryChange$.next()); // emit outside routing
   }
 
   /**
@@ -50,7 +47,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
   public removeViewOutlet(viewRef: string): void {
     this._viewRegistry.get(viewRef).portal.destroy();
     this._viewRegistry.delete(viewRef);
-    this._taskScheduler.scheduleMicrotask(() => this._viewRegistryChange$.next()); // emit outside routing
+    asapScheduler.schedule(() => this._viewRegistryChange$.next()); // emit outside routing
   }
 
   /**
@@ -103,24 +100,13 @@ export class WorkbenchViewRegistry implements OnDestroy {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_COMPONENT_TYPE));
     const view = new InternalWorkbenchView(viewRef, active, this._injector.get(WORKBENCH), portal, this._viewActivationInstantProvider);
 
-    const injectionTokens = new WeakMap();
-    injectionTokens.set(ROUTER_OUTLET_NAME, viewRef);
-    injectionTokens.set(WorkbenchView, view);
-    injectionTokens.set(InternalWorkbenchView, view);
-
-    // We must not use the root injector as parent injector of the portal component element injector.
-    // Otherwise, if tokens of the root injector are masked or extended in lazily loaded modules, they would not be resolved.
-    //
-    // This is by design of Angular injection token resolution rules of not checking module injectors when checking the element hierarchy for a token.
-    // See function `resolveDep` in Angular file `provider.ts`.
-    //
-    // Instead, we use a {NullInjector} which further acts as a barrier to not resolve workbench internal tokens declared somewhere in the element hierarchy.
-    const injector = new PortalInjector(Injector.NULL, injectionTokens);
-
     portal.init({
-      injector: injector,
-      onActivate: (): void => view.activate(true),
-      onDeactivate: (): void => view.activate(false),
+      injectorTokens: new WeakMap()
+        .set(ROUTER_OUTLET_NAME, viewRef)
+        .set(WorkbenchView, view)
+        .set(InternalWorkbenchView, view),
+      onAttach: (): void => view.activate(true),
+      onDetach: (): void => view.activate(false),
     });
 
     return view;

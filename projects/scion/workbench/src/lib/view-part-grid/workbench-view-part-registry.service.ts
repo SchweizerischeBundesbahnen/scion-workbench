@@ -11,7 +11,6 @@
 import { ComponentFactoryResolver, Injectable, Injector, IterableDiffers } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { PortalInjector } from '@angular/cdk/portal';
 import { InternalWorkbenchViewPart, WorkbenchViewPart } from '../workbench.model';
 import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
@@ -97,10 +96,11 @@ export class WorkbenchViewPartRegistry {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_PART_COMPONENT_TYPE));
     const viewPart = new InternalWorkbenchViewPart(viewPartRef, portal);
 
-    const injectionTokens = new WeakMap();
-    injectionTokens.set(WorkbenchViewPart, viewPart);
-    injectionTokens.set(InternalWorkbenchViewPart, viewPart);
-    portal.init({injector: new PortalInjector(this._injector, injectionTokens)});
+    portal.init({
+      injectorTokens: new WeakMap()
+        .set(WorkbenchViewPart, viewPart)
+        .set(InternalWorkbenchViewPart, viewPart),
+    });
 
     return viewPart;
   }

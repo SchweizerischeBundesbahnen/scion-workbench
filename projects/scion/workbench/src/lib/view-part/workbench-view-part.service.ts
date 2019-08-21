@@ -10,28 +10,24 @@
 
 import { Injectable, OnDestroy } from '@angular/core';
 import { InternalWorkbenchView, InternalWorkbenchViewPart } from '../workbench.model';
-import { VIEW_GRID_QUERY_PARAM } from '../workbench.constants';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { InternalWorkbenchService } from '../workbench.service';
-import { Router } from '@angular/router';
-import { Region } from './view-drop-zone.directive';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
-import { TaskScheduler } from '../task-scheduler.service';
+import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 
+// TODO [issue/163] remove this service and move functionality to {WorkbenchViewPart}
 @Injectable()
 export class WorkbenchViewPartService implements OnDestroy {
 
-  private _destroy$ = new Subject<void>();
   private _hiddenViewTabs = new Set<string>();
   private _hiddenViewTabs$ = new BehaviorSubject<string[]>([]);
 
   constructor(private _workbench: InternalWorkbenchService,
+              private _viewOutletNavigator: ViewOutletNavigator,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _router: Router,
-              private _viewPart: InternalWorkbenchViewPart,
-              private _taskScheduler: TaskScheduler) {
+              private _viewPart: InternalWorkbenchViewPart) {
     this._workbench.registerViewPartService(this);
     this.activate();
   }
@@ -42,6 +38,13 @@ export class WorkbenchViewPartService implements OnDestroy {
 
   public get viewRefs(): string[] {
     return this._viewPart.viewRefs;
+  }
+
+  /**
+   * Emits the views contained in this viewpart.
+   */
+  public get viewRefs$(): Observable<string[]> {
+    return this._viewPart.viewRefs$;
   }
 
   public get activeViewRef(): string | null {
@@ -86,23 +89,6 @@ export class WorkbenchViewPartService implements OnDestroy {
   }
 
   /**
-   * Swaps the two specified views.
-   *
-   * Note: This instruction runs asynchronously via URL routing.
-   */
-  public swapViewTabs(viewRef1: string, viewRef2: string): Promise<boolean> {
-    if (viewRef1 === viewRef2) {
-      return Promise.resolve(true);
-    }
-
-    const serializedGrid = this._viewPartRegistry.grid
-      .swapViews(this._viewPart.viewPartRef, viewRef1, viewRef2)
-      .serialize();
-
-    return this.navigate([], serializedGrid, true);
-  }
-
-  /**
    * Activates the specified view.
    *
    * Note: This instruction runs asynchronously via URL routing.
@@ -116,42 +102,22 @@ export class WorkbenchViewPartService implements OnDestroy {
       .activateView(this._viewPart.viewPartRef, viewRef)
       .serialize();
 
-    return this.navigate([], serializedGrid);
+    return this._viewOutletNavigator.navigate({viewGrid: serializedGrid});
   }
 
   /**
-   * Moves the specified view to this workbench viewpart.
+   * Activates the view next to the active view.
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public moveViewToThisViewPart(viewRef: string): Promise<boolean> {
+  public activateSiblingView(): Promise<boolean> {
     const grid = this._viewPartRegistry.grid;
 
     const serializedGrid = grid
-      .removeView(viewRef)
-      .addView(this._viewPart.viewPartRef, viewRef)
+      .activateSiblingView(this.viewPartRef, this.activeViewRef)
       .serialize();
 
-    return this.navigate([], serializedGrid, true);
-  }
-
-  /**
-   * Moves the specified view to a new workbench viewpart.
-   * The new viewpart is created relative to this viewpart in the specified region.
-   *
-   * Note: This instruction runs asynchronously via URL routing.
-   */
-  public moveViewToNewViewPart(viewRef: string, region: Region): Promise<boolean> {
-    const grid = this._viewPartRegistry.grid;
-    const newViewPartRef = grid.computeNextViewPartIdentity();
-
-    const serializedGrid = grid
-      .addSiblingViewPart(region, this._viewPart.viewPartRef, newViewPartRef)
-      .removeView(viewRef)
-      .addView(newViewPartRef, viewRef)
-      .serialize();
-
-    return this.navigate([], serializedGrid, true);
+    return this._viewOutletNavigator.navigate({viewGrid: serializedGrid});
   }
 
   public isViewActive(viewRef: string): boolean {
@@ -180,32 +146,7 @@ export class WorkbenchViewPartService implements OnDestroy {
     return this._hiddenViewTabs$.asObservable();
   }
 
-  /**
-   * Navigate based on the provided array of commands with the view grid set as query parameter.
-   *
-   * Set 'async' to `true` for guaranteed asynchronous routing, which is essential when routing is a consequence of a drag & drop operation like moving view tabs.
-   * Otherwise, 'dragend' event would not be dispatched if the source node is moved or removed during the drag.
-   */
-  private navigate(commands: any[], serializedGrid: string, async: boolean = false): Promise<boolean> {
-    const navigateFn = ((): Promise<boolean> => {
-      return this._router.navigate(commands, {
-        queryParams: {[VIEW_GRID_QUERY_PARAM]: serializedGrid},
-        queryParamsHandling: 'merge',
-      });
-    });
-
-    if (async) {
-      return new Promise<boolean>((resolve: (status: boolean) => void, reject: (reason?: any) => void): void => {
-        this._taskScheduler.scheduleMacrotask(() => navigateFn().then(resolve).catch(reject));
-      });
-    }
-    else {
-      return navigateFn();
-    }
-  }
-
   public ngOnDestroy(): void {
     this._workbench.unregisterViewPartService(this);
-    this._destroy$.next();
   }
 }

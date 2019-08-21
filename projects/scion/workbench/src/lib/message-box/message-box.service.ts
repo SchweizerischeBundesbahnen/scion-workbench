@@ -94,7 +94,10 @@ export class MessageBoxService {
   }
 
   /**
-   * Emits the number of active message boxes if a message box is opened or closed.
+   * Emits the number of displayed message boxes.
+   *
+   * Upon subscription, the current count is emitted, and then emits continuously
+   * when a message box is opened or closed. It never completes.
    */
   public get count$(): Observable<number> {
     return this._count$.asObservable();

@@ -14,13 +14,13 @@ import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.componen
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
-import { InternalWorkbenchRouter, WorkbenchRouter } from '../routing/workbench-router.service';
+import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
-import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { WorkbenchView } from '../workbench.model';
 import { WorkbenchTestingModule } from './workbench-testing.module';
+import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 
-describe('WbRouter', () => {
+describe('ViewOutletNavigator', () => {
 
   beforeEach(async(() => {
     jasmine.addMatchers(jasmineCustomMatchers);
@@ -32,7 +32,7 @@ describe('WbRouter', () => {
     TestBed.get(Router).initialNavigation();
   }));
 
-  it('resolves present views by path', fakeAsync(inject([WorkbenchRouter, WorkbenchViewRegistry], (wbRouter: InternalWorkbenchRouter, viewRegistry: WorkbenchViewRegistry) => {
+  it('resolves present views by path', fakeAsync(inject([WorkbenchRouter, ViewOutletNavigator], (wbRouter: WorkbenchRouter, viewOutletNavigator: ViewOutletNavigator) => {
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
@@ -57,14 +57,14 @@ describe('WbRouter', () => {
     wbRouter.navigate(['path', 'to', 'view-3'], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
     advance(fixture);
 
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-1']).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-2'])).toEqual(['view.3']);
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view-3'])).toEqual(['view.4']);
+    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view-1']).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view-2'])).toEqual(['view.3']);
+    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view-3'])).toEqual(['view.4']);
 
     tick();
   })));
 
-  it('resolves present views by path and matrix params', fakeAsync(inject([WorkbenchRouter, WorkbenchViewRegistry], (wbRouter: InternalWorkbenchRouter, viewRegistry: WorkbenchViewRegistry) => {
+  it('resolves present views by path and matrix params', fakeAsync(inject([WorkbenchRouter, ViewOutletNavigator], (wbRouter: WorkbenchRouter, viewOutletNavigator: ViewOutletNavigator) => {
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
@@ -89,10 +89,10 @@ describe('WbRouter', () => {
     wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'C'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
     advance(fixture);
 
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view'])).toEqual([]);
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'A'}]).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(['view.3'].sort());
-    expect(wbRouter.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(['view.4'].sort());
+    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view'])).toEqual([]);
+    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'A'}]).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(['view.3'].sort());
+    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(['view.4'].sort());
 
     tick();
   })));

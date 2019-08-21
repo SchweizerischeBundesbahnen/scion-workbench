@@ -14,10 +14,9 @@ import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { ViewPartComponent } from '../view-part/view-part.component';
 import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { VIEW_PART_REF_INDEX, ViewPartSashBox } from '../view-part-grid/view-part-grid-serializer.service';
-import { VIEW_GRID_QUERY_PARAM } from '../workbench.constants';
-import { Router } from '@angular/router';
 import { debounceTime, takeUntil } from 'rxjs/operators';
-import { noop, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
+import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 
 /**
  * Building block to render the viewpart portal grid.
@@ -46,9 +45,9 @@ export class ViewPartSashBoxComponent implements OnDestroy {
   }
 
   constructor(private _host: ElementRef,
+              private _viewOutletNavigator: ViewOutletNavigator,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _workbenchLayout: WorkbenchLayoutService,
-              private _router: Router) {
+              private _workbenchLayout: WorkbenchLayoutService) {
     this.installSashListener();
   }
 
@@ -95,11 +94,7 @@ export class ViewPartSashBoxComponent implements OnDestroy {
         const serializedGrid = this._viewPartRegistry.grid
           .splitPosition(this.sashBox.id, this.sashBox.splitter)
           .serialize();
-
-        this._router.navigate([], {
-          queryParams: {[VIEW_GRID_QUERY_PARAM]: serializedGrid},
-          queryParamsHandling: 'merge',
-        }).then(noop);
+        this._viewOutletNavigator.navigate({viewGrid: serializedGrid}).then();
       });
   }
 }

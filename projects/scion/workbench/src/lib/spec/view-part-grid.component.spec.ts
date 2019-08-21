@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { async, fakeAsync, inject, TestBed } from '@angular/core/testing';
+import { async, fakeAsync, TestBed } from '@angular/core/testing';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { Component, NgModule } from '@angular/core';
+import { AbstractType, Component, InjectionToken, NgModule, Type } from '@angular/core';
 import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -18,6 +18,9 @@ import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
 import { WorkbenchTestingModule } from './workbench-testing.module';
+import { WorkbenchService } from '../workbench.service';
+import { ViewDragService } from '../view-dnd/view-drag.service';
+import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 
 describe('ViewPartGridComponent', () => {
 
@@ -31,13 +34,15 @@ describe('ViewPartGridComponent', () => {
     TestBed.get(Router).initialNavigation();
   }));
 
-  it('allows to move a view into a new view part in the east', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move a view into a new view part in the east', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -48,7 +53,18 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 2 to a new ViewPart in the east
-    viewPart1Component.moveViewToNewViewPart('view.2', 'east').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'east',
+      },
+    });
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid({
@@ -58,15 +74,19 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
+  }));
 
-  it('allows to move a view into a new view part in the west', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move a view into a new view part in the west', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -77,7 +97,18 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 2 to a new ViewPart in the west
-    viewPart1Component.moveViewToNewViewPart('view.2', 'west').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'west',
+      },
+    });
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid({
@@ -87,15 +118,19 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
+  }));
 
-  it('allows to move a view into a new view part in the north', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move a view into a new view part in the north', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -106,7 +141,18 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 1 to a new ViewPart in the north
-    viewPart1Component.moveViewToNewViewPart('view.2', 'north').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'north',
+      },
+    });
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid({
@@ -116,15 +162,19 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: true,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
+  }));
 
-  it('allows to move a view into a new view part in the south', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move a view into a new view part in the south', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -135,7 +185,18 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 1 to a new ViewPart in the south
-    viewPart1Component.moveViewToNewViewPart('view.2', 'south').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'south',
+      },
+    });
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid({
@@ -145,15 +206,19 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: true,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
+  }));
 
-  it('disallows to move a view into a new view part in the center', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('disallows to move a view into a new view part in the center', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -164,20 +229,34 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 1 to a new ViewPart in the center
-    viewPart1Component.moveViewToNewViewPart('view.2', 'center').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'center',
+      },
+    });
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid(['viewpart.1', 'view.2', 'view.1', 'view.2']);
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.1');
+  }));
 
-  it('allows to move views to another view part', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move views to another view part', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPartRegistry = fixture.componentRef.injector.get(WorkbenchViewPartRegistry);
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -192,14 +271,33 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 3 to a new ViewPart in the east
-    viewPart1Component.moveViewToNewViewPart('view.3', 'east').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.3',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'east',
+      },
+    });
     advance(fixture);
 
-    const viewPart2 = viewPartRegistry.getElseThrow('viewpart.2');
-    const viewPart2Component = viewPart2.portal.componentRef.instance;
-
     // Move View 2 to the new ViewPart
-    viewPart2Component.moveViewToThisViewPart('view.2').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.2',
+        viewPartRegion: 'center',
+      },
+    });
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid({
@@ -209,21 +307,40 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
+    expect(viewRegistry.getElseThrow('view.3').viewPart.viewPartRef).toEqual('viewpart.2');
 
     // Move View 1 to the new ViewPart
-    viewPart2Component.moveViewToThisViewPart('view.1').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.1',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.2',
+        viewPartRegion: 'center',
+      },
+    });
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid(['viewpart.2', 'view.1', 'view.3', 'view.2', 'view.1']);
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.2');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
+    expect(viewRegistry.getElseThrow('view.3').viewPart.viewPartRef).toEqual('viewpart.2');
+  }));
 
-  it('allows to move the last view of another viewpart to a new viewpart in the east', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move the last view of a viewpart to a new viewpart in the east', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -234,7 +351,18 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 2 to a new ViewPart in the east
-    viewPart1Component.moveViewToNewViewPart('view.2', 'east').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'east',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 1,
@@ -243,9 +371,22 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
 
     // Move View 2 to a new ViewPart in the east of ViewPart 1
-    viewPart1Component.moveViewToNewViewPart('view.2', 'east').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.2',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'east',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 2,
@@ -254,15 +395,19 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.3');
+  }));
 
-  it('allows to move the last view of another viewpart to a new viewpart in the west', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move the last view of a viewpart to a new viewpart in the west', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -273,7 +418,18 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 2 to a new ViewPart in the east
-    viewPart1Component.moveViewToNewViewPart('view.2', 'east').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'east',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 1,
@@ -282,9 +438,22 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
 
     // Move View 2 to a new ViewPart in the west of ViewPart 1
-    viewPart1Component.moveViewToNewViewPart('view.2', 'west').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.2',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'west',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 2,
@@ -293,15 +462,19 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.3');
+  }));
 
-  it('allows to move the last view of another viewpart to a new viewpart in the north', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move the last view of a viewpart to a new viewpart in the north', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -312,7 +485,18 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 2 to a new ViewPart in the east
-    viewPart1Component.moveViewToNewViewPart('view.2', 'east').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'east',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 1,
@@ -321,9 +505,22 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
 
     // Move View 2 to a new ViewPart in the north of ViewPart 1
-    viewPart1Component.moveViewToNewViewPart('view.2', 'north').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.2',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'north',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 2,
@@ -332,15 +529,19 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: true,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.3');
+  }));
 
-  it('allows to move the last view of another viewpart to a new viewpart in the south', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move the last view of a viewpart to a new viewpart in the south', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
-
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -351,7 +552,18 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     // Move View 2 to a new ViewPart in the east
-    viewPart1Component.moveViewToNewViewPart('view.2', 'east').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'east',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 1,
@@ -360,9 +572,22 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.2');
 
     // Move View 2 to a new ViewPart in the south of ViewPart 1
-    viewPart1Component.moveViewToNewViewPart('view.2', 'south').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.2',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'south',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 2,
@@ -371,16 +596,21 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: true,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.3');
+  }));
 
-  it('allows to move a view around viewparts', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to move a view around viewparts', fakeAsync(() => {
+    const workbench = getService(WorkbenchService);
+    const wbRouter = getService(WorkbenchRouter);
+    const viewDragService = getService(ViewDragService);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
-    const gridComponent: ViewPartGridComponent = fixture.componentInstance;
     const viewPartRegistry = fixture.componentRef.injector.get(WorkbenchViewPartRegistry);
-    const viewPart1Component = gridComponent.viewPartPortal.componentRef.instance;
 
     // Add View 1
     wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
@@ -397,7 +627,18 @@ describe('ViewPartGridComponent', () => {
     expect(fixture).toBeViewPartGrid(['viewpart.1', 'view.3', 'view.1', 'view.2', 'view.3']);
 
     // Move View 3 to a new ViewPart in the east
-    viewPart1Component.moveViewToNewViewPart('view.3', 'east').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.3',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'east',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 1,
@@ -406,12 +647,26 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.3').viewPart.viewPartRef).toEqual('viewpart.2');
 
     // Move View 2 to a new ViewPart in the south of ViewPart 2
     const viewPart2Component = viewPartRegistry.getElseThrow('viewpart.2').portal.componentRef.instance;
     expect(viewPart2Component).toBeTruthy();
 
-    viewPart2Component.moveViewToNewViewPart('view.2', 'south').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.2',
+        viewPartRegion: 'south',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 1,
@@ -426,9 +681,23 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.3');
+    expect(viewRegistry.getElseThrow('view.3').viewPart.viewPartRef).toEqual('viewpart.2');
 
     // Move View 2 to a new ViewPart in the south of ViewPart 1
-    viewPart1Component.moveViewToNewViewPart('view.2', 'south').then();
+    viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.3',
+        viewRef: 'view.2',
+      },
+      target: {
+        appInstanceId: workbench.appInstanceId,
+        viewPartRef: 'viewpart.1',
+        viewPartRegion: 'south',
+      },
+    });
     advance(fixture);
     expect(fixture).toBeViewPartGrid({
       id: 1,
@@ -443,9 +712,15 @@ describe('ViewPartGridComponent', () => {
       splitter: .5,
       hsplit: false,
     });
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.4');
+    expect(viewRegistry.getElseThrow('view.3').viewPart.viewPartRef).toEqual('viewpart.2');
+  }));
 
-  it('should open the same view multiple times', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('should open the same view multiple times', fakeAsync(() => {
+    const wbRouter = getService(WorkbenchRouter);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
@@ -463,9 +738,14 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid(['viewpart.1', 'view.2', 'view.1', 'view.2']);
-  })));
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.1');
+  }));
 
-  it('should open the same view multiple times', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('should open the same view multiple times', fakeAsync(() => {
+    const wbRouter = getService(WorkbenchRouter);
+    const viewRegistry = getService(WorkbenchViewRegistry);
+
     const fixture = TestBed.createComponent(ViewPartGridComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
@@ -483,8 +763,12 @@ describe('ViewPartGridComponent', () => {
     advance(fixture);
 
     expect(fixture).toBeViewPartGrid(['viewpart.1', 'view.3', 'view.1', 'view.2', 'view.3']);
-  })));
-});
+    expect(viewRegistry.getElseThrow('view.1').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.2').viewPart.viewPartRef).toEqual('viewpart.1');
+    expect(viewRegistry.getElseThrow('view.3').viewPart.viewPartRef).toEqual('viewpart.1');
+  }));
+})
+;
 
 /****************************************************************************************************
  * Definition of App Test Module                                                                    *
@@ -513,4 +797,9 @@ class View3Component {
   ],
 })
 class AppTestModule {
+}
+
+// TODO [Angular 9]: remove once 'angular/issues/29905' and 'angular/issues/23611' are fixed
+function getService<T>(token: Type<T> | AbstractType<T> | InjectionToken<T>): T {
+  return TestBed.get(token as Type<T>);
 }

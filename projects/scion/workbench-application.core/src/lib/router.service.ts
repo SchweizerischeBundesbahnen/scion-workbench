@@ -74,14 +74,14 @@ export interface ViewNavigateCommand {
    */
   activateIfPresent?: boolean;
   /**
-   * Closes the view if present. Has no effect if no view is present which matches the qualifier.
+   * Closes the view(s) that match the qualifier, if any.
    */
   closeIfPresent?: boolean;
   /**
    * Controls where to open the view.
    *
-   * 'blank': opens the view as a new workbench view (which is by default)
-   * 'self':  opens the view in the current workbench view
+   * 'blank': opens the view in a new view tab (which is by default)
+   * 'self':  opens the view in the current view tab
    */
   target?: 'blank' | 'self';
 }

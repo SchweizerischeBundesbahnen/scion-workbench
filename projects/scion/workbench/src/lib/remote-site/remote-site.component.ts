@@ -8,11 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, EventEmitter, Input, isDevMode, NgZone, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, isDevMode, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
 import { combineLatest, from, fromEvent, merge, Observable, of, OperatorFunction, Subject } from 'rxjs';
 import { mergeMap, takeUntil } from 'rxjs/operators';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { installMouseDispatcher, SciMouseDispatcher } from '@scion/mouse-dispatcher';
+import { setStyle } from '../dom.util';
 
 /**
  * Displays the content of a remote site in an <iframe>.
@@ -127,9 +128,7 @@ export class RemoteSiteComponent implements OnDestroy {
     this._whenIframeResolveFn(iframe.nativeElement);
   }
 
-  constructor(private _workbenchLayout: WorkbenchLayoutService,
-              private _renderer: Renderer2,
-              private _zone: NgZone) {
+  constructor(private _workbenchLayout: WorkbenchLayoutService, private _zone: NgZone) {
     this.installWorkbenchLayoutListener();
     this.installIframeMessageListener();
   }
@@ -180,17 +179,15 @@ export class RemoteSiteComponent implements OnDestroy {
   private installWorkbenchLayoutListener(): void {
     // Suspend pointer events for the duration of a workbench layout change, so that pointer events are not swallowed by the iframe.
     // Otherwise, view drag and view sash operation does not work as expected.
-    merge(this._workbenchLayout.viewSashDrag$, this._workbenchLayout.viewTabDrag$, this._workbenchLayout.messageBoxMove$)
+    merge(this._workbenchLayout.viewSashDrag$, this._workbenchLayout.viewDrag$, this._workbenchLayout.messageBoxMove$)
       .pipe(
         bufferUntil(from(this._whenIframe)),
-        takeUntil(this._destroy$))
+        takeUntil(this._destroy$),
+      )
       .subscribe(([event, iframe]: ['start' | 'end', HTMLIFrameElement]) => {
-        if (event === 'start') {
-          this._renderer.setStyle(iframe, 'pointer-events', 'none');
-        }
-        else {
-          this._renderer.removeStyle(iframe, 'pointer-events');
-        }
+        setStyle(iframe, {
+          'pointer-events': (event === 'start') ? 'none' : null,
+        });
       });
   }
 

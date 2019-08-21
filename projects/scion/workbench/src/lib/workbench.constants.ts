@@ -65,11 +65,6 @@ export const ACTIVITY_OUTLET_NAME = 'activity';
 export const ACTIVITY_DATA_KEY = 'wb.activity';
 
 /**
- * Specifies the drag type to move views.
- */
-export const VIEW_DRAG_TYPE = 'workbench/view';
-
-/**
  * Specifies the prefix used to name viewpart references.
  */
 export const VIEW_PART_REF_PREFIX = 'viewpart.';
@@ -83,6 +78,20 @@ export const VIEW_REF_PREFIX = 'view.';
  * Specifies the HTTP query parameter name to set the viewpart grid in the URI.
  */
 export const VIEW_GRID_QUERY_PARAM = 'viewgrid';
+
+/**
+ * Defines the contexts in which a viewtab is rendered.
+ *
+ * - tabbar: as tab in the tabbar
+ * - tabbar-dropdown: as item in the dropdown of not visible views
+ * - drag-image: as drag image during a view drag operation
+ */
+export declare type ViewTabContext = 'tabbar' | 'tabbar-dropdown' | 'drag-image';
+
+/**
+ * DI injection token to inject the context in which the viewtab is rendered.
+ */
+export const VIEW_TAB_CONTEXT = new InjectionToken<ViewTabContext>('VIEW_TAB_CONTEXT');
 
 /**
  * Represents severity levels.

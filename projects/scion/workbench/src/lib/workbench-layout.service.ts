@@ -8,8 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { mapTo } from 'rxjs/operators';
+import { ViewDragService } from './view-dnd/view-drag.service';
 
 /**
  * Allows rearrange the layout of Workbench window.
@@ -26,8 +28,9 @@ export class WorkbenchLayoutService {
 
   /**
    * Notifies upon dragging a view to different positions within the Workbench.
+   * The event is received across app instances of the same origin.
    */
-  public readonly viewTabDrag$ = new Subject<'start' | 'end'>();
+  public readonly viewDrag$: Observable<'start' | 'end'>;
 
   /**
    * Notifies upon moving a message box to different positions within the Workbench.
@@ -38,6 +41,13 @@ export class WorkbenchLayoutService {
    * Notifies upon workbench layout change.
    */
   public readonly afterGridChange$ = new Subject<void>();
+
+  constructor(viewDragService: ViewDragService) {
+    this.viewDrag$ = merge<'start' | 'end'>(
+      viewDragService.viewDragStart$.pipe(mapTo('start')),
+      viewDragService.viewDragEnd$.pipe(mapTo('end')),
+    );
+  }
 
   /**
    * Displays the main content in full viewport width.

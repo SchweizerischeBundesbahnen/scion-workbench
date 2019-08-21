@@ -14,7 +14,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ViewComponent } from './view/view.component';
 import { WorkbenchService } from './workbench.service';
 import { Arrays } from './array.util';
-import { Injector, TemplateRef } from '@angular/core';
+import { Injector, TemplateRef, Type } from '@angular/core';
 import { Disposable } from './disposable';
 import { ComponentType } from '@angular/cdk/portal';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
@@ -29,6 +29,13 @@ export abstract class WorkbenchView {
    * View outlet identity which is unique in this application.
    */
   public readonly viewRef: string;
+
+  /**
+   * The viewpart which contains this view.
+   *
+   * Note: the viewpart of a view can change, e.g. when the view is moved to another viewpart.
+   */
+  public readonly viewPart: WorkbenchViewPart;
 
   /**
    * Specifies the title to be displayed in the view tab.
@@ -55,6 +62,11 @@ export abstract class WorkbenchView {
    * If dirty, a dirty marker is displayed in the view tab.
    */
   public dirty: boolean;
+
+  /**
+   * Specifies if the view is blocked, e.g., not interactable because of showing a view-modal message box.
+   */
+  public blocked: boolean;
 
   /**
    * Specifies if a close button should be displayed in the view tab.
@@ -91,13 +103,16 @@ export class InternalWorkbenchView implements WorkbenchView {
   public heading: string;
   public dirty: boolean;
   public closable: boolean;
-  public disabled: boolean;
+  public blocked: boolean;
+
   public scrollTop: number | null;
   public scrollLeft: number | null;
   public activationInstant: number;
 
   public readonly active$: BehaviorSubject<boolean>;
   public readonly cssClasses$: BehaviorSubject<string[]>;
+
+  public viewPart: WorkbenchViewPart;
 
   constructor(public readonly viewRef: string,
               active: boolean,
@@ -124,6 +139,12 @@ export class InternalWorkbenchView implements WorkbenchView {
 
   public activate(activate: boolean): void {
     if (activate) {
+      // DO NOT resolve the viewpart at construction time because it can change, e.g. when this view is moved to another viewpart.
+      // Also:
+      // - use the element injector of the portal (and not the root injector) to resolve the containing viewpart
+      // - store the viewpart reference in a member variable because when the view is deactivated, it is removed
+      //   from the Angular component tree and has, therefore, no element injector
+      this.viewPart = this.portal.injector.get(WorkbenchViewPart as Type<WorkbenchViewPart>);
       this.activationInstant = this._viewActivationInstantProvider.instant;
     }
     this.active$.next(activate);
@@ -138,8 +159,14 @@ export class InternalWorkbenchView implements WorkbenchView {
   }
 }
 
+/**
+ * A viewpart is a container for multiple views.
+ */
 export abstract class WorkbenchViewPart {
 
+  /**
+   * Viewpart outlet identity which is unique in this application.
+   */
   public abstract readonly viewPartRef: string;
 
   /**
@@ -147,6 +174,17 @@ export abstract class WorkbenchViewPart {
    */
   public abstract get activeViewRef$(): Observable<string | null>;
 
+  /**
+   * The currently active view, if any.
+   */
+  public abstract get activeViewRef(): string | null;
+
+  /**
+   * Emits the views opened in this viewpart.
+   *
+   * Upon subscription, the currently opened views are emitted, and then emits continuously
+   * when new views are opened or existing views closed. It never completes.
+   */
   public abstract get viewRefs$(): Observable<string[]>;
 
   /**
@@ -172,7 +210,7 @@ export class InternalWorkbenchViewPart implements WorkbenchViewPart {
   public readonly activeViewRef$ = new BehaviorSubject<string | null>(null);
 
   public set viewRefs(viewRefs: string[]) {
-    if (!Arrays.equal(viewRefs, this.viewRefs, false)) {
+    if (!Arrays.equal(viewRefs, this.viewRefs, true)) {
       this.viewRefs$.next(viewRefs);
     }
   }

@@ -77,7 +77,7 @@ export class SciViewportComponent {
   @Output()
   public scroll = new EventEmitter<Event>();
 
-  constructor(public nativeScrollbarTrackSizeProvider: SciNativeScrollbarTrackSizeProvider) {
+  constructor(public host: ElementRef<HTMLElement>, public nativeScrollbarTrackSizeProvider: SciNativeScrollbarTrackSizeProvider) {
   }
 
   @HostListener('focus')

@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
-import { fromEvent, Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
-import { VIEW_DRAG_TYPE } from '../workbench.constants';
+import { Directive, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { createElement, ElementCreateOptions, setStyle } from '../dom.util';
+import { ViewDragData, ViewDragService } from './view-drag.service';
 
 const DROP_REGION_MAX_SIZE = 150;
 const DROP_REGION_GAP = 20;
@@ -29,11 +29,11 @@ const NULL_BOUNDS: Bounds = null;
 export class ViewDropZoneDirective implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  private _host: Element;
+  private _host: HTMLElement;
 
-  private _dropZoneOverlay: Element;
-  private _dropRegionElement1: Element;
-  private _dropRegionElement2: Element;
+  private _dropZoneOverlay: HTMLElement;
+  private _dropRegionElement1: HTMLElement;
+  private _dropRegionElement2: HTMLElement;
 
   private _dropRegion: Region;
 
@@ -43,7 +43,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
   @Output()
   public wbViewDropZoneDrop = new EventEmitter<WbViewDropEvent>();
 
-  constructor(host: ElementRef<Element>, private _renderer: Renderer2, private _workbenchLayout: WorkbenchLayoutService) {
+  constructor(host: ElementRef<HTMLElement>, private _viewDragService: ViewDragService, private _zone: NgZone) {
     this._host = host.nativeElement;
   }
 
@@ -53,6 +53,9 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
   }
 
   private onDragOver(event: DragEvent): void {
+    NgZone.assertNotInAngularZone();
+    event.preventDefault(); // allow view drop
+
     const dropRegion = this.computeDropRegion(event);
     if (dropRegion === this._dropRegion) {
       return; // drop region did not change
@@ -125,82 +128,62 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
   }
 
   private onDrop(event: DragEvent): void {
-    event.stopPropagation();
+    const dropEvent: WbViewDropEvent = {
+      dropRegion: this._dropRegion,
+      dragData: this._viewDragService.getViewDragData(),
+      sourceEvent: event,
+    };
 
-    const dropRegion = this._dropRegion;
     this._dropRegion = null;
+    this.renderDropRegions(NULL_BOUNDS, NULL_BOUNDS);
 
-    this.deactivateDropZone();
-    this.wbViewDropZoneDrop.emit({
-      region: dropRegion,
-      source: event,
-    });
+    this._zone.run(() => this.wbViewDropZoneDrop.emit(dropEvent));
   }
 
   private activateDropZone(): void {
-    this._renderer.setStyle(this._dropZoneOverlay, 'display', 'block');
+    setStyle(this._dropZoneOverlay, {display: 'block'});
   }
 
   private deactivateDropZone(): void {
-    this._renderer.setStyle(this._dropZoneOverlay, 'display', 'none');
-    this.renderDropRegions(NULL_BOUNDS, NULL_BOUNDS);
-  }
-
-  private isViewDragEvent(dragEvent: DragEvent): boolean {
-    return dragEvent.dataTransfer.types.includes(VIEW_DRAG_TYPE);
+    setStyle(this._dropZoneOverlay, {display: 'none'});
   }
 
   private installDragListeners(): void {
-    // Activate drop zone when view tab dragging starts
-    this._workbenchLayout.viewTabDrag$
-      .pipe(
-        filter(event => event === 'start'),
-        takeUntil(this._destroy$),
-      )
-      .subscribe(() => {
-        this.activateDropZone();
-      });
-
-    // Deactivate drop zone when view tab dragging ends
-    this._workbenchLayout.viewTabDrag$
-      .pipe(
-        filter(event => event === 'end'),
-        takeUntil(this._destroy$),
-      )
-      .subscribe(() => {
-        this.deactivateDropZone();
-      });
-
-    // Add listeners to control dragging
-    fromEvent<DragEvent>(this._dropZoneOverlay, 'dragover')
-      .pipe(
-        filter(event => this.isViewDragEvent(event)),
-        takeUntil(this._destroy$),
-      )
-      .subscribe((dragEvent: DragEvent) => {
-        dragEvent.preventDefault(); // `preventDefault` to allow drop
-        this.onDragOver(dragEvent);
-      });
-
-    fromEvent<DragEvent>(this._dropZoneOverlay, 'dragleave')
+    this._viewDragService.viewDrag$(window, {capture: true, eventType: ['dragenter', 'dragleave', 'drop'], emitOutsideAngular: true})
       .pipe(takeUntil(this._destroy$))
-      .subscribe(() => {
-        this.onDragLeave();
+      .subscribe((event: DragEvent) => {
+        switch (event.type) {
+          case 'dragenter':
+            this.activateDropZone();
+            break;
+          case 'dragleave':
+          case 'drop':
+            this.deactivateDropZone();
+            break;
+        }
       });
 
-    fromEvent<DragEvent>(this._dropZoneOverlay, 'drop')
-      .pipe(
-        filter(event => this.isViewDragEvent(event)),
-        takeUntil(this._destroy$),
-      )
-      .subscribe((dragEvent: DragEvent) => {
-        this.onDrop(dragEvent);
+    this._viewDragService.viewDrag$(this._dropZoneOverlay, {emitOutsideAngular: true})
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((event: DragEvent) => {
+        switch (event.type) {
+          case 'dragover':
+            this.onDragOver(event);
+            break;
+          case 'dragleave':
+            this.onDragLeave();
+            break;
+          case 'drop':
+            this.onDrop(event);
+            break;
+        }
       });
   }
 
   private createDropZoneOverlay(): void {
     // Create drop zone as an overlay to avoid flickering when dragging over child elements.
-    this._dropZoneOverlay = this.createElement(this._host, 'div', {
+    this._dropZoneOverlay = createElement('div', {
+      parent: this._host,
       cssClass: 'wb-view-drop-zone',
       style: {
         'position': 'absolute',
@@ -211,12 +194,12 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
         'right': '0',
         'bottom': '0',
         'left': '0',
-        'z-index': '1',
       },
     });
 
     // Create the two drop regions which are moved depending on the computed region.
     const dropRegionOptions: ElementCreateOptions = {
+      parent: this._dropZoneOverlay,
       cssClass: 'wb-view-drop-region',
       style: {
         'position': 'absolute',
@@ -230,16 +213,8 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
         'transition-timing-function': 'ease-out',
       },
     };
-    this._dropRegionElement1 = this.createElement(this._dropZoneOverlay, 'section', dropRegionOptions);
-    this._dropRegionElement2 = this.createElement(this._dropZoneOverlay, 'section', dropRegionOptions);
-  }
-
-  private createElement(parent: Element, tag: string, options?: ElementCreateOptions): Element {
-    const element = this._renderer.createElement(tag);
-    this._renderer.appendChild(parent, element);
-    options && options.style && Object.keys(options.style).forEach(key => this._renderer.setStyle(element, key, options.style[key]));
-    options && options.cssClass && this._renderer.addClass(element, options.cssClass);
-    return element;
+    this._dropRegionElement1 = createElement('section', dropRegionOptions);
+    this._dropRegionElement2 = createElement('section', dropRegionOptions);
   }
 
   private renderDropRegions(region1: Bounds, region2: Bounds): void {
@@ -247,31 +222,28 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
     this.renderDropRegion(this._dropRegionElement2, region2);
   }
 
-  private renderDropRegion(element: Element, bounds: Bounds): void {
+  private renderDropRegion(element: HTMLElement, bounds: Bounds): void {
     if (bounds === NULL_BOUNDS) {
-      this._renderer.setStyle(element, 'display', 'none');
+      setStyle(element, {display: 'none'});
     }
     else {
-      Object.keys(bounds).forEach(key => this._renderer.setStyle(element, key, bounds[key]));
-      this._renderer.removeStyle(element, 'display');
+      setStyle(element, {
+        ...bounds,
+        display: null,
+      });
     }
-  }
-
-  public ngOnDestroy(): void {
-    this._dropZoneOverlay && this._dropZoneOverlay.remove();
-    this._destroy$.next();
   }
 
   private computeDropRegion(event: DragEvent): Region {
-    const horizontalDropAreaDetectorWidth = Math.min(DROP_REGION_MAX_SIZE, this._host.clientWidth / 3);
+    const horizontalDropZoneWidth = Math.min(DROP_REGION_MAX_SIZE, this._host.clientWidth / 3);
     const verticalDropZoneHeight = Math.min(DROP_REGION_MAX_SIZE, this._host.clientHeight / 3);
     const offsetX = event.pageX - this._host.getBoundingClientRect().left;
     const offsetY = event.pageY - this._host.getBoundingClientRect().top;
 
-    if (offsetX < horizontalDropAreaDetectorWidth) {
+    if (offsetX < horizontalDropZoneWidth) {
       return 'west';
     }
-    if (offsetX > this._host.clientWidth - horizontalDropAreaDetectorWidth) {
+    if (offsetX > this._host.clientWidth - horizontalDropZoneWidth) {
       return 'east';
     }
     if (offsetY < verticalDropZoneHeight) {
@@ -282,11 +254,10 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
     }
     return 'center';
   }
-}
 
-interface ElementCreateOptions {
-  cssClass?: string;
-  style?: { [style: string]: any };
+  public ngOnDestroy(): void {
+    this._destroy$.next();
+  }
 }
 
 interface Bounds {
@@ -298,8 +269,9 @@ interface Bounds {
 }
 
 export interface WbViewDropEvent {
-  source: DragEvent;
-  region: Region;
+  sourceEvent: DragEvent;
+  dropRegion: Region;
+  dragData: ViewDragData;
 }
 
 export type Region = 'north' | 'east' | 'south' | 'west' | 'center';

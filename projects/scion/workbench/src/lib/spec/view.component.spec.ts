@@ -49,12 +49,12 @@ describe('ViewComponent', () => {
     const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({dirty: true}), '(A)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'e2e-dirty': true}), '(A)');
 
     // Clear dirty flag
     viewDebugElement.view.dirty = false;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({dirty: false}), '(B)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'e2e-dirty': false}), '(B)');
 
     tick();
   })));

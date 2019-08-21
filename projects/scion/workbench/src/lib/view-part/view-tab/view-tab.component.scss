@@ -1,97 +1,39 @@
 @import '../../workbench.constants';
 
-@mixin text {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 :host {
-  display: inline-flex;
+  display: grid; // stretches the portal to be full width and full height
+  position: relative; // positioning context for the portal
   overflow: hidden;
   user-select: none;
   cursor: pointer;
   border: none;
   box-sizing: border-box;
 
-  &.tab-item {
-    border-right: 1px solid $viewpart_tabbar_separator-color;
-    min-width: $viewtab-min-width;
-    height: $viewtab-height;
-  }
-
   &.active {
     cursor: default;
     color: $viewpart_tab-active-fgcolor;
   }
 
-  &.active.tab-item {
-    background-color: $viewpart_tab-active-bgcolor;
-    box-shadow: -7px 0 10px 0 rgba(0, 0, 0, 0.4);
+  &[context="tabbar"] {
+    border-right: 1px solid $viewpart_tabbar_separator-color;
+    min-width: $viewtab-min-width;
+    max-width: $viewtab-max-width;
+    height: $viewtab-height;
+
+    &.active {
+      background-color: $viewpart_tab-active-bgcolor;
+      box-shadow: -7px 0 10px 0 rgba(0, 0, 0, 0.4);
+    }
   }
 
-  &:hover.list-item {
+  &[context="tabbar-dropdown"]:hover {
     background-color: rgba(239, 239, 239, .5);
     box-shadow: 0 0 0 1px $viewlistitem-border-color;
   }
-}
 
-div.tab-content {
-  flex: auto;
-  padding: .5em 0 .5em 1em;
-
-  > div.title {
-    @include text;
-    font-size: 16px;
-    font-weight: 400;
-    max-width: $viewtab-max-width;
-
-    > span.wb-icon-edit {
-      padding-right: .2em;
-    }
-  }
-
-  > div.heading {
-    @include text;
-    max-width: $viewtab-max-width;
-    font-size: 13px;
-    font-weight: 300;
-    line-height: 2em;
+  // disable pointer events on direct children if the view is blocked (not on the host element to allow dragging the viewtab)
+  &.blocked > ::ng-deep * {
+    pointer-events: none;
   }
 }
 
-button.close {
-  flex: none;
-  align-self: flex-start;
-  padding: 0;
-  margin: 4px 4px 4px .5em;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  outline: none;
-  font-size: .75em;
-  color: inherit;
-  visibility: hidden;
-
-  &::before {
-    content: '\e5cd';
-  }
-
-  :host-context(.closable.active,.closable:hover):not(.disabled) & {
-    visibility: visible;
-  }
-
-  :host-context(.tab-item) &:hover::before {
-    content: '\e5c9';
-  }
-
-  :host-context(.list-item) & {
-    align-self: center;
-    margin-right: 1em;
-    font-size: 1em;
-
-    &:hover::before {
-      font-weight: bold;
-    }
-  }
-}

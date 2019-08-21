@@ -11,9 +11,10 @@
 import { Injectable, Injector } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME } from '../workbench.constants';
-import { InternalWorkbenchRouter } from '../routing/workbench-router.service';
+import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { Activity, InternalActivity } from './activity';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 
 @Injectable()
 export class WorkbenchActivityPartService {
@@ -21,7 +22,8 @@ export class WorkbenchActivityPartService {
   private _activities$ = new BehaviorSubject<Activity[]>([]);
 
   constructor(private _router: Router,
-              private _wbRouter: InternalWorkbenchRouter,
+              private _wbRouter: WorkbenchRouter,
+              private _viewOutletNavigator: ViewOutletNavigator,
               private _injector: Injector) {
   }
 
@@ -43,7 +45,7 @@ export class WorkbenchActivityPartService {
    * Creates an activity to be added to this service.
    */
   public createActivity(): Activity {
-    return new InternalActivity(this._wbRouter, this._injector);
+    return new InternalActivity(this._viewOutletNavigator, this._injector);
   }
 
   /**

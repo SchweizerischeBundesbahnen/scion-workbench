@@ -8,38 +8,113 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { ViewTabComponent } from '../view-tab/view-tab.component';
-import { InternalWorkbenchService } from '../../workbench.service';
-import { VIEW_DRAG_TYPE } from '../../workbench.constants';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { switchMap, takeUntil, tap } from 'rxjs/operators';
+import { EMPTY, Observable, Subject, timer } from 'rxjs';
 import { SciViewportComponent } from '@scion/viewport';
 import { SciDimension } from '@scion/dimension';
+import { ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer } from '../../view-dnd/view-tab-drag-image-renderer.service';
+import { setCssVariable, unsetCssVariable } from '../../dom.util';
+import { WorkbenchService } from '../../workbench.service';
+import { Arrays } from '../../array.util';
+import { ViewListButtonComponent } from '../view-list-button/view-list-button.component';
+import { WorkbenchViewPart } from '../../workbench.model';
+import { ViewDragData, ViewDragService } from '../../view-dnd/view-drag.service';
 
+/**
+ * Renders the view tabbar and viewpart actions, if any.
+ * The viewtabs are added to a viewport, which the user can scroll if not enough space.
+ */
 @Component({
   selector: 'wb-view-part-bar',
   templateUrl: './view-part-bar.component.html',
   styleUrls: ['./view-part-bar.component.scss'],
 })
-export class ViewPartBarComponent implements OnDestroy {
+export class ViewPartBarComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
+  private _host: HTMLElement;
 
   @ViewChildren(ViewTabComponent)
   private _viewTabs: QueryList<ViewTabComponent>;
 
-  @ViewChild(SciViewportComponent, {static: true, read: ElementRef})
-  private _viewport: ElementRef<HTMLElement>;
+  @ViewChild(SciViewportComponent, {static: true})
+  private _viewport: SciViewportComponent;
 
-  constructor(private _workbench: InternalWorkbenchService,
+  @ViewChild(ViewListButtonComponent, {static: true, read: ElementRef})
+  private _viewListButtonElement: ElementRef<HTMLElement>;
+
+  /**
+   * Transfer data of the view being dragged over this tabbar.
+   */
+  public dragData: ViewDragData;
+
+  /**
+   * Reference to the viewtab over which the user is dragging a viewtab.
+   */
+  public dropTargetViewTab: ViewTabComponent;
+
+  /**
+   * Reference to the viewtab on which the drag operation started.
+   * This reference is only set if the drag operation started on a viewtab of this tabbar.
+   */
+  public dragSourceViewTab: ViewTabComponent;
+
+  /**
+   * Indicates if the user is dragging a viewtab over this component.
+   */
+  public get isDragOver(): boolean {
+    return !!this.dragData;
+  }
+
+  /**
+   * Indicates if the user is dragging over the viewtab where the drag operation started.
+   */
+  public get isDragSourceDragOver(): boolean {
+    return this.dragSourceViewTab && this.dropTargetViewTab === this.dragSourceViewTab;
+  }
+
+  /**
+   * Indicates if the user is dragging a viewtab over a valid viewtab drop slot,
+   * which is either when dragging over a viewtab or the tabbar tail.
+   */
+  public isTabDropSlotDragOver: boolean;
+
+  /**
+   * Indicates if the user is auto scrolling the viewtabs.
+   */
+  public isAutoScroll: boolean;
+
+  /**
+   * Locks the y-axis of the viewtab drag image to snap it to the tabbar while dragging over.
+   */
+  private constrainFn: ConstrainFn = (rect: ViewDragImageRect): ViewDragImageRect => {
+    return {
+      x: rect.x,
+      y: this._host.getBoundingClientRect().top,
+      width: rect.width,
+      height: this._host.offsetHeight,
+    };
+  };
+
+  // tslint:disable-next-line:member-ordering
+  constructor(host: ElementRef<HTMLElement>,
+              private _workbench: WorkbenchService,
               private _workbenchLayout: WorkbenchLayoutService,
-              public viewPartService: WorkbenchViewPartService) {
-    this._workbenchLayout.afterGridChange$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(() => this.scrollActiveViewTabIntoViewport());
+              private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
+              private _viewPart: WorkbenchViewPart,
+              private _viewPartService: WorkbenchViewPartService,
+              private _viewDragService: ViewDragService) {
+    this._host = host.nativeElement;
+  }
+
+  public ngOnInit(): void {
+    this.installGridChangeListener();
+    this.installViewDragListener();
+    this.installAutoScroller();
   }
 
   @HostListener('dblclick', ['$event'])
@@ -48,35 +123,21 @@ export class ViewPartBarComponent implements OnDestroy {
     event.stopPropagation();
   }
 
-  @HostListener('dragover', ['$event'])
-  public onDragOver(event: DragEvent): void {
-    if (!event.dataTransfer.types.includes(VIEW_DRAG_TYPE)) {
-      return;
-    }
-
-    if (this._workbench.activeViewPartService !== this.viewPartService) {
-      event.preventDefault(); // allow drop
-    }
+  public get viewRefs$(): Observable<string[]> {
+    return this._viewPart.viewRefs$;
   }
 
-  @HostListener('drop', ['$event'])
-  public onDrop(event: DragEvent): void {
-    event.stopPropagation();
-
-    const sourceViewRef = this._workbench.activeViewPartService.activeViewRef;
-    this.viewPartService.moveViewToThisViewPart(sourceViewRef).then();
-  }
-
-  public onViewportChange(): void {
+  public onTabbarViewportDimensionChange(): void {
     this.computeHiddenViewTabs();
   }
 
-  public onViewportClientChange(dimension: SciDimension): void {
-    // The viewport is set to 'flex: initial' with its width set equal to the viewport client width. It shrinks if there is not enough space available.
-    // The viewport is not set to 'flex: auto' to render left-aligned actions right after the view tabs.
+  public onTabbarViewportClientDimensionChange(dimension: SciDimension): void {
+    // The tabbar viewport is set to 'flex: initial' (and not to 'flex: auto') and its width set equals to the viewport client width.
+    // This allows rendering left-aligned actions right after the viewtabs, and shrinks the viewport if there is not enough space available.
 
-    // The width is set directly to the viewport DOM element not to waste a change detection cycle when computing the hidden view tabs.
-    this._viewport.nativeElement.style.width = `${dimension.clientWidth}px`;
+    // The width is set directly to the viewport DOM element not to waste a change detection cycle in order to compute the hidden viewtabs.
+    this._viewport.host.nativeElement.style.width = `${dimension.clientWidth}px`;
+
     this.computeHiddenViewTabs();
   }
 
@@ -84,18 +145,156 @@ export class ViewPartBarComponent implements OnDestroy {
     this.computeHiddenViewTabs();
   }
 
+  /**
+   * Computes tabs which are not visible in the viewtabs viewport.
+   */
   private computeHiddenViewTabs(): void {
-    // Compute tabs which are not visible in the viewtabs viewport.
-    this._viewTabs && this.viewPartService.setHiddenViewTabs(this._viewTabs
+    this._viewTabs && this._viewPartService.setHiddenViewTabs(this._viewTabs
       .filter(viewTab => !viewTab.isVisibleInViewport())
       .map(viewTab => viewTab.viewRef));
   }
 
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
-
   private scrollActiveViewTabIntoViewport(): void {
     this._viewTabs.length && this._viewTabs.find(viewTab => viewTab.active).scrollIntoViewport();
+  }
+
+  /**
+   * Method invoked when the user starts dragging a viewtab of this tabbar.
+   */
+  @HostListener('dragstart')
+  public onViewDragStart(): void {
+    this.dragData = this._viewDragService.getViewDragData();
+    this.dragSourceViewTab = this.dropTargetViewTab = this._viewTabs.find(viewTab => viewTab.viewRef === this.dragData.viewRef);
+  }
+
+  /**
+   * Method invoked when the user ends dragging a viewtab of this tabbar.
+   */
+  @HostListener('dragend')
+  public onViewDragEnd(): void {
+    this.dragSourceViewTab = this.dropTargetViewTab = null;
+  }
+
+  /**
+   * Method invoked when the user drags a viewtab into this viewpart.
+   */
+  private onTabbarDragEnter(): void {
+    this.dragData = this._viewDragService.getViewDragData();
+    setCssVariable(this._host, '--drag-source-width', `${this.dragData.viewTabWidth}px`);
+
+    // Lock the y-axis to snap the view drag image to the view tabbar.
+    this._viewTabDragImageRenderer.setConstrainDragImageRectFn(this.constrainFn);
+  }
+
+  /**
+   * Method invoked while the user is dragging a viewtab over this viewpart.
+   */
+  private onTabbarDragOver(event: DragEvent): void {
+    event.preventDefault(); // allow view drop
+
+    // Compute the pointer x-coordinate relative to the tabbar.
+    const pointerOffsetX = event.clientX - this._host.getBoundingClientRect().left + this._viewport.scrollLeft;
+
+    // Determine over which viewtab the user is dragging.
+    this.dropTargetViewTab = this._viewTabs.find(viewTab => {
+      return pointerOffsetX >= viewTab.host.offsetLeft && pointerOffsetX <= viewTab.host.offsetLeft + viewTab.host.offsetWidth;
+    });
+
+    // Compute if the user is dragging over a viewtab drop slot. A drop slot is some valid drop target within the tabbar,
+    // which is either when dragging over a viewtab or the tabbar tail.
+    const lastViewTab = Arrays.last(this._viewTabs, viewTab => viewTab !== this.dragSourceViewTab);
+    const viewTabsWidth = lastViewTab ? (lastViewTab.host.offsetLeft + lastViewTab.host.offsetWidth) : 0;
+    this.isTabDropSlotDragOver = pointerOffsetX <= viewTabsWidth + this.dragData.viewTabWidth;
+  }
+
+  /**
+   * Method invoked when the user drags a view out of this viewpart.
+   */
+  private onTabbarDragLeave(): void {
+    this.unsetDragState({unsetDragSource: false});
+
+    // Activate the view next to the view being dragged out of this tabbar.
+    if (this.dragSourceViewTab && this.dragSourceViewTab.active) {
+      this._viewPartService.activateSiblingView().then();
+    }
+  }
+
+  /**
+   * Method invoked when the user drops a view into this viewpart.
+   */
+  private onTabbarDrop(): void {
+    if (this.isDragSourceDragOver) {
+      this.unsetDragState({unsetDragSource: true});
+      return;
+    }
+
+    const dropIndex = this._viewTabs.toArray().indexOf(this.dropTargetViewTab);
+    this._viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: this.dragData.appInstanceId,
+        viewPartRef: this.dragData.viewPartRef,
+        viewRef: this.dragData.viewRef,
+      },
+      target: {
+        appInstanceId: this._workbench.appInstanceId,
+        insertionIndex: dropIndex !== -1 ? dropIndex : undefined,
+        viewPartRef: this._viewPart.viewPartRef,
+      },
+    });
+    this.unsetDragState({unsetDragSource: true});
+  }
+
+  private unsetDragState(options: { unsetDragSource: boolean }): void {
+    if (options && options.unsetDragSource) {
+      this.dragSourceViewTab = null;
+    }
+    this.dropTargetViewTab = null;
+    this.dragData = null;
+    this.isTabDropSlotDragOver = false;
+    this._viewTabDragImageRenderer.unsetConstrainDragImageRectFn(this.constrainFn);
+    unsetCssVariable(this._host, '--drag-source-width');
+  }
+
+  private installGridChangeListener(): void {
+    this._workbenchLayout.afterGridChange$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(() => this.scrollActiveViewTabIntoViewport());
+  }
+
+  private installViewDragListener(): void {
+    this._viewDragService.viewDrag$(this._host)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((event: DragEvent) => {
+        switch (event.type) {
+          case 'dragenter':
+            this.onTabbarDragEnter();
+            break;
+          case 'dragover':
+            this.onTabbarDragOver(event);
+            break;
+          case 'dragleave':
+            this.onTabbarDragLeave();
+            break;
+          case 'drop':
+            this.onTabbarDrop();
+            break;
+        }
+      });
+  }
+
+  private installAutoScroller(): void {
+    this._viewDragService.viewDrag$(this._viewListButtonElement.nativeElement, {eventType: ['dragenter', 'dragleave', 'drop']})
+      .pipe(
+        tap(event => this.isAutoScroll = (event.type === 'dragenter')),
+        switchMap(() => this.isAutoScroll ? timer(0, 3) : EMPTY), // start or stop auto scroller
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        this._viewport.scrollLeft += 3;
+      });
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }
