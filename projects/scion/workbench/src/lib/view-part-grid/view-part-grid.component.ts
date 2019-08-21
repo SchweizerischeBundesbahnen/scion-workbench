@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, isDevMode, OnDestroy, OnInit } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { WorkbenchViewPartRegistry } from './workbench-view-part-registry.service';
 import { VIEW_PART_REF_INDEX, ViewPartInfoArray, ViewPartSashBox } from './view-part-grid-serializer.service';
@@ -16,6 +16,8 @@ import { ViewPartComponent } from '../view-part/view-part.component';
 import { noop, Subject } from 'rxjs';
 import { pairwise, startWith, takeUntil } from 'rxjs/operators';
 import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
+import { ViewDragService, ViewMoveEvent } from '../view-dnd/view-drag.service';
+import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 
 /**
  * Allows the arrangement of viewparts in a grid.
@@ -50,7 +52,11 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
    */
   public sashBox: ViewPartSashBox;
 
-  constructor(private _viewPartRegistry: WorkbenchViewPartRegistry, private _cd: ChangeDetectorRef) {
+  constructor(private _viewOutletNavigator: ViewOutletNavigator,
+              private _viewPartRegistry: WorkbenchViewPartRegistry,
+              private _viewDragService: ViewDragService,
+              private _cd: ChangeDetectorRef) {
+    this.installViewMoveListener();
   }
 
   public ngOnInit(): void {
@@ -121,5 +127,39 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
 
     portalsToBeMoved.forEach(portal => portal.detach());
     return (): void => portalsToBeMoved.forEach(portal => portal.attach());
+  }
+
+  private installViewMoveListener(): void {
+    this._viewDragService.viewMove$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((event: ViewMoveEvent) => {
+        if (event.source.appInstanceId !== event.target.appInstanceId) {
+          isDevMode() && console && console.warn && console.warn('[UnsupportedOperationError] Dragging views between different browsing contexts not supported yet');
+          return;
+        }
+
+        if (event.source.viewPartRef === event.target.viewPartRef && event.target.viewPartRegion === 'center') {
+          return;
+        }
+
+        if (!event.target.viewPartRegion || event.target.viewPartRegion === 'center') {
+          this._viewOutletNavigator.navigate({
+            viewGrid: this._viewPartRegistry.grid
+              .moveView(event.source.viewRef, event.target.viewPartRef, event.target.insertionIndex)
+              .serialize(),
+          }).then();
+        }
+        else {
+          const grid = this._viewPartRegistry.grid;
+          const newViewPartRef = grid.computeNextViewPartIdentity();
+
+          this._viewOutletNavigator.navigate({
+            viewGrid: grid
+              .addSiblingViewPart(event.target.viewPartRegion, event.target.viewPartRef, newViewPartRef)
+              .moveView(event.source.viewRef, newViewPartRef)
+              .serialize(),
+          }).then();
+        }
+      });
   }
 }

@@ -1,13 +1,1 @@
-<div class="tab-content">
-  <div class="title e2e-title">
-    <span *ngIf="dirty" class="wb-icon-edit e2e-dirty"></span>
-    {{view.title}}
-  </div>
-  <div class="heading e2e-heading" *ngIf="view.heading as heading">
-    {{heading}}
-  </div>
-</div>
-<button type="button"
-        class="close e2e-close wb-icons"
-        (click)="onClose($event)">
-</button>
+<ng-container *cdkPortalOutlet="viewTabContentPortal"></ng-container>

@@ -10,13 +10,13 @@
 
 import { Injectable } from '@angular/core';
 import { WorkbenchViewPartService } from './view-part/workbench-view-part.service';
-import { VIEW_GRID_QUERY_PARAM } from './workbench.constants';
-import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WorkbenchViewRegistry } from './workbench-view-registry.service';
 import { Disposable } from './disposable';
 import { WorkbenchViewPartAction } from './workbench.model';
 import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
+import { UUID } from './uuid.util';
+import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
 
 /**
  * Root object for the SCION Workbench.
@@ -37,6 +37,11 @@ import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-
  * Use `wbRouterLink` directive or `WorkbenchRouter` service for view-based navigation.
  */
 export abstract class WorkbenchService {
+
+  /**
+   * A unique ID per instance of the app. If opened in a different browser tab, it has a different instance ID.
+   */
+  public readonly appInstanceId: string;
 
   /**
    * Destroys the specified workbench view(s) and associated routed component.
@@ -82,20 +87,20 @@ export class InternalWorkbenchService implements WorkbenchService {
   private _activeViewPartService: WorkbenchViewPartService;
   private _viewPartServices: WorkbenchViewPartService[] = [];
   public readonly viewPartActions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
+  public readonly appInstanceId = UUID.randomUUID();
 
-  constructor(private _router: Router,
+  constructor(private _viewOutletNavigator: ViewOutletNavigator,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
               private _viewRegistry: WorkbenchViewRegistry) {
   }
 
   public destroyView(...viewRefs: string[]): Promise<boolean> {
     const destroyViewFn = (viewRef: string): Promise<boolean> => {
-      const serializedGrid = this._viewPartRegistry.grid
-        .removeView(viewRef)
-        .serialize();
-      return this._router.navigate([{outlets: {[viewRef]: null}}], {
-        queryParams: {[VIEW_GRID_QUERY_PARAM]: serializedGrid},
-        queryParamsHandling: 'merge',
+      return this._viewOutletNavigator.navigate({
+        viewOutlet: {name: viewRef, commands: null},
+        viewGrid: this._viewPartRegistry.grid
+          .removeView(viewRef)
+          .serialize(),
       });
     };
 

@@ -8,6 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
+import { QueryList } from '@angular/core';
+
 /**
  * Provides array utility methods.
  */
@@ -48,5 +50,20 @@ export class Arrays {
         return array2.includes(item);
       }
     });
+  }
+
+  /**
+   * Finds the last item matching the given predicate, if any,
+   * or returns the last item in the array if no predicate is specified.
+   *
+   * Returns `undefined` if no element is found.
+   */
+  public static last<T>(items: T[] | QueryList<T>, predicate?: (item: T) => boolean): T | undefined {
+    const array = items ? (Array.isArray(items) ? items : items.toArray()) : [];
+
+    if (!predicate) {
+      return array[array.length - 1];
+    }
+    return [...array].reverse().find(predicate);
   }
 }

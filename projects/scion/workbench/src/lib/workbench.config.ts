@@ -8,6 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
+import { ComponentType } from '@angular/cdk/portal';
+
 /**
  * Configuration for the Workbench.
  */
@@ -18,4 +20,21 @@ export abstract class WorkbenchConfig {
    * If set to 'true', which is by default, activity components are not destroyed when toggling the activity.
    */
   abstract reuseActivityRoutes?: boolean;
+
+  /**
+   * Allows customizing the appearance of a view tab by providing a custom view tab component.
+   *
+   * Inject {@link WorkbenchView} and {@link VIEW_TAB_CONTEXT} token into the component to get a reference to the view and the rendering context.
+   *
+   *
+   * ---
+   * Example:
+   *
+   * @Component(...)
+   * export class ViewTabContentComponent {
+   *   constructor(view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {}
+   * }
+   */
+  abstract viewTabComponent?: ComponentType<any>;
 }
+

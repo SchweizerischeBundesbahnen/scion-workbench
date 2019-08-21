@@ -1,0 +1,14 @@
+<div class="title e2e-title">
+  <span *ngIf="view.dirty" class="wb-icon-edit"></span>
+  {{view.title}}
+</div>
+
+<div class="heading e2e-heading" *ngIf="view.heading">
+  {{view.heading}}
+</div>
+
+<button *ngIf="view.closable"
+        type="button"
+        class="close e2e-close wb-icon-close"
+        (click)="onClose($event)">
+</button>

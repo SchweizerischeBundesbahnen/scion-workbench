@@ -8,10 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Region } from '../view-part/view-drop-zone.directive';
+import { Region } from '../view-dnd/view-drop-zone.directive';
 import { VIEW_PART_REF_PREFIX } from '../workbench.constants';
 import { ACTIVE_VIEW_REF_INDEX, VIEW_PART_REF_INDEX, VIEW_REFS_START_INDEX, ViewPartGridSerializerService, ViewPartInfoArray, ViewPartSashBox } from './view-part-grid-serializer.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
+import { Defined } from '../defined.util';
 
 /**
  * Represents the arrangement of viewparts in a grid and provides methods to modify the grid.
@@ -45,11 +46,22 @@ export class ViewPartGrid {
 
   /**
    * Adds a view to the specified viewpart, and activates it.
+   * Control the insertion position by providing an insertion index. If not specified, the view is added to the tail.
    *
    * Returns a copy of this grid with the specified view added.
    */
-  public addView(viewPartRef: string, viewRef: string): ViewPartGrid {
-    return this.clone()._addView(viewPartRef, viewRef);
+  public addView(viewPartRef: string, viewRef: string, insertionIndex?: number): ViewPartGrid {
+    return this.clone()._addView(viewPartRef, viewRef, insertionIndex);
+  }
+
+  /**
+   * Moves a view in the viewpart grid.
+   * Control the insertion position by providing an insertion index. If not specified, the view is moved to the tail.
+   *
+   * Returns a copy of this grid with the view moved.
+   */
+  public moveView(viewRef: string, moveToViewPartRef: string, insertionIndex?: number): ViewPartGrid {
+    return this.clone()._moveView(viewRef, moveToViewPartRef, insertionIndex);
   }
 
   /**
@@ -59,16 +71,16 @@ export class ViewPartGrid {
    * Returns a copy of this grid with the specified view removed.
    */
   public removeView(viewRef: string): ViewPartGrid {
-    return this.clone()._removeView(viewRef);
+    return this.clone()._removeView(viewRef, {removeViewPartIfEmpty: true});
   }
 
   /**
-   * Swaps two views of the specified viewpart.
+   * Activates the view next to the given view.
    *
-   * Returns a copy of this grid with the specified views switched.
+   * Returns a copy of this grid with most recent view activated.
    */
-  public swapViews(viewPartRef: string, viewRef1: string, viewRef2: string): ViewPartGrid {
-    return this.clone()._swapViews(viewPartRef, viewRef1, viewRef2);
+  public activateSiblingView(viewPartRef: string, viewRef: string): ViewPartGrid {
+    return this.clone()._activateSiblingView(viewPartRef, viewRef);
   }
 
   /**
@@ -107,23 +119,41 @@ export class ViewPartGrid {
     return this.clone()._removeViewPart(viewPartRef);
   }
 
-  private _addView(viewPartRef: string, viewRef: string): this {
+  private _addView(viewPartRef: string, viewRef: string, insertionIndex?: number): this {
     const viewPartInfoArray = this.getViewPartElseThrow(viewPartRef).viewPartInfoArray;
+
+    const views = viewPartInfoArray.slice(VIEW_REFS_START_INDEX);
+    const newViewIndex = Defined.orElse(insertionIndex, views.length);
+    if (newViewIndex < 0 || newViewIndex > views.length) {
+      throw Error(`[IndexOutOfRangeError] View index ${newViewIndex} must be in the following range: [0, ${views.length}]`);
+    }
 
     // Add the view and make it the active view
     viewPartInfoArray[ACTIVE_VIEW_REF_INDEX] = viewRef;
-    viewPartInfoArray.push(viewRef);
+    viewPartInfoArray.splice(VIEW_REFS_START_INDEX + newViewIndex, 0, viewRef);
 
     return this;
   }
 
-  private _removeView(viewRef: string): this {
+  private _moveView(viewRef: string, moveToViewPartRef: string, insertionIndex?: number): this {
+    const targetPartInfoArray = this.getViewPartElseThrow(moveToViewPartRef).viewPartInfoArray;
+    const targetViewRef = insertionIndex !== undefined ? targetPartInfoArray[VIEW_REFS_START_INDEX + insertionIndex] : undefined;
+    const moveToDifferentViewPart = this.findContainingViewPartElseThrow(viewRef) !== moveToViewPartRef;
+
+    this._removeView(viewRef, {removeViewPartIfEmpty: moveToDifferentViewPart});
+    const targetInsertionIndex = targetViewRef ? targetPartInfoArray.slice(VIEW_REFS_START_INDEX).indexOf(targetViewRef) : undefined;
+    this._addView(moveToViewPartRef, viewRef, targetInsertionIndex);
+
+    return this;
+  }
+
+  private _removeView(viewRef: string, options: { removeViewPartIfEmpty: boolean }): this {
     const viewPartRef = this.findContainingViewPartElseThrow(viewRef);
     const viewPartInfoArray = this.getViewPartElseThrow(viewPartRef).viewPartInfoArray;
 
     const viewIndex = viewPartInfoArray.indexOf(viewRef, VIEW_REFS_START_INDEX);
     if (viewIndex === -1) {
-      throw Error(`Illegal argument. View not found in viewpart [viewPartRef=${viewPartRef}, viewRef=${viewRef}]`);
+      throw Error(`[ViewNotFoundError] View not found in viewpart [viewPartRef=${viewPartRef}, viewRef=${viewRef}]`);
     }
 
     // Remove the view
@@ -135,11 +165,19 @@ export class ViewPartGrid {
       viewPartInfoArray[ACTIVE_VIEW_REF_INDEX] = this.findMostRecentView(viewRefs);
     }
 
-    // Remove viewpart if its last view is closed.
+    // Remove viewpart if its last view is removed.
     const lastView = !(viewPartInfoArray.length > VIEW_REFS_START_INDEX);
-    if (lastView) {
+    if (lastView && options.removeViewPartIfEmpty) {
       this._removeViewPart(viewPartRef);
     }
+
+    return this;
+  }
+
+  private _activateSiblingView(viewPartRef: string, viewRef: string): this {
+    const viewPartInfoArray = this.getViewPartElseThrow(viewPartRef).viewPartInfoArray;
+    const viewIndex = viewPartInfoArray.indexOf(viewRef, VIEW_REFS_START_INDEX);
+    viewPartInfoArray[ACTIVE_VIEW_REF_INDEX] = viewPartInfoArray[viewIndex + 1] || viewPartInfoArray[viewIndex - 1];
 
     return this;
   }
@@ -150,23 +188,6 @@ export class ViewPartGrid {
       .sort((view1, view2) => view2.activationInstant - view1.activationInstant);
 
     return viewsSorted.length > 0 ? viewsSorted[0].viewRef : null;
-  }
-
-  private _swapViews(viewPartRef: string, viewRef1: string, viewRef2: string): this {
-    const viewPartInfoArray = this.getViewPartElseThrow(viewPartRef).viewPartInfoArray;
-
-    const view1Index = viewPartInfoArray.indexOf(viewRef1, VIEW_REFS_START_INDEX);
-    const view2Index = viewPartInfoArray.indexOf(viewRef2, VIEW_REFS_START_INDEX);
-    if (view1Index === -1) {
-      throw Error(`Illegal argument. View not found in viewpart [viewPartRef=${viewPartRef}, viewRef=${viewRef1}]`);
-    }
-    if (view2Index === -1) {
-      throw Error(`Illegal argument. View not found in viewpart [viewPartRef=${viewPartRef}, viewRef=${viewRef2}]`);
-    }
-    viewPartInfoArray[view2Index] = viewRef1;
-    viewPartInfoArray[view1Index] = viewRef2;
-
-    return this;
   }
 
   private _activateView(viewPartRef: string, viewRef: string): this {

@@ -10,12 +10,18 @@
 // This files contains all all the theming functionality.
 @import 'font-theme';
 @import 'popup-theme';
-@import '~@angular/cdk/overlay-prebuilt.css';
+@import 'view-drag-theme';
+@import '~@angular/cdk/a11y';
+@import '~@angular/cdk/overlay';
 
 /**
  * Invoke from `index.scss' to style the SCION workbench frame.
  */
 @mixin wb-theme($theme: ()) {
+  @include cdk-a11y();
+  @include cdk-overlay();
+
   @include wb-font-theme($theme);
   @include wb-popup-theme($theme);
+  @include wb-view-tab-drag-image-theme($theme);
 }

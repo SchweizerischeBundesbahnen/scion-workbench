@@ -1,9 +1,23 @@
-<sci-viewport scrollbarStyle="hidden"
-              sciDimension (sciDimensionChange)="onViewportChange()"
+<sci-viewport class="tabbar"
+              scrollbarStyle="hidden"
+              sciDimension (sciDimensionChange)="onTabbarViewportDimensionChange()"
               (scroll)="onScroll()">
-  <div class="viewport-client" sciDimension (sciDimensionChange)="onViewportClientChange($event)">
-    <wb-view-tab *ngFor="let viewRef of viewPartService.viewRefs" [viewRef]="viewRef" [renderingHint]="'tab-item'"></wb-view-tab>
+  <div class="viewport-client" [class.drag-over]="isDragOver"
+       sciDimension (sciDimensionChange)="onTabbarViewportClientDimensionChange($event)">
+    <wb-view-tab *ngFor="let viewRef of viewRefs$ | async"
+                 #viewtab
+                 [viewRef]="viewRef"
+                 context="tabbar"
+                 [class.drop-target]="viewtab === dropTargetViewTab"
+                 [class.drag-source]="viewtab === dragSourceViewTab">
+    </wb-view-tab>
+
+    <!-- add a placeholder element to the tabbar end while the user is dragging a viewtab over this tabbar -->
+    <div *ngIf="isTabDropSlotDragOver && !isAutoScroll && !isDragSourceDragOver"
+         [style.flex]="'none'"
+         [style.width.px]="dragData.viewTabWidth">
+    </div>
   </div>
 </sci-viewport>
-<wb-view-part-action-bar></wb-view-part-action-bar>
+<wb-view-part-action-bar [class.drag-over]="isDragOver"></wb-view-part-action-bar>
 <wb-view-list-button></wb-view-list-button>

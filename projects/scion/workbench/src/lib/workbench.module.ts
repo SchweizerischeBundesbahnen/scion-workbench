@@ -23,7 +23,7 @@ import { ViewListComponent } from './view-part/view-list/view-list.component';
 import { ViewListButtonComponent } from './view-part/view-list-button/view-list-button.component';
 import { ViewPartBarComponent } from './view-part/view-part-bar/view-part-bar.component';
 import { InternalWorkbenchService, WorkbenchService } from './workbench.service';
-import { ViewDropZoneDirective } from './view-part/view-drop-zone.directive';
+import { ViewDropZoneDirective } from './view-dnd/view-drop-zone.directive';
 import { ViewPartGridComponent } from './view-part-grid/view-part-grid.component';
 import { RemoteSiteComponent } from './remote-site/remote-site.component';
 import { WorkbenchLayoutService } from './workbench-layout.service';
@@ -34,7 +34,7 @@ import { ViewPartGridSerializerService } from './view-part-grid/view-part-grid-s
 import { WbPortalOutletComponent } from './portal/wb-portal-outlet.component';
 import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
-import { InternalWorkbenchRouter, WorkbenchRouter } from './routing/workbench-router.service';
+import { WorkbenchRouter } from './routing/workbench-router.service';
 import { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './routing/wb-router-link.directive';
 import { WorkbenchViewRegistry } from './workbench-view-registry.service';
 import { OverlayHostRef } from './overlay-host-ref.service';
@@ -68,6 +68,8 @@ import { ViewPartActionBarComponent } from './view-part/view-part-action-bar/vie
 import { TaskScheduler } from './task-scheduler.service';
 import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
+import { ViewTabContentComponent } from './view-part/view-tab-content/view-tab-content.component';
+import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
 
 @NgModule({
   imports: [
@@ -89,6 +91,7 @@ import { ViewActivationInstantProvider } from './view-activation-instant-provide
     ViewComponent,
     ViewPartBarComponent,
     ViewTabComponent,
+    ViewTabContentComponent,
     ViewListButtonComponent,
     ViewListComponent,
     ViewPartGridComponent,
@@ -185,13 +188,11 @@ export class WorkbenchModule {
         WorkbenchViewPartRegistry,
         OverlayHostRef,
         ContentHostRef,
-        InternalWorkbenchRouter,
+        WorkbenchRouter,
+        ViewOutletNavigator,
         PopupService,
         TaskScheduler,
         ViewActivationInstantProvider,
-        {
-          provide: WorkbenchRouter, useExisting: InternalWorkbenchRouter,
-        },
         {
           provide: APP_MESSAGE_BOX_SERVICE,
           useExisting: MessageBoxService,
@@ -206,6 +207,11 @@ export class WorkbenchModule {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
           multi: true,
           useValue: ViewComponent,
+        },
+        {
+          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
+          multi: true,
+          useValue: ViewTabContentComponent,
         },
         {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,

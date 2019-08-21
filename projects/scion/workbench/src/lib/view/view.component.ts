@@ -66,7 +66,7 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
               public messageBoxOverlayHostRef: OverlayHostRef) {
     this._messageBoxService.count$
       .pipe(takeUntil(this._destroy$))
-      .subscribe(count => this._view.disabled = count > 0);
+      .subscribe(count => this._view.blocked = count > 0);
   }
 
   public ngAfterViewInit(): void {

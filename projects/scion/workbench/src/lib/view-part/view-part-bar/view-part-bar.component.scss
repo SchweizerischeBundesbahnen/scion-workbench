@@ -4,21 +4,41 @@
   display: flex;
   background-color: $viewpart_tabbar-bgcolor;
   color: $viewpart_tab-fgcolor;
+  --drag-source-width: 0;
 
-  > sci-viewport {
+  > sci-viewport.tabbar {
     flex: initial;
 
-    // Sets the viewport client (<div.viewport-client>) to its smallest width, so that view-tabs do not overflow.
+    // Set the viewport client width to its ideal content width, so it occupies only as much space as its content requires.
     // This allows view actions to stick to the right of the viewport, even if closing view tabs.
-    --grid-template-columns: min-content;
+    --grid-template-columns: max-content; // DO NOT USE `min-content` to preserve white space of text content.
 
     div.viewport-client {
       display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
+      flex-flow: row nowrap;
+      position: relative; // positioning context for viewtabs to compute their position inside the tabbar
 
       > wb-view-tab {
         flex: none;
+      }
+
+      > wb-view-tab.drag-source:not(.drop-target) {
+        display: none;
+      }
+
+      &.drag-over {
+        > wb-view-tab {
+          transition: transform 175ms cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        > wb-view-tab.drop-target:not(.drag-source), > wb-view-tab.drop-target:not(.drag-source) ~ wb-view-tab {
+          transform: translateX(var(--drag-source-width));
+        }
+
+        // do not animate views right to the drop-target if the drop-target is immediately following the drag-source
+        > wb-view-tab.drag-source + wb-view-tab.drop-target ~ wb-view-tab {
+          transition: none;
+        }
       }
     }
   }
