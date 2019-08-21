@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { captureElementDimension, SciDimension, SciDimensionService } from './dimension.service';
@@ -27,7 +27,7 @@ import { captureElementDimension, SciDimension, SciDimensionService } from './di
   selector: '[sciDimension]',
   exportAs: 'sciDimension',
 })
-export class SciDimensionDirective implements OnDestroy {
+export class SciDimensionDirective implements OnInit, OnDestroy {
 
   private _host: HTMLElement;
   private _destroy$ = new Subject<void>();
@@ -49,6 +49,9 @@ export class SciDimensionDirective implements OnDestroy {
               private _dimensionService: SciDimensionService,
               private _ngZone: NgZone) {
     this._host = host.nativeElement;
+  }
+
+  public ngOnInit(): void {
     this.installDimensionListener();
   }
 

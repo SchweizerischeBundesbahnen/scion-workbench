@@ -61,7 +61,7 @@ export class SciDimensionService {
    *          Flag to control if to use {ResizeObserver} to listen natively for element dimension changes, if supported by the user agent.
    *          By default, this flag is enabled.
    */
-  public dimension$(target: HTMLElement, options?: { useNativeResizeObserver: boolean }): Observable<SciDimension> {
+  public dimension$(target: HTMLElement, options?: { useNativeResizeObserver?: boolean }): Observable<SciDimension> {
     options = {
       useNativeResizeObserver: this._injector.get(USE_NATIVE_RESIZE_OBSERVER, true),
       ...options,
@@ -104,6 +104,9 @@ function createNativeResizeObservable$(target: HTMLElement): Observable<SciDimen
   return new Observable((observer: Observer<SciDimension>): TeardownLogic => {
     const resizeObserver = new window['ResizeObserver'](() => observer.next(captureElementDimension(target))); // tslint:disable-line:typedef
     resizeObserver.observe(target);
+
+    // emit the current dimension once the browser is about to repaint
+    requestAnimationFrame(() => observer.next(captureElementDimension(target)));
 
     return (): void => {
       resizeObserver.disconnect();
