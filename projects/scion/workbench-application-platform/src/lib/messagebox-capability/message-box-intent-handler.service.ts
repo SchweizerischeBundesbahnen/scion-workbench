@@ -55,8 +55,8 @@ export class MessageBoxIntentHandler implements IntentHandler {
   }
 
   public onIntent(envelope: MessageEnvelope<MessageBoxIntentMessage>): void {
-    const messageBus: MessageBus = envelope._injector.get(MessageBus as Type<MessageBus>);
-    const messageBoxService: MessageBoxService = envelope._injector.get(MessageBoxService as Type<MessageBoxService>);
+    const messageBus: MessageBus = envelope._injector.get(MessageBus);
+    const messageBoxService: MessageBoxService = envelope._injector.get(MessageBoxService);
     const msgbox: MessageBox = envelope.message.payload;
 
     messageBoxService.open({

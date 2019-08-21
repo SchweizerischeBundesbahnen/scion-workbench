@@ -392,6 +392,6 @@ class AppTestModule {
 }
 
 function getWorkbenchService(): WorkbenchService {
-  // TODO [Angular 9]: remove type cast for abstract symbols once the following issue is fixed: https://github.com/angular/angular/issues/29905
+  // TODO [Angular 9]: remove type cast for abstract symbols once 'angular/issues/29905' and 'angular/issues/23611' are fixed
   return TestBed.get(WorkbenchService as Type<WorkbenchService>);
 }
