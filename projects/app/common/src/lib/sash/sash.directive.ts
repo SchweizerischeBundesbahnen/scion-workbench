@@ -72,9 +72,7 @@ export class SciSashDirective implements OnDestroy, OnChanges {
 
     // Listen for 'mousemove' events
     const mousemoveListener = fromEvent(this._document, 'mousemove')
-      .pipe(
-        takeUntil(this._destroy$),
-      )
+      .pipe(takeUntil(this._destroy$))
       .subscribe((mousemoveEvent: MouseEvent) => {
         mousemoveEvent.preventDefault();
         const mousePosition = this.extractMousePosition(mousemoveEvent);
