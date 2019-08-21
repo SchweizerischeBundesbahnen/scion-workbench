@@ -46,7 +46,7 @@ export class ViewPartGrid {
 
   /**
    * Adds a view to the specified viewpart, and activates it.
-   * Control the insertion position by providing an insertion index. If not specified, the view is added to the tail.
+   * Control the insertion position by providing an insertion index. If not specified, the view is added at the end.
    *
    * Returns a copy of this grid with the specified view added.
    */
@@ -305,7 +305,7 @@ export class ViewPartGrid {
     return i;
   }
 
-  private getViewPartElseThrow(viewPartRef: string): ViewPartGridNode {
+  public getViewPartElseThrow(viewPartRef: string): ViewPartGridNode {
     let node: ViewPartGridNode = null;
     this.visit((it: ViewPartGridNode): boolean => {
       if (it.viewPartRef === viewPartRef) {

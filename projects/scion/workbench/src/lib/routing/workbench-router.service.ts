@@ -13,6 +13,7 @@ import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { Defined } from '../defined.util';
 import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
+import { ViewPartGrid } from '../view-part-grid/view-part-grid.model';
 import { ViewOutletNavigator } from './view-outlet-navigator.service';
 import { Injectable } from '@angular/core';
 
@@ -73,9 +74,10 @@ export class WorkbenchRouter {
         const viewPartGrid = this._viewPartRegistry.grid;
         const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
         const viewPartRef = extras.blankViewPartRef || (this._workbench.activeViewPartService && this._workbench.activeViewPartService.viewPartRef) || viewPartGrid.viewPartRefs()[0];
+        const viewInsertionIndex = this.coerceViewInsertionIndex(extras.blankInsertionIndex, viewPartRef, viewPartGrid);
         return this._viewOutletNavigator.navigate({
           viewOutlet: {name: newViewRef, commands},
-          viewGrid: viewPartGrid.addView(viewPartRef, newViewRef).serialize(),
+          viewGrid: viewPartGrid.addView(viewPartRef, newViewRef, viewInsertionIndex).serialize(),
           extras: {
             ...extras,
             relativeTo: null, // commands are absolute because normalized
@@ -104,6 +106,29 @@ export class WorkbenchRouter {
       }
       default: {
         throw Error('Not supported routing view target.');
+      }
+    }
+  }
+
+  /**
+   * Computes the index for 'start' or 'last' literals, or coerces the index to a number.
+   * If `undefined` is given as insertion index, it returns the position after the currently active view.
+   */
+  private coerceViewInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined, viewPartRef: string, viewPartGrid: ViewPartGrid): number {
+    switch (insertionIndex) {
+      case undefined: {  // index after the active view, if any, or after the last view otherwise
+        const viewPart = viewPartGrid.getViewPartElseThrow(viewPartRef);
+        const index = viewPart.viewRefs.indexOf(viewPart.activeViewRef);
+        return (index > -1 ? index + 1 : viewPartGrid.getViewPartElseThrow(viewPartRef).viewRefs.length);
+      }
+      case 'start': {
+        return 0;
+      }
+      case 'end': {
+        return viewPartGrid.getViewPartElseThrow(viewPartRef).viewRefs.length;
+      }
+      default: {
+        return insertionIndex;
       }
     }
   }
@@ -139,4 +164,10 @@ export interface WbNavigationExtras extends NavigationExtras {
    * If not specified, the currently active workbench viewpart is used.
    */
   blankViewPartRef?: string;
+  /**
+   * Specifies the position where to insert the view into the tab bar when using 'blank' view target strategy.
+   * If not specified, the view is inserted after the active view. Set the index to 'start' or 'end' for inserting
+   * the view at the beginning or at the end.
+   */
+  blankInsertionIndex?: number | 'start' | 'end' | undefined;
 }

@@ -13,6 +13,7 @@ import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { SciParamsEnterComponent } from '@scion/app/common';
 import { WbNavigationExtras, WorkbenchRouter } from '@scion/workbench-application.angular';
 import { Qualifier } from '@scion/workbench-application-platform.api';
+import { coerceNumberProperty } from '@angular/cdk/coercion';
 
 const QUALIFIER = 'qualifier';
 const QUERY_PARAMS = 'queryParams';
@@ -20,6 +21,7 @@ const MATRIX_PARAMS = 'matrixParams';
 const ACTIVATE_IF_PRESENT = 'activateIfPresent';
 const CLOSE_IF_PRESENT = 'closeIfPresent';
 const TARGET = 'target';
+const INSERTION_INDEX = 'insertionIndex';
 
 @Component({
   selector: 'app-view-navigation-panel',
@@ -34,6 +36,7 @@ export class ViewNavigationPanelComponent {
   public readonly ACTIVATE_IF_PRESENT = ACTIVATE_IF_PRESENT;
   public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
   public readonly TARGET = TARGET;
+  public readonly INSERTION_INDEX = INSERTION_INDEX;
 
   public form: FormGroup;
 
@@ -45,6 +48,7 @@ export class ViewNavigationPanelComponent {
       [ACTIVATE_IF_PRESENT]: formBuilder.control(true),
       [CLOSE_IF_PRESENT]: formBuilder.control(false),
       [TARGET]: formBuilder.control('blank'),
+      [INSERTION_INDEX]: formBuilder.control(''),
     });
   }
 
@@ -56,8 +60,19 @@ export class ViewNavigationPanelComponent {
       activateIfPresent: this.form.get(ACTIVATE_IF_PRESENT).value,
       closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
       target: this.form.get(TARGET).value,
+      blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
     };
 
     this._router.navigate(qualifier, extras);
   }
+}
+
+function coerceInsertionIndex(value: any): number | 'start' | 'end' | undefined {
+  if (value === '') {
+    return undefined;
+  }
+  if (value === 'start' || value === 'end' || value === undefined) {
+    return value;
+  }
+  return coerceNumberProperty(value);
 }

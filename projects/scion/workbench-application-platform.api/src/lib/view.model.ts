@@ -210,5 +210,11 @@ export interface ViewIntentMessage extends IntentMessage {
      * 'self':  opens the view in the current view tab
      */
     target?: 'blank' | 'self';
+    /**
+     * Specifies the position where to insert the view into the tab bar when using 'blank' view target strategy.
+     * If not specified, the view is inserted after the active view. Set the index to 'start' or 'end' for inserting
+     * the view at the beginning or at the end.
+     */
+    blankInsertionIndex?: number | 'start' | 'end' | undefined;
   };
 }

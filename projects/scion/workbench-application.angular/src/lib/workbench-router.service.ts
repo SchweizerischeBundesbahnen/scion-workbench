@@ -33,6 +33,7 @@ export class WorkbenchRouter {
       activateIfPresent: extras.activateIfPresent,
       closeIfPresent: extras.closeIfPresent,
       target: extras.target,
+      blankInsertionIndex: extras.blankInsertionIndex,
     };
     Platform.getService(RouterService).navigate(navigateCommand);
   }
@@ -73,4 +74,10 @@ export interface WbNavigationExtras {
   matrixParams?: {
     [key: string]: any;
   };
+  /**
+   * Specifies the position where to insert the view into the tab bar when using 'blank' view target strategy.
+   * If not specified, the view is inserted after the active view. Set the index to 'start' or 'end' for inserting
+   * the view at the beginning or at the end.
+   */
+  blankInsertionIndex?: number | 'start' | 'end' | undefined;
 }

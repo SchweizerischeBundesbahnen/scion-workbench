@@ -78,6 +78,7 @@ export class ViewIntentHandler implements IntentHandler {
           target: intentMessage.payload.target,
           selfViewRef: view && view.viewRef,
           blankViewPartRef: view && this._workbench.resolveViewPart(view.viewRef),
+          blankInsertionIndex: intentMessage.payload.blankInsertionIndex,
         };
 
         const commands = this.createNavigateCommands(viewCapability, matrixParamObject, envelope.message.qualifier);
