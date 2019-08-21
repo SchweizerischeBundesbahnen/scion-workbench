@@ -81,8 +81,8 @@ export class PopupService implements OnDestroy {
       hasBackdrop: false,
       positionStrategy: overlayPositionStrategy,
       scrollStrategy: this._overlay.scrollStrategies.reposition(),
+      disposeOnNavigation: true,
     });
-    overlayConfig['disposeOnNavigation'] = true; // added in CDK 7.x
 
     const overlayRef = this._overlay.create(overlayConfig);
     const popup = new InternalPopup(input);

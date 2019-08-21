@@ -45,12 +45,12 @@ export class ViewListButtonComponent {
       scrollStrategy: this._overlay.scrollStrategies.noop(),
       hasBackdrop: true,
       backdropClass: null,
+      disposeOnNavigation: true,
       positionStrategy: this._overlay.position()
         .flexibleConnectedTo(this._host)
         .withFlexibleDimensions(false)
         .withPositions([ViewListButtonComponent.SOUTH, ViewListButtonComponent.NORTH]),
     });
-    config['disposeOnNavigation'] = true; // added in CDK 7.x
 
     const overlayRef = this._overlay.create(config);
     const injectionTokens = new WeakMap();
