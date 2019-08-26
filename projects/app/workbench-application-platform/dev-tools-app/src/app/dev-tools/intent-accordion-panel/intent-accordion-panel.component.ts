@@ -21,7 +21,6 @@ import { map } from 'rxjs/operators';
 })
 export class IntentAccordionPanelComponent implements OnChanges {
 
-  public anyQualifier: boolean;
   public providers$: Observable<Application[]>;
 
   @Input()
@@ -31,7 +30,6 @@ export class IntentAccordionPanelComponent implements OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    this.anyQualifier = Object.keys(this.intent.qualifier || {}).includes('*');
     this.providers$ = this._manifestRegistryService.capabilityProviders$(this.intent.metadata.id)
       .pipe(map(providers => [...providers].sort((p1, p2) => p1.name.localeCompare(p2.name))));
   }

@@ -48,7 +48,7 @@ export class ManifestRegistry {
   }
 
   /**
-   * Returns capabilities which have the given required type and qualifiers.
+   * Returns capabilities which have the given required type and qualifier.
    */
   public getCapabilities<T extends Capability>(type: string, qualifier: Qualifier): T[] {
     return this.getCapabilitiesByType(type)

@@ -21,7 +21,6 @@ import { map } from 'rxjs/operators';
 })
 export class IntentAccordionItemComponent implements OnChanges {
 
-  public anyQualifier: boolean;
   public unhandled$: Observable<boolean>;
 
   @Input()
@@ -31,8 +30,6 @@ export class IntentAccordionItemComponent implements OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    this.anyQualifier = Object.keys(this.intent.qualifier || {}).includes('*');
-
     this.unhandled$ = this._manifestRegistryService.capabilityProviders$(this.intent.metadata.id)
       .pipe(map(providers => providers.length === 0));
   }

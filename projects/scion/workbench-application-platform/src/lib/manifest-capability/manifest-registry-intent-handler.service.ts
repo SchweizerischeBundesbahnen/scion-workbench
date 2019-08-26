@@ -15,7 +15,9 @@ import { MessageBus } from '../core/message-bus.service';
 import { ApplicationRegistry } from '../core/application-registry.service';
 import { ManifestRegistry } from '../core/manifest-registry.service';
 import { Logger } from '../core/logger.service';
-import { matchesIntentQualifier } from '../core/qualifier-tester';
+import { matchesCapabilityQualifier, matchesIntentQualifier } from '../core/qualifier-tester';
+import { Arrays } from '../core/array.util';
+import { patchQualifier } from '../core/qualifier-patcher';
 
 /**
  * Allows to query manifest registry.
@@ -87,10 +89,16 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
     const intentId = envelope.message.payload.intentId;
     const intent: Intent = this._manifestRegistry.getIntent(intentId);
 
-    const providers: Application[] = this._manifestRegistry.getCapabilities(intent.type, intent.qualifier)
+    const providers: Application[] = this._manifestRegistry.getCapabilitiesByType(intent.type)
       .filter(capability => this._manifestRegistry.isVisibleForApplication(capability, intent.metadata.symbolicAppName))
+      .filter(capability => {
+        const patchedQualifier: Qualifier = patchQualifier(intent.qualifier, capability.qualifier);
+        return matchesCapabilityQualifier(capability.qualifier, patchedQualifier);
+      })
       .map(capability => this._applicationRegistry.getApplication(capability.metadata.symbolicAppName));
-    this._messageBus.publishReply(providers, envelope.sender, envelope.replyToUid);
+
+    const distinctProviders: Application[] = Arrays.distinct(providers, (app) => app.symbolicName);
+    this._messageBus.publishReply(distinctProviders, envelope.sender, envelope.replyToUid);
   }
 
   /**
