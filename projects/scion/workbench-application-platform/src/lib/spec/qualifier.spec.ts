@@ -9,6 +9,7 @@
  */
 
 import { matchesCapabilityQualifier, matchesIntentQualifier } from '../core/qualifier-tester';
+import { patchQualifier } from '../core/qualifier-patcher';
 
 describe('Qualifier', () => {
 
@@ -41,6 +42,10 @@ describe('Qualifier', () => {
       expect(matchesCapabilityQualifier({a: 'a', b: '*', c: 'c'}, {a: 'a', b: null, c: 'c'})).toBeFalsy();
       expect(matchesCapabilityQualifier({a: 'a', b: '*', c: 'c'}, {a: 'a', c: 'c'})).toBeFalsy();
       expect(matchesCapabilityQualifier({a: 'a', b: '*', c: 'c'}, {a: 'a', c: 'c', d: 'd'})).toBeFalsy();
+
+      expect(matchesCapabilityQualifier({entity: '*'}, undefined)).toBeFalsy();
+      expect(matchesCapabilityQualifier({entity: '*'}, null)).toBeFalsy();
+      expect(matchesCapabilityQualifier({entity: '*'}, {})).toBeFalsy();
     });
 
     it('supports value wildcards (?)', () => {
@@ -56,6 +61,10 @@ describe('Qualifier', () => {
       expect(matchesCapabilityQualifier({a: 'a', b: '?', c: 'c'}, {a: 'a', b: null, c: 'c'})).toBeTruthy();
       expect(matchesCapabilityQualifier({a: 'a', b: '?', c: 'c'}, {a: 'a', c: 'c'})).toBeTruthy();
       expect(matchesCapabilityQualifier({a: 'a', b: '?', c: 'c'}, {a: 'a', c: 'c', d: 'd'})).toBeFalsy();
+
+      expect(matchesCapabilityQualifier({entity: '?'}, undefined)).toBeTruthy();
+      expect(matchesCapabilityQualifier({entity: '?'}, null)).toBeTruthy();
+      expect(matchesCapabilityQualifier({entity: '?'}, {})).toBeTruthy();
     });
 
     it('accepts only empty qualifiers', () => {
@@ -151,6 +160,97 @@ describe('Qualifier', () => {
       expect(matchesIntentQualifier(null, {})).toBeTruthy();
       expect(matchesIntentQualifier(null, null)).toBeTruthy();
       expect(matchesIntentQualifier(null, {entity: 'person'})).toBeFalsy();
+    });
+  });
+
+  describe('function \'patchQualifier(...)\'', () => {
+
+    it('returns \'NilQualifier\' for an empty intent qualifier', () => {
+      expect(patchQualifier(null, null)).toEqual({});
+      expect(patchQualifier(undefined, null)).toEqual({});
+      expect(patchQualifier({}, null)).toEqual({});
+
+      expect(patchQualifier(null, undefined)).toEqual({});
+      expect(patchQualifier(undefined, undefined)).toEqual({});
+      expect(patchQualifier({}, undefined)).toEqual({});
+
+      expect(patchQualifier(null, {})).toEqual({});
+      expect(patchQualifier(undefined, {})).toEqual({});
+      expect(patchQualifier({}, {})).toEqual({});
+
+      expect(patchQualifier(null, {entity: 'user'})).toEqual({});
+      expect(patchQualifier(undefined, {entity: 'user'})).toEqual({});
+      expect(patchQualifier({}, {entity: 'user'})).toEqual({});
+    });
+
+    it('returns an exact copy of the intent qualifier for an empty capability qualifier', () => {
+      expect(patchQualifier({entity: 'train'}, undefined)).toEqual({entity: 'train'});
+      expect(patchQualifier({entity: 'user', id: '*'}, undefined)).toEqual({entity: 'user', id: '*'});
+      expect(patchQualifier({entity: 'user', id: '?'}, undefined)).toEqual({entity: 'user', id: '?'});
+
+      expect(patchQualifier({entity: 'train'}, null)).toEqual({entity: 'train'});
+      expect(patchQualifier({entity: 'user', id: '*'}, null)).toEqual({entity: 'user', id: '*'});
+      expect(patchQualifier({entity: 'user', id: '?'}, null)).toEqual({entity: 'user', id: '?'});
+
+      expect(patchQualifier({entity: 'train'}, {})).toEqual({entity: 'train'});
+      expect(patchQualifier({entity: 'user', id: '*'}, {})).toEqual({entity: 'user', id: '*'});
+      expect(patchQualifier({entity: 'user', id: '?'}, {})).toEqual({entity: 'user', id: '?'});
+    });
+
+    it('patches intent qualifier wildcard values by capability qualifier values', () => {
+      expect(patchQualifier({entity: 'train'}, {entity: 'user'})).toEqual({entity: 'train'});
+      expect(patchQualifier({entity: 'user', id: '*'}, {entity: 'user'})).toEqual({entity: 'user', id: '*'});
+      expect(patchQualifier({entity: 'user', id: '?'}, {entity: 'user'})).toEqual({entity: 'user', id: '?'});
+
+      expect(patchQualifier({entity: 'user'}, {entity: 'user'})).toEqual({entity: 'user'});
+      expect(patchQualifier({entity: '*'}, {entity: 'user'})).toEqual({entity: 'user'});
+      expect(patchQualifier({entity: '?'}, {entity: 'user'})).toEqual({entity: 'user'});
+      expect(patchQualifier({'*': '*'}, {entity: 'user'})).toEqual({entity: 'user'});
+
+      expect(patchQualifier({id: '42'}, {id: '42'})).toEqual({id: '42'});
+      expect(patchQualifier({id: '*'}, {id: '42'})).toEqual({id: '42'});
+      expect(patchQualifier({id: '?'}, {id: 42})).toEqual({id: 42});
+      expect(patchQualifier({'*': '*'}, {id: 42})).toEqual({id: 42});
+
+      expect(patchQualifier({flag: true}, {flag: true})).toEqual({flag: true});
+      expect(patchQualifier({flag: '*'}, {flag: false})).toEqual({flag: false});
+      expect(patchQualifier({flag: '?'}, {flag: false})).toEqual({flag: false});
+    });
+
+    it('patches intent qualifier wildcard values by capability qualifier wildcard (*) values', () => {
+      expect(patchQualifier(null, {entity: 'user', id: '*'})).toEqual({});
+      expect(patchQualifier(undefined, {entity: 'user', id: '*'})).toEqual({});
+      expect(patchQualifier({}, {entity: 'user', id: '*'})).toEqual({});
+
+      expect(patchQualifier({entity: 'train'}, {entity: 'user', id: '*'})).toEqual({entity: 'train'});
+      expect(patchQualifier({entity: 'user'}, {entity: 'user', id: '*'})).toEqual({entity: 'user'});
+      expect(patchQualifier({entity: 'user', id: '*', name: 'smith'}, {entity: 'user', id: '*'})).toEqual({entity: 'user', id: '*', name: 'smith'});
+      expect(patchQualifier({entity: 'user', id: '?', name: 'smith'}, {entity: 'user', id: '*'})).toEqual({entity: 'user', id: '*', name: 'smith'});
+      expect(patchQualifier({entity: 'person', '*': '*'}, {entity: 'user', id: '*'})).toEqual({entity: 'person', id: '*'});
+
+      expect(patchQualifier({entity: 'user', id: '*'}, {entity: 'user', id: '*'})).toEqual({entity: 'user', id: '*'});
+      expect(patchQualifier({entity: 'user', id: '?'}, {entity: 'user', id: '*'})).toEqual({entity: 'user', id: '*'});
+      expect(patchQualifier({entity: '*', id: '*'}, {entity: 'user', id: '*'})).toEqual({entity: 'user', id: '*'});
+      expect(patchQualifier({entity: '?', id: '?'}, {entity: 'user', id: '*'})).toEqual({entity: 'user', id: '*'});
+      expect(patchQualifier({'*': '*'}, {entity: 'user', id: '*'})).toEqual({entity: 'user', id: '*'});
+    });
+
+    it('patches intent qualifier wildcard values by capability qualifier wildcard (?) values', () => {
+      expect(patchQualifier(null, {entity: 'user', id: '?'})).toEqual({});
+      expect(patchQualifier(undefined, {entity: 'user', id: '?'})).toEqual({});
+      expect(patchQualifier({}, {entity: 'user', id: '?'})).toEqual({});
+
+      expect(patchQualifier({entity: 'train'}, {entity: 'user', id: '?'})).toEqual({entity: 'train'});
+      expect(patchQualifier({entity: 'user'}, {entity: 'user', id: '?'})).toEqual({entity: 'user'});
+      expect(patchQualifier({entity: 'user', id: '*', name: 'smith'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?', name: 'smith'});
+      expect(patchQualifier({entity: 'user', id: '?', name: 'smith'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?', name: 'smith'});
+      expect(patchQualifier({entity: 'person', '*': '*'}, {entity: 'user', id: '?'})).toEqual({entity: 'person', id: '?'});
+
+      expect(patchQualifier({entity: 'user', id: '*'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?'});
+      expect(patchQualifier({entity: 'user', id: '?'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?'});
+      expect(patchQualifier({entity: '*', id: '*'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?'});
+      expect(patchQualifier({entity: '?', id: '?'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?'});
+      expect(patchQualifier({'*': '*'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?'});
     });
   });
 });

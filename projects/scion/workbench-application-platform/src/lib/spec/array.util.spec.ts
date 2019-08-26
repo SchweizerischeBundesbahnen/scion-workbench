@@ -92,4 +92,38 @@ describe('Arrays', () => {
       expect(array).toEqual(['a', 'b', 'c', 'd', 'e']);
     });
   });
+
+  describe('Arrays.distinct', () => {
+
+    it('should remove duplicate string items', () => {
+      const array = ['a', 'a', 'b', 'c', 'd', 'e', 'c'];
+      expect(Arrays.distinct(array)).toEqual(['a', 'b', 'c', 'd', 'e']);
+    });
+
+    it('should remove duplicate objects by reference', () => {
+      const apple = {id: 1, name: 'apple'};
+      const banana = {id: 2, name: 'banana'};
+      const cherry = {id: 3, name: 'cherry'};
+
+      const array = [apple, banana, cherry, banana, apple];
+      expect(Arrays.distinct(array)).toEqual([apple, banana, cherry]);
+    });
+
+    it('should remove duplicate objects by a given identity function', () => {
+      const apple = {id: 1, name: 'apple'};
+      const banana = {id: 2, name: 'banana'};
+      const cherry = {id: 3, name: 'cherry'};
+      const appleOtherInstance = {...apple};
+      const bananaOtherInstance = {...banana};
+
+      const array = [apple, banana, cherry, bananaOtherInstance, appleOtherInstance];
+      expect(Arrays.distinct(array, (fruit) => fruit.id)).toEqual([apple, banana, cherry]);
+    });
+
+    it('should not modify the original array', () => {
+      const array = ['a', 'a', 'b', 'c', 'd', 'e', 'c'];
+      expect(Arrays.distinct(array)).toEqual(['a', 'b', 'c', 'd', 'e']);
+      expect(array).toEqual(['a', 'a', 'b', 'c', 'd', 'e', 'c']);
+    });
+  });
 });
