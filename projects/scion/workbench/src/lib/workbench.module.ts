@@ -70,6 +70,12 @@ import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 import { ViewTabContentComponent } from './view-part/view-tab-content/view-tab-content.component';
 import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
+import { ViewMenuComponent } from './view-part/view-context-menu/view-menu.component';
+import { ViewMenuItemDirective } from './view-part/view-context-menu/view-menu.directive';
+import { WbFormatAcceleratorPipe } from './view-part/view-context-menu/accelerator-format.pipe';
+import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
+import { TextComponent } from './view-part/view-context-menu/text.component';
+import { ViewMenuService } from './view-part/view-context-menu/view-menu.service';
 
 @NgModule({
   imports: [
@@ -113,6 +119,10 @@ import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
     ContentAsOverlayComponent,
     ViewPartActionDirective,
     ViewPartActionBarComponent,
+    ViewMenuComponent,
+    ViewMenuItemDirective,
+    WbFormatAcceleratorPipe,
+    TextComponent,
   ],
   exports: [
     WorkbenchComponent,
@@ -124,6 +134,7 @@ import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
     RemoteSiteComponent,
     ContentAsOverlayComponent,
     ViewPartActionDirective,
+    ViewMenuItemDirective,
   ],
 })
 export class WorkbenchModule {
@@ -131,8 +142,10 @@ export class WorkbenchModule {
   // Note: Inject services which should be created eagerly.
   constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any,
               auxiliaryRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
-              workbenchUrlObserver: WorkbenchUrlObserver) {
+              workbenchUrlObserver: WorkbenchUrlObserver,
+              viewMenuService: ViewMenuService) {
     auxiliaryRoutesRegistrator.registerActivityAuxiliaryRoutes();
+    viewMenuService.registerBuiltInMenuItems();
   }
 
   /**
@@ -193,6 +206,7 @@ export class WorkbenchModule {
         PopupService,
         TaskScheduler,
         ViewActivationInstantProvider,
+        ViewPartGridProvider,
         {
           provide: APP_MESSAGE_BOX_SERVICE,
           useExisting: MessageBoxService,
@@ -212,6 +226,16 @@ export class WorkbenchModule {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,
           multi: true,
           useValue: ViewTabContentComponent,
+        },
+        {
+          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
+          multi: true,
+          useValue: ViewMenuComponent,
+        },
+        {
+          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
+          multi: true,
+          useValue: TextComponent,
         },
         {
           provide: ANALYZE_FOR_ENTRY_COMPONENTS,

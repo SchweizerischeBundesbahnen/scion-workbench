@@ -16,6 +16,9 @@ import { asapScheduler, AsyncSubject, merge, Observable, Subject } from 'rxjs';
 import { delay, filter, map, take, takeUntil } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
+import { ViewDragService } from './view-dnd/view-drag.service';
+import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
+import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
 
 /**
  * Registry for {WorkbenchView} objects.
@@ -30,7 +33,9 @@ export class WorkbenchViewRegistry implements OnDestroy {
   constructor(private _componentFactoryResolver: ComponentFactoryResolver,
               private _router: Router,
               private _injector: Injector,
-              private _viewActivationInstantProvider: ViewActivationInstantProvider) {
+              private _viewActivationInstantProvider: ViewActivationInstantProvider,
+              private _viewDragService: ViewDragService,
+              private _viewPartGridProvider: ViewPartGridProvider) {
   }
 
   /**
@@ -98,7 +103,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
 
   private createWorkbenchView(viewRef: string, active: boolean): InternalWorkbenchView {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_COMPONENT_TYPE));
-    const view = new InternalWorkbenchView(viewRef, active, this._injector.get(WORKBENCH), portal, this._viewActivationInstantProvider, this._router);
+    const view = new InternalWorkbenchView(viewRef, active, portal, this._injector.get(WORKBENCH), this._viewActivationInstantProvider, this._router, this._viewDragService, this._injector.get(WorkbenchViewPartRegistry), this._viewPartGridProvider);
 
     portal.init({
       injectorTokens: new WeakMap()

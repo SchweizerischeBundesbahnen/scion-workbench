@@ -7,10 +7,11 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 import { ACTIVITY_OUTLET_NAME, VIEW_GRID_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
 import { Injectable } from '@angular/core';
 import { Arrays } from '../array.util';
+import { coerceArray } from '@angular/cdk/coercion';
 
 /**
  * Allows navigating to auxiliary routes in view outlets.
@@ -25,10 +26,18 @@ export class ViewOutletNavigator {
    * Navigates based on the provided array of commands, if any, and updates the URL with the given view grid.
    */
   public navigate(params: { viewOutlet?: { name: string, commands: any[] }, viewGrid: string, extras?: NavigationExtras }): Promise<boolean> {
-    const {viewOutlet, viewGrid, extras = {}} = params;
-    const commands: any[] = (viewOutlet ? [{outlets: {[viewOutlet.name]: viewOutlet.commands}}] : []);
+    const urlTree = this.createUrlTree(params);
+    return this._router.navigateByUrl(urlTree);
+  }
 
-    return this._router.navigate(commands, {
+  /**
+   * Applies the provided commands and viewgrid to the current URL tree and creates a new URL tree.
+   */
+  public createUrlTree(params: { viewOutlet?: Outlet | Outlet[], viewGrid: string, extras?: NavigationExtras }): UrlTree {
+    const {viewOutlet, viewGrid, extras = {}} = params;
+    const commands: any[] = this.createOutletCommands(viewOutlet);
+
+    return this._router.createUrlTree(commands, {
       ...extras,
       queryParams: {...extras.queryParams, [VIEW_GRID_QUERY_PARAM]: viewGrid},
       queryParamsHandling: 'merge',
@@ -98,4 +107,17 @@ export class ViewOutletNavigator {
 
     return serializedCommands;
   }
+
+  private createOutletCommands(viewOutlets?: Outlet | Outlet[]): any[] {
+    if (!viewOutlets) {
+      return [];
+    }
+    const outletsObject = coerceArray(viewOutlets).reduce((acc, viewOutlet) => ({...acc, [viewOutlet.name]: viewOutlet.commands}), {});
+    return [{outlets: outletsObject}];
+  }
+}
+
+export interface Outlet {
+  name: string;
+  commands: any[];
 }

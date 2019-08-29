@@ -8,6 +8,7 @@
   cursor: pointer;
   border: none;
   box-sizing: border-box;
+  outline: none;
 
   &.active {
     cursor: default;

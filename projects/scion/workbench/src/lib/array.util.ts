@@ -66,4 +66,15 @@ export class Arrays {
     }
     return [...array].reverse().find(predicate);
   }
+
+  /**
+   * Removes given item from the array. The original array will not be modified.
+   */
+  public static remove<T>(items: T[], item: T): T[] {
+    const result = [...items];
+    for (let index = result.indexOf(item); index !== -1; index = result.indexOf(item)) {
+      result.splice(index, 1);
+    }
+    return result;
+  }
 }

@@ -10,13 +10,12 @@
 
 import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
 import { WorkbenchViewPartService } from './workbench-view-part.service';
-import { combineLatest, noop, Subject } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { WbViewDropEvent } from '../view-dnd/view-drop-zone.directive';
 import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewPart } from '../workbench.model';
 import { takeUntil } from 'rxjs/operators';
 import { ViewDragService } from '../view-dnd/view-drag.service';
-import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 
 @Component({
   selector: 'wb-view-part',
@@ -45,7 +44,6 @@ export class ViewPartComponent implements OnDestroy {
   constructor(private _workbench: InternalWorkbenchService,
               private _viewDragService: ViewDragService,
               private _viewPart: WorkbenchViewPart,
-              private _viewRegistry: WorkbenchViewRegistry,
               public viewPartService: WorkbenchViewPartService) {
     combineLatest([this._workbench.viewPartActions$, this._viewPart.actions$, this._viewPart.viewRefs$])
       .pipe(takeUntil(this._destroy$))
@@ -53,45 +51,6 @@ export class ViewPartComponent implements OnDestroy {
         this.hasViews = viewRefs.length > 0;
         this.hasActions = globalActions.length > 0 || localActions.length > 0;
       });
-  }
-
-  @HostListener('keydown.control.k', ['$event'])
-  public onCloseView(event: KeyboardEvent): void {
-    this.viewPartService.destroyActiveView().then(noop);
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
-  @HostListener('keydown.control.shift.k', ['$event'])
-  public onCloseViews(event: KeyboardEvent): void {
-    this.viewPartService.remove().then(noop);
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
-  @HostListener('keydown.control.alt.end', ['$event'])
-  public onSplitVertically(event: KeyboardEvent): void {
-    if (this.viewPartService.viewCount() === 0) {
-      return;
-    }
-
-    const activeView = this._viewRegistry.getElseThrow(this._viewPart.activeViewRef);
-    this._viewDragService.dispatchViewMoveEvent({
-      source: {
-        appInstanceId: this._workbench.appInstanceId,
-        viewPartRef: this._viewPart.viewPartRef,
-        viewRef: activeView.viewRef,
-        viewUrlSegments: activeView.urlSegments,
-      },
-      target: {
-        appInstanceId: this._workbench.appInstanceId,
-        viewPartRef: this._viewPart.viewPartRef,
-        viewPartRegion: 'east',
-      },
-    });
-
-    event.preventDefault();
-    event.stopPropagation();
   }
 
   @HostListener('focusin')

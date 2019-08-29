@@ -1,0 +1,50 @@
+@import '../../workbench.constants';
+
+@mixin showEllipsisIfOverflowing {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  border: 1px solid $viewlistitem-border-color;
+  background-color: $viewpart_tab-active-bgcolor;
+  box-shadow: 8px 8px 9px -9px rgba(0, 0, 0, 0.2);
+
+  > div.menu-item-group {
+    &:not(:last-child) {
+      border-bottom: 1px solid $viewlistitem-border-color;
+    }
+
+    > div.menu-item {
+      display: flex;
+      flex-flow: row nowrap;
+      padding: .6em 1.5em;
+      cursor: default;
+      font-size: smaller;
+
+      > div.text {
+        flex: auto;
+        @include showEllipsisIfOverflowing;
+      }
+
+      > div.accelerator {
+        flex: none;
+        margin-left: 1em;
+      }
+
+      &:hover {
+        background-color: rgba(239, 239, 239, .5);
+        box-shadow: 0 0 0 1px $viewlistitem-border-color;
+      }
+
+      &.disabled {
+        opacity: .5;
+        pointer-events: none;
+      }
+    }
+  }
+}

@@ -45,6 +45,14 @@ export class ViewPartGrid {
   }
 
   /**
+   *
+   * Returns a copy of this grid with all views removed.
+   */
+  public clear(): ViewPartGrid {
+    return new ViewPartGrid(null, this._serializer, this._viewRegistry);
+  }
+
+  /**
    * Adds a view to the specified viewpart, and activates it.
    * Control the insertion position by providing an insertion index. If not specified, the view is added at the end.
    *

@@ -180,7 +180,7 @@ describe('Workbench Router', () => {
     await appPO.openNewViewTab();
 
     // close all view tabs
-    await appPO.closeAllViewTabs();
+    await appPO.closeAllViewTabs('viewpart.1');
 
     await expect(appPO.getViewTabCount('viewpart.1')).toEqual(0);
 

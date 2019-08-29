@@ -13,10 +13,11 @@ import { WorkbenchViewPartService } from './view-part/workbench-view-part.servic
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WorkbenchViewRegistry } from './workbench-view-registry.service';
 import { Disposable } from './disposable';
-import { WorkbenchViewPartAction } from './workbench.model';
-import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
+import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench.model';
 import { UUID } from './uuid.util';
 import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
+import { Arrays } from './array.util';
+import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
 
 /**
  * Root object for the SCION Workbench.
@@ -74,11 +75,22 @@ export abstract class WorkbenchService {
   public abstract get views$(): Observable<string[]>;
 
   /**
-   * Adds given viewpart action to every viewpart.
+   * Registers an action which is added to every viewpart.
    *
    * Viewpart actions are displayed next to the opened view tabs.
+   *
+   * @return {@link Disposable} to unregister the action.
    */
   public abstract registerViewPartAction(action: WorkbenchViewPartAction): Disposable;
+
+  /**
+   * Registers a view menu item which is added to the context menu of every view tab.
+   *
+   * The factory function is invoked with the view as its argument when the menu is about to show.
+   *
+   * @return {@link Disposable} to unregister the menu item.
+   */
+  public abstract registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable;
 }
 
 @Injectable()
@@ -87,10 +99,11 @@ export class InternalWorkbenchService implements WorkbenchService {
   private _activeViewPartService: WorkbenchViewPartService;
   private _viewPartServices: WorkbenchViewPartService[] = [];
   public readonly viewPartActions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
+  public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   public readonly appInstanceId = UUID.randomUUID();
 
   constructor(private _viewOutletNavigator: ViewOutletNavigator,
-              private _viewPartRegistry: WorkbenchViewPartRegistry,
+              private _viewPartGridProvider: ViewPartGridProvider,
               private _viewRegistry: WorkbenchViewRegistry) {
   }
 
@@ -98,7 +111,7 @@ export class InternalWorkbenchService implements WorkbenchService {
     const destroyViewFn = (viewRef: string): Promise<boolean> => {
       return this._viewOutletNavigator.navigate({
         viewOutlet: {name: viewRef, commands: null},
-        viewGrid: this._viewPartRegistry.grid
+        viewGrid: this._viewPartGridProvider.grid
           .removeView(viewRef)
           .serialize(),
       });
@@ -161,6 +174,13 @@ export class InternalWorkbenchService implements WorkbenchService {
     this.viewPartActions$.next([...this.viewPartActions$.value, action]);
     return {
       dispose: (): void => this.viewPartActions$.next(this.viewPartActions$.value.filter(it => it !== action)),
+    };
+  }
+
+  public registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable {
+    this.viewMenuItemProviders$.next([...this.viewMenuItemProviders$.value, factoryFn]);
+    return {
+      dispose: (): void => this.viewMenuItemProviders$.next(Arrays.remove(this.viewMenuItemProviders$.value, factoryFn)),
     };
   }
 }

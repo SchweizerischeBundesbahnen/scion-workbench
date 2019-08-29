@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, Component, HostBinding, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, ViewChild } from '@angular/core';
 import { InternalWorkbenchView } from '../workbench.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -19,6 +19,7 @@ import { WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM } from '../routing/routing-p
 import { MessageBoxService } from '../message-box/message-box.service';
 import { OverlayHostRef } from '../overlay-host-ref.service';
 import { ContentProjectionContext } from '../content-projection/content-projection-context.service';
+import { ViewMenuService } from '../view-part/view-context-menu/view-menu.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -60,13 +61,18 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
     return this._view.cssClasses.join(' ');
   }
 
-  constructor(private _view: InternalWorkbenchView,
-              private _messageBoxService: MessageBoxService,
+  constructor(host: ElementRef<HTMLElement>,
+              private _view: InternalWorkbenchView,
               private _contentProjectionContext: ContentProjectionContext,
-              public messageBoxOverlayHostRef: OverlayHostRef) {
-    this._messageBoxService.count$
+              public messageBoxOverlayHostRef: OverlayHostRef,
+              messageBoxService: MessageBoxService,
+              viewContextMenuService: ViewMenuService) {
+    messageBoxService.count$
       .pipe(takeUntil(this._destroy$))
       .subscribe(count => this._view.blocked = count > 0);
+    viewContextMenuService.installMenuItemAccelerators$(host, this._view)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe();
   }
 
   public ngAfterViewInit(): void {

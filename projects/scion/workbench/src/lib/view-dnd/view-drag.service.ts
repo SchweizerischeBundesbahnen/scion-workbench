@@ -236,7 +236,7 @@ export interface ViewMoveEvent {
     viewPartRef: string;
     viewPartRegion?: 'north' | 'east' | 'south' | 'west' | 'center';
     insertionIndex?: number;
-    appInstanceId: string;
+    appInstanceId: string | 'new';
   };
 }
 

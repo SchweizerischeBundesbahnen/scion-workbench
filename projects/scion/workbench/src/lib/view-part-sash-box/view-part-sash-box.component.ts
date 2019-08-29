@@ -17,6 +17,7 @@ import { VIEW_PART_REF_INDEX, ViewPartSashBox } from '../view-part-grid/view-par
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
+import { ViewPartGridProvider } from '../view-part-grid/view-part-grid-provider.service';
 
 /**
  * Building block to render the viewpart portal grid.
@@ -47,6 +48,7 @@ export class ViewPartSashBoxComponent implements OnDestroy {
   constructor(private _host: ElementRef,
               private _viewOutletNavigator: ViewOutletNavigator,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
+              private _viewPartGridProvider: ViewPartGridProvider,
               private _workbenchLayout: WorkbenchLayoutService) {
     this.installSashListener();
   }
@@ -91,7 +93,7 @@ export class ViewPartSashBoxComponent implements OnDestroy {
         debounceTime(500),
       )
       .subscribe(() => {
-        const serializedGrid = this._viewPartRegistry.grid
+        const serializedGrid = this._viewPartGridProvider.grid
           .splitPosition(this.sashBox.id, this.sashBox.splitter)
           .serialize();
         this._viewOutletNavigator.navigate({viewGrid: serializedGrid}).then();
