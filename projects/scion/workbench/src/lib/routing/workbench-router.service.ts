@@ -12,10 +12,10 @@ import { NavigationExtras, Router } from '@angular/router';
 import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { Defined } from '../defined.util';
-import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { ViewPartGrid } from '../view-part-grid/view-part-grid.model';
 import { ViewOutletNavigator } from './view-outlet-navigator.service';
 import { Injectable } from '@angular/core';
+import { ViewPartGridProvider } from '../view-part-grid/view-part-grid-provider.service';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -27,7 +27,7 @@ export class WorkbenchRouter {
               private _viewOutletNavigator: ViewOutletNavigator,
               private _workbench: InternalWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _viewPartRegistry: WorkbenchViewPartRegistry) {
+              private _viewPartGridProvider: ViewPartGridProvider) {
   }
 
   /**
@@ -71,7 +71,7 @@ export class WorkbenchRouter {
 
     switch (extras.target || 'blank') {
       case 'blank': {
-        const viewPartGrid = this._viewPartRegistry.grid;
+        const viewPartGrid = this._viewPartGridProvider.grid;
         const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
         const viewPartRef = extras.blankViewPartRef || (this._workbench.activeViewPartService && this._workbench.activeViewPartService.viewPartRef) || viewPartGrid.viewPartRefs()[0];
         const viewInsertionIndex = this.coerceViewInsertionIndex(extras.blankInsertionIndex, viewPartRef, viewPartGrid);
@@ -97,7 +97,7 @@ export class WorkbenchRouter {
 
         return this._viewOutletNavigator.navigate({
           viewOutlet: {name: extras.selfViewRef, commands},
-          viewGrid: this._viewPartRegistry.grid.serialize(),
+          viewGrid: this._viewPartGridProvider.grid.serialize(),
           extras: {
             ...extras,
             relativeTo: null, // commands are absolute because normalized

@@ -10,12 +10,11 @@
 
 import { ComponentFactoryResolver, Injectable, Injector, IterableDiffers } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { InternalWorkbenchViewPart, WorkbenchViewPart } from '../workbench.model';
 import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { VIEW_PART_COMPONENT_TYPE } from '../workbench.constants';
-import { filter } from 'rxjs/operators';
+import { ViewPartGridProvider } from './view-part-grid-provider.service';
 
 /**
  * Registry for {WorkbenchViewPart} objects.
@@ -24,19 +23,19 @@ import { filter } from 'rxjs/operators';
 export class WorkbenchViewPartRegistry {
 
   private readonly _viewPartRegistry = new Map<string, InternalWorkbenchViewPart>();
-  private readonly _grid$ = new BehaviorSubject<ViewPartGrid>(null);
 
   constructor(private _differs: IterableDiffers,
               private _injector: Injector,
               private _componentFactoryResolver: ComponentFactoryResolver,
-              private _layoutService: WorkbenchLayoutService) {
+              private _layoutService: WorkbenchLayoutService,
+              private _viewPartGridProvider: ViewPartGridProvider) {
   }
 
   /**
    * Sets the given viewpart grid.
    */
   public setGrid(newGrid: ViewPartGrid): void {
-    const prevGrid = this.grid;
+    const prevGrid = this._viewPartGridProvider.grid;
 
     if (prevGrid && prevGrid.serialize() === newGrid.serialize()) {
       return; // no grid change
@@ -61,7 +60,7 @@ export class WorkbenchViewPartRegistry {
     });
 
     // Notify about the grid change
-    this._grid$.next(newGrid);
+    this._viewPartGridProvider.setGrid(newGrid);
 
     // Destroy viewparts which are no longer used.
     //
@@ -74,22 +73,6 @@ export class WorkbenchViewPartRegistry {
     });
 
     this._layoutService.afterGridChange$.next();
-  }
-
-  /**
-   * Returns a reference to the viewpart grid, if any. Is `null` until the initial navigation is performed.
-   */
-  public get grid(): ViewPartGrid {
-    return this._grid$.value;
-  }
-
-  /**
-   * Emits the viewpart grid.
-   *
-   * Upon subscription, the current grid is emitted, if any, and then emits continuously when the grid changes. It never completes.
-   */
-  public get grid$(): Observable<ViewPartGrid> {
-    return this._grid$.pipe(filter(Boolean));
   }
 
   private createWorkbenchViewPart(viewPartRef: string): InternalWorkbenchViewPart {

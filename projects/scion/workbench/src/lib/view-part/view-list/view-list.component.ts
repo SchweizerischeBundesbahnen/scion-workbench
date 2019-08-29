@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostBinding, HostListener, OnDestroy } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { animate, AnimationBuilder, style } from '@angular/animations';
-import { Subject } from 'rxjs';
+import { fromEvent, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SciDimension } from '@scion/dimension';
 
@@ -21,7 +21,7 @@ import { SciDimension } from '@scion/dimension';
   templateUrl: './view-list.component.html',
   styleUrls: ['./view-list.component.scss'],
 })
-export class ViewListComponent implements OnDestroy {
+export class ViewListComponent implements OnInit, OnDestroy {
 
   private static MAX_COMPONENT_HEIGHT_PX = 350;
 
@@ -37,6 +37,9 @@ export class ViewListComponent implements OnDestroy {
               private _overlayRef: OverlayRef,
               private _animationBuilder: AnimationBuilder) {
     this.installHiddenViewTabsListener();
+  }
+
+  public ngOnInit(): void {
     this.installBackdropListener();
   }
 
@@ -78,11 +81,9 @@ export class ViewListComponent implements OnDestroy {
   }
 
   private installBackdropListener(): void {
-    this._overlayRef.backdropClick()
+    fromEvent(this._overlayRef.backdropElement, 'mousedown')
       .pipe(takeUntil(this._destroy$))
-      .subscribe(() => {
-        this._overlayRef.dispose();
-      });
+      .subscribe(() => this._overlayRef.dispose());
   }
 
   public ngOnDestroy(): void {

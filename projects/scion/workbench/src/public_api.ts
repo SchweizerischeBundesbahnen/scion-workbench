@@ -37,3 +37,4 @@ export { Disposable } from './lib/disposable';
 export { ContentAsOverlayComponent } from './lib/content-projection/content-as-overlay.component';
 export { PopupService } from './lib/popup/popup.service';
 export { Popup, PopupConfig, Position, CloseStrategy } from './lib/popup/metadata';
+export { ViewMenuItemDirective } from './lib/view-part/view-context-menu/view-menu.directive';

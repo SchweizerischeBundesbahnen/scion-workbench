@@ -78,4 +78,18 @@ describe('Arrays', () => {
       expect(Arrays.last([], () => true)).toBeUndefined();
     });
   });
+
+  describe('Arrays.remove', () => {
+
+    it('should remove the specified element', () => {
+      const array = ['a', 'b', 'c', 'd', 'e'];
+      expect(Arrays.remove(array, 'c')).toEqual(['a', 'b', 'd', 'e']);
+    });
+
+    it('should not modify the original array', () => {
+      const array = ['a', 'b', 'c', 'd', 'e'];
+      expect(Arrays.remove(array, 'c')).toEqual(['a', 'b', 'd', 'e']);
+      expect(array).toEqual(['a', 'b', 'c', 'd', 'e']);
+    });
+  });
 });

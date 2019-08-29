@@ -9,16 +9,17 @@
  */
 
 import { ApplicationRef, ComponentFactoryResolver, Injectable, Injector, OnDestroy } from '@angular/core';
-import { of, Subject } from 'rxjs';
+import { EMPTY, of, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { createElement, setStyle } from '../dom.util';
 import { ViewDragData, ViewDragService } from './view-drag.service';
 import { ComponentPortal, DomPortalOutlet, PortalInjector } from '@angular/cdk/portal';
 import { ViewTabContentComponent } from '../view-part/view-tab-content/view-tab-content.component';
-import { WorkbenchView } from '../workbench.model';
+import { WorkbenchMenuItem, WorkbenchView } from '../workbench.model';
 import { WorkbenchConfig } from '../workbench.config';
 import { VIEW_TAB_CONTEXT } from '../workbench.constants';
 import { UrlSegment } from '@angular/router';
+import { Disposable } from '../disposable';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 
@@ -193,6 +194,10 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly blocked = false;
   public readonly cssClasses = [];
   public readonly urlSegments: UrlSegment[];
+  public readonly viewMenuItems$ = EMPTY;
+  public readonly first = true;
+  public readonly last = true;
+  public readonly position = 0;
 
   constructor(dragData: ViewDragData) {
     this.viewRef = dragData.viewRef;
@@ -207,7 +212,15 @@ class DragImageWorkbenchView implements WorkbenchView {
     throw Error('[UnsupportedOperationError]');
   }
 
+  public move(region: 'north' | 'south' | 'west' | 'east'): Promise<boolean> {
+    throw Error('[UnsupportedOperationError]');
+  }
+
   public set cssClass(cssClass: string | string[]) {
+    throw Error('[UnsupportedOperationError]');
+  }
+
+  public registerMenuItem(menuItem: WorkbenchMenuItem): Disposable {
     throw Error('[UnsupportedOperationError]');
   }
 }

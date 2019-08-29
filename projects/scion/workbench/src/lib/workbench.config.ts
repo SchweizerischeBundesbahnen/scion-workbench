@@ -36,5 +36,32 @@ export abstract class WorkbenchConfig {
    * }
    */
   abstract viewTabComponent?: ComponentType<any>;
+
+  /**
+   * Controls which built-in menu items to display in the view context menu.
+   */
+  abstract viewMenuItems?: ViewMenuItemsConfig;
 }
 
+/**
+ * Controls which built-in menu items to display in the view context menu.
+ */
+export interface ViewMenuItemsConfig {
+  close?: MenuItemConfig;
+  closeOthers?: MenuItemConfig;
+  closeAll?: MenuItemConfig;
+  closeToTheRight?: MenuItemConfig;
+  closeToTheLeft?: MenuItemConfig;
+  moveUp?: MenuItemConfig;
+  moveRight?: MenuItemConfig;
+  moveDown?: MenuItemConfig;
+  moveLeft?: MenuItemConfig;
+  moveBlank?: MenuItemConfig;
+}
+
+export interface MenuItemConfig {
+  visible?: boolean;
+  text?: string;
+  accelerator?: string[];
+  group?: string;
+}

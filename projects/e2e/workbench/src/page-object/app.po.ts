@@ -266,8 +266,9 @@ export class AppPO {
   /**
    * Closes all views of all viewparts.
    */
-  public async closeAllViewTabs(): Promise<void> {
-    return $$('wb-view-part').sendKeys(Key.chord(Key.CONTROL, Key.SHIFT, 'k'));
+  public async closeAllViewTabs(viewPartRef: string): Promise<void> {
+    const viewPartBarFinder = createViewPartBarFinder(viewPartRef);
+    return viewPartBarFinder.$('wb-view-tab').sendKeys(Key.chord(Key.CONTROL, Key.ALT, Key.SHIFT, 'k'));
   }
 
   /**

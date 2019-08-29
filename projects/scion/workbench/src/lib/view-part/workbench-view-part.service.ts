@@ -13,8 +13,8 @@ import { InternalWorkbenchView, InternalWorkbenchViewPart } from '../workbench.m
 import { BehaviorSubject, Observable } from 'rxjs';
 import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
-import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
+import { ViewPartGridProvider } from '../view-part-grid/view-part-grid-provider.service';
 
 // TODO [issue/163] remove this service and move functionality to {WorkbenchViewPart}
 @Injectable()
@@ -26,7 +26,7 @@ export class WorkbenchViewPartService implements OnDestroy {
   constructor(private _workbench: InternalWorkbenchService,
               private _viewOutletNavigator: ViewOutletNavigator,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _viewPartRegistry: WorkbenchViewPartRegistry,
+              private _viewPartGridProvider: ViewPartGridProvider,
               private _viewPart: InternalWorkbenchViewPart) {
     this._workbench.registerViewPartService(this);
     this.activate();
@@ -98,7 +98,7 @@ export class WorkbenchViewPartService implements OnDestroy {
       return Promise.resolve(true);
     }
 
-    const serializedGrid = this._viewPartRegistry.grid
+    const serializedGrid = this._viewPartGridProvider.grid
       .activateView(this._viewPart.viewPartRef, viewRef)
       .serialize();
 
@@ -111,7 +111,7 @@ export class WorkbenchViewPartService implements OnDestroy {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public activateSiblingView(): Promise<boolean> {
-    const grid = this._viewPartRegistry.grid;
+    const grid = this._viewPartGridProvider.grid;
 
     const serializedGrid = grid
       .activateSiblingView(this.viewPartRef, this.activeViewRef)

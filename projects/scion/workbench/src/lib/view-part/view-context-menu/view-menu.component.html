@@ -1,0 +1,11 @@
+<div class="menu-item-group" *ngFor="let menuItemGroup of menuItemGroups$ | async | keyvalue">
+  <div *ngFor="let menuItem of menuItemGroup.value"
+       class="menu-item"
+       [class.disabled]="menuItem.isDisabled && menuItem.isDisabled()"
+       (click)="onMenuItemClick(menuItem)">
+    <div class="text">
+      <ng-container *cdkPortalOutlet="menuItem.portal"></ng-container>
+    </div>
+    <div class="accelerator">{{menuItem.accelerator | wbFormatAccelerator}}</div>
+  </div>
+</div>

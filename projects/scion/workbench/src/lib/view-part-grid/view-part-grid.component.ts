@@ -18,9 +18,11 @@ import { pairwise, startWith, takeUntil } from 'rxjs/operators';
 import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
 import { ViewDragService, ViewMoveEvent } from '../view-dnd/view-drag.service';
 import { InternalWorkbenchService } from '../workbench.service';
-import { UrlSegment } from '@angular/router';
+import { Router, UrlSegment } from '@angular/router';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
+import { ViewPartGridProvider } from './view-part-grid-provider.service';
+import { LocationStrategy } from '@angular/common';
 
 /**
  * Allows the arrangement of viewparts in a grid.
@@ -59,13 +61,16 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
               private _viewOutletNavigator: ViewOutletNavigator,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
+              private _viewPartGridProvider: ViewPartGridProvider,
               private _viewDragService: ViewDragService,
+              private _locationStrategy: LocationStrategy,
+              private _router: Router,
               private _cd: ChangeDetectorRef) {
     this.installViewMoveListener();
   }
 
   public ngOnInit(): void {
-    this._viewPartRegistry.grid$
+    this._viewPartGridProvider.grid$
       .pipe(
         startWith(null as ViewPartGrid), // start with a null grid to initialize the 'pairwise' operator, so it emits once the grid is set.
         pairwise(),
@@ -155,6 +160,10 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
         // Check if to remove the view from this app instance if being moved to another app instance.
         if (crossAppInstanceViewDrag && event.source.appInstanceId === appInstanceId) {
           this.removeView(event);
+          // Check if to add the view to a new browser window.
+          if (event.target.appInstanceId === 'new') {
+            this.addViewToNewWindow(event);
+          }
         }
         // Check if to add the view to this app instance if being moved from another app instance to this app instance.
         else if (crossAppInstanceViewDrag && event.target.appInstanceId === appInstanceId) {
@@ -180,10 +189,10 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
 
     if (addToNewViewPart) {
       const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
-      const newViewPartRef = this._viewPartRegistry.grid.computeNextViewPartIdentity();
+      const newViewPartRef = this._viewPartGridProvider.grid.computeNextViewPartIdentity();
       this._viewOutletNavigator.navigate({
         viewOutlet: {name: newViewRef, commands},
-        viewGrid: this._viewPartRegistry.grid
+        viewGrid: this._viewPartGridProvider.grid
           .addSiblingViewPart(event.target.viewPartRegion, event.target.viewPartRef, newViewPartRef)
           .addView(newViewPartRef, newViewRef)
           .serialize(),
@@ -193,11 +202,25 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
       const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
       this._viewOutletNavigator.navigate({
         viewOutlet: {name: newViewRef, commands},
-        viewGrid: this._viewPartRegistry.grid
+        viewGrid: this._viewPartGridProvider.grid
           .addView(event.target.viewPartRef, newViewRef, event.target.insertionIndex)
           .serialize(),
       }).then();
     }
+  }
+
+  private addViewToNewWindow(event: ViewMoveEvent): void {
+    const urlTree = this._viewOutletNavigator.createUrlTree({
+      viewOutlet: this._viewRegistry.viewRefs
+        .filter(viewRef => viewRef !== event.source.viewRef) // retain the source view outlet
+        .map(viewRef => ({name: viewRef, commands: null})), // remove all other view outlets
+      viewGrid: this._viewPartGridProvider.grid
+        .clear()
+        .addView(event.target.viewPartRef, event.source.viewRef)
+        .serialize(),
+    });
+
+    window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree)));
   }
 
   private removeView(event: ViewMoveEvent): void {
@@ -206,7 +229,7 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
 
   private moveView(event: ViewMoveEvent): void {
     const addToNewViewPart = (event.target.viewPartRegion || 'center') !== 'center';
-    const grid = this._viewPartRegistry.grid;
+    const grid = this._viewPartGridProvider.grid;
 
     if (addToNewViewPart) {
       const newViewPartRef = grid.computeNextViewPartIdentity();

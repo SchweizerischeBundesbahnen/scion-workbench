@@ -12,7 +12,7 @@ import { Attribute, Component, ElementRef, HostBinding, HostListener, Injector, 
 import { InternalWorkbenchView, WorkbenchView } from '../../workbench.model';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { SciViewportComponent } from '@scion/viewport';
-import { fromEvent, merge, noop, Subject } from 'rxjs';
+import { fromEvent, merge, Subject } from 'rxjs';
 import { InternalWorkbenchService } from '../../workbench.service';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { WorkbenchViewRegistry } from '../../workbench-view-registry.service';
@@ -23,6 +23,12 @@ import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { VIEW_TAB_CONTEXT } from '../../workbench.constants';
 import { WorkbenchConfig } from '../../workbench.config';
 import { ViewTabContentComponent } from '../view-tab-content/view-tab-content.component';
+import { ViewMenuService } from '../view-context-menu/view-menu.service';
+
+/**
+ * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
+ */
+const AUXILARY_MOUSE_BUTTON = 4;
 
 @Component({
   selector: 'wb-view-tab',
@@ -59,12 +65,14 @@ export class ViewTabComponent implements OnDestroy {
               private _viewPartService: WorkbenchViewPartService,
               private _viewDragService: ViewDragService,
               private _differs: IterableDiffers,
+              private _viewContextMenuService: ViewMenuService,
               private _injector: Injector,
               zone: NgZone) {
     this._context = context as 'tabbar' | 'tabbar-dropdown';
     this.host = host.nativeElement;
     this.installMaximizeListener(zone);
     this.installViewCssClassListener();
+    this.installViewMenuItemAccelerators();
   }
 
   @HostBinding('class.active')
@@ -85,7 +93,28 @@ export class ViewTabComponent implements OnDestroy {
 
   @HostListener('click')
   public onClick(): void {
-    this._viewPartService.activateView(this.viewRef).then(noop);
+    this._viewPartService.activateView(this.viewRef).then();
+  }
+
+  @HostListener('mousedown', ['$event'])
+  public onMousedown(event: MouseEvent): void {
+    if (event.buttons === AUXILARY_MOUSE_BUTTON) {
+      this.view.close().then();
+      event.stopPropagation();
+      event.preventDefault();
+    }
+  }
+
+  @HostListener('contextmenu', ['$event'])
+  public onContextmenu(event: MouseEvent): void {
+    this._viewContextMenuService.showMenu({x: event.clientX, y: event.clientY}, this.viewRef).then();
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
+  @HostBinding('attr.tabindex')
+  public get tabindex(): number {
+    return -1; // make the view focusable to install view menu accelerators
   }
 
   @HostBinding('attr.draggable')
@@ -189,6 +218,15 @@ export class ViewTabComponent implements OnDestroy {
         diff.forEachAddedItem(({item}) => this.host.classList.add(item));
         diff.forEachRemovedItem(({item}) => this.host.classList.remove(item));
       });
+  }
+
+  private installViewMenuItemAccelerators(): void {
+    this._viewRefChange$
+      .pipe(
+        switchMap(() => this._viewContextMenuService.installMenuItemAccelerators$(this.host, this.view)),
+        takeUntil(this._destroy$),
+      )
+      .subscribe();
   }
 
   private createViewTabContentPortal(): ComponentPortal<any> {

@@ -53,9 +53,7 @@ export class ViewListButtonComponent {
     });
 
     const overlayRef = this._overlay.create(config);
-    const injectionTokens = new WeakMap();
-    injectionTokens.set(OverlayRef, overlayRef);
-    const injector = new PortalInjector(this._injector, injectionTokens);
+    const injector = new PortalInjector(this._injector, new WeakMap().set(OverlayRef, overlayRef));
 
     overlayRef.attach(new ComponentPortal(ViewListComponent, null, injector));
   }
