@@ -15,7 +15,7 @@ import { MessageBus } from '../core/message-bus.service';
 import { ApplicationRegistry } from '../core/application-registry.service';
 import { ManifestRegistry } from '../core/manifest-registry.service';
 import { Logger } from '../core/logger.service';
-import { testQualifier } from '../core/qualifier-tester';
+import { matchesIntentQualifier } from '../core/qualifier-tester';
 
 /**
  * Allows to query manifest registry.
@@ -88,8 +88,7 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
     const intent: Intent = this._manifestRegistry.getIntent(intentId);
 
     const providers: Application[] = this._manifestRegistry.getCapabilities(intent.type, intent.qualifier)
-      .filter(capability => !capability.metadata.proxy)
-      .filter(capability => !capability.private || this._manifestRegistry.isScopeCheckDisabled(intent.metadata.symbolicAppName) || capability.metadata.symbolicAppName === intent.metadata.symbolicAppName)
+      .filter(capability => this._manifestRegistry.isVisibleForApplication(capability, intent.metadata.symbolicAppName))
       .map(capability => this._applicationRegistry.getApplication(capability.metadata.symbolicAppName));
     this._messageBus.publishReply(providers, envelope.sender, envelope.replyToUid);
   }
@@ -106,7 +105,7 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
       const intents = this._manifestRegistry.getIntentsByApplication(application.symbolicName);
       const isConsumer = intents
         .filter(intent => !capability.private || this._manifestRegistry.isScopeCheckDisabled(intent.metadata.symbolicAppName) || intent.metadata.symbolicAppName === capability.metadata.symbolicAppName)
-        .some(intent => intent.type === capability.type && testQualifier(capability.qualifier, intent.qualifier));
+        .some(intent => intent.type === capability.type && matchesIntentQualifier(capability.qualifier, intent.qualifier));
       if (isConsumer) {
         consumers.push(application);
       }
@@ -125,8 +124,7 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
     const qualifier: Qualifier = envelope.message.payload.qualifier;
 
     const capabilities: Capability[] = this._manifestRegistry.getCapabilities(type, qualifier)
-      .filter(capability => !capability.metadata.proxy)
-      .filter(capability => !capability.private || this._manifestRegistry.isScopeCheckDisabled(envelope.sender) || capability.metadata.symbolicAppName === envelope.sender)
+      .filter(capability => this._manifestRegistry.isVisibleForApplication(capability, envelope.sender))
       .filter(capability => this._manifestRegistry.hasIntent(envelope.sender, capability.type, capability.qualifier));
     this._messageBus.publishReply(capabilities, envelope.sender, envelope.replyToUid);
   }
@@ -152,8 +150,7 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
       scopeCheckDisabled: application.scopeCheckDisabled,
       restrictions: application.restrictions,
       intents: this._manifestRegistry.getIntentsByApplication(application.symbolicName),
-      capabilities: this._manifestRegistry.getCapabilitiesByApplication(application.symbolicName)
-        .filter(capability => !capability.metadata.proxy),
+      capabilities: this._manifestRegistry.getCapabilitiesByApplication(application.symbolicName),
     };
   }
 }

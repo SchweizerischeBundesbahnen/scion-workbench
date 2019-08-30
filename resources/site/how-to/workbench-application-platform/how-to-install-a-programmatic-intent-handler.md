@@ -7,8 +7,6 @@
 
 The platform allows handling intents in the host application. It is like providing a capability in a sub-application, but in the host application.
 
-The handler can be configured to act as a proxy which the platform invokes only if some application provides a respective capability. For example, `ViewIntentHandler` is a proxy for view capabilities. Upon a view intent, the handler loads capability metadata from the application providing that view, reads the view path and opens the view via the workbench.
-
 Open `app.module.ts` and register the intent handler as multi provider under DI injection `INTENT_HANDLER`
 
 ```typescript
@@ -32,16 +30,15 @@ export class CustomIntentHandler implements IntentHandler {
 
   public readonly type = '...'; ➀
   public readonly qualifier: Qualifier = {...}; ➁
-  public readonly proxy = false; ➂
 
-  public readonly description = '...'; ➃
+  public readonly description = '...'; ➂
 
   public onInit(applicationRegistry: ApplicationRegistry, manifestRegistry: ManifestRegistry): void {
-    ... ➄
+    ... ➃
   }
 
   public onIntent(envelope: MessageEnvelope<IntentMessage>): void {
-    ... ➅
+    ... ➄
   }
 }
 ```
@@ -49,10 +46,9 @@ export class CustomIntentHandler implements IntentHandler {
 |-|-|
 |➀|Sets the type of functionality which this handler provides, e.g. 'auth-token' to reply with the auth-token.|
 |➁|Sets the qualifier which intents must have to be handled. If not set, `NilQualifier` is used.|
-|➂|Indicates if this handler acts as a proxy through which intents are processed, which is `false` by default.|
-|➃|Describes the capability this handler provides.|
-|➄|Optional lifecycle hook that is called after the platform completed registration of applications.<br>Use this method to handle any initialization tasks which require the application or manifest registry.|
-|➅|Method invoked upon the receipt of an intent.|
+|➂|Describes the capability this handler provides.|
+|➃|Optional lifecycle hook that is called after the platform completed registration of applications.<br>Use this method to handle any initialization tasks which require the application or manifest registry.|
+|➄|Method invoked upon the receipt of an intent.|
 
 ## How to issue intents to the programmatic intent handler
 

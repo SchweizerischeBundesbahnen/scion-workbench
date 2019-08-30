@@ -16,7 +16,8 @@ import { Defined } from './defined.util';
 import { ManifestRegistry } from './manifest-registry.service';
 import { ApplicationRegistry } from './application-registry.service';
 import { UUID } from './uuid.util';
-import { Capability, CapabilityProviderMessage, Channel, IntentMessage, MessageEnvelope, PROTOCOL } from '@scion/workbench-application-platform.api';
+import { CapabilityProviderMessage, Channel, IntentMessage, MessageEnvelope, PROTOCOL } from '@scion/workbench-application-platform.api';
+import { matchesCapabilityQualifier } from './qualifier-tester';
 
 /**
  * Allows communication between the workbench applications.
@@ -137,14 +138,17 @@ export class MessageBus implements OnDestroy {
       filterByChannel('intent'),
       filter(envelope => {
         const message = envelope.message as IntentMessage;
-
-        // To receive the intent, the capability must have public visibility or provided by the intending application itself.
-        const selector = (capability: Capability): boolean => {
-          return !capability.private || this._manifestRegistry.isScopeCheckDisabled(symbolicName) || envelope.sender === symbolicName;
-        };
-
-        return this._manifestRegistry.hasCapability(symbolicName, message.type, message.qualifier, selector);
+        return this._manifestRegistry.getCapabilitiesByApplication(symbolicName)
+          .filter(capability => matchesCapabilityQualifier(capability.qualifier, message.qualifier))
+          .some(capability => this._manifestRegistry.isVisibleForApplication(capability, envelope.sender));
       }));
+  }
+
+  /**
+   * Receives all intent messages.
+   */
+  public receiveIntents$(): Observable<MessageEnvelope<IntentMessage>> {
+    return this._stream$.pipe(filterByChannel('intent'));
   }
 
   /**
@@ -163,12 +167,9 @@ export class MessageBus implements OnDestroy {
           return false;
         }
 
-        // To receive a message from a capability provider, the capability must have public visibility or provided by the application itself.
-        return envelope.sender === symbolicName
-          || this._manifestRegistry.isScopeCheckDisabled(symbolicName)
-          || this._manifestRegistry.getCapabilities(message.type, message.qualifier)
-            .filter(capability => capability.metadata.symbolicAppName === envelope.sender)
-            .some(capability => !capability.private);
+        return this._manifestRegistry.getCapabilities(message.type, message.qualifier)
+          .filter(capability => capability.metadata.symbolicAppName === envelope.sender)
+          .some(capability => this._manifestRegistry.isVisibleForApplication(capability, symbolicName));
       }));
   }
 
@@ -178,7 +179,7 @@ export class MessageBus implements OnDestroy {
   public receiveReplyMessagesForApplication$(symbolicName: string): Observable<MessageEnvelope> {
     return this._stream$.pipe(
       filterByChannel('reply'),
-      filter(envelope => envelope.replyTo === symbolicName)
+      filter(envelope => envelope.replyTo === symbolicName),
     );
   }
 

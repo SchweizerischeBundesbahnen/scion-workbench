@@ -34,8 +34,7 @@ export class ActivityRegistrator {
    */
   public init(): void {
     this._manifestCollector.whenManifests.then(manifestRegistry => {
-      const activityCapabilities: ActivityCapability[] = manifestRegistry.getCapabilitiesByType<ActivityCapability>(PlatformCapabilityTypes.Activity)
-        .filter(capability => !capability.metadata.proxy);
+      const activityCapabilities: ActivityCapability[] = manifestRegistry.getCapabilitiesByType<ActivityCapability>(PlatformCapabilityTypes.Activity);
       this.installActivityCapabilityRoutes(activityCapabilities);
       this.registerActivities(activityCapabilities);
     });
@@ -46,7 +45,6 @@ export class ActivityRegistrator {
     this._routesRegistrator.replaceRouterConfig([
       ...this._router.config,
       ...activityCapabilities
-        .filter(activityCapability => !activityCapability.metadata.proxy)
         .map((activityCapability: ActivityCapability): Route => {
           return {
             path: `${activityCapability.metadata.symbolicAppName}/${activityCapability.metadata.id}`,
@@ -62,7 +60,6 @@ export class ActivityRegistrator {
 
   private registerActivities(activityCapabilities: ActivityCapability[]): void {
     activityCapabilities
-      .filter(activityCapability => !activityCapability.metadata.proxy)
       .forEach(activityCapability => {
         const activity = this._activityPartService.createActivity();
         activity.title = activityCapability.properties.title;

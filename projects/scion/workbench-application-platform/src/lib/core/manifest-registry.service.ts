@@ -12,9 +12,7 @@ import { Injectable } from '@angular/core';
 import { Capability, Intent, Qualifier } from '@scion/workbench-application-platform.api';
 import { Defined } from './defined.util';
 import { sha256 } from 'js-sha256';
-import { testQualifier } from './qualifier-tester';
-
-const NilSelector = (capability: Capability): boolean => true;
+import { matchesCapabilityQualifier, matchesIntentQualifier } from './qualifier-tester';
 
 /**
  * Registry with all registered application capabilities and intents.
@@ -53,7 +51,22 @@ export class ManifestRegistry {
    * Returns capabilities which have the given required type and qualifiers.
    */
   public getCapabilities<T extends Capability>(type: string, qualifier: Qualifier): T[] {
-    return this.getCapabilitiesByType(type).filter(capability => testQualifier(capability.qualifier, qualifier)) as T[];
+    return this.getCapabilitiesByType(type)
+      .filter(capability => matchesCapabilityQualifier(capability.qualifier, qualifier)) as T[];
+  }
+
+  /**
+   * Returns capabilities which match the given predicate.
+   */
+  public getCapabilitiesByPredicate(predicate: (capability: Capability) => boolean): Capability[] {
+    return Array.from(this._capabilitiesById.values()).filter(predicate);
+  }
+
+  /**
+   * Checks if the given capability is visible to the given application.
+   */
+  public isVisibleForApplication(capability: Capability, symbolicName: string): boolean {
+    return !capability.private || this.isScopeCheckDisabled(symbolicName) || capability.metadata.symbolicAppName === symbolicName;
   }
 
   /**
@@ -71,22 +84,21 @@ export class ManifestRegistry {
   }
 
   /**
-   * Tests if the application has registered an intent for the given type and qualifiers,
+   * Tests if the specified application has registered an intent for the given type and qualifiers,
    * or whether the application has an implicit intent because it provides the capability itself.
    */
   public hasIntent(symbolicName: string, type: string, qualifier: Qualifier): boolean {
     return this.getIntentsByApplication(symbolicName).some(intent => {
-      return intent.type === type && testQualifier(intent.qualifier, qualifier);
+      return intent.type === type && matchesIntentQualifier(intent.qualifier, qualifier);
     });
   }
 
   /**
-   * Tests if the application has registered a capability for the given type and qualifiers,
-   * and if specified, which also matches the selector function.
+   * Tests if the specified application has registered a capability for the given type and qualifiers.
    */
-  public hasCapability(symbolicName: string, type: string, qualifier: Qualifier, selector: (capability: Capability) => boolean = NilSelector): boolean {
-    const capabilities = this.getCapabilities(type, qualifier);
-    return capabilities.some(capability => capability.metadata.symbolicAppName === symbolicName && selector(capability));
+  public hasCapability(symbolicName: string, type: string, qualifier: Qualifier): boolean {
+    return this.getCapabilities(type, qualifier)
+      .some(capability => capability.metadata.symbolicAppName === symbolicName);
   }
 
   /**
@@ -94,22 +106,22 @@ export class ManifestRegistry {
    * The capability must be provided with public visibility unless provided by the requesting application itself.
    */
   public isHandled(symbolicName: string, type: string, qualifier: Qualifier): boolean {
-    return this.getCapabilities(type, qualifier)
-      .filter(capability => !capability.metadata.proxy)
-      .some(capability => !capability.private || this.isScopeCheckDisabled(symbolicName) || capability.metadata.symbolicAppName === symbolicName);
+    return this.getCapabilities(type, qualifier).some(capability => this.isVisibleForApplication(capability, symbolicName));
   }
 
   /**
    * Registers capabilities of the given application.
-   *
-   * The parameter 'proxy' indicates the implementor act as a proxy through which intents are processed (which by default is false).
    */
-  public registerCapability(symbolicName: string, capabilities: Capability[], proxy: boolean = false): void {
+  public registerCapability(symbolicName: string, capabilities: Capability[]): void {
     if (!capabilities || !capabilities.length) {
       return;
     }
 
     capabilities.forEach(it => {
+      if (it.hasOwnProperty('*')) {
+        throw Error(`[CapabilityRegistrationError] Capability qualifiers do not support \`*\` as key`);
+      }
+
       const registeredCapabilities = this._capabilitiesByType.get(it.type) || [];
       const capability: Capability = {
         ...it,
@@ -117,7 +129,6 @@ export class ManifestRegistry {
         metadata: {
           id: sha256(JSON.stringify({application: symbolicName, type: it.type, ...it.qualifier})).substr(0, 7), // use the first 7 digits of the capability hash as capability id
           symbolicAppName: symbolicName,
-          proxy: proxy,
         },
       };
 
@@ -126,9 +137,7 @@ export class ManifestRegistry {
     });
 
     // Register implicit intents. These are intents for capabilities which the application provides itself.
-    if (!proxy) {
-      this.registerIntents(symbolicName, capabilities.map(capability => ({type: capability.type, qualifier: capability.qualifier})), true);
-    }
+    this.registerIntents(symbolicName, capabilities.map(capability => ({type: capability.type, qualifier: capability.qualifier})), true);
   }
 
   /**

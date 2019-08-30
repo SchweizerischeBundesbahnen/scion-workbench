@@ -8,17 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, Type } from '@angular/core';
+import { Injectable, OnDestroy, Type } from '@angular/core';
 import { VIEW_CAPABILITY_ID_PARAM, VIEW_PATH_PARAM } from './metadata';
 import { Router } from '@angular/router';
 import { ViewOutletComponent } from './view-outlet.component';
 import { WbNavigationExtras, WorkbenchActivityPartService, WorkbenchAuxiliaryRoutesRegistrator, WorkbenchRouter, WorkbenchService, WorkbenchView } from '@scion/workbench';
-import { noop } from 'rxjs';
-import { IntentHandler } from '../core/metadata';
+import { noop, Subject } from 'rxjs';
 import { ApplicationRegistry } from '../core/application-registry.service';
 import { ManifestRegistry } from '../core/manifest-registry.service';
 import { Url } from '../core/url.util';
-import { AnyQualifier, MessageEnvelope, PlatformCapabilityTypes, Qualifier, ViewCapability, ViewIntentMessage } from '@scion/workbench-application-platform.api';
+import { MessageEnvelope, PlatformCapabilityTypes, Qualifier, ViewCapability, ViewIntentMessage } from '@scion/workbench-application-platform.api';
+import { filter, takeUntil } from 'rxjs/operators';
+import { MessageBus } from '../core/message-bus.service';
+import { Logger } from '../core/logger.service';
+import { ManifestCollector } from '../core/manifest-collector.service';
 
 /**
  * Opens a workbench view for intents of the type 'view'.
@@ -29,40 +32,33 @@ import { AnyQualifier, MessageEnvelope, PlatformCapabilityTypes, Qualifier, View
  * is looked up to provide metadata about the page to navigate to.
  */
 @Injectable()
-export class ViewIntentHandler implements IntentHandler {
+export class ViewIntentDispatcher implements OnDestroy {
 
-  public readonly type: PlatformCapabilityTypes = PlatformCapabilityTypes.View;
-  public readonly qualifier = AnyQualifier;
-  public readonly proxy = true;
-  public readonly description = 'Open a workbench view for capabilities of the type \'view\'.';
-
-  private _applicationRegistry: ApplicationRegistry;
-  private _manifestRegistry: ManifestRegistry;
+  private _destroy$ = new Subject<void>();
 
   constructor(private _workbench: WorkbenchService,
               private _router: Router,
               private _wbRouter: WorkbenchRouter,
               private _routesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
-              private _activityPartService: WorkbenchActivityPartService) {
+              private _activityPartService: WorkbenchActivityPartService,
+              private _applicationRegistry: ApplicationRegistry,
+              private _manifestRegistry: ManifestRegistry,
+              private _messageBus: MessageBus,
+              private _logger: Logger,
+              private _manifestCollector: ManifestCollector) {
   }
 
-  public onInit(applicationRegistry: ApplicationRegistry, manifestRegistry: ManifestRegistry): void {
-    this._applicationRegistry = applicationRegistry;
-    this._manifestRegistry = manifestRegistry;
-    this.installViewCapabilityRoutes();
-    this.addToActivityPanel();
+  public init(): void {
+    this._manifestCollector.whenManifests.then(() => {
+      this.installViewCapabilityRoutes();
+      this.installIntentListener();
+      this.addToActivityPanel();
+    });
   }
 
-  public onIntent(envelope: MessageEnvelope<ViewIntentMessage>): void {
-    this._manifestRegistry.getCapabilities<ViewCapability>(this.type, envelope.message.qualifier)
-      .filter(viewCapability => {
-        // Skip proxy providers (e.g. this implementor class)
-        return !viewCapability.metadata.proxy;
-      })
-      .filter(viewCapability => {
-        // Skip if the capability has private visibility and the intending application does not provide the view capability itself
-        return !viewCapability.private || this._manifestRegistry.isScopeCheckDisabled(envelope.sender) || envelope.sender === viewCapability.metadata.symbolicAppName;
-      })
+  private onIntent(envelope: MessageEnvelope<ViewIntentMessage>): void {
+    this._manifestRegistry.getCapabilities<ViewCapability>(PlatformCapabilityTypes.View, envelope.message.qualifier)
+      .filter(capability => this._manifestRegistry.isVisibleForApplication(capability, envelope.sender))
       .forEach((viewCapability: ViewCapability) => {
         const intentMessage: ViewIntentMessage = envelope.message;
         const view = envelope._injector.get(WorkbenchView as Type<WorkbenchView>, null); // TODO [Angular 9]: remove type cast for abstract symbols once 'angular/issues/29905' and 'angular/issues/23611' are fixed
@@ -86,6 +82,21 @@ export class ViewIntentHandler implements IntentHandler {
       });
   }
 
+  private installIntentListener(): void {
+    this._messageBus.receiveIntents$()
+      .pipe(
+        filter(envelope => envelope.message.type === PlatformCapabilityTypes.View),
+        takeUntil(this._destroy$),
+      )
+      .subscribe((envelope: MessageEnvelope<ViewIntentMessage>) => {
+        try {
+          this.onIntent(envelope);
+        } catch (error) {
+          this._logger.error(`Failed to handle intent [${JSON.stringify(envelope.message.qualifier || {})}]`, error);
+        }
+      });
+  }
+
   private installViewCapabilityRoutes(): void {
     // Register capability routes as primary routes. Auxiliary routes are registered when the views are opened (by the workbench)
     this._routesRegistrator.replaceRouterConfig([
@@ -100,8 +111,7 @@ export class ViewIntentHandler implements IntentHandler {
   }
 
   private addToActivityPanel(): void {
-    this._manifestRegistry.getCapabilitiesByType<ViewCapability>(this.type)
-      .filter(viewCapability => !viewCapability.metadata.proxy)
+    this._manifestRegistry.getCapabilitiesByType<ViewCapability>(PlatformCapabilityTypes.View)
       .filter(viewCapability => viewCapability.properties.activityItem)
       .forEach((viewCapability: ViewCapability) => {
         const activityItem = viewCapability.properties.activityItem;
@@ -132,6 +142,10 @@ export class ViewIntentHandler implements IntentHandler {
       Url.substitutePathVariables(viewCapability.properties.path, qualifier).join('/') || '/', // path as single parameter
       ...(matrixParamObject ? [matrixParamObject] : []),
     ];
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }
 

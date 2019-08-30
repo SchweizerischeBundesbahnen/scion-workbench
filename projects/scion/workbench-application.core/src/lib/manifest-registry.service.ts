@@ -106,7 +106,7 @@ export class ManifestRegistryService implements Service {
   /**
    * Queries the manifest registry for capabilities of given type and qualifier.
    *
-   * There are ony capabilities returned for which the requesting application has manifested an intent.
+   * There are only capabilities returned for which the requesting application has manifested an intent.
    */
   public capabilities$(type: string, qualifier: Qualifier): Observable<Capability[]> {
     const intentMessage: ManifestRegistryIntentMessages.FindCapabilities = {

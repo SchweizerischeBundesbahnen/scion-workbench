@@ -49,10 +49,13 @@ To integrate an application, it should provide one or more entry points. When on
 The platform provides the concept of an application manifest to facilitate this entry-point invocation paradigm. Thus every application has a manifest which lists its capabilities and intents. Typically, the manifest is deployed as part of the application.
 
 #### Capability
-A capability represents a feature which an application provides. It is of a specific type and has assigned a qualifier. The qualifier is used for logical addressing so that other applications can invoke it without knowing the provider nor the relevant entry point, if any. A qualifier is a dictionary of key-value pairs. It is allowed to use the wildcard character (*) as qualifier value or as qualifier key.
+A capability represents a feature which an application provides. It is of a specific type and has assigned a qualifier. The qualifier is used for logical addressing so that other applications can invoke it without knowing the provider nor the relevant entry point, if any. A qualifier is a dictionary of key-value pairs. It is allowed to use the wildcard characters (\*) and (?) as qualifier value. (\*) means that some value has to be provided, whereas for (?) the entry value is optional.
 
 > For example, if an application provides a view to editing some personal data, the qualifier could look as follows: `{entity: 'person', id: '*'}`.\
-Other applications can invoke this capability by issuing an intent matching the capability's qualifier, with any value allowed for the 'id'.
+Applications can invoke this capability by issuing an intent matching the capability's qualifier, with any value allowed for the 'id'.\
+
+> For example, if the application provides a single view to edit or create a person, the qualifier could look as follows: `{entity: 'person', id: '?'}`.\
+Applications can invoke this capability by issuing an intent without an id for creation (`{entity: 'person'}`), or with an id for editing (`{entity: 'person', id: 1}`).
 
 Some capabilities define an entry point URL if showing an application page. Using placeholders in URL segments is possible. When invoked, they are replaced with values from the intent qualifier.
 
@@ -72,7 +75,7 @@ There are some built-in capability types supported by the platform. However, the
 |manifest-registry|allows querying the manifest registry|
 
 #### Intent
-If an application intends to interact with functionality of another application, it must declare a respective intent in its manifest. An application has implicit intents for all its own capabilities. Just like for capabilities, it is allowed to use the wildcard character (*) as qualifier value or as qualifier key.
+If an application intends to interact with functionality of another application, it must declare a respective intent in its manifest. An application has implicit intents for all its own capabilities. It is allowed to use the wildcard character (*) as qualifier key and/or wildcard characters (\*) and (?) as qualifier value.
 
 ### Limitation and restrictions
 The platform starts a separate application instance for every entry point invoked. The only exception is when navigating within the same view, but only if the application uses hash-based URLs. The fact of having multiple instances brings some requirements and limitations which you should be aware of:

@@ -8,8 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
+import { QueryList } from '@angular/core';
+
 /**
- * Provides array utlity methods.
+ * Provides array utility methods.
  */
 export class Arrays {
 
@@ -24,5 +26,55 @@ export class Arrays {
       return [];
     }
     return Array.isArray(value) ? value : [value];
+  }
+
+  /**
+   * Compares items of given arrays for reference equality.
+   *
+   * Use the parameter `exactOrder` to control if the item order must be equal.
+   */
+  public static equal(array1: any[], array2: any[], exactOrder: boolean = true): boolean {
+    if (array1 === array2) {
+      return true;
+    }
+
+    if (array1.length !== array2.length) {
+      return false;
+    }
+
+    return array1.every((item, index) => {
+      if (exactOrder) {
+        return item === array2[index];
+      }
+      else {
+        return array2.includes(item);
+      }
+    });
+  }
+
+  /**
+   * Finds the last item matching the given predicate, if any,
+   * or returns the last item in the array if no predicate is specified.
+   *
+   * Returns `undefined` if no element is found.
+   */
+  public static last<T>(items: T[] | QueryList<T>, predicate?: (item: T) => boolean): T | undefined {
+    const array = items ? (Array.isArray(items) ? items : items.toArray()) : [];
+
+    if (!predicate) {
+      return array[array.length - 1];
+    }
+    return [...array].reverse().find(predicate);
+  }
+
+  /**
+   * Removes given item from the array. The original array will not be modified.
+   */
+  public static remove<T>(items: T[], item: T): T[] {
+    const result = [...items];
+    for (let index = result.indexOf(item); index !== -1; index = result.indexOf(item)) {
+      result.splice(index, 1);
+    }
+    return result;
   }
 }

@@ -213,13 +213,13 @@ describe('MessageBus', () => {
         name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, private: false}],
       });
       registerApp({
-        name: 'app-2', capability: [{type: PlatformCapabilityTypes.View, qualifier: {'*': '*'}, private: false}],
+        name: 'app-2', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: '*', viewType: '*'}, private: false}],
       });
       registerApp({
-        name: 'app-3', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', '*': '*'}, private: false}],
+        name: 'app-3', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: '?', viewType: '?'}, private: false}],
       });
       registerApp({
-        name: 'app-4', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'company', '*': '*'}, private: false}],
+        name: 'app-4', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'company', viewType: 'company-info'}, private: false}],
       });
       registerApp({
         name: 'app-5', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}, private: false}],
@@ -265,12 +265,22 @@ describe('MessageBus', () => {
       expect(messageDispatched).toBeTruthy();
     })));
 
-    it('should be published if the publishing app manifests a matching wildcard capability', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
+    it('should be published if the publishing app manifests a matching wildcard (*) capability', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
       registerApp({
         name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '*'}, private: false}],
       });
 
       const envelope = createCapabilityEnvelope({type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: 'salary-info'}});
+      messageBus.publishMessageIfQualified(envelope, 'app-1');
+      expect(messageDispatched).toBeTruthy();
+    })));
+
+    it('should be published if the publishing app manifests a matching wildcard (?) capability', fakeAsync(inject([MessageBus], (messageBus: MessageBus) => {
+      registerApp({
+        name: 'app-1', capability: [{type: PlatformCapabilityTypes.View, qualifier: {entity: 'person', viewType: '?'}, private: false}],
+      });
+
+      const envelope = createCapabilityEnvelope({type: PlatformCapabilityTypes.View, qualifier: {entity: 'person'}});
       messageBus.publishMessageIfQualified(envelope, 'app-1');
       expect(messageDispatched).toBeTruthy();
     })));

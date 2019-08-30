@@ -8,14 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, Injector, NgModule } from '@angular/core';
 import { CoreModule } from '../core/core.module';
-import { ViewIntentHandler } from './view-intent-handler.service';
+import { ViewIntentDispatcher } from './view-intent-dispatcher.service';
 import { WorkbenchModule } from '@scion/workbench';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ViewOutletComponent } from './view-outlet.component';
-import { INTENT_HANDLER } from '../core/metadata';
 
 /**
  * Built-in capability to show a view.
@@ -31,11 +30,19 @@ import { INTENT_HANDLER } from '../core/metadata';
     RouterModule.forChild([]),
   ],
   providers: [
-    {provide: INTENT_HANDLER, useClass: ViewIntentHandler, multi: true},
+    {provide: APP_INITIALIZER, useFactory: provideModuleInitializerFn, multi: true, deps: [Injector]},
+    ViewIntentDispatcher,
   ],
   entryComponents: [
     ViewOutletComponent,
   ],
 })
 export class ViewCapabilityModule {
+}
+
+export function provideModuleInitializerFn(injector: Injector): () => void {
+  // use injector because Angular Router cannot be injected in `APP_INITIALIZER` function
+  // do not return the function directly to not break the AOT build (add redundant assignment)
+  const fn = (): void => injector.get(ViewIntentDispatcher).init();
+  return fn;
 }

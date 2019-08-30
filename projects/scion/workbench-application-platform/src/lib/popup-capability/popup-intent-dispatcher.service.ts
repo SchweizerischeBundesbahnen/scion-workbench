@@ -10,13 +10,15 @@
 
 import { ElementRef, Inject, Injectable, OnDestroy, Renderer2, RendererFactory2 } from '@angular/core';
 import { PopupConfig, PopupService } from '@scion/workbench';
-import { IntentHandler } from '../core/metadata';
 import { ManifestRegistry } from '../core/manifest-registry.service';
 import { Logger } from '../core/logger.service';
 import { PopupInput, PopupOutletComponent } from './popup-outlet.component';
 import { MessageBus } from '../core/message-bus.service';
 import { DOCUMENT } from '@angular/common';
-import { AnyQualifier, IntentMessage, MessageEnvelope, PlatformCapabilityTypes, PopupCapability, PopupIntentMessage } from '@scion/workbench-application-platform.api';
+import { IntentMessage, MessageEnvelope, PlatformCapabilityTypes, PopupCapability, PopupIntentMessage } from '@scion/workbench-application-platform.api';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { ManifestCollector } from '../core/manifest-collector.service';
 
 /**
  * Shows a workbench popup for intents of the type 'popup'.
@@ -27,13 +29,9 @@ import { AnyQualifier, IntentMessage, MessageEnvelope, PlatformCapabilityTypes, 
  * is looked up to provide metadata about the page to load in the popup.
  */
 @Injectable()
-export class PopupIntentHandler implements IntentHandler, OnDestroy {
+export class PopupIntentDispatcher implements OnDestroy {
 
-  public readonly type: PlatformCapabilityTypes = PlatformCapabilityTypes.Popup;
-  public readonly qualifier = AnyQualifier;
-  public readonly proxy = true;
-  public readonly description = 'Shows a workbench popup for capabilities of the type \'popup\'.';
-
+  private _destroy$ = new Subject<void>();
   private _renderer: Renderer2;
 
   constructor(private _logger: Logger,
@@ -41,11 +39,16 @@ export class PopupIntentHandler implements IntentHandler, OnDestroy {
               private _messageBus: MessageBus,
               private _popupService: PopupService,
               @Inject(DOCUMENT) private _document: any,
-              rendererFactory: RendererFactory2) {
-    this._renderer = rendererFactory.createRenderer(null, null);
+              rendererFactory: RendererFactory2,
+              private _manifestCollector: ManifestCollector) {
+      this._renderer = rendererFactory.createRenderer(null, null);
   }
 
-  public onIntent(envelope: MessageEnvelope<PopupIntentMessage>): void {
+  public init(): void {
+    this._manifestCollector.whenManifests.then(() => this.installIntentListener());
+  }
+
+  private onIntent(envelope: MessageEnvelope<PopupIntentMessage>): void {
     const intentMessage: PopupIntentMessage = envelope.message;
     const popupCapability = this.resolvePopupCapabilityProvider(envelope);
     if (!popupCapability) {
@@ -77,6 +80,21 @@ export class PopupIntentHandler implements IntentHandler, OnDestroy {
     });
   }
 
+  private installIntentListener(): void {
+    this._messageBus.receiveIntents$()
+      .pipe(
+        filter(envelope => envelope.message.type === PlatformCapabilityTypes.Popup),
+        takeUntil(this._destroy$),
+      )
+      .subscribe((envelope: MessageEnvelope<PopupIntentMessage>) => {
+        try {
+          this.onIntent(envelope);
+        } catch (error) {
+          this._logger.error(`Failed to handle intent [${JSON.stringify(envelope.message.qualifier || {})}]`, error);
+        }
+      });
+  }
+
   private createVirtualAnchorElement(outletBoundingBox: ClientRect | null, anchor: ClientRect): Element {
     const outletTop = outletBoundingBox && outletBoundingBox.top || 0;
     const outletLeft = outletBoundingBox && outletBoundingBox.left || 0;
@@ -95,15 +113,8 @@ export class PopupIntentHandler implements IntentHandler, OnDestroy {
 
   private resolvePopupCapabilityProvider(envelope: MessageEnvelope<IntentMessage>): PopupCapability {
     const qualifier = envelope.message.qualifier;
-    const popupCapabilities = this._manifestRegistry.getCapabilities<PopupCapability>(this.type, qualifier)
-      .filter(popupCapability => {
-        // Skip proxy providers (e.g. this implementor class)
-        return !popupCapability.metadata.proxy;
-      })
-      .filter(popupCapability => {
-        // Skip if the capability has private visibility and the intending application does not provide the view capability itself
-        return !popupCapability.private || this._manifestRegistry.isScopeCheckDisabled(envelope.sender) || envelope.sender === popupCapability.metadata.symbolicAppName;
-      });
+    const popupCapabilities = this._manifestRegistry.getCapabilities<PopupCapability>(PlatformCapabilityTypes.Popup, qualifier)
+      .filter(capability => this._manifestRegistry.isVisibleForApplication(capability, envelope.sender));
 
     if (popupCapabilities.length === 0) {
       this._logger.error(`[IllegalStateError] No capability registered matching the qualifier '${JSON.stringify(qualifier || {})}'.`, popupCapabilities);
@@ -119,5 +130,6 @@ export class PopupIntentHandler implements IntentHandler, OnDestroy {
 
   public ngOnDestroy(): void {
     this._renderer.destroy();
+    this._destroy$.next();
   }
 }

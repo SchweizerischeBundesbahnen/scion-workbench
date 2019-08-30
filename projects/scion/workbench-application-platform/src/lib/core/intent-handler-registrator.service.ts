@@ -15,9 +15,8 @@ import { Subject } from 'rxjs';
 import { ManifestRegistry } from './manifest-registry.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { MessageBus } from './message-bus.service';
-import { ApplicationRegistry } from './application-registry.service';
 import { MessageEnvelope, NilQualifier } from '@scion/workbench-application-platform.api';
-import { testQualifier } from './qualifier-tester';
+import { matchesIntentQualifier } from './qualifier-tester';
 
 /**
  * Registers intent handlers registered via {INTENT_HANDLER} DI injection token.
@@ -30,7 +29,6 @@ export class IntentHandlerRegistrator implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   constructor(@Inject(INTENT_HANDLER) private _handlers: IntentHandler[],
-              private _applicationRegistry: ApplicationRegistry,
               private _manifestRegistry: ManifestRegistry,
               private _messageBus: MessageBus,
               private _logger: Logger) {
@@ -50,14 +48,14 @@ export class IntentHandlerRegistrator implements OnDestroy {
       qualifier: handler.qualifier || NilQualifier,
       private: false,
       description: handler.description,
-    }], handler.proxy);
+    }]);
 
-    handler.onInit && handler.onInit(this._applicationRegistry, this._manifestRegistry);
+    handler.onInit && handler.onInit();
 
     this._messageBus.receiveIntentsForApplication$(HOST_APPLICATION_SYMBOLIC_NAME)
       .pipe(
         filter(envelope => envelope.message.type === handler.type),
-        filter(envelope => testQualifier(handler.qualifier, envelope.message.qualifier)),
+        filter(envelope => matchesIntentQualifier(handler.qualifier, envelope.message.qualifier)),
         takeUntil(this._destroy$),
       )
       .subscribe((envelope: MessageEnvelope) => {
