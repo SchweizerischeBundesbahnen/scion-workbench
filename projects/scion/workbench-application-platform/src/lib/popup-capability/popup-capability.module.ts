@@ -8,13 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, Injector, NgModule } from '@angular/core';
 import { CoreModule } from '../core/core.module';
 import { WorkbenchModule } from '@scion/workbench';
 import { CommonModule } from '@angular/common';
 import { PopupOutletComponent } from './popup-outlet.component';
-import { INTENT_HANDLER } from '../core/metadata';
-import { PopupIntentHandler } from './popup-intent-handler.service';
+import { PopupIntentDispatcher } from './popup-intent-dispatcher.service';
 
 /**
  * Built-in capability to show a popup.
@@ -29,11 +28,19 @@ import { PopupIntentHandler } from './popup-intent-handler.service';
     WorkbenchModule.forChild(),
   ],
   providers: [
-    {provide: INTENT_HANDLER, useClass: PopupIntentHandler, multi: true},
+    {provide: APP_INITIALIZER, useFactory: provideModuleInitializerFn, multi: true, deps: [Injector]},
+    PopupIntentDispatcher,
   ],
   entryComponents: [
     PopupOutletComponent,
   ],
 })
 export class PopupCapabilityModule {
+}
+
+export function provideModuleInitializerFn(injector: Injector): () => void {
+  // use injector because Angular Router cannot be injected in `APP_INITIALIZER` function
+  // do not return the function directly to not break the AOT build (add redundant assignment)
+  const fn = (): void => injector.get(PopupIntentDispatcher).init();
+  return fn;
 }

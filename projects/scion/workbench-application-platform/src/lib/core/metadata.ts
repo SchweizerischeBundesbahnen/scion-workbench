@@ -9,8 +9,6 @@
  */
 
 import { InjectionToken } from '@angular/core';
-import { ApplicationRegistry } from './application-registry.service';
-import { ManifestRegistry } from './manifest-registry.service';
 import { Capability, Intent, IntentMessage, MessageEnvelope, Qualifier } from '@scion/workbench-application-platform.api';
 import { Observable } from 'rxjs';
 
@@ -101,7 +99,7 @@ export interface ApplicationManifest {
 /**
  * Handles intents of a specific type and qualifiers.
  *
- * There are some built-in handlers installed by the platform: 'view', 'popup', 'messagebox', 'notification' and 'manifest-registry'.
+ * There are some built-in handlers installed by the platform: 'messagebox', 'notification' and 'manifest-registry'.
  *
  * To install a handler, register it via DI token {INTENT_HANDLER} as multi provider in the host application.
  *
@@ -126,9 +124,9 @@ export interface IntentHandler {
   readonly type: string;
 
   /**
-   * Optional qualifiers which this handler requires. If not specified, {NilQualifier} is used.
+   * Qualifier which this handler requires. If not specified, {NilQualifier} is used.
    */
-  readonly qualifier?: Qualifier;
+  readonly qualifier: Qualifier;
 
   /**
    * Describes the capability this handler handles.
@@ -136,19 +134,9 @@ export interface IntentHandler {
   readonly description: string;
 
   /**
-   * Indicates if this handler acts as a proxy through which intents are processed.
-   *
-   * For example, `ViewIntentHandler` is a proxy for application view capabilities which
-   * reads config from registered view capability providers and dispatches intents to the Angular router.
-   */
-  readonly proxy?: boolean;
-
-  /**
    * A lifecycle hook that is called after the platform completed registration of applications.
-   *
-   * Use this method to handle any initialization tasks which require the application or manifest registry.
    */
-  onInit?(applicationRegistry: ApplicationRegistry, manifestRegistry: ManifestRegistry): void;
+  onInit?(): void;
 
   /**
    * Method invoked upon the receipt of an intent which this handler qualifies to receive.

@@ -139,13 +139,6 @@ export interface Capability {
      * Symbolic name of the application which provides this capability.
      */
     symbolicAppName: string;
-    /**
-     * Indicates if the capability implementor acts as a proxy through which intents are processed.
-     *
-     * For example, `ViewIntentHandler` is a proxy for application view capabilities which
-     * reads config from registered view capability providers and dispatches intents to the Angular router.
-     */
-    proxy: boolean;
   };
 }
 
