@@ -39,6 +39,13 @@ export const Platform = new class {
   }
 
   /**
+   * Returns true if running standalone, or false if running inside the workbench application platform.
+   */
+  public isRunningStandalone(): boolean {
+    return window === window.parent;
+  }
+
+  /**
    * Destroys this platform and releases resources allocated.
    */
   public destroy(): void {
