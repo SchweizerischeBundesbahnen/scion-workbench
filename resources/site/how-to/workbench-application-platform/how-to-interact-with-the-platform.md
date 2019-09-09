@@ -72,6 +72,12 @@ Use the global Platform object to obtain respective service reference, e.g.:
 Platform.getService(RouterService).navigate(...);
 ```
 
+To query if an application is running standalone or inside the platform, call the following function:
+
+```typescript 
+Platform.isRunningStandalone();
+```
+
 See the other how-to's for more detailed instructions.
 
 ### Main platform services to interact with the platform
