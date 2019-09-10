@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench-application.angular",
-  "version": "0.0.0-beta.25",
+  "version": "0.0.0-beta.26",
   "description": "SCION Workbench Application Platform is an extension of SCION Workbench to integrate content from multiple web applications in a coherent way, thus enabling a micro frontend architecture for allowing different front-end frameworks to co-exist and independent delivery.\n\nThe platform provides the mechanics for client-side web application integration. Any web application can be integrated. If the site does not interact with the platform, there is no need for adaptation. For a deeper integration, the platform provides a framework-agnostic guest API.\n\nThis package allows an Angular application to interact with SCION Workbench Application Platform.",
   "license": "EPL-2.0",
   "private": false,
@@ -16,7 +16,7 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "dependencies": {
-    "@scion/workbench-application.core": "0.0.0-beta.25"
+    "@scion/workbench-application.core": "0.0.0-beta.26"
   },
   "peerDependencies": {
     "@angular/common": "^8.0.0-rc.0 || ^8.0.0",
