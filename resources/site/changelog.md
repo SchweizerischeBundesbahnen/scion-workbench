@@ -6,6 +6,32 @@
 # Changelog
 
 
+# [0.0.0-beta.26](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.25...0.0.0-beta.26) (2019-09-10)
+
+
+### Bug Fixes
+
+* emit the initial element dimension also if using native resize observer ([5d88128](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5d88128)), closes [#169](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/169)
+* insert new view tab into the tab bar after the active view tab ([14d76f0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/14d76f0)), closes [#167](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/167)
+* match intent with wildcard qualifier key/value(s) ([5ea3981](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5ea3981)), closes [#172](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/172)
+* preserve line-breaks in message box content ([0060c11](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0060c11)), closes [#131](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/131)
+* support mac command key when opening view in new view tab ([b2be851](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/b2be851)), closes [#155](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/155)
+
+
+### Features
+
+* add API to query if micro-frontend is running standalone ([10c2b45](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/10c2b45)), closes [#130](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/130)
+* add context menu to view tabs and provide menu items for commonly used view tab actions ([cd41eb3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/cd41eb3)), closes [#174](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/174)
+* allow defining capabilities with optional qualifier entries ([d462512](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d462512)), closes [#154](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/154) [#173](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/173)
+* allow dragging views to app instances running in different browser tabs or windows ([2ee9df3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/2ee9df3)), closes [#168](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/168)
+* provide better feedback to the user when dragging views ([78f9c80](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/78f9c80)), closes [#164](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/164)
+
+
+### BREAKING CHANGES
+
+* removed support for the asterisk (*) wildcard as capability qualifier key: instead, use the question mark (?) as qualifier value to mark the qualifier entry as optional
+
+
 # [0.0.0-beta.25](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.24...0.0.0-beta.25) (2019-07-26)
 
 
