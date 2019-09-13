@@ -19,10 +19,17 @@
     flex: auto;
   }
 
-  > main {
+  > sci-viewport {
     flex: auto;
-    overflow: hidden;
     @include allowPointerEvents;
+
+    main {
+      display: grid;
+
+      > router-outlet {
+        position: absolute; // take router outlet out of the document flow
+      }
+    }
   }
 }
 
