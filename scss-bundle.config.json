@@ -1,0 +1,6 @@
+{
+  "bundlerOptions": {
+    "rootDir": ".",
+    "logLevel": "info"
+  }
+}
