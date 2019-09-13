@@ -6,6 +6,14 @@
 # Changelog
 
 
+# [0.0.0-beta.28](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.27...0.0.0-beta.28) (2019-09-13)
+
+
+### Bug Fixes
+
+* use correct registry in package-lock.json ([28c3e05](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/28c3e05)), closes [#182](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/182)
+
+
 # [0.0.0-beta.27](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.26...0.0.0-beta.27) (2019-09-13)
 
 
