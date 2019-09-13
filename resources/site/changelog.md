@@ -6,6 +6,14 @@
 # Changelog
 
 
+# [0.0.0-beta.27](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.26...0.0.0-beta.27) (2019-09-13)
+
+
+### Bug Fixes
+
+* bundle stylesheets with scss-bundle ([5e2d141](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5e2d141)), closes [#179](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/179)
+
+
 # [0.0.0-beta.26](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.25...0.0.0-beta.26) (2019-09-10)
 
 
