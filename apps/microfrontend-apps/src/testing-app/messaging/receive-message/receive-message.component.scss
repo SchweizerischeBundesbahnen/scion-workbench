@@ -1,0 +1,25 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > * {
+    flex: none;
+
+    &:not(:first-child) {
+      margin-top: .5em;
+    }
+  }
+
+  > form {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    grid-auto-rows: min-content;
+    row-gap: .25em;
+  }
+
+  > sci-list.messages {
+    flex: auto;
+    min-height: 300px;
+  }
+}

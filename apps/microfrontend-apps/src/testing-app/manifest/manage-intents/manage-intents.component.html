@@ -1,0 +1,26 @@
+<form autocomplete="off" [formGroup]="form">
+  <sci-form-field label="Type *">
+    <input [formControlName]="TYPE" class="e2e-intent-type">
+  </sci-form-field>
+
+  <sci-form-field label="Qualifier">
+    <sci-params-enter [paramsFormArray]="form.get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-intent-qualifier"></sci-params-enter>
+  </sci-form-field>
+</form>
+
+<button type="button" (click)="onIntentRegister()" [disabled]="form.invalid" class="e2e-register-intent">Register intent</button>
+
+<sci-list class="intents e2e-intents">
+  <ng-container *ngFor="let intent of intents$ | async">
+    <ng-template sciListItem [actions]="!intent.metadata.implicit ? remove_action: null">
+      <section class="intent">
+        <sci-qualifier-chip-list [qualifier]="intent.qualifier" [type]="intent.type"></sci-qualifier-chip-list>
+        <span class="implicit e2e-implicit" *ngIf="intent.metadata.implicit">IMPLICIT</span>
+      </section>
+    </ng-template>
+
+    <ng-template #remove_action>
+      <button class="material-icons e2e-unregister" title="Unregister intent" (click)="onIntentUnregister(intent)">remove</button>
+    </ng-template>
+  </ng-container>
+</sci-list>

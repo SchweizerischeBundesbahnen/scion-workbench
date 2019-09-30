@@ -229,7 +229,6 @@ export class SciSashboxComponent implements OnDestroy {
     return this.direction === 'row';
   }
 
-  /** @internal **/
   public ngOnDestroy(): void {
     this._destroy$.next();
   }

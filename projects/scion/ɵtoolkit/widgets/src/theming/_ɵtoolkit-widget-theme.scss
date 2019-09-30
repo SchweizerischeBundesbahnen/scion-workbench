@@ -1,0 +1,48 @@
+@import 'widgets.scss';
+@import '~@angular/cdk/a11y';
+@import '~@angular/cdk/overlay';
+
+/**
+ * Installs the application theme.
+ */
+@mixin ɵtoolkit-widget-theme() {
+  @import url('https://fonts.googleapis.com/css?family=Roboto:normal,bold,italic,bolditalic|Roboto+Mono');
+  @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+  @include cdk-a11y();
+  @include cdk-overlay();
+
+  input, textarea, select {
+    @include input-field;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  a {
+    @include link;
+  }
+
+  button.material-icons {
+    @include mat-icon-button;
+  }
+
+  button:not(.material-icons) {
+    @include button;
+  }
+}
+
+@mixin badge($size: 10px) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $size;
+  color: #FFFFFF;
+  font-size: $size;
+  font-weight: normal;
+  min-height: $size;
+  min-width: $size;
+  background-color: accentColor(.4);
+  user-select: none;
+  box-sizing: content-box;
+}

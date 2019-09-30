@@ -1,0 +1,36 @@
+@import '../theming/ɵtoolkit-widget-theme';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  outline: none;
+
+  > sci-filter-field {
+    flex: none;
+
+    &.top {
+      margin-bottom: .3em;
+    }
+
+    &.bottom {
+      margin-top: .3em;
+    }
+  }
+
+  > sci-viewport {
+    flex: auto;
+    border: 1px solid accentColor(.25);
+    border-radius: 5px;
+    padding: .5em;
+
+    sci-list-item {
+      &:not(:first-child) {
+        border-top: 1px solid accentColor(.25);
+      }
+
+      &:last-child {
+        border-bottom: 1px solid accentColor(.25);
+      }
+    }
+  }
+}

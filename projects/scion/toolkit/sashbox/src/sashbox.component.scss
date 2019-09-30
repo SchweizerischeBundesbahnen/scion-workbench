@@ -38,16 +38,33 @@
     transition-property: flex-basis, flex-grow;
   }
 
-  &.vertical > div.sash {
+  &.row > div.sash {
     padding: 0 var(--sci-sashbox-gap);
+
+    &.first {
+      padding-left: 0;
+    }
+
+    &.last {
+      padding-right: 0;
+    }
   }
 
-  &.horizontal > div.sash {
+  &.column > div.sash {
     padding: var(--sci-sashbox-gap) 0;
+
+    &.first {
+      padding-top: 0;
+    }
+
+    &.last {
+      padding-bottom: 0;
+    }
   }
 
   &.sashing > div.sash {
     transition-property: none;
+    pointer-events: none; // e.g. iframes would swallow pointer events
   }
 
   > div.splitter {

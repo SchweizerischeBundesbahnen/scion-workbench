@@ -1,0 +1,35 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  display: grid;
+  grid-template-rows: max-content 1fr;
+  padding: 1em;
+
+  > header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5em;
+
+    > span.page-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    > span.app-name {
+      font-weight: bold;
+      background-color: primaryColor(.15);
+      border: 1px solid primaryColor();
+      color: primaryColor();
+      border-radius: 10px;
+      justify-self: end;
+      padding: .25em 1.5em;
+      user-select: none;
+      align-self: flex-start;
+    }
+  }
+
+  > sci-viewport router-outlet {
+    position: absolute; // out of the document flow
+  }
+}
+

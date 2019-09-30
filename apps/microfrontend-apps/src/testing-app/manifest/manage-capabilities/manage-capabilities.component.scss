@@ -1,0 +1,34 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content min-content;
+  gap: .5em 1em;
+
+  > form {
+    display: grid;
+    grid-auto-rows: min-content;
+    row-gap: .25em;
+  }
+
+  > sci-list.capabilities {
+    min-height: 300px;
+
+    section.capability {
+      display: flex;
+      justify-content: space-between;
+
+      > sci-qualifier-chip-list {
+        flex: auto;
+      }
+
+      > span.visibility {
+        flex: none;
+        align-self: flex-start;
+        font-weight: bold;
+        @include chip(primaryColor(), null, primaryColor());
+      }
+    }
+  }
+}

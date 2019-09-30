@@ -1,0 +1,43 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > * {
+    flex: none;
+
+    &:not(:first-child) {
+      margin-top: .5em;
+    }
+  }
+
+  > form {
+    display: grid;
+    grid-auto-rows: min-content;
+    row-gap: .25em;
+
+    div.subscriber-badge {
+      display: flex;
+      margin: 2px 0 10px 0;
+      padding: 2px;
+      @include badge(12px);
+
+      > span.count {
+        margin-right: .25em;
+      }
+    }
+  }
+
+  > output.publish-error {
+    border: 1px solid errorColor(1);
+    background-color: errorColor(.2);
+    border-radius: 3px;
+    padding: 1em;
+  }
+
+  > sci-list.replies {
+    flex: auto;
+    min-height: 300px;
+  }
+}

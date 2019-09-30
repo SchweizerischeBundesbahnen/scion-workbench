@@ -1,0 +1,38 @@
+@import '../theming/ɵtoolkit-widget-theme';
+
+$size: 1.5rem;
+
+:host {
+  display: inline-block;
+  position: relative;
+  width: $size;
+  height: $size;
+  border: 1px solid accentColor(.25);
+  font-size: $size;
+
+  &:focus {
+    outline: 2px solid red;
+  }
+
+  &:focus-within, :focus, :active {
+    border-color: primaryColor();
+    box-shadow: 0 0 6px 0 primaryColor(.35);
+  }
+
+  > input[type="checkbox"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+  }
+
+  > span.checked {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+    font-size: 90%;
+  }
+}

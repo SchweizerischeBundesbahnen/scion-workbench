@@ -1,0 +1,18 @@
+<ng-container *ngIf="isTopicMessage; then topic_message_template else intent_message_template"></ng-container>
+<ng-template #topic_message_template>
+  Topic:<span class="e2e-topic topic">{{message.topic}}</span>
+  <ng-container *ngIf="message.replyTo">
+    replyTo: <span class="e2e-reply-to">{{message.replyTo}}</span>
+  </ng-container>
+  Payload: <span class="e2e-payload">{{message.payload}}</span>
+</ng-template>
+
+<ng-template #intent_message_template>
+  Type: <span class="e2e-intent-type">{{message.type}}</span>
+  Qualifier: <span class="e2e-intent-qualifier">{{message.qualifier | json}}</span>
+  <ng-container *ngIf="message.replyTo">
+    replyTo: <span class="e2e-reply-to">{{message.replyTo}}</span>
+  </ng-container>
+  Payload: <span class="e2e-payload">{{message.payload}}</span>
+</ng-template>
+

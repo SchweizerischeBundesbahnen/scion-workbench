@@ -32,6 +32,12 @@
       "@scion/workbench/*": [
         "dist/scion/workbench/*"
       ],
+      "@scion/microfrontend-platform": [
+        "dist/scion/microfrontend-platform"
+      ],
+      "@scion/microfrontend-platform/*": [
+        "dist/scion/microfrontend-platform/*"
+      ],
       "@scion/workbench-application-platform.api": [
         "dist/scion/workbench-application-platform.api"
       ],
@@ -105,6 +111,9 @@
     //      ],
     //      "@scion/workbench/core": [
     //        "projects/scion/workbench/core/src/public_api"
+    //      ],
+    //      "@scion/microfrontend-platform": [
+    //        "projects/scion/microfrontend-platform/src/public_api"
     //      ],
     //      "@scion/workbench-application-platform.api": [
     //        "projects/scion/workbench-application-platform.api/src/public_api"

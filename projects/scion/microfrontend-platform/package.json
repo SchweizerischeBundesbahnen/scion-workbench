@@ -1,0 +1,29 @@
+{
+  "name": "@scion/microfrontend-platform",
+  "version": "0.0.0-beta.32",
+  "description": "Provides the mechanics to integrate microfrontends and cross-origin messaging between microfrontends.",
+  "license": "EPL-2.0",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
+  "bugs": {
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
+  },
+  "author": {
+    "name": "SCION Workbench contributors",
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
+  },
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "rxjs": "^6.0.0"
+  },
+  "keywords": [
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+  }
+}

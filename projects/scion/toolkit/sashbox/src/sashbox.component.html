@@ -1,5 +1,7 @@
-<ng-container *ngFor="let sash of sashes; index as i; last as last;">
+<ng-container *ngFor="let sash of sashes; index as i; first as first; last as last;">
   <div class="sash"
+       [class.first]="first"
+       [class.last]="last"
        [sciSashInitializer]="sash" [sciSashInitializerRowDirection]="isRowDirection"
        [style.flex-grow]="sash.flexGrowNormalized"
        [style.flex-shrink]="sash.flexShrink"

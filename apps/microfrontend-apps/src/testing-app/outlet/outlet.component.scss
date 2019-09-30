@@ -1,0 +1,33 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > div.url {
+    flex: none;
+    margin-bottom: .25em;
+    display: flex;
+    align-items: center;
+
+    > input.url {
+      flex: auto;
+    }
+
+    > button.go {
+      flex: none;
+      margin-left: .5em;
+    }
+
+    > button.clear {
+      flex: none;
+      margin-left: .25em;
+    }
+  }
+
+  > iframe {
+    flex: auto;
+    border: 1px solid accentColor(.25);
+    border-radius: 3px;
+  }
+}

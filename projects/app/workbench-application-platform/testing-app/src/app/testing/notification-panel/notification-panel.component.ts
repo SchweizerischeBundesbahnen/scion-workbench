@@ -22,7 +22,7 @@ const SEVERITY = 'severity';
 const DURATION = 'duration';
 const GROUP = 'group';
 const CSS_CLASS = 'css-class';
-const PAYLOAD = 'payload';
+const PAYLOAD = 'message';
 
 @Component({
   selector: 'app-notification-panel',

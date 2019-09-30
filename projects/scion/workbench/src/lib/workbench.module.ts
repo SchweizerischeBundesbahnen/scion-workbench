@@ -74,7 +74,7 @@ import { ViewMenuItemDirective } from './view-part/view-context-menu/view-menu.d
 import { WbFormatAcceleratorPipe } from './view-part/view-context-menu/accelerator-format.pipe';
 import { TextComponent } from './view-part/view-context-menu/text.component';
 import { ViewMenuService } from './view-part/view-context-menu/view-menu.service';
-import { MultiTabPartProvider, PART_PROVIDER, SingleTabPartProvider, StandalonePartProvider } from './layout/part-provider.model';
+import { MultiTabPartProvider, PART_PROVIDER, StandalonePartProvider } from './layout/part-provider.model';
 
 @NgModule({
   imports: [
@@ -188,7 +188,7 @@ export class WorkbenchModule {
           provide: VIEW_COMPONENT_TYPE, useValue: ViewComponent,
         },
 
-        {provide: PART_PROVIDER, useClass: SingleTabPartProvider, multi: true},
+        {provide: PART_PROVIDER, useClass: StandalonePartProvider, multi: true},
         {provide: PART_PROVIDER, useClass: MultiTabPartProvider, multi: true},
         {provide: PART_PROVIDER, useClass: StandalonePartProvider, multi: true},
         WorkbenchLayoutService,

@@ -1,0 +1,11 @@
+<div class="url">
+  <input [formControl]="urlformControl" (keydown.enter)="onUrlEnter()" placeholder="Enter a URL for a microfrontend" class="url e2e-url" list="endpoints">
+  <button class="go e2e-go" (click)="onGoClick()" [disabled]="urlformControl.invalid">Go</button>
+  <button class="clear e2e-clear" (click)="onClearClick()">Clear</button>
+</div>
+
+<iframe [src]="url" [id]="outletId"></iframe>
+
+<datalist id="endpoints">
+  <option *ngFor="let endpoint of endpoints$ | async" [value]="endpoint.url">{{endpoint.label}}</option>
+</datalist>

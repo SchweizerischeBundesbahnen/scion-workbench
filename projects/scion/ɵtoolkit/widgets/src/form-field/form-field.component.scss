@@ -1,0 +1,27 @@
+@import '../theming/ɵtoolkit-widget-theme';
+
+:host {
+  display: inline-flex;
+  flex-flow: row wrap;
+
+  > label {
+    flex: 0 1 120px;
+    align-self: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    user-select: none;
+    margin-right: 1em;
+  }
+
+  > div.content {
+    flex: auto;
+    display: grid;
+
+    ::ng-deep {
+      input, textarea, select {
+        @include input-field;
+      }
+    }
+  }
+}

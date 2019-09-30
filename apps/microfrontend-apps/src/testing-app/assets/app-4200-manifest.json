@@ -1,0 +1,8 @@
+{
+  "name": "Testing App 4200",
+  "baseUrl": "#/testing-app",
+  "capabilities": [
+   ],
+  "intents": [
+  ]
+}

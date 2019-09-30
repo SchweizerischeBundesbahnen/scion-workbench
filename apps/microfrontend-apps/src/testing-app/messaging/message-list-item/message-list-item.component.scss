@@ -1,0 +1,10 @@
+:host {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 1em;
+  font-family: monospace;
+
+  > span.topic {
+    font-weight: bold;
+  }
+}

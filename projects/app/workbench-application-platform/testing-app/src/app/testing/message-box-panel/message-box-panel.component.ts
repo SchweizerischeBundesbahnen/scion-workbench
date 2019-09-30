@@ -23,7 +23,7 @@ const SEVERITY = 'severity';
 const MODALITY = 'modality';
 const CONTENT_SELECTABLE = 'content-selectable';
 const CSS_CLASS = 'css-class';
-const PAYLOAD = 'payload';
+const PAYLOAD = 'message';
 
 @Component({
   selector: 'app-message-box-panel',

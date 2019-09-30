@@ -1,0 +1,54 @@
+<form autocomplete="off" [formGroup]="form">
+  <sci-form-field label="Model *">
+    <select [formControlName]="MESSAGING_MODEL" class="e2e-messaging-model">
+      <option [value]="MessagingModel.Topic">Topic</option>
+      <option [value]="MessagingModel.Intent">Intent</option>
+    </select>
+  </sci-form-field>
+
+  <ng-container *ngIf="isTopicModel(); then topic_template else intent_template"></ng-container>
+
+  <sci-form-field label="Message">
+    <textarea rows="10" [formControlName]="MESSAGE" class="e2e-message"></textarea>
+  </sci-form-field>
+
+  <sci-form-field label="Request-Reply *">
+    <sci-checkbox [formControlName]="REQUEST_REPLY" class="e2e-request-reply"></sci-checkbox>
+  </sci-form-field>
+</form>
+
+<button type="button" (click)="onPublish()" *ngIf="!isSubscribed" [disabled]="form.invalid" class="e2e-publish">{{isTopicModel() ? 'Publish message' : 'Issue intent'}}</button>
+<button type="button" (click)="onCancelPublish()" *ngIf="isSubscribed" class="e2e-cancel">Cancel</button>
+
+<output class="publish-error e2e-publish-error" *ngIf="publishError">
+  {{publishError}}
+</output>
+
+<ng-container *ngIf="form.get(REQUEST_REPLY).value && isSubscribed">
+  <sci-list class="replies e2e-replies">
+    <ng-template sciListItem *ngFor="let reply of replies">
+      <app-message-list-item [message]="reply" [isTopicMessage]="true"></app-message-list-item>
+    </ng-template>
+  </sci-list>
+  <button type="button" class="e2e-clear-replies" (click)="onClear()">Clear</button>
+</ng-container>
+
+<ng-template #topic_template>
+  <sci-form-field label="Topic *">
+    <input [formControl]="form.get(DESTINATION).get(TOPIC)" class="e2e-topic">
+    <div class="subscriber-badge">
+      <span class="e2e-topic-subscriber-count count">{{form.get(DESTINATION).get(TOPIC).value | appTopicSubscriberCount$ | async}}</span>
+      Subscribers
+    </div>
+  </sci-form-field>
+</ng-template>
+
+<ng-template #intent_template>
+  <sci-form-field label="Intent type *">
+    <input [formControl]="form.get(DESTINATION).get(TYPE)" class="e2e-intent-type">
+  </sci-form-field>
+
+  <sci-form-field label="Intent qualifier">
+    <sci-params-enter [paramsFormArray]="form.get(DESTINATION).get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-intent-qualifier"></sci-params-enter>
+  </sci-form-field>
+</ng-template>

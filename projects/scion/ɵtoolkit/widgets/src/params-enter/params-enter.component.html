@@ -1,0 +1,21 @@
+<h2>{{title}}</h2>
+
+<!-- 'add' button -->
+<button *ngIf="addable" (click)="onAdd()" class="add e2e-add material-icons" type="button" title="Add entry">add</button>
+<button *ngIf="removable" (click)="onClear()" class="clear e2e-clear material-icons" type="button" title="Clear all entries">clear</button>
+
+<ng-container *ngFor="let paramGroup of paramsFormArray.controls; index as i;">
+  <!-- label -->
+  <ng-container *ngIf="paramGroup.get(PARAM_NAME).disabled; then label_readonly; else label_editable"></ng-container>
+  <!-- value -->
+  <input [formControl]="paramGroup.get(PARAM_VALUE)" class="e2e-value">
+  <!-- 'remove' button -->
+  <button *ngIf="removable" class="material-icons e2e-remove" type="button" (click)="onRemove(i)" title="remove entry">remove</button>
+
+  <ng-template #label_readonly>
+    <label>{{paramGroup.get(PARAM_NAME).value}}</label>
+  </ng-template>
+  <ng-template #label_editable>
+    <input [formControl]="paramGroup.get(PARAM_NAME)" class="e2e-key">
+  </ng-template>
+</ng-container>

@@ -16,10 +16,36 @@
     "build-apps": "run-s *:build",
     "toolkit:build": "ng build --prod @scion/toolkit",
     "posttoolkit:build": "scss-bundle -e projects/scion/toolkit/viewport/src/theme/_scrollbar.scss -o dist/scion/toolkit/scrollbar.scss",
+    "toolkit-internal:build": "ng build --prod @scion/ɵtoolkit",
 
     "toolkit-apps:serve": "ng serve toolkit-apps --aot",
     "toolkit-apps:lint": "ng lint toolkit-apps",
     "toolkit-apps:build": "ng build --configuration=production toolkit-apps",
+
+    "workbench:build": "ng build --prod @scion/workbench",
+    "postworkbench:build": "scss-bundle -e projects/scion/workbench/src/theme/_theming.scss -o dist/scion/workbench/theming.scss",
+
+    "microfrontend-platform:build": "ng build --prod @scion/microfrontend-platform",
+    "microfrontend-platform:lint": "ng lint @scion/microfrontend-platform",
+    "microfrontend-platform:test": "ng test @scion/microfrontend-platform",
+    "microfrontend-platform:lint:e2e-specs": "ng lint e2e-microfrontend-platform",
+    "microfrontend-platform:e2e": "run-p -r microfrontend-apps:serve microfrontend-platform:await-then-protractor",
+    "microfrontend-platform:e2e-headless": "cross-env HEADLESS=true run-p -r microfrontend-apps:serve microfrontend-platform:await-then-protractor",
+    "microfrontend-platform:await-then-protractor": "run-s microfrontend-apps:await:* microfrontend-platform:run-protractor",
+    "microfrontend-platform:run-protractor": "ng e2e e2e-microfrontend-platform",
+
+    "microfrontend-apps:serve": "run-p -r microfrontend-apps:serve:*",
+    "microfrontend-apps:serve:4200": "ng serve microfrontend-apps --aot --port 4200",
+    "microfrontend-apps:serve:4201": "ng serve microfrontend-apps --aot --port 4201",
+    "microfrontend-apps:serve:4202": "ng serve microfrontend-apps --aot --port 4202",
+    "microfrontend-apps:serve:4203": "ng serve microfrontend-apps --aot --port 4203",
+    "microfrontend-apps:await:4200": "wait-on http-get://localhost:4200",
+    "microfrontend-apps:await:4201": "wait-on http-get://localhost:4201",
+    "microfrontend-apps:await:4202": "wait-on http-get://localhost:4202",
+    "microfrontend-apps:await:4203": "wait-on http-get://localhost:4203",
+    "microfrontend-apps:lint": "ng lint microfrontend-apps",
+    "microfrontend-apps:build": "ng build --configuration=production microfrontend-apps",
+
     "build-all": "run-s build app:common:build app:workbench-application-platform:build-now",
     "lint-all": "run-p -r lint app:common:lint app:workbench:lint app:workbench-application-platform:lint",
 

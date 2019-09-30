@@ -1,0 +1,8 @@
+<header>
+  <span class="page-title">{{pageTitle}}</span>
+  <span class="app-name" [title]="appOrigin">{{symbolicAppName}}</span>
+</header>
+
+<sci-viewport>
+  <router-outlet #outlet=outlet (activate)="onRouteActivate(outlet.activatedRoute)"></router-outlet>
+</sci-viewport>

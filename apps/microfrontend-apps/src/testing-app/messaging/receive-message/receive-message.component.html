@@ -1,0 +1,44 @@
+<form autocomplete="off" [formGroup]="form" [class.topic-messaging-model]="isTopicModel()">
+  <sci-form-field label="Model *">
+    <select [formControlName]="MESSAGING_MODEL" class="e2e-messaging-model">
+      <option [value]="MessagingModel.Topic">Topic</option>
+      <option [value]="MessagingModel.Intent">Intent</option>
+    </select>
+  </sci-form-field>
+  <ng-container *ngIf="isTopicModel(); then topic_template else intent_template"></ng-container>
+</form>
+<button (click)="onSubscribe()" *ngIf="!isSubscribed" [disabled]="form.invalid" class="e2e-subscribe">Subscribe</button>
+<button (click)="onUnsubscribe()" *ngIf="isSubscribed" class="e2e-unsubscribe">Unsubscribe</button>
+
+<ng-container *ngIf="isSubscribed">
+  <sci-list class="messages e2e-messages">
+    <ng-container *ngFor="let message of messages">
+
+      <ng-template sciListItem [actions]="message.replyTo ? reply_action: null">
+        <app-message-list-item [message]="message" [isTopicMessage]="isTopicModel()"></app-message-list-item>
+      </ng-template>
+
+      <ng-template #reply_action>
+        <button class="material-icons e2e-reply" title="Reply" (click)="onReply(message.replyTo)">reply</button>
+      </ng-template>
+
+    </ng-container>
+  </sci-list>
+  <button class="e2e-clear-messages" (click)="onClear()">Clear</button>
+</ng-container>
+
+<ng-template #topic_template>
+  <sci-form-field label="Topic *">
+    <input [formControl]="form.get(DESTINATION).get(TOPIC)" class="e2e-topic">
+  </sci-form-field>
+</ng-template>
+
+<ng-template #intent_template>
+  <sci-form-field label="Intent type">
+    <input [formControl]="form.get(DESTINATION).get(TYPE)" class="e2e-intent-type">
+  </sci-form-field>
+
+  <sci-form-field label="Intent qualifier">
+    <sci-params-enter [paramsFormArray]="form.get(DESTINATION).get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-intent-qualifier"></sci-params-enter>
+  </sci-form-field>
+</ng-template>

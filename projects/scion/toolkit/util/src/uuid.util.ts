@@ -21,7 +21,7 @@ export class UUID {
    */
   public static randomUUID(): string {
     let now = Date.now();
-    if (window.performance && typeof window.performance.now === 'function') {
+    if (typeof window !== 'undefined' && typeof window.performance !== 'undefined' && typeof window.performance.now === 'function') {
       now += performance.now(); // use high-precision timer if available
     }
 
