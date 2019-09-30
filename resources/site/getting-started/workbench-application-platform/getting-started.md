@@ -118,7 +118,7 @@ ng new host-app --style scss
 - Use NPM command-line tool to install `SCION Workbench` and `SCION Workbench Application Platform`.
 
   ```
-  npm install --save @scion/workbench @scion/workbench-application-platform @scion/dimension @scion/viewport @angular/cdk
+  npm install --save @scion/workbench @scion/workbench-application-platform @scion/toolkit @angular/cdk
   ```
   > SCION Workbench requires some peer dependencies to be installed. By using the above commands, those are installed as well.
 
@@ -283,13 +283,12 @@ As a possible viewport implementation for Angular applications, you can use  `Sc
 - Use NPM command-line tool to install `SciViewportModule`.
 
   ```
-  npm install --save @scion/viewport @scion/dimension
+  npm install --save @scion/toolkit
   ```
-  > Viewport requires `@scion/dimension`. By using the above command, it is installed as well.
 
 - Import 'SciViewportModule'
 
-  Open `app.module.ts` and import `SciViewportModule`.
+  Open `app.module.ts` and import `SciViewportModule` from `@scion/toolkit/viewport`.
   ```typescript
   @NgModule({
     imports: [

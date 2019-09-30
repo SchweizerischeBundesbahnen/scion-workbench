@@ -13,7 +13,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { WorkbenchApplicationModule } from '@scion/workbench-application.angular';
-import { SciViewportModule } from '@scion/viewport';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 

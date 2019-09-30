@@ -12,13 +12,12 @@ As a possible viewport implementation for Angular applications, you can use  `Sc
 #### 1. Use NPM command-line tool to install 'SciViewportModule'
 
   ```
-  npm install --save @scion/viewport @scion/dimension
+  npm install --save @scion/toolkit
   ```
-  > Viewport requires `@scion/dimension`. By using the above command, it is installed as well.
 
 #### 2. Import 'SciViewportModule'
 
-  Open `app.module.ts` and import 'SciViewportModule'.
+  Open `app.module.ts` and import 'SciViewportModule' from `@scion/toolkit/viewport`.
   ```typescript
   @NgModule({
     imports: [

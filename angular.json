@@ -3,6 +3,82 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "@scion/toolkit": {
+      "projectType": "library",
+      "root": "projects/scion/toolkit",
+      "sourceRoot": "projects/scion/toolkit/src",
+      "prefix": "sci",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/scion/toolkit/tsconfig.lib.json",
+            "project": "projects/scion/toolkit/ng-package.json"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/toolkit/src/test.ts",
+            "tsConfig": "projects/scion/toolkit/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/toolkit/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/toolkit/tsconfig.lib.json",
+              "projects/scion/toolkit/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "@scion/ɵtoolkit": {
+      "projectType": "library",
+      "root": "projects/scion/ɵtoolkit",
+      "sourceRoot": "projects/scion/ɵtoolkit/src",
+      "prefix": "sci",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/scion/ɵtoolkit/tsconfig.lib.json",
+            "project": "projects/scion/ɵtoolkit/ng-package.json"
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/ɵtoolkit/src/test.ts",
+            "tsConfig": "projects/scion/ɵtoolkit/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/ɵtoolkit/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/ɵtoolkit/tsconfig.lib.json",
+              "projects/scion/ɵtoolkit/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
     "@scion/workbench": {
       "projectType": "library",
       "root": "projects/scion/workbench",
@@ -33,6 +109,91 @@
             "tsConfig": [
               "projects/scion/workbench/tsconfig.lib.json",
               "projects/scion/workbench/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "toolkit-apps": {
+      "projectType": "application",
+      "root": "apps/toolkit-apps",
+      "sourceRoot": "apps/toolkit-apps/src",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/toolkit-apps",
+            "index": "apps/toolkit-apps/src/index.html",
+            "main": "apps/toolkit-apps/src/main.ts",
+            "polyfills": "apps/toolkit-apps/src/polyfills.ts",
+            "tsConfig": "apps/toolkit-apps/tsconfig.app.json",
+            "assets": [
+              "apps/toolkit-apps/src/favicon.ico",
+              "apps/toolkit-apps/src/assets"
+            ],
+            "styles": [
+              "apps/toolkit-apps/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/toolkit-apps/src/environments/environment.ts",
+                  "with": "apps/toolkit-apps/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "toolkit-apps:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "toolkit-apps:build:production"
+            }
+          }
+        },
+        "serve-aot": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "toolkit-apps:build",
+            "aot": true,
+            "progress": false
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "toolkit-apps:build:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/toolkit-apps/tsconfig.app.json"
             ],
             "exclude": [
               "**/node_modules/**"
@@ -214,82 +375,6 @@
             "tsConfig": [
               "projects/scion/mouse-dispatcher/tsconfig.lib.json",
               "projects/scion/mouse-dispatcher/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
-    "@scion/dimension": {
-      "projectType": "library",
-      "root": "projects/scion/dimension",
-      "sourceRoot": "projects/scion/dimension/src",
-      "prefix": "sci",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/scion/dimension/tsconfig.lib.json",
-            "project": "projects/scion/dimension/ng-package.json"
-          },
-          "configurations": {
-            "production": {}
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/scion/dimension/src/test.ts",
-            "tsConfig": "projects/scion/dimension/tsconfig.spec.json",
-            "karmaConfig": "projects/scion/dimension/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/scion/dimension/tsconfig.lib.json",
-              "projects/scion/dimension/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
-    "@scion/viewport": {
-      "projectType": "library",
-      "root": "projects/scion/viewport",
-      "sourceRoot": "projects/scion/viewport/src",
-      "prefix": "sci",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/scion/viewport/tsconfig.lib.json",
-            "project": "projects/scion/viewport/ng-package.json"
-          },
-          "configurations": {
-            "production": {}
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/scion/viewport/src/test.ts",
-            "tsConfig": "projects/scion/viewport/tsconfig.spec.json",
-            "karmaConfig": "projects/scion/viewport/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/scion/viewport/tsconfig.lib.json",
-              "projects/scion/viewport/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"

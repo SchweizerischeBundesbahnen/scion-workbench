@@ -69,36 +69,6 @@ jobs:
           branch: master
           tags: true
           condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"
-      # Publish @scion/dimension
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/dimension $NPM_TOKEN "--tag next"
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $BETA_RC_TAG_REGEX"
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/dimension $NPM_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"
-      # Publish @scion/viewport
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/viewport $NPM_TOKEN "--tag next"
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $BETA_RC_TAG_REGEX"
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/viewport $NPM_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"
       # Publish @scion/workbench
       - provider: script
         script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench $NPM_TOKEN "--tag next"

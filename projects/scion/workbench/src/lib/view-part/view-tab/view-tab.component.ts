@@ -11,7 +11,7 @@
 import { Attribute, Component, ElementRef, HostBinding, HostListener, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnDestroy } from '@angular/core';
 import { InternalWorkbenchView, WorkbenchView } from '../../workbench.model';
 import { WorkbenchViewPartService } from '../workbench-view-part.service';
-import { SciViewportComponent } from '@scion/viewport';
+import { SciViewportComponent } from '@scion/toolkit/viewport';
 import { fromEvent, merge, Subject } from 'rxjs';
 import { InternalWorkbenchService } from '../../workbench.service';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';

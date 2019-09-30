@@ -14,7 +14,7 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { SciFilterFieldModule } from '../filter-field/filter-field.module';
 import { SciListItemComponent } from './list-item/list-item.component';
 import { SciListItemDirective } from './list-item.directive';
-import { SciViewportModule } from '@scion/viewport';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 import { CommonModule } from '@angular/common';
 
 /**

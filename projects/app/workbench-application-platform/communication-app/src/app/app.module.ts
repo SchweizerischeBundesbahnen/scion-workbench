@@ -12,7 +12,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { SciViewportModule } from '@scion/viewport';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WorkbenchApplicationModule } from '@scion/workbench-application.angular';

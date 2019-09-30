@@ -1,0 +1,32 @@
+{
+  "name": "@scion/toolkit",
+  "version": "0.0.0-beta.32",
+  "description": "SCION Toolkit provides a collection of building blocks for creating applications with multiple views based on the Angular platform.",
+  "license": "EPL-2.0",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
+  "bugs": {
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
+  },
+  "author": {
+    "name": "SCION Workbench contributors",
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
+  },
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "@angular/common": "^8.0.0-rc.0 || ^8.0.0",
+    "@angular/core": "^8.0.0-rc.0 || ^8.0.0",
+    "@angular/cdk": "^8.0.0-rc.0 || ^8.0.0",
+    "rxjs": "^6.0.0"
+  },
+  "keywords": [
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+  }
+}

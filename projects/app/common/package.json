@@ -21,8 +21,8 @@
     "@angular/common": "^8.0.0-rc.0 || ^8.0.0",
     "@angular/core": "^8.0.0-rc.0 || ^8.0.0",
     "@angular/cdk": "^8.0.0-rc.0 || ^8.0.0",
-    "@scion/viewport": "0.0.0-beta.32",
-    "@scion/dimension": "0.0.0-beta.32",
+    "@scion/workbench": "0.0.0-beta.32",
+    "@scion/toolkit":  "0.0.0-beta.32",
     "@scion/workbench-application-platform.api": "0.0.0-beta.32",
     "rxjs": "^6.0.0"
   },

@@ -10,7 +10,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SciViewportModule } from '@scion/viewport';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 import { ContactRoutingModule } from './contact-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { WorkbenchApplicationModule } from '@scion/workbench-application.angular';

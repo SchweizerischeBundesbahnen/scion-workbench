@@ -20,6 +20,12 @@
       "dom"
     ],
     "paths": {
+      "@scion/toolkit/*": [
+        "dist/scion/toolkit/*"
+      ],
+      "@scion/ɵtoolkit/*": [
+        "dist/scion/ɵtoolkit/*"
+      ],
       "@scion/workbench": [
         "dist/scion/workbench"
       ],
@@ -56,18 +62,6 @@
       "@scion/mouse-dispatcher/*": [
         "dist/scion/mouse-dispatcher/*"
       ],
-      "@scion/dimension": [
-        "dist/scion/dimension"
-      ],
-      "@scion/dimension/*": [
-        "dist/scion/dimension/*"
-      ],
-      "@scion/viewport": [
-        "dist/scion/viewport"
-      ],
-      "@scion/viewport/*": [
-        "dist/scion/viewport/*"
-      ],
       "@scion/app/common": [
         "dist/scion/app/common"
       ],
@@ -85,11 +79,32 @@
     //     * Note: DO NOT ACTIVATE FOR PRODUCTION!
     //     */
     //    "paths": {
+    //      "@scion/toolkit/dimension": [
+    //        "projects/scion/toolkit/dimension/src/public_api"
+    //      ],
+    //      "@scion/toolkit/viewport": [
+    //        "projects/scion/toolkit/viewport/src/public_api"
+    //      ],
+    //      "@scion/toolkit/sashbox": [
+    //        "projects/scion/toolkit/sashbox/src/public_api"
+    //      ],
+    //      "@scion/toolkit/operators": [
+    //        "projects/scion/toolkit/operators/src/public_api"
+    //      ],
+    //      "@scion/toolkit/util": [
+    //        "projects/scion/toolkit/util/src/public_api"
+    //      ],
+    //      "@scion/ɵtoolkit/widgets": [
+    //        "projects/scion/ɵtoolkit/widgets/src/public_api"
+    //      ],
+    //      "@scion/ɵtoolkit/widgets.po": [
+    //        "projects/scion/ɵtoolkit/widgets.po/src/public_api"
+    //      ],
     //      "@scion/workbench": [
     //        "projects/scion/workbench/src/public_api"
     //      ],
-    //      "@scion/workbench/*": [
-    //        "projects/scion/workbench/src/*"
+    //      "@scion/workbench/core": [
+    //        "projects/scion/workbench/core/src/public_api"
     //      ],
     //      "@scion/workbench-application-platform.api": [
     //        "projects/scion/workbench-application-platform.api/src/public_api"
@@ -120,18 +135,6 @@
     //      ],
     //      "@scion/mouse-dispatcher/*": [
     //        "projects/scion/mouse-dispatcher/src/*"
-    //      ],
-    //      "@scion/dimension": [
-    //        "projects/scion/dimension/src/public_api"
-    //      ],
-    //      "@scion/dimension/*": [
-    //        "projects/scion/dimension/src/*"
-    //      ],
-    //      "@scion/viewport": [
-    //        "projects/scion/viewport/src/public_api"
-    //      ],
-    //      "@scion/viewport/*": [
-    //        "projects/scion/viewport/src/*"
     //      ],
     //      "@scion/app/common": [
     //        "projects/app/common/src/public_api"

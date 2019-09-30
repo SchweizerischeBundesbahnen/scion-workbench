@@ -1,0 +1,126 @@
+:host {
+  // CSS variables to override properties of the theme (public API).
+  --sci-sashbox-gap: 10px;
+  --sci-sashbox-splitter_backgroundColor: #d2d2d2;
+  --sci-sashbox-splitter_backgroundColor_hover: var(--sci-sashbox-splitter_backgroundColor);
+  --sci-sashbox-splitter_size: 1px; // size of the splitter along the main axis (width if direction is row, or height if direction is column)
+  --sci-sashbox-splitter_sizeOnHover: 8px; // size of the splitter along the main axis when hovered
+  --sci-sashbox-splitter_touchTargetSize: 15px; // touch target size to move the splitter
+  --sci-sashbox-splitter_crossAxisSize: 100%; // handle size along the cross axis (height if direction is row, or width if direction is column)
+  --sci-sashbox-splitter_borderRadius: 0; // border radius of the handle
+  --sci-sashbox-splitter_opacityWhenActive: 1; // opacity of the splitter when active
+  --sci-sashbox-splitter_opacityOnHover: .3; // opacity of the splitter on hover
+
+  display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  &.column {
+    flex-direction: column;
+  }
+
+  &.row {
+    flex-direction: row;
+  }
+
+  > div.sash {
+    overflow: hidden;
+    display: grid; // stretch the sash content
+    grid-auto-rows: 100%;
+    grid-auto-columns: 100%;
+    // flex properties are set programmatically.
+    transition-timing-function: ease-out;
+    transition-duration: 200ms;
+    transition-property: flex-basis, flex-grow;
+  }
+
+  &.vertical > div.sash {
+    padding: 0 var(--sci-sashbox-gap);
+  }
+
+  &.horizontal > div.sash {
+    padding: var(--sci-sashbox-gap) 0;
+  }
+
+  &.sashing > div.sash {
+    transition-property: none;
+  }
+
+  > div.splitter {
+    flex: none;
+    display: grid; // stretch the touch-target
+    position: relative; // positioning context for 'touch-target'
+    background-color: var(--sci-sashbox-splitter_backgroundColor);
+    place-items: center; // center the touch-target
+
+    > div.touch-target {
+      position: absolute; // out of the document flow
+      display: grid; // stretch the handle
+      place-items: center; // center the handle
+      z-index: 1; // overlay the subsequent sash
+      pointer-events: auto; // ensure interactable
+
+      > div.handle {
+        position: absolute; // out of the document flow
+        background-color: var(--sci-sashbox-splitter_backgroundColor);
+        border-radius: var(--sci-sashbox-splitter_borderRadius);
+        opacity: var(--sci-sashbox-splitter_opacityOnHover);
+        transition-property: width, height;
+        transition-timing-function: ease-in;
+        transition-duration: 75ms;
+      }
+    }
+
+    &.vertical {
+      width: var(--sci-sashbox-splitter_size);
+      height: var(--sci-sashbox-splitter_crossAxisSize);
+
+      > div.touch-target {
+        width: var(--sci-sashbox-splitter_touchTargetSize);
+        height: 100%;
+
+        > div.handle {
+          width: var(--sci-sashbox-splitter_size);
+          height: var(--sci-sashbox-splitter_crossAxisSize);
+        }
+      }
+    }
+
+    &.horizontal {
+      height: var(--sci-sashbox-splitter_size);
+      width: var(--sci-sashbox-splitter_crossAxisSize);
+
+      > div.touch-target {
+        width: 100%;
+        height: var(--sci-sashbox-splitter_touchTargetSize);
+
+        > div.handle {
+          width: var(--sci-sashbox-splitter_crossAxisSize);
+          height: var(--sci-sashbox-splitter_size);
+        }
+      }
+    }
+
+    > div.touch-target:active > div.handle {
+      opacity: var(--sci-sashbox-splitter_opacityWhenActive);
+    }
+
+    &.vertical:hover, &.vertical.moving {
+      > div.touch-target > div.handle {
+        background-color: var(--sci-sashbox-splitter_backgroundColor_hover);
+        width: var(--sci-sashbox-splitter_sizeOnHover);
+      }
+    }
+
+    &.horizontal:hover, &.horizontal.moving {
+      > div.touch-target > div.handle {
+        background-color: var(--sci-sashbox-splitter_backgroundColor_hover);
+        height: var(--sci-sashbox-splitter_sizeOnHover);
+      }
+    }
+  }
+}

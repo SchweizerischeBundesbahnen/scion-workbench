@@ -12,14 +12,17 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "scripts": {
+    "toolkit:build": "ng build --prod @scion/toolkit",
+    "posttoolkit:build": "scss-bundle -e projects/scion/toolkit/viewport/src/theme/_scrollbar.scss -o dist/scion/toolkit/scrollbar.scss",
+
+    "toolkit-apps:serve": "ng serve toolkit-apps --aot",
+    "toolkit-apps:lint": "ng lint toolkit-apps",
+    "toolkit-apps:build": "ng build --configuration=production toolkit-apps",
     "build-all": "run-s build app:common:build app:workbench-application-platform:build-now",
     "lint-all": "run-p -r lint app:common:lint app:workbench:lint app:workbench-application-platform:lint",
 
     "build": "run-s build:*",
     "build:mouse-dispatcher": "ng build --prod @scion/mouse-dispatcher",
-    "build:dimension": "ng build --prod @scion/dimension",
-    "build:viewport": "ng build --prod @scion/viewport",
-    "postbuild:viewport": "scss-bundle -e projects/scion/viewport/src/theme/_scrollbar.scss -o dist/scion/viewport/scrollbar.scss",
     "build:workbench": "ng build --prod @scion/workbench",
     "postbuild:workbench": "scss-bundle -e projects/scion/workbench/src/theme/_theming.scss -o dist/scion/workbench/theming.scss",
     "build:workbench-application-platform.api": "ng build --prod @scion/workbench-application-platform.api",
@@ -33,8 +36,6 @@
     "test:workbench-application-platform": "ng test @scion/workbench-application-platform",
     "test:workbench-application.core": "ng test @scion/workbench-application.core",
     "test:workbench-application.angular": "ng test @scion/workbench-application.angular",
-    "test:dimension": "ng test @scion/dimension",
-    "test:viewport": "ng test @scion/viewport",
 
     "lint": "run-p lint:*",
     "lint:workbench": "ng lint @scion/workbench",
@@ -43,8 +44,6 @@
     "lint:workbench-application.core": "ng lint @scion/workbench-application.core",
     "lint:workbench-application.angular": "ng lint @scion/workbench-application.angular",
     "lint:mouse-dispatcher": "ng lint @scion/mouse-dispatcher",
-    "lint:dimension": "ng lint @scion/dimension",
-    "lint:viewport": "ng lint @scion/viewport",
 
     "app:common:build": "ng build --prod app/common",
     "app:common:lint": "ng lint app/common",

@@ -10,7 +10,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SciViewportModule } from '@scion/viewport';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 import { SciAccordionModule, SciPopupShellModule, SciSessionStorageModule } from '@scion/app/common';
 import { CommunicationViewComponent } from './communication-view/communication-view.component';
 import { CommunicationAccordionItemHeaderComponent } from './communication-accordion-item-header/communication-accordion-item-header.component';

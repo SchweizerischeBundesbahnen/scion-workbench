@@ -1,0 +1,24 @@
+<ng-container *ngFor="let sash of sashes; index as i; last as last;">
+  <div class="sash"
+       [sciSashInitializer]="sash" [sciSashInitializerRowDirection]="isRowDirection"
+       [style.flex-grow]="sash.flexGrowNormalized"
+       [style.flex-shrink]="sash.flexShrink"
+       [style.flex-basis]="sash.flexBasis">
+    <ng-container *ngTemplateOutlet="sash.sashTemplate"></ng-container>
+  </div>
+
+  <div *ngIf="!last" #splitter
+       class="splitter"
+       [class.moving]="sciSplitter.moving"
+       [class.vertical]="isRowDirection"
+       [class.horizontal]="isColumnDirection">
+    <div class="touch-target"
+         sciSplitter [sciSplitterVertical]="isRowDirection" #sciSplitter="sciSplitter"
+         (sciSplitterStart)="onSashStart()"
+         (sciSplitterMove)="onSash(splitter, i, $event)"
+         (sciSplitterEnd)="onSashEnd()"
+         (sciSplitterReset)="onSashReset(i)">
+      <div class="handle"></div>
+    </div>
+  </div>
+</ng-container>

@@ -14,7 +14,7 @@ import { SciPopupShellComponent } from './popup-shell.component';
 import { SciPopupShellTitleDirective } from './popup-shell-title.directive';
 import { SciPopupShellContentDirective } from './popup-shell-content.directive';
 import { SciPopupShellButtonDirective } from './popup-shell-button.directive';
-import { SciViewportModule } from '@scion/viewport';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 
 /**
  * Provides the shell for a popup.

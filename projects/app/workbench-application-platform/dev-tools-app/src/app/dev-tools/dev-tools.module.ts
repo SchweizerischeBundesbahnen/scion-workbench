@@ -10,7 +10,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SciViewportModule } from '@scion/viewport';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 import { SciAccordionModule, SciFilterFieldModule, SciListModule, SciParamsEnterModule, SciPopupShellModule, SciPropertyModule, SciSashModule } from '@scion/app/common';
 import { DevToolsRoutingModule } from './dev-tools-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';

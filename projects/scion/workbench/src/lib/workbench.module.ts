@@ -55,8 +55,8 @@ import { APP_MESSAGE_BOX_SERVICE, MessageBoxService } from './message-box/messag
 import { EmptyOutletComponent } from './routing/empty-outlet.component';
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
-import { SciViewportModule } from '@scion/viewport';
-import { SciDimensionModule } from '@scion/dimension';
+import { SciViewportModule } from '@scion/toolkit/viewport';
+import { SciDimensionModule } from '@scion/toolkit/dimension';
 import { ActivityResolver } from './routing/activity.resolver';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';

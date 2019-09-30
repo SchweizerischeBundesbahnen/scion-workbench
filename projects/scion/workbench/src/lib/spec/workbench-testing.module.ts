@@ -2,7 +2,7 @@ import { Injectable, ModuleWithProviders, NgModule } from '@angular/core';
 import { ViewActivationInstantProvider } from '../view-activation-instant-provider.service';
 import { WorkbenchModule } from '../workbench.module';
 import { WorkbenchConfig } from '../workbench.config';
-import { USE_NATIVE_RESIZE_OBSERVER } from '@scion/dimension';
+import { USE_NATIVE_RESIZE_OBSERVER } from '@scion/toolkit/dimension';
 
 @Injectable()
 export class ViewActivationTestingInstantProvider implements ViewActivationInstantProvider {

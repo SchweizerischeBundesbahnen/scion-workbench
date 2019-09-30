@@ -11,7 +11,7 @@
 import { Component, ContentChildren, Input, QueryList, TrackByFunction, ViewChild } from '@angular/core';
 import { animate, AnimationMetadata, style, transition, trigger } from '@angular/animations';
 import { SciAccordionItemDirective } from './accordion-item.directive';
-import { SciViewportComponent } from '@scion/viewport';
+import { SciViewportComponent } from '@scion/toolkit/viewport';
 import { CdkAccordionItem } from '@angular/cdk/accordion';
 
 /**

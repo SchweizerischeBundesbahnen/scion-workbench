@@ -14,7 +14,7 @@ import { OverlayRef } from '@angular/cdk/overlay';
 import { animate, AnimationBuilder, style } from '@angular/animations';
 import { fromEvent, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { SciDimension } from '@scion/dimension';
+import { SciDimension } from '@scion/toolkit/dimension';
 
 @Component({
   selector: 'wb-view-list',

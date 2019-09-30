@@ -13,7 +13,7 @@ import { InternalWorkbenchView } from '../workbench.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
-import { SciViewportComponent } from '@scion/viewport';
+import { SciViewportComponent } from '@scion/toolkit/viewport';
 import { WbRouterOutletDirective } from '../routing/wb-router-outlet.directive';
 import { WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
 import { MessageBoxService } from '../message-box/message-box.service';
