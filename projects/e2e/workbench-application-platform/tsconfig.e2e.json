@@ -8,6 +8,14 @@
       "jasmine",
       "jasminewd2",
       "node"
-    ]
+    ],
+    "paths": {
+      "@scion/workbench/core": [
+        "projects/scion/workbench/core/src/public_api"
+      ],
+      "@scion/workbench-application-platform.api": [
+        "projects/scion/workbench-application-platform.api/src/public_api"
+      ]
+    }
   }
 }

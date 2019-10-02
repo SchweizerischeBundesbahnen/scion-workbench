@@ -8,11 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-/*
- * Secondary entrypoint: '@scion/toolkit/util'
- *
- *  See https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
+/**
+ * Identifies the main workbench part.
  */
-export { UUID } from './uuid.util';
-export { Defined } from './defined.util';
-export { Arrays } from './arrays.util';
+export const MAIN_PART_ID = 'WORKBENCH_MAIN_PART';

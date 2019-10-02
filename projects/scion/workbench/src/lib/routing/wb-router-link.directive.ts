@@ -59,8 +59,8 @@ export class WbRouterLinkDirective {
   }
 
   protected createNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): WbNavigationExtras {
-    const currentViewRef = this._view && this._view.viewRef;
-    const currentViewPartRef = currentViewRef && this._workbench.resolveViewPart(currentViewRef);
+    const currentViewId = this._view && this._view.viewId;
+    const currentPartId = currentViewId && this._workbench.resolveViewPart(currentViewId);
     const isAbsolute = (typeof this._commands[0] === 'string') && this._commands[0].startsWith('/');
     const relativeTo = (isAbsolute ? null : this._route);
 
@@ -68,8 +68,8 @@ export class WbRouterLinkDirective {
       ...this._extras,
       relativeTo: this._extras.relativeTo === undefined ? relativeTo : this._extras.relativeTo,
       target: this._extras.target || (this._view && !ctrlKey && !metaKey ? 'self' : 'blank'),
-      selfViewRef: this._extras.selfViewRef || currentViewRef,
-      blankViewPartRef: this._extras.blankViewPartRef || currentViewPartRef,
+      selfViewId: this._extras.selfViewId || currentViewId,
+      blankPartId: this._extras.blankPartId || currentPartId,
     };
   }
 }

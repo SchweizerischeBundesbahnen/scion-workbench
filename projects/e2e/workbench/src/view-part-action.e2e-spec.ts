@@ -11,6 +11,7 @@
 import { AppPO } from './page-object/app.po';
 import { browser } from 'protractor';
 import { WelcomePagePO } from './page-object/welcome-page.po';
+import { MAIN_PART_ID } from '@scion/workbench/core';
 
 describe('ViewPartAction', () => {
 
@@ -37,7 +38,7 @@ describe('ViewPartAction', () => {
 
   it('should stick to a view if registered in the context of a view [testcase: 4a3a8932]', async () => {
     const welcomePagePO = new WelcomePagePO();
-    const viewTabPO = appPO.findViewTab('viewpart.1', {cssClass: 'e2e-view-4a3a8932'});
+    const viewTabPO = appPO.findViewTab(MAIN_PART_ID, {cssClass: 'e2e-view-4a3a8932'});
     const viewLocalActionButtonPO = appPO.findViewPartAction('e2e-button-4a3a8932');
 
     await welcomePagePO.clickTile('e2e-tile-4a3a8932');

@@ -12,10 +12,11 @@ import { NavigationExtras, Router } from '@angular/router';
 import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { Defined } from '../defined.util';
-import { ViewPartGrid } from '../view-part-grid/view-part-grid.model';
 import { ViewOutletNavigator } from './view-outlet-navigator.service';
 import { Injectable } from '@angular/core';
-import { ViewPartGridProvider } from '../view-part-grid/view-part-grid-provider.service';
+import { PartsLayoutProvider } from '../view-part-grid/view-part-grid-provider.service';
+
+export const WB_NAVIGATION_EXTRAS_STATE = 'wbNavigationExtras';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -27,7 +28,7 @@ export class WorkbenchRouter {
               private _viewOutletNavigator: ViewOutletNavigator,
               private _workbench: InternalWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _viewPartGridProvider: ViewPartGridProvider) {
+              private _partsLayoutProvider: PartsLayoutProvider) {
   }
 
   /**
@@ -57,47 +58,47 @@ export class WorkbenchRouter {
     const commands = this._viewOutletNavigator.normalizeCommands(commandList, extras.relativeTo);
 
     if (extras.closeIfPresent) {
-      return this._workbench.destroyView(...this._viewOutletNavigator.resolvePresentViewRefs(commands));
+      return this._workbench.destroyView(...this._viewOutletNavigator.resolvePresentViewIds(commands));
     }
 
     const activateIfPresent = Defined.orElse(extras.activateIfPresent, !commands.includes('new') && !commands.includes('create') /* coerce activation based on command segment names */);
     // If the view is present, activate it.
     if (activateIfPresent) {
-      const presentViewRef = this._viewOutletNavigator.resolvePresentViewRefs(commands)[0];
-      if (presentViewRef) {
-        return this._workbench.activateView(presentViewRef);
+      const presentViewId = this._viewOutletNavigator.resolvePresentViewIds(commands)[0];
+      if (presentViewId) {
+        return this._workbench.activateView(presentViewId);
       }
     }
 
     switch (extras.target || 'blank') {
       case 'blank': {
-        const viewPartGrid = this._viewPartGridProvider.grid;
-        const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
-        const viewPartRef = extras.blankViewPartRef || (this._workbench.activeViewPartService && this._workbench.activeViewPartService.viewPartRef) || viewPartGrid.viewPartRefs()[0];
-        const viewInsertionIndex = this.coerceViewInsertionIndex(extras.blankInsertionIndex, viewPartRef, viewPartGrid);
+        const partsLayout = this._partsLayoutProvider.layout;
+        const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
+
         return this._viewOutletNavigator.navigate({
-          viewOutlet: {name: newViewRef, commands},
-          viewGrid: viewPartGrid.addView(viewPartRef, newViewRef, viewInsertionIndex).serialize(),
+          viewOutlet: {name: newViewId, commands},
+          partsLayout: partsLayout.serialize(),
           extras: {
             ...extras,
             relativeTo: null, // commands are absolute because normalized
+            state: {[WB_NAVIGATION_EXTRAS_STATE]: extras},
           },
         });
       }
       case 'self': {
-        if (!extras.selfViewRef) {
-          throw Error('Invalid argument: navigation property \'selfViewRef\' required for routing view target \'self\'.');
+        if (!extras.selfViewId) {
+          throw Error('Invalid argument: navigation property \'selfViewId\' required for routing view target \'self\'.');
         }
 
         const urlTree = this._router.parseUrl(this._router.url);
         const urlSegmentGroups = urlTree.root.children;
-        if (!urlSegmentGroups[extras.selfViewRef]) {
-          throw Error(`Invalid argument: '${extras.selfViewRef}' is not a valid view outlet.`);
+        if (!urlSegmentGroups[extras.selfViewId]) {
+          throw Error(`Invalid argument: '${extras.selfViewId}' is not a valid view outlet.`);
         }
 
         return this._viewOutletNavigator.navigate({
-          viewOutlet: {name: extras.selfViewRef, commands},
-          viewGrid: this._viewPartGridProvider.grid.serialize(),
+          viewOutlet: {name: extras.selfViewId, commands},
+          partsLayout: this._partsLayoutProvider.layout.serialize(),
           extras: {
             ...extras,
             relativeTo: null, // commands are absolute because normalized
@@ -106,29 +107,6 @@ export class WorkbenchRouter {
       }
       default: {
         throw Error('Not supported routing view target.');
-      }
-    }
-  }
-
-  /**
-   * Computes the index for 'start' or 'last' literals, or coerces the index to a number.
-   * If `undefined` is given as insertion index, it returns the position after the currently active view.
-   */
-  private coerceViewInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined, viewPartRef: string, viewPartGrid: ViewPartGrid): number {
-    switch (insertionIndex) {
-      case undefined: {  // index after the active view, if any, or after the last view otherwise
-        const viewPart = viewPartGrid.getViewPartElseThrow(viewPartRef);
-        const index = viewPart.viewRefs.indexOf(viewPart.activeViewRef);
-        return (index > -1 ? index + 1 : viewPartGrid.getViewPartElseThrow(viewPartRef).viewRefs.length);
-      }
-      case 'start': {
-        return 0;
-      }
-      case 'end': {
-        return viewPartGrid.getViewPartElseThrow(viewPartRef).viewRefs.length;
-      }
-      default: {
-        return insertionIndex;
       }
     }
   }
@@ -158,12 +136,12 @@ export interface WbNavigationExtras extends NavigationExtras {
    * Specifies the view which to replace when using 'self' view target strategy.
    * If not specified and if in the context of a workbench view, that view is used as the self target.
    */
-  selfViewRef?: string;
+  selfViewId?: string;
   /**
    * Specifies the viewpart where to add the view when using 'blank' view target strategy.
    * If not specified, the currently active workbench viewpart is used.
    */
-  blankViewPartRef?: string;
+  blankPartId?: string;
   /**
    * Specifies the position where to insert the view into the tab bar when using 'blank' view target strategy.
    * If not specified, the view is inserted after the active view. Set the index to 'start' or 'end' for inserting

@@ -11,24 +11,26 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { WorkbenchViewPartRegistry } from './workbench-view-part-registry.service';
-import { VIEW_PART_REF_INDEX, ViewPartInfoArray, ViewPartSashBox } from './view-part-grid-serializer.service';
 import { ViewPartComponent } from '../view-part/view-part.component';
 import { noop, Subject } from 'rxjs';
 import { pairwise, startWith, takeUntil } from 'rxjs/operators';
-import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
 import { ViewDragService, ViewMoveEvent } from '../view-dnd/view-drag.service';
 import { InternalWorkbenchService } from '../workbench.service';
 import { Router, UrlSegment } from '@angular/router';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
-import { ViewPartGridProvider } from './view-part-grid-provider.service';
+import { PartsLayoutProvider } from './view-part-grid-provider.service';
 import { LocationStrategy } from '@angular/common';
+import { PartsLayout, regionToLayoutPosition } from '../layout/parts-layout';
+import { Part, TreeNode } from '../layout/parts-layout.model';
+import { Arrays, UUID } from '@scion/toolkit/util';
+import { MAIN_PART_ID } from '../workbench.constants';
 
 /**
- * Allows the arrangement of viewparts in a grid.
+ * Allows the arrangement of parts in a grid.
  *
- * The grid is a tree of nested sash boxes and viewpart portals.
- * A sash box is the container for two sashes, which itself is either a portal or a sash box, respectively.
+ * The grid is a tree of nested sashboxes and part portals.
+ * A sashbox is the container for two sashes, which itself is either a portal or a sash box, respectively.
  */
 @Component({
   selector: 'wb-view-part-grid',
@@ -39,29 +41,23 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  /**
-   * Reference to the root grid node, which is either a sashbox or a viewpart.
-   *
-   * @see viewPartPortal
-   * @see sashBox
-   */
-  public root: ViewPartSashBox | ViewPartInfoArray;
+  public root: TreeNode | Part;
 
   /**
-   * Reference to the root viewpart of the grid, or 'null' if having a nested grid.
+   * Reference to the root part of the layout, if any.
    */
-  public viewPartPortal: WbComponentPortal<ViewPartComponent>;
+  public partPortal: WbComponentPortal<ViewPartComponent>;
 
   /**
-   * Reference to the root sash box of the grid, or 'null' if not having a nested grid.
+   * Reference to the root tree node of the layout, if any.
    */
-  public sashBox: ViewPartSashBox;
+  public treeNode: TreeNode;
 
   constructor(private _workbench: InternalWorkbenchService,
               private _viewOutletNavigator: ViewOutletNavigator,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _viewPartGridProvider: ViewPartGridProvider,
+              private _partsLayoutProvider: PartsLayoutProvider,
               private _viewDragService: ViewDragService,
               private _locationStrategy: LocationStrategy,
               private _router: Router,
@@ -70,23 +66,23 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this._viewPartGridProvider.grid$
+    this._partsLayoutProvider.layout$
       .pipe(
-        startWith(null as ViewPartGrid), // start with a null grid to initialize the 'pairwise' operator, so it emits once the grid is set.
+        startWith(null as PartsLayout), // start with a null layout to initialize the 'pairwise' operator, so it emits once the layout is set.
         pairwise(),
         takeUntil(this._destroy$),
       )
-      .subscribe(([prevGrid, currGrid]: [ViewPartGrid, ViewPartGrid]) => {
+      .subscribe(([prevLayout, curLayout]: [PartsLayout, PartsLayout]) => {
         // Determine the portals which are about to be re-parented in the DOM, and detach them temporarily from Angular component tree,
         // so they are not destroyed while being re-parented.
-        const reattachFn = this.detachPortalsToBeMovedFromComponentTree(prevGrid, currGrid);
+        const reattachFn = this.detachPortalsToBeMovedFromComponentTree(prevLayout, curLayout);
 
-        // Set the new grid.
-        this.root = currGrid.root;
-        this.sashBox = !Array.isArray(this.root) ? this.root : null;
-        this.viewPartPortal = Array.isArray(this.root) ? this._viewPartRegistry.getElseThrow(this.root[VIEW_PART_REF_INDEX]).portal : null;
+        // Set the new layout.
+        this.root = curLayout.root;
+        this.treeNode = this.root instanceof TreeNode ? this.root : null;
+        this.partPortal = this.root instanceof Part ? this._viewPartRegistry.getElseThrow(this.root.partId).portal : null;
 
-        // Trigger a change detection cycle to flush the new grid to the DOM.
+        // Trigger a change detection cycle to flush the new layout to the DOM.
         this._cd.detectChanges();
 
         // Re-attach detached portals.
@@ -104,36 +100,27 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
    *
    * Returns a function to attach the detached portals to the Angular component tree anew.
    */
-  private detachPortalsToBeMovedFromComponentTree(prevGrid: ViewPartGrid, newGrid: ViewPartGrid): () => void {
-    if (!prevGrid) {
-      return noop; // no current grid in place, so no portal is moved
+  private detachPortalsToBeMovedFromComponentTree(prevLayout: PartsLayout, newLayout: PartsLayout): () => void {
+    if (!prevLayout) {
+      return noop; // no current layout in place, so no portal is moved
     }
 
-    // Function to compute the path of a ViewPart to its root sash box
-    const computePathToRootFn = (node: ViewPartGridNode): string => {
-      return node.path.map(it => it.id).join(',');
-    };
+    // Compute the paths to the root element of every part
+    const newPartRootPaths = newLayout.parts.reduce((acc, part) => {
+      return acc.set(part.partId, part.getPath());
+    }, new Map<string, string[]>());
 
-    // Compute all ViewPart root paths of the new grid
-    const newViewPartRootPaths = new Map<string, string>();
-    newGrid.visit((newNode: ViewPartGridNode): boolean => {
-      newViewPartRootPaths.set(newNode.viewPartRef, computePathToRootFn(newNode));
-      return true;
-    });
-
-    // Compare ViewPart root paths of the current and the new grid.
+    // Compare ViewPart root paths of the current and the new layout.
     // If the path changed, the portal will be moved and is therefore detached from Angular component tree.
-    const portalsToBeMoved: WbComponentPortal<any>[] = [];
-    prevGrid.visit((prevNode: ViewPartGridNode): boolean => {
-      const prevPathToRoot = computePathToRootFn(prevNode);
-      const newPathToRoot = newViewPartRootPaths.get(prevNode.viewPartRef);
+    const portalsToBeMoved = prevLayout.parts.reduce((acc, part) => {
+      const prevPathToRoot = part.getPath();
+      const newPathToRoot = newPartRootPaths.get(part.partId);
 
-      if (newPathToRoot !== prevPathToRoot) {
-        const viewPart = this._viewPartRegistry.getElseThrow(prevNode.viewPartRef);
-        portalsToBeMoved.push(viewPart.portal);
+      if (!Arrays.equal(newPathToRoot, prevPathToRoot)) {
+        acc.push(this._viewPartRegistry.getElseThrow(part.partId).portal);
       }
-      return true;
-    });
+      return acc;
+    }, [] as WbComponentPortal<any>[]);
 
     portalsToBeMoved.forEach(portal => portal.detach());
     return (): void => portalsToBeMoved.forEach(portal => portal.attach());
@@ -153,7 +140,7 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
         const crossAppInstanceViewDrag = (event.source.appInstanceId !== event.target.appInstanceId);
 
         // Check if the user dropped the viewtab at the same location. If so, do nothing.
-        if (!crossAppInstanceViewDrag && event.source.viewPartRef === event.target.viewPartRef && event.target.viewPartRegion === 'center') {
+        if (!crossAppInstanceViewDrag && event.source.partId === event.target.partId && event.target.region === 'center') {
           return;
         }
 
@@ -177,7 +164,7 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
   }
 
   private addView(event: ViewMoveEvent): void {
-    const addToNewViewPart = (event.target.viewPartRegion || 'center') !== 'center';
+    const addToNewViewPart = (event.target.region || 'center') !== 'center';
 
     // Transform URL segments into an array of commands.
     const commands = event.source.viewUrlSegments.reduce((acc: any[], segment: UrlSegment) => {
@@ -188,22 +175,22 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
     }, []);
 
     if (addToNewViewPart) {
-      const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
-      const newViewPartRef = this._viewPartGridProvider.grid.computeNextViewPartIdentity();
+      const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
+      const newPartId = event.target.newPartId || UUID.randomUUID();
       this._viewOutletNavigator.navigate({
-        viewOutlet: {name: newViewRef, commands},
-        viewGrid: this._viewPartGridProvider.grid
-          .addSiblingViewPart(event.target.viewPartRegion, event.target.viewPartRef, newViewPartRef)
-          .addView(newViewPartRef, newViewRef)
+        viewOutlet: {name: newViewId, commands},
+        partsLayout: this._partsLayoutProvider.layout
+          .addPart(newPartId, {partId: event.target.partId, align: regionToLayoutPosition(event.target.region)}, {primary: event.source.primaryPart})
+          .addView(newPartId, newViewId)
           .serialize(),
       }).then();
     }
     else {
-      const newViewRef = this._viewRegistry.computeNextViewOutletIdentity();
+      const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
       this._viewOutletNavigator.navigate({
-        viewOutlet: {name: newViewRef, commands},
-        viewGrid: this._viewPartGridProvider.grid
-          .addView(event.target.viewPartRef, newViewRef, event.target.insertionIndex)
+        viewOutlet: {name: newViewId, commands},
+        partsLayout: this._partsLayoutProvider.layout
+          .addView(event.target.partId, newViewId, event.target.insertionIndex)
           .serialize(),
       }).then();
     }
@@ -211,12 +198,12 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
 
   private addViewToNewWindow(event: ViewMoveEvent): void {
     const urlTree = this._viewOutletNavigator.createUrlTree({
-      viewOutlet: this._viewRegistry.viewRefs
-        .filter(viewRef => viewRef !== event.source.viewRef) // retain the source view outlet
-        .map(viewRef => ({name: viewRef, commands: null})), // remove all other view outlets
-      viewGrid: this._viewPartGridProvider.grid
-        .clear()
-        .addView(event.target.viewPartRef, event.source.viewRef)
+      viewOutlet: this._viewRegistry.viewIds
+        .filter(viewId => viewId !== event.source.viewId) // retain the source view outlet
+        .map(viewId => ({name: viewId, commands: null})), // remove all other view outlets
+      partsLayout: this._partsLayoutProvider.layout
+        .removeParts()
+        .addView(MAIN_PART_ID, event.source.viewId)
         .serialize(),
     });
 
@@ -224,26 +211,24 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
   }
 
   private removeView(event: ViewMoveEvent): void {
-    this._workbench.destroyView(event.source.viewRef).then();
+    this._workbench.destroyView(event.source.viewId).then();
   }
 
   private moveView(event: ViewMoveEvent): void {
-    const addToNewViewPart = (event.target.viewPartRegion || 'center') !== 'center';
-    const grid = this._viewPartGridProvider.grid;
-
-    if (addToNewViewPart) {
-      const newViewPartRef = grid.computeNextViewPartIdentity();
+    const addToNewPart = (event.target.region || 'center') !== 'center';
+    if (addToNewPart) {
+      const newPartId = event.target.newPartId || UUID.randomUUID();
       this._viewOutletNavigator.navigate({
-        viewGrid: grid
-          .addSiblingViewPart(event.target.viewPartRegion, event.target.viewPartRef, newViewPartRef)
-          .moveView(event.source.viewRef, newViewPartRef)
+        partsLayout: this._partsLayoutProvider.layout
+          .addPart(newPartId, {partId: event.target.partId, align: regionToLayoutPosition(event.target.region)}, {primary: event.source.primaryPart})
+          .moveView(event.source.viewId, newPartId)
           .serialize(),
       }).then();
     }
     else {
       this._viewOutletNavigator.navigate({
-        viewGrid: grid
-          .moveView(event.source.viewRef, event.target.viewPartRef, event.target.insertionIndex)
+        partsLayout: this._partsLayoutProvider.layout
+          .moveView(event.source.viewId, event.target.partId, event.target.insertionIndex)
           .serialize(),
       }).then();
     }

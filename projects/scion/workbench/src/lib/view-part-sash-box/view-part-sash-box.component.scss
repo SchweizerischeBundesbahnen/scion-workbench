@@ -1,27 +1,22 @@
 @import '../workbench.constants';
-@import '../content-projection/mixins';
 
 :host {
-  display: flex;
-  width: 100%;
-  height: 100%;
+  display: block;
+  position: relative; // positioning context for <sci-sashbox>
 
-  &.split-vertical {
-    flex-direction: row;
-  }
+  > sci-sashbox {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 
-  &.split-horizontal {
-    flex-direction: column;
-  }
-
-  > .splitter {
-    flex: 0 0 3px;
-    background-color: $viewpart_sash-bgcolor;
-    @include allowPointerEvents;
-  }
-
-  > .sash-1, > .sash-2 {
-    flex: 1 1 0;
-    overflow: hidden;
+    --sci-sashbox-gap: 0;
+    --sci-sashbox-splitter_touchTargetSize: 5px;
+    --sci-sashbox-splitter_sizeOnHover: 9px;
+    --sci-sashbox-splitter_size: 1px;
+    --sci-sashbox-splitter_backgroundColor: #{$viewpart_sash-bgcolor};
+    --sci-sashbox-splitter_opacityWhenActive: .5;
+    --sci-sashbox-splitter_opacityOnHover: .125;
   }
 }

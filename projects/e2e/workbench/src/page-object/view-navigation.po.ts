@@ -14,6 +14,7 @@ import { Params } from '@angular/router';
 import { SciParamsEnterPanelPO } from './sci-params-enter.po';
 import { WelcomePagePO } from './welcome-page.po';
 import { AppPO } from './app.po';
+import { MAIN_PART_ID } from '@scion/workbench/core';
 
 export class ViewNavigationPO {
 
@@ -25,11 +26,11 @@ export class ViewNavigationPO {
   }
 
   public async activateViewTab(): Promise<void> {
-    await new AppPO().findViewTab('viewpart.1', {cssClass: 'e2e-view-navigation'}).click();
+    await new AppPO().findViewTab(MAIN_PART_ID, {cssClass: 'e2e-view-navigation'}).click();
   }
 
   public async isActiveViewTab(): Promise<boolean> {
-    return new AppPO().findViewTab('viewpart.1', {cssClass: 'e2e-view-navigation'}).isActive();
+    return new AppPO().findViewTab(MAIN_PART_ID, {cssClass: 'e2e-view-navigation'}).isActive();
   }
 
   public async enterPath(path: string): Promise<void> {

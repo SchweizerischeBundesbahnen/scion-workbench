@@ -11,6 +11,7 @@
 import { AppPO } from './page-object/app.po';
 import { browser } from 'protractor';
 import { expectViewToShow } from './util/testing.util';
+import { MAIN_PART_ID } from '@scion/workbench/core';
 
 describe('Workbench', () => {
 
@@ -23,13 +24,13 @@ describe('Workbench', () => {
   it('should allow to always have an entry view open', async () => {
     await browser.get('/#/?ensure-welcome-view=true');
 
-    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
+    await expect(appPO.getViewTabCount(MAIN_PART_ID)).toEqual(1);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
     await expectViewToShow({viewCssClass: 'e2e-welcome-page', componentSelector: 'app-welcome-page'});
 
     // close the view
-    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-welcome-page'}).close();
-    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
+    await appPO.findViewTab(MAIN_PART_ID, {cssClass: 'e2e-welcome-page'}).close();
+    await expect(appPO.getViewTabCount(MAIN_PART_ID)).toEqual(1);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
     await expectViewToShow({viewCssClass: 'e2e-welcome-page', componentSelector: 'app-welcome-page'});
   });

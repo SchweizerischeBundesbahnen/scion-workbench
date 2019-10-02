@@ -30,9 +30,7 @@ import { WorkbenchLayoutService } from './workbench-layout.service';
 import { ViewComponent } from './view/view.component';
 import { WbRouterOutletDirective } from './routing/wb-router-outlet.directive';
 import { ViewPartSashBoxComponent } from './view-part-sash-box/view-part-sash-box.component';
-import { ViewPartGridSerializerService } from './view-part-grid/view-part-grid-serializer.service';
 import { WbPortalOutletComponent } from './portal/wb-portal-outlet.component';
-import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
 import { WorkbenchRouter } from './routing/workbench-router.service';
 import { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './routing/wb-router-link.directive';
@@ -57,6 +55,7 @@ import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
 import { SciViewportModule } from '@scion/toolkit/viewport';
 import { SciDimensionModule } from '@scion/toolkit/dimension';
+import { SciSashboxModule } from '@scion/toolkit/sashbox';
 import { ActivityResolver } from './routing/activity.resolver';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
@@ -73,9 +72,9 @@ import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
 import { ViewMenuComponent } from './view-part/view-context-menu/view-menu.component';
 import { ViewMenuItemDirective } from './view-part/view-context-menu/view-menu.directive';
 import { WbFormatAcceleratorPipe } from './view-part/view-context-menu/accelerator-format.pipe';
-import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
 import { TextComponent } from './view-part/view-context-menu/text.component';
 import { ViewMenuService } from './view-part/view-context-menu/view-menu.service';
+import { MultiTabPartProvider, PART_PROVIDER, SingleTabPartProvider, StandalonePartProvider } from './layout/part-provider.model';
 
 @NgModule({
   imports: [
@@ -85,6 +84,7 @@ import { ViewMenuService } from './view-part/view-context-menu/view-menu.service
     ReactiveFormsModule,
     SciViewportModule,
     SciDimensionModule,
+    SciSashboxModule,
     OverlayModule,
     A11yModule,
   ],
@@ -188,15 +188,16 @@ export class WorkbenchModule {
           provide: VIEW_COMPONENT_TYPE, useValue: ViewComponent,
         },
 
+        {provide: PART_PROVIDER, useClass: SingleTabPartProvider, multi: true},
+        {provide: PART_PROVIDER, useClass: MultiTabPartProvider, multi: true},
+        {provide: PART_PROVIDER, useClass: StandalonePartProvider, multi: true},
         WorkbenchLayoutService,
         WorkbenchActivityPartService,
         WorkbenchAuxiliaryRoutesRegistrator,
         ActivityResolver,
         NotificationService,
         MessageBoxService,
-        ViewPartGridSerializerService,
         WorkbenchUrlObserver,
-        WbBeforeDestroyGuard,
         WorkbenchViewRegistry,
         WorkbenchViewPartRegistry,
         OverlayHostRef,
@@ -206,7 +207,6 @@ export class WorkbenchModule {
         PopupService,
         TaskScheduler,
         ViewActivationInstantProvider,
-        ViewPartGridProvider,
         {
           provide: APP_MESSAGE_BOX_SERVICE,
           useExisting: MessageBoxService,

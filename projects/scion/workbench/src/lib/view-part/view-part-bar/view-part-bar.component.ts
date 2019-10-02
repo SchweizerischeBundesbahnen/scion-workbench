@@ -123,8 +123,8 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
-  public get viewRefs$(): Observable<string[]> {
-    return this._viewPart.viewRefs$;
+  public get viewIds$(): Observable<string[]> {
+    return this._viewPart.viewIds$;
   }
 
   public onTabbarViewportDimensionChange(): void {
@@ -151,11 +151,12 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   private computeHiddenViewTabs(): void {
     this._viewTabs && this._viewPartService.setHiddenViewTabs(this._viewTabs
       .filter(viewTab => !viewTab.isVisibleInViewport())
-      .map(viewTab => viewTab.viewRef));
+      .map(viewTab => viewTab.viewId));
   }
 
   private scrollActiveViewTabIntoViewport(): void {
-    this._viewTabs.length && this._viewTabs.find(viewTab => viewTab.active).scrollIntoViewport();
+    const activeViewTab = this._viewTabs.find(viewTab => viewTab.active); // while dragging a view, the active view tab may not be present in the DOM
+    activeViewTab && activeViewTab.scrollIntoViewport();
   }
 
   /**
@@ -164,7 +165,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   @HostListener('dragstart')
   public onViewDragStart(): void {
     this.dragData = this._viewDragService.getViewDragData();
-    this.dragSourceViewTab = this.dropTargetViewTab = this._viewTabs.find(viewTab => viewTab.viewRef === this.dragData.viewRef);
+    this.dragSourceViewTab = this.dropTargetViewTab = this._viewTabs.find(viewTab => viewTab.viewId === this.dragData.viewId);
   }
 
   /**
@@ -232,14 +233,15 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: this.dragData.appInstanceId,
-        viewPartRef: this.dragData.viewPartRef,
-        viewRef: this.dragData.viewRef,
+        partId: this.dragData.partId,
+        primaryPart: this.dragData.primaryPart,
+        viewId: this.dragData.viewId,
         viewUrlSegments: this.dragData.viewUrlSegments,
       },
       target: {
         appInstanceId: this._workbench.appInstanceId,
         insertionIndex: dropIndex !== -1 ? dropIndex : undefined,
-        viewPartRef: this._viewPart.viewPartRef,
+        partId: this._viewPart.partId,
       },
     });
     this.unsetDragState({unsetDragSource: true});

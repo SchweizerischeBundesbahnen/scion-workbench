@@ -36,19 +36,19 @@ export class ViewPartComponent implements OnDestroy {
   @HostBinding('class.suspend-pointer-events')
   public suspendPointerEvents = false;
 
-  @HostBinding('attr.viewpartref')
-  public get viewPartRef(): string {
-    return this.viewPartService.viewPartRef;
+  @HostBinding('attr.data-partid')
+  public get partId(): string {
+    return this.viewPartService.partId;
   }
 
   constructor(private _workbench: InternalWorkbenchService,
               private _viewDragService: ViewDragService,
-              private _viewPart: WorkbenchViewPart,
+              private _part: WorkbenchViewPart,
               public viewPartService: WorkbenchViewPartService) {
-    combineLatest([this._workbench.viewPartActions$, this._viewPart.actions$, this._viewPart.viewRefs$])
+    combineLatest([this._workbench.viewPartActions$, this._part.actions$, this._part.viewIds$])
       .pipe(takeUntil(this._destroy$))
-      .subscribe(([globalActions, localActions, viewRefs]) => {
-        this.hasViews = viewRefs.length > 0;
+      .subscribe(([globalActions, localActions, viewIds]) => {
+        this.hasViews = viewIds.length > 0;
         this.hasActions = globalActions.length > 0 || localActions.length > 0;
       });
   }
@@ -65,14 +65,15 @@ export class ViewPartComponent implements OnDestroy {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: event.dragData.appInstanceId,
-        viewPartRef: event.dragData.viewPartRef,
-        viewRef: event.dragData.viewRef,
+        partId: event.dragData.partId,
+        primaryPart: event.dragData.primaryPart,
+        viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
       },
       target: {
         appInstanceId: this._workbench.appInstanceId,
-        viewPartRef: this._viewPart.viewPartRef,
-        viewPartRegion: event.dropRegion,
+        partId: this._part.partId,
+        region: event.dropRegion,
       },
     });
   }

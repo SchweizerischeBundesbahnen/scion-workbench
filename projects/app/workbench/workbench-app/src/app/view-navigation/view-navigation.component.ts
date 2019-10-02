@@ -62,7 +62,7 @@ export class ViewNavigationComponent {
       activateIfPresent: this.form.get(ACTIVATE_IF_PRESENT).value,
       closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
       target: this.form.get(TARGET).value,
-      selfViewRef: this._view.viewRef,
+      selfViewId: this._view.viewId,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
     };
 

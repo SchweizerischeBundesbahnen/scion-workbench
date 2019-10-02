@@ -46,17 +46,13 @@ export class SciViewportComponent {
   @HostBinding('attr.tabindex')
   public tabindex = -1; // make the viewport programmatically focusable but do not include it in the tab order
 
-  /**
-   * @internal
-   */
+  /** @internal */
   @ViewChild('viewport', {static: true})
   public set setViewport(viewport: ElementRef<HTMLDivElement>) {
     this._viewport = coerceElement(viewport);
   }
 
-  /**
-   * @internal
-   */
+  /** @internal */
   @ViewChild('viewport_client', {static: true})
   public set setViewportClient(viewportClient: ElementRef<HTMLDivElement>) {
     this._viewportClient = coerceElement(viewportClient);
@@ -85,9 +81,6 @@ export class SciViewportComponent {
     this._viewport && this._viewport.focus();
   }
 
-  /**
-   * @internal
-   */
   public onScroll(event: Event): void {
     this.scroll.emit(event);
   }

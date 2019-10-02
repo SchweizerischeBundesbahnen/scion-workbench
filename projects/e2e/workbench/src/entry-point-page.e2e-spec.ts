@@ -11,6 +11,7 @@
 import { AppPO } from './page-object/app.po';
 import { browser } from 'protractor';
 import { WelcomePagePO } from './page-object/welcome-page.po';
+import { MAIN_PART_ID } from '@scion/workbench/core';
 
 describe('Entry point page', () => {
 
@@ -32,10 +33,10 @@ describe('Entry point page', () => {
     await expect(appPO.isEntryPointPageShowing('app-welcome-page')).toBeFalsy();
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
     await expect(welcomePagePO.isPresent()).toBeFalsy();
-    await expect(appPO.findViewTab('viewpart.1', {cssClass: 'e2e-tile-view-1'}).isPresent).toBeTruthy();
+    await expect(appPO.findViewTab(MAIN_PART_ID, {cssClass: 'e2e-tile-view-1'}).isPresent).toBeTruthy();
 
     // Close the view
-    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-tile-view-1'}).close();
+    await appPO.findViewTab(MAIN_PART_ID, {cssClass: 'e2e-tile-view-1'}).close();
     await expect(appPO.isEntryPointPageShowing('app-welcome-page')).toBeTruthy();
     await expect(welcomePagePO.isPresent()).toBeTruthy();
     await expect(appPO.isViewTabBarShowing()).toBeFalsy();

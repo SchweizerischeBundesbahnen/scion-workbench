@@ -8,8 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-export class AssertException {
-
-  constructor(public readonly message: string) {
-  }
-}
+/*
+ * Secondary entrypoint: '@scion/workbench/core'
+ *
+ *  See https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
+ */
+export * from './constants';

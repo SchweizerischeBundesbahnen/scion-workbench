@@ -182,10 +182,10 @@ export interface ViewDragImageRect {
 
 class DragImageWorkbenchView implements WorkbenchView {
 
-  public readonly viewRef: string;
+  public readonly viewId: string;
   public readonly title: string;
   public readonly heading: string;
-  public readonly viewPart = null;
+  public readonly part = null;
   public readonly closable: boolean;
   public readonly dirty: boolean;
   public readonly destroyed = false;
@@ -200,7 +200,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly position = 0;
 
   constructor(dragData: ViewDragData) {
-    this.viewRef = dragData.viewRef;
+    this.viewId = dragData.viewId;
     this.title = dragData.viewTitle;
     this.heading = dragData.viewHeading;
     this.closable = dragData.viewClosable;

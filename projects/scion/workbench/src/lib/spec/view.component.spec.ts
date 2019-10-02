@@ -42,7 +42,7 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set dirty flag
@@ -65,7 +65,7 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set heading
@@ -88,7 +88,7 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set heading
@@ -111,7 +111,7 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     const component1: SpecView1Component = view1DebugElement.component;
@@ -122,7 +122,7 @@ describe('ViewComponent', () => {
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(B)');
 
     // Add View 2
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView2Component>('view.2');
     const component2: SpecView2Component = view2DebugElement.component;
@@ -180,14 +180,14 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     expect(view1DebugElement.view.active).toBeTruthy('(A)');
     expect(view1DebugElement.component.activated).toBeTruthy('(B)');
 
     // Add View 2
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView1Component>('view.2');
     expect(view1DebugElement.view.active).toBeFalsy('(C)');
@@ -222,14 +222,14 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     expect(view1DebugElement.view.destroyed).toBeFalsy('(A)');
     expect(view1DebugElement.component.destroyed).toBeFalsy('(B)');
 
     // Add View 2
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView1Component>('view.2');
     expect(view1DebugElement.view.destroyed).toBeFalsy('(C)');
@@ -265,7 +265,7 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
 
@@ -296,7 +296,7 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement1.component.destroyed).toBeFalsy('(A)');
@@ -304,7 +304,7 @@ describe('ViewComponent', () => {
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(C)');
 
     // Route to View 2
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1', target: 'self', selfViewRef: 'view.1'}).then();
+    wbRouter.navigate(['view-2'], {target: 'self', selfViewId: 'view.1'}).then();
     advance(fixture);
 
     const viewDebugElement2 = getViewDebugElement<SpecView2Component>('view.1');
@@ -327,7 +327,7 @@ describe('ViewComponent', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement1.component.destroyed).toBeFalsy('(A)');
@@ -342,7 +342,7 @@ describe('ViewComponent', () => {
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(F)');
 
     // Remove View 1 again
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement2 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement2.component.destroyed).toBeFalsy('(G)');
@@ -359,8 +359,8 @@ describe('ViewComponent', () => {
     tick();
   })));
 
-  function getViewDebugElement<T>(viewRef: string): ViewDebugElement<T> {
-    const view = TestBed.get(WorkbenchViewRegistry).getElseThrow(viewRef);
+  function getViewDebugElement<T>(viewId: string): ViewDebugElement<T> {
+    const view = TestBed.get(WorkbenchViewRegistry).getElseThrow(viewId);
     const viewComponent = view.portal.componentRef.instance as ViewComponent;
     const component = viewComponent.routerOutlet.component as T;
 

@@ -1,7 +1,7 @@
 <sci-viewport>
   <ul sciDimension (sciDimensionChange)="onViewportClientDimensionChange($event)">
     <li *ngFor="let hiddenViewTab of hiddenViewTabs">
-      <wb-view-tab [viewRef]="hiddenViewTab" context="tabbar-dropdown" (click)="onViewTabClick()"></wb-view-tab>
+      <wb-view-tab [viewId]="hiddenViewTab" context="tabbar-dropdown" (click)="onViewTabClick()"></wb-view-tab>
     </li>
   </ul>
 </sci-viewport>

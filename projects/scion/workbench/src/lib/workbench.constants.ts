@@ -14,6 +14,8 @@ import { InternalWorkbenchService } from './workbench.service';
 import { ViewPartComponent } from './view-part/view-part.component';
 import { ViewComponent } from './view/view.component';
 
+export { MAIN_PART_ID } from '@scion/workbench/core';
+
 /**
  * DI injection token to inject a router outlet name for {WbRouterOutletDirective}.
  *
@@ -70,14 +72,14 @@ export const ACTIVITY_DATA_KEY = 'wb.activity';
 export const VIEW_PART_REF_PREFIX = 'viewpart.';
 
 /**
- * Specifies the prefix used to name viewreferences.
+ * Specifies the prefix used to name views.
  */
 export const VIEW_REF_PREFIX = 'view.';
 
 /**
- * Specifies the HTTP query parameter name to set the viewpart grid in the URI.
+ * Specifies the HTTP query parameter name to set the parts layout in the URL.
  */
-export const VIEW_GRID_QUERY_PARAM = 'viewgrid';
+export const PARTS_LAYOUT_QUERY_PARAM = 'parts';
 
 /**
  * Defines the contexts in which a viewtab is rendered.

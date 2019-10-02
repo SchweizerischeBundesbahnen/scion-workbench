@@ -38,3 +38,4 @@ export { ContentAsOverlayComponent } from './lib/content-projection/content-as-o
 export { PopupService } from './lib/popup/popup.service';
 export { Popup, PopupConfig, Position, CloseStrategy } from './lib/popup/metadata';
 export { ViewMenuItemDirective } from './lib/view-part/view-context-menu/view-menu.directive';
+export { PartsLayout, PartOptions, ReferencePart } from './lib/layout/parts-layout';

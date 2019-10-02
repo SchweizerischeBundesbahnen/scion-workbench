@@ -46,8 +46,8 @@ export class ViewMenuService {
    *
    * @see {@link WorkbenchView.registerViewMenuItem}
    */
-  public async showMenu(location: Point, viewRef: string): Promise<boolean> {
-    const view = this._viewRegistry.getElseThrow(viewRef);
+  public async showMenu(location: Point, viewId: string): Promise<boolean> {
+    const view = this._viewRegistry.getElseThrow(viewId);
     const menuItems = await view.menuItems$.pipe(take(1)).toPromise();
 
     // Do not show the menu if there are no menu items registered.

@@ -38,28 +38,28 @@ describe('ViewOutletNavigator', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['path', 'to', 'view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['path', 'to', 'view-1']).then();
     advance(fixture);
 
     // Add View 1 again
-    wbRouter.navigate(['path', 'to', 'view-1'], {blankViewPartRef: 'viewpart.1', activateIfPresent: false}).then();
+    wbRouter.navigate(['path', 'to', 'view-1'], {activateIfPresent: false}).then();
     advance(fixture);
 
     // Add View 2
-    wbRouter.navigate(['path', 'to', 'view-2'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['path', 'to', 'view-2']).then();
     advance(fixture);
 
     // Add View 2 again (activate)
-    wbRouter.navigate(['path', 'to', 'view-2'], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
+    wbRouter.navigate(['path', 'to', 'view-2'], {activateIfPresent: true}).then();
     advance(fixture);
 
     // Add View 3
-    wbRouter.navigate(['path', 'to', 'view-3'], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
+    wbRouter.navigate(['path', 'to', 'view-3'], {activateIfPresent: true}).then();
     advance(fixture);
 
-    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view-1']).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view-2'])).toEqual(['view.3']);
-    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view-3'])).toEqual(['view.4']);
+    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view-1']).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view-2'])).toEqual(['view.3']);
+    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view-3'])).toEqual(['view.4']);
 
     tick();
   })));
@@ -70,29 +70,29 @@ describe('ViewOutletNavigator', () => {
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'A'}], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'A'}]).then();
     advance(fixture);
 
     // Add View 1 again
-    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'A'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: false}).then();
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'A'}], {activateIfPresent: false}).then();
     advance(fixture);
 
     // Add View 2
-    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'B'}], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'B'}]).then();
     advance(fixture);
 
     // Add View 2 again (activate)
-    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'B'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'B'}], {activateIfPresent: true}).then();
     advance(fixture);
 
     // Add View 3
-    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'C'}], {blankViewPartRef: 'viewpart.1', activateIfPresent: true}).then();
+    wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'C'}], {activateIfPresent: true}).then();
     advance(fixture);
 
-    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view'])).toEqual([]);
-    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'A'}]).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(['view.3'].sort());
-    expect(viewOutletNavigator.resolvePresentViewRefs(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(['view.4'].sort());
+    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view'])).toEqual([]);
+    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'A'}]).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(['view.3'].sort());
+    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(['view.4'].sort());
 
     tick();
   })));
@@ -101,7 +101,7 @@ describe('ViewOutletNavigator', () => {
 /****************************************************************************************************
  * Definition of App Test Module                                                                    *
  ****************************************************************************************************/
-@Component({selector: 'spec-view', template: '{{view.viewRef}}'})
+@Component({selector: 'spec-view', template: '{{view.viewId}}'})
 class ViewComponent {
 
   constructor(public view: WorkbenchView) {

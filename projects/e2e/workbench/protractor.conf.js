@@ -6,6 +6,11 @@ const {SpecReporter} = require('jasmine-spec-reporter');
 const puppeteer = require('puppeteer');
 const chromeArgs = ['--window-size=1920,1080'];
 
+// Allow resolving modules specified by paths in 'tsconfig', e.g., to resolve '@scion/workbench' module.
+// By default, 'ts-node' only looks in the 'node_modules' folder for modules and not in paths specified in 'tsconfig'.
+// See https://www.npmjs.com/package/tsconfig-paths
+require('tsconfig-paths/register');
+
 exports.config = {
   allScriptsTimeout: 11000,
   specs: [

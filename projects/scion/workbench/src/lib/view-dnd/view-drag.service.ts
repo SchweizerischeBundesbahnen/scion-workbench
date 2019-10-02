@@ -210,13 +210,14 @@ export interface ViewDragData {
    * Y-coordinate of the mouse pointer, relative to the view tab drag image.
    */
   viewTabPointerOffsetY: number;
-  viewRef: string;
+  viewId: string;
   viewTitle: string;
   viewUrlSegments: UrlSegment[];
   viewHeading: string;
   viewClosable: boolean;
   viewDirty: boolean;
-  viewPartRef: string;
+  partId: string;
+  primaryPart: boolean;
   viewTabWidth: number;
   viewTabHeight: number;
   appInstanceId: string;
@@ -227,14 +228,17 @@ export interface ViewDragData {
  */
 export interface ViewMoveEvent {
   source: {
-    viewRef: string;
-    viewPartRef: string;
+    viewId: string;
+    partId: string;
+    primaryPart: boolean,
     viewUrlSegments: UrlSegment[],
     appInstanceId: string;
   };
   target: {
-    viewPartRef: string;
-    viewPartRegion?: 'north' | 'east' | 'south' | 'west' | 'center';
+    partId: string;
+    /** @internal */
+    newPartId?: string;
+    region?: 'north' | 'east' | 'south' | 'west' | 'center'; // TODO use position
     insertionIndex?: number;
     appInstanceId: string | 'new';
   };

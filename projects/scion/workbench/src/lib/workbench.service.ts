@@ -17,7 +17,8 @@ import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench
 import { UUID } from './uuid.util';
 import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
 import { Arrays } from './array.util';
-import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
+import { PartsLayoutProvider } from './view-part-grid/view-part-grid-provider.service';
+import { PartsLayout } from '@scion/workbench';
 
 /**
  * Root object for the SCION Workbench.
@@ -50,21 +51,21 @@ export abstract class WorkbenchService {
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public abstract destroyView(...viewRefs: string[]): Promise<boolean>;
+  public abstract destroyView(...viewIds: string[]): Promise<boolean>;
 
   /**
    * Activates the specified view.
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public abstract activateView(viewRef: string): Promise<boolean>;
+  public abstract activateView(viewId: string): Promise<boolean>;
 
   /**
    * Returns the identity of the viewpart which contains the specified view.
    *
    * Throws an error if no viewpart contains the view.
    */
-  public abstract resolveViewPart(viewRef: string): string;
+  public abstract resolveViewPart(viewId: string): string;
 
   /**
    * Emits the views opened in the workbench.
@@ -91,6 +92,10 @@ export abstract class WorkbenchService {
    * @return {@link Disposable} to unregister the menu item.
    */
   public abstract registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable;
+
+  public abstract getPartsLayout(): PartsLayout;
+
+  public abstract updateLayout(partsLayout: PartsLayout): void;
 }
 
 @Injectable()
@@ -103,39 +108,39 @@ export class InternalWorkbenchService implements WorkbenchService {
   public readonly appInstanceId = UUID.randomUUID();
 
   constructor(private _viewOutletNavigator: ViewOutletNavigator,
-              private _viewPartGridProvider: ViewPartGridProvider,
+              private _partsLayoutProvider: PartsLayoutProvider,
               private _viewRegistry: WorkbenchViewRegistry) {
   }
 
-  public destroyView(...viewRefs: string[]): Promise<boolean> {
-    const destroyViewFn = (viewRef: string): Promise<boolean> => {
+  public destroyView(...viewIds: string[]): Promise<boolean> {
+    const destroyViewFn = (viewId: string): Promise<boolean> => {
       return this._viewOutletNavigator.navigate({
-        viewOutlet: {name: viewRef, commands: null},
-        viewGrid: this._viewPartGridProvider.grid
-          .removeView(viewRef)
+        viewOutlet: {name: viewId, commands: null},
+        partsLayout: this._partsLayoutProvider.layout
+          .removeView(viewId)
           .serialize(),
       });
     };
 
     // Use a separate navigate command to remove each view separately. Otherwise, if a view would reject destruction,
     // no view would be removed at all. Also, removal must be done sequentially to have a proper grid snapshot.
-    return viewRefs.reduce((prevDestroyPromise, viewRef) => {
-      return prevDestroyPromise.then(() => destroyViewFn(viewRef));
+    return viewIds.reduce((prevDestroyPromise, viewId) => {
+      return prevDestroyPromise.then(() => destroyViewFn(viewId));
     }, Promise.resolve(true));
   }
 
-  public activateView(viewRef: string): Promise<boolean> {
-    return this.resolveViewPartServiceElseThrow(viewRef).activateView(viewRef);
+  public activateView(viewId: string): Promise<boolean> {
+    return this.resolveViewPartServiceElseThrow(viewId).activateView(viewId);
   }
 
-  public resolveViewPart(viewRef: string): string {
-    return this.resolveViewPartServiceElseThrow(viewRef).viewPartRef;
+  public resolveViewPart(viewId: string): string {
+    return this.resolveViewPartServiceElseThrow(viewId).partId;
   }
 
-  private resolveViewPartServiceElseThrow(viewRef: string): WorkbenchViewPartService | null {
-    const viewPartService = this._viewPartServices.find(it => it.containsView(viewRef));
+  private resolveViewPartServiceElseThrow(viewId: string): WorkbenchViewPartService | null {
+    const viewPartService = this._viewPartServices.find(it => it.containsView(viewId));
     if (!viewPartService) {
-      throw Error(`No ViewPartService for View found [view=${viewRef}]`);
+      throw Error(`No ViewPartService for View found [view=${viewId}]`);
     }
     return viewPartService;
   }
@@ -167,7 +172,7 @@ export class InternalWorkbenchService implements WorkbenchService {
   }
 
   public get views$(): Observable<string[]> {
-    return this._viewRegistry.viewRefs$;
+    return this._viewRegistry.viewIds$;
   }
 
   public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
@@ -182,5 +187,13 @@ export class InternalWorkbenchService implements WorkbenchService {
     return {
       dispose: (): void => this.viewMenuItemProviders$.next(Arrays.remove(this.viewMenuItemProviders$.value, factoryFn)),
     };
+  }
+
+  public getPartsLayout(): PartsLayout {
+    return this._partsLayoutProvider.layout;
+  }
+
+  public updateLayout(partsLayout: PartsLayout): void {
+    this._viewOutletNavigator.navigate({partsLayout: partsLayout.serialize()});
   }
 }

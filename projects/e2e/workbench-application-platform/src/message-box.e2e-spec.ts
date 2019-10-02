@@ -14,6 +14,7 @@ import { browser } from 'protractor';
 import { expectViewToNotExist, expectViewToShow } from './util/testing.util';
 import { noop } from 'rxjs';
 import { Testcase61097badMessageBoxPO } from './page-object/testcase-61097bad-msgbox.po';
+import { MAIN_PART_ID } from '@scion/workbench/core';
 
 describe('MessageBox', () => {
 
@@ -133,7 +134,7 @@ describe('MessageBox', () => {
 
     // switch to disabled view
     {
-      await hostAppPO.findViewTab('viewpart.1', {cssClass: 'e2e-testing-view'}).click();
+      await hostAppPO.findViewTab(MAIN_PART_ID, {cssClass: 'e2e-testing-view'}).click();
       await expectViewToShow({symbolicAppName: 'testing-app', viewCssClass: 'e2e-testing-view', componentSelector: 'app-testing-view'});
       const msgboxPO = await hostAppPO.findMessageBox('e2e-dfa87d85eb1f-msgbox');
       await expect(msgboxPO.isDisplayed()).toBeTruthy('expected messagebox to be displayed');

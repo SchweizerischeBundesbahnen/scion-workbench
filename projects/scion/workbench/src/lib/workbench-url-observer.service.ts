@@ -14,11 +14,10 @@ import { Injectable, IterableChanges, IterableDiffers, OnDestroy } from '@angula
 import { Subject } from 'rxjs';
 import { ViewOutletDiffer } from './routing/view-outlet-differ';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
-import { VIEW_GRID_QUERY_PARAM } from './workbench.constants';
-import { ViewPartGridSerializerService } from './view-part-grid/view-part-grid-serializer.service';
+import { PARTS_LAYOUT_QUERY_PARAM } from './workbench.constants';
 import { WorkbenchViewRegistry } from './workbench-view-registry.service';
 import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
-import { ViewPartGrid } from './view-part-grid/view-part-grid.model';
+import { PartsLayout } from './layout/parts-layout';
 
 /**
  * Observes the application URL to update view and viewpart registries, and to dynamically register Angular auxiliary routes for views.
@@ -35,12 +34,12 @@ export class WorkbenchUrlObserver implements OnDestroy {
 
   constructor(private _router: Router,
               private _auxRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
-              private _viewPartGridSerializer: ViewPartGridSerializerService,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
               differs: IterableDiffers) {
     this.installNavigationStartRoutingListener(differs);
     this.installGuardsCheckEndRoutingListener(differs);
+    this.installNavigationCancelRoutingListener();
   }
 
   /**
@@ -53,9 +52,9 @@ export class WorkbenchUrlObserver implements OnDestroy {
     const viewOutletChanges = differ.diff(routerEvent.url);
     if (viewOutletChanges) {
       // Register auxiliary routes for added view outlets.
-      const viewRefs: string[] = [];
-      viewOutletChanges.forEachAddedItem(({item}) => viewRefs.push(item));
-      const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerViewAuxiliaryRoutes(...viewRefs);
+      const viewIds: string[] = [];
+      viewOutletChanges.forEachAddedItem(({item}) => viewIds.push(item));
+      const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerViewAuxiliaryRoutes(...viewIds);
 
       // Prepare undo action in case navigation is rejected, e.g. by routing guard.
       this._undoRouteRegistrationFn = (): void => {
@@ -81,9 +80,9 @@ export class WorkbenchUrlObserver implements OnDestroy {
 
     this.discardRoutesOfClosedViews(viewOutletChanges);
 
-    // Parse the ViewPartGrid from the URL.
-    const serializedViewPartGrid = this._router.parseUrl(routerEvent.url).queryParamMap.get(VIEW_GRID_QUERY_PARAM);
-    const viewPartGrid = new ViewPartGrid(serializedViewPartGrid, this._viewPartGridSerializer, this._viewRegistry);
+    // Parse the parts layout from the URL.
+    const serializedPartsLayout = this._router.parseUrl(routerEvent.url).queryParamMap.get(PARTS_LAYOUT_QUERY_PARAM);
+    const partsLayout = new PartsLayout(this._viewRegistry, serializedPartsLayout);
 
     // Update the view registry with added or removed view outlets.
     //
@@ -94,10 +93,10 @@ export class WorkbenchUrlObserver implements OnDestroy {
     // If the outlets would not be instantiated yet, they would get activated only once attached to the DOM.
     //
     // Early activation is important for inactive views to set their view title, e.g. when reloading the application.
-    this.updateViewRegistry(viewOutletChanges, viewPartGrid);
+    this.updateViewRegistry(viewOutletChanges, partsLayout);
 
     // Update the grid after routing completed to not run into following error: 'Cannot activate an already activated outlet'.
-    this.whenNavigatedThen(() => this._viewPartRegistry.setGrid(viewPartGrid));
+    this.whenNavigatedThen(() => this._viewPartRegistry.setPartsLayout(partsLayout));
   }
 
   private discardRoutesOfClosedViews(viewOutletChanges: IterableChanges<string>): void {
@@ -117,11 +116,11 @@ export class WorkbenchUrlObserver implements OnDestroy {
     }
   }
 
-  private updateViewRegistry(viewOutletChanges: IterableChanges<string>, viewPartGrid: ViewPartGrid): void {
+  private updateViewRegistry(viewOutletChanges: IterableChanges<string>, partsLayout: PartsLayout): void {
     if (viewOutletChanges) {
       viewOutletChanges.forEachAddedItem(({item}) => {
         // Note: registering a view outlet instantiates a new 'ViewComponent' with the view's named router outlet
-        this._viewRegistry.addViewOutlet(item, viewPartGrid.isViewActive(item));
+        this._viewRegistry.addViewOutlet(item, partsLayout.isViewActive(item));
       });
       viewOutletChanges.forEachRemovedItem(({item}) => {
         this._viewRegistry.removeViewOutlet(item);
@@ -156,6 +155,20 @@ export class WorkbenchUrlObserver implements OnDestroy {
       )
       .subscribe((routerEvent: GuardsCheckEnd) => {
         this.onGuardsCheckEnd(routerEvent, outletDiffer);
+      });
+  }
+
+  private installNavigationCancelRoutingListener(): void {
+    this._router.events
+      .pipe(
+        filter(event => event instanceof NavigationCancel),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        if (this._undoRouteRegistrationFn) {
+          this._undoRouteRegistrationFn();
+          this._undoRouteRegistrationFn = null;
+        }
       });
   }
 

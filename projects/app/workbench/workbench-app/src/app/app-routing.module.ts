@@ -14,11 +14,11 @@ const routes: Routes = [
   {path: 'welcome', component: WelcomePageComponent},
   {path: 'activity-1a90c8d31-1', component: Activity1a90c8d31Component},
   {path: 'activity-1a90c8d31-2', component: Activity1a90c8d32Component},
-  {path: 'view', component: ViewComponent},
+  {path: 'view', component: ViewComponent, data: {part: 'topLeft'}},
   {path: 'view-4a3a8932', component: View4a3a8932Component},
   {path: 'view-bb9700a6', component: ViewBb9700a6Component},
   {path: 'view-navigation', component: ViewNavigationComponent},
-  {path: 'view-interaction', component: ViewInterationComponent},
+  {path: 'view-interaction', component: ViewInterationComponent, data: {part: 'bottomLeft'}},
 ];
 
 @NgModule({

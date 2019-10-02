@@ -17,7 +17,7 @@ import { delay, filter, map, take, takeUntil } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 import { ViewDragService } from './view-dnd/view-drag.service';
-import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
+import { PartsLayoutProvider } from './view-part-grid/view-part-grid-provider.service';
 import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
 
 /**
@@ -35,23 +35,23 @@ export class WorkbenchViewRegistry implements OnDestroy {
               private _injector: Injector,
               private _viewActivationInstantProvider: ViewActivationInstantProvider,
               private _viewDragService: ViewDragService,
-              private _viewPartGridProvider: ViewPartGridProvider) {
+              private _partsLayoutProvider: PartsLayoutProvider) {
   }
 
   /**
    * Creates a {WorkbenchView} for the given view reference and adds it to this registry.
    */
-  public addViewOutlet(viewRef: string, active: boolean): void {
-    this._viewRegistry.set(viewRef, this.createWorkbenchView(viewRef, active));
+  public addViewOutlet(viewId: string, active: boolean): void {
+    this._viewRegistry.set(viewId, this.createWorkbenchView(viewId, active));
     asapScheduler.schedule(() => this._viewRegistryChange$.next()); // emit outside routing
   }
 
   /**
    * Destroys the view of the given view reference and removes it from this registry.
    */
-  public removeViewOutlet(viewRef: string): void {
-    this._viewRegistry.get(viewRef).portal.destroy();
-    this._viewRegistry.delete(viewRef);
+  public removeViewOutlet(viewId: string): void {
+    this._viewRegistry.get(viewId).portal.destroy();
+    this._viewRegistry.delete(viewId);
     asapScheduler.schedule(() => this._viewRegistryChange$.next()); // emit outside routing
   }
 
@@ -66,24 +66,24 @@ export class WorkbenchViewRegistry implements OnDestroy {
   }
 
   /**
-   * Returns the view for the specified 'viewRef', or throws an Error if not found.
+   * Returns the {@link WorkbenchView} of the given identity, or throws an Error if not found.
    */
-  public getElseThrow(viewRef: string): InternalWorkbenchView {
-    const view = this._viewRegistry.get(viewRef);
+  public getElseThrow(viewId: string): InternalWorkbenchView {
+    const view = this._viewRegistry.get(viewId);
     if (!view) {
-      throw Error(`[IllegalStateError] view '${viewRef}' not contained in the view registry`);
+      throw Error(`[IllegalStateError] view '${viewId}' not contained in the view registry`);
     }
     return view;
   }
 
   /**
-   * Returns the view for the specified 'viewRef', or 'null' if not found.
+   * Returns the {@link WorkbenchView} of the given identity, or returns `null` if not found.
    */
-  public getElseNull(viewRef: string): InternalWorkbenchView | null {
-    return this._viewRegistry.get(viewRef) || null;
+  public getElseNull(viewId: string): InternalWorkbenchView | null {
+    return this._viewRegistry.get(viewId) || null;
   }
 
-  public get viewRefs(): string[] {
+  public get viewIds(): string[] {
     return Array.from(this._viewRegistry.keys());
   }
 
@@ -93,21 +93,21 @@ export class WorkbenchViewRegistry implements OnDestroy {
    * Upon subscription, the currently opened views are emitted, and then emits continuously
    * when new views are opened or existing views closed. It never completes.
    */
-  public get viewRefs$(): Observable<string[]> {
-    return merge(this._viewRegistryChange$, this.initialNavigationNotifier$).pipe(map(() => this.viewRefs));
+  public get viewIds$(): Observable<string[]> {
+    return merge(this._viewRegistryChange$, this.initialNavigationNotifier$).pipe(map(() => this.viewIds));
   }
 
   public ngOnDestroy(): void {
     this._destroy$.next();
   }
 
-  private createWorkbenchView(viewRef: string, active: boolean): InternalWorkbenchView {
+  private createWorkbenchView(viewId: string, active: boolean): InternalWorkbenchView {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_COMPONENT_TYPE));
-    const view = new InternalWorkbenchView(viewRef, active, portal, this._injector.get(WORKBENCH), this._viewActivationInstantProvider, this._router, this._viewDragService, this._injector.get(WorkbenchViewPartRegistry), this._viewPartGridProvider);
+    const view = new InternalWorkbenchView(viewId, active, portal, this._injector.get(WORKBENCH), this._viewActivationInstantProvider, this._router, this._viewDragService, this._injector.get(WorkbenchViewPartRegistry), this._partsLayoutProvider);
 
     portal.init({
       injectorTokens: new WeakMap()
-        .set(ROUTER_OUTLET_NAME, viewRef)
+        .set(ROUTER_OUTLET_NAME, viewId)
         .set(WorkbenchView, view)
         .set(InternalWorkbenchView, view),
       onAttach: (): void => view.activate(true),

@@ -38,7 +38,7 @@ const AUXILARY_MOUSE_BUTTON = 4;
 export class ViewTabComponent implements OnDestroy {
 
   private _destroy$: Subject<void> = new Subject<void>();
-  private _viewRefChange$ = new Subject<void>();
+  private _viewIdChange$ = new Subject<void>();
   private _context: 'tabbar' | 'tabbar-dropdown';
 
   public host: HTMLElement;
@@ -46,11 +46,11 @@ export class ViewTabComponent implements OnDestroy {
   public viewTabContentPortal: ComponentPortal<any>;
 
   @Input()
-  @HostBinding('attr.viewref')
-  public set viewRef(viewRef: string) {
-    this.view = this._viewRegistry.getElseThrow(viewRef);
+  @HostBinding('attr.data-viewid')
+  public set viewId(viewId: string) {
+    this.view = this._viewRegistry.getElseThrow(viewId);
     this.viewTabContentPortal = this.createViewTabContentPortal();
-    this._viewRefChange$.next();
+    this._viewIdChange$.next();
   }
 
   constructor(host: ElementRef<HTMLElement>,
@@ -93,7 +93,7 @@ export class ViewTabComponent implements OnDestroy {
 
   @HostListener('click')
   public onClick(): void {
-    this._viewPartService.activateView(this.viewRef).then();
+    this._viewPartService.activateView(this.viewId).then();
   }
 
   @HostListener('mousedown', ['$event'])
@@ -107,7 +107,7 @@ export class ViewTabComponent implements OnDestroy {
 
   @HostListener('contextmenu', ['$event'])
   public onContextmenu(event: MouseEvent): void {
-    this._viewContextMenuService.showMenu({x: event.clientX, y: event.clientY}, this.viewRef).then();
+    this._viewContextMenuService.showMenu({x: event.clientX, y: event.clientY}, this.viewId).then();
     event.stopPropagation();
     event.preventDefault();
   }
@@ -124,20 +124,21 @@ export class ViewTabComponent implements OnDestroy {
 
   @HostListener('dragstart', ['$event'])
   public onDragStart(event: DragEvent): void {
-    this._viewPartService.activateView(this.viewRef).then(() => {
+    this._viewPartService.activateView(this.viewId).then(() => {
       event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData(VIEW_DRAG_TRANSFER_TYPE, this.view.viewRef);
+      event.dataTransfer.setData(VIEW_DRAG_TRANSFER_TYPE, this.view.viewId);
       // Use an invisible <div> as the native drag image because the effective drag image is rendered by {ViewTabDragImageRenderer}.
       event.dataTransfer.setDragImage(createElement('div', {style: {display: 'none'}}), 0, 0);
 
       this._viewDragService.setViewDragData({
-        viewRef: this.view.viewRef,
+        viewId: this.view.viewId,
         viewTitle: this.view.title,
         viewHeading: this.view.heading,
         viewClosable: this.view.closable,
         viewDirty: this.view.dirty,
         viewUrlSegments: this.view.urlSegments,
-        viewPartRef: this.view.viewPart.viewPartRef,
+        partId: this.view.part.partId,
+        primaryPart: this.view.part.primary,
         viewTabPointerOffsetX: event.offsetX,
         viewTabPointerOffsetY: event.offsetY,
         viewTabWidth: (event.target as HTMLElement).offsetWidth,
@@ -151,7 +152,7 @@ export class ViewTabComponent implements OnDestroy {
   public onDragEnd(event: DragEvent): void {
     // Ensure this view stays activated if the user cancels the drag operation.
     if (event.dataTransfer.dropEffect === 'none') {
-      this._viewPartService.activateView(this.viewRef).then();
+      this._viewPartService.activateView(this.viewId).then();
     }
     this._viewDragService.unsetViewDragData();
   }
@@ -172,8 +173,8 @@ export class ViewTabComponent implements OnDestroy {
     }
   }
 
-  public get viewRef(): string {
-    return this.view.viewRef;
+  public get viewId(): string {
+    return this.view.viewId;
   }
 
   /**
@@ -207,7 +208,7 @@ export class ViewTabComponent implements OnDestroy {
   private installViewCssClassListener(): void {
     const differ = this._differs.find([]).create<string>();
 
-    this._viewRefChange$
+    this._viewIdChange$
       .pipe(
         switchMap(() => this.view.cssClasses$),
         map(cssClasses => differ.diff(cssClasses)),
@@ -221,7 +222,7 @@ export class ViewTabComponent implements OnDestroy {
   }
 
   private installViewMenuItemAccelerators(): void {
-    this._viewRefChange$
+    this._viewIdChange$
       .pipe(
         switchMap(() => this._viewContextMenuService.installMenuItemAccelerators$(this.host, this.view)),
         takeUntil(this._destroy$),

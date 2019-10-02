@@ -1,36 +1,36 @@
 import { Injectable } from '@angular/core';
-import { ViewPartGrid } from './view-part-grid.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { PartsLayout } from '../layout/parts-layout';
 
 /**
- * Provides access to the viewpart grid which represents the visual arrangement of the viewparts.
+ * Provides the layout with the visual arrangement of the parts.
  */
-@Injectable()
-export class ViewPartGridProvider {
+@Injectable({providedIn: 'root'})
+export class PartsLayoutProvider {
 
-  private readonly _grid$ = new BehaviorSubject<ViewPartGrid>(null);
+  private readonly _layout$ = new BehaviorSubject<PartsLayout>(null);
 
   /**
-   * Sets the given viewpart grid.
+   * Sets the given {@link PartsLayout}.
    */
-  public setGrid(grid: ViewPartGrid): void {
-    this._grid$.next(grid);
+  public setLayout(layout: PartsLayout): void {
+    this._layout$.next(layout);
   }
 
   /**
-   * Returns a reference to the viewpart grid, if any. Is `null` until the initial navigation is performed.
+   * Returns a reference to current {@link PartsLayout}, if any. Is `null` until the initial navigation is performed.
    */
-  public get grid(): ViewPartGrid {
-    return this._grid$.value;
+  public get layout(): PartsLayout {
+    return this._layout$.value;
   }
 
   /**
-   * Emits the viewpart grid.
+   * Emits the current {@link PartsLayout}.
    *
-   * Upon subscription, the current grid is emitted, if any, and then emits continuously when the grid changes. It never completes.
+   * Upon subscription, the current layout is emitted, if any, and then emits continuously when the layout changes. It never completes.
    */
-  public get grid$(): Observable<ViewPartGrid> {
-    return this._grid$.pipe(filter(Boolean));
+  public get layout$(): Observable<PartsLayout> {
+    return this._layout$.pipe(filter(Boolean));
   }
 }

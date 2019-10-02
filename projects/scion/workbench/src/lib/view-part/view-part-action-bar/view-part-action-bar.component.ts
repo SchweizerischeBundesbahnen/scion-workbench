@@ -28,8 +28,8 @@ export class ViewPartActionBarComponent {
   public endActions$: Observable<WorkbenchViewPartAction[]>;
 
   constructor(private _viewPart: WorkbenchViewPart, workbenchService: InternalWorkbenchService, viewPartService: WorkbenchViewPartService) {
-    this.startActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewRef$]).pipe(combineAndFilterViewPartActions('start'));
-    this.endActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewRef$]).pipe(combineAndFilterViewPartActions('end'));
+    this.startActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewId$]).pipe(combineAndFilterViewPartActions('start'));
+    this.endActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewId$]).pipe(combineAndFilterViewPartActions('end'));
   }
 
   public isTemplate(action: WorkbenchViewPartAction): boolean {
@@ -44,10 +44,10 @@ export class ViewPartActionBarComponent {
 }
 
 function combineAndFilterViewPartActions(align: 'start' | 'end'): OperatorFunction<[WorkbenchViewPartAction[], WorkbenchViewPartAction[], string], WorkbenchViewPartAction[]> {
-  return map(([localActions, globalActions, activeViewRef]: [WorkbenchViewPartAction[], WorkbenchViewPartAction[], string]): WorkbenchViewPartAction[] => {
+  return map(([localActions, globalActions, activeViewId]: [WorkbenchViewPartAction[], WorkbenchViewPartAction[], string]): WorkbenchViewPartAction[] => {
       return [...localActions, ...globalActions]
         .filter(action => (action.align || 'start') === align)
-        .filter(action => !action.viewRef || action.viewRef === activeViewRef);
+        .filter(action => !action.viewId || action.viewId === activeViewId);
     },
   );
 }

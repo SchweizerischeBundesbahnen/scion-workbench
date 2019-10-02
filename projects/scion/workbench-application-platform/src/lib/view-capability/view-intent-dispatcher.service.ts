@@ -71,8 +71,8 @@ export class ViewIntentDispatcher implements OnDestroy {
         const extras: WbNavigationExtras = {
           activateIfPresent: intentMessage.payload.activateIfPresent,
           closeIfPresent: intentMessage.payload.closeIfPresent,
-          selfViewRef: view && view.viewRef,
-          blankViewPartRef: view && this._workbench.resolveViewPart(view.viewRef),
+          selfViewId: view && view.viewId,
+          blankPartId: view && this._workbench.resolveViewPart(view.viewId),
           blankInsertionIndex: intentMessage.payload.blankInsertionIndex,
         };
 
@@ -83,7 +83,7 @@ export class ViewIntentDispatcher implements OnDestroy {
         }
         else {
           extras.target = 'self';
-          extras.selfViewRef = target;
+          extras.selfViewId = target;
         }
 
         const commands = this.createNavigateCommands(viewCapability, matrixParamObject, envelope.message.qualifier);

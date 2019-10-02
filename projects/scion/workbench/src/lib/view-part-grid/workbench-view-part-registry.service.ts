@@ -11,10 +11,10 @@
 import { ComponentFactoryResolver, Injectable, Injector, IterableDiffers } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { InternalWorkbenchViewPart, WorkbenchViewPart } from '../workbench.model';
-import { ViewPartGrid, ViewPartGridNode } from './view-part-grid.model';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { VIEW_PART_COMPONENT_TYPE } from '../workbench.constants';
-import { ViewPartGridProvider } from './view-part-grid-provider.service';
+import { PartsLayoutProvider } from './view-part-grid-provider.service';
+import { PartsLayout } from '../layout/parts-layout';
 
 /**
  * Registry for {WorkbenchViewPart} objects.
@@ -28,39 +28,34 @@ export class WorkbenchViewPartRegistry {
               private _injector: Injector,
               private _componentFactoryResolver: ComponentFactoryResolver,
               private _layoutService: WorkbenchLayoutService,
-              private _viewPartGridProvider: ViewPartGridProvider) {
+              private _partsLayoutProvider: PartsLayoutProvider) {
   }
 
   /**
    * Sets the given viewpart grid.
    */
-  public setGrid(newGrid: ViewPartGrid): void {
-    const prevGrid = this._viewPartGridProvider.grid;
+  public setPartsLayout(newPartsLayout: PartsLayout): void {
+    const prevLayout = this._partsLayoutProvider.layout;
 
-    if (prevGrid && prevGrid.serialize() === newGrid.serialize()) {
-      return; // no grid change
+    if (prevLayout && prevLayout.serialize() === newPartsLayout.serialize()) {
+      return; // no layout change
     }
 
     // Initialize a viewpart differ
     const viewPartsDiffer = this._differs.find([]).create<string>();
-    prevGrid && viewPartsDiffer.diff(prevGrid.viewPartRefs());
+    prevLayout && viewPartsDiffer.diff(prevLayout.parts.map(part => part.partId));
 
     // Register new viewparts
-    const viewPartsChange = viewPartsDiffer.diff(newGrid.viewPartRefs());
+    const viewPartsChange = viewPartsDiffer.diff(newPartsLayout.parts.map(part => part.partId));
     viewPartsChange && viewPartsChange.forEachAddedItem(({item}) => {
       this._viewPartRegistry.set(item, this.createWorkbenchViewPart(item));
     });
 
-    // Set viewpart properties
-    newGrid.visit((newGridNode: ViewPartGridNode): boolean => {
-      const viewPart = this.getElseThrow(newGridNode.viewPartRef);
-      viewPart.viewRefs = newGridNode.viewRefs;
-      viewPart.activeViewRef = newGridNode.activeViewRef;
-      return true;
-    });
+    // Set part properties
+    newPartsLayout.parts.forEach(part => this.getElseThrow(part.partId).setPart(part));
 
     // Notify about the grid change
-    this._viewPartGridProvider.setGrid(newGrid);
+    this._partsLayoutProvider.setLayout(newPartsLayout);
 
     // Destroy viewparts which are no longer used.
     //
@@ -75,9 +70,9 @@ export class WorkbenchViewPartRegistry {
     this._layoutService.afterGridChange$.next();
   }
 
-  private createWorkbenchViewPart(viewPartRef: string): InternalWorkbenchViewPart {
+  private createWorkbenchViewPart(partId: string): InternalWorkbenchViewPart {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_PART_COMPONENT_TYPE));
-    const viewPart = new InternalWorkbenchViewPart(viewPartRef, portal);
+    const viewPart = new InternalWorkbenchViewPart(partId, portal);
 
     portal.init({
       injectorTokens: new WeakMap()
@@ -89,12 +84,12 @@ export class WorkbenchViewPartRegistry {
   }
 
   /**
-   * Returns the viewpart for the specified 'viewPartRef', or throws an Error if not found.
+   * Returns the {@link WorkbenchViewPart} of the given identity, or throws an Error if not found.
    */
-  public getElseThrow(viewPartRef: string): InternalWorkbenchViewPart {
-    const viewPart = this._viewPartRegistry.get(viewPartRef);
+  public getElseThrow(partId: string): InternalWorkbenchViewPart {
+    const viewPart = this._viewPartRegistry.get(partId);
     if (!viewPart) {
-      throw Error(`[IllegalStateError] viewpart '${viewPartRef}' not contained in the viewpart registry`);
+      throw Error(`[IllegalStateError] Part '${partId}' not contained in the part registry`);
     }
     return viewPart;
   }

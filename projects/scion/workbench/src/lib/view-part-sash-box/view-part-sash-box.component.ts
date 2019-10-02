@@ -8,95 +8,86 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostBinding, Input, OnDestroy } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { ViewPartComponent } from '../view-part/view-part.component';
 import { WorkbenchViewPartRegistry } from '../view-part-grid/workbench-view-part-registry.service';
-import { VIEW_PART_REF_INDEX, ViewPartSashBox } from '../view-part-grid/view-part-grid-serializer.service';
-import { debounceTime, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
-import { ViewPartGridProvider } from '../view-part-grid/view-part-grid-provider.service';
+import { PartsLayoutProvider } from '../view-part-grid/view-part-grid-provider.service';
+import { Part, TreeNode } from '../layout/parts-layout.model';
 
 /**
- * Building block to render the viewpart portal grid.
+ * Visual representation of a {@link TreeNode} in {@link PartsLayout}.
  */
 @Component({
   selector: 'wb-view-part-sash-box',
   templateUrl: './view-part-sash-box.component.html',
   styleUrls: ['./view-part-sash-box.component.scss'],
 })
-export class ViewPartSashBoxComponent implements OnDestroy {
+export class ViewPartSashBoxComponent {
 
-  private _destroy$ = new Subject<void>();
-  private _sash$ = new Subject<void>();
+  private _treeNode: TreeNode;
+
+  public sash1: Sash;
+  public sash2: Sash;
 
   @Input()
-  public sashBox: ViewPartSashBox;
-
-  @HostBinding('class.split-vertical')
-  public get splitVertical(): boolean {
-    return !this.sashBox.hsplit;
+  public set treeNode(treeNode: TreeNode) {
+    this._treeNode = treeNode;
+    this.sash1 = this.createSash(treeNode.child1, treeNode.ratio);
+    this.sash2 = this.createSash(treeNode.child2, 1 - treeNode.ratio);
   }
 
-  @HostBinding('class.split-horizontal')
-  public get splitHorizontal(): boolean {
-    return this.sashBox.hsplit;
-  }
-
-  constructor(private _host: ElementRef,
-              private _viewOutletNavigator: ViewOutletNavigator,
+  constructor(private _viewOutletNavigator: ViewOutletNavigator,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _viewPartGridProvider: ViewPartGridProvider,
+              private _partsLayoutProvider: PartsLayoutProvider,
               private _workbenchLayout: WorkbenchLayoutService) {
-    this.installSashListener();
+  }
+
+  public get nodeId(): string {
+    return this._treeNode.nodeId;
+  }
+
+  public get direction(): 'column' | 'row' {
+    return this._treeNode.direction;
   }
 
   public onSashStart(): void {
     this._workbenchLayout.viewSashDrag$.next('start');
   }
 
-  public onSash(deltaPx: number): void {
-    const host = this._host.nativeElement as HTMLElement;
-    const hostSizePx = (this.splitVertical ? host.clientWidth : host.clientHeight);
-    this.sashBox.splitter = this.sashPositionFr + (deltaPx / hostSizePx);
-    this._sash$.next();
-  }
+  public onSashEnd(sashSizes: (string | number)[]): void {
+    // assert sash sizes to be a fraction and not a fixed size
+    sashSizes.forEach(sashSize => {
+      if (typeof sashSize !== 'number') {
+        throw Error(`[IllegalSashSizeError] Sash size expected to be a fraction [actual=${sashSize}]`);
+      }
+    });
 
-  public onSashEnd(): void {
+    const sashSize1 = sashSizes[0] as number;
+    const sashSize2 = sashSizes[1] as number;
+    const ratio = sashSize1 / (sashSize1 + sashSize2);
+
     this._workbenchLayout.viewSashDrag$.next('end');
+
+    const serializedLayout = this._partsLayoutProvider.layout
+      .setNodeSplitterPosition(this._treeNode.nodeId, ratio)
+      .serialize();
+    this._viewOutletNavigator.navigate({partsLayout: serializedLayout}).then();
   }
 
-  public get sashPositionFr(): number {
-    return this.sashBox.splitter;
+  private createSash(content: TreeNode | Part, size: number): Sash {
+    return {
+      portal: content instanceof Part ? this._viewPartRegistry.getElseThrow(content.partId).portal : null,
+      treeNode: content instanceof TreeNode ? content : null,
+      size: Math.max(1, size * 1000000), // the proportion for flexible sized sashes must be >=1
+    };
   }
+}
 
-  public sashAsViewPartPortal(which: 'sash1' | 'sash2'): WbComponentPortal<ViewPartComponent> {
-    const sash = (which === 'sash1' ? this.sashBox.sash1 : this.sashBox.sash2);
-    return Array.isArray(sash) ? this._viewPartRegistry.getElseThrow(sash[VIEW_PART_REF_INDEX]).portal : null;
-  }
-
-  public sashAsSashBox(which: 'sash1' | 'sash2'): ViewPartSashBox {
-    const sash = (which === 'sash1' ? this.sashBox.sash1 : this.sashBox.sash2);
-    return !Array.isArray(sash) ? sash : null;
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
-
-  private installSashListener(): void {
-    this._sash$
-      .pipe(
-        takeUntil(this._destroy$),
-        debounceTime(500),
-      )
-      .subscribe(() => {
-        const serializedGrid = this._viewPartGridProvider.grid
-          .splitPosition(this.sashBox.id, this.sashBox.splitter)
-          .serialize();
-        this._viewOutletNavigator.navigate({viewGrid: serializedGrid}).then();
-      });
-  }
+export interface Sash {
+  treeNode?: TreeNode;
+  portal?: WbComponentPortal<ViewPartComponent>;
+  size: number;
 }

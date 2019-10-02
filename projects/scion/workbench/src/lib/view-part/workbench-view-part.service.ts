@@ -14,7 +14,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
-import { ViewPartGridProvider } from '../view-part-grid/view-part-grid-provider.service';
+import { PartsLayoutProvider } from '../view-part-grid/view-part-grid-provider.service';
 
 // TODO [issue/163] remove this service and move functionality to {WorkbenchViewPart}
 @Injectable()
@@ -26,37 +26,37 @@ export class WorkbenchViewPartService implements OnDestroy {
   constructor(private _workbench: InternalWorkbenchService,
               private _viewOutletNavigator: ViewOutletNavigator,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _viewPartGridProvider: ViewPartGridProvider,
+              private _partsLayoutProvider: PartsLayoutProvider,
               private _viewPart: InternalWorkbenchViewPart) {
     this._workbench.registerViewPartService(this);
     this.activate();
   }
 
-  public get viewPartRef(): string {
-    return this._viewPart.viewPartRef;
+  public get partId(): string {
+    return this._viewPart.partId;
   }
 
-  public get viewRefs(): string[] {
-    return this._viewPart.viewRefs;
+  public get viewIds(): string[] {
+    return this._viewPart.viewIds;
   }
 
   /**
    * Emits the views contained in this viewpart.
    */
-  public get viewRefs$(): Observable<string[]> {
-    return this._viewPart.viewRefs$;
+  public get viewIds$(): Observable<string[]> {
+    return this._viewPart.viewIds$;
   }
 
-  public get activeViewRef(): string | null {
-    return this._viewPart.activeViewRef;
+  public get activeViewId(): string | null {
+    return this._viewPart.activeViewId;
   }
 
-  public get activeViewRef$(): Observable<string | null> {
-    return this._viewPart.activeViewRef$;
+  public get activeViewId$(): Observable<string | null> {
+    return this._viewPart.activeViewId$;
   }
 
   public get activeView(): InternalWorkbenchView | null {
-    return this._viewRegistry.getElseNull(this._viewPart.activeViewRef);
+    return this._viewRegistry.getElseNull(this._viewPart.activeViewId);
   }
 
   /**
@@ -66,8 +66,8 @@ export class WorkbenchViewPartService implements OnDestroy {
     this._workbench.activeViewPartService = this;
   }
 
-  public containsView(viewRef: string): boolean {
-    return this._viewPart.viewRefs.includes(viewRef);
+  public containsView(viewId: string): boolean {
+    return this._viewPart.viewIds.includes(viewId);
   }
 
   /**
@@ -76,7 +76,7 @@ export class WorkbenchViewPartService implements OnDestroy {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public destroyActiveView(): Promise<boolean> {
-    return this.activeViewRef && this._workbench.destroyView(this.activeViewRef) || Promise.resolve(true);
+    return this.activeViewId && this._workbench.destroyView(this.activeViewId) || Promise.resolve(true);
   }
 
   /**
@@ -85,7 +85,7 @@ export class WorkbenchViewPartService implements OnDestroy {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public remove(): Promise<boolean> {
-    return this._workbench.destroyView(...this.viewRefs);
+    return this._workbench.destroyView(...this.viewIds);
   }
 
   /**
@@ -93,16 +93,16 @@ export class WorkbenchViewPartService implements OnDestroy {
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public activateView(viewRef: string): Promise<boolean> {
-    if (this.activeViewRef === viewRef) {
+  public activateView(viewId: string): Promise<boolean> {
+    if (this.activeViewId === viewId) {
       return Promise.resolve(true);
     }
 
-    const serializedGrid = this._viewPartGridProvider.grid
-      .activateView(this._viewPart.viewPartRef, viewRef)
+    const serializedLayout = this._partsLayoutProvider.layout
+      .activateView(viewId)
       .serialize();
 
-    return this._viewOutletNavigator.navigate({viewGrid: serializedGrid});
+    return this._viewOutletNavigator.navigate({partsLayout: serializedLayout});
   }
 
   /**
@@ -111,31 +111,31 @@ export class WorkbenchViewPartService implements OnDestroy {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public activateSiblingView(): Promise<boolean> {
-    const grid = this._viewPartGridProvider.grid;
+    const grid = this._partsLayoutProvider.layout;
 
-    const serializedGrid = grid
-      .activateSiblingView(this.viewPartRef, this.activeViewRef)
+    const serializedLayout = grid
+      .activateSiblingView(this.activeViewId)
       .serialize();
 
-    return this._viewOutletNavigator.navigate({viewGrid: serializedGrid});
+    return this._viewOutletNavigator.navigate({partsLayout: serializedLayout});
   }
 
-  public isViewActive(viewRef: string): boolean {
-    return this.activeViewRef === viewRef;
+  public isViewActive(viewId: string): boolean {
+    return this.activeViewId === viewId;
   }
 
   public viewCount(): number {
-    return this.viewRefs.length;
+    return this.viewIds.length;
   }
 
-  public setHiddenViewTabs(viewRefs: string[]): void {
+  public setHiddenViewTabs(viewIds: string[]): void {
     this._hiddenViewTabs.clear();
-    viewRefs.forEach(viewRef => this._hiddenViewTabs.add(viewRef));
-    this._hiddenViewTabs$.next(viewRefs);
+    viewIds.forEach(viewId => this._hiddenViewTabs.add(viewId));
+    this._hiddenViewTabs$.next(viewIds);
   }
 
-  public isViewTabHidden(viewRef: string): boolean {
-    return this._hiddenViewTabs.has(viewRef);
+  public isViewTabHidden(viewId: string): boolean {
+    return this._hiddenViewTabs.has(viewId);
   }
 
   public get hiddenViewTabCount(): number {

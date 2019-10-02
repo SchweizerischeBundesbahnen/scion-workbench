@@ -22,8 +22,9 @@ import { Router, UrlSegment } from '@angular/router';
 import { ViewDragService } from './view-dnd/view-drag.service';
 import { filterArray, mapArray } from './operators';
 import { map } from 'rxjs/operators';
-import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
+import { PartsLayoutProvider } from './view-part-grid/view-part-grid-provider.service';
 import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
+import { Part } from './layout/parts-layout.model';
 
 /**
  * A view is a visual component within the Workbench to present content,
@@ -34,14 +35,14 @@ export abstract class WorkbenchView {
   /**
    * View outlet identity which is unique in this application.
    */
-  public readonly viewRef: string;
+  public readonly viewId: string;
 
   /**
    * The viewpart which contains this view.
    *
    * Note: the viewpart of a view can change, e.g. when the view is moved to another viewpart.
    */
-  public readonly viewPart: WorkbenchViewPart;
+  public readonly part: WorkbenchViewPart;
 
   /**
    * Specifies the title to be displayed in the view tab.
@@ -128,7 +129,7 @@ export abstract class WorkbenchView {
   public abstract close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean>;
 
   /**
-   * Moves this view to a new viewpart in the specified region, or to a new browser window if 'blank-window'.
+   * Moves this view to a new part in the specified region, or to a new browser window if 'blank-window'.
    */
   public abstract move(region: 'north' | 'south' | 'west' | 'east' | 'blank-window'): Promise<boolean>;
 
@@ -165,7 +166,7 @@ export class InternalWorkbenchView implements WorkbenchView {
   public readonly cssClasses$: BehaviorSubject<string[]>;
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
 
-  constructor(public readonly viewRef: string,
+  constructor(public readonly viewId: string,
               active: boolean,
               public readonly portal: WbComponentPortal<ViewComponent>,
               private _workbench: InternalWorkbenchService,
@@ -173,10 +174,10 @@ export class InternalWorkbenchView implements WorkbenchView {
               private _router: Router,
               private _viewDragService: ViewDragService,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _viewPartGridProvider: ViewPartGridProvider) {
+              private _partsLayoutProvider: PartsLayoutProvider) {
     this.active$ = new BehaviorSubject<boolean>(active);
     this.cssClasses$ = new BehaviorSubject<string[]>([]);
-    this.title = viewRef;
+    this.title = viewId;
     this.closable = true;
 
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbench.viewMenuItemProviders$])
@@ -192,11 +193,11 @@ export class InternalWorkbenchView implements WorkbenchView {
   }
 
   public get last(): boolean {
-    return this.position === this.viewPart.viewRefs.length - 1;
+    return this.position === this.part.viewIds.length - 1;
   }
 
   public get position(): number {
-    return this.viewPart.viewRefs.indexOf(this.viewRef);
+    return this.part.viewIds.indexOf(this.viewId);
   }
 
   public set cssClass(cssClass: string | string[]) {
@@ -218,10 +219,10 @@ export class InternalWorkbenchView implements WorkbenchView {
     this.active$.next(activate);
   }
 
-  public get viewPart(): WorkbenchViewPart {
-    // DO NOT resolve the viewpart at construction time because it can change, e.g. when this view is moved to another viewpart.
+  public get part(): WorkbenchViewPart {
+    // DO NOT resolve the part at construction time because it can change, e.g. when this view is moved to another part.
 
-    // Lookup the viewpart from the element injector.
+    // Lookup the part from the element injector.
     // The element injector is only available for the currently active view. Inactive views are removed
     // from the Angular component tree and have, therefore, no element injector.
     const viewPart = this.portal.injector.get(WorkbenchViewPart as Type<WorkbenchViewPart>, null);
@@ -230,28 +231,28 @@ export class InternalWorkbenchView implements WorkbenchView {
     }
 
     // Resolve the view part from the view part grid.
-    const viewPartRef = this._viewPartGridProvider.grid.findContainingViewPartElseThrow(this.viewRef);
-    return this._viewPartRegistry.getElseThrow(viewPartRef);
+    const part = this._partsLayoutProvider.layout.findPartByViewId(this.viewId, {orElseThrow: true});
+    return this._viewPartRegistry.getElseThrow(part.partId);
   }
 
   public close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean> {
     switch (target || 'self') {
       case 'self': {
-        return this._workbench.destroyView(this.viewRef);
+        return this._workbench.destroyView(this.viewId);
       }
       case 'all-views': {
-        return this._workbench.destroyView(...this.viewPart.viewRefs);
+        return this._workbench.destroyView(...this.part.viewIds);
       }
       case 'other-views': {
-        return this._workbench.destroyView(...Arrays.remove(this.viewPart.viewRefs, this.viewRef));
+        return this._workbench.destroyView(...Arrays.remove(this.part.viewIds, this.viewId));
       }
       case 'views-to-the-right': {
-        const viewRefs = this.viewPart.viewRefs;
-        return this._workbench.destroyView(...viewRefs.slice(viewRefs.indexOf(this.viewRef) + 1));
+        const viewIds = this.part.viewIds;
+        return this._workbench.destroyView(...viewIds.slice(viewIds.indexOf(this.viewId) + 1));
       }
       case 'views-to-the-left': {
-        const viewRefs = this.viewPart.viewRefs;
-        return this._workbench.destroyView(...viewRefs.slice(0, viewRefs.indexOf(this.viewRef)));
+        const viewIds = this.part.viewIds;
+        return this._workbench.destroyView(...viewIds.slice(0, viewIds.indexOf(this.viewId)));
       }
     }
   }
@@ -260,14 +261,15 @@ export class InternalWorkbenchView implements WorkbenchView {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: this._workbench.appInstanceId,
-        viewPartRef: this.viewPart.viewPartRef,
-        viewRef: this.viewRef,
+        partId: this.part.partId,
+        primaryPart: this.part.primary,
+        viewId: this.viewId,
         viewUrlSegments: this.urlSegments,
       },
       target: {
         appInstanceId: region === 'blank-window' ? 'new' : this._workbench.appInstanceId,
-        viewPartRef: region === 'blank-window' ? 'viewpart.1' : this.viewPart.viewPartRef,
-        viewPartRegion: region === 'blank-window' ? 'center' : region,
+        partId: region === 'blank-window' ? null : this.part.partId,
+        region: region === 'blank-window' ? 'center' : region,
       },
     });
     return Promise.resolve(true);
@@ -277,9 +279,9 @@ export class InternalWorkbenchView implements WorkbenchView {
     const urlTree = this._router.parseUrl(this._router.url);
     const urlSegmentGroups = urlTree.root.children;
 
-    const viewOutlet = urlSegmentGroups[this.viewRef];
+    const viewOutlet = urlSegmentGroups[this.viewId];
     if (!viewOutlet) {
-      throw Error(`[ViewOutletNotFoundError] View outlet not part of the URL [outlet=${this.viewRef}]`);
+      throw Error(`[ViewOutletNotFoundError] View outlet not part of the URL [outlet=${this.viewId}]`);
     }
 
     return viewOutlet.segments;
@@ -306,17 +308,17 @@ export abstract class WorkbenchViewPart {
   /**
    * Viewpart outlet identity which is unique in this application.
    */
-  public abstract readonly viewPartRef: string;
+  public abstract readonly partId: string;
 
   /**
    * Emits the currently active view in this viewpart.
    */
-  public abstract get activeViewRef$(): Observable<string | null>;
+  public abstract get activeViewId$(): Observable<string | null>;
 
   /**
    * The currently active view, if any.
    */
-  public abstract get activeViewRef(): string | null;
+  public abstract get activeViewId(): string | null;
 
   /**
    * Emits the views opened in this viewpart.
@@ -324,9 +326,11 @@ export abstract class WorkbenchViewPart {
    * Upon subscription, the currently opened views are emitted, and then emits continuously
    * when new views are opened or existing views closed. It never completes.
    */
-  public abstract get viewRefs$(): Observable<string[]>;
+  public abstract get viewIds$(): Observable<string[]>;
 
-  public abstract get viewRefs(): string[];
+  public abstract get viewIds(): string[];
+
+  public abstract get primary(): boolean;
 
   /**
    * Emits the actions of this viewpart.
@@ -348,32 +352,34 @@ export abstract class WorkbenchViewPart {
 
 export class InternalWorkbenchViewPart implements WorkbenchViewPart {
 
-  public readonly viewRefs$ = new BehaviorSubject<string[]>([]);
+  private _part: Part;
+
+  public readonly viewIds$ = new BehaviorSubject<string[]>([]);
   public readonly actions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
-  public readonly activeViewRef$ = new BehaviorSubject<string | null>(null);
+  public readonly activeViewId$ = new BehaviorSubject<string | null>(null);
 
-  public set viewRefs(viewRefs: string[]) {
-    if (!Arrays.equal(viewRefs, this.viewRefs, true)) {
-      this.viewRefs$.next(viewRefs);
-    }
+  constructor(public readonly partId: string, public readonly portal: WbComponentPortal<ViewPartComponent>) {
   }
 
-  public get viewRefs(): string[] {
-    return this.viewRefs$.value;
+  public setPart(part: Part): void {
+    const viewIdsChange = !Arrays.equal(part.viewIds, this.viewIds, true);
+    const activeViewChange = part.activeViewId !== this.activeViewId;
+
+    this._part = part;
+    viewIdsChange && this.viewIds$.next(part.viewIds);
+    activeViewChange && this.activeViewId$.next(part.activeViewId);
   }
 
-  public set activeViewRef(viewRef: string) {
-    if (viewRef !== this.activeViewRef) {
-      this.activeViewRef$.next(viewRef);
-    }
+  public get primary(): boolean {
+    return this._part && this._part.primary || false;
   }
 
-  public get activeViewRef(): string {
-    return this.activeViewRef$.value;
+  public get viewIds(): string[] {
+    return this._part && this._part.viewIds || [];
   }
 
-  constructor(public readonly viewPartRef: string,
-              public readonly portal: WbComponentPortal<ViewPartComponent>) {
+  public get activeViewId(): string {
+    return this._part && this._part.activeViewId || null;
   }
 
   public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
@@ -423,7 +429,7 @@ export interface WorkbenchViewPartAction extends WorkbenchAction {
    *
    * If set, the action is only visible if the specified view is the active view in the viewpart.
    */
-  viewRef?: string;
+  viewId?: string;
 }
 
 /**

@@ -12,6 +12,8 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "scripts": {
+    "build-libs": "run-s *:build",
+    "build-apps": "run-s *:build",
     "toolkit:build": "ng build --prod @scion/toolkit",
     "posttoolkit:build": "scss-bundle -e projects/scion/toolkit/viewport/src/theme/_scrollbar.scss -o dist/scion/toolkit/scrollbar.scss",
 
@@ -130,6 +132,7 @@
     "rxjs-tslint": "0.1.7",
     "scss-bundle": "3.0.1",
     "ts-node": "8.2.0",
+    "tsconfig-paths": "3.9.0",
     "tsickle": "0.35.0",
     "tslint": "5.12.1",
     "typescript": "3.4.5",

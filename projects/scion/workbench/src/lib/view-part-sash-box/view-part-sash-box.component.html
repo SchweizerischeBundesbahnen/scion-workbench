@@ -1,31 +1,34 @@
-<!-- Render the first sash -->
-<wb-view-part-sash-box *ngIf="sashAsSashBox('sash1') as sashBox"
-                       [sashBox]="sashBox"
-                       [style.flex-grow]="sashPositionFr"
-                       class="sash-1">
-</wb-view-part-sash-box>
-<wb-portal-outlet *ngIf="sashAsViewPartPortal('sash1') as viewPartPortal"
-                  [wbPortal]="viewPartPortal"
-                  [style.flex-grow]="sashPositionFr"
-                  class="sash-1">
-</wb-portal-outlet>
+<sci-sashbox #sashbox [direction]="direction" (sashStart)="onSashStart()" (sashEnd)="onSashEnd(sashbox.sashSizes)">
 
-<!-- Splitter -->
-<div class="splitter"
-     [wbSash]="splitVertical ? 'vertical' : 'horizontal'"
-     (wbSashStart)="onSashStart()"
-     (wbSashChange)="onSash($event)"
-     (wbSashEnd)="onSashEnd()">
-</div>
+  <!-- left or top sash -->
+  <ng-template sciSash [size]="sash1.size">
+    <wb-view-part-sash-box *ngIf="sash1.treeNode"
+                           [treeNode]="sash1.treeNode"
+                           [attr.data-parentnodeid]="nodeId"
+                           [attr.data-nodeid]="sash1.treeNode.nodeId"
+                           class="sash-1">
+    </wb-view-part-sash-box>
+    <wb-portal-outlet *ngIf="sash1.portal"
+                      [wbPortal]="sash1.portal"
+                      [attr.data-parentnodeid]="nodeId"
+                      class="sash-1">
+    </wb-portal-outlet>
+  </ng-template>
 
-<!-- Render the second sash -->
-<wb-view-part-sash-box *ngIf="sashAsSashBox('sash2') as sashBox"
-                       [sashBox]="sashBox"
-                       [style.flex-grow]="1 - sashPositionFr"
-                       class="sash-2">
-</wb-view-part-sash-box>
-<wb-portal-outlet *ngIf="sashAsViewPartPortal('sash2') as viewPartPortal"
-                  [wbPortal]="viewPartPortal"
-                  [style.flex-grow]="1 - sashPositionFr"
-                  class="sash-2">
-</wb-portal-outlet>
+  <!-- right or bottom sash -->
+  <ng-template sciSash [size]="sash2.size">
+    <wb-view-part-sash-box *ngIf="sash2.treeNode"
+                           [treeNode]="sash2.treeNode"
+                           [attr.data-parentnodeid]="nodeId"
+                           [attr.data-nodeid]="sash2.treeNode.nodeId"
+                           class="sash-2">
+
+    </wb-view-part-sash-box>
+    <wb-portal-outlet *ngIf="sash2.portal"
+                      [wbPortal]="sash2.portal"
+                      [attr.data-parentnodeid]="nodeId"
+                      class="sash-2">
+    </wb-portal-outlet>
+  </ng-template>
+
+</sci-sashbox>
