@@ -15,7 +15,7 @@ import { SciAccordionModule, SciFilterFieldModule, SciListModule, SciParamsEnter
 import { DevToolsRoutingModule } from './dev-tools-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { WorkbenchApplicationModule } from '@scion/workbench-application.angular';
-import { ApplicationListComponent } from './application-list/application-list.component';
+import { DevToolsComponent } from './dev-tools/dev-tools.component';
 import { ApplicationListItemComponent } from './application-list-item/application-list-item.component';
 import { ApplicationViewComponent } from './application-view/application-view.component';
 import { CapabilityAccordionItemComponent } from './capability-accordion-item/capability-accordion-item.component';
@@ -27,7 +27,7 @@ import { OutletCapabilityExecPopupComponent } from './outlet-capability-exec-pop
 
 @NgModule({
   declarations: [
-    ApplicationListComponent,
+    DevToolsComponent,
     ApplicationListItemComponent,
     ApplicationViewComponent,
     CapabilityAccordionItemComponent,

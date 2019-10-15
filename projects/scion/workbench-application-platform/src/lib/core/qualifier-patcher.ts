@@ -11,32 +11,30 @@
 import { NilQualifier, Qualifier } from '@scion/workbench-application-platform.api';
 
 /**
- * Returns a copy of the given intent qualifier with all its wildcard qualifier values
- * replaced with values of the given capability qualifier, if any.
- * Also, if the intent qualifier specifies a wildcard key, it is merged with the capability qualifier.
+ * Returns a copy of the given qualifier with all its wildcard qualifier values replaced with values of the given capability qualifier, if any.
+ * Also, if the qualifier specifies a wildcard key, it is merged with the capability qualifier.
  *
- * @param intentQualifier
- *        qualifier for an intent as specified in the manifest, may contain wildcards as qualifier key (*)
- *        and/or qualifier value (* or ?).
+ * @param qualifier
+ *        qualifier, which may contain wildcards as qualifier key (*) and/or qualifier value (* or ?).
  * @param capabilityQualifier
  *        qualifier for a capability as specified in the manifest, may contain wildcards (* or ?) as qualifier value;
  *        if `null`, {NilQualifier} is used.
  */
-export function patchQualifier(intentQualifier: Qualifier, capabilityQualifier: Qualifier): Qualifier {
-  if (!intentQualifier || !capabilityQualifier) {
-    return intentQualifier || NilQualifier;
+export function patchQualifier(qualifier: Qualifier, capabilityQualifier: Qualifier): Qualifier {
+  if (!qualifier || !capabilityQualifier) {
+    return qualifier || NilQualifier;
   }
 
   // Create a working copy of the intent qualifier
-  const _intentQualifier: Qualifier = {...intentQualifier};
+  const _intentQualifier: Qualifier = {...qualifier};
   delete _intentQualifier['*'];
 
   Object.keys(capabilityQualifier)
     .forEach(key => {
-      if (intentQualifier[key] === '*' || intentQualifier[key] === '?') {
+      if (qualifier[key] === '*' || qualifier[key] === '?') {
         _intentQualifier[key] = capabilityQualifier[key];
       }
-      else if (intentQualifier.hasOwnProperty('*') && !intentQualifier.hasOwnProperty(key)) {
+      else if (qualifier.hasOwnProperty('*') && !qualifier.hasOwnProperty(key)) {
         _intentQualifier[key] = capabilityQualifier[key];
       }
     });

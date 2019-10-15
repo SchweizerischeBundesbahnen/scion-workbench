@@ -125,15 +125,19 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
   /**
    * Finds capabilities of given type and qualifier.
    *
-   * There are ony capabilities returned for which the requesting application has manifested an intent.
+   * There are only capabilities returned for which the requesting application has manifested an intent.
    */
   private queryCapabilities(envelope: MessageEnvelope<ManifestRegistryIntentMessages.FindCapabilities>): void {
     const type: string = envelope.message.payload.type;
     const qualifier: Qualifier = envelope.message.payload.qualifier;
 
-    const capabilities: Capability[] = this._manifestRegistry.getCapabilities(type, qualifier)
+    const capabilities: Capability[] = this._manifestRegistry.getCapabilitiesByType(type)
       .filter(capability => this._manifestRegistry.isVisibleForApplication(capability, envelope.sender))
-      .filter(capability => this._manifestRegistry.hasIntent(envelope.sender, capability.type, capability.qualifier));
+      .filter(capability => {
+        const patchedQualifier: Qualifier = patchQualifier(qualifier, capability.qualifier);
+        return matchesCapabilityQualifier(capability.qualifier, patchedQualifier);
+      })
+      .filter(capability => this._manifestRegistry.isScopeCheckDisabled(envelope.sender) || this._manifestRegistry.hasIntent(envelope.sender, capability.type, capability.qualifier));
     this._messageBus.publishReply(capabilities, envelope.sender, envelope.replyToUid);
   }
 

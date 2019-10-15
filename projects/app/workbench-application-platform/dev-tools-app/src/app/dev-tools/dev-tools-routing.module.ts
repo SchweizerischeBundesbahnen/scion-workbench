@@ -10,12 +10,13 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ApplicationListComponent } from './application-list/application-list.component';
+import { DevToolsComponent } from './dev-tools/dev-tools.component';
 import { ApplicationViewComponent } from './application-view/application-view.component';
 import { OutletCapabilityExecPopupComponent } from './outlet-capability-exec-popup/outlet-capability-exec-popup.component';
 
 const routes: Routes = [
-  {path: 'application-list', component: ApplicationListComponent},
+  {path: '', component: DevToolsComponent},
+  {path: 'application-list', component: DevToolsComponent},
   {path: 'application/:symbolicName', component: ApplicationViewComponent},
   {path: 'view-capability/:id', component: OutletCapabilityExecPopupComponent},
   {path: 'popup-capability/:id', component: OutletCapabilityExecPopupComponent},
