@@ -1,0 +1,54 @@
+<section [class.expanded]="appListPanelExpanded">
+  <header (click)="toggleAppListPanel()">
+    <h2>Application List</h2>
+    <span class="toggle material-icons"></span>
+  </header>
+
+  <sci-viewport class="app-list">
+    <sci-list (filter)="onFilter($event)">
+      <ng-template *ngFor="let manifest of manifests$ | async; trackBy: trackByFn" sciListItem [key]="manifest.symbolicName">
+        <app-application-list-item [manifest]="manifest"></app-application-list-item>
+      </ng-template>
+    </sci-list>
+  </sci-viewport>
+</section>
+
+<section [class.expanded]="capabilityLookupPanelExpanded">
+  <header (click)="toggleCapabilityLookupPanel()">
+    <h2>Lookup Capabilities</h2>
+    <span class="toggle material-icons"></span>
+  </header>
+
+  <sci-viewport class="lookup-capabilities">
+    <input [formControl]="form.get(CAPABILITY_LOOKUP_TYPE)" placeholder="Enter capability type" list="capability-types">
+    <sci-params-enter class="qualifier" [title]="'Qualifier'" [paramsFormArray]="form.get(CAPABILITY_LOOKUP_QUALIFIER)" [addable]="true" [removable]="true"></sci-params-enter>
+    <button class="search" (click)="onLookupClick()" [disabled]="!form.valid">Lookup</button>
+
+    <output *ngIf="capabilityLookupResult$ | async as capabilities">
+      <h3>Capabilities matching the type and qualifier:</h3>
+      <sci-accordion *ngIf="capabilities.length else notFound">
+        <ng-container *ngFor="let capability of capabilities">
+          <ng-template sciAccordionItem [panel]="panel">
+            <app-capability-accordion-item [capability]="capability"></app-capability-accordion-item>
+          </ng-template>
+
+          <ng-template #panel>
+            <app-capability-accordion-panel [capability]="capability"></app-capability-accordion-panel>
+          </ng-template>
+        </ng-container>
+      </sci-accordion>
+      <ng-template #notFound>
+        No capabilities found.
+      </ng-template>
+    </output>
+  </sci-viewport>
+</section>
+
+<datalist id="capability-types">
+  <option [value]="PlatformCapabilityTypes.View">
+  <option [value]="PlatformCapabilityTypes.Popup">
+  <option [value]="PlatformCapabilityTypes.Activity">
+  <option [value]="PlatformCapabilityTypes.MessageBox">
+  <option [value]="PlatformCapabilityTypes.Notification">
+  <option [value]="PlatformCapabilityTypes.ManifestRegistry">
+</datalist>

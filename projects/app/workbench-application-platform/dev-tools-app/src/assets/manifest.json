@@ -31,6 +31,19 @@
     {
       "type": "view",
       "qualifier": {
+        "entity": "dev-tools"
+      },
+      "private": false,
+      "description": "Provides DevTools for workbench application platform.",
+      "properties": {
+        "path": "dev-tools",
+        "title": "DevTools",
+        "heading": "Workbench Application Platform"
+      }
+    },
+    {
+      "type": "view",
+      "qualifier": {
         "entity": "application",
         "symbolicName": "*"
       },

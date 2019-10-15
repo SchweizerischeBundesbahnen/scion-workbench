@@ -1,0 +1,79 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: app-padding();
+
+  > section {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    &:not(:first-of-type) {
+      margin-top: 1.75em;
+    }
+
+    &:not(.expanded) {
+      flex: none;
+    }
+
+    > header {
+      flex: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+
+      > h2 {
+        flex: auto;
+        font-size: 1.25em;
+        margin-top: 0;
+      }
+
+      > span.toggle {
+        flex: none;
+        margin-left: .5em;
+        user-select: none;
+
+        &::after {
+          content: 'expand_more'
+        }
+      }
+    }
+
+    &.expanded > header > span.toggle::after {
+      content: 'expand_less';
+    }
+
+    &:not(.expanded) > sci-viewport {
+      height: 0;
+    }
+
+    > sci-viewport.app-list, sci-viewport.lookup-capabilities {
+      flex: auto;
+
+      &.lookup-capabilities {
+        --grid-template-rows: min-content min-content min-content 1fr;
+        --gap: .5em 0;
+
+        output {
+          flex: auto;
+          margin-top: 1em;
+          display: flex;
+          flex-direction: column;
+
+          > h3 {
+            flex: none;
+          }
+
+          > sci-accordion {
+            flex: auto;
+            min-height: 10em;
+          }
+        }
+      }
+    }
+  }
+}
