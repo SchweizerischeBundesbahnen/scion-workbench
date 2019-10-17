@@ -141,6 +141,25 @@ export class ManifestRegistry {
   }
 
   /**
+   * Unregisters capability of the given application.
+   */
+  public unregisterCapability(symbolicName: string, capabilityId: string): void {
+    const capabilityToUnregister = this.getCapability(capabilityId);
+
+    if (!capabilityToUnregister) {
+      throw Error(`[CapabilityUnregistrationError] Capability does not exist [id=${capabilityId}]`);
+    }
+
+    if (capabilityToUnregister.metadata.symbolicAppName !== symbolicName) {
+      throw Error(`[CapabilityUnregistrationError] Capability cannot be unregistered by this application [id=${capabilityId}, appName=${symbolicName}]`);
+    }
+
+    const registeredCapabilities = this._capabilitiesByType.get(capabilityToUnregister.type);
+    this._capabilitiesById.delete(capabilityId);
+    this._capabilitiesByType.set(capabilityToUnregister.type, registeredCapabilities.filter(capability => capability.metadata.id !== capabilityId));
+  }
+
+  /**
    * Registers intents of the given application.
    *
    * The parameter 'implicit' indicates the intents to be implicit because the application provides the capability itself.

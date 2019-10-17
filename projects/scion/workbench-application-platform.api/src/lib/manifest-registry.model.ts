@@ -13,13 +13,15 @@ import { Capability, Intent, IntentMessage, PlatformCapabilityTypes, Qualifier }
 /**
  * Represents message types used for communication between the manifest application outlet and the application.
  */
-export enum ManifestQueries {
+export enum ManifestCommands {
   FindManifests = 'find-manifests',
   FindManifest = 'find-manifest',
   FindCapabilityProviders = 'find-capability-providers',
   FindCapabilityConsumers = 'find-capability-consumers',
   FindCapability = 'find-capability',
   FindCapabilities = 'find-capabilities',
+  RegisterCapability = 'register-capability',
+  UnregisterCapability = 'unregister-capability',
 }
 
 export namespace ManifestRegistryIntentMessages {
@@ -29,7 +31,7 @@ export namespace ManifestRegistryIntentMessages {
   export interface FindManifests extends IntentMessage {
     type: PlatformCapabilityTypes.ManifestRegistry;
     payload: {
-      query: ManifestQueries.FindManifests;
+      command: ManifestCommands.FindManifests;
     };
   }
 
@@ -39,7 +41,7 @@ export namespace ManifestRegistryIntentMessages {
   export interface FindManifest extends IntentMessage {
     type: PlatformCapabilityTypes.ManifestRegistry;
     payload: {
-      query: ManifestQueries.FindManifest;
+      command: ManifestCommands.FindManifest;
       symbolicAppName: string;
     };
   }
@@ -50,7 +52,7 @@ export namespace ManifestRegistryIntentMessages {
   export interface FindCapabilityProviders extends IntentMessage {
     type: PlatformCapabilityTypes.ManifestRegistry;
     payload: {
-      query: ManifestQueries.FindCapabilityProviders;
+      command: ManifestCommands.FindCapabilityProviders;
       intentId: string;
     };
   }
@@ -61,7 +63,7 @@ export namespace ManifestRegistryIntentMessages {
   export interface FindCapabilityConsumers extends IntentMessage {
     type: PlatformCapabilityTypes.ManifestRegistry;
     payload: {
-      query: ManifestQueries.FindCapabilityConsumers;
+      command: ManifestCommands.FindCapabilityConsumers;
       capabilityId: string;
     };
   }
@@ -72,7 +74,7 @@ export namespace ManifestRegistryIntentMessages {
   export interface FindCapability extends IntentMessage {
     type: PlatformCapabilityTypes.ManifestRegistry;
     payload: {
-      query: ManifestQueries.FindCapability;
+      command: ManifestCommands.FindCapability;
       capabilityId: string;
     };
   }
@@ -85,11 +87,43 @@ export namespace ManifestRegistryIntentMessages {
   export interface FindCapabilities extends IntentMessage {
     type: PlatformCapabilityTypes.ManifestRegistry;
     payload: {
-      query: ManifestQueries.FindCapabilities;
+      command: ManifestCommands.FindCapabilities;
       type: string;
       qualifier: Qualifier;
     };
   }
+
+  /**
+   * Registers given capability.
+   */
+  export interface RegisterCapability extends IntentMessage {
+    type: PlatformCapabilityTypes.ManifestRegistry;
+    payload: {
+      command: ManifestCommands.RegisterCapability;
+      capability: Capability;
+    };
+  }
+
+  /**
+   * Unregisters capability of given id.
+   *
+   * The requesting application can only unregister its own capabilities.
+   */
+  export interface UnregisterCapability extends IntentMessage {
+    type: PlatformCapabilityTypes.ManifestRegistry;
+    payload: {
+      command: ManifestCommands.UnregisterCapability;
+      capabilityId: string;
+    };
+  }
+}
+
+/**
+ * Represents return message of certain manifest commands.
+ */
+export interface ManifestRegistryStatusMessage {
+  status: 'ok' | 'error';
+  message?: string;
 }
 
 /**

@@ -48,7 +48,7 @@ describe('ManifestRegistry', () => {
 
     it('should return `true` only if the application provides the capability', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
       const type1 = 'type-1';
-      const type2 = 'type2';
+      const type2 = 'type-2';
       const type3 = 'type-3';
       const qualifier1: Qualifier = {entity: 'entity', qualifier: 1};
       const qualifier2: Qualifier = {entity: 'entity', qualifier: 2};
@@ -272,6 +272,50 @@ describe('ManifestRegistry', () => {
 
       expect(manifestRegistry.getIntentsByApplication('app-1').length).toBe(3);
       expect(manifestRegistry.getIntentsByApplication('app-2').length).toBe(0);
+    })));
+  });
+
+  describe('function \'unregisterCapability(...)\'', () => {
+
+    it('should unregister capability of given id', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
+      const type = PlatformCapabilityTypes.View;
+      const qualifier1: Qualifier = {entity: 'entity', qualifier: 1};
+      const qualifier2: Qualifier = {entity: 'entity', qualifier: 2};
+      const qualifier3: Qualifier = {entity: '?'};
+      manifestRegistry.registerCapability('app-1', [{type, qualifier: qualifier1, private: false}]);
+      manifestRegistry.registerCapability('app-1', [{type, qualifier: qualifier2, private: false}]);
+      manifestRegistry.registerCapability('app-1', [{type, qualifier: qualifier3, private: false}]);
+      const capability = manifestRegistry.getCapabilities(type, qualifier2)[0];
+
+      manifestRegistry.unregisterCapability('app-1', capability.metadata.id);
+      expect(manifestRegistry.getCapabilitiesByApplication('app-1').length).toBe(2);
+      expect(manifestRegistry.getCapabilitiesByType(type).length).toBe(2);
+      expect(manifestRegistry.getCapabilities(type, qualifier1).length).toBe(1);
+      expect(manifestRegistry.getCapabilities(type, qualifier2).length).toBe(0);
+      expect(manifestRegistry.getCapabilities(type, qualifier3).length).toBe(1);
+    })));
+
+    it('should throw exception for nonexistent capability', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
+      const type = PlatformCapabilityTypes.View;
+      const qualifier: Qualifier = {entity: 'entity'};
+      manifestRegistry.registerCapability('app-1', [{type, qualifier, private: false}]);
+
+      expect(() => manifestRegistry.unregisterCapability('app-1', 'nonexistent_id')).toThrowError(/CapabilityUnregistrationError/);
+      expect(manifestRegistry.getCapabilitiesByApplication('app-1').length).toBe(1);
+      expect(manifestRegistry.getCapabilitiesByType(type).length).toBe(1);
+      expect(manifestRegistry.getCapabilities(type, qualifier).length).toBe(1);
+    })));
+
+    it('should throw exception for capability of other application', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
+      const type = PlatformCapabilityTypes.View;
+      const qualifier: Qualifier = {entity: 'entity'};
+      manifestRegistry.registerCapability('app-1', [{type, qualifier, private: false}]);
+      const capability = manifestRegistry.getCapabilities(type, qualifier)[0];
+
+      expect(() => manifestRegistry.unregisterCapability('app-2', capability.metadata.id)).toThrowError(/CapabilityUnregistrationError/);
+      expect(manifestRegistry.getCapabilitiesByApplication('app-1').length).toBe(1);
+      expect(manifestRegistry.getCapabilitiesByType(type).length).toBe(1);
+      expect(manifestRegistry.getCapabilities(type, qualifier).length).toBe(1);
     })));
   });
 });

@@ -9,7 +9,7 @@
  */
 
 import { fromEvent, merge, Observable, Observer, Subject, TeardownLogic } from 'rxjs';
-import { filter, first, takeUntil } from 'rxjs/operators';
+import { filter, first, take, takeUntil, tap } from 'rxjs/operators';
 import { UUID } from './uuid.util';
 import { Service } from './metadata';
 import { MessageEnvelope, parseMessageEnvelopeElseNull, PROTOCOL } from '@scion/workbench-application-platform.api';
@@ -26,8 +26,10 @@ export abstract class MessageBus implements Service {
 
   /**
    * Initiates a request and receives replies continuously.
+   *
+   * Provide options object to control the subscription.
    */
-  public abstract requestReceive$(envelope: MessageEnvelope): Observable<MessageEnvelope>;
+  public abstract requestReceive$(envelope: MessageEnvelope, options?: { once: boolean }): Observable<MessageEnvelope>;
 
   /**
    * Posts a message to the application platform.
@@ -97,7 +99,7 @@ export class DefaultMessageBus implements MessageBus {
     window.parent.postMessage(envelope, this._ancestorOrigin || '*');
   }
 
-  public requestReceive$(envelope: MessageEnvelope): Observable<MessageEnvelope> {
+  public requestReceive$(envelope: MessageEnvelope, options?: { once: boolean }): Observable<MessageEnvelope> {
     const replyToUid = UUID.randomUUID();
     envelope.replyToUid = replyToUid;
     envelope.protocol = PROTOCOL;
@@ -108,6 +110,7 @@ export class DefaultMessageBus implements MessageBus {
         .pipe(
           filter(env => env.channel === 'reply'),
           filter(env => env.replyToUid === replyToUid),
+          options && options.once ? take(1) : tap(),
           takeUntil(merge(destroy$, this._destroy$)),
         )
         .subscribe(observer);
