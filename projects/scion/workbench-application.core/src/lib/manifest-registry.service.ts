@@ -10,9 +10,10 @@
 
 import { Service } from './metadata';
 import { MessageBus } from './message-bus.service';
-import { from, Observable } from 'rxjs';
+import { EMPTY, Observable, OperatorFunction, throwError } from 'rxjs';
 import { Platform } from './platform';
-import { Application, Capability, Manifest, ManifestQueries, ManifestRegistryIntentMessages, NilQualifier, PlatformCapabilityTypes, Qualifier } from '@scion/workbench-application-platform.api';
+import { Application, Capability, Manifest, ManifestCommands, ManifestRegistryIntentMessages, ManifestRegistryStatusMessage, MessageEnvelope, NilQualifier, PlatformCapabilityTypes, Qualifier } from '@scion/workbench-application-platform.api';
+import { map, mergeMap } from 'rxjs/operators';
 
 /**
  * Allows to query manifest registry.
@@ -27,12 +28,12 @@ export class ManifestRegistryService implements Service {
       type: PlatformCapabilityTypes.ManifestRegistry,
       qualifier: NilQualifier,
       payload: {
-        query: ManifestQueries.FindManifests,
+        command: ManifestCommands.FindManifests,
       },
     };
 
-    return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
-      .then(replyEnvelope => replyEnvelope && replyEnvelope.message || [])); // replyEnvelope is 'undefined' on shutdown
+    return Platform.getService(MessageBus).requestReceive$({channel: 'intent', message: intentMessage}, {once: true})
+      .pipe(extractMessage([]));
   }
 
   /**
@@ -43,13 +44,13 @@ export class ManifestRegistryService implements Service {
       type: PlatformCapabilityTypes.ManifestRegistry,
       qualifier: NilQualifier,
       payload: {
-        query: ManifestQueries.FindManifest,
+        command: ManifestCommands.FindManifest,
         symbolicAppName: symbolicName,
       },
     };
 
-    return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
-      .then(replyEnvelope => replyEnvelope && replyEnvelope.message)); // replyEnvelope is 'undefined' on shutdown
+    return Platform.getService(MessageBus).requestReceive$({channel: 'intent', message: intentMessage}, {once: true})
+      .pipe(extractMessage([]));
   }
 
   /**
@@ -60,13 +61,13 @@ export class ManifestRegistryService implements Service {
       type: PlatformCapabilityTypes.ManifestRegistry,
       qualifier: NilQualifier,
       payload: {
-        query: ManifestQueries.FindCapabilityProviders,
+        command: ManifestCommands.FindCapabilityProviders,
         intentId: intentId,
       },
     };
 
-    return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
-      .then(replyEnvelope => replyEnvelope && replyEnvelope.message || [])); // replyEnvelope is 'undefined' on shutdown
+    return Platform.getService(MessageBus).requestReceive$({channel: 'intent', message: intentMessage}, {once: true})
+      .pipe(extractMessage([]));
   }
 
   /**
@@ -77,13 +78,13 @@ export class ManifestRegistryService implements Service {
       type: PlatformCapabilityTypes.ManifestRegistry,
       qualifier: NilQualifier,
       payload: {
-        query: ManifestQueries.FindCapabilityConsumers,
+        command: ManifestCommands.FindCapabilityConsumers,
         capabilityId: capabilityId,
       },
     };
 
-    return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
-      .then(replyEnvelope => replyEnvelope && replyEnvelope.message || [])); // replyEnvelope is 'undefined' on shutdown
+    return Platform.getService(MessageBus).requestReceive$({channel: 'intent', message: intentMessage}, {once: true})
+      .pipe(extractMessage([]));
   }
 
   /**
@@ -94,13 +95,13 @@ export class ManifestRegistryService implements Service {
       type: PlatformCapabilityTypes.ManifestRegistry,
       qualifier: NilQualifier,
       payload: {
-        query: ManifestQueries.FindCapability,
+        command: ManifestCommands.FindCapability,
         capabilityId: capabilityId,
       },
     };
 
-    return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
-      .then(replyEnvelope => replyEnvelope && replyEnvelope.message)); // replyEnvelope is 'undefined' on shutdown
+    return Platform.getService(MessageBus).requestReceive$({channel: 'intent', message: intentMessage}, {once: true})
+      .pipe(extractMessage(null));
   }
 
   /**
@@ -113,17 +114,73 @@ export class ManifestRegistryService implements Service {
       type: PlatformCapabilityTypes.ManifestRegistry,
       qualifier: NilQualifier,
       payload: {
-        query: ManifestQueries.FindCapabilities,
+        command: ManifestCommands.FindCapabilities,
         type: type,
         qualifier: qualifier,
       },
     };
 
-    return from(Platform.getService(MessageBus).requestReply({channel: 'intent', message: intentMessage})
-      .then(replyEnvelope => replyEnvelope && replyEnvelope.message || [])); // replyEnvelope is 'undefined' on shutdown
+    return Platform.getService(MessageBus).requestReceive$({channel: 'intent', message: intentMessage}, {once: true})
+      .pipe(extractMessage([]));
+  }
+
+  /**
+   * Registers given capability.
+   */
+  public registerCapability$(capability: Capability): Observable<ManifestRegistryStatusMessage> {
+    const intentMessage: ManifestRegistryIntentMessages.RegisterCapability = {
+      type: PlatformCapabilityTypes.ManifestRegistry,
+      qualifier: NilQualifier,
+      payload: {
+        command: ManifestCommands.RegisterCapability,
+        capability: capability,
+      },
+    };
+
+    return Platform.getService(MessageBus).requestReceive$({channel: 'intent', message: intentMessage}, {once: true})
+      .pipe(
+        extractMessage(null),
+        mergeMap(reply => {
+          const success = reply && reply.status === 'ok';
+          return success ? EMPTY : throwError(reply.message);
+        }));
+  }
+
+  /**
+   * Unregisters capability of given id.
+   *
+   * The requesting application can only unregister its own capabilities.
+   */
+  public unregisterCapability$(capabilityId: string): Observable<void> {
+    const intentMessage: ManifestRegistryIntentMessages.UnregisterCapability = {
+      type: PlatformCapabilityTypes.ManifestRegistry,
+      qualifier: NilQualifier,
+      payload: {
+        command: ManifestCommands.UnregisterCapability,
+        capabilityId: capabilityId,
+      },
+    };
+
+    return Platform.getService(MessageBus).requestReceive$({channel: 'intent', message: intentMessage}, {once: true})
+      .pipe(
+        extractMessage(null),
+        mergeMap(reply => {
+          const success = reply && reply.status === 'ok';
+          return success ? EMPTY : throwError(reply.message);
+        }));
   }
 
   public onDestroy(): void {
     // noop
   }
+}
+
+/**
+ * Extracts the message from the envelope.
+ *
+ * @param valueOnShutdown
+ *        Value which is emitted when the platform is about to shutdown.
+ */
+function extractMessage<T>(valueOnShutdown: T): OperatorFunction<MessageEnvelope, T> {
+  return map(envelope => envelope ? envelope.message : valueOnShutdown);
 }

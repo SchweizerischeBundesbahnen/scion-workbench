@@ -10,7 +10,7 @@
 
 import { Injectable } from '@angular/core';
 import { IntentHandler } from '../core/metadata';
-import { Application, Capability, Intent, IntentMessage, Manifest, ManifestQueries, ManifestRegistryIntentMessages, MessageEnvelope, NilQualifier, PlatformCapabilityTypes, Qualifier } from '@scion/workbench-application-platform.api';
+import { Application, Capability, Intent, IntentMessage, Manifest, ManifestCommands, ManifestRegistryIntentMessages, MessageEnvelope, NilQualifier, PlatformCapabilityTypes, Qualifier } from '@scion/workbench-application-platform.api';
 import { MessageBus } from '../core/message-bus.service';
 import { ApplicationRegistry } from '../core/application-registry.service';
 import { ManifestRegistry } from '../core/manifest-registry.service';
@@ -36,34 +36,42 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
   }
 
   public onIntent(envelope: MessageEnvelope<IntentMessage>): void {
-    const query = envelope.message.payload.query;
-    switch (query) {
-      case ManifestQueries.FindManifests: {
+    const command = envelope.message.payload.command;
+    switch (command) {
+      case ManifestCommands.FindManifests: {
         this.queryManifests(envelope as MessageEnvelope<ManifestRegistryIntentMessages.FindManifests>);
         break;
       }
-      case ManifestQueries.FindManifest: {
+      case ManifestCommands.FindManifest: {
         this.queryManifest(envelope as MessageEnvelope<ManifestRegistryIntentMessages.FindManifest>);
         break;
       }
-      case ManifestQueries.FindCapabilityProviders: {
+      case ManifestCommands.FindCapabilityProviders: {
         this.queryCapabilityProviders(envelope as MessageEnvelope<ManifestRegistryIntentMessages.FindCapabilityProviders>);
         break;
       }
-      case ManifestQueries.FindCapabilityConsumers: {
+      case ManifestCommands.FindCapabilityConsumers: {
         this.queryCapabilityConsumers(envelope as MessageEnvelope<ManifestRegistryIntentMessages.FindCapabilityConsumers>);
         break;
       }
-      case ManifestQueries.FindCapability: {
+      case ManifestCommands.FindCapability: {
         this.queryCapability(envelope as MessageEnvelope<ManifestRegistryIntentMessages.FindCapability>);
         break;
       }
-      case ManifestQueries.FindCapabilities: {
+      case ManifestCommands.FindCapabilities: {
         this.queryCapabilities(envelope as MessageEnvelope<ManifestRegistryIntentMessages.FindCapabilities>);
         break;
       }
+      case ManifestCommands.RegisterCapability: {
+        this.registerCapability(envelope as MessageEnvelope<ManifestRegistryIntentMessages.RegisterCapability>);
+        break;
+      }
+      case ManifestCommands.UnregisterCapability: {
+        this.unregisterCapability(envelope as MessageEnvelope<ManifestRegistryIntentMessages.UnregisterCapability>);
+        break;
+      }
       default: {
-        this._logger.error(`[UnsupportedQueryError] Query not supported [query=${query}]`);
+        this._logger.error(`[UnsupportedQueryError] Query not supported [query=${command}]`);
         this._messageBus.publishReply(null, envelope.sender, envelope.replyToUid);
       }
     }
@@ -145,6 +153,36 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
     const capabilityId = envelope.message.payload.capabilityId;
     const capability: Capability = this._manifestRegistry.getCapability(capabilityId);
     this._messageBus.publishReply(capability, envelope.sender, envelope.replyToUid);
+  }
+
+  /**
+   * Registers given capability.
+   */
+  private registerCapability(envelope: MessageEnvelope<ManifestRegistryIntentMessages.RegisterCapability>): void {
+    const capability: Capability = envelope.message.payload.capability;
+    try {
+      this._manifestRegistry.registerCapability(envelope.sender, [capability]);
+      this._messageBus.publishReply({status: 'ok'}, envelope.sender, envelope.replyToUid);
+    }
+    catch (error) {
+      this._messageBus.publishReply({status: 'error', message: error.message}, envelope.sender, envelope.replyToUid);
+    }
+  }
+
+  /**
+   * Unregisters capability of given id.
+   *
+   * The requesting application can only unregister its own capabilities.
+   */
+  private unregisterCapability(envelope: MessageEnvelope<ManifestRegistryIntentMessages.UnregisterCapability>): void {
+    const capabilityId: string = envelope.message.payload.capabilityId;
+    try {
+      this._manifestRegistry.unregisterCapability(envelope.sender, capabilityId);
+      this._messageBus.publishReply({status: 'ok'}, envelope.sender, envelope.replyToUid);
+    }
+    catch (error) {
+      this._messageBus.publishReply({status: 'error', message: error.message}, envelope.sender, envelope.replyToUid);
+    }
   }
 
   private loadManifest(symbolicName: string): Manifest {
