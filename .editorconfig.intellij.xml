@@ -1,116 +1,118 @@
 <code_scheme name="SCION Workbench" version="173">
   <option name="OTHER_INDENT_OPTIONS">
     <value>
-      <option name="INDENT_SIZE" value="2"/>
-      <option name="CONTINUATION_INDENT_SIZE" value="4"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="INDENT_SIZE" value="2" />
+      <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      <option name="TAB_SIZE" value="2" />
     </value>
   </option>
-  <option name="LINE_SEPARATOR" value="&#xA;"/>
-  <option name="RIGHT_MARGIN" value="999"/>
+  <option name="LINE_SEPARATOR" value="&#xA;" />
+  <option name="RIGHT_MARGIN" value="999" />
   <JSCodeStyleSettings version="0">
-    <option name="USE_DOUBLE_QUOTES" value="false"/>
-    <option name="ENFORCE_TRAILING_COMMA" value="WhenMultiline"/>
-    <option name="INDENT_CHAINED_CALLS" value="false"/>
+    <option name="USE_DOUBLE_QUOTES" value="false" />
+    <option name="ENFORCE_TRAILING_COMMA" value="WhenMultiline" />
+    <option name="INDENT_CHAINED_CALLS" value="false" />
   </JSCodeStyleSettings>
   <TypeScriptCodeStyleSettings version="0">
-    <option name="USE_PUBLIC_MODIFIER" value="true"/>
-    <option name="USE_DOUBLE_QUOTES" value="false"/>
-    <option name="ENFORCE_TRAILING_COMMA" value="WhenMultiline"/>
-    <option name="IMPORTS_WRAP" value="0"/>
-    <option name="SPACES_WITHIN_IMPORTS" value="true"/>
+    <option name="USE_PUBLIC_MODIFIER" value="true" />
+    <option name="USE_DOUBLE_QUOTES" value="false" />
+    <option name="ENFORCE_TRAILING_COMMA" value="WhenMultiline" />
+    <option name="IMPORTS_WRAP" value="0" />
+    <option name="SPACES_WITHIN_IMPORTS" value="true" />
   </TypeScriptCodeStyleSettings>
   <XML>
-    <option name="XML_ALIGN_ATTRIBUTES" value="false"/>
-    <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true"/>
+    <option name="XML_ALIGN_ATTRIBUTES" value="false" />
+    <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
   </XML>
   <codeStyleSettings language="CSS">
     <indentOptions>
-      <option name="INDENT_SIZE" value="2"/>
-      <option name="CONTINUATION_INDENT_SIZE" value="4"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="INDENT_SIZE" value="2" />
+      <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      <option name="TAB_SIZE" value="2" />
     </indentOptions>
   </codeStyleSettings>
   <codeStyleSettings language="ECMA Script Level 4">
-    <option name="KEEP_BLANK_LINES_IN_CODE" value="1"/>
-    <option name="ALIGN_MULTILINE_PARAMETERS" value="false"/>
-    <option name="ALIGN_MULTILINE_FOR" value="false"/>
-    <option name="CALL_PARAMETERS_WRAP" value="1"/>
-    <option name="METHOD_PARAMETERS_WRAP" value="1"/>
-    <option name="EXTENDS_LIST_WRAP" value="1"/>
-    <option name="BINARY_OPERATION_WRAP" value="1"/>
-    <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true"/>
-    <option name="TERNARY_OPERATION_WRAP" value="1"/>
-    <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true"/>
-    <option name="FOR_STATEMENT_WRAP" value="1"/>
-    <option name="ARRAY_INITIALIZER_WRAP" value="1"/>
-    <option name="IF_BRACE_FORCE" value="3"/>
-    <option name="DOWHILE_BRACE_FORCE" value="3"/>
-    <option name="WHILE_BRACE_FORCE" value="3"/>
-    <option name="FOR_BRACE_FORCE" value="3"/>
+    <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+    <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+    <option name="ALIGN_MULTILINE_FOR" value="false" />
+    <option name="CALL_PARAMETERS_WRAP" value="1" />
+    <option name="METHOD_PARAMETERS_WRAP" value="1" />
+    <option name="EXTENDS_LIST_WRAP" value="1" />
+    <option name="BINARY_OPERATION_WRAP" value="1" />
+    <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+    <option name="TERNARY_OPERATION_WRAP" value="1" />
+    <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+    <option name="FOR_STATEMENT_WRAP" value="1" />
+    <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+    <option name="IF_BRACE_FORCE" value="3" />
+    <option name="DOWHILE_BRACE_FORCE" value="3" />
+    <option name="WHILE_BRACE_FORCE" value="3" />
+    <option name="FOR_BRACE_FORCE" value="3" />
   </codeStyleSettings>
   <codeStyleSettings language="HTML">
     <indentOptions>
-      <option name="INDENT_SIZE" value="2"/>
-      <option name="CONTINUATION_INDENT_SIZE" value="4"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="INDENT_SIZE" value="2" />
+      <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      <option name="TAB_SIZE" value="2" />
     </indentOptions>
   </codeStyleSettings>
   <codeStyleSettings language="JSON">
     <indentOptions>
-      <option name="CONTINUATION_INDENT_SIZE" value="4"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      <option name="TAB_SIZE" value="2" />
     </indentOptions>
   </codeStyleSettings>
   <codeStyleSettings language="JavaScript">
-    <option name="RIGHT_MARGIN" value="999"/>
-    <option name="KEEP_BLANK_LINES_IN_CODE" value="1"/>
-    <option name="ELSE_ON_NEW_LINE" value="true"/>
-    <option name="ALIGN_MULTILINE_PARAMETERS" value="false"/>
-    <option name="ALIGN_MULTILINE_FOR" value="false"/>
-    <option name="CALL_PARAMETERS_WRAP" value="1"/>
-    <option name="METHOD_PARAMETERS_WRAP" value="1"/>
-    <option name="BINARY_OPERATION_WRAP" value="1"/>
-    <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true"/>
-    <option name="TERNARY_OPERATION_WRAP" value="1"/>
-    <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true"/>
-    <option name="FOR_STATEMENT_WRAP" value="1"/>
-    <option name="ARRAY_INITIALIZER_WRAP" value="1"/>
-    <option name="IF_BRACE_FORCE" value="3"/>
-    <option name="DOWHILE_BRACE_FORCE" value="3"/>
-    <option name="WHILE_BRACE_FORCE" value="3"/>
-    <option name="FOR_BRACE_FORCE" value="3"/>
+    <option name="RIGHT_MARGIN" value="999" />
+    <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+    <option name="ELSE_ON_NEW_LINE" value="true" />
+    <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+    <option name="ALIGN_MULTILINE_FOR" value="false" />
+    <option name="CALL_PARAMETERS_WRAP" value="1" />
+    <option name="METHOD_PARAMETERS_WRAP" value="1" />
+    <option name="BINARY_OPERATION_WRAP" value="1" />
+    <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+    <option name="TERNARY_OPERATION_WRAP" value="1" />
+    <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+    <option name="FOR_STATEMENT_WRAP" value="1" />
+    <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+    <option name="IF_BRACE_FORCE" value="3" />
+    <option name="DOWHILE_BRACE_FORCE" value="3" />
+    <option name="WHILE_BRACE_FORCE" value="3" />
+    <option name="FOR_BRACE_FORCE" value="3" />
     <indentOptions>
-      <option name="INDENT_SIZE" value="2"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="INDENT_SIZE" value="2" />
+      <option name="TAB_SIZE" value="2" />
     </indentOptions>
   </codeStyleSettings>
   <codeStyleSettings language="SASS">
     <indentOptions>
-      <option name="CONTINUATION_INDENT_SIZE" value="4"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      <option name="TAB_SIZE" value="2" />
     </indentOptions>
   </codeStyleSettings>
   <codeStyleSettings language="SCSS">
     <indentOptions>
-      <option name="CONTINUATION_INDENT_SIZE" value="4"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      <option name="TAB_SIZE" value="2" />
     </indentOptions>
   </codeStyleSettings>
   <codeStyleSettings language="TypeScript">
-    <option name="KEEP_BLANK_LINES_IN_CODE" value="1"/>
-    <option name="ELSE_ON_NEW_LINE" value="true"/>
+    <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+    <option name="ELSE_ON_NEW_LINE" value="true" />
+    <option name="CATCH_ON_NEW_LINE" value="true" />
+    <option name="FINALLY_ON_NEW_LINE" value="true" />
     <indentOptions>
-      <option name="INDENT_SIZE" value="2"/>
-      <option name="CONTINUATION_INDENT_SIZE" value="2"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="INDENT_SIZE" value="2" />
+      <option name="CONTINUATION_INDENT_SIZE" value="2" />
+      <option name="TAB_SIZE" value="2" />
     </indentOptions>
   </codeStyleSettings>
   <codeStyleSettings language="XML">
     <indentOptions>
-      <option name="INDENT_SIZE" value="2"/>
-      <option name="CONTINUATION_INDENT_SIZE" value="2"/>
-      <option name="TAB_SIZE" value="2"/>
+      <option name="INDENT_SIZE" value="2" />
+      <option name="CONTINUATION_INDENT_SIZE" value="2" />
+      <option name="TAB_SIZE" value="2" />
     </indentOptions>
     <arrangement>
       <rules>
@@ -119,7 +121,7 @@
             <match>
               <AND>
                 <NAME>xmlns:android</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>^$</XML_NAMESPACE>
               </AND>
             </match>
@@ -130,7 +132,7 @@
             <match>
               <AND>
                 <NAME>xmlns:.*</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>^$</XML_NAMESPACE>
               </AND>
             </match>
@@ -142,7 +144,7 @@
             <match>
               <AND>
                 <NAME>.*:id</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -153,7 +155,7 @@
             <match>
               <AND>
                 <NAME>style</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>^$</XML_NAMESPACE>
               </AND>
             </match>
@@ -164,7 +166,7 @@
             <match>
               <AND>
                 <NAME>.*</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>^$</XML_NAMESPACE>
               </AND>
             </match>
@@ -176,7 +178,7 @@
             <match>
               <AND>
                 <NAME>.*:.*Style</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -188,7 +190,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_width</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -199,7 +201,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_height</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -210,7 +212,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_weight</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -221,7 +223,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_margin</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -232,7 +234,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_marginTop</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -243,7 +245,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_marginBottom</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -254,7 +256,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_marginStart</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -265,7 +267,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_marginEnd</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -276,7 +278,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_marginLeft</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -287,7 +289,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_marginRight</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -298,7 +300,7 @@
             <match>
               <AND>
                 <NAME>.*:layout_.*</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -310,7 +312,7 @@
             <match>
               <AND>
                 <NAME>.*:padding</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -321,7 +323,7 @@
             <match>
               <AND>
                 <NAME>.*:paddingTop</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -332,7 +334,7 @@
             <match>
               <AND>
                 <NAME>.*:paddingBottom</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -343,7 +345,7 @@
             <match>
               <AND>
                 <NAME>.*:paddingStart</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -354,7 +356,7 @@
             <match>
               <AND>
                 <NAME>.*:paddingEnd</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -365,7 +367,7 @@
             <match>
               <AND>
                 <NAME>.*:paddingLeft</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
@@ -376,7 +378,7 @@
             <match>
               <AND>
                 <NAME>.*:paddingRight</NAME>
-                <XML_ATTRIBUTE/>
+                <XML_ATTRIBUTE />
                 <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
               </AND>
             </match>
