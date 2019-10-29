@@ -36,7 +36,8 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
   }
 
   public onIntent(envelope: MessageEnvelope<IntentMessage>): void {
-    const command = envelope.message.payload.command;
+    // provide fallback for the former 'query' property of manifest commands
+    const command = envelope.message.payload.command || envelope.message.payload.query;
     switch (command) {
       case ManifestCommands.FindManifests: {
         this.queryManifests(envelope as MessageEnvelope<ManifestRegistryIntentMessages.FindManifests>);
@@ -71,7 +72,7 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
         break;
       }
       default: {
-        this._logger.error(`[UnsupportedQueryError] Query not supported [query=${command}]`);
+        this._logger.error(`[UnsupportedQueryError] Command not supported [command=${command}]`);
         this._messageBus.publishReply(null, envelope.sender, envelope.replyToUid);
       }
     }
