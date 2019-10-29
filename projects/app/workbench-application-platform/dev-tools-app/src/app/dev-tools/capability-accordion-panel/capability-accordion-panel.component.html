@@ -7,6 +7,11 @@
   <sci-property [properties]="capability.properties"></sci-property>
 </section>
 
+<section class="metadata" *ngIf="capability.metadata">
+  <h2>Metadata</h2>
+  <sci-property [properties]="capability.metadata"></sci-property>
+</section>
+
 <section class="used-by">
   <h2>Used by following applications</h2>
   <ul>
