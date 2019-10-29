@@ -18,3 +18,4 @@ export * from './lib/popup.model';
 export * from './lib/messagebox.model';
 export * from './lib/notification.model';
 export * from './lib/manifest-registry.model';
+export * from './lib/activator.model';

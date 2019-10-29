@@ -39,6 +39,7 @@ This section provides answers to some common questions when integrating applicat
 - [How to make a capability private or public scope](how-to-make-a-capability-private-or-public-scope.md)
 - [How to configure focus handling](how-to-configure-focus-handling.md)
 - [How to issue a custom intent](how-to-issue-custom-intent.md)
+- [How to provide an activator capability](how-to-provide-an-activator-capability.md)
 
 
 ***
