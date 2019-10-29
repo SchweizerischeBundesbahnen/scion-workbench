@@ -36,6 +36,11 @@ export enum PlatformCapabilityTypes {
    * Allows querying the manifest registry.
    */
   ManifestRegistry = 'manifest-registry',
+  /**
+   * Activator capabilities are loaded at platform startup allowing applications to interact with the platform even if no microfrontend of that application is running,
+   * e.g., to dynamically register capabilities based on some application state.
+   */
+  Activator = 'activator',
 }
 
 /**

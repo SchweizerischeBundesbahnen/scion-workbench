@@ -23,6 +23,7 @@ import { NotificationCapabilityModule } from './notification-capability/notifica
 import { ManifestCapabilityModule } from './manifest-capability/manifest-capability.module';
 import { PopupCapabilityModule } from './popup-capability/popup-capability.module';
 import { ModulePlatformConfigLoader } from './core/module-platform-config-loader.service';
+import { ActivatorCapabilityModule } from './activator-capability/activator-capability.module';
 
 @NgModule({
   imports: [
@@ -34,6 +35,7 @@ import { ModulePlatformConfigLoader } from './core/module-platform-config-loader
     NotificationCapabilityModule,
     PopupCapabilityModule,
     ManifestCapabilityModule,
+    ActivatorCapabilityModule,
   ],
 })
 export class WorkbenchApplicationPlatformModule {

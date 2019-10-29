@@ -85,6 +85,7 @@ const routes: Routes = [
   {path: 'activity-28f32b51', component: Activity28f32b51Component},
   {path: 'activity-6d806bea', component: Activity6d806beaComponent},
   {path: 'activity-5782ab19', component: Activity5782ab19Component},
+  {path: 'activator', loadChildren: (): any => import('./activator.module').then(m => m.ActivatorModule)},
 ];
 
 @NgModule({

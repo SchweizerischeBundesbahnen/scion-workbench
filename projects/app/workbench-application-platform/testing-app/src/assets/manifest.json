@@ -699,9 +699,18 @@
         "cssClass": "e2e-activity-5782ab19",
         "position": 10000000009
       }
+    },
+    {
+      "type": "activator",
+      "properties": {
+        "path": "testing/activator"
+      }
     }
   ],
   "intents": [
+    {
+      "type": "manifest-registry"
+    },
     {
       "type": "ping"
     },
