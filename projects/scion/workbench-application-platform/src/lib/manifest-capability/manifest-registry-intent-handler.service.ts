@@ -15,7 +15,7 @@ import { MessageBus } from '../core/message-bus.service';
 import { ApplicationRegistry } from '../core/application-registry.service';
 import { ManifestRegistry } from '../core/manifest-registry.service';
 import { Logger } from '../core/logger.service';
-import { matchesCapabilityQualifier, matchesIntentQualifier } from '../core/qualifier-tester';
+import { matchesCapabilityQualifier } from '../core/qualifier-tester';
 import { Arrays } from '../core/array.util';
 import { patchQualifier } from '../core/qualifier-patcher';
 
@@ -122,7 +122,11 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
       const intents = this._manifestRegistry.getIntentsByApplication(application.symbolicName);
       const isConsumer = intents
         .filter(intent => !capability.private || this._manifestRegistry.isScopeCheckDisabled(intent.metadata.symbolicAppName) || intent.metadata.symbolicAppName === capability.metadata.symbolicAppName)
-        .some(intent => intent.type === capability.type && matchesIntentQualifier(capability.qualifier, intent.qualifier));
+        .filter(intent => intent.type === capability.type)
+        .some(intent => {
+          const patchedQualifier: Qualifier = patchQualifier(intent.qualifier, capability.qualifier);
+          return matchesCapabilityQualifier(capability.qualifier, patchedQualifier);
+        });
       if (isConsumer) {
         consumers.push(application);
       }
