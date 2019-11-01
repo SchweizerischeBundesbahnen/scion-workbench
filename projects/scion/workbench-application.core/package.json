@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench-application.core",
-  "version": "0.0.0-beta.28",
+  "version": "0.0.0-beta.29",
   "description": "SCION Workbench Application Platform is an extension of SCION Workbench to integrate content from multiple web applications in a coherent way, thus enabling a micro frontend architecture for allowing different front-end frameworks to co-exist and independent delivery.\n\nThe platform provides the mechanics for client-side web application integration. Any web application can be integrated. If the site does not interact with the platform, there is no need for adaptation. For a deeper integration, the platform provides a framework-agnostic guest API.\n\nThis package allows an application to interact with SCION Workbench Application Platform. It is written in pure TypeScript.",
   "license": "EPL-2.0",
   "private": false,
@@ -16,8 +16,8 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "dependencies": {
-    "@scion/mouse-dispatcher": "0.0.0-beta.28",
-    "@scion/workbench-application-platform.api": "0.0.0-beta.28"
+    "@scion/mouse-dispatcher": "0.0.0-beta.29",
+    "@scion/workbench-application-platform.api": "0.0.0-beta.29"
   },
   "peerDependencies": {
     "rxjs": "^6.0.0"

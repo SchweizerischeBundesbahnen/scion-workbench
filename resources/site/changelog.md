@@ -6,6 +6,24 @@
 # Changelog
 
 
+# [0.0.0-beta.29](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.28...0.0.0-beta.29) (2019-11-01)
+
+
+### Bug Fixes
+
+* provide fallback for the former 'query' property of manifest commands ([5431811](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5431811))
+* show entry point page inside a viewport ([818187e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/818187e)), closes [#129](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/129)
+* support wildcard intents when querying capability consumers ([2332f10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/2332f10))
+
+
+### Features
+
+* allow a microfrontend to register activator endpoints invoked at platform startup ([a5a97df](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a5a97df)), closes [#190](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/190)
+* allow querying capabilities matching a given qualifier pattern ([16d1fa7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/16d1fa7)), closes [#188](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/188)
+* allow to register and unregister capabilities from inside a microfrontend ([782c831](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/782c831)), closes [#189](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/189)
+* show metadata of capabilities in dev-tools ([0af6db8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0af6db8))
+
+
 # [0.0.0-beta.28](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.27...0.0.0-beta.28) (2019-09-13)
 
 
