@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { matchesCapabilityQualifier, matchesIntentQualifier } from '../core/qualifier-tester';
+import { isEqualQualifier, matchesCapabilityQualifier, matchesIntentQualifier } from '../core/qualifier-tester';
 import { patchQualifier } from '../core/qualifier-patcher';
 
 describe('Qualifier', () => {
@@ -251,6 +251,52 @@ describe('Qualifier', () => {
       expect(patchQualifier({entity: '*', id: '*'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?'});
       expect(patchQualifier({entity: '?', id: '?'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?'});
       expect(patchQualifier({'*': '*'}, {entity: 'user', id: '?'})).toEqual({entity: 'user', id: '?'});
+    });
+  });
+
+  describe('function \'isEqualQualifier(...)\'', () => {
+
+    it('equals same qualifiers', () => {
+      const qualifier = {entity: 'person', id: 42};
+      expect(isEqualQualifier(qualifier, qualifier)).toBeTruthy();
+    });
+
+    it('equals if all keys and values match', () => {
+      expect(isEqualQualifier(null, null)).toBeTruthy();
+      expect(isEqualQualifier(undefined, undefined)).toBeTruthy();
+      expect(isEqualQualifier({}, {})).toBeTruthy();
+      expect(isEqualQualifier({entity: 'person', id: 42}, {entity: 'person', id: 42})).toBeTruthy();
+      expect(isEqualQualifier({entity: '*', id: 42}, {entity: '*', id: 42})).toBeTruthy();
+      expect(isEqualQualifier({entity: '?', id: 42}, {entity: '?', id: 42})).toBeTruthy();
+      expect(isEqualQualifier({'*': '*'}, {'*': '*'})).toBeTruthy();
+    });
+
+    it('is not equal if having different qualifier keys', () => {
+      expect(isEqualQualifier({entity: 'person'}, {entity: 'person', id: 42})).toBeFalsy();
+      expect(isEqualQualifier({entity: 'person', id: 42}, {entity: 'person'})).toBeFalsy();
+    });
+
+    it('is not equal if having different qualifier values', () => {
+      expect(isEqualQualifier({entity: 'person', id: 42}, {entity: 'person', id: 43})).toBeFalsy();
+      expect(isEqualQualifier({entity: 'person', id: 43}, {entity: 'person', id: 42})).toBeFalsy();
+    });
+
+    it('is not equal if comparing wildcard qualifier with specific qualifier', () => {
+      expect(isEqualQualifier({'*': '*'}, {entity: 'person'})).toBeFalsy();
+      expect(isEqualQualifier({entity: '*'}, {entity: 'person'})).toBeFalsy();
+      expect(isEqualQualifier({entity: '?'}, {entity: 'person'})).toBeFalsy();
+      expect(isEqualQualifier({entity: 'person'}, {'*': '*'})).toBeFalsy();
+      expect(isEqualQualifier({entity: 'person'}, {entity: '*'})).toBeFalsy();
+      expect(isEqualQualifier({entity: 'person'}, {entity: '?'})).toBeFalsy();
+    });
+
+    it('is not equal if comparing empty qualifier with non-empty qualifier', () => {
+      expect(isEqualQualifier(null, {entity: 'person'})).toBeFalsy();
+      expect(isEqualQualifier(undefined, {entity: 'person'})).toBeFalsy();
+      expect(isEqualQualifier({}, {entity: 'person'})).toBeFalsy();
+      expect(isEqualQualifier({entity: 'person'}, null)).toBeFalsy();
+      expect(isEqualQualifier({entity: 'person'}, undefined)).toBeFalsy();
+      expect(isEqualQualifier({entity: 'person'}, {})).toBeFalsy();
     });
   });
 });

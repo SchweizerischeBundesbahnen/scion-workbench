@@ -12,7 +12,7 @@ import { Injectable } from '@angular/core';
 import { Capability, Intent, Qualifier } from '@scion/workbench-application-platform.api';
 import { Defined } from './defined.util';
 import { sha256 } from 'js-sha256';
-import { matchesCapabilityQualifier, matchesIntentQualifier } from './qualifier-tester';
+import { isEqualQualifier, matchesCapabilityQualifier, matchesIntentQualifier } from './qualifier-tester';
 
 /**
  * Registry with all registered application capabilities and intents.
@@ -157,6 +157,9 @@ export class ManifestRegistry {
     const registeredCapabilities = this._capabilitiesByType.get(capabilityToUnregister.type);
     this._capabilitiesById.delete(capabilityId);
     this._capabilitiesByType.set(capabilityToUnregister.type, registeredCapabilities.filter(capability => capability.metadata.id !== capabilityId));
+
+    // Unregister implicit intent.
+    this.unregisterImplicitIntents(symbolicName, capabilityToUnregister.type, capabilityToUnregister.qualifier);
   }
 
   /**
@@ -185,6 +188,18 @@ export class ManifestRegistry {
         intent,
       ]);
     });
+  }
+
+  /**
+   * Unregisters implicit intents of the given type and qualifier for the given application.
+   */
+  private unregisterImplicitIntents(symbolicName: string, type: string, qualifier: Qualifier): void {
+    this.getIntentsByApplication(symbolicName)
+      .filter(it => it.metadata.implicit && it.type === type && isEqualQualifier(it.qualifier, qualifier))
+      .forEach(intentToUnregister => {
+        this._intentsById.delete(intentToUnregister.metadata.id);
+        this._intentsByApplication.set(symbolicName, this._intentsByApplication.get(symbolicName).filter(it => it.metadata.id !== intentToUnregister.metadata.id));
+      });
   }
 
   /**

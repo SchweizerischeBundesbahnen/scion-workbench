@@ -277,7 +277,7 @@ describe('ManifestRegistry', () => {
 
   describe('function \'unregisterCapability(...)\'', () => {
 
-    it('should unregister capability of given id', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
+    it('should unregister capability of given id and its implicit intent', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
       const type = PlatformCapabilityTypes.View;
       const qualifier1: Qualifier = {entity: 'entity', qualifier: 1};
       const qualifier2: Qualifier = {entity: 'entity', qualifier: 2};
@@ -293,6 +293,39 @@ describe('ManifestRegistry', () => {
       expect(manifestRegistry.getCapabilities(type, qualifier1).length).toBe(1);
       expect(manifestRegistry.getCapabilities(type, qualifier2).length).toBe(0);
       expect(manifestRegistry.getCapabilities(type, qualifier3).length).toBe(1);
+      expect(manifestRegistry.hasIntent('app-1', type, qualifier1)).toBeTruthy();
+      expect(manifestRegistry.hasIntent('app-1', type, qualifier2)).toBeFalsy();
+      expect(manifestRegistry.hasIntent('app-1', type, qualifier3)).toBeTruthy();
+    })));
+
+    it('should unregister capability of given id and its implicit intent, but not the implicit intents of wildcard (*) capabilities', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
+      const type = PlatformCapabilityTypes.View;
+      const qualifier1: Qualifier = {entity: 'entity', qualifier: 1};
+      const qualifier2: Qualifier = {entity: '*', qualifier: '*'};  // implicit intent of this capability should not be unregistered
+      manifestRegistry.registerCapability('app-1', [{type, qualifier: qualifier1, private: false}]);
+      manifestRegistry.registerCapability('app-1', [{type, qualifier: qualifier2, private: false}]);
+      const capability = manifestRegistry.getCapabilities(type, qualifier1)[0];
+
+      manifestRegistry.unregisterCapability('app-1', capability.metadata.id);
+      expect(manifestRegistry.getCapabilitiesByApplication('app-1').length).toBe(1);
+      expect(manifestRegistry.getCapabilitiesByType(type).length).toBe(1);
+      expect(manifestRegistry.getIntentsByApplication('app-1').length).toBe(1);
+      expect(manifestRegistry.getIntentsByApplication('app-1')[0].qualifier).toEqual(qualifier2);
+    })));
+
+    it('should unregister capability of given id and its implicit intent, but not the implicit intents of wildcard (?) capabilities', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
+      const type = PlatformCapabilityTypes.View;
+      const qualifier1: Qualifier = {entity: 'entity', qualifier: 1};
+      const qualifier2: Qualifier = {entity: '?', qualifier: '?'};  // implicit intent of this capability should not be unregistered
+      manifestRegistry.registerCapability('app-1', [{type, qualifier: qualifier1, private: false}]);
+      manifestRegistry.registerCapability('app-1', [{type, qualifier: qualifier2, private: false}]);
+      const capability = manifestRegistry.getCapabilities(type, qualifier1)[0];
+
+      manifestRegistry.unregisterCapability('app-1', capability.metadata.id);
+      expect(manifestRegistry.getCapabilitiesByApplication('app-1').length).toBe(1);
+      expect(manifestRegistry.getCapabilitiesByType(type).length).toBe(1);
+      expect(manifestRegistry.getIntentsByApplication('app-1').length).toBe(1);
+      expect(manifestRegistry.getIntentsByApplication('app-1')[0].qualifier).toEqual(qualifier2);
     })));
 
     it('should throw exception for nonexistent capability', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
@@ -304,6 +337,7 @@ describe('ManifestRegistry', () => {
       expect(manifestRegistry.getCapabilitiesByApplication('app-1').length).toBe(1);
       expect(manifestRegistry.getCapabilitiesByType(type).length).toBe(1);
       expect(manifestRegistry.getCapabilities(type, qualifier).length).toBe(1);
+      expect(manifestRegistry.hasIntent('app-1', type, qualifier)).toBeTruthy();
     })));
 
     it('should throw exception for capability of other application', fakeAsync(inject([ManifestRegistry], (manifestRegistry: ManifestRegistry) => {
@@ -316,6 +350,7 @@ describe('ManifestRegistry', () => {
       expect(manifestRegistry.getCapabilitiesByApplication('app-1').length).toBe(1);
       expect(manifestRegistry.getCapabilitiesByType(type).length).toBe(1);
       expect(manifestRegistry.getCapabilities(type, qualifier).length).toBe(1);
+      expect(manifestRegistry.hasIntent('app-1', type, qualifier)).toBeTruthy();
     })));
   });
 });
