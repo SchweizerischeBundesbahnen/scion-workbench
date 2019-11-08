@@ -13,6 +13,7 @@ import { Capability, Intent, Qualifier } from '@scion/workbench-application-plat
 import { Defined } from './defined.util';
 import { sha256 } from 'js-sha256';
 import { isEqualQualifier, matchesCapabilityQualifier, matchesIntentQualifier } from './qualifier-tester';
+import { patchQualifier } from './qualifier-patcher';
 
 /**
  * Registry with all registered application capabilities and intents.
@@ -50,9 +51,13 @@ export class ManifestRegistry {
   /**
    * Returns capabilities which have the given required type and qualifier.
    */
-  public getCapabilities<T extends Capability>(type: string, qualifier: Qualifier): T[] {
+  public getCapabilities<T extends Capability>(type: string, qualifier: Qualifier, options?: { wildcardQuery?: boolean }): T[] {
+    const wildcardQuery = Defined.orElse(options && options.wildcardQuery, false);
     return this.getCapabilitiesByType(type)
-      .filter(capability => matchesCapabilityQualifier(capability.qualifier, qualifier)) as T[];
+      .filter(capability => {
+        const queryQualifier = wildcardQuery ? patchQualifier(qualifier, capability.qualifier) : qualifier;
+        return matchesCapabilityQualifier(capability.qualifier, queryQualifier);
+      }) as T[];
   }
 
   /**
