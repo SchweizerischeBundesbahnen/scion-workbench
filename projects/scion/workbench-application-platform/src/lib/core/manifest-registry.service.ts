@@ -118,7 +118,7 @@ export class ManifestRegistry {
     }
 
     capabilities.forEach(it => {
-      if (it.hasOwnProperty('*')) {
+      if (it.qualifier && it.qualifier.hasOwnProperty('*')) {
         throw Error(`[CapabilityRegistrationError] Capability qualifiers do not support \`*\` as key`);
       }
 
@@ -141,25 +141,29 @@ export class ManifestRegistry {
   }
 
   /**
-   * Unregisters capability of the given application.
+   * Unregisters capabilities of given application which have the given type and qualifier.
    */
-  public unregisterCapability(symbolicName: string, capabilityId: string): void {
-    const capabilityToUnregister = this.getCapability(capabilityId);
+  public unregisterCapability(symbolicName: string, type: string, qualifier: Qualifier): void {
+    const capabilitiesToUnregister = this.getCapabilitiesByApplication(symbolicName)
+      .filter(it => it.type === type && isEqualQualifier(it.qualifier, qualifier));
 
-    if (!capabilityToUnregister) {
-      throw Error(`[CapabilityUnregistrationError] Capability does not exist [id=${capabilityId}]`);
+    if (!capabilitiesToUnregister.length) {
+      return;
     }
 
-    if (capabilityToUnregister.metadata.symbolicAppName !== symbolicName) {
-      throw Error(`[CapabilityUnregistrationError] Capability cannot be unregistered by this application [id=${capabilityId}, appName=${symbolicName}]`);
-    }
+    capabilitiesToUnregister.forEach(capabilityToUnregister => {
+      this._capabilitiesById.delete(capabilityToUnregister.metadata.id);
+      const capabilities = this._capabilitiesByType.get(capabilityToUnregister.type).filter(it => it.metadata.id !== capabilityToUnregister.metadata.id);
+      if (capabilities.length) {
+        this._capabilitiesByType.set(capabilityToUnregister.type, capabilities);
+      }
+      else {
+        this._capabilitiesByType.delete(capabilityToUnregister.type);
+      }
+    });
 
-    const registeredCapabilities = this._capabilitiesByType.get(capabilityToUnregister.type);
-    this._capabilitiesById.delete(capabilityId);
-    this._capabilitiesByType.set(capabilityToUnregister.type, registeredCapabilities.filter(capability => capability.metadata.id !== capabilityId));
-
-    // Unregister implicit intent.
-    this.unregisterImplicitIntents(symbolicName, capabilityToUnregister.type, capabilityToUnregister.qualifier);
+    // Unregister implicit intents.
+    this.unregisterImplicitIntents(symbolicName, type, qualifier);
   }
 
   /**

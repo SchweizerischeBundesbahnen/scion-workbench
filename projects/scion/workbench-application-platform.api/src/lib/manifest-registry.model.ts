@@ -105,7 +105,7 @@ export namespace ManifestRegistryIntentMessages {
   }
 
   /**
-   * Unregisters capability of given id.
+   * Unregisters capability of given type and qualifier.
    *
    * The requesting application can only unregister its own capabilities.
    */
@@ -113,7 +113,8 @@ export namespace ManifestRegistryIntentMessages {
     type: PlatformCapabilityTypes.ManifestRegistry;
     payload: {
       command: ManifestCommands.UnregisterCapability;
-      capabilityId: string;
+      type: string;
+      qualifier: Qualifier;
     };
   }
 }
