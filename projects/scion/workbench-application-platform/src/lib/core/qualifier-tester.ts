@@ -83,3 +83,31 @@ export function matchesIntentQualifier(intentQualifier: Qualifier, testee: Quali
       return _intentQualifier[key] === _testee[key];
     });
 }
+
+/**
+ * Tests if the given qualifies are equal.
+ */
+export function isEqualQualifier(qualifier1: Qualifier, qualifier2: Qualifier): boolean {
+  // Test if same instance
+  if (qualifier1 === qualifier2) {
+    return true;
+  }
+
+  // Test if one of the qualifiers is undefined
+  if (!qualifier1 || !qualifier2) {
+    return false;
+  }
+
+  // Test if qualifier2 has all required entries
+  if (!Object.keys(qualifier1).every(key => qualifier2.hasOwnProperty(key))) {
+    return false;
+  }
+
+  // Test if qualifier2 has no additional entries
+  if (!Object.keys(qualifier2).every(key => qualifier1.hasOwnProperty(key))) {
+    return false;
+  }
+
+  // Test if values match
+  return Object.keys(qualifier1).every(key => qualifier1[key] === qualifier2[key]);
+}
