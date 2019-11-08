@@ -147,17 +147,18 @@ export class ManifestRegistryService implements Service {
   }
 
   /**
-   * Unregisters capability of given id.
+   * Unregisters capability of given type and qualifier.
    *
    * The requesting application can only unregister its own capabilities.
    */
-  public unregisterCapability$(capabilityId: string): Observable<void> {
+  public unregisterCapability$(type: string, qualifier: Qualifier): Observable<void> {
     const intentMessage: ManifestRegistryIntentMessages.UnregisterCapability = {
       type: PlatformCapabilityTypes.ManifestRegistry,
       qualifier: NilQualifier,
       payload: {
         command: ManifestCommands.UnregisterCapability,
-        capabilityId: capabilityId,
+        type: type,
+        qualifier: qualifier,
       },
     };
 

@@ -36,7 +36,7 @@
     }
   }
 
-  &.has-properties {
+  &:not(.has-properties) {
     > section.used-by {
       grid-column: 1/-1;
     }

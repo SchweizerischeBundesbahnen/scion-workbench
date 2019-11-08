@@ -175,14 +175,15 @@ export class ManifestRegistryIntentHandler implements IntentHandler {
   }
 
   /**
-   * Unregisters capability of given id.
+   * Unregisters capability of given type and qualifier.
    *
    * The requesting application can only unregister its own capabilities.
    */
   private unregisterCapability(envelope: MessageEnvelope<ManifestRegistryIntentMessages.UnregisterCapability>): void {
-    const capabilityId: string = envelope.message.payload.capabilityId;
+    const type: string = envelope.message.payload.type;
+    const qualifier: Qualifier = envelope.message.payload.qualifier;
     try {
-      this._manifestRegistry.unregisterCapability(envelope.sender, capabilityId);
+      this._manifestRegistry.unregisterCapability(envelope.sender, type, qualifier);
       this._messageBus.publishReply({status: 'ok'}, envelope.sender, envelope.replyToUid);
     }
     catch (error) {
