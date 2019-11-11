@@ -6,6 +6,17 @@
 # Changelog
 
 
+# [0.0.0-beta.30](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.29...0.0.0-beta.30) (2019-11-11)
+
+
+### Bug Fixes
+
+* add wildcard support for querying capabilities in the host app ([e6bde77](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e6bde77)), closes [#201](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/201)
+* allow a microfrontend observing capabilities for which it declares an intent ([99ccdf5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/99ccdf5)), closes [#198](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/198) [#202](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/202)
+* remove implicit intent when unregistering a capability ([0996a22](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0996a22)), closes [#200](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/200)
+* unregister a capability by its type and qualifier instead of its id ([6044823](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6044823)), closes [#199](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/199)
+
+
 # [0.0.0-beta.29](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.28...0.0.0-beta.29) (2019-11-01)
 
 
