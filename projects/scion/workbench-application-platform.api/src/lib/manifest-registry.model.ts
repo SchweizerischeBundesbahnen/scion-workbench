@@ -164,3 +164,17 @@ export interface Manifest {
    */
   restrictions: any;
 }
+
+/**
+ * Represents manifest specific message types used for communication between the application outlet and the application.
+ */
+export enum ManifestHostMessageTypes {
+  /**
+   * Notifies when a capability is registered or unregistered.
+   *
+   * direction:  outlet => application
+   * request:    void
+   * reply:      -
+   */
+  CapabilityChange = 'capability-change',
+}

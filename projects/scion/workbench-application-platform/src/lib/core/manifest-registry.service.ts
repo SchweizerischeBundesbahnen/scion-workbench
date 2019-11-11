@@ -14,6 +14,7 @@ import { Defined } from './defined.util';
 import { sha256 } from 'js-sha256';
 import { isEqualQualifier, matchesCapabilityQualifier, matchesIntentQualifier } from './qualifier-tester';
 import { patchQualifier } from './qualifier-patcher';
+import { Observable, Subject } from 'rxjs';
 
 /**
  * Registry with all registered application capabilities and intents.
@@ -26,6 +27,7 @@ export class ManifestRegistry {
   private _intentsByApplication = new Map<string, Intent[]>();
   private _intentsById = new Map<string, Intent>();
   private _scopeCheckDisabled = new Set<string>();
+  private _capabilityChange$ = new Subject<void>();
 
   /**
    * Returns capabilities which have the given required type.
@@ -51,7 +53,7 @@ export class ManifestRegistry {
   /**
    * Returns capabilities which have the given required type and qualifier.
    */
-  public getCapabilities<T extends Capability>(type: string, qualifier: Qualifier, options?: { wildcardQuery?: boolean }): T[] {
+  public getCapabilities<T extends Capability>(type: string, qualifier?: Qualifier, options?: { wildcardQuery?: boolean }): T[] {
     const wildcardQuery = Defined.orElse(options && options.wildcardQuery, false);
     return this.getCapabilitiesByType(type)
       .filter(capability => {
@@ -143,12 +145,14 @@ export class ManifestRegistry {
 
     // Register implicit intents. These are intents for capabilities which the application provides itself.
     this.registerIntents(symbolicName, capabilities.map(capability => ({type: capability.type, qualifier: capability.qualifier})), true);
+
+    this._capabilityChange$.next();
   }
 
   /**
    * Unregisters capabilities of given application which have the given type and qualifier.
    */
-  public unregisterCapability(symbolicName: string, type: string, qualifier: Qualifier): void {
+  public unregisterCapability(symbolicName: string, type: string, qualifier?: Qualifier): void {
     const capabilitiesToUnregister = this.getCapabilitiesByApplication(symbolicName)
       .filter(it => it.type === type && isEqualQualifier(it.qualifier, qualifier));
 
@@ -169,6 +173,8 @@ export class ManifestRegistry {
 
     // Unregister implicit intents.
     this.unregisterImplicitIntents(symbolicName, type, qualifier);
+
+    this._capabilityChange$.next();
   }
 
   /**
@@ -223,5 +229,12 @@ export class ManifestRegistry {
    */
   public isScopeCheckDisabled(symbolicName: string): boolean {
     return this._scopeCheckDisabled.has(symbolicName);
+  }
+
+  /**
+   * Returns an Observable that emits when a capability is added or removed.
+   */
+  public get capabilityChange$(): Observable<void> {
+    return this._capabilityChange$;
   }
 }
