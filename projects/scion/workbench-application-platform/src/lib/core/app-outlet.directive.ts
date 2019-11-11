@@ -14,7 +14,8 @@ import { merge, Subject } from 'rxjs';
 import { MessageBus } from './message-bus.service';
 import { filter, first, map, takeUntil } from 'rxjs/operators';
 import { UUID } from './uuid.util';
-import { HostMessage, MessageEnvelope, parseMessageEnvelopeElseNull, PROTOCOL } from '@scion/workbench-application-platform.api';
+import { HostMessage, ManifestHostMessageTypes, MessageEnvelope, parseMessageEnvelopeElseNull, PROTOCOL } from '@scion/workbench-application-platform.api';
+import { ManifestRegistry } from './manifest-registry.service';
 
 /**
  * Extends {RemoteSiteComponent} to interact with the application which is showing as a remote site.
@@ -42,12 +43,19 @@ export class AppOutletDirective implements OnInit, OnDestroy {
   constructor(host: ElementRef<Element>,
               private _site: RemoteSiteComponent,
               private _messageBus: MessageBus,
+              private _manifestRegistry: ManifestRegistry,
               private _injector: Injector,
               private _zone: NgZone) {
     this._host = host.nativeElement;
   }
 
   public ngOnInit(): void {
+    this._manifestRegistry.capabilityChange$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(() => {
+        this.postHostMessage({type: ManifestHostMessageTypes.CapabilityChange});
+      });
+
     // Dispatch messages from the message bus to the application
     const intentMessages$ = this._messageBus.receiveIntentsForApplication$(this.symbolicName);
     const providerMessages$ = this._messageBus.receiveProviderMessagesForApplication$(this.symbolicName);
@@ -81,7 +89,8 @@ export class AppOutletDirective implements OnInit, OnDestroy {
       else {
         this._messageBus.publishMessageIfQualified(envelope, this.symbolicName, {injector: this._injector, outletBoundingBox: this._host.getBoundingClientRect()});
       }
-    } catch (error) {
+    }
+    catch (error) {
       this.postHostError(error.message);
     }
   }
