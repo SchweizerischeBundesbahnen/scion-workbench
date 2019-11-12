@@ -11,6 +11,11 @@
 import { Capability, IntentMessage, PlatformCapabilityTypes } from './core.model';
 
 /**
+ * Declares the type of a view reference.
+ */
+export declare type ViewRef = 'string';
+
+/**
  * Capability to show an application page as a workbench view.
  */
 export interface ViewCapability extends Capability {
@@ -206,10 +211,11 @@ export interface ViewIntentMessage extends IntentMessage {
     /**
      * Controls where to open the view.
      *
-     * 'blank': opens the view in a new view tab (which is by default)
-     * 'self':  opens the view in the current view tab
+     * 'blank':   opens the view in a new view tab (which is by default)
+     * 'self':    opens the view in the current view tab
+     * <viewRef>: opens the view in the given view tab
      */
-    target?: 'blank' | 'self';
+    target?: 'blank' | 'self' | ViewRef;
     /**
      * Specifies the position where to insert the view into the tab bar when using 'blank' view target strategy.
      * If not specified, the view is inserted after the active view. Set the index to 'start' or 'end' for inserting

@@ -9,7 +9,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Platform, Qualifier, RouterService, ViewNavigateCommand } from '@scion/workbench-application.core';
+import { Platform, Qualifier, RouterService, ViewNavigateCommand, ViewRef } from '@scion/workbench-application.core';
 
 /**
  * Provides workbench view navigation capabilities.
@@ -55,10 +55,11 @@ export interface WbNavigationExtras {
   /**
    * Controls where to open the view.
    *
-   * 'blank': opens the view in a new view tab (which is by default)
-   * 'self':  opens the view in the current view tab
+   * 'blank':   opens the view in a new view tab (which is by default)
+   * 'self':    opens the view in the current view tab
+   * <viewRef>: opens the view in the given view tab
    */
-  target?: 'blank' | 'self';
+  target?: 'blank' | 'self' | ViewRef;
   /**
    * Specifies optional query parameters to open the view.
    */
