@@ -71,11 +71,20 @@ export class ViewIntentDispatcher implements OnDestroy {
         const extras: WbNavigationExtras = {
           activateIfPresent: intentMessage.payload.activateIfPresent,
           closeIfPresent: intentMessage.payload.closeIfPresent,
-          target: intentMessage.payload.target,
           selfViewRef: view && view.viewRef,
           blankViewPartRef: view && this._workbench.resolveViewPart(view.viewRef),
           blankInsertionIndex: intentMessage.payload.blankInsertionIndex,
         };
+
+        // Check if to open the view in a specific view outlet.
+        const target = intentMessage.payload.target || 'blank';
+        if (target === 'self' || target === 'blank') {
+          extras.target = target;
+        }
+        else {
+          extras.target = 'self';
+          extras.selfViewRef = target;
+        }
 
         const commands = this.createNavigateCommands(viewCapability, matrixParamObject, envelope.message.qualifier);
         this._wbRouter.navigate(commands, extras).then(noop);
@@ -91,7 +100,8 @@ export class ViewIntentDispatcher implements OnDestroy {
       .subscribe((envelope: MessageEnvelope<ViewIntentMessage>) => {
         try {
           this.onIntent(envelope);
-        } catch (error) {
+        }
+        catch (error) {
           this._logger.error(`Failed to handle intent [${JSON.stringify(envelope.message.qualifier || {})}]`, error);
         }
       });
