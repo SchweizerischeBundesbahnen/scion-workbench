@@ -79,7 +79,7 @@ describe('DimensionService', () => {
     expect(reportedSizes).toEqual([100, 200, 300]);
   });
 
-  fit('should allocate a single HTML object element for multiple observers', async () => {
+  it('should allocate a single HTML object element for multiple observers', async () => {
     const dimensionService: SciDimensionService = TestBed.get(SciDimensionService);
 
     // create the testee <div>
