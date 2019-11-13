@@ -13,7 +13,7 @@ import { Capability, IntentMessage, PlatformCapabilityTypes } from './core.model
 /**
  * Declares the type of a view reference.
  */
-export declare type ViewRef = 'string';
+export type ViewRef = string;
 
 /**
  * Capability to show an application page as a workbench view.
