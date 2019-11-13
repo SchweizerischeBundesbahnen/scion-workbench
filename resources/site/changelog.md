@@ -5,6 +5,13 @@
 
 # Changelog
 
+# [0.0.0-beta.31](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.30...0.0.0-beta.31) (2019-11-13)
+
+
+### Features
+
+* allow a microfrontend to open a view in a specific view outlet ([6e44e1a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6e44e1aafea058d49a0cdf0e03793cd14db5e4ed)), closes [#207](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/207)
+
 
 # [0.0.0-beta.30](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.29...0.0.0-beta.30) (2019-11-11)
 
