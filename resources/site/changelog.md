@@ -5,6 +5,14 @@
 
 # Changelog
 
+# [0.0.0-beta.32](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.31...0.0.0-beta.32) (2019-11-13)
+
+
+### Bug Fixes
+
+* declare the type `viewref` to be of type `string` instead of a string literal ([7bc15c6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7bc15c6b814e62db5c5324338a19909d1b082149)), closes [#207](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/207)
+
+
 # [0.0.0-beta.31](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.30...0.0.0-beta.31) (2019-11-13)
 
 
