@@ -69,9 +69,8 @@ export async function findAsync<T>(items: T[], predicate: (item: T) => Promise<b
 /**
  * Expects the given function to be rejected.
  *
- * Remove this util when updating to Jasmine 3.5.
- *
  * Jasmine 3.5 provides 'expectAsync' expectation with the 'toBeRejectedWithError' matcher.
+ * But, it does not support to test against a regular expression.
  * @see https://jasmine.github.io/api/3.5/async-matchers.html
  */
 export function expectToBeRejectedWithError(fn: () => Promise<any>, expected?: RegExp): Promise<void> {
@@ -90,6 +89,9 @@ export function expectToBeRejectedWithError(fn: () => Promise<any>, expected?: R
     .catch(reason => {
       if (expected && !reasonExtractorFn(reason).match(expected)) {
         fail(`Expected promise to be rejected with a reason matching '${expected.source}', but was '${reason}'.`);
+      }
+      else {
+        expect(true).toBeTruthy();
       }
     });
 }

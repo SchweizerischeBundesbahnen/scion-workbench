@@ -1,44 +1,39 @@
-// tslint:disable:unified-signatures
+/*
+ * Copyright (c) 2018-2019 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
 
 import { MessageClient } from './message-client';
-import { EMPTY, from, fromEvent, merge, MonoTypeOperatorFunction, Observable, Observer, of, Subject, TeardownLogic, throwError } from 'rxjs';
-import { BrokerConnector, BrokerWindowRef } from './broker-connector';
+import { EMPTY, merge, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
 import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
-import { filterByChannel, filterByTopic, filterByTransport, pluckEnvelope, pluckMessage } from './operators';
-import { filter, finalize, first, map, mergeMap, share, takeUntil, timeoutWith } from 'rxjs/operators';
-import { Defined, UUID } from '@scion/toolkit/util';
+import { filterByChannel, filterByTopic, pluckMessage } from './operators';
+import { catchError, filter, finalize, first, map, mergeMap, takeUntil, timeoutWith } from 'rxjs/operators';
+import { UUID } from '@scion/toolkit/util';
 import { Beans } from '../bean-manager';
 import { Intent, Qualifier } from '../platform.model';
 import { IntentMessage, TopicMessage } from '../messaging.model';
 import { matchesIntentQualifier } from '../qualifier-tester';
-import { ClientConfig } from './client-config';
 import { MicrofrontendPlatformState, PlatformStates } from '../microfrontend-platform-state';
+import { BrokerGateway } from './broker-gateway';
 
+// tslint:disable:unified-signatures
 export class ɵMessageClient implements MessageClient { // tslint:disable-line:class-name
 
   private readonly _destroy$ = new Subject<void>();
-  private readonly _connector: BrokerConnector;
-  private readonly _brokerMessages$: Observable<MessageEnvelope>;
-  private readonly _clientConfig: ClientConfig;
+  private readonly _brokerGateway: BrokerGateway;
 
-  constructor() {
-    this._clientConfig = Beans.get(ClientConfig);
-    this._connector = new BrokerConnector(this._clientConfig);
-
-    // Construct a stream of messages sent by the broker.
-    this._brokerMessages$ = fromEvent<MessageEvent>(window, 'message')
-      .pipe(
-        filterByTransport(MessagingTransport.BrokerToClient),
-        checkMessageOrigin(this._connector),
-        pluckEnvelope(),
-        share(),
-        takeUntil(this._destroy$), // no longer emit messages when destroyed
-      );
+  constructor(clientAppName: string, private _config: { discoveryTimeout: number, deliveryTimeout: number }) {
+    this._brokerGateway = new BrokerGateway(clientAppName, {discoveryTimeout: this._config.discoveryTimeout});
 
     // Disconnect from the broker when the platform has stopped and after all beans have been destroyed.
     Beans.get(MicrofrontendPlatformState).whenState(PlatformStates.Stopped).then(() => {
       this._destroy$.next();
-      this._connector.disconnect().then();
+      this._brokerGateway.destroy();
     });
   }
 
@@ -56,7 +51,7 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
       return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
     }
     else {
-      throw Error('[DestinationError] Destination must be of type `Topic` or `Intent`.');
+      throw Error('[DestinationError] Destination must be of the type `string` for topic-based messaging, or `Intent` for intent-based messaging.');
     }
   }
 
@@ -74,14 +69,14 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
       return this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage);
     }
     else {
-      throw Error('[DestinationError] Destination must be of type `Topic` or `Intent`.');
+      throw Error('[DestinationError] Destination must be of the type `string` for topic-based messaging, or `Intent` for intent-based messaging.');
     }
   }
 
   /** @publicApi **/
   public observe$<T>(topic: string): Observable<TopicMessage<T>>;
   public observe$<T>(intentSelector?: Intent): Observable<IntentMessage<T>>;
-  public observe$<T>(destination: string | Intent): Observable<TopicMessage> | Observable<IntentMessage<T>> {
+  public observe$<T>(destination: string | Intent): Observable<TopicMessage<T>> | Observable<IntentMessage<T>> {
     if (typeof destination === 'string') {
       return this.receiveMessage$(destination);
     }
@@ -89,7 +84,7 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
       return this.receiveIntent$(destination);
     }
     else {
-      throw Error('[DestinationError] Destination must be of type `Topic` or `Intent`.');
+      throw Error('[DestinationError] Destination must be of the type `string` for topic-based messaging, or `Intent` for intent-based messaging.');
     }
   }
 
@@ -99,21 +94,25 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
       .pipe(map(message => message.payload));
   }
 
+  /**
+   * Receives topic messages from the message broker.
+   * There are only messages received for which the client has a topic subscription.
+   */
   private receiveMessage$<T>(topic: string): Observable<TopicMessage<T>> {
     return new Observable((observer: Observer<TopicMessage>): TeardownLogic => {
       const unsubscribe$ = new Subject<void>();
       const topicSubscribeError$ = new Subject<void>();
 
       // Receive messages sent to the given topic.
-      merge(this._brokerMessages$, topicSubscribeError$)
+      merge(this._brokerGateway.message$, topicSubscribeError$)
         .pipe(
-          filterByChannel(MessagingChannel.Topic),
-          filterByTopic(topic),
-          pluckMessage<TopicMessage<T>>(),
+          filterByTopic<T>(topic),
           takeUntil(merge(this._destroy$, unsubscribe$)),
           finalize(() => {
             const command: TopicUnsubscribeCommand = {topic: topic};
-            this.postMessageToBroker$(MessagingChannel.TopicUnsubscribe, command).subscribe();
+            this.postMessageToBroker$(MessagingChannel.TopicUnsubscribe, command)
+              .pipe(catchError(() => EMPTY)) // do not propagate unsubscribe errors
+              .subscribe();
           }),
         )
         .subscribe(observer);
@@ -128,16 +127,24 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
     });
   }
 
+  /**
+   * Receives intents from the message broker for which this client has declared an intent.
+   */
   private receiveIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {
-    return this._brokerMessages$
+    return this._brokerGateway.message$
       .pipe(
-        filterByChannel(MessagingChannel.Intent),
-        pluckMessage<IntentMessage<T>>(),
+        filterByChannel<IntentMessage<T>>(MessagingChannel.Intent),
+        pluckMessage(),
         filter(intent => !selector || !selector.type || selector.type === intent.type),
         filter(intent => !selector || !selector.qualifier || matchesIntentQualifier(selector.qualifier, intent.qualifier)),
       );
   }
 
+  /**
+   * Posts a message to the message broker.
+   *
+   * @return An Observable that completes upon successful delivery, or errors otherwise.
+   */
   private postMessageToBroker$(channel: MessagingChannel, message: any): Observable<never> {
     const messageId = UUID.randomUUID();
     const envelope: MessageEnvelope = {
@@ -151,30 +158,25 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
       const unsubscribe$ = new Subject<void>();
 
       // Wait until the message is delivered.
-      const deliveryTimeout = Defined.orElse(this._clientConfig.messaging && this._clientConfig.messaging.deliveryTimeout, 10000);
-      this._brokerMessages$
+      this._brokerGateway.message$
         .pipe(
-          filterByChannel(MessagingChannel.Topic),
-          filterByTopic(messageId),
+          filterByTopic<MessageDeliveryStatus>(messageId),
           first(),
-          pluckMessage<TopicMessage<MessageDeliveryStatus>>(),
-          timeoutWith(new Date(Date.now() + deliveryTimeout), throwError(`[MessageDispatchError] Broker did not report message dispatch state within the ${deliveryTimeout}ms timeout. [message=${JSON.stringify(envelope)}]`)),
+          timeoutWith(new Date(Date.now() + this._config.deliveryTimeout), throwError(`[MessageDispatchError] Broker did not report message delivery state within the ${this._config.deliveryTimeout}ms timeout. [message=${JSON.stringify(envelope)}]`)),
           takeUntil(merge(unsubscribe$, this._destroy$)),
-          mergeMap(statusMessage => statusMessage.payload.success ? EMPTY : throwError(statusMessage.payload.details)),
+          mergeMap(statusMessage => statusMessage.payload.ok ? EMPTY : throwError(statusMessage.payload.details)),
         )
         .subscribe(observer);
 
       // Dispatch the message to the broker.
-      this._connector.whenConnected
-        .then(broker => broker.window.postMessage(envelope, broker.origin))
-        .catch(error => observer.error(error));
+      this._brokerGateway.postMessage(envelope).catch(error => observer.error(error));
 
       return (): void => unsubscribe$.next();
     });
   }
 
   private postMessageToBrokerAndReceiveReplies$<T = any>(channel: MessagingChannel, message: IntentMessage | TopicMessage): Observable<TopicMessage<T>> {
-    const replyToTopic = `ɵ${UUID.randomUUID()}`;
+    const replyToTopic = UUID.randomUUID();
     const request: IntentMessage | TopicMessage = {...message, replyTo: replyToTopic};
 
     return new Observable((observer: Observer<TopicMessage>): TeardownLogic => {
@@ -194,12 +196,6 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
       return (): void => unsubscribe$.next();
     });
   }
-}
-
-function checkMessageOrigin<T = any>(connector: BrokerConnector): MonoTypeOperatorFunction<MessageEvent> {
-  return mergeMap((event: MessageEvent): Observable<MessageEvent> => {
-    return from(connector.whenConnected).pipe(mergeMap((broker: BrokerWindowRef) => (event.origin === broker.origin) ? of(event) : EMPTY));
-  });
 }
 
 function assertNoWildcardCharacters(qualifier: Qualifier): void {

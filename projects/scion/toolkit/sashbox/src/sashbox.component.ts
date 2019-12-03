@@ -69,7 +69,6 @@ export class SciSashboxComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  /** @internal **/
   public sashes: SciSashDirective[] = [];
 
   /** @internal **/

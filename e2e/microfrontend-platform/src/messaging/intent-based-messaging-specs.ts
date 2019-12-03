@@ -61,7 +61,7 @@ export namespace IntendBasedMessagingSpecs {
     await publisherPO.enterIntent('testing', {key: 'value'});
     await publisherPO.clickPublish();
 
-    await expect(publisherPO.getPublishError()).toContain('[NullCapabilityProviderError]');
+    await expect(publisherPO.getPublishError()).toContain('[NullProviderError]');
   }
 
   /**
@@ -145,7 +145,7 @@ export namespace IntendBasedMessagingSpecs {
     await publisherPO_4202.clickPublish();
 
     // assert intent not to be dispatched
-    await expect(publisherPO_4202.getPublishError()).toContain('[NullCapabilityProviderError]');
+    await expect(publisherPO_4202.getPublishError()).toContain('[NullProviderError]');
 
     // assert intent not to be received
     await expect(receiverPO_4203.getMessages()).toEqual([]);

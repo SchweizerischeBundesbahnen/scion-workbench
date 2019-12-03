@@ -12,6 +12,8 @@
     "importHelpers": true,
     "target": "es2015",
     "noUnusedLocals": true,
+    // to correctly transpile ES2015 collections to ES5; crucial to run on ES5
+    "downlevelIteration": true,
     "typeRoots": [
       "node_modules/@types"
     ],

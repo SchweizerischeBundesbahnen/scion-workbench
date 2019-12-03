@@ -60,7 +60,6 @@ export class SciCheckboxComponent implements ControlValueAccessor, OnDestroy {
 
   /**
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
-   * @internal
    */
   public registerOnChange(fn: any): void {
     this._cvaChangeFn = fn;
@@ -68,7 +67,6 @@ export class SciCheckboxComponent implements ControlValueAccessor, OnDestroy {
 
   /**
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
-   * @internal
    */
   public registerOnTouched(fn: any): void {
     this._cvaTouchedFn = fn;
@@ -76,7 +74,6 @@ export class SciCheckboxComponent implements ControlValueAccessor, OnDestroy {
 
   /**
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
-   * @internal
    */
   public setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
@@ -85,10 +82,9 @@ export class SciCheckboxComponent implements ControlValueAccessor, OnDestroy {
 
   /**
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
-   * @internal
    */
-  public writeValue(checked: string): void {
-    this.formControl.setValue(coerceBooleanProperty(checked), {emitEvent: false});
+  public writeValue(value: any): void {
+    this.formControl.setValue(coerceBooleanProperty(value), {emitEvent: false});
     this._cd.markForCheck();
   }
 

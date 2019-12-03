@@ -23,6 +23,10 @@ import { PlatformProperties } from './host/platform-properties';
 import { Logger } from './logger';
 import { HttpClient } from './host/http-client';
 import { ManifestCollector } from './host/manifest-collector';
+import { PlatformMessageClient } from './host/platform-message-client';
+import { PLATFORM_SYMBOLIC_NAME } from './host/platform.constants';
+import { PlatformInitializer } from './host/platform-initializer';
+import { Defined } from '@scion/toolkit/util';
 
 /**
  * The central class of the SCION microfrontend platform.
@@ -35,6 +39,8 @@ import { ManifestCollector } from './host/manifest-collector';
  * - registry of installed microfrontends
  * - outlet to embed a microfrontend
  * - ...
+ *
+ * TODO: Complete feature list
  */
 export const MicrofrontendPlatform = new class {
 
@@ -54,9 +60,9 @@ export const MicrofrontendPlatform = new class {
   public forClient(config: ClientConfig): Promise<void> {
     return this.startPlatform(() => {
         Beans.register(ClientConfig, {useValue: config});
-        Beans.registerIfAbsent(MessageClient, {useClass: ɵMessageClient, eager: true});
         Beans.registerIfAbsent(HttpClient);
         Beans.registerIfAbsent(Logger);
+        Beans.registerIfAbsent(MessageClient, {useFactory: provideMessageClient(config.symbolicName, config.messaging), eager: true});
       },
     );
   }
@@ -68,7 +74,7 @@ export const MicrofrontendPlatform = new class {
    *         Defines the applications running in the platform. You can provide a static configuration or a loader to load the configuration from remote.
    *         If using a static config, provide it either as an array of {@link ApplicationConfig}s or as a {@link PlatformConfig} object.
    * @param  clientConfig
-   *         Provide a client configuration if the host app also acts as a client app. If set, the host-app can provide capabilities and interact with other clients.
+   *         Provide a client configuration if the host app also acts as a client app. If set, the host app can interact with other clients.
    * @return A Promise that resolves when the platform started successfully, or that rejects if startup fails.
    */
   public forHost(platformConfig: ApplicationConfig[] | PlatformConfig | Type<PlatformConfigLoader>, clientConfig?: ClientConfig): Promise<void> {
@@ -80,12 +86,14 @@ export const MicrofrontendPlatform = new class {
         Beans.register(PlatformProperties);
         Beans.registerIfAbsent(Logger);
         Beans.registerIfAbsent(HttpClient);
+        Beans.registerIfAbsent(PlatformMessageClient, {useFactory: provideMessageClient(PLATFORM_SYMBOLIC_NAME, clientConfig && clientConfig.messaging), eager: true});
 
+        Beans.registerInitializer({useClass: PlatformInitializer});
         Beans.registerInitializer({useClass: ManifestCollector});
 
         if (clientConfig) {
           Beans.register(ClientConfig, {useValue: clientConfig});
-          Beans.registerIfAbsent(MessageClient, {useClass: ɵMessageClient, eager: true});
+          Beans.registerIfAbsent(MessageClient, {useFactory: provideMessageClient(clientConfig.symbolicName, clientConfig.messaging), eager: true});
         }
       },
     );
@@ -95,7 +103,7 @@ export const MicrofrontendPlatform = new class {
    * Checks if this application is running in the context of the microfrontend platform.
    */
   public isRunningStandalone(): boolean {
-    throw Error('[UnsupportedOperationError] Method not implemented yet.');
+    throw Error('[UnsupportedOperationError] Method not implemented yet.'); // TODO implement this functionality
   }
 
   /**
@@ -144,6 +152,17 @@ function createConfigLoaderBeanDescriptor(config: ApplicationConfig[] | Platform
   else { // {PlatformConfig} object
     return {useValue: new StaticPlatformConfigLoader(config)};
   }
+}
+
+/**
+ * Provides the message client for the given configuration.
+ */
+function provideMessageClient(clientAppName: string, config?: { brokerDiscoverTimeout?: number, deliveryTimeout?: number }): () => MessageClient {
+  return (): MessageClient => {
+    const discoveryTimeout = Defined.orElse(config && config.brokerDiscoverTimeout, 10000);
+    const deliveryTimeout = Defined.orElse(config && config.deliveryTimeout, 10000);
+    return new ɵMessageClient(clientAppName, {discoveryTimeout, deliveryTimeout});
+  };
 }
 
 class StaticPlatformConfigLoader implements PlatformConfigLoader {

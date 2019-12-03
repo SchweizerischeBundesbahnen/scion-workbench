@@ -1,20 +1,31 @@
+/*
+ * Copyright (c) 2018-2019 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
 // tslint:disable:unified-signatures
-
-import { Observable } from 'rxjs';
+import { MonoTypeOperatorFunction, Observable } from 'rxjs';
 import { Intent } from '../platform.model';
 import { IntentMessage, TopicMessage } from '../messaging.model';
+import { first, takeUntil } from 'rxjs/operators';
+import { Beans } from '../bean-manager';
 
 /**
  * Message client for sending and receiving messages between applications across origins.
+ * This client provides topic-based (publish/subscribe) and intent-based messaging, and
+ * allows consumers to reply to a message.
  *
- * This client provides topic-based (publish/subscribe) and intent-based messaging.
+ * ### Topic-based Messaging:
+ * Allows publishing a message to multiple consumers subscribed to a topic.
  *
- * - Topic-based messaging allows publishing a message to multiple consumers subscribed to a topic.
- * - Intent-based messaging requires the publisher to declare an intent and some application to provide a capability.
- *   The intent is transported to all consumers capable of handling the intent, i.e., providing a capability fulfilling
- *   the intent and which is visible to the publishing application.
- *
- * Besides, this client provides 'request-reply' messaging, allowing consumers to reply to a message.
+ * ### Intent-based Messaging:
+ * Requires the publisher to declare an intent and some application to provide a capability. The intent is transported
+ * to all consumers capable of handling the intent, i.e., providing a capability fulfilling the intent and which is
+ * visible to the publishing application.
  */
 export abstract class MessageClient {
 
@@ -66,7 +77,7 @@ export abstract class MessageClient {
    * Publishing an intent requires the publisher declaring the intent in its application manifest.
    *
    * @param  intent
-   *         Describes the intent. It must not include wildcard characters.
+   *         Describes the intent. The qualifier must not include wildcard characters.
    * @param  payload
    *         Specifies transfer data to be sent with the intent, if any.
    * @return An Observable that emits when some consumer replies. It never completes. It throws an error if the message could not be dispatched.
@@ -77,19 +88,18 @@ export abstract class MessageClient {
   /**
    * Receives messages published to the given topic.
    *
-   * If the received message has the `replyTo` field set, the publisher expects the consumer to send some reply(ies) to that `replyTo` topic.
-   * If replying with data from some long-living Observable, the consumer can track the requestor's subscription by monitoring {@link MessageClient#subscriberCount$}.
-   * When the subscription count drops to zero, the requestor unsubscribed, meaning that the consumer can stop replying.
-   *
+   * If the received message has the `replyTo` field set, the publisher expects to send some reply(ies) to that `replyTo` topic.
+   * If replying with data from some long-living Observable, you can track the requestor's subscription by monitoring {@link MessageClient#subscriberCount$}.
+   * You can use {@link takeUntilUnsubscribe} operator to stop replying when the requestor unsubscribes.
    *
    * ### Request-Reply example monitoring the requestor's subscription:
    *
    * ```
    * Beans.get(MessageClient).observe$('topic').subscribe(request => {
-   *   data$
+   *   stream$
    *     .pipe(
    *       mergeMap(data => Beans.get(MessageClient).publish$(request.replyTo, data)),
-   *       takeUntil(Beans.get(MessageClient).subscriberCount$(request.replyTo).pipe(first(count => count === 0))),
+   *       takeUntilUnsubscribe(request.replyTo),
    *     )
    *     .subscribe();
    * });
@@ -118,8 +128,8 @@ export abstract class MessageClient {
    * Beans.get(MessageClient).observe$({type: 'auth-token'}).subscribe(request => {
    *   authToken$
    *     .pipe(
-   *       mergeMap(authToken => Beans.get(MessageClient).publish$(request.replyTo, authToken)),
-   *       takeUntil(Beans.get(MessageClient).subscriberCount$(request.replyTo).pipe(first(count => count === 0))),
+   *       mergeMap(data => Beans.get(MessageClient).publish$(request.replyTo, authToken)),
+   *       takeUntilUnsubscribe(request.replyTo),
    *     )
    *     .subscribe();
    * });
@@ -138,12 +148,21 @@ export abstract class MessageClient {
   abstract observe$<T>(selector?: Intent): Observable<IntentMessage<T>>;
 
   /**
-   * Allows observing the subscriptions for a topic.
+   * Allows observing the subscriptions on a topic.
    *
    * @param  topic
    *         Specifies the topic which to observe its subscribers.
-   * @return An Observable that, when subscribed, emits the current number of subscribers for this topic. It never completes and
+   * @return An Observable that, when subscribed, emits the current number of subscribers on this topic. It never completes and
    *         emits continuously when the number of subscribers changes.
    */
   abstract subscriberCount$(topic: string): Observable<number>;
+}
+
+/**
+ * Emits the values emitted by the source Observable until all subscribers unsubscribe from the given topic.
+ *
+ * Use this method as `takeUntil` operator when replying to a message.
+ */
+export function takeUntilUnsubscribe<T>(topic: string): MonoTypeOperatorFunction<T[]> {
+  return takeUntil(Beans.get(MessageClient).subscriberCount$(topic).pipe(first(count => count === 0)));
 }

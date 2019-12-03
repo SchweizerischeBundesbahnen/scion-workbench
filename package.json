@@ -27,8 +27,8 @@
 
     "microfrontend-platform:build": "ng build --prod @scion/microfrontend-platform",
     "microfrontend-platform:lint": "ng lint @scion/microfrontend-platform",
-    "microfrontend-platform:test": "ng test @scion/microfrontend-platform",
     "microfrontend-platform:lint:e2e-specs": "ng lint e2e-microfrontend-platform",
+    "microfrontend-platform:test": "ng test @scion/microfrontend-platform",
     "microfrontend-platform:e2e": "run-p -r microfrontend-apps:serve microfrontend-platform:await-then-protractor",
     "microfrontend-platform:e2e-headless": "cross-env HEADLESS=true run-p -r microfrontend-apps:serve microfrontend-platform:await-then-protractor",
     "microfrontend-platform:await-then-protractor": "run-s microfrontend-apps:await:* microfrontend-platform:run-protractor",

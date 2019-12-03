@@ -9,12 +9,11 @@
  */
 
 /**
- * Configures a client of the microfrontend platform.
+ * Configures a client application of the microfrontend platform.
  */
 export abstract class ClientConfig {
   /**
-   * Specifies the symbolic name of this application.
-   * The application must be registered under this symbolic name in the host-app.
+   * Specifies the symbolic name of this client. The client must be registered in the host app under this symbol.
    */
   symbolicName: string;
   /**
@@ -22,17 +21,13 @@ export abstract class ClientConfig {
    */
   messaging?: {
     /**
-     * Specifies the maximal time to wait until a connection to the broker is established.
-     * If the broker does not respond within the specified timeout, an error is thrown.
-     *
-     * If not set, a timeout of 10s is used.
+     * Specifies the maximal time to wait until the client discovered the messaging broker.
+     * By default, a timeout of 10s is used.
      */
-    connectTimeout?: number;
+    brokerDiscoverTimeout?: number;
     /**
-     * Specifies the maximal time to wait when publishing a message until receiving a delivery receipt of the broker.
-     * If not receiving a delivery receipt within the specified timeout, an error is thrown.
-     *
-     * If not set, a timeout of 10s is used.
+     * Specifies the maximal time to wait when publishing a message until receiving a delivery
+     * receipt of the messaging broker. By default, a timeout of 10s is used.
      */
     deliveryTimeout?: number;
   };

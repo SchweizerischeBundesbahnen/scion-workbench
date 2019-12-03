@@ -35,7 +35,7 @@ export class Logger {
   }
 
   private log(severity: 'info' | 'warn' | 'error', message: any, args: any[]): void {
-    if (console && console[severity]) {
+    if (console && typeof console[severity] === 'function') {
       const consoleFn = console[severity];
       (args && args.length) ? consoleFn(message, ...args) : consoleFn(message);
     }

@@ -193,10 +193,13 @@ function createBeanConstructFunction<T>(symbol: Type<T | any> | AbstractType<T |
     return (): T => options.useValue;
   }
   else if (options && options.useClass) {
-    return (): T => new options.useClass() as T;
+    return (): T => new options.useClass();
+  }
+  else if (options && options.useFactory) {
+    return (): T => options.useFactory();
   }
   else {
-    return (): T => new (symbol as Type<T>)() as T;
+    return (): T => new (symbol as Type<T>)();
   }
 }
 
@@ -228,6 +231,10 @@ export interface BeanConstructDescriptor<T = any> {
    * Set if to create an instance of a class as bean instance.
    */
   useClass?: Type<T>;
+  /**
+   * Set if to construct the bean instance with a factory function.
+   */
+  useFactory?: () => T;
   /**
    * Set if to construct the bean eagerly. By default, bean construction is lazy when the bean is looked up for the first time.
    */

@@ -1,10 +1,10 @@
-import { MonoTypeOperatorFunction, OperatorFunction } from 'rxjs';
+import { MonoTypeOperatorFunction, OperatorFunction, pipe } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { MessageEnvelope, MessagingChannel, MessagingTransport } from '../ɵmessaging.model';
 import { TopicMessage } from '../messaging.model';
 
-export function filterByChannel(channel: MessagingChannel): MonoTypeOperatorFunction<MessageEnvelope> {
-  return filter((envelope: MessageEnvelope): boolean => {
+export function filterByChannel<T>(channel: MessagingChannel): MonoTypeOperatorFunction<MessageEnvelope<T>> {
+  return filter((envelope: MessageEnvelope<any>): boolean => {
     return envelope.channel === channel;
   });
 }
@@ -16,17 +16,12 @@ export function filterByTransport(transport: MessagingTransport): MonoTypeOperat
   });
 }
 
-export function filterByTopic(topic: string): MonoTypeOperatorFunction<MessageEnvelope<TopicMessage>> {
-  return filter((envelope: MessageEnvelope<TopicMessage>): boolean => {
-    return envelope.message.topic === topic;
-  });
-}
-
-export function filterEnvelope<T>(filterFn?: (envelope: MessageEnvelope<T>) => boolean): MonoTypeOperatorFunction<MessageEvent> {
-  return filter((messageEvent: MessageEvent): boolean => {
-    const envelope: MessageEnvelope<T> = messageEvent.data;
-    return filterFn(envelope);
-  });
+export function filterByTopic<T>(topic: string): OperatorFunction<MessageEnvelope, TopicMessage<T>> {
+  return pipe(
+    filterByChannel<TopicMessage>(MessagingChannel.Topic),
+    filter(envelope => envelope.message.topic === topic),
+    pluckMessage(),
+  );
 }
 
 export function pluckMessage<T>(): OperatorFunction<MessageEnvelope<T>, T> {
@@ -35,8 +30,14 @@ export function pluckMessage<T>(): OperatorFunction<MessageEnvelope<T>, T> {
   });
 }
 
-export function pluckEnvelope(): OperatorFunction<MessageEvent, MessageEnvelope> {
-  return map((messageEvent: MessageEvent): MessageEnvelope => {
+export function pluckEnvelope<T = any>(): OperatorFunction<MessageEvent, MessageEnvelope<T>> {
+  return map((messageEvent: MessageEvent): MessageEnvelope<T> => {
     return messageEvent.data;
+  });
+}
+
+export function filterByOrigin(origin: string): MonoTypeOperatorFunction<MessageEvent> {
+  return filter((event: MessageEvent): boolean => {
+    return event.origin === origin;
   });
 }

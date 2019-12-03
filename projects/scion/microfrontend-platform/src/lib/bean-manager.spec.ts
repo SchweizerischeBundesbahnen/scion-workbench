@@ -350,6 +350,17 @@ describe('BeanManager', () => {
     expect(Beans.get(SomeSymbol)).toBe(someObject);
   });
 
+  it('should allow registering a bean using a factory construction function', async () => {
+    abstract class SomeSymbol {
+    }
+
+    const someObject = {};
+    Beans.register(SomeSymbol, {useFactory: () => someObject});
+    await Beans.init();
+
+    expect(Beans.get(SomeSymbol)).toBe(someObject);
+  });
+
   it('should register a bean only if absent', async () => {
     abstract class SomeSymbol {
     }
