@@ -12,7 +12,7 @@ import { MessageClient } from './client/message-client';
 import { ManifestRegistry } from './host/manifest.registry';
 import { ApplicationRegistry } from './host/application.registry';
 import { MessageBroker } from './host/message-broker';
-import { BeanConstructDescriptor, Beans, Type } from './bean-manager';
+import { InstanceConstructInstructions, Beans, Type } from './bean-manager';
 import { ɵMessageClient } from './client/ɵmessage-client';
 import { MicrofrontendPlatformState, PlatformStates } from './microfrontend-platform-state';
 import { PlatformConfigLoader } from './host/platform-config-loader';
@@ -142,7 +142,7 @@ export const MicrofrontendPlatform = new class {
 /**
  * Creates a {@link PlatformConfigLoader} from the given config.
  */
-function createConfigLoaderBeanDescriptor(config: ApplicationConfig[] | PlatformConfig | Type<PlatformConfigLoader>): BeanConstructDescriptor {
+function createConfigLoaderBeanDescriptor(config: ApplicationConfig[] | PlatformConfig | Type<PlatformConfigLoader>): InstanceConstructInstructions {
   if (typeof config === 'function') {
     return {useClass: config}; // {PlatformConfigLoader} class
   }

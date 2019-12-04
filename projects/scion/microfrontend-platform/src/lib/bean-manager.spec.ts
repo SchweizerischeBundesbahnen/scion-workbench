@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Beans, Initializer, PreDestroy, Type } from './bean-manager';
+import { BeanDecorator, Beans, Initializer, PreDestroy, Type } from './bean-manager';
 import { fakeAsync, flush, tick } from '@angular/core/testing';
 
 // tslint:disable:typedef
@@ -18,32 +18,74 @@ describe('BeanManager', () => {
     Beans.destroy();
   });
 
-  it('should throw when looking up a bean not found in the bean manager', async () => {
+  it('should allow looking up a bean', async () => {
+    class Bean {
+    }
+
+    Beans.register(Bean);
+    expect(Beans.get(Bean)).toBeTruthy();
+    expect(Beans.get(Bean) instanceof Bean).toBeTruthy();
+    expect(Beans.get(Bean)).toBe(Beans.get(Bean));
+  });
+
+  it('should throw when looking up a bean not present in the bean manager', async () => {
     class Bean {
     }
 
     expect(() => Beans.get(Bean)).toThrowError(/NullBeanError/);
   });
 
-  it('should return \'undefined\' when looking up a bean not found in the bean manager [orElseThrow=false]', async () => {
+  it('should return \'undefined\' when looking up an optional bean not present in the bean manager', async () => {
     abstract class SomeSymbol {
     }
 
-    expect(Beans.get(SomeSymbol, {orElseThrow: false})).toBeUndefined();
+    expect(Beans.opt(SomeSymbol)).toBeUndefined();
   });
 
-  it('should return \'orElseGet\' value when looking up a bean not found in the bean manager [orElseGet]', async () => {
+  it('should return \'orElseGet\' value when looking up a bean not present in the bean manager [orElseGet]', async () => {
     abstract class SomeSymbol {
     }
 
     expect(Beans.get(SomeSymbol, {orElseGet: 'not-found'})).toEqual('not-found');
   });
 
-  it('should invoke \'orElseSupply\' function when looking up a bean not found in the bean manager [orElseSupply]', async () => {
+  it('should invoke \'orElseSupply\' function when looking up a bean not present in the bean manager [orElseSupply]', async () => {
     abstract class SomeSymbol {
     }
 
     expect(Beans.get(SomeSymbol, {orElseSupply: (): string => 'not-found'})).toEqual('not-found');
+  });
+
+  it('should allow looking up multiple beans', async () => {
+    class Bean {
+    }
+
+    const bean1 = new Bean();
+    const bean2 = new Bean();
+    const bean3 = new Bean();
+
+    Beans.register(Bean, {useValue: bean1, multi: true});
+    Beans.register(Bean, {useValue: bean2, multi: true});
+    Beans.register(Bean, {useValue: bean3, multi: true});
+
+    expect(() => Beans.get(Bean)).toThrowError(/MultiBeanError/);
+    expect(Beans.all(Bean)).toEqual([bean1, bean2, bean3]);
+  });
+
+  it('should throw when registering a bean as \'multi-bean\' on a symbol that has already registered a \'non-multi\' bean', async () => {
+    class Bean {
+    }
+
+    Beans.register(Bean, {useValue: new Bean()});
+    expect(() => Beans.register(Bean, {useValue: new Bean(), multi: true})).toThrowError(/BeanRegisterError/);
+  });
+
+  it('should throw when registering a bean on a symbol that has already registered a \'multi-bean\'', async () => {
+    class Bean {
+    }
+
+    Beans.register(Bean, {useValue: new Bean(), multi: true});
+    expect(() => Beans.register(Bean, {useValue: new Bean(), multi: false})).toThrowError(/BeanRegisterError/);
   });
 
   it('should construct beans as a singleton', async () => {
@@ -372,5 +414,64 @@ describe('BeanManager', () => {
     Beans.registerIfAbsent(SomeSymbol, {useValue: bean2});
 
     expect(Beans.get(SomeSymbol)).toBe(bean1);
+  });
+
+  it('should allow decorating a bean', async () => {
+    abstract class Bean {
+      abstract getName(): string;
+    }
+
+    class BeanImpl implements Bean {
+      public getName(): string {
+        return 'name';
+      }
+    }
+
+    class Decorator implements BeanDecorator<Bean> {
+      public decorate(bean: Bean): Bean {
+        return new class implements Bean {
+          public getName(): string {
+            return bean.getName().toUpperCase();
+          }
+        };
+      }
+    }
+
+    Beans.register(Bean, {useClass: BeanImpl});
+    Beans.registerDecorator(Bean, {useClass: Decorator});
+    expect(Beans.get(Bean).getName()).toEqual('NAME');
+  });
+
+  it('should allow decorating multiple beans', async () => {
+    abstract class Bean {
+      abstract getName(): string;
+    }
+
+    class Bean1 implements Bean {
+      public getName(): string {
+        return 'name of bean 1';
+      }
+    }
+
+    class Bean2 implements Bean {
+      public getName(): string {
+        return 'name of bean 2';
+      }
+    }
+
+    class Decorator implements BeanDecorator<Bean> {
+      public decorate(bean: Bean): Bean {
+        return new class implements Bean {
+          public getName(): string {
+            return bean.getName().toUpperCase();
+          }
+        };
+      }
+    }
+
+    Beans.register(Bean, {useClass: Bean1, multi: true});
+    Beans.register(Bean, {useClass: Bean2, multi: true});
+    Beans.registerDecorator(Bean, {useClass: Decorator});
+    expect(Beans.all(Bean).map(bean => bean.getName())).toEqual(['NAME OF BEAN 1', 'NAME OF BEAN 2']);
   });
 });
