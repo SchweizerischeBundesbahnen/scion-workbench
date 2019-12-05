@@ -50,9 +50,10 @@ export enum MessagingChannel {
 }
 
 /**
- * Envelope for all messages sent over the message bus.
+ * Envelope for all messages.
  */
-export interface MessageEnvelope<Message = IntentMessage | TopicMessage | TopicSubscribeCommand | TopicUnsubscribeCommand | BrokerDiscoverCommand> {
+export interface MessageEnvelope<Message = IntentMessage | TopicMessage | TopicSubscribeCommand | TopicUnsubscribeCommand> {
+  senderId?: string;
   messageId: string;
   transport: MessagingTransport;
   channel: MessagingChannel;
@@ -66,23 +67,39 @@ export enum PlatformTopics {
   /**
    * Send a request-reply request to this topic to observe the number of subscribers subscribed to the topic in the message payload.
    */
-  SubscriberCount = 'ɵSubscriber-count',
+  SubscriberCount = 'ɵSUBSCRIBER_COUNT',
   /**
-   * A broker gateway broadcasts a broker discovery request on this topic.
+   * A broker gateway broadcasts a connect request to this topic in order to discover the broker.
    */
-  BrokerDiscovery = 'ɵBroker-discovery',
+  ClientConnect = 'ɵCLIENT_CONNECT',
   /**
-   * A broker gateway sends a message to this topic before being disposed.
+   * A broker gateway sends a disconnect message to this topic before being disposed.
    */
-  ClientDispose = 'ɵClient-dispose',
+  ClientDisconnect = 'ɵCLIENT_DISCONNECT',
   /**
-   * A message client sends a request to this topic to request information about the gateway and the broker.
+   * A message client sends an info request to this topic to request information about the gateway and the broker.
    */
-  GatewayInfoRequest = 'ɵGateway-info-request',
+  GatewayInfoRequest = 'ɵGATEWAY_INFO',
 }
 
-export interface BrokerDiscoverCommand {
+/**
+ * Sent by a client gateway to initiate a connection to the broker.
+ * The broker responds with a @{link ConnackMessage} message.
+ */
+export interface ConnectMessage {
   symbolicAppName: string;
+}
+
+/**
+ * Sent by the broker in response to a {@link ConnectMessage} request from a client gateway.
+ */
+export interface ConnackMessage {
+  returnCode: 'accepted' | 'refused:bad-request' | 'refused:rejected' | 'refused:blocked';
+  returnMessage?: string;
+  /**
+   * Unique id assigned to the client by the broker. Is only set on success.
+   */
+  clientId?: string;
 }
 
 export interface TopicSubscribeCommand {

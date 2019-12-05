@@ -7,11 +7,11 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { BrokerDiscoverCommand, MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../ɵmessaging.model';
+import { ConnackMessage, ConnectMessage, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../ɵmessaging.model';
 import { TopicMessage } from '../messaging.model';
 
 /**
- * Returns the JavaScript for the gateway to discover the message broker.
+ * Returns the JavaScript for the gateway to connect to the message broker.
  */
 export function getGatewayJavaScript(config: GatewayConfig): string {
   // Create an IIFE (Immediately Invoked Function Expression) which invokes the transpiled 'initGateway' function.
@@ -34,8 +34,8 @@ export function getGatewayJavaScript(config: GatewayConfig): string {
          Topic: '${MessagingChannel.Topic}',
        },
        topics: {
-         BrokerDiscovery: '${PlatformTopics.BrokerDiscovery}',
-         ClientDispose: '${PlatformTopics.ClientDispose}',
+         ClientConnect: '${PlatformTopics.ClientConnect}',
+         ClientDisconnect: '${PlatformTopics.ClientDisconnect}',
          GatewayInfoRequest: '${PlatformTopics.GatewayInfoRequest}',
        },
      };
@@ -54,7 +54,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
   const noop = (): void => {
   };
   const whenUnload = createPageUnloadPromise();
-  const whenBrokerDiscovered = discoverBroker();
+  const whenConnected = discoverBrokerAndConnect();
 
   installClientMessageDispatcher();
   installGatewayInfoRequestReplier();
@@ -71,7 +71,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
       if (event.data.transport !== constants.transports.ClientToBroker) {
         return;
       }
-      whenBrokerDiscovered
+      whenConnected
         .then(broker => broker.window.postMessage(event.data, broker.origin))
         .catch(noop); // avoid uncaught promise error
     };
@@ -103,9 +103,9 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
       const requestEnvelope: MessageEnvelope<TopicMessage<void>> = event.data;
 
       const replyTo = requestEnvelope.message.replyTo;
-      whenBrokerDiscovered
+      whenConnected
         .then(broker => {
-          const reply = newReply(replyTo, {ok: true, brokerOrigin: broker.origin});
+          const reply = newReply(replyTo, {ok: true, clientId: broker.clientId, brokerOrigin: broker.origin});
           (event.source as Window).postMessage(reply, event.origin);
         })
         .catch(error => {
@@ -131,34 +131,34 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
   }
 
   /**
-   * Initiates broker discovery by sending a broker discover request to the parent windows.
+   * Initiates broker discovery by sending a broker connect request to the parent windows.
    *
    * @return A Promise function that resolves to the message broker, or that rejects if discovery failed.
    */
-  function discoverBroker(): Promise<BrokerInfo> {
+  function discoverBrokerAndConnect(): Promise<BrokerInfo> {
     const replyTo = randomUUID();
     const disposables: (() => void)[] = [];
 
-    const whenDiscovered = new Promise<BrokerInfo>((resolve, reject) => { // tslint:disable-line:typedef
+    const connectPromise = new Promise<BrokerInfo>((resolve, reject) => { // tslint:disable-line:typedef
       onSuccessResolve(resolve, reject);
       onTimeoutReject(reject);
     });
-    whenDiscovered
+    connectPromise
       .then(() => disposables.forEach(fn => fn()))
       .catch(() => disposables.forEach(fn => fn()));
 
-    const brokerDiscoverRequest: MessageEnvelope<TopicMessage<BrokerDiscoverCommand>> = {
+    const connectMessage: MessageEnvelope<TopicMessage<ConnectMessage>> = {
       messageId: randomUUID(),
       transport: constants.transports.GatewayToBroker,
       channel: constants.channels.Topic,
       message: {
-        topic: constants.topics.BrokerDiscovery,
+        topic: constants.topics.ClientConnect,
         replyTo: replyTo,
         payload: {symbolicAppName: config.clientAppName},
       },
     };
-    findBrokerWindowCandidates().forEach(candidate => candidate.postMessage(brokerDiscoverRequest, '*'));
-    return whenDiscovered;
+    findBrokerWindowCandidates().forEach(candidate => candidate.postMessage(connectMessage, '*'));
+    return connectPromise;
 
     function onSuccessResolve(resolve: (brokerInfo: BrokerInfo) => void, reject: (error: string) => void): void {
       const onmessage = (event: MessageEvent): void => {
@@ -172,13 +172,13 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
           return;
         }
 
-        const envelope: MessageEnvelope<TopicMessage<MessageDeliveryStatus>> = event.data;
+        const envelope: MessageEnvelope<TopicMessage<ConnackMessage>> = event.data;
         const response = envelope.message.payload;
-        if (response.ok) {
-          resolve({window: event.source as Window, origin: event.origin});
+        if (response.returnCode === 'accepted') {
+          resolve({clientId: response.clientId, window: event.source as Window, origin: event.origin});
         }
         else {
-          reject(response.details);
+          reject(`${response.returnMessage} [code: '${response.returnCode}']`);
         }
       };
       window.addEventListener('message', onmessage);
@@ -186,7 +186,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
     }
 
     /**
-     * Rejects the discovery Promise when the broker does not acknowledge within the given timeout.
+     * Rejects the Promise when the broker does not acknowledge within the given timeout.
      */
     function onTimeoutReject(reject: (error: string) => void): void {
       const ontimeout = (): void => {
@@ -216,13 +216,14 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
    * Sends a dispose message to the broker when this window unloads.
    */
   function installClientDisposeFunction(): void {
-    whenUnload.then(() => whenBrokerDiscovered)
+    whenUnload.then(() => whenConnected)
       .then(broker => {
         const clientDisposeMessage: MessageEnvelope<TopicMessage<void>> = {
+          senderId: broker.clientId,
           messageId: randomUUID(),
           transport: constants.transports.GatewayToBroker,
           channel: constants.channels.Topic,
-          message: {topic: constants.topics.ClientDispose},
+          message: {topic: constants.topics.ClientDisconnect},
         };
         broker.window.postMessage(clientDisposeMessage, broker.origin);
       })
@@ -262,12 +263,14 @@ export interface GatewayInfoResponse {
   ok: boolean;
   error?: any;
   brokerOrigin?: string;
+  clientId?: string;
 }
 
 /**
  * Information about the broker.
  */
 interface BrokerInfo {
+  clientId: string;
   origin: string;
   window: Window;
 }
@@ -287,8 +290,8 @@ interface Constants {
     Topic: MessagingChannel,
   };
   topics: {
-    BrokerDiscovery: string,
-    ClientDispose: string,
+    ClientConnect: string,
+    ClientDisconnect: string,
     GatewayInfoRequest: string,
   };
 }

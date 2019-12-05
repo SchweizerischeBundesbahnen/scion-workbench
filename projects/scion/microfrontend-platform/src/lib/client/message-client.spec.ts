@@ -70,12 +70,12 @@ describe('PlatformMessageClient and HostAppMessageClient', () => {
     await expectAsync(actual).toBeResolvedTo(['PING']);
   });
 
-  it('should reject a client connect attempt if the app is not trusted (not registered)', async () => {
+  it('should reject a client connect attempt if the app is not registered', async () => {
     const manifestUrl = createManifestURL({name: 'Trusted Client'});
     const registeredApps: ApplicationConfig[] = [{symbolicName: 'trusted-client', manifestUrl: manifestUrl}];
     await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'untrusted-client'});
 
-    const expected = '[MessageClientConnectError] Client connect attempt rejected by the message broker: Client not registered as trusted application. [app=\'untrusted-client\']';
+    const expected = '[MessageClientConnectError] Client connect attempt rejected by the message broker: Unknown client. [app=\'untrusted-client\'] [code: \'refused:rejected\']';
     await expectAsync(Beans.get(MessageClient).publish$('some-topic').toPromise()).toBeRejectedWith(expected);
   });
 
@@ -87,7 +87,7 @@ describe('PlatformMessageClient and HostAppMessageClient', () => {
     const registeredApps: ApplicationConfig[] = [{symbolicName: 'client', manifestUrl: manifestUrl}];
     await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'client'});
     await expectAsync(waitUntilInvoked(loggerSpy.error, 1000)).toBeResolved('\'Logger.error\' not invoked within 1s');
-    await expect(loggerSpy.error.calls.mostRecent().args[0]).toMatch(/\[MessageClientConnectError] Client connect attempt blocked by the message broker: Wrong origin/);
+    await expect(loggerSpy.error.calls.mostRecent().args[0]).toMatch(/\[MessageClientConnectError] Client connect attempt blocked by the message broker: Wrong origin.*\[code: 'refused:blocked']/);
   });
 
   it('should log an error if the message broker cannot be discovered', async () => {

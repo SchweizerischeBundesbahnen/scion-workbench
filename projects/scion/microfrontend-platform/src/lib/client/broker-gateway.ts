@@ -18,12 +18,15 @@ import { Beans } from '../bean-manager';
 import { Logger } from '../logger';
 
 /**
- * Allows a client sending messages to the message broker and receiving messages from the message broker.
+ * The gateway is responsible for dispatching messages between the client and the broker.
  *
- * The gateway operates on a dedicated {@link Window} instance and begins its operation with broadcasting
- * a broker discovery request. The request is sent to the current and all its parent windows. When the broker
- * receives a discovery request from a gateway, the broker acknowledges the request, unless the client is not trusted.
- * If no acknowledgment is received within some timeout, message publishing is rejected and no messages are received.
+ * The gateway is always between one client and the broker. Clients never connect to the broker or to each other directly.
+ * The gateway operates on a dedicated {@link Window} instance. To initiate a connection, the gateway sends a CONNECT message
+ * to the current and all its parent windows. When the broker receives a CONNECT message of a trusted client, the broker responds
+ * with a CONNACK message and a status code. If no CONNACK message is received within some timeout, publishing messages is rejected
+ * and no messages are received.
+ *
+ * When the gateway is disposed, it sends a DISCONNECT message to the broker.
  */
 export class BrokerGateway {
 
@@ -40,7 +43,7 @@ export class BrokerGateway {
     // Wait until receiving info about the gateway.
     this._whenGatewayInfo = whenGatewayWindow.then(gatewayWindow => this.requestGatewayInfo(gatewayWindow));
     // Subscribe for broker messages sent to the gateway window.
-    this._message$ = from(this._whenGatewayInfo.catch(() => NEVER)) // avoid uncaught promise error
+    this._message$ = from(this._whenGatewayInfo.catch(() => NEVER_PROMISE)) // avoid uncaught promise error
       .pipe(
         switchMap(gateway => fromEvent<MessageEvent>(gateway.window, 'message').pipe(filterByOrigin(gateway.brokerOrigin))),
         filterByTransport(MessagingTransport.BrokerToClient),
@@ -51,12 +54,12 @@ export class BrokerGateway {
   }
 
   /**
-   * Posts a message to the message broker. The message is buffered until broker discovery completed.
+   * Posts a message to the message broker. The message is buffered until broker discovery completed and connected to the broker.
    *
    * @return a Promise that resolves when the message is dispatched to the broker, or that rejects if not connected to the broker.
    */
   public postMessage(envelope: MessageEnvelope): Promise<void> {
-    return this._whenGatewayInfo.then(gateway => gateway.window.postMessage(envelope, gateway.window.origin));
+    return this._whenGatewayInfo.then(gateway => gateway.window.postMessage(setSenderId(envelope, gateway.clientId), gateway.window.origin));
   }
 
   /**
@@ -126,7 +129,8 @@ export class BrokerGateway {
         pluckEnvelope(),
         filterByTopic<GatewayInfoResponse>(replyToTopic),
         mergeMap((reply: TopicMessage<GatewayInfoResponse>): Observable<GatewayInfo> => {
-          return reply.payload.ok ? of({window: gatewayWindow, brokerOrigin: reply.payload.brokerOrigin}) : throwError(reply.payload.error);
+          const response: GatewayInfoResponse = reply.payload;
+          return response.ok ? of({clientId: response.clientId, window: gatewayWindow, brokerOrigin: response.brokerOrigin}) : throwError(response.error);
         }),
         take(1),
         timeoutWith(new Date(Date.now() + this._config.discoveryTimeout), throwError(`[BrokerDiscoverTimeoutError] Message broker not discovered within the ${this._config.discoveryTimeout}ms timeout. Messages cannot be published or received.`)),
@@ -153,6 +157,7 @@ export class BrokerGateway {
 export interface GatewayInfo {
   window: Window;
   brokerOrigin: string;
+  clientId: string;
 }
 
 /**
@@ -162,10 +167,17 @@ export interface GatewayInfo {
  * if the Observable did not emit a value before its completion, e.g., on shutdown.
  */
 function neverResolveIfUndefined<T>(value: T): Promise<T> {
-  return value !== undefined ? Promise.resolve(value) : NEVER;
+  return value !== undefined ? Promise.resolve(value) : NEVER_PROMISE;
+}
+
+/**
+ * Adds the client id to the envelope.
+ */
+function setSenderId<T>(envelope: MessageEnvelope<T>, senderId: string): MessageEnvelope<T> {
+  return {...envelope, senderId};
 }
 
 /**
  * Promise which never resolves.
  */
-const NEVER = new Promise<never>(noop);
+const NEVER_PROMISE = new Promise<never>(noop);

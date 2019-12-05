@@ -15,9 +15,10 @@ import { first, takeUntil } from 'rxjs/operators';
 import { Beans } from '../bean-manager';
 
 /**
- * Message client for sending and receiving messages between applications across origins.
- * This client provides topic-based (publish/subscribe) and intent-based messaging, and
- * allows consumers to reply to a message.
+ * The message client allows sending and receiving messages between applications across origins.
+ *
+ * The client provides topic-based (publish/subscribe) and intent-based messaging, and allows consumers
+ * to reply to a message.
  *
  * ### Topic-based Messaging:
  * Allows publishing a message to multiple consumers subscribed to a topic.

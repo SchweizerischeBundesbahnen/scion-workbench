@@ -12,7 +12,7 @@ import { MessageClient } from './client/message-client';
 import { ManifestRegistry } from './host/manifest.registry';
 import { ApplicationRegistry } from './host/application.registry';
 import { MessageBroker } from './host/message-broker';
-import { InstanceConstructInstructions, Beans, Type } from './bean-manager';
+import { Beans, InstanceConstructInstructions, Type } from './bean-manager';
 import { ɵMessageClient } from './client/ɵmessage-client';
 import { MicrofrontendPlatformState, PlatformStates } from './microfrontend-platform-state';
 import { PlatformConfigLoader } from './host/platform-config-loader';
@@ -123,9 +123,7 @@ export const MicrofrontendPlatform = new class {
       startupFn();
 
       return Beans.init()
-        .then(() => {
-          Beans.get(MicrofrontendPlatformState).enterState(PlatformStates.Started);
-        })
+        .then(() => Beans.get(MicrofrontendPlatformState).enterState(PlatformStates.Started))
         .catch(error => {
           Beans.get(MicrofrontendPlatformState).enterState(PlatformStates.Stopped);
           Beans.destroy();
