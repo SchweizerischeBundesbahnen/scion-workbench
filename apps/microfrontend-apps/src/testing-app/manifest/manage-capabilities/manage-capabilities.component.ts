@@ -34,7 +34,7 @@ export class ManageCapabilitiesComponent {
       [PRIVATE]: new FormControl(true, Validators.required),
     });
 
-    this.capabilities$ = Beans.get(MessageClient).requestReply$(Topics.Capabilities, this._symbolicAppName)
+    this.capabilities$ = Beans.get(MessageClient).request$(Topics.Capabilities, this._symbolicAppName)
       .pipe(map((message: TopicMessage<Capability[]>) => message.payload));
   }
 

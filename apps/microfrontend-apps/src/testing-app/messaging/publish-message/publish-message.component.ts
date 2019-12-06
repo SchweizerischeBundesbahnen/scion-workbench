@@ -118,7 +118,7 @@ export class PublishMessageComponent implements OnDestroy {
     this.publishError = null;
 
     if (requestReply) {
-      this._subscription = this._messageClient.requestReply$(topic, message)
+      this._subscription = this._messageClient.request$(topic, message)
         .pipe(finalize(() => this.form.enable()))
         .subscribe(
           reply => this.replies.push(reply),
@@ -144,7 +144,7 @@ export class PublishMessageComponent implements OnDestroy {
     this.publishError = null;
 
     if (requestReply) {
-      this._subscription = this._messageClient.requestReply$({type, qualifier}, message)
+      this._subscription = this._messageClient.requestByIntent$({type, qualifier}, message)
         .pipe(finalize(() => this.form.enable()))
         .subscribe(
           reply => this.replies.push(reply),
@@ -152,7 +152,7 @@ export class PublishMessageComponent implements OnDestroy {
         );
     }
     else {
-      this._subscription = this._messageClient.publish$({type, qualifier}, message)
+      this._subscription = this._messageClient.issueIntent$({type, qualifier}, message)
         .pipe(finalize(() => this.form.enable()))
         .subscribe(noop, error => {
           this.publishError = error;

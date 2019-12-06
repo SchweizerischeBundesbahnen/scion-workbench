@@ -64,7 +64,7 @@ describe('PlatformMessageClient and HostAppMessageClient', () => {
       Beans.get(PlatformMessageClient).publish$(msg.replyTo, msg.payload.toUpperCase()).subscribe();
     });
 
-    const ping$ = Beans.get(PlatformMessageClient).requestReply$<string>('some-topic', 'ping');
+    const ping$ = Beans.get(PlatformMessageClient).request$<string>('some-topic', 'ping');
     const actual = collectToPromise(ping$, {take: 1, timeout: 1000});
 
     await expectAsync(actual).toBeResolvedTo(['PING']);
@@ -113,18 +113,18 @@ describe('PlatformMessageClient and HostAppMessageClient', () => {
 
       // Register a platform capability. Intents should not be received by the host-app message client.
       Beans.get(ManifestRegistry).registerCapability(PLATFORM_SYMBOLIC_NAME, [{type: 'some-platform-capability'}]);
-      const intentsReceivedByPlatformMessageClient = collectToPromise(Beans.get(PlatformMessageClient).observe$(), {take: 1, timeout: 500});
-      const intentsReceivedByHostMessageClient = collectToPromise(Beans.get(MessageClient).observe$(), {take: 1, timeout: 500});
+      const intentsReceivedByPlatformMessageClient = collectToPromise(Beans.get(PlatformMessageClient).handleIntent$(), {take: 1, timeout: 500});
+      const intentsReceivedByHostMessageClient = collectToPromise(Beans.get(MessageClient).handleIntent$(), {take: 1, timeout: 500});
 
       // Issue the intent via platform message client.
-      await Beans.get(PlatformMessageClient).publish$({type: 'some-platform-capability'}).subscribe();
+      await Beans.get(PlatformMessageClient).issueIntent$({type: 'some-platform-capability'}).subscribe();
 
       // Verify host-app message client not receiving the intent.
       await expectAsync(intentsReceivedByPlatformMessageClient).toBeResolved();
       await expectAsync(intentsReceivedByHostMessageClient).toBeRejected();
 
       // Verify host-app message client not allowed to issue the intent.
-      await expectToBeRejectedWithError(Beans.get(MessageClient).publish$({type: 'some-platform-capability'}).toPromise(), /NotQualifiedError/);
+      await expectToBeRejectedWithError(Beans.get(MessageClient).issueIntent$({type: 'some-platform-capability'}).toPromise(), /NotQualifiedError/);
     });
 
     it('should dispatch an intent only to the host-app message client', async () => {
@@ -134,18 +134,18 @@ describe('PlatformMessageClient and HostAppMessageClient', () => {
 
       // Register a host-app capability. Intents should not be received by the platform message client.
       Beans.get(ManifestRegistry).registerCapability('host-app', [{type: 'some-host-app-capability'}]);
-      const intentsReceivedByPlatformMessageClient = collectToPromise(Beans.get(PlatformMessageClient).observe$(), {take: 1, timeout: 500});
-      const intentsReceivedByHostMessageClient = collectToPromise(Beans.get(MessageClient).observe$(), {take: 1, timeout: 500});
+      const intentsReceivedByPlatformMessageClient = collectToPromise(Beans.get(PlatformMessageClient).handleIntent$(), {take: 1, timeout: 500});
+      const intentsReceivedByHostMessageClient = collectToPromise(Beans.get(MessageClient).handleIntent$(), {take: 1, timeout: 500});
 
       // Issue the intent via host-app message client.
-      await Beans.get(MessageClient).publish$({type: 'some-host-app-capability'}).subscribe();
+      await Beans.get(MessageClient).issueIntent$({type: 'some-host-app-capability'}).subscribe();
 
       // Verify platform message client not receiving the intent.
       await expectAsync(intentsReceivedByPlatformMessageClient).toBeRejected();
       await expectAsync(intentsReceivedByHostMessageClient).toBeResolved();
 
       // Verify platform message client not allowed to issue the intent.
-      await expectToBeRejectedWithError(Beans.get(PlatformMessageClient).publish$({type: 'some-host-app-capability'}).toPromise(), /NotQualifiedError/);
+      await expectToBeRejectedWithError(Beans.get(PlatformMessageClient).issueIntent$({type: 'some-host-app-capability'}).toPromise(), /NotQualifiedError/);
     });
   });
 });

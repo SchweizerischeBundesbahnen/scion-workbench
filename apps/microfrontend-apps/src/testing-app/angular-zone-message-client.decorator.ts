@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BeanDecorator, Beans, MessageClient, TopicMessage } from '@scion/microfrontend-platform';
+import { BeanDecorator, Beans, Intent, IntentMessage, MessageClient, TopicMessage } from '@scion/microfrontend-platform';
 import { MonoTypeOperatorFunction, Observable, Observer, TeardownLogic } from 'rxjs';
 import { NgZone } from '@angular/core';
 
@@ -24,16 +24,28 @@ export class AngularZoneMessageClientDecorator implements BeanDecorator<MessageC
     const zone = Beans.get(NgZone);
     return new class implements MessageClient {
 
-      public publish$(destination: any, payload?: any): Observable<never> {
-        return messageClient.publish$(destination, payload).pipe(runInsideAngular(zone));
+      public publish$(topic: string, message?: any): Observable<never> {
+        return messageClient.publish$(topic, message).pipe(runInsideAngular(zone));
       }
 
-      public requestReply$<T>(destination: any, payload?: any): Observable<TopicMessage<T>> {
-        return messageClient.requestReply$<T>(destination, payload).pipe(runInsideAngular(zone));
+      public request$<T>(topic: string, message?: any): Observable<TopicMessage<T>> {
+        return messageClient.request$<T>(topic, message).pipe(runInsideAngular(zone));
       }
 
-      public observe$<T>(destination: any): Observable<any> {
-        return messageClient.observe$<T>(destination).pipe(runInsideAngular(zone));
+      public observe$<T>(topic: string): Observable<TopicMessage<T>> {
+        return messageClient.observe$<T>(topic).pipe(runInsideAngular(zone));
+      }
+
+      public issueIntent$(intent: Intent, payload?: any): Observable<never> {
+        return messageClient.issueIntent$(intent, payload).pipe(runInsideAngular(zone));
+      }
+
+      public requestByIntent$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>> {
+        return messageClient.requestByIntent$<T>(intent, payload).pipe(runInsideAngular(zone));
+      }
+
+      public handleIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {
+        return messageClient.handleIntent$<T>(selector).pipe(runInsideAngular(zone));
       }
 
       public subscriberCount$(topic: string): Observable<number> {

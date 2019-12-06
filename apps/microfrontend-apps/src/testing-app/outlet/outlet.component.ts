@@ -22,7 +22,7 @@ export class OutletComponent {
   public outletId: string;
 
   constructor(private _sanitizer: DomSanitizer) {
-    this.endpoints$ = Beans.get(MessageClient).requestReply$(Topics.Applications)
+    this.endpoints$ = Beans.get(MessageClient).request$(Topics.Applications)
       .pipe(
         take(1),
         map((reply: TopicMessage<Application[]>) => {

@@ -37,60 +37,38 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
     });
   }
 
-  /** @publicApi **/
-  public publish$(topic: string, message?: any): Observable<never>;
-  public publish$(intent: Intent, payload?: any): Observable<never>;
-  public publish$(destination: string | Intent, payload?: any): Observable<never> {
-    if (typeof destination === 'string') {
-      const topicMessage: TopicMessage = {topic: destination, payload: payload};
-      return this.postMessageToBroker$(MessagingChannel.Topic, topicMessage);
-    }
-    else if (typeof destination === 'object' && destination.type) {
-      const intentMessage: IntentMessage = {type: destination.type, qualifier: destination.qualifier, payload: payload};
-      assertNoWildcardCharacters(intentMessage.qualifier);
-      return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
-    }
-    else {
-      throw Error('[DestinationError] Destination must be of the type `string` for topic-based messaging, or `Intent` for intent-based messaging.');
-    }
+  public publish$(topic: string, message?: any): Observable<never> {
+    const topicMessage: TopicMessage = {topic, payload: message};
+    return this.postMessageToBroker$(MessagingChannel.Topic, topicMessage);
   }
 
-  /** @publicApi **/
-  public requestReply$<T>(topic: string, message?: any): Observable<TopicMessage<T>>;
-  public requestReply$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>>;
-  public requestReply$<T>(destination: string | Intent, payload?: any): Observable<TopicMessage<T>> {
-    if (typeof destination === 'string') {
-      const topicMessage: TopicMessage = {topic: destination, payload: payload};
-      return this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Topic, topicMessage);
-    }
-    else if (typeof destination === 'object' && destination.type) {
-      const intentMessage: IntentMessage = {type: destination.type, qualifier: destination.qualifier, payload: payload};
-      assertNoWildcardCharacters(intentMessage.qualifier);
-      return this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage);
-    }
-    else {
-      throw Error('[DestinationError] Destination must be of the type `string` for topic-based messaging, or `Intent` for intent-based messaging.');
-    }
+  public request$<T>(topic: string, request?: any): Observable<TopicMessage<T>> {
+    const topicMessage: TopicMessage = {topic, payload: request};
+    return this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Topic, topicMessage);
   }
 
-  /** @publicApi **/
-  public observe$<T>(topic: string): Observable<TopicMessage<T>>;
-  public observe$<T>(intentSelector?: Intent): Observable<IntentMessage<T>>;
-  public observe$<T>(destination: string | Intent): Observable<TopicMessage<T>> | Observable<IntentMessage<T>> {
-    if (typeof destination === 'string') {
-      return this.receiveMessage$(destination);
-    }
-    else if (!destination || typeof destination === 'object') {
-      return this.receiveIntent$(destination);
-    }
-    else {
-      throw Error('[DestinationError] Destination must be of the type `string` for topic-based messaging, or `Intent` for intent-based messaging.');
-    }
+  public observe$<T>(topic: string): Observable<TopicMessage<T>> {
+    return this.receiveMessage$(topic);
   }
 
-  /** @publicApi **/
+  public issueIntent$(intent: Intent, payload?: any): Observable<never> {
+    const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, payload};
+    assertNoWildcardCharacters(intentMessage.qualifier);
+    return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
+  }
+
+  public requestByIntent$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>> {
+    const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, payload};
+    assertNoWildcardCharacters(intentMessage.qualifier);
+    return this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage);
+  }
+
+  public handleIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {
+    return this.receiveIntent$(selector);
+  }
+
   public subscriberCount$(topic: string): Observable<number> {
-    return this.requestReply$<number>(PlatformTopics.SubscriberCount, topic)
+    return this.request$<number>(PlatformTopics.SubscriberCount, topic)
       .pipe(map(message => message.payload));
   }
 

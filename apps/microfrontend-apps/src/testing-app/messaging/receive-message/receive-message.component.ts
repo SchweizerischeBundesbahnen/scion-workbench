@@ -79,7 +79,7 @@ export class ReceiveMessageComponent implements OnDestroy {
     const type: string = this.form.get(DESTINATION).get(TYPE).value;
     const qualifier: Qualifier = SciParamsEnterComponent.toParams(this.form.get(DESTINATION).get(QUALIFIER) as FormArray);
 
-    this._subscription = this._messageClient.observe$({type, qualifier})
+    this._subscription = this._messageClient.handleIntent$({type, qualifier})
       .pipe(finalize(() => this.form.enable()))
       .subscribe(message => this.messages.push(message));
   }

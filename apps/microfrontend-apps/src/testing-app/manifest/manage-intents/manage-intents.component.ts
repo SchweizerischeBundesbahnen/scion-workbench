@@ -31,7 +31,7 @@ export class ManageIntentsComponent {
       [QUALIFIER]: fb.array([]),
     });
 
-    this.intents$ = Beans.get(MessageClient).requestReply$(Topics.Intents, this._symbolicAppName)
+    this.intents$ = Beans.get(MessageClient).request$(Topics.Intents, this._symbolicAppName)
       .pipe(map((message: TopicMessage<Intent[]>) => message.payload));
   }
 
