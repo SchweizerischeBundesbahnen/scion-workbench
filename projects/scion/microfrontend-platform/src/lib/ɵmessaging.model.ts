@@ -45,8 +45,8 @@ export enum MessagingTransport {
 export enum MessagingChannel {
   TopicSubscribe = 'topic-subscribe',
   TopicUnsubscribe = 'topic-unsubscribe',
-  Intent = 'intent',
   Topic = 'topic',
+  Intent = 'intent',
 }
 
 /**
@@ -65,9 +65,9 @@ export interface MessageEnvelope<Message = IntentMessage | TopicMessage | TopicS
  */
 export enum PlatformTopics {
   /**
-   * Send a request-reply request to this topic to observe the number of subscribers subscribed to the topic in the message payload.
+   * Allows requesting the subscription count on a topic.
    */
-  SubscriberCount = 'ɵSUBSCRIBER_COUNT',
+  RequestSubscriberCount = 'ɵREQUEST_SUBSCRIBER_COUNT',
   /**
    * A broker gateway broadcasts a connect request to this topic in order to discover the broker.
    */
@@ -79,7 +79,11 @@ export enum PlatformTopics {
   /**
    * A message client sends an info request to this topic to request information about the gateway and the broker.
    */
-  GatewayInfoRequest = 'ɵGATEWAY_INFO',
+  RequestGatewayInfo = 'ɵGATEWAY_INFO',
+  /**
+   * Allows observing the platform state of the host. The last state is retained on the topic.
+   */
+  HostPlatformState = 'ɵHOST_PLATFORM_STATE',
 }
 
 /**

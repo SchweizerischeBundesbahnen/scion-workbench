@@ -11,12 +11,11 @@
 import { MessageClient } from './client/message-client';
 import { ManifestRegistry } from './host/manifest.registry';
 import { ApplicationRegistry } from './host/application.registry';
-import { MessageBroker } from './host/message-broker';
-import { Beans, InstanceConstructInstructions, Type } from './bean-manager';
+import { BeanInstanceConstructInstructions, Beans, InstanceConstructInstructions, Type } from './bean-manager';
 import { ɵMessageClient } from './client/ɵmessage-client';
-import { MicrofrontendPlatformState, PlatformStates } from './microfrontend-platform-state';
+import { PlatformState, PlatformStates } from './platform-state';
 import { PlatformConfigLoader } from './host/platform-config-loader';
-import { Observable, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { ClientConfig } from './client/client-config';
 import { ApplicationConfig, PlatformConfig } from './host/platform-config';
 import { PlatformProperties } from './host/platform-properties';
@@ -27,6 +26,10 @@ import { PlatformMessageClient } from './host/platform-message-client';
 import { PLATFORM_SYMBOLIC_NAME } from './host/platform.constants';
 import { PlatformInitializer } from './host/platform-initializer';
 import { Defined } from '@scion/toolkit/util';
+import { HostPlatformState } from './client/host-platform-state';
+import { MessageBroker } from './host/message-broker';
+import { PlatformTopics } from './ɵmessaging.model';
+import { mergeMap, takeUntil } from 'rxjs/operators';
 
 /**
  * The central class of the SCION microfrontend platform.
@@ -60,9 +63,10 @@ export const MicrofrontendPlatform = new class {
   public forClient(config: ClientConfig): Promise<void> {
     return this.startPlatform(() => {
         Beans.register(ClientConfig, {useValue: config});
-        Beans.registerIfAbsent(HttpClient);
         Beans.registerIfAbsent(Logger);
-        Beans.registerIfAbsent(MessageClient, {useFactory: provideMessageClient(config.symbolicName, config.messaging), eager: true});
+        Beans.registerIfAbsent(HttpClient);
+        Beans.registerIfAbsent(MessageClient, provideMessageClient(config.symbolicName, config.messaging));
+        Beans.register(HostPlatformState);
       },
     );
   }
@@ -79,22 +83,33 @@ export const MicrofrontendPlatform = new class {
    */
   public forHost(platformConfig: ApplicationConfig[] | PlatformConfig | Type<PlatformConfigLoader>, clientConfig?: ClientConfig): Promise<void> {
     return this.startPlatform(() => {
-        Beans.registerIfAbsent(MessageBroker, {eager: true});
+        Beans.registerIfAbsent(Logger);
+        Beans.register(PlatformProperties);
+        Beans.registerIfAbsent(HttpClient);
         Beans.register(PlatformConfigLoader, createConfigLoaderBeanDescriptor(platformConfig));
         Beans.register(ManifestRegistry);
         Beans.register(ApplicationRegistry);
-        Beans.register(PlatformProperties);
-        Beans.registerIfAbsent(Logger);
-        Beans.registerIfAbsent(HttpClient);
-        Beans.registerIfAbsent(PlatformMessageClient, {useFactory: provideMessageClient(PLATFORM_SYMBOLIC_NAME, clientConfig && clientConfig.messaging), eager: true});
+        Beans.registerIfAbsent(PlatformMessageClient, provideMessageClient(PLATFORM_SYMBOLIC_NAME, clientConfig && clientConfig.messaging));
 
         Beans.registerInitializer({useClass: PlatformInitializer});
         Beans.registerInitializer({useClass: ManifestCollector});
+        Beans.register(HostPlatformState);
 
         if (clientConfig) {
           Beans.register(ClientConfig, {useValue: clientConfig});
-          Beans.registerIfAbsent(MessageClient, {useFactory: provideMessageClient(clientConfig.symbolicName, clientConfig.messaging), eager: true});
+          Beans.registerIfAbsent(MessageClient, provideMessageClient(clientConfig.symbolicName, clientConfig.messaging));
         }
+
+        // Construct the bean manager instantly to receive connect requests of clients.
+        Beans.registerIfAbsent(MessageBroker, {useValue: new MessageBroker(), destroyPhase: PlatformStates.Stopped});
+
+        // Notify clients about host platform state changes.
+        Beans.get(PlatformState).state$
+          .pipe(
+            mergeMap(state => Beans.get(PlatformMessageClient).publish$(PlatformTopics.HostPlatformState, state, {retain: true})),
+            takeUntil(from(Beans.get(PlatformState).whenState(PlatformStates.Stopping))),
+          )
+          .subscribe();
       },
     );
   }
@@ -108,30 +123,28 @@ export const MicrofrontendPlatform = new class {
 
   /**
    * Destroys this platform and releases resources allocated.
-   * @internal
    */
-  public destroy(): void {
+  public async destroy(): Promise<void> {
+    await Beans.get(PlatformState).enterState(PlatformStates.Stopping);
     Beans.destroy();
-    Beans.get(MicrofrontendPlatformState).enterState(PlatformStates.Stopped);
+    await Beans.get(PlatformState).enterState(PlatformStates.Stopped);
   }
 
   /** @internal **/
-  public startPlatform(startupFn: () => void): Promise<void> {
-    Beans.register(MicrofrontendPlatformState);
-    Beans.get(MicrofrontendPlatformState).enterState(PlatformStates.Starting);
+  public async startPlatform(startupFn: () => void): Promise<void> {
+    await Beans.get(PlatformState).enterState(PlatformStates.Starting);
     try {
       startupFn();
 
-      return Beans.init()
-        .then(() => Beans.get(MicrofrontendPlatformState).enterState(PlatformStates.Started))
-        .catch(error => {
-          Beans.get(MicrofrontendPlatformState).enterState(PlatformStates.Stopped);
-          Beans.destroy();
+      return Beans.runInitializers()
+        .then(() => Beans.get(PlatformState).enterState(PlatformStates.Started))
+        .catch(async error => {
+          await Beans.destroy();
           return Promise.reject(`[PlatformStartupError] Microfrontend platform failed to start: ${error}`);
         });
     }
     catch (error) {
-      Beans.get(MicrofrontendPlatformState).enterState(PlatformStates.Stopped);
+      await Beans.destroy();
       return Promise.reject(`[PlatformStartupError] Microfrontend platform failed to start: ${error}`);
     }
   }
@@ -152,14 +165,15 @@ function createConfigLoaderBeanDescriptor(config: ApplicationConfig[] | Platform
   }
 }
 
-/**
- * Provides the message client for the given configuration.
- */
-function provideMessageClient(clientAppName: string, config?: { brokerDiscoverTimeout?: number, deliveryTimeout?: number }): () => MessageClient {
-  return (): MessageClient => {
-    const discoveryTimeout = Defined.orElse(config && config.brokerDiscoverTimeout, 10000);
-    const deliveryTimeout = Defined.orElse(config && config.deliveryTimeout, 10000);
-    return new ɵMessageClient(clientAppName, {discoveryTimeout, deliveryTimeout});
+function provideMessageClient(clientAppName: string, config?: { brokerDiscoverTimeout?: number, deliveryTimeout?: number }): BeanInstanceConstructInstructions {
+  return {
+    useFactory: (): MessageClient => {
+      const discoveryTimeout = Defined.orElse(config && config.brokerDiscoverTimeout, 10000);
+      const deliveryTimeout = Defined.orElse(config && config.deliveryTimeout, 10000);
+      return new ɵMessageClient(clientAppName, {discoveryTimeout, deliveryTimeout});
+    },
+    eager: true,
+    destroyPhase: PlatformStates.Stopped,
   };
 }
 

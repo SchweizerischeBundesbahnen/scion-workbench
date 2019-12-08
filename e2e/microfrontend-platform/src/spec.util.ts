@@ -73,7 +73,7 @@ export async function findAsync<T>(items: T[], predicate: (item: T) => Promise<b
  * But, it does not support to test against a regular expression.
  * @see https://jasmine.github.io/api/3.5/async-matchers.html
  */
-export function expectToBeRejectedWithError(fn: () => Promise<any>, expected?: RegExp): Promise<void> {
+export function expectToBeRejectedWithError(promise: Promise<any>, expected?: RegExp): Promise<void> {
   const reasonExtractorFn = (reason: any): string => {
     if (typeof reason === 'string') {
       return reason;
@@ -84,7 +84,7 @@ export function expectToBeRejectedWithError(fn: () => Promise<any>, expected?: R
     return reason.toString();
   };
 
-  return fn()
+  return promise
     .then(() => fail('Promise expected to be rejected but was resolved.'))
     .catch(reason => {
       if (expected && !reasonExtractorFn(reason).match(expected)) {

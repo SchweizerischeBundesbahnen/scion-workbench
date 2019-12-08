@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 // tslint:disable:unified-signatures
-import { MonoTypeOperatorFunction, Observable } from 'rxjs';
+import { MonoTypeOperatorFunction, NEVER, Observable } from 'rxjs';
 import { Intent } from '../platform.model';
 import { IntentMessage, TopicMessage } from '../messaging.model';
 import { first, takeUntil } from 'rxjs/operators';
@@ -27,6 +27,10 @@ import { Beans } from '../bean-manager';
  * Requires the publisher to declare an intent and some application to provide a capability.
  * The intent is transported to all clients that provide a satisfying capability visible to
  * the sending application.
+ *
+ * Messages published to a topic can be marked as 'retained'. Retained messages help newly-subscribed
+ * clients to immediately get the last message published to that topic. The broker stores one retained
+ * message per topic. To delete a retained message, send a retained message without payload to the topic.
  */
 export abstract class MessageClient {
 
@@ -37,10 +41,12 @@ export abstract class MessageClient {
    *         Specifies the topic destination of the message.
    * @param  message
    *         Specifies transfer data to be sent to the destination, if any.
+   * @param  options
+   *         Controls how to publish the message.
    * @return An Observable which completes immediately when dispatched the message, or which throws an error if the message
    *         could not be dispatched.
    */
-  abstract publish$(topic: string, message?: any): Observable<never>;
+  abstract publish$(topic: string, message?: any, options?: PublishOptions): Observable<never>;
 
   /**
    * Sends a request to the given topic and receives one or more replies.
@@ -160,4 +166,54 @@ export abstract class MessageClient {
  */
 export function takeUntilUnsubscribe<T>(topic: string): MonoTypeOperatorFunction<T[]> {
   return takeUntil(Beans.get(MessageClient).subscriberCount$(topic).pipe(first(count => count === 0)));
+}
+
+/**
+ * Control how to publish the message.
+ */
+export interface PublishOptions {
+  /**
+   * Instructs the broker to store this message as retained message for the topic. With the retained flag set to `true`,
+   * a client receives this message immediately upon subscription. The broker stores only one retained message per topic.
+   * To delete the retained message, send a retained message without payload to the topic.
+   */
+  retain?: boolean;
+}
+
+/**
+ * Message client that does nothing.
+ */
+export class NullMessageClient implements MessageClient {
+
+  public constructor() {
+    console.log('[NullMessageClient] Using \'NullMessageClient\' for messaging. Messages cannot be sent or received.');
+  }
+
+  public publish$(topic: string, message?: any, options?: PublishOptions): Observable<never> {
+    return NEVER;
+  }
+
+  public request$<T>(topic: string, message?: any): Observable<TopicMessage<T>> {
+    return NEVER;
+  }
+
+  public observe$<T>(topic: string): Observable<TopicMessage<T>> {
+    return NEVER;
+  }
+
+  public issueIntent$(intent: Intent, payload?: any): Observable<never> {
+    return NEVER;
+  }
+
+  public requestByIntent$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>> {
+    return NEVER;
+  }
+
+  public handleIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {
+    return NEVER;
+  }
+
+  public subscriberCount$(topic: string): Observable<number> {
+    return NEVER;
+  }
 }

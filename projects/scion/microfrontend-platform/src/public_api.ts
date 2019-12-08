@@ -15,7 +15,7 @@ export * from './lib/platform.model';
 export * from './lib/messaging.model';
 export * from './lib/bean-manager';
 export * from './lib/microfrontend-platform';
-export * from './lib/microfrontend-platform-state';
+export * from './lib/platform-state';
 export * from './lib/logger';
 export * from './lib/client/public_api';
 export * from './lib/host/public_api';

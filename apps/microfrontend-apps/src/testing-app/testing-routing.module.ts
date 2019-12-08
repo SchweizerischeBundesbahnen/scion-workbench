@@ -7,11 +7,13 @@ import { OutletsComponent } from './outlets/outlets.component';
 import { ReceiveMessageComponent } from './messaging/receive-message/receive-message.component';
 import { ManageCapabilitiesComponent } from './manifest/manage-capabilities/manage-capabilities.component';
 import { ManageIntentsComponent } from './manifest/manage-intents/manage-intents.component';
+import { TestingAppPlatformInitializerResolver } from './testing-app-platform-initializer.resolver';
 
 const routes: Routes = [
   {
     path: '',
     component: TestingAppComponent,
+    resolve: {platform: TestingAppPlatformInitializerResolver},
     children: [
       {path: 'outlets', component: OutletsComponent},
       {path: 'publish-message', component: PublishMessageComponent, data: {title: 'Publish messages'}},

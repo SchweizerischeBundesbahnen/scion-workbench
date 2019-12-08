@@ -17,7 +17,7 @@ import { Beans, PreDestroy } from '../bean-manager';
 import { ApplicationRegistry } from './application.registry';
 import { ManifestRegistry } from './manifest.registry';
 import { UUID } from '@scion/toolkit/util';
-import { MicrofrontendPlatformState, PlatformStates } from '../microfrontend-platform-state';
+import { PlatformState, PlatformStates } from '../platform-state';
 import { Logger } from '../logger';
 
 declare type ClientRegistry = Map<Window, Client>;
@@ -27,7 +27,7 @@ const messageBrokerId = UUID.randomUUID();
  * The broker is responsible for receiving all messages, filtering the messages, determining who is
  * subscribed to each message, and sending the message to these subscribed clients.
  *
- * The broker supports topic-based and intent-based messaging.
+ * The broker allows topic-based and intent-based messaging and supports retained messages.
  *
  * When the broker receives a message from a client, the broker identifies the sending client using the {@Window}
  * contained in the {@link MessageEvent}. The user agent sets the window, which cannot be tampered by the client.
@@ -39,7 +39,8 @@ export class MessageBroker implements PreDestroy {
 
   private readonly _destroy$ = new Subject<void>();
   private readonly _clientRegistry = new Map<Window, Client>();
-  private readonly _clientsByTopicMap = new Map<string, Set<Client>>();
+  private readonly _clientsByTopic = new Map<string, Set<Client>>();
+  private readonly _retainedMessagesByTopic = new Map<string, TopicMessage>();
   private readonly _clientRequests$: Observable<ClientMessage>;
 
   private readonly _applicationRegistry: ApplicationRegistry;
@@ -54,7 +55,7 @@ export class MessageBroker implements PreDestroy {
     this._clientRequests$ = fromEvent<MessageEvent>(window, 'message')
       .pipe(
         filterMessage(MessagingTransport.ClientToBroker),
-        bufferUntil(Beans.get(MicrofrontendPlatformState).whenState(PlatformStates.Started)),
+        bufferUntil(Beans.get(PlatformState).whenState(PlatformStates.Started)),
         checkOriginTrusted(this._clientRegistry, {transport: MessagingTransport.BrokerToClient}),
         catchErrorAndRetry(),
         share(),
@@ -80,7 +81,7 @@ export class MessageBroker implements PreDestroy {
     fromEvent<MessageEvent>(window, 'message')
       .pipe(
         filterByTransportAndTopic(MessagingTransport.GatewayToBroker, PlatformTopics.ClientConnect),
-        bufferUntil(Beans.get(MicrofrontendPlatformState).whenState(PlatformStates.Started)),
+        bufferUntil(Beans.get(PlatformState).whenState(PlatformStates.Started)),
         catchErrorAndRetry(),
         takeUntil(this._destroy$),
       )
@@ -135,7 +136,7 @@ export class MessageBroker implements PreDestroy {
     fromEvent<MessageEvent>(window, 'message')
       .pipe(
         filterByTransportAndTopic(MessagingTransport.GatewayToBroker, PlatformTopics.ClientDisconnect),
-        bufferUntil(Beans.get(MicrofrontendPlatformState).whenState(PlatformStates.Started)),
+        bufferUntil(Beans.get(PlatformState).whenState(PlatformStates.Started)),
         checkOriginTrusted<void>(this._clientRegistry, {transport: MessagingTransport.BrokerToGateway}),
         catchErrorAndRetry(),
         takeUntil(this._destroy$),
@@ -165,8 +166,15 @@ export class MessageBroker implements PreDestroy {
           return;
         }
 
-        const clients = this._clientsByTopicMap.get(topic) || new Set<Client>();
-        this._clientsByTopicMap.set(topic, clients.add(client));
+        const clients = this._clientsByTopic.get(topic) || new Set<Client>();
+        this._clientsByTopic.set(topic, clients.add(client));
+
+        // Dispatch the retained message on the topic, if any.
+        const retainedMessage = this._retainedMessagesByTopic.get(topic);
+        if (retainedMessage) {
+          sendTopicMessage(client, {transport: MessagingTransport.BrokerToClient, topic: topic}, retainedMessage.payload);
+        }
+
         this._topicSubscriberChange$.next({topic, subscriptionCount: clients.size});
         sendDeliveryStatusSuccess(client, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId});
       }));
@@ -192,9 +200,9 @@ export class MessageBroker implements PreDestroy {
           return;
         }
 
-        const clients = this._clientsByTopicMap.get(topic) || new Set<Client>();
+        const clients = this._clientsByTopic.get(topic) || new Set<Client>();
         if (clients.delete(clientMessage.client) && clients.size === 0) {
-          this._clientsByTopicMap.delete(topic);
+          this._clientsByTopic.delete(topic);
         }
 
         this._topicSubscriberChange$.next({topic, subscriptionCount: clients.size});
@@ -209,7 +217,7 @@ export class MessageBroker implements PreDestroy {
     this._clientRequests$
       .pipe(
         filterByChannel(MessagingChannel.Topic),
-        filterByTopic(PlatformTopics.SubscriberCount),
+        filterByTopic(PlatformTopics.RequestSubscriberCount),
         takeUntil(this._destroy$),
       )
       .subscribe((clientMessage: ClientMessage<TopicMessage<string>>) => runSafe(() => {
@@ -222,7 +230,7 @@ export class MessageBroker implements PreDestroy {
           .pipe(
             filter(event => event.topic === topic),
             map(event => event.subscriptionCount),
-            startWith((this._clientsByTopicMap.get(topic) || new Set()).size),
+            startWith((this._clientsByTopic.get(topic) || new Set()).size),
             takeUntil(this._topicSubscriberChange$.pipe(first(change => change.topic === replyTo && change.subscriptionCount === 0))),
           )
           .subscribe((subscriptionCount: number) => runSafe(() => {
@@ -245,7 +253,7 @@ export class MessageBroker implements PreDestroy {
     this._clientRequests$
       .pipe(
         filterByChannel(MessagingChannel.Topic),
-        filter(clientMessage => clientMessage.envelope.message.topic !== PlatformTopics.SubscriberCount), // do not dispatch messages sent to `SubscriberCount` topic
+        filter(clientMessage => clientMessage.envelope.message.topic !== PlatformTopics.RequestSubscriberCount), // do not dispatch messages sent to `SubscriberCount` topic
         takeUntil(this._destroy$),
       )
       .subscribe((clientMessage: ClientMessage<TopicMessage>) => runSafe(() => {
@@ -253,14 +261,25 @@ export class MessageBroker implements PreDestroy {
           ...clientMessage.envelope,
           transport: MessagingTransport.BrokerToClient,
         };
+        const topicMessage = envelope.message;
 
-        // dispatch the message asynchronously
-        const clients = this._clientsByTopicMap.get(envelope.message.topic) || new Set();
+        // If the message is marked as 'retained', store it, or if without payload, delete it.
+        if (topicMessage.retain && topicMessage.payload === undefined || topicMessage.payload === null) {
+          this._retainedMessagesByTopic.delete(topicMessage.topic);
+          sendDeliveryStatusSuccess(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId});
+          return; // do not dispatch the 'delete' message.
+        }
+        if (topicMessage.retain) {
+          this._retainedMessagesByTopic.set(topicMessage.topic, topicMessage);
+        }
+
+        // Dispatch the message asynchronously.
+        const clients = this._clientsByTopic.get(topicMessage.topic) || new Set();
         clients.forEach(client => asapScheduler.schedule(() => client.window.postMessage(envelope, client.application.origin)));
 
-        // if request-reply communication, send an error if no replier is found to reply to the topic.
-        if (envelope.message.replyTo !== undefined && clients.size === 0) {
-          const error = {type: 'RequestReplyError', details: `No replier found to reply to requests published to topic '${envelope.message.topic}'.`};
+        // If request-reply communication, send an error if no replier is found to reply to the topic.
+        if (topicMessage.replyTo !== undefined && clients.size === 0) {
+          const error = {type: 'RequestReplyError', details: `No replier found to reply to requests sent to topic '${topicMessage.topic}'.`};
           sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
         }
         else {
@@ -336,10 +355,10 @@ export class MessageBroker implements PreDestroy {
     this._clientRegistry.delete(clientWindow);
 
     // unregister the client from all topics
-    this._clientsByTopicMap.forEach((clients: Set<Client>, topic: string) => {
+    this._clientsByTopic.forEach((clients: Set<Client>, topic: string) => {
       const subscribed = clients.delete(client);
       if (subscribed && clients.size === 0) {
-        this._clientsByTopicMap.delete(topic);
+        this._clientsByTopic.delete(topic);
       }
 
       if (subscribed) {

@@ -37,6 +37,12 @@ export interface TopicMessage<T = any> {
    */
   topic: string;
   /**
+   * Instructs the broker to store this message as retained message for the topic. With the retained flag set to `true`,
+   * a client receives this message immediately upon subscription. The broker stores only one retained message per topic.
+   * To delete the retained message, send a retained message without payload to the topic.
+   */
+  retain?: boolean;
+  /**
    * Optional message payload.
    */
   payload?: T;

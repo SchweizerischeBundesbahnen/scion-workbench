@@ -33,6 +33,7 @@
     "microfrontend-platform:e2e-headless": "cross-env HEADLESS=true run-p -r microfrontend-apps:serve microfrontend-platform:await-then-protractor",
     "microfrontend-platform:await-then-protractor": "run-s microfrontend-apps:await:* microfrontend-platform:run-protractor",
     "microfrontend-platform:run-protractor": "ng e2e e2e-microfrontend-platform",
+    "microfrontend-platform:run-protractor-headless": "cross-env HEADLESS=true ng e2e e2e-microfrontend-platform",
 
     "microfrontend-apps:serve": "run-p -r microfrontend-apps:serve:*",
     "microfrontend-apps:serve:4200": "ng serve microfrontend-apps --aot --port 4200",

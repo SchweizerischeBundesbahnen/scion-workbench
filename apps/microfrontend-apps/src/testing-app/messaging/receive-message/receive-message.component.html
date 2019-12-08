@@ -1,11 +1,11 @@
-<form autocomplete="off" [formGroup]="form" [class.topic-messaging-model]="isTopicModel()">
+<form autocomplete="off" [formGroup]="form" [class.topic-messaging-model]="isTopicMessaging()">
   <sci-form-field label="Model *">
     <select [formControlName]="MESSAGING_MODEL" class="e2e-messaging-model">
       <option [value]="MessagingModel.Topic">Topic</option>
       <option [value]="MessagingModel.Intent">Intent</option>
     </select>
   </sci-form-field>
-  <ng-container *ngIf="isTopicModel(); then topic_template else intent_template"></ng-container>
+  <ng-container *ngIf="isTopicMessaging(); then topic_template else intent_template"></ng-container>
 </form>
 <button (click)="onSubscribe()" *ngIf="!isSubscribed" [disabled]="form.invalid" class="e2e-subscribe">Subscribe</button>
 <button (click)="onUnsubscribe()" *ngIf="isSubscribed" class="e2e-unsubscribe">Unsubscribe</button>
@@ -15,7 +15,7 @@
     <ng-container *ngFor="let message of messages">
 
       <ng-template sciListItem [actions]="message.replyTo ? reply_action: null">
-        <app-message-list-item [message]="message" [isTopicMessage]="isTopicModel()"></app-message-list-item>
+        <app-message-list-item [message]="message" [isTopicMessage]="isTopicMessaging()"></app-message-list-item>
       </ng-template>
 
       <ng-template #reply_action>

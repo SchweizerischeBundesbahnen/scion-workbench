@@ -8,7 +8,6 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { Beans } from '../bean-manager';
 import { PlatformMessageClient } from '../host/platform-message-client';
 import { first, mapTo, reduce, take, timeoutWith } from 'rxjs/operators';
@@ -16,17 +15,17 @@ import { Observable, throwError } from 'rxjs';
 import { IntentMessage, TopicMessage } from '../messaging.model';
 import { MessageClient } from './message-client';
 import { Logger } from '../logger';
-import { HttpClient } from '../host/http-client';
-import { ApplicationManifest } from '../platform.model';
 import { ManifestRegistry } from '../host/manifest.registry';
 import { ApplicationConfig } from '../host/platform-config';
 import { PLATFORM_SYMBOLIC_NAME } from '../host/platform.constants';
-import { expectToBeRejectedWithError } from '../spec.util.spec';
+import { createManifestURL, expectToBeRejectedWithError } from '../spec.util.spec';
+import { MicrofrontendPlatform } from '../microfrontend-platform';
 import Spy = jasmine.Spy;
 
 describe('PlatformMessageClient and HostAppMessageClient', () => {
 
-  afterEach(() => MicrofrontendPlatform.destroy());
+  beforeEach(async () => await MicrofrontendPlatform.destroy());
+  afterEach(async () => await MicrofrontendPlatform.destroy());
 
   it('should allow publishing messages to a topic', async () => {
     await MicrofrontendPlatform.forHost([]);
@@ -80,22 +79,27 @@ describe('PlatformMessageClient and HostAppMessageClient', () => {
   });
 
   it('should reject a client connect attempt if the app is not trusted (wrong origin)', async () => {
-    const loggerSpy = jasmine.createSpyObj(Logger.name, ['error']);
+    const loggerSpy = jasmine.createSpyObj(Logger.name, ['error', 'info']);
     Beans.register(Logger, {useValue: loggerSpy});
 
-    const manifestUrl = createManifestURL({name: 'Trusted Client'}, {origin: 'http://trusted-origin.com'});
+    const manifestUrl = createManifestURL({name: 'Trusted Client'}, {origin: 'http://other-than-karma-testrunner'});
     const registeredApps: ApplicationConfig[] = [{symbolicName: 'client', manifestUrl: manifestUrl}];
+    const logCapturePromise = waitUntilInvoked(loggerSpy.error, 1000);
+
     await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'client'});
-    await expectAsync(waitUntilInvoked(loggerSpy.error, 1000)).toBeResolved('\'Logger.error\' not invoked within 1s');
+
+    await expectAsync(logCapturePromise).toBeResolved('\'Logger.error\' not invoked within 1s');
     await expect(loggerSpy.error.calls.mostRecent().args[0]).toMatch(/\[MessageClientConnectError] Client connect attempt blocked by the message broker: Wrong origin.*\[code: 'refused:blocked']/);
   });
 
   it('should log an error if the message broker cannot be discovered', async () => {
-    const loggerSpy = jasmine.createSpyObj(Logger.name, ['error']);
+    const loggerSpy = jasmine.createSpyObj(Logger.name, ['error', 'info']);
     Beans.register(Logger, {useValue: loggerSpy});
+    const logCapturePromise = waitUntilInvoked(loggerSpy.error, 1000);
 
     await MicrofrontendPlatform.forClient({symbolicName: 'client-app', messaging: {brokerDiscoverTimeout: 250}});
-    await expectAsync(waitUntilInvoked(loggerSpy.error, 1000)).toBeResolved();
+
+    await expectAsync(logCapturePromise).toBeResolved();
     await expect(loggerSpy.error).toHaveBeenCalledWith('[BrokerDiscoverTimeoutError] Message broker not discovered within the 250ms timeout. Messages cannot be published or received.');
   });
 
@@ -187,20 +191,4 @@ function waitUntilSubscriberCount(topic: string, expectedCount: number, options:
       mapTo(undefined),
     )
     .toPromise();
-}
-
-/***
- * Serves the given manifest and returns the URL where the manifest is served. By default, it is served under the current origin.
- */
-function createManifestURL(manifest: Partial<ApplicationManifest>, config?: { origin: string }): string {
-  const manifestUrl = new URL('url', config && config.origin || window.location.origin).toString();
-  const response: Partial<Response> = {
-    ok: true,
-    json: (): Promise<any> => Promise.resolve(manifest),
-  };
-
-  const httpClientSpy = jasmine.createSpyObj(HttpClient.name, ['fetch']);
-  httpClientSpy.fetch.withArgs(manifestUrl).and.returnValue(response);
-  Beans.register(HttpClient, {useValue: httpClientSpy});
-  return manifestUrl;
 }

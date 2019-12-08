@@ -10,7 +10,7 @@
 
 import { TestingAppOrigins, TestingAppPO } from '../testing-app.po';
 import { MessagingModel, PublishMessagePagePO } from './publish-message-page.po';
-import { ReceiveMessagePO } from './receive-message.po';
+import { ReceiveMessagePagePO } from './receive-message-page.po';
 import { ManageIntentsPagePO } from '../manifest/manage-intents-page.po';
 import { ManageCapabilitiesPagePO } from '../manifest/manage-capabilities-page.po';
 import { OutletPO } from '../outlet.po';
@@ -73,7 +73,7 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4202: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -87,7 +87,7 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManager_4202.registerCapability('testing', {key: 'value'}, {scope: 'private'});
 
     // receive the intent
-    const receiverPO_4202 = pagePOs.get<ReceiveMessagePO>('receiver_4202');
+    const receiverPO_4202 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
     await receiverPO_4202.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4202.enterIntentSelector('testing', {key: 'value'});
     await receiverPO_4202.clickSubscribe();
@@ -118,7 +118,7 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -132,7 +132,7 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManagerPO_4203.registerCapability('testing', {key: 'value'}, {scope: 'private'});
 
     // receive the intent
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePO>('receiver_4203');
+    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
     await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203.enterIntentSelector('testing', {key: 'value'});
     await receiverPO_4203.clickSubscribe();
@@ -160,7 +160,7 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4202: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -174,7 +174,7 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManagerPO_4202.registerCapability('testing', {key: 'value'}, {scope: 'public'});
 
     // receive the intent
-    const receiverPO = pagePOs.get<ReceiveMessagePO>('receiver_4202');
+    const receiverPO = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
     await receiverPO.selectMessagingModel(MessagingModel.Intent);
     await receiverPO.enterIntentSelector('testing', {key: 'value'});
     await receiverPO.clickSubscribe();
@@ -205,7 +205,7 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -219,7 +219,7 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManagerPO_4203.registerCapability('testing', {key: 'value'}, {scope: 'public'});
 
     // receive the intent
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePO>('receiver_4203');
+    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
     await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203.enterIntentSelector('testing', {key: 'value'});
     await receiverPO_4203.clickSubscribe();
@@ -250,9 +250,9 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4201: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver_4201: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver_4202_1: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4202_2: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      receiver_4201: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
+      receiver_4202_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      receiver_4202_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -270,19 +270,19 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManagerPO_4202.registerCapability('testing', {key: 'value'}, {scope: 'public'});
 
     // receive the intent in app 4201
-    const receiverPO_4201 = pagePOs.get<ReceiveMessagePO>('receiver_4201');
+    const receiverPO_4201 = pagePOs.get<ReceiveMessagePagePO>('receiver_4201');
     await receiverPO_4201.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4201.enterIntentSelector('testing', {key: 'value'});
     await receiverPO_4201.clickSubscribe();
 
     // receive the intent in app 4202_1
-    const receiverPO_4202_1 = pagePOs.get<ReceiveMessagePO>('receiver_4202_1');
+    const receiverPO_4202_1 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202_1');
     await receiverPO_4202_1.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4202_1.enterIntentSelector('testing', {key: 'value'});
     await receiverPO_4202_1.clickSubscribe();
 
     // receive the intent in app 4202_2
-    const receiverPO_4202_2 = pagePOs.get<ReceiveMessagePO>('receiver_4202_2');
+    const receiverPO_4202_2 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202_2');
     await receiverPO_4202_2.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4202_2.enterIntentSelector('testing', {key: 'value'});
     await receiverPO_4202_2.clickSubscribe();
@@ -327,7 +327,7 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -341,7 +341,7 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManagerPO_4203.registerCapability('testing', {key: 'value'}, {scope: 'public'});
 
     // receive the intent
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePO>('receiver_4203');
+    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
     await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203.enterIntentSelector('testing', {key: 'value'});
     await receiverPO_4203.clickSubscribe();
@@ -385,7 +385,7 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -399,7 +399,7 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManagerPO_4203.registerCapability('testing', {key: 'value'}, {scope: 'public'});
 
     // receive the intent
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePO>('receiver_4203');
+    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
     await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203.enterIntentSelector('testing', {key: 'value'});
     await receiverPO_4203.clickSubscribe();
@@ -441,10 +441,10 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203_1: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
-      receiver_4203_2: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
-      receiver_4203_3: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
-      receiver_4203_4: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4203_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4203_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4203_3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4203_4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -458,25 +458,25 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManagerPO_4203.registerCapability('testing', {key1: 'value1', key2: 'value2'}, {scope: 'public'});
 
     // receive the intent using qualifier: {key1: 'value1', key2: '*'}
-    const receiverPO_4203_1 = pagePOs.get<ReceiveMessagePO>('receiver_4203_1');
+    const receiverPO_4203_1 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_1');
     await receiverPO_4203_1.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203_1.enterIntentSelector('testing', {key1: 'value1', key2: '*'});
     await receiverPO_4203_1.clickSubscribe();
 
     // receive the intent using qualifier: {key1: 'value1', key2: '*', key3: '?'}
-    const receiverPO_4203_2 = pagePOs.get<ReceiveMessagePO>('receiver_4203_2');
+    const receiverPO_4203_2 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_2');
     await receiverPO_4203_2.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203_2.enterIntentSelector('testing', {key1: 'value1', key2: '*', key3: '?'});
     await receiverPO_4203_2.clickSubscribe();
 
     // receive the intent using qualifier: {'*': '*'}
-    const receiverPO_4203_3 = pagePOs.get<ReceiveMessagePO>('receiver_4203_3');
+    const receiverPO_4203_3 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_3');
     await receiverPO_4203_3.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203_3.enterIntentSelector('testing', {'*': '*'});
     await receiverPO_4203_3.clickSubscribe();
 
     // receive the intent using qualifier: undefined
-    const receiverPO_4203_4 = pagePOs.get<ReceiveMessagePO>('receiver_4203_4');
+    const receiverPO_4203_4 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_4');
     await receiverPO_4203_4.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203_4.enterIntentSelector('testing');
     await receiverPO_4203_4.clickSubscribe();
@@ -503,8 +503,8 @@ export namespace IntendBasedMessagingSpecs {
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
       publisher_4200: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-      receiver_4202: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
     const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
@@ -523,12 +523,12 @@ export namespace IntendBasedMessagingSpecs {
     await capabilityManagerPO_4203.registerCapability('testing', {key1: 'value1', key2: '?'}, {scope: 'public'});
 
     // receive the intent in 4202
-    const receiverPO_4202 = pagePOs.get<ReceiveMessagePO>('receiver_4202');
+    const receiverPO_4202 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
     await receiverPO_4202.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4202.clickSubscribe();
 
     // receive the intent in 4203
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePO>('receiver_4203');
+    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
     await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
     await receiverPO_4203.clickSubscribe();
 
@@ -551,7 +551,7 @@ export namespace IntendBasedMessagingSpecs {
     await publisherPO_4200.clickPublish();
 
     // assert receiving the intent
-    await expectToBeRejectedWithError(() => receiverPO_4202.getFirstMessageOrElseReject(), /[TimeoutError]/);
+    await expectToBeRejectedWithError(receiverPO_4202.getFirstMessageOrElseReject(), /[TimeoutError]/);
     await expect((await receiverPO_4203.getFirstMessageOrElseReject()).getIntentQualifier()).toEqual({key1: 'value1'});
     await receiverPO_4202.clickClearMessages();
     await receiverPO_4203.clickClearMessages();

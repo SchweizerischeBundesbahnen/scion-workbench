@@ -9,12 +9,11 @@
  */
 
 import { Defined } from '@scion/toolkit/util';
-import { MicrofrontendPlatformState, PlatformStates } from './microfrontend-platform-state';
+import { PlatformState, PlatformStates } from './platform-state';
 
 const initializers: InitializerFn[] = [];
-const beanRegistry = new Map<Type<any> | AbstractType<any>, BeanInfo[]>();
+const beanRegistry = new Map<Type<any> | AbstractType<any>, Set<BeanInfo>>();
 const beanDecoratorRegistry = new Map<Type<any> | AbstractType<any>, BeanDecorator<any>[]>();
-const platformState = new MicrofrontendPlatformState();
 
 /**
  * Allows looking up beans registered with the platform.
@@ -22,16 +21,18 @@ const platformState = new MicrofrontendPlatformState();
  * A bean can be any object and is registered under some symbol with this bean manager. A symbol is either a class type
  * or an abstract class type.
  *
- * Beans are application-scoped and, by default, are constructed lazily when looked up for the first time - a bean's
- * construction strategy, however, can be changed when registering the bean. Beans with an eager construction strategy
- * are constructed after all initializers completed, in the order as registered.
+ * Beans are application-scoped and, by default, are constructed lazily when looked up for the first time.
+ * Beans with an eager construction strategy are constructed after all initializers completed, in the order as registered.
  *
- * Beans do not support field or constructor injection. Instead, a bean can programmatically lookup dependent beans.
- * It is allowed to lookup other beans during bean construction.
+ * Beans do not support field or constructor injection. Instead, beans are looked up programmatically.
  *
  * If a bean implements {@link PreDestroy} lifecycle hook, it is invoked when the platform is shutting down.
  */
 export const Beans = new class {
+
+  constructor() {
+    this.register(PlatformState, {destroyPhase: 'none', eager: true});
+  }
 
   /**
    * Registers a bean under the given symbol.
@@ -40,12 +41,12 @@ export const Beans = new class {
    *
    * By default, bean construction is lazy, meaning that the bean is constructed when looked up for the first time.
    * If another bean is registered under the same symbol, by default, it is disposed and replaced with the given bean.
-   * To register multiple beans on the same symbol, set the flag 'multi' to `true`.
+   * To register multiple beans on the same symbol, register it with the flag 'multi' set to `true`.
    *
-   * @param symbol
-   *        Symbol under which to register the bean.
-   * @param instructions
-   *        Control bean construction; see {@link BeanInstanceConstructInstructions} for more detail.
+   * @param  symbol
+   *         Symbol under which to register the bean.
+   * @param  instructions
+   *         Control bean construction; see {@link BeanInstanceConstructInstructions} for more detail.
    */
   public register<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: BeanInstanceConstructInstructions<T>): void {
     if (!symbol) {
@@ -54,42 +55,50 @@ export const Beans = new class {
 
     // Check that only 'multi' or 'non-multi' beans are registered on the same symbol.
     const multi = Defined.orElse(instructions && instructions.multi, false);
-    if (multi && beanRegistry.has(symbol) && beanRegistry.get(symbol).some(metaData => !metaData.multi)) {
+    if (multi && beanRegistry.has(symbol) && Array.from(beanRegistry.get(symbol)).some(metaData => !metaData.multi)) {
       throw Error('[BeanRegisterError] Trying to register a bean as \'multi-bean\' on a symbol that has already registered a \'non-multi-bean\'. This is probably not what was intended.');
     }
-    if (!multi && beanRegistry.has(symbol) && beanRegistry.get(symbol).some(metaData => metaData.multi)) {
+    if (!multi && beanRegistry.has(symbol) && Array.from(beanRegistry.get(symbol)).some(metaData => metaData.multi)) {
       throw Error('[BeanRegisterError] Trying to register a bean on a symbol that has already registered a \'multi-bean\'. This is probably not what was intended.');
     }
 
     // Destroy an already registered bean on the same symbol, if any, unless multi is set to `true`.
     if (!multi && beanRegistry.has(symbol)) {
-      destroyBeans(beanRegistry.get(symbol));
+      destroyBean(beanRegistry.get(symbol).values().next().value);
     }
 
     const beanInfo: BeanInfo<T> = {
       symbol: symbol,
       beanConstructFn: deriveConstructFunction(symbol, instructions),
-      eager: Defined.orElse(instructions && instructions.eager, false),
+      eager: Defined.orElse(instructions && (instructions.eager || !!instructions.useValue), false),
       multi: multi,
-      registrationInstant: instantProvider.get(),
+      destroyPhase: instructions && instructions.destroyPhase || PlatformStates.Stopping,
     };
 
     if (multi) {
-      const beans = beanRegistry.get(symbol) || [];
-      beanRegistry.set(symbol, beans.concat(beanInfo));
+      const beans = beanRegistry.get(symbol) || new Set<BeanInfo>();
+      beanRegistry.set(symbol, beans.add(beanInfo));
     }
     else {
-      beanRegistry.set(symbol, [beanInfo]);
+      beanRegistry.set(symbol, new Set<BeanInfo>([beanInfo]));
     }
 
-    // Construct the bean if having eager construction strategy unless the platform is not started yet.
-    if (beanInfo.eager && Beans.get(MicrofrontendPlatformState).state === PlatformStates.Started) {
-      getBeanInstanceIfPresentElseConstruct(beanInfo);
-    }
+    // Construct the bean if eager unless the platform is not startet yet.
+    beanInfo.eager && this.get(PlatformState).whenState(PlatformStates.Started).then(() => {
+      // Check if the bean is still registered in the bean manager
+      if (beanRegistry.has(beanInfo.symbol) && beanRegistry.get(beanInfo.symbol).has(beanInfo)) {
+        getOrConstructBeanInstance(beanInfo);
+      }
+    });
+
+    // Destroy the bean on platform shutdown.
+    beanInfo.destroyPhase !== 'none' && this.get(PlatformState).whenState(beanInfo.destroyPhase).then(() => {
+      destroyBean(beanInfo);
+    });
   }
 
   /**
-   * Registers a bean under the given symbol, but only if no bean is registered under that symbol yet.
+   * Registers a bean under the given symbol, but only if no other bean is registered under that symbol yet.
    *
    * For detailed information about how to register a bean, see {@link register}.
    *
@@ -196,11 +205,7 @@ export const Beans = new class {
    *        Symbol to lookup the beans.
    */
   public all<T>(symbol: Type<T> | AbstractType<T> | Type<any> | AbstractType<any>): T[] {
-    if (symbol === MicrofrontendPlatformState) { // static bean
-      return [platformState as any];
-    }
-
-    const beanInfos = beanRegistry.get(symbol);
+    const beanInfos = Array.from(beanRegistry.get(symbol) || new Set<BeanInfo>());
     if (!beanInfos || !beanInfos.length) {
       return [];
     }
@@ -208,30 +213,26 @@ export const Beans = new class {
       throw Error(`[BeanConstructError] Circular bean construction cycle detected [bean={${symbol.name}}].`);
     }
 
-    return beanInfos.map(beanInfo => getBeanInstanceIfPresentElseConstruct(beanInfo));
+    return beanInfos.map(beanInfo => getOrConstructBeanInstance(beanInfo));
   }
 
   /**
    * @internal
    */
-  public init(): Promise<void> {
+  public runInitializers(): Promise<void> {
     return Promise.all(initializers.map(fn => fn()))
-      .then(() => constructEagerBeans())
-      .catch(error => {
-        return Promise.reject(`[BeanManagerInitError] Bean manager failed to initialize. Initializer rejected with error: ${error}.`);
-      });
+      .then(() => Promise.resolve())
+      .catch(error => Promise.reject(`[BeanManagerInitializerError] Initializer rejected with error: ${error}.`));
   }
 
   /** @internal **/
   public destroy(): void {
-    beanRegistry.forEach(destroyBeans);
-    beanRegistry.clear();
     beanDecoratorRegistry.clear();
     initializers.length = 0;
   }
 };
 
-function getBeanInstanceIfPresentElseConstruct<T>(beanInfo: BeanInfo): T {
+function getOrConstructBeanInstance<T>(beanInfo: BeanInfo): T {
   // Check if the bean is already constructed.
   if (beanInfo.instance) {
     return beanInfo.instance;
@@ -249,21 +250,16 @@ function getBeanInstanceIfPresentElseConstruct<T>(beanInfo: BeanInfo): T {
   }
 }
 
-function constructEagerBeans(): void {
-  Array.from(beanRegistry.values())
-    .reduce((combined, beanInfos) => combined.concat(beanInfos), [])
-    .filter(beanInfo => beanInfo.eager)
-    .sort((a, b) => a.registrationInstant - b.registrationInstant)
-    .forEach(beanInfo => getBeanInstanceIfPresentElseConstruct(beanInfo));
-}
+function destroyBean(beanInfo: BeanInfo): void {
+  if (beanInfo.instance && typeof (beanInfo.instance as PreDestroy).preDestroy === 'function') {
+    beanInfo.instance.preDestroy();
+  }
 
-function destroyBeans(beanInfos: BeanInfo[]): void {
-  beanInfos
-    .filter(beanInfo => beanInfo.instance && typeof (beanInfo.instance as PreDestroy).preDestroy === 'function')
-    .forEach(beanInfo => {
-      (beanInfo.instance as PreDestroy).preDestroy();
-      beanInfo.instance = null;
-    });
+  const symbol = beanInfo.symbol;
+  const beans = beanRegistry.get(symbol) || new Set<BeanInfo>();
+  if (beans.delete(beanInfo) && beans.size === 0) {
+    beanRegistry.delete(symbol);
+  }
 }
 
 function deriveConstructFunction<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: InstanceConstructInstructions<T>): () => T {
@@ -282,7 +278,9 @@ function deriveConstructFunction<T>(symbol: Type<T | any> | AbstractType<T | any
 }
 
 /**
- * Lifecycle hook invoked when the bean is about to be destroyed.
+ * Lifecycle hook will be executed before destroying this bean.
+ *
+ * On platform shutdown, beans are destroyed when the platform enters {@link PlatformStates.Stopping} state.
  */
 export interface PreDestroy {
   preDestroy(): void;
@@ -295,7 +293,7 @@ interface BeanInfo<T = any> {
   beanConstructFn: () => T;
   eager: boolean;
   multi: boolean;
-  registrationInstant: number;
+  destroyPhase: PlatformStates | 'none';
 }
 
 /**
@@ -328,6 +326,13 @@ export interface BeanInstanceConstructInstructions<T = any> extends InstanceCons
    * Set if to provide multiple beans for a single symbol.
    */
   multi?: boolean;
+  /**
+   * Set in which phase to destroy the bean on platform shutdown, or set to 'none' to not destroy the bean.
+   * If not set, the bean is destroyed in the phase {@link PlatformStates.Stopping}.
+   *
+   * @internal
+   */
+  destroyPhase?: PlatformStates | 'none';
 }
 
 /**
@@ -380,12 +385,3 @@ export interface AbstractType<T> extends Function {
 export interface Type<T> extends Function {
   new(...args: any[]): T; // tslint:disable-line:callable-types
 }
-
-const instantProvider = new class {
-
-  private _sequence = 0;
-
-  public get(): number {
-    return ++this._sequence;
-  }
-};

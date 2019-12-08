@@ -1,6 +1,6 @@
-import { ApplicationRegistry, Beans, ManifestRegistry, MessageClient, PreDestroy, TopicMessage } from '@scion/microfrontend-platform';
+import { Application, ApplicationRegistry, Beans, ManifestRegistry, MessageClient, PreDestroy, takeUntilUnsubscribe, TopicMessage } from '@scion/microfrontend-platform';
 import { CapabilityRegisterCommand, CapabilityUnregisterCommand, IntentRegisterCommand, IntentUnregisterCommand, Topics } from '../microfrontend-api';
-import { first, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
+import { map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { merge, of, Subject } from 'rxjs';
 
 export class ManifestRequestHandler implements PreDestroy {
@@ -8,7 +8,7 @@ export class ManifestRequestHandler implements PreDestroy {
   private _destroy$ = new Subject<void>();
 
   constructor() {
-    this.installApplicationsQueryRequestHandler();
+    this.publishInstalledApplications();
     this.installCapabilityRegisterRequestHandler();
     this.installCapabilityUnregisterRequestHandler();
     this.installIntentRegisterRequestHandler();
@@ -17,13 +17,9 @@ export class ManifestRequestHandler implements PreDestroy {
     this.installIntentsQueryRequestHandler();
   }
 
-  private installApplicationsQueryRequestHandler(): void {
-    Beans.get(MessageClient).observe$(Topics.Applications)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((request: TopicMessage) => {
-        const applications = Beans.get(ApplicationRegistry).getApplications();
-        return Beans.get(MessageClient).publish$(request.replyTo, applications).subscribe();
-      });
+  private publishInstalledApplications(): void {
+    const applications: Application[] = Beans.get(ApplicationRegistry).getApplications();
+    Beans.get(MessageClient).publish$(Topics.Applications, applications, {retain: true}).subscribe();
   }
 
   private installCapabilityRegisterRequestHandler(): void {
@@ -73,7 +69,7 @@ export class ManifestRequestHandler implements PreDestroy {
             .pipe(
               map(() => manifestRegistry.getCapabilitiesByApplication(symbolicAppName)),
               switchMap(capabilities => Beans.get(MessageClient).publish$(request.replyTo, capabilities)),
-              takeUntil(Beans.get(MessageClient).subscriberCount$(request.replyTo).pipe(first(count => count === 0))),
+              takeUntilUnsubscribe(request.replyTo),
             );
         }),
         takeUntil(this._destroy$),
@@ -91,7 +87,7 @@ export class ManifestRequestHandler implements PreDestroy {
             .pipe(
               map(() => manifestRegistry.getIntentsByApplication(symbolicAppName)),
               switchMap(intents => Beans.get(MessageClient).publish$(request.replyTo, intents)),
-              takeUntil(Beans.get(MessageClient).subscriberCount$(request.replyTo).pipe(first(count => count === 0))),
+              takeUntilUnsubscribe(request.replyTo),
             );
         }),
         takeUntil(this._destroy$),

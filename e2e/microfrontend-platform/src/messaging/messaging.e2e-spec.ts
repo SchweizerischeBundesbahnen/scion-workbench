@@ -59,6 +59,14 @@ describe('Messaging', () => {
     it('throws an error when no replier is found to reply a request', async () => {
       await TopicBasedMessagingSpecs.throwIfNoReplierFoundSpec();
     });
+
+    it('allows receiving retained messages', async () => {
+      await TopicBasedMessagingSpecs.receiveRetainedMessagesSpec();
+    });
+
+    it('allows receiving messages without a payload', async () => {
+      await TopicBasedMessagingSpecs.receiveMessagesWithoutPayloadSpec();
+    });
   });
 
   describe('intent-based', () => {

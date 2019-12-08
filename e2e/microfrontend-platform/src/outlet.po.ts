@@ -31,7 +31,6 @@ export class OutletPO {
    * @return Promise which resolves to the page object instance. If given a URL, the promise resolves to `undefined`.
    */
   public async enterUrl<T = void>(command: string | OutletPageObjectClass | OutletPageObjectDescriptor): Promise<T> {
-    // Navigate to the given URL; no page object is returned.
     switch (OutletDescriptorTypes.of(command)) {
       case OutletDescriptorTypes.URL: {
         await this.switchToOutlet();
@@ -75,7 +74,7 @@ export class OutletPO {
    * Elements contained within iframes can not be accessed from inside the root execution context.
    * Instead, the execution context must first be switched to the iframe.
    */
-  public async switchToOutlet(): Promise<void> {
+  private async switchToOutlet(): Promise<void> {
     if (await this._outletFinder.isPresent()) {
       return; // WebDriver execution context for this iframe is already active
     }
@@ -125,8 +124,7 @@ export class OutletPO {
     }
   }
 
-  /** @internal **/
-  public get iframePath(): string[] {
+  private get iframePath(): string[] {
     const iframeIdentity = `iframe#${this.outletName}`;
 
     if (this._parentOutletPO) {

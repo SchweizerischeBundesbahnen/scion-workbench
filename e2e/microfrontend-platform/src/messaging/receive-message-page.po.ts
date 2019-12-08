@@ -5,9 +5,9 @@ import { Qualifier } from '@scion/microfrontend-platform';
 import { SciListPO, SciParamsEnterPO, WaitUntil } from '@scion/ɵtoolkit/widgets.po';
 import { MessageListItemPO } from './message-list-item.po';
 
-export class ReceiveMessagePO {
+export class ReceiveMessagePagePO {
 
-  public static pageUrl = 'receive-message';
+  public static readonly pageUrl = 'receive-message'; // path to the page; required by {@link TestingAppPO}
 
   private _pageFinder = $('app-receive-message');
   private _messageListPO: SciListPO;

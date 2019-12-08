@@ -12,6 +12,7 @@ export const TYPE = 'type';
 export const QUALIFIER = 'qualifier';
 export const MESSAGE = 'message';
 export const REQUEST_REPLY = 'request-reply';
+export const RETAIN = 'retain';
 
 enum MessagingModel {
   Topic = 'Topic', Intent = 'Intent',
@@ -31,6 +32,7 @@ export class PublishMessageComponent implements OnDestroy {
   public QUALIFIER = QUALIFIER;
   public MESSAGE = MESSAGE;
   public REQUEST_REPLY = REQUEST_REPLY;
+  public RETAIN = RETAIN;
 
   private _destroy$ = new Subject<void>();
   private _messageClient: MessageClient;
@@ -49,6 +51,7 @@ export class PublishMessageComponent implements OnDestroy {
       [DESTINATION]: this.createTopicDestinationFormGroup(),
       [MESSAGE]: new FormControl(''),
       [REQUEST_REPLY]: new FormControl(false),
+      [RETAIN]: new FormControl(false),
     });
 
     this.form.get(MESSAGING_MODEL).valueChanges
@@ -72,11 +75,15 @@ export class PublishMessageComponent implements OnDestroy {
   }
 
   public onPublish(): void {
-    this.isTopicModel() ? this.publishMessageToTopic() : this.issueIntent();
+    this.isTopicMessaging() ? this.publishMessageToTopic() : this.issueIntent();
   }
 
-  public isTopicModel(): boolean {
+  public isTopicMessaging(): boolean {
     return this.form.get(MESSAGING_MODEL).value === MessagingModel.Topic;
+  }
+
+  public isRequestReply(): boolean {
+    return this.form.get(REQUEST_REPLY).value;
   }
 
   public onClear(): void {
@@ -112,8 +119,9 @@ export class PublishMessageComponent implements OnDestroy {
 
   private publishMessageToTopic(): void {
     const topic = this.form.get(DESTINATION).get(TOPIC).value;
-    const message = this.form.get(MESSAGE).value;
+    const message = this.form.get(MESSAGE).value === '' ? undefined : this.form.get(MESSAGE).value;
     const requestReply = this.form.get(REQUEST_REPLY).value;
+
     this.form.disable();
     this.publishError = null;
 
@@ -126,11 +134,12 @@ export class PublishMessageComponent implements OnDestroy {
         );
     }
     else {
-      this._subscription = this._messageClient.publish$(topic, message)
+      this._subscription = this._messageClient.publish$(topic, message, {retain: this.form.get(RETAIN).value})
         .pipe(finalize(() => this.form.enable()))
-        .subscribe(noop, error => {
-          this.publishError = error;
-        });
+        .subscribe(
+          noop,
+          error => this.publishError = error,
+        );
     }
   }
 
@@ -138,7 +147,7 @@ export class PublishMessageComponent implements OnDestroy {
     const type: string = this.form.get(DESTINATION).get(TYPE).value;
     const qualifier: Qualifier = SciParamsEnterComponent.toParams(this.form.get(DESTINATION).get(QUALIFIER) as FormArray);
 
-    const message = this.form.get(MESSAGE).value;
+    const message = this.form.get(MESSAGE).value === '' ? undefined : this.form.get(MESSAGE).value;
     const requestReply = this.form.get(REQUEST_REPLY).value;
     this.form.disable();
     this.publishError = null;
@@ -154,9 +163,10 @@ export class PublishMessageComponent implements OnDestroy {
     else {
       this._subscription = this._messageClient.issueIntent$({type, qualifier}, message)
         .pipe(finalize(() => this.form.enable()))
-        .subscribe(noop, error => {
-          this.publishError = error;
-        });
+        .subscribe(
+          noop,
+          error => this.publishError = error,
+        );
     }
   }
 

@@ -36,7 +36,7 @@ export function getGatewayJavaScript(config: GatewayConfig): string {
        topics: {
          ClientConnect: '${PlatformTopics.ClientConnect}',
          ClientDisconnect: '${PlatformTopics.ClientDisconnect}',
-         GatewayInfoRequest: '${PlatformTopics.GatewayInfoRequest}',
+         GatewayInfoRequest: '${PlatformTopics.RequestGatewayInfo}',
        },
      };
 
@@ -157,6 +157,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
         payload: {symbolicAppName: config.clientAppName},
       },
     };
+
     findBrokerWindowCandidates().forEach(candidate => candidate.postMessage(connectMessage, '*'));
     return connectPromise;
 

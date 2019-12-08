@@ -10,13 +10,13 @@
 
 import { BeanDecorator, Beans, Initializer, PreDestroy, Type } from './bean-manager';
 import { fakeAsync, flush, tick } from '@angular/core/testing';
+import { MicrofrontendPlatform } from './microfrontend-platform';
 
 // tslint:disable:typedef
 describe('BeanManager', () => {
 
-  beforeEach(() => {
-    Beans.destroy();
-  });
+  beforeEach(async () => await MicrofrontendPlatform.destroy());
+  afterEach(async () => await MicrofrontendPlatform.destroy());
 
   it('should allow looking up a bean', async () => {
     class Bean {
@@ -93,7 +93,6 @@ describe('BeanManager', () => {
     }
 
     Beans.register(Bean);
-    await Beans.init();
 
     expect(Beans.get(Bean)).toBe(Beans.get(Bean));
     expect(Beans.get(Bean) instanceof Bean).toBeTruthy();
@@ -109,14 +108,13 @@ describe('BeanManager', () => {
     }
 
     Beans.register(Bean);
-    await Beans.init();
 
     expect(constructed).toBeFalsy();
     Beans.get(Bean);
     expect(constructed).toBeTruthy();
   });
 
-  it('should construct eager beans at bean manager initialization', async () => {
+  it('should construct eager beans at platform startup', async () => {
     let constructed = false;
 
     class Bean {
@@ -125,8 +123,9 @@ describe('BeanManager', () => {
       }
     }
 
-    Beans.register(Bean, {eager: true});
-    await Beans.init();
+    await MicrofrontendPlatform.startPlatform(() => {
+      Beans.register(Bean, {eager: true});
+    });
 
     expect(constructed).toBeTruthy();
   });
@@ -152,15 +151,16 @@ describe('BeanManager', () => {
       }
     }
 
-    Beans.register(Bean1, {eager: true});
-    Beans.register(Bean2, {eager: true});
-    Beans.register(Bean3, {eager: true});
-    await Beans.init();
+    await MicrofrontendPlatform.startPlatform(() => {
+      Beans.register(Bean1, {eager: true});
+      Beans.register(Bean2, {eager: true});
+      Beans.register(Bean3, {eager: true});
+    });
 
     expect(beanConstructionOrder).toEqual([Bean1, Bean2, Bean3]);
   });
 
-  it('should wait constructing eager beans until all initializers resolve', fakeAsync(() => {
+  it('should wait constructing eager beans until all initializers completed', fakeAsync(async () => {
     let constructed = false;
 
     class Bean {
@@ -180,12 +180,15 @@ describe('BeanManager', () => {
       },
     });
 
-    Beans.register(Bean, {eager: true});
-    Beans.init().then();
+    MicrofrontendPlatform.startPlatform(() => {
+      Beans.register(Bean, {eager: true});
+    });
     expect(constructed).toBeFalsy();
 
     tick(10000);
     expect(constructed).toBeTruthy();
+
+    await MicrofrontendPlatform.destroy(); // 'fakeAsync' tests for pending timers before 'afterEach' is invoked.
   }));
 
   it('should not construct eager beans when some initializers reject', fakeAsync(async () => {
@@ -197,39 +200,44 @@ describe('BeanManager', () => {
       }
     }
 
-    Beans.registerInitializer(() => new Promise(resolve => setTimeout(resolve, 5000)));
-    Beans.registerInitializer(() => new Promise((resolve, reject) => setTimeout(reject, 2000))); // reject initialization
-    Beans.registerInitializer({useFunction: () => new Promise(resolve => setTimeout(resolve, 8000))});
-    Beans.registerInitializer({
-      useClass: class implements Initializer {
-        public init(): Promise<void> {
-          return Promise.resolve();
-        }
-      },
-    });
-    Beans.register(Bean, {eager: true});
+    expectAsync(MicrofrontendPlatform.startPlatform(() => {
+      Beans.registerInitializer(() => new Promise(resolve => setTimeout(resolve, 5000)));
+      Beans.registerInitializer(() => new Promise((resolve, reject) => setTimeout(reject, 2000))); // reject initialization
+      Beans.registerInitializer({useFunction: () => new Promise(resolve => setTimeout(resolve, 8000))});
+      Beans.registerInitializer({
+        useClass: class implements Initializer {
+          public init(): Promise<void> {
+            return Promise.resolve();
+          }
+        },
+      });
+      Beans.register(Bean, {eager: true});
+    })).toBeRejected();
 
-    // init and expect
-    expectAsync(Beans.init()).toBeRejected();
     flush();
     expect(constructed).toBeFalsy();
+
+    await MicrofrontendPlatform.destroy(); // 'fakeAsync' tests for pending timers before 'afterEach' is invoked.
   }));
 
-  it('should allow initializers to lookup beans', fakeAsync(() => {
+  it('should allow initializers to lookup beans', fakeAsync(async () => {
     class Bean {
     }
 
     let actualBeanInInitializer: Bean = null;
-    Beans.registerInitializer(() => new Promise(resolve => {
-      actualBeanInInitializer = Beans.get(Bean);
-      setTimeout(resolve, 5000);
-    }));
+    MicrofrontendPlatform.startPlatform(() => {
+      Beans.registerInitializer(() => new Promise(resolve => {
+        actualBeanInInitializer = Beans.get(Bean);
+        setTimeout(resolve, 5000);
+      }));
 
-    Beans.register(Bean);
-    Beans.init().then();
+      Beans.register(Bean);
+    });
 
     tick(10000);
     expect(actualBeanInInitializer).toBe(Beans.get(Bean));
+
+    await MicrofrontendPlatform.destroy(); // 'fakeAsync' tests for pending timers before 'afterEach' is invoked.
   }));
 
   it('should construct lazy beans when looking it up for the first time', async () => {
@@ -242,7 +250,6 @@ describe('BeanManager', () => {
     }
 
     Beans.register(Bean, {eager: false});
-    await Beans.init();
 
     expect(constructed).toBeFalsy();
     Beans.get(Bean);
@@ -258,16 +265,50 @@ describe('BeanManager', () => {
       }
     }
 
-    Beans.register(Bean);
-    await Beans.init();
+    await MicrofrontendPlatform.startPlatform(() => {
+      Beans.register(Bean);
+    });
 
     // construct the bean
     Beans.get(Bean);
     expect(destroyed).toBeFalsy();
 
-    // destroy the bean
-    Beans.destroy();
+    // destroy the platform
+    await MicrofrontendPlatform.destroy();
+
     expect(destroyed).toBeTruthy();
+    expect(Beans.opt(Bean)).toBeUndefined();
+  });
+
+  it('should destroy beans which have no \'preDestroy\' lifecycle hook', async () => {
+    class Bean {
+    }
+
+    await MicrofrontendPlatform.startPlatform(() => {
+      Beans.register(Bean);
+    });
+
+    // destroy the platform
+    await MicrofrontendPlatform.destroy();
+
+    expect(Beans.opt(Bean)).toBeUndefined();
+  });
+
+  it('should not destroy beans flagged with \'preventDestroy\'', async () => {
+    class HolyBean {
+    }
+
+    class Bean {
+    }
+
+    await MicrofrontendPlatform.startPlatform(() => {
+      Beans.register(HolyBean, {destroyPhase: 'none'});
+      Beans.register(Bean);
+    });
+
+    await MicrofrontendPlatform.destroy();
+    expect(Beans.opt(HolyBean)).not.toBeUndefined();
+    expect(Beans.opt(Bean)).toBeUndefined();
   });
 
   it('should allow replacing a bean and destroy the replaced bean', async () => {
@@ -286,7 +327,6 @@ describe('BeanManager', () => {
     }
 
     Beans.register(BeanSymbol, {useClass: Bean1});
-    await Beans.init();
     expect(Beans.get(BeanSymbol) instanceof Bean1).toBeTruthy();
 
     // replace the bean
@@ -322,7 +362,6 @@ describe('BeanManager', () => {
     Beans.register(Bean1);
     Beans.register(Bean2);
     Beans.register(Bean3);
-    await Beans.init();
 
     expect(bean1Constructed).toBeFalsy();
     expect(bean2Constructed).toBeFalsy();
@@ -356,7 +395,6 @@ describe('BeanManager', () => {
     Beans.register(Bean1);
     Beans.register(Bean2);
     Beans.register(Bean3);
-    await Beans.init();
 
     expect(() => Beans.get(Bean1)).toThrowError(/BeanConstructError/);
   });
@@ -374,7 +412,6 @@ describe('BeanManager', () => {
     }
 
     Beans.register(SomeSymbol, {useClass: Bean});
-    await Beans.init();
 
     Beans.get(SomeSymbol);
     expect(constructed).toBeTruthy();
@@ -387,7 +424,6 @@ describe('BeanManager', () => {
 
     const someObject = {};
     Beans.register(SomeSymbol, {useValue: someObject});
-    await Beans.init();
 
     expect(Beans.get(SomeSymbol)).toBe(someObject);
   });
@@ -398,7 +434,6 @@ describe('BeanManager', () => {
 
     const someObject = {};
     Beans.register(SomeSymbol, {useFactory: () => someObject});
-    await Beans.init();
 
     expect(Beans.get(SomeSymbol)).toBe(someObject);
   });

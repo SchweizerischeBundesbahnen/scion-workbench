@@ -8,47 +8,43 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { MessageClient } from './message-client';
-import { EMPTY, merge, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
+import { MessageClient, PublishOptions } from './message-client';
+import { EMPTY, from, merge, noop, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
 import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
 import { filterByChannel, filterByTopic, pluckMessage } from './operators';
-import { catchError, filter, finalize, first, map, mergeMap, takeUntil, timeoutWith } from 'rxjs/operators';
-import { UUID } from '@scion/toolkit/util';
-import { Beans } from '../bean-manager';
+import { catchError, filter, finalize, first, map, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
+import { Defined, UUID } from '@scion/toolkit/util';
 import { Intent, Qualifier } from '../platform.model';
 import { IntentMessage, TopicMessage } from '../messaging.model';
 import { matchesIntentQualifier } from '../qualifier-tester';
-import { MicrofrontendPlatformState, PlatformStates } from '../microfrontend-platform-state';
 import { BrokerGateway } from './broker-gateway';
+import { Beans, PreDestroy } from '../bean-manager';
+import { HostPlatformState } from './host-platform-state';
 
 // tslint:disable:unified-signatures
-export class ɵMessageClient implements MessageClient { // tslint:disable-line:class-name
+export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:disable-line:class-name
 
   private readonly _destroy$ = new Subject<void>();
   private readonly _brokerGateway: BrokerGateway;
 
   constructor(clientAppName: string, private _config: { discoveryTimeout: number, deliveryTimeout: number }) {
     this._brokerGateway = new BrokerGateway(clientAppName, {discoveryTimeout: this._config.discoveryTimeout});
-
-    // Disconnect from the broker when the platform has stopped and after all beans have been destroyed.
-    Beans.get(MicrofrontendPlatformState).whenState(PlatformStates.Stopped).then(() => {
-      this._destroy$.next();
-      this._brokerGateway.destroy();
-    });
   }
 
-  public publish$(topic: string, message?: any): Observable<never> {
-    const topicMessage: TopicMessage = {topic, payload: message};
+  public publish$(topic: string, message?: any, options?: PublishOptions): Observable<never> {
+    const topicMessage: TopicMessage = {topic, payload: message, retain: Defined.orElse(options && options.retain, false)};
     return this.postMessageToBroker$(MessagingChannel.Topic, topicMessage);
   }
 
   public request$<T>(topic: string, request?: any): Observable<TopicMessage<T>> {
     const topicMessage: TopicMessage = {topic, payload: request};
-    return this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Topic, topicMessage);
+    // Delay sending the request until the host platform started to not lose the request if handled by a replier in the host.
+    return from(Beans.get(HostPlatformState).whenStarted())
+      .pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Topic, topicMessage)));
   }
 
   public observe$<T>(topic: string): Observable<TopicMessage<T>> {
-    return this.receiveMessage$(topic);
+    return this._observe$(topic);
   }
 
   public issueIntent$(intent: Intent, payload?: any): Observable<never> {
@@ -60,23 +56,24 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
   public requestByIntent$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>> {
     const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, payload};
     assertNoWildcardCharacters(intentMessage.qualifier);
-    return this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage);
+    // Delay sending the request until the host platform started to not lose the request if handled by a replier in the host.
+    return from(Beans.get(HostPlatformState).whenStarted())
+      .pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage)));
   }
 
   public handleIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {
-    return this.receiveIntent$(selector);
+    return this._handleIntent$(selector);
   }
 
   public subscriberCount$(topic: string): Observable<number> {
-    return this.request$<number>(PlatformTopics.SubscriberCount, topic)
+    return this.request$<number>(PlatformTopics.RequestSubscriberCount, topic)
       .pipe(map(message => message.payload));
   }
 
   /**
-   * Receives topic messages from the message broker.
-   * There are only messages received for which the client has a topic subscription.
+   * Receives messages from the broker published to the given topic.
    */
-  private receiveMessage$<T>(topic: string): Observable<TopicMessage<T>> {
+  private _observe$<T>(topic: string): Observable<TopicMessage<T>> {
     return new Observable((observer: Observer<TopicMessage>): TeardownLogic => {
       const unsubscribe$ = new Subject<void>();
       const topicSubscribeError$ = new Subject<void>();
@@ -108,7 +105,7 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
   /**
    * Receives intents from the message broker for which this client has declared an intent.
    */
-  private receiveIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {
+  private _handleIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {
     return this._brokerGateway.message$
       .pipe(
         filterByChannel<IntentMessage<T>>(MessagingChannel.Intent),
@@ -134,45 +131,58 @@ export class ɵMessageClient implements MessageClient { // tslint:disable-line:c
 
     return new Observable((observer: Observer<never>): TeardownLogic => {
       const unsubscribe$ = new Subject<void>();
+      const deliveryError$ = new Subject<never>();
 
       // Wait until the message is delivered.
-      this._brokerGateway.message$
+      merge(this._brokerGateway.message$, deliveryError$)
         .pipe(
           filterByTopic<MessageDeliveryStatus>(messageId),
           first(),
           timeoutWith(new Date(Date.now() + this._config.deliveryTimeout), throwError(`[MessageDispatchError] Broker did not report message delivery state within the ${this._config.deliveryTimeout}ms timeout. [message=${JSON.stringify(envelope)}]`)),
-          takeUntil(merge(unsubscribe$, this._destroy$)),
+          takeUntil(merge(this._destroy$, unsubscribe$)),
           mergeMap(statusMessage => statusMessage.payload.ok ? EMPTY : throwError(statusMessage.payload.details)),
         )
-        .subscribe(observer);
+        .subscribe(observer); // dispatch next, error and complete
 
       // Dispatch the message to the broker.
-      this._brokerGateway.postMessage(envelope).catch(error => observer.error(error));
+      this._brokerGateway.postMessage(envelope).catch(error => deliveryError$.error(error));
 
       return (): void => unsubscribe$.next();
     });
   }
 
+  /**
+   * Posts a message to the message broker and receives replies.
+   */
   private postMessageToBrokerAndReceiveReplies$<T = any>(channel: MessagingChannel, message: IntentMessage | TopicMessage): Observable<TopicMessage<T>> {
     const replyToTopic = UUID.randomUUID();
     const request: IntentMessage | TopicMessage = {...message, replyTo: replyToTopic};
 
     return new Observable((observer: Observer<TopicMessage>): TeardownLogic => {
       const unsubscribe$ = new Subject<void>();
-      const deliveryError$ = new Subject<never>();
+      const deliveryError$ = new Subject<void>();
 
       // Receive replies sent to the reply topic.
-      merge(this.receiveMessage$<T>(replyToTopic), deliveryError$)
-        .pipe(takeUntil(merge(this._destroy$, unsubscribe$)))
-        .subscribe(observer);
+      this._observe$<T>(replyToTopic)
+        .pipe(takeUntil(merge(this._destroy$, unsubscribe$, deliveryError$)))
+        .subscribe(next => observer.next(next), error => observer.error(error)); // dispatch next and error, but not complete
 
       // Post the message to the broker.
       this.postMessageToBroker$(channel, request)
         .pipe(takeUntil(merge(this._destroy$, unsubscribe$)))
-        .subscribe(deliveryError$);
+        .subscribe(noop, error => {
+          deliveryError$.next();
+          observer.error(error);
+        });
 
       return (): void => unsubscribe$.next();
     });
+  }
+
+  /** @internal **/
+  public preDestroy(): void {
+    this._destroy$.next();
+    this._brokerGateway.destroy();
   }
 }
 

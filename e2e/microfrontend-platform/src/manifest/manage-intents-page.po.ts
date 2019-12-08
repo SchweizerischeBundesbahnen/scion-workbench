@@ -7,7 +7,7 @@ import { IntentListItemPO } from './intent-list-item.po';
 
 export class ManageIntentsPagePO {
 
-  public static readonly pageUrl = 'manage-intents';
+  public static readonly pageUrl = 'manage-intents'; // path to the page; required by {@link TestingAppPO}
 
   private _pageFinder = $('app-manage-intents');
   private _intentListPO: SciListPO;

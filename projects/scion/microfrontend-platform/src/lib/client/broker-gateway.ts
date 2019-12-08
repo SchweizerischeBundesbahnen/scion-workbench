@@ -117,7 +117,7 @@ export class BrokerGateway {
       channel: MessagingChannel.Topic,
       messageId: UUID.randomUUID(),
       message: {
-        topic: PlatformTopics.GatewayInfoRequest,
+        topic: PlatformTopics.RequestGatewayInfo,
         replyTo: replyToTopic,
       },
     };

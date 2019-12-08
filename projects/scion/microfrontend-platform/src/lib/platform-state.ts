@@ -1,10 +1,10 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { filter, mapTo, take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 
 /**
  * Allows observing the state of the microfrontend platform.
  */
-export class MicrofrontendPlatformState {
+export class PlatformState {
 
   private _state$ = new BehaviorSubject<PlatformStates>(PlatformStates.Stopped);
 
@@ -23,11 +23,9 @@ export class MicrofrontendPlatformState {
    */
   public whenState(state: PlatformStates): Promise<void> {
     return this._state$
-      .pipe(
-        filter(it => it === state),
-        mapTo(undefined),
-        take(1),
-      ).toPromise();
+      .pipe(filter(it => it === state), take(1))
+      .toPromise()
+      .then(() => Promise.resolve());
   }
 
   /**
@@ -39,14 +37,15 @@ export class MicrofrontendPlatformState {
   }
 
   /** @internal **/
-  public enterState(newState: PlatformStates): void {
-    if (newState === PlatformStates.Starting && this.state === PlatformStates.Starting) {
-      throw Error('[PlatformStateError] Microfrontend platform is already starting.');
+  public async enterState(newState: PlatformStates): Promise<void> {
+    if (newState > PlatformStates.Stopped && newState <= this.state) {
+      throw Error(`[PlatformStateError] Failed to enter platform state [prevState=${PlatformStates[this.state]}, newState=${PlatformStates[newState]}].`);
     }
-    if (newState === PlatformStates.Starting && this.state === PlatformStates.Started) {
-      throw Error('[PlatformStateError] Microfrontend platform is already started.');
-    }
+
     this._state$.next(newState);
+
+    // Queue microtask to resolve the return promise after all promises waiting to enter the given state resolved.
+    await this.whenState(newState);
   }
 }
 
@@ -57,13 +56,17 @@ export enum PlatformStates {
   /**
    * Indicates that the platform is not yet started.
    */
-  Stopped,
+  Stopped = 0,
   /**
    * Indicates that the platform is about to start.
    */
-  Starting,
+  Starting = 1,
   /**
    * Indicates that the platform started.
    */
-  Started
+  Started = 2,
+  /**
+   * Indicates that the platform is about to stop.
+   */
+  Stopping = 3,
 }

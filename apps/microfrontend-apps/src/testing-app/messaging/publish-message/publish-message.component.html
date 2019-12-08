@@ -6,25 +6,29 @@
     </select>
   </sci-form-field>
 
-  <ng-container *ngIf="isTopicModel(); then topic_template else intent_template"></ng-container>
+  <ng-container *ngIf="isTopicMessaging(); then topic_template else intent_template"></ng-container>
 
   <sci-form-field label="Message">
     <textarea rows="10" [formControlName]="MESSAGE" class="e2e-message"></textarea>
   </sci-form-field>
 
-  <sci-form-field label="Request-Reply *">
+  <sci-form-field label="Request-Reply">
     <sci-checkbox [formControlName]="REQUEST_REPLY" class="e2e-request-reply"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Retain" *ngIf="isTopicMessaging() && !isRequestReply()">
+    <sci-checkbox [formControlName]="RETAIN" class="e2e-retain"></sci-checkbox>
   </sci-form-field>
 </form>
 
-<button type="button" (click)="onPublish()" *ngIf="!isSubscribed" [disabled]="form.invalid" class="e2e-publish">{{isTopicModel() ? 'Publish message' : 'Issue intent'}}</button>
+<button type="button" (click)="onPublish()" *ngIf="!isSubscribed" [disabled]="form.invalid" class="e2e-publish">{{isTopicMessaging() ? 'Publish message' : 'Issue intent'}}</button>
 <button type="button" (click)="onCancelPublish()" *ngIf="isSubscribed" class="e2e-cancel">Cancel</button>
 
 <output class="publish-error e2e-publish-error" *ngIf="publishError">
   {{publishError}}
 </output>
 
-<ng-container *ngIf="form.get(REQUEST_REPLY).value && isSubscribed">
+<ng-container *ngIf="isRequestReply() && isSubscribed">
   <sci-list class="replies e2e-replies">
     <ng-template sciListItem *ngFor="let reply of replies">
       <app-message-list-item [message]="reply" [isTopicMessage]="true"></app-message-list-item>

@@ -5,9 +5,11 @@ import { Capability, Intent } from '@scion/microfrontend-platform';
  */
 export enum Topics {
   /**
-   * Request-Reply topic to query applications.
+   * Allows observing applications installed in the platform.
    *
-   * Replies with an array of {@link Application} objects.
+   * Messages published to this topic are retained, so that observers receive the applications immediately after they subscribe.
+   *
+   * Message: array of {@link Application} objects
    */
   Applications = 'applications',
   /**

@@ -11,7 +11,7 @@ export enum MessagingModel {
 
 export class PublishMessagePagePO {
 
-  public static readonly pageUrl = 'publish-message';
+  public static readonly pageUrl = 'publish-message'; // path to the page; required by {@link TestingAppPO}
 
   private _pageFinder = $('app-publish-message');
   private _replyListPO: SciListPO;
@@ -48,6 +48,11 @@ export class PublishMessagePagePO {
   public async toggleRequestReply(check: boolean): Promise<void> {
     await this._switchToIframeFn();
     await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-request-reply')).toggle(check);
+  }
+
+  public async toggleRetain(check: boolean): Promise<void> {
+    await this._switchToIframeFn();
+    await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-retain')).toggle(check);
   }
 
   public async clickPublish(): Promise<void> {

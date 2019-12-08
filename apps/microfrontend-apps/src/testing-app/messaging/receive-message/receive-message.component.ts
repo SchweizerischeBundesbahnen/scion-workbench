@@ -65,7 +65,7 @@ export class ReceiveMessageComponent implements OnDestroy {
   }
 
   public onSubscribe(): void {
-    this.isTopicModel() ? this.subscribeTopic() : this.subscribeIntent();
+    this.isTopicMessaging() ? this.subscribeTopic() : this.subscribeIntent();
     this.form.disable();
   }
 
@@ -100,7 +100,7 @@ export class ReceiveMessageComponent implements OnDestroy {
     return this._subscription && !this._subscription.closed;
   }
 
-  public isTopicModel(): boolean {
+  public isTopicMessaging(): boolean {
     return this.form.get(MESSAGING_MODEL).value === MessagingModel.Topic;
   }
 

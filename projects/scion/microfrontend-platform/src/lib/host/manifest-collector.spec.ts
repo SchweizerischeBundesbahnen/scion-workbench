@@ -15,9 +15,12 @@ import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { ApplicationManifest } from '../platform.model';
 import { ApplicationRegistry } from './application.registry';
 import { Logger } from '../logger';
-import { MicrofrontendPlatformState, PlatformStates } from '../microfrontend-platform-state';
+import { PlatformState, PlatformStates } from '../platform-state';
 
 describe('ManifestCollector', () => {
+
+  beforeEach(async () => await MicrofrontendPlatform.destroy());
+  afterEach(async () => await MicrofrontendPlatform.destroy());
 
   it('should collect and register applications', fakeAsync(async () => {
     // mock {HttpClient}
@@ -40,7 +43,7 @@ describe('ManifestCollector', () => {
     ]);
 
     tick(1000);
-    await Beans.get(MicrofrontendPlatformState).whenState(PlatformStates.Started);
+    await Beans.get(PlatformState).whenState(PlatformStates.Started);
 
     // assert application registrations
     expect(Beans.get(ApplicationRegistry).getApplication('app-1').name).toEqual('application-1');
@@ -48,7 +51,7 @@ describe('ManifestCollector', () => {
     expect(Beans.get(ApplicationRegistry).getApplication('app-3').name).toEqual('application-3');
     expect(loggerSpy.error.calls.count()).toEqual(0);
 
-    MicrofrontendPlatform.destroy();
+    await MicrofrontendPlatform.destroy(); // 'fakeAsync' tests for pending timers before 'afterEach' is invoked.
   }));
 
   it('should ignore applications which are not available', fakeAsync(async () => {
@@ -74,7 +77,7 @@ describe('ManifestCollector', () => {
     ]);
 
     tick(1000);
-    await Beans.get(MicrofrontendPlatformState).whenState(PlatformStates.Started);
+    await Beans.get(PlatformState).whenState(PlatformStates.Started);
 
     // assert application registrations
     expect(Beans.get(ApplicationRegistry).getApplication('app-1').name).toEqual('application-1');
@@ -83,7 +86,7 @@ describe('ManifestCollector', () => {
     expect(Beans.get(ApplicationRegistry).getApplication('app-4')).toBeUndefined();
     expect(loggerSpy.error.calls.count()).toEqual(2);
 
-    MicrofrontendPlatform.destroy();
+    await MicrofrontendPlatform.destroy(); // 'fakeAsync' tests for pending timers before 'afterEach' is invoked.
   }));
 });
 

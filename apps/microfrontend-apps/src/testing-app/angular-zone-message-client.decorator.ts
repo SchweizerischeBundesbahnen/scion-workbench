@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BeanDecorator, Beans, Intent, IntentMessage, MessageClient, TopicMessage } from '@scion/microfrontend-platform';
+import { BeanDecorator, Beans, Intent, IntentMessage, MessageClient, PublishOptions, TopicMessage } from '@scion/microfrontend-platform';
 import { MonoTypeOperatorFunction, Observable, Observer, TeardownLogic } from 'rxjs';
 import { NgZone } from '@angular/core';
 
@@ -24,8 +24,8 @@ export class AngularZoneMessageClientDecorator implements BeanDecorator<MessageC
     const zone = Beans.get(NgZone);
     return new class implements MessageClient {
 
-      public publish$(topic: string, message?: any): Observable<never> {
-        return messageClient.publish$(topic, message).pipe(runInsideAngular(zone));
+      public publish$(topic: string, message?: any, options?: PublishOptions): Observable<never> {
+        return messageClient.publish$(topic, message, options).pipe(runInsideAngular(zone));
       }
 
       public request$<T>(topic: string, message?: any): Observable<TopicMessage<T>> {
@@ -58,13 +58,14 @@ export class AngularZoneMessageClientDecorator implements BeanDecorator<MessageC
 function runInsideAngular<T>(zone: NgZone): MonoTypeOperatorFunction<T> {
   return (source: Observable<T>): Observable<T> => {
     return new Observable((observer: Observer<T>): TeardownLogic => {
+      return zone.runOutsideAngular(() => {
         const subscription = source.subscribe(
           next => zone.run(() => observer.next(next)),
           error => zone.run(() => observer.error(error)),
           () => zone.run(() => observer.complete()),
         );
         return (): void => subscription.unsubscribe();
-      },
-    );
+      });
+    });
   };
 }

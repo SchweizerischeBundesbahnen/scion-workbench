@@ -8,7 +8,7 @@ import { Defined } from '@scion/toolkit/util';
 
 export class ManageCapabilitiesPagePO {
 
-  public static readonly pageUrl = 'manage-capabilities';
+  public static readonly pageUrl = 'manage-capabilities'; // path to the page; required by {@link TestingAppPO}
 
   private _pageFinder = $('app-manage-capabilities');
   private _capabilityListPO: SciListPO;
