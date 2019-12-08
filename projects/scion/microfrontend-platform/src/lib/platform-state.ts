@@ -38,13 +38,14 @@ export class PlatformState {
 
   /** @internal **/
   public async enterState(newState: PlatformStates): Promise<void> {
-    if (newState > PlatformStates.Stopped && newState <= this.state) {
+    const currentState = (this.state === PlatformStates.Stopped) ? -1 : this.state;
+    if (currentState >= newState) {
       throw Error(`[PlatformStateError] Failed to enter platform state [prevState=${PlatformStates[this.state]}, newState=${PlatformStates[newState]}].`);
     }
 
     this._state$.next(newState);
 
-    // Queue microtask to resolve the return promise after all promises waiting to enter the given state resolved.
+    // Queue as microtask, so that any other promise waiting to enter that state, is resolved prior.
     await this.whenState(newState);
   }
 }
@@ -53,10 +54,6 @@ export class PlatformState {
  * Represents states of the microfrontend platform.
  */
 export enum PlatformStates {
-  /**
-   * Indicates that the platform is not yet started.
-   */
-  Stopped = 0,
   /**
    * Indicates that the platform is about to start.
    */
@@ -69,4 +66,8 @@ export enum PlatformStates {
    * Indicates that the platform is about to stop.
    */
   Stopping = 3,
+  /**
+   * Indicates that the platform is not yet started.
+   */
+  Stopped = 4,
 }

@@ -11,6 +11,7 @@
 import { BeanDecorator, Beans, Initializer, PreDestroy, Type } from './bean-manager';
 import { fakeAsync, flush, tick } from '@angular/core/testing';
 import { MicrofrontendPlatform } from './microfrontend-platform';
+import { PlatformState, PlatformStates } from '@scion/microfrontend-platform';
 
 // tslint:disable:typedef
 describe('BeanManager', () => {
@@ -294,23 +295,6 @@ describe('BeanManager', () => {
     expect(Beans.opt(Bean)).toBeUndefined();
   });
 
-  it('should not destroy beans flagged with \'preventDestroy\'', async () => {
-    class HolyBean {
-    }
-
-    class Bean {
-    }
-
-    await MicrofrontendPlatform.startPlatform(() => {
-      Beans.register(HolyBean, {destroyPhase: 'none'});
-      Beans.register(Bean);
-    });
-
-    await MicrofrontendPlatform.destroy();
-    expect(Beans.opt(HolyBean)).not.toBeUndefined();
-    expect(Beans.opt(Bean)).toBeUndefined();
-  });
-
   it('should allow replacing a bean and destroy the replaced bean', async () => {
     let bean1Destroyed = false;
 
@@ -508,5 +492,47 @@ describe('BeanManager', () => {
     Beans.register(Bean, {useClass: Bean2, multi: true});
     Beans.registerDecorator(Bean, {useClass: Decorator});
     expect(Beans.all(Bean).map(bean => bean.getName())).toEqual(['NAME OF BEAN 1', 'NAME OF BEAN 2']);
+  });
+
+  it('should destroy a bean in the phase as configured, if any', async () => {
+    class Bean1 { // default destroy strategy (when stopping the platform)
+    }
+
+    class Bean2 { // destroy bean when stopping the platform
+    }
+
+    class Bean3 { // destroy bean when stopped the platform
+    }
+
+    class Bean4 { // never destroy bean
+    }
+
+    Beans.register(Bean1, {eager: true});
+    Beans.register(Bean2, {destroyPhase: PlatformStates.Stopping, eager: true});
+    Beans.register(Bean3, {destroyPhase: PlatformStates.Stopped, eager: true});
+    Beans.register(Bean4, {destroyPhase: 'none', eager: true});
+
+    // enter state 'PlatformStates.Starting' and 'PlatformStates.Started'
+    await Beans.get(PlatformState).enterState(PlatformStates.Starting);
+    await Beans.get(PlatformState).enterState(PlatformStates.Started);
+
+    await expect(Beans.opt(Bean1)).toBeDefined();
+    await expect(Beans.opt(Bean2)).toBeDefined();
+    await expect(Beans.opt(Bean3)).toBeDefined();
+    await expect(Beans.opt(Bean4)).toBeDefined();
+
+    // enter state 'PlatformStates.Stopping'
+    await Beans.get(PlatformState).enterState(PlatformStates.Stopping);
+    await expect(Beans.opt(Bean1)).toBeUndefined();
+    await expect(Beans.opt(Bean2)).toBeUndefined();
+    await expect(Beans.opt(Bean3)).toBeDefined();
+    await expect(Beans.opt(Bean4)).toBeDefined();
+
+    // enter state 'PlatformStates.Stopped'
+    await Beans.get(PlatformState).enterState(PlatformStates.Stopped);
+    await expect(Beans.opt(Bean1)).toBeUndefined();
+    await expect(Beans.opt(Bean2)).toBeUndefined();
+    await expect(Beans.opt(Bean3)).toBeUndefined();
+    await expect(Beans.opt(Bean4)).toBeDefined();
   });
 });

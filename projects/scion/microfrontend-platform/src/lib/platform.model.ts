@@ -99,6 +99,8 @@ export interface Capability {
   };
   /**
    * Metadata about the capability provider (read-only, exclusively managed by the platform).
+   *
+   * @internal
    */
   metadata?: {
     /**
@@ -126,6 +128,8 @@ export interface Intent {
   qualifier?: Qualifier;
   /**
    * Metadata about this intent (read-only, exclusively managed by the platform).
+   *
+   * @internal
    */
   metadata?: {
     /**

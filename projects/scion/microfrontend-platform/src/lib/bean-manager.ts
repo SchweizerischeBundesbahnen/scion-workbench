@@ -72,7 +72,7 @@ export const Beans = new class {
       beanConstructFn: deriveConstructFunction(symbol, instructions),
       eager: Defined.orElse(instructions && (instructions.eager || !!instructions.useValue), false),
       multi: multi,
-      destroyPhase: instructions && instructions.destroyPhase || PlatformStates.Stopping,
+      destroyPhase: Defined.orElse(instructions && instructions.destroyPhase as any, PlatformStates.Stopping),
     };
 
     if (multi) {
@@ -92,9 +92,11 @@ export const Beans = new class {
     });
 
     // Destroy the bean on platform shutdown.
-    beanInfo.destroyPhase !== 'none' && this.get(PlatformState).whenState(beanInfo.destroyPhase).then(() => {
-      destroyBean(beanInfo);
-    });
+    if (beanInfo.destroyPhase !== 'none') {
+      Beans.get(PlatformState).whenState(PlatformStates.Starting) // wait until starting the platform
+        .then(() => Beans.get(PlatformState).whenState(beanInfo.destroyPhase as PlatformStates))
+        .then(() => destroyBean(beanInfo));
+    }
   }
 
   /**
@@ -217,6 +219,15 @@ export const Beans = new class {
   }
 
   /**
+   * Returns metadata about beans registered under the given symbol.
+   *
+   * @internal
+   */
+  public getBeanInfo<T>(symbol: Type<T | any> | AbstractType<T | any>): Set<BeanInfo<T>> {
+    return beanRegistry.get(symbol);
+  }
+
+  /**
    * @internal
    */
   public runInitializers(): Promise<void> {
@@ -286,14 +297,19 @@ export interface PreDestroy {
   preDestroy(): void;
 }
 
-interface BeanInfo<T = any> {
+/**
+ * Metadata about a bean.
+ *
+ * @internal
+ */
+export interface BeanInfo<T = any> {
   symbol: Type<T | any> | AbstractType<T | any>;
   instance?: T;
   constructing?: boolean;
   beanConstructFn: () => T;
   eager: boolean;
   multi: boolean;
-  destroyPhase: PlatformStates | 'none';
+  destroyPhase?: PlatformStates | 'none';
 }
 
 /**
@@ -329,8 +345,6 @@ export interface BeanInstanceConstructInstructions<T = any> extends InstanceCons
   /**
    * Set in which phase to destroy the bean on platform shutdown, or set to 'none' to not destroy the bean.
    * If not set, the bean is destroyed in the phase {@link PlatformStates.Stopping}.
-   *
-   * @internal
    */
   destroyPhase?: PlatformStates | 'none';
 }

@@ -8,13 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Beans } from './bean-manager';
+import { AbstractType, BeanInfo, Beans, Type } from './bean-manager';
 import { MicrofrontendPlatform } from './microfrontend-platform';
 import { MessageClient, NullMessageClient } from './client/message-client';
 import { PlatformState, PlatformStates } from './platform-state';
 import { ApplicationConfig } from './host/platform-config';
 import { HostPlatformState } from './client/host-platform-state';
-import { createManifestURL } from './spec.util.spec';
+import { serveManifest } from './spec.util.spec';
+import { PlatformMessageClient } from './host/platform-message-client';
+import { MessageBroker } from './host/message-broker';
+import { ManifestRegistry } from './host/manifest.registry';
+import { ApplicationRegistry } from './host/application.registry';
 
 describe('MicrofrontendPlatform', () => {
 
@@ -54,10 +58,46 @@ describe('MicrofrontendPlatform', () => {
   });
 
   it('should allow clients to wait until the host platform started', async () => {
-    const manifestUrl = createManifestURL({name: 'Host Application'});
+    const manifestUrl = serveManifest({name: 'Host Application'});
     const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
-    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app', messaging: {brokerDiscoverTimeout: 250, deliveryTimeout: 100000}});
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app', messaging: {brokerDiscoverTimeout: 250, deliveryTimeout: 250}});
 
     await expectAsync(Beans.get(HostPlatformState).whenStarted()).toBeResolved();
   });
+
+  it('should register platform beans of the host platform correctly', async () => {
+    await MicrofrontendPlatform.forHost([]);
+
+    // MessageBroker
+    expect(getBeanInfo(MessageBroker)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    // PlatformMessageClient
+    expect(getBeanInfo(PlatformMessageClient)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    // MessageClient
+    expect(getBeanInfo(MessageClient)).toBeUndefined();
+    // ManifestRegistry
+    expect(getBeanInfo(ManifestRegistry)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    // ApplicationRegistry
+    expect(getBeanInfo(ApplicationRegistry)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+  });
+
+  it('should register platform beans of the client platform correctly', async () => {
+    const manifestUrl = serveManifest({name: 'Host Application'});
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app', messaging: {brokerDiscoverTimeout: 250, deliveryTimeout: 250}});
+
+    // MessageBroker
+    expect(getBeanInfo(MessageBroker)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    // PlatformMessageClient
+    expect(getBeanInfo(PlatformMessageClient)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    // MessageClient
+    expect(getBeanInfo(PlatformMessageClient)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    // ManifestRegistry
+    expect(getBeanInfo(ManifestRegistry)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    // ApplicationRegistry
+    expect(getBeanInfo(ApplicationRegistry)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+  });
 });
+
+function getBeanInfo<T>(symbol: Type<T | any> | AbstractType<T | any>): BeanInfo<T> {
+  return Array.from(Beans.getBeanInfo<T>(symbol) || new Set())[0];
+}

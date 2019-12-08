@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { QueryList } from '@angular/core';
+import { QueryList } from '@angular/core'; // FIXME this module must not have an Angular dependency
 
 /**
  * Provides array utility methods.
@@ -34,11 +34,11 @@ export class Arrays {
    * Use the parameter `exactOrder` to control if the item order must be equal.
    */
   public static equal(array1: any[], array2: any[], exactOrder: boolean = true): boolean {
-    if ((!array1 && array2) || (array1 && !array2)) {
-      return false;
-    }
     if (array1 === array2) {
       return true;
+    }
+    if (!array1 || !array2) {
+      return false;
     }
     if (array1.length !== array2.length) {
       return false;
@@ -70,14 +70,25 @@ export class Arrays {
   }
 
   /**
-   * Removes given item from the array. The original array will not be modified.
+   * Removes the specified element from an array.
+   *
+   * @param array
+   *        the array
+   * @param element
+   *        the element to be removed
+   * @param options
+   *        Control if to remove all occurrences of the element.
+   * @return `true` if an element in the array has been removed; otherwise `false`.
    */
-  public static remove<T>(items: T[], item: T): T[] {
-    const result = [...items];
-    for (let index = result.indexOf(item); index !== -1; index = result.indexOf(item)) {
-      result.splice(index, 1);
+  public static remove(array: any[], element: any, options: { firstOnly: boolean }): boolean {
+    const removedElements = [];
+    for (let index = array.indexOf(element); index !== -1; index = array.indexOf(element)) {
+      removedElements.push(array.splice(index, 1));
+      if (options.firstOnly) {
+        break;
+      }
     }
-    return result;
+    return removedElements.length > 0;
   }
 
   /**

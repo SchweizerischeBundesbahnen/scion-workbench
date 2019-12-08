@@ -8,11 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-/**
- * Entry point for all public APIs of this package.
- */
-export * from '@scion/toolkit/dimension';
-export * from '@scion/toolkit/operators';
-export * from '@scion/toolkit/sashbox';
-export * from '@scion/toolkit/util';
-export * from '@scion/toolkit/viewport';
+describe('ɵtoolkit', () => {
+
+  // single spec is required because karma fails if no spec is found
+  it('should be truthy', () => {
+    expect(true).toBeTruthy();
+  });
+});

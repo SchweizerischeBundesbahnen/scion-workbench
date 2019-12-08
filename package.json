@@ -12,11 +12,14 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "scripts": {
-    "build-libs": "run-s *:build",
-    "build-apps": "run-s *:build",
     "toolkit:build": "ng build --prod @scion/toolkit",
+    "toolkit:lint": "ng lint @scion/toolkit",
+    "toolkit:test": "ng test @scion/toolkit",
     "posttoolkit:build": "scss-bundle -e projects/scion/toolkit/viewport/src/theme/_scrollbar.scss -o dist/scion/toolkit/scrollbar.scss",
-    "toolkit-internal:build": "ng build --prod @scion/ɵtoolkit",
+
+    "ɵtoolkit:build": "ng build --prod @scion/ɵtoolkit",
+    "ɵtoolkit:lint": "ng lint @scion/ɵtoolkit",
+    "ɵtoolkit:test": "ng test @scion/ɵtoolkit",
 
     "toolkit-apps:serve": "ng serve toolkit-apps --aot",
     "toolkit-apps:lint": "ng lint toolkit-apps",

@@ -9,8 +9,6 @@
  */
 
 import { ApplicationManifest } from './platform.model';
-import { HttpClient } from './host/http-client';
-import { Beans } from './bean-manager';
 
 /**
  * Expects the given function to be rejected.
@@ -43,17 +41,8 @@ export function expectToBeRejectedWithError(promise: Promise<any>, expected?: Re
 }
 
 /***
- * Serves the given manifest and returns the URL where the manifest is served. By default, it is served under the current origin.
+ * Serves the given manifest and returns the URL where the manifest is served.
  */
-export function createManifestURL(manifest: Partial<ApplicationManifest>, config?: { origin: string }): string {
-  const manifestUrl = new URL('url', config && config.origin || window.location.origin).toString();
-  const response: Partial<Response> = {
-    ok: true,
-    json: (): Promise<any> => Promise.resolve(manifest),
-  };
-
-  const httpClientSpy = jasmine.createSpyObj(HttpClient.name, ['fetch']);
-  httpClientSpy.fetch.withArgs(manifestUrl).and.returnValue(response);
-  Beans.register(HttpClient, {useValue: httpClientSpy});
-  return manifestUrl;
+export function serveManifest(manifest: Partial<ApplicationManifest>): string {
+  return URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
 }

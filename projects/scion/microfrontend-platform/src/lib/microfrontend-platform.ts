@@ -87,21 +87,20 @@ export const MicrofrontendPlatform = new class {
         Beans.register(PlatformProperties);
         Beans.registerIfAbsent(HttpClient);
         Beans.register(PlatformConfigLoader, createConfigLoaderBeanDescriptor(platformConfig));
-        Beans.register(ManifestRegistry);
-        Beans.register(ApplicationRegistry);
+        Beans.register(ManifestRegistry, {eager: true, destroyPhase: PlatformStates.Stopped});
+        Beans.register(ApplicationRegistry, {eager: true, destroyPhase: PlatformStates.Stopped});
         Beans.registerIfAbsent(PlatformMessageClient, provideMessageClient(PLATFORM_SYMBOLIC_NAME, clientConfig && clientConfig.messaging));
 
         Beans.registerInitializer({useClass: PlatformInitializer});
         Beans.registerInitializer({useClass: ManifestCollector});
         Beans.register(HostPlatformState);
+        // Construct the bean manager instantly to receive connect requests of clients.
+        Beans.registerIfAbsent(MessageBroker, {useValue: new MessageBroker(), destroyPhase: PlatformStates.Stopped});
 
         if (clientConfig) {
           Beans.register(ClientConfig, {useValue: clientConfig});
           Beans.registerIfAbsent(MessageClient, provideMessageClient(clientConfig.symbolicName, clientConfig.messaging));
         }
-
-        // Construct the bean manager instantly to receive connect requests of clients.
-        Beans.registerIfAbsent(MessageBroker, {useValue: new MessageBroker(), destroyPhase: PlatformStates.Stopped});
 
         // Notify clients about host platform state changes.
         Beans.get(PlatformState).state$
