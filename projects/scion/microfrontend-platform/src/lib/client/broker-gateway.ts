@@ -12,7 +12,7 @@ import { MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics }
 import { first, map, mergeMap, share, switchMap, take, takeUntil, timeoutWith } from 'rxjs/operators';
 import { filterByOrigin, filterByTopic, filterByTransport, pluckEnvelope } from './operators';
 import { UUID } from '@scion/toolkit/util';
-import { TopicMessage } from '../messaging.model';
+import { MessageHeaders, TopicMessage } from '../messaging.model';
 import { GatewayInfoResponse, getGatewayJavaScript } from './broker-gateway-script';
 import { Beans } from '../bean-manager';
 import { Logger } from '../logger';
@@ -59,7 +59,10 @@ export class BrokerGateway {
    * @return a Promise that resolves when the message is dispatched to the broker, or that rejects if not connected to the broker.
    */
   public postMessage(envelope: MessageEnvelope): Promise<void> {
-    return this._whenGatewayInfo.then(gateway => gateway.window.postMessage(setSenderId(envelope, gateway.clientId), gateway.window.origin));
+    return this._whenGatewayInfo.then(gateway => {
+      this.setSenderMessageHeaders(envelope, gateway.clientId);
+      gateway.window.postMessage(envelope, gateway.window.origin);
+    });
   }
 
   /**
@@ -118,7 +121,7 @@ export class BrokerGateway {
       messageId: UUID.randomUUID(),
       message: {
         topic: PlatformTopics.RequestGatewayInfo,
-        replyTo: replyToTopic,
+        headers: new Map().set(MessageHeaders.ReplyTo, replyToTopic),
       },
     };
 
@@ -129,7 +132,7 @@ export class BrokerGateway {
         pluckEnvelope(),
         filterByTopic<GatewayInfoResponse>(replyToTopic),
         mergeMap((reply: TopicMessage<GatewayInfoResponse>): Observable<GatewayInfo> => {
-          const response: GatewayInfoResponse = reply.payload;
+          const response: GatewayInfoResponse = reply.body;
           return response.ok ? of({clientId: response.clientId, window: gatewayWindow, brokerOrigin: response.brokerOrigin}) : throwError(response.error);
         }),
         take(1),
@@ -142,8 +145,19 @@ export class BrokerGateway {
         throw error;
       });
 
+    this.setSenderMessageHeaders(request);
     gatewayWindow.postMessage(request, gatewayWindow.origin);
     return whenReply.then(neverResolveIfUndefined);
+  }
+
+  /**
+   * Adds headers to the message to identify the sending app.
+   */
+  private setSenderMessageHeaders(envelope: MessageEnvelope, clientId?: string): void {
+    const headers = envelope.message.headers;
+
+    headers.set(MessageHeaders.AppSymbolicName, this._clientAppName);
+    clientId && headers.set(MessageHeaders.ClientId, clientId);
   }
 
   public destroy(): void {
@@ -168,13 +182,6 @@ export interface GatewayInfo {
  */
 function neverResolveIfUndefined<T>(value: T): Promise<T> {
   return value !== undefined ? Promise.resolve(value) : NEVER_PROMISE;
-}
-
-/**
- * Adds the client id to the envelope.
- */
-function setSenderId<T>(envelope: MessageEnvelope<T>, senderId: string): MessageEnvelope<T> {
-  return {...envelope, senderId};
 }
 
 /**

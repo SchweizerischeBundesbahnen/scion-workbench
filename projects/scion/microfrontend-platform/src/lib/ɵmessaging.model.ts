@@ -7,7 +7,7 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { IntentMessage, TopicMessage } from './messaging.model';
+import { IntentMessage, Message, TopicMessage } from './messaging.model';
 
 /**
  * Declares the message transports.
@@ -52,12 +52,11 @@ export enum MessagingChannel {
 /**
  * Envelope for all messages.
  */
-export interface MessageEnvelope<Message = IntentMessage | TopicMessage | TopicSubscribeCommand | TopicUnsubscribeCommand> {
-  senderId?: string;
+export interface MessageEnvelope<MSG = IntentMessage | TopicMessage | TopicSubscribeCommand | TopicUnsubscribeCommand> {
   messageId: string;
   transport: MessagingTransport;
   channel: MessagingChannel;
-  message?: Message;
+  message: MSG;
 }
 
 /**
@@ -87,15 +86,7 @@ export enum PlatformTopics {
 }
 
 /**
- * Sent by a client gateway to initiate a connection to the broker.
- * The broker responds with a @{link ConnackMessage} message.
- */
-export interface ConnectMessage {
-  symbolicAppName: string;
-}
-
-/**
- * Sent by the broker in response to a {@link ConnectMessage} request from a client gateway.
+ * Sent by the broker in response to a connect request from a client gateway.
  */
 export interface ConnackMessage {
   returnCode: 'accepted' | 'refused:bad-request' | 'refused:rejected' | 'refused:blocked';
@@ -106,11 +97,11 @@ export interface ConnackMessage {
   clientId?: string;
 }
 
-export interface TopicSubscribeCommand {
+export interface TopicSubscribeCommand extends Message {
   topic: string;
 }
 
-export interface TopicUnsubscribeCommand {
+export interface TopicUnsubscribeCommand extends Message {
   topic: string;
 }
 

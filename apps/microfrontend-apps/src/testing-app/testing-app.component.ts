@@ -9,17 +9,17 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class TestingAppComponent implements OnDestroy {
 
-  public symbolicAppName: string;
+  public appSymbolicName: string;
   public appOrigin: string;
   public pageTitle: string;
 
   public onRouteActivate(route: ActivatedRoute): void {
     this.pageTitle = route.snapshot.data['title'];
-    this.symbolicAppName = Beans.get(ClientConfig).symbolicName;
+    this.appSymbolicName = Beans.get(ClientConfig).symbolicName;
     this.appOrigin = window.origin;
   }
 
   public ngOnDestroy(): void {
-    MicrofrontendPlatform.destroy().then();
+    MicrofrontendPlatform.destroy().then(); // Platform is started in {@link TestingAppPlatformInitializerResolver}
   }
 }

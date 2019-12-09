@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Beans, IntentMessage, MessageClient, Qualifier, TopicMessage } from '@scion/microfrontend-platform';
+import { Beans, IntentMessage, MessageClient, MessageHeaders, Qualifier, TopicMessage } from '@scion/microfrontend-platform';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, finalize, startWith, takeUntil } from 'rxjs/operators';
@@ -35,6 +35,7 @@ export class ReceiveMessageComponent implements OnDestroy {
   public form: FormGroup;
   public messages: (TopicMessage | IntentMessage)[] = [];
   public MessagingModel = MessagingModel;
+  public MessageHeaders = MessageHeaders;
 
   constructor(private _formBuilder: FormBuilder) {
     this._messageClient = Beans.get(MessageClient);

@@ -40,6 +40,17 @@ export function expectToBeRejectedWithError(promise: Promise<any>, expected?: Re
     });
 }
 
+/**
+ * Expects the resolved map to contain at least the given map entries.
+ *
+ * Jasmine 3.5 provides 'mapContaining' matcher.
+ */
+export async function expectToBeResolvedToMapContaining(actual: Promise<Map<any, any>>, expected: Map<any, any>): Promise<void> {
+  const expectedTuples = [...expected];
+  const actualTuples = [...await actual];
+  await expect(actualTuples).toEqual(jasmine.arrayContaining(expectedTuples));
+}
+
 /***
  * Serves the given manifest and returns the URL where the manifest is served.
  */

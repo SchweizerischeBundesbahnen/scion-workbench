@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { MessageClient, PublishOptions } from './message-client';
+import { mapToBody, MessageClient, MessageOptions, PublishOptions } from './message-client';
 import { EMPTY, from, merge, noop, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
 import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
 import { filterByChannel, filterByTopic, pluckMessage } from './operators';
-import { catchError, filter, finalize, first, map, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
+import { catchError, filter, finalize, first, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
 import { Defined, UUID } from '@scion/toolkit/util';
 import { Intent, Qualifier } from '../platform.model';
-import { IntentMessage, TopicMessage } from '../messaging.model';
+import { IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
 import { matchesIntentQualifier } from '../qualifier-tester';
 import { BrokerGateway } from './broker-gateway';
 import { Beans, PreDestroy } from '../bean-manager';
@@ -32,12 +32,14 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
   }
 
   public publish$(topic: string, message?: any, options?: PublishOptions): Observable<never> {
-    const topicMessage: TopicMessage = {topic, payload: message, retain: Defined.orElse(options && options.retain, false)};
+    const topicMessage: TopicMessage = {topic, retain: Defined.orElse(options && options.retain, false), headers: options && options.headers || new Map()};
+    setBodyIfDefined(topicMessage, message);
     return this.postMessageToBroker$(MessagingChannel.Topic, topicMessage);
   }
 
-  public request$<T>(topic: string, request?: any): Observable<TopicMessage<T>> {
-    const topicMessage: TopicMessage = {topic, payload: request};
+  public request$<T>(topic: string, request?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
+    const topicMessage: TopicMessage = {topic, retain: false, headers: options && options.headers || new Map()};
+    setBodyIfDefined(topicMessage, request);
     // Delay sending the request until the host platform started to not lose the request if handled by a replier in the host.
     return from(Beans.get(HostPlatformState).whenStarted())
       .pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Topic, topicMessage)));
@@ -47,15 +49,17 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     return this._observe$(topic);
   }
 
-  public issueIntent$(intent: Intent, payload?: any): Observable<never> {
-    const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, payload};
+  public issueIntent$(intent: Intent, body?: any, options?: MessageOptions): Observable<never> {
+    const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: options && options.headers || new Map()};
     assertNoWildcardCharacters(intentMessage.qualifier);
+    setBodyIfDefined(intentMessage, body);
     return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
   }
 
-  public requestByIntent$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>> {
-    const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, payload};
+  public requestByIntent$<T>(intent: Intent, body?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
+    const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: options && options.headers || new Map()};
     assertNoWildcardCharacters(intentMessage.qualifier);
+    setBodyIfDefined(intentMessage, body);
     // Delay sending the request until the host platform started to not lose the request if handled by a replier in the host.
     return from(Beans.get(HostPlatformState).whenStarted())
       .pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage)));
@@ -66,8 +70,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
   }
 
   public subscriberCount$(topic: string): Observable<number> {
-    return this.request$<number>(PlatformTopics.RequestSubscriberCount, topic)
-      .pipe(map(message => message.payload));
+    return this.request$<number>(PlatformTopics.RequestSubscriberCount, topic).pipe(mapToBody());
   }
 
   /**
@@ -84,7 +87,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
           filterByTopic<T>(topic),
           takeUntil(merge(this._destroy$, unsubscribe$)),
           finalize(() => {
-            const command: TopicUnsubscribeCommand = {topic: topic};
+            const command: TopicUnsubscribeCommand = {topic: topic, headers: new Map()};
             this.postMessageToBroker$(MessagingChannel.TopicUnsubscribe, command)
               .pipe(catchError(() => EMPTY)) // do not propagate unsubscribe errors
               .subscribe();
@@ -93,7 +96,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
         .subscribe(observer);
 
       // Subscribe for the messages sent to the given topic.
-      const topicSubscribeMessage: TopicSubscribeCommand = {topic: topic};
+      const topicSubscribeMessage: TopicSubscribeCommand = {topic: topic, headers: new Map()};
       this.postMessageToBroker$(MessagingChannel.TopicSubscribe, topicSubscribeMessage)
         .pipe(takeUntil(merge(this._destroy$, unsubscribe$)))
         .subscribe(topicSubscribeError$);
@@ -140,7 +143,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
           first(),
           timeoutWith(new Date(Date.now() + this._config.deliveryTimeout), throwError(`[MessageDispatchError] Broker did not report message delivery state within the ${this._config.deliveryTimeout}ms timeout. [message=${JSON.stringify(envelope)}]`)),
           takeUntil(merge(this._destroy$, unsubscribe$)),
-          mergeMap(statusMessage => statusMessage.payload.ok ? EMPTY : throwError(statusMessage.payload.details)),
+          mergeMap(statusMessage => statusMessage.body.ok ? EMPTY : throwError(statusMessage.body.details)),
         )
         .subscribe(observer); // dispatch next, error and complete
 
@@ -155,20 +158,19 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
    * Posts a message to the message broker and receives replies.
    */
   private postMessageToBrokerAndReceiveReplies$<T = any>(channel: MessagingChannel, message: IntentMessage | TopicMessage): Observable<TopicMessage<T>> {
-    const replyToTopic = UUID.randomUUID();
-    const request: IntentMessage | TopicMessage = {...message, replyTo: replyToTopic};
+    message.headers.set(MessageHeaders.ReplyTo, UUID.randomUUID());
 
     return new Observable((observer: Observer<TopicMessage>): TeardownLogic => {
       const unsubscribe$ = new Subject<void>();
       const deliveryError$ = new Subject<void>();
 
       // Receive replies sent to the reply topic.
-      this._observe$<T>(replyToTopic)
+      this._observe$<T>(message.headers.get(MessageHeaders.ReplyTo))
         .pipe(takeUntil(merge(this._destroy$, unsubscribe$, deliveryError$)))
         .subscribe(next => observer.next(next), error => observer.error(error)); // dispatch next and error, but not complete
 
       // Post the message to the broker.
-      this.postMessageToBroker$(channel, request)
+      this.postMessageToBroker$(channel, message)
         .pipe(takeUntil(merge(this._destroy$, unsubscribe$)))
         .subscribe(noop, error => {
           deliveryError$.next();
@@ -189,5 +191,11 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
 function assertNoWildcardCharacters(qualifier: Qualifier): void {
   if (qualifier && Object.entries(qualifier).some(([key, value]) => key === '*' || value === '*' || value === '?')) {
     throw Error(`[IllegalQualifierError] Qualifier must not contain wildcards. [qualifier=${JSON.stringify(qualifier)}]`);
+  }
+}
+
+function setBodyIfDefined<T>(message: TopicMessage<T> | IntentMessage<T>, body?: T): void {
+  if (body !== undefined) {
+    message.body = body;
   }
 }

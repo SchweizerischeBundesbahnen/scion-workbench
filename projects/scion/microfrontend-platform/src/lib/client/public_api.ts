@@ -11,6 +11,6 @@
 /**
  * Entry point for all public APIs of this package.
  */
-export { MessageClient, PublishOptions, takeUntilUnsubscribe, NullMessageClient } from './message-client';
+export { MessageClient, PublishOptions, takeUntilUnsubscribe, mapToBody, NullMessageClient, MessageOptions } from './message-client';
 export { ClientConfig } from './client-config';
 export { HostPlatformState } from './host-platform-state';

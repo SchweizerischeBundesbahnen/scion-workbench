@@ -14,12 +14,12 @@
   <sci-list class="messages e2e-messages">
     <ng-container *ngFor="let message of messages">
 
-      <ng-template sciListItem [actions]="message.replyTo ? reply_action: null">
+      <ng-template sciListItem [actions]="message.headers.get(MessageHeaders.ReplyTo) ? reply_action: null">
         <app-message-list-item [message]="message" [isTopicMessage]="isTopicMessaging()"></app-message-list-item>
       </ng-template>
 
       <ng-template #reply_action>
-        <button class="material-icons e2e-reply" title="Reply" (click)="onReply(message.replyTo)">reply</button>
+        <button class="material-icons e2e-reply" title="Reply" (click)="onReply(message.headers.get(MessageHeaders.ReplyTo))">reply</button>
       </ng-template>
 
     </ng-container>

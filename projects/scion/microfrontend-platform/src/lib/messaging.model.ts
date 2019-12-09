@@ -1,12 +1,23 @@
 import { Qualifier } from './platform.model';
 
 /**
+ * Represents a message with headers to transport additional information with a message.
+ */
+export interface Message {
+  /**
+   * Additional information attached to this message.
+   *
+   * Header values must be JSON serializable. If no headers are set, the {@link Map} is empty.
+   */
+  headers: Map<string, any>;
+}
+
+/**
  * Represents an intent issued by an application.
  *
- * The intent is transported to all subscribed consumers capable handling the intent,
- * i.e., providing a capability which fulfills the intent, and which is visible to the sending application.
+ * The intent is transported to all clients that provide a satisfying capability visible to the issuing application.
  */
-export interface IntentMessage<T = any> {
+export interface IntentMessage<BODY = any> extends Message {
   /**
    * Type of functionality which to intent.
    */
@@ -16,14 +27,9 @@ export interface IntentMessage<T = any> {
    */
   qualifier?: Qualifier;
   /**
-   * Optional intent payload.
+   * Optional JSON serializable data to pass with the intent.
    */
-  payload?: T;
-  /**
-   * Topic where a reply to the current message should be sent. This field is only set if the publisher
-   * expects the consumer to reply. However, a reply is optional; it is up to the client to decide.
-   */
-  replyTo?: string;
+  body?: BODY;
 }
 
 /**
@@ -31,7 +37,7 @@ export interface IntentMessage<T = any> {
  *
  * The message is transported to all consumers subscribed to the topic.
  */
-export interface TopicMessage<T = any> {
+export interface TopicMessage<BODY = any> extends Message {
   /**
    * The topic where to publish this message to.
    */
@@ -39,16 +45,33 @@ export interface TopicMessage<T = any> {
   /**
    * Instructs the broker to store this message as retained message for the topic. With the retained flag set to `true`,
    * a client receives this message immediately upon subscription. The broker stores only one retained message per topic.
-   * To delete the retained message, send a retained message without payload to the topic.
+   * To delete the retained message, send a retained message without a body to the topic.
    */
   retain?: boolean;
   /**
-   * Optional message payload.
+   * Optional JSON serializable data.
    */
-  payload?: T;
+  body?: BODY;
+}
+
+/**
+ * Declares headers set by the platform when sending a message.
+ *
+ * Clients are allowed to read platform defined headers from a message.
+ */
+export enum MessageHeaders {
   /**
-   * Topic where a reply to the current message should be sent. This field is only set if the publisher
-   * expects the consumer to reply. However, a reply is optional; it is up to the client to decide.
+   * Identifies the sending client instance of a message.
    */
-  replyTo?: string;
+  ClientId = 'ɵClientId',
+  /**
+   * Identifies the sending application of a message.
+   */
+  AppSymbolicName = 'ɵAppSymbolicName',
+  /**
+   * Destination to which to send a response to this message.
+   *
+   * This header is set by the platform if the publisher expects the consumer to reply to the message.
+   */
+  ReplyTo = 'ɵReplyTo',
 }

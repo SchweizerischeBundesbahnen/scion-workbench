@@ -27,7 +27,7 @@ export class OutletComponent {
         take(1),
         map((reply: TopicMessage<Application[]>) => {
           const endpoints: AppEndpoint[] = [];
-          const applications = reply.payload;
+          const applications = reply.body;
 
           applications.forEach(application => {
             const origin = application.origin;

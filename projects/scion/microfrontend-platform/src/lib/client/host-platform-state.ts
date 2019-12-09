@@ -1,9 +1,8 @@
 import { noop, Observable } from 'rxjs';
-import { filter, map, shareReplay, take } from 'rxjs/operators';
+import { filter, shareReplay, take } from 'rxjs/operators';
 import { PlatformTopics } from '../ɵmessaging.model';
 import { PlatformStates } from '../platform-state';
-import { TopicMessage } from '../messaging.model';
-import { MessageClient } from './message-client';
+import { mapToBody, MessageClient } from './message-client';
 import { Beans } from '../bean-manager';
 import { PlatformMessageClient } from '../host/platform-message-client';
 
@@ -16,9 +15,9 @@ export class HostPlatformState {
 
   constructor() {
     const messageClient = Beans.get(PlatformMessageClient, {orElseSupply: (): MessageClient => Beans.get(MessageClient)});
-    this._state$ = messageClient.observe$(PlatformTopics.HostPlatformState)
+    this._state$ = messageClient.observe$<PlatformStates>(PlatformTopics.HostPlatformState)
       .pipe(
-        map((message: TopicMessage<PlatformStates>) => message.payload),
+        mapToBody(),
         shareReplay(1),
       );
   }

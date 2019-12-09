@@ -1,4 +1,4 @@
-import { Application, ApplicationRegistry, Beans, ManifestRegistry, MessageClient, PreDestroy, takeUntilUnsubscribe, TopicMessage } from '@scion/microfrontend-platform';
+import { Application, ApplicationRegistry, Beans, ManifestRegistry, MessageClient, MessageHeaders, PreDestroy, takeUntilUnsubscribe, TopicMessage } from '@scion/microfrontend-platform';
 import { CapabilityRegisterCommand, CapabilityUnregisterCommand, IntentRegisterCommand, IntentUnregisterCommand, Topics } from '../microfrontend-api';
 import { map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { merge, of, Subject } from 'rxjs';
@@ -26,8 +26,8 @@ export class ManifestRequestHandler implements PreDestroy {
     Beans.get(MessageClient).observe$(Topics.RegisterCapability)
       .pipe(takeUntil(this._destroy$))
       .subscribe((request: TopicMessage<CapabilityRegisterCommand>) => {
-        const command = request.payload;
-        Beans.get(ManifestRegistry).registerCapability(command.symbolicAppName, [command.capability]);
+        const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
+        Beans.get(ManifestRegistry).registerCapability(appSymbolicName, [request.body.capability]);
       });
   }
 
@@ -35,8 +35,8 @@ export class ManifestRequestHandler implements PreDestroy {
     Beans.get(MessageClient).observe$(Topics.UnregisterCapability)
       .pipe(takeUntil(this._destroy$))
       .subscribe((request: TopicMessage<CapabilityUnregisterCommand>) => {
-        const command = request.payload;
-        Beans.get(ManifestRegistry).unregisterCapability(command.symbolicAppName, command.capabilityId);
+        const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
+        Beans.get(ManifestRegistry).unregisterCapability(appSymbolicName, request.body.capabilityId);
       });
   }
 
@@ -44,8 +44,8 @@ export class ManifestRequestHandler implements PreDestroy {
     Beans.get(MessageClient).observe$(Topics.RegisterIntent)
       .pipe(takeUntil(this._destroy$))
       .subscribe((request: TopicMessage<IntentRegisterCommand>) => {
-        const command = request.payload;
-        Beans.get(ManifestRegistry).registerIntent(command.symbolicAppName, command.intent);
+        const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
+        Beans.get(ManifestRegistry).registerIntent(appSymbolicName, request.body.intent);
       });
   }
 
@@ -53,23 +53,24 @@ export class ManifestRequestHandler implements PreDestroy {
     Beans.get(MessageClient).observe$(Topics.UnregisterIntent)
       .pipe(takeUntil(this._destroy$))
       .subscribe((request: TopicMessage<IntentUnregisterCommand>) => {
-        const command = request.payload;
-        Beans.get(ManifestRegistry).unregisterIntent(command.symbolicAppName, command.intentId);
+        const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
+        Beans.get(ManifestRegistry).unregisterIntent(appSymbolicName, request.body.intentId);
       });
   }
 
   private installCapabilitiesQueryRequestHandler(): void {
-    Beans.get(MessageClient).observe$(Topics.Capabilities)
+    Beans.get(MessageClient).observe$<void>(Topics.Capabilities)
       .pipe(
-        mergeMap((request: TopicMessage<string>) => {
-          const symbolicAppName = request.payload;
+        mergeMap((request: TopicMessage<void>) => {
           const manifestRegistry = Beans.get(ManifestRegistry);
+          const replyTo = request.headers.get(MessageHeaders.ReplyTo);
+          const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
 
           return merge(of(null), manifestRegistry.capabilityChange$)
             .pipe(
-              map(() => manifestRegistry.getCapabilitiesByApplication(symbolicAppName)),
-              switchMap(capabilities => Beans.get(MessageClient).publish$(request.replyTo, capabilities)),
-              takeUntilUnsubscribe(request.replyTo),
+              map(() => manifestRegistry.getCapabilitiesByApplication(appSymbolicName)),
+              switchMap(capabilities => Beans.get(MessageClient).publish$(replyTo, capabilities)),
+              takeUntilUnsubscribe(replyTo),
             );
         }),
         takeUntil(this._destroy$),
@@ -78,16 +79,17 @@ export class ManifestRequestHandler implements PreDestroy {
   }
 
   private installIntentsQueryRequestHandler(): void {
-    Beans.get(MessageClient).observe$(Topics.Intents)
-      .pipe(mergeMap((request: TopicMessage<string>) => {
-          const symbolicAppName = request.payload;
+    Beans.get(MessageClient).observe$<void>(Topics.Intents)
+      .pipe(mergeMap((request: TopicMessage<void>) => {
           const manifestRegistry = Beans.get(ManifestRegistry);
+          const replyTo = request.headers.get(MessageHeaders.ReplyTo);
+          const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
 
           return merge(of(null), manifestRegistry.intentChange$)
             .pipe(
-              map(() => manifestRegistry.getIntentsByApplication(symbolicAppName)),
-              switchMap(intents => Beans.get(MessageClient).publish$(request.replyTo, intents)),
-              takeUntilUnsubscribe(request.replyTo),
+              map(() => manifestRegistry.getIntentsByApplication(appSymbolicName)),
+              switchMap(intents => Beans.get(MessageClient).publish$(replyTo, intents)),
+              takeUntilUnsubscribe(replyTo),
             );
         }),
         takeUntil(this._destroy$),

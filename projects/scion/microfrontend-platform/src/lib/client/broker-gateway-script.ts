@@ -7,8 +7,8 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { ConnackMessage, ConnectMessage, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../ɵmessaging.model';
-import { TopicMessage } from '../messaging.model';
+import { ConnackMessage, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../ɵmessaging.model';
+import { MessageHeaders, TopicMessage } from '../messaging.model';
 
 /**
  * Returns the JavaScript for the gateway to connect to the message broker.
@@ -38,6 +38,11 @@ export function getGatewayJavaScript(config: GatewayConfig): string {
          ClientDisconnect: '${PlatformTopics.ClientDisconnect}',
          GatewayInfoRequest: '${PlatformTopics.RequestGatewayInfo}',
        },
+       headers: {
+         ReplyTo: '${MessageHeaders.ReplyTo}',
+         ClientId: '${MessageHeaders.ClientId}',
+         AppSymbolicName: '${MessageHeaders.AppSymbolicName}',
+       }
      };
 
      ${initGateway.name}(config, constants);
@@ -102,7 +107,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
 
       const requestEnvelope: MessageEnvelope<TopicMessage<void>> = event.data;
 
-      const replyTo = requestEnvelope.message.replyTo;
+      const replyTo = requestEnvelope.message.headers.get(constants.headers.ReplyTo);
       whenConnected
         .then(broker => {
           const reply = newReply(replyTo, {ok: true, clientId: broker.clientId, brokerOrigin: broker.origin});
@@ -124,7 +129,10 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
         channel: constants.channels.Topic,
         message: {
           topic: replyTo,
-          payload: response,
+          body: response,
+          headers: new Map()
+            .set(constants.headers.ClientId, response.clientId)
+            .set(constants.headers.AppSymbolicName, config.clientAppName),
         },
       };
     }
@@ -147,14 +155,15 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
       .then(() => disposables.forEach(fn => fn()))
       .catch(() => disposables.forEach(fn => fn()));
 
-    const connectMessage: MessageEnvelope<TopicMessage<ConnectMessage>> = {
+    const connectMessage: MessageEnvelope<TopicMessage<void>> = {
       messageId: randomUUID(),
       transport: constants.transports.GatewayToBroker,
       channel: constants.channels.Topic,
       message: {
         topic: constants.topics.ClientConnect,
-        replyTo: replyTo,
-        payload: {symbolicAppName: config.clientAppName},
+        headers: new Map()
+          .set(constants.headers.AppSymbolicName, config.clientAppName)
+          .set(constants.headers.ReplyTo, replyTo),
       },
     };
 
@@ -174,7 +183,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
         }
 
         const envelope: MessageEnvelope<TopicMessage<ConnackMessage>> = event.data;
-        const response = envelope.message.payload;
+        const response = envelope.message.body;
         if (response.returnCode === 'accepted') {
           resolve({clientId: response.clientId, window: event.source as Window, origin: event.origin});
         }
@@ -220,11 +229,15 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
     whenUnload.then(() => whenConnected)
       .then(broker => {
         const clientDisposeMessage: MessageEnvelope<TopicMessage<void>> = {
-          senderId: broker.clientId,
           messageId: randomUUID(),
           transport: constants.transports.GatewayToBroker,
           channel: constants.channels.Topic,
-          message: {topic: constants.topics.ClientDisconnect},
+          message: {
+            topic: constants.topics.ClientDisconnect,
+            headers: new Map()
+              .set(constants.headers.ClientId, broker.clientId)
+              .set(constants.headers.AppSymbolicName, config.clientAppName),
+          },
         };
         broker.window.postMessage(clientDisposeMessage, broker.origin);
       })
@@ -294,5 +307,10 @@ interface Constants {
     ClientConnect: string,
     ClientDisconnect: string,
     GatewayInfoRequest: string,
+  };
+  headers: {
+    ReplyTo: string,
+    ClientId: string,
+    AppSymbolicName: string,
   };
 }

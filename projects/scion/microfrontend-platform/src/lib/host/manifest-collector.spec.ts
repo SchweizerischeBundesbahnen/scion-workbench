@@ -26,9 +26,9 @@ describe('ManifestCollector', () => {
     // mock {HttpClient}
     const httpClientSpy = jasmine.createSpyObj(HttpClient.name, ['fetch']);
     httpClientSpy.fetch
-      .withArgs('http://www.app-1/manifest').and.returnValue(okAnswer({payload: {name: 'application-1', intents: [], capabilities: []}, delay: 50}))
-      .withArgs('http://www.app-2/manifest').and.returnValue(okAnswer({payload: {name: 'application-2', intents: [], capabilities: []}, delay: 120}))
-      .withArgs('http://www.app-3/manifest').and.returnValue(okAnswer({payload: {name: 'application-3', intents: [], capabilities: []}, delay: 30}));
+      .withArgs('http://www.app-1/manifest').and.returnValue(okAnswer({body: {name: 'application-1', intents: [], capabilities: []}, delay: 50}))
+      .withArgs('http://www.app-2/manifest').and.returnValue(okAnswer({body: {name: 'application-2', intents: [], capabilities: []}, delay: 120}))
+      .withArgs('http://www.app-3/manifest').and.returnValue(okAnswer({body: {name: 'application-3', intents: [], capabilities: []}, delay: 30}));
     Beans.register(HttpClient, {useValue: httpClientSpy});
 
     // mock {Logger}
@@ -58,9 +58,9 @@ describe('ManifestCollector', () => {
     // mock {HttpClient}
     const httpClientSpy = jasmine.createSpyObj(HttpClient.name, ['fetch']);
     httpClientSpy.fetch
-      .withArgs('http://www.app-1/manifest').and.returnValue(okAnswer({payload: {name: 'application-1', intents: [], capabilities: []}, delay: 12}))
+      .withArgs('http://www.app-1/manifest').and.returnValue(okAnswer({body: {name: 'application-1', intents: [], capabilities: []}, delay: 12}))
       .withArgs('http://www.app-2/manifest').and.returnValue(nokAnswer({status: 500, delay: 100}))
-      .withArgs('http://www.app-3/manifest').and.returnValue(okAnswer({payload: {name: 'application-3', intents: [], capabilities: []}, delay: 600}))
+      .withArgs('http://www.app-3/manifest').and.returnValue(okAnswer({body: {name: 'application-3', intents: [], capabilities: []}, delay: 600}))
       .withArgs('http://www.app-4/manifest').and.returnValue(nokAnswer({status: 502, delay: 200}));
     Beans.register(HttpClient, {useValue: httpClientSpy});
 
@@ -90,10 +90,10 @@ describe('ManifestCollector', () => {
   }));
 });
 
-function okAnswer(answer: { payload: ApplicationManifest, delay: number }): Promise<Partial<Response>> {
+function okAnswer(answer: { body: ApplicationManifest, delay: number }): Promise<Partial<Response>> {
   const response: Partial<Response> = {
     ok: true,
-    json: (): Promise<any> => Promise.resolve(answer.payload),
+    json: (): Promise<any> => Promise.resolve(answer.body),
   };
   return new Promise(resolve => { // tslint:disable-line:typedef
     setTimeout(() => resolve(response), answer.delay);

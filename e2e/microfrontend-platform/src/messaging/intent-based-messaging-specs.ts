@@ -104,7 +104,7 @@ export namespace IntendBasedMessagingSpecs {
     // assert intent to be received
     const intent = await receiverPO_4202.getFirstMessageOrElseReject();
     await expect(intent.getIntentType()).toEqual('testing');
-    await expect(intent.getPayload()).toEqual('some payload');
+    await expect(intent.getBody()).toEqual('some payload');
     await expect(intent.getIntentQualifier()).toEqual({key: 'value'});
     await expect(intent.getReplyTo()).toBeUndefined();
   }
@@ -191,7 +191,7 @@ export namespace IntendBasedMessagingSpecs {
     // assert intent to be received
     const intent = await receiverPO.getFirstMessageOrElseReject();
     await expect(intent.getIntentType()).toEqual('testing');
-    await expect(intent.getPayload()).toEqual('some payload');
+    await expect(intent.getBody()).toEqual('some payload');
     await expect(intent.getIntentQualifier()).toEqual({key: 'value'});
     await expect(intent.getReplyTo()).toBeUndefined();
   }
@@ -236,7 +236,7 @@ export namespace IntendBasedMessagingSpecs {
     // assert intent to be received
     const intent = await receiverPO_4203.getFirstMessageOrElseReject();
     await expect(intent.getIntentType()).toEqual('testing');
-    await expect(intent.getPayload()).toEqual('some payload');
+    await expect(intent.getBody()).toEqual('some payload');
     await expect(intent.getIntentQualifier()).toEqual({key: 'value'});
     await expect(intent.getReplyTo()).toBeUndefined();
   }
@@ -299,21 +299,21 @@ export namespace IntendBasedMessagingSpecs {
     // assert intent to be received by app 4201
     const intent_4201 = await receiverPO_4201.getFirstMessageOrElseReject();
     await expect(intent_4201.getIntentType()).toEqual('testing');
-    await expect(intent_4201.getPayload()).toEqual('some payload');
+    await expect(intent_4201.getBody()).toEqual('some payload');
     await expect(intent_4201.getIntentQualifier()).toEqual({key: 'value'});
     await expect(intent_4201.getReplyTo()).toBeUndefined();
 
     // assert intent to be received by app 4202_1
     const intent_4202_1 = await receiverPO_4202_1.getFirstMessageOrElseReject();
     await expect(intent_4202_1.getIntentType()).toEqual('testing');
-    await expect(intent_4202_1.getPayload()).toEqual('some payload');
+    await expect(intent_4202_1.getBody()).toEqual('some payload');
     await expect(intent_4202_1.getIntentQualifier()).toEqual({key: 'value'});
     await expect(intent_4202_1.getReplyTo()).toBeUndefined();
 
     // assert intent to be received by app 4202_2
     const intent_4202_2 = await receiverPO_4202_2.getFirstMessageOrElseReject();
     await expect(intent_4202_2.getIntentType()).toEqual('testing');
-    await expect(intent_4202_2.getPayload()).toEqual('some payload');
+    await expect(intent_4202_2.getBody()).toEqual('some payload');
     await expect(intent_4202_2.getIntentQualifier()).toEqual({key: 'value'});
     await expect(intent_4202_2.getReplyTo()).toBeUndefined();
   }
@@ -421,14 +421,14 @@ export namespace IntendBasedMessagingSpecs {
     await intent.clickReply();
     const reply1 = await publisherPO_4202.getFirstReplyOrElseReject();
     await expect(reply1.getReplyTo()).toBeUndefined();
-    await expect(reply1.getPayload()).toEqual('this is a reply');
+    await expect(reply1.getBody()).toEqual('this is a reply');
     await publisherPO_4202.clickClearReplies();
 
     // send the second reply
     await intent.clickReply();
     const reply2 = await publisherPO_4202.getFirstReplyOrElseReject();
     await expect(reply2.getReplyTo()).toBeUndefined();
-    await expect(reply2.getPayload()).toEqual('this is a reply');
+    await expect(reply2.getBody()).toEqual('this is a reply');
     await publisherPO_4202.clickClearReplies();
   }
 

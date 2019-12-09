@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { IntentMessage, TopicMessage } from '@scion/microfrontend-platform';
+import { IntentMessage, MessageHeaders, TopicMessage } from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-message-list-item',
@@ -7,6 +7,8 @@ import { IntentMessage, TopicMessage } from '@scion/microfrontend-platform';
   styleUrls: ['./message-list-item.component.scss'],
 })
 export class MessageListItemComponent {
+
+  public MessageHeaders = MessageHeaders;
 
   @Input()
   public isTopicMessage: boolean;

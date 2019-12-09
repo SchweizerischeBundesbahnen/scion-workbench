@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BeanDecorator, Beans, Intent, IntentMessage, MessageClient, PublishOptions, TopicMessage } from '@scion/microfrontend-platform';
+import { BeanDecorator, Beans, Intent, IntentMessage, MessageClient, MessageOptions, PublishOptions, TopicMessage } from '@scion/microfrontend-platform';
 import { MonoTypeOperatorFunction, Observable, Observer, TeardownLogic } from 'rxjs';
 import { NgZone } from '@angular/core';
 
@@ -28,20 +28,20 @@ export class AngularZoneMessageClientDecorator implements BeanDecorator<MessageC
         return messageClient.publish$(topic, message, options).pipe(runInsideAngular(zone));
       }
 
-      public request$<T>(topic: string, message?: any): Observable<TopicMessage<T>> {
-        return messageClient.request$<T>(topic, message).pipe(runInsideAngular(zone));
+      public request$<T>(topic: string, request?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
+        return messageClient.request$<T>(topic, request, options).pipe(runInsideAngular(zone));
       }
 
       public observe$<T>(topic: string): Observable<TopicMessage<T>> {
         return messageClient.observe$<T>(topic).pipe(runInsideAngular(zone));
       }
 
-      public issueIntent$(intent: Intent, payload?: any): Observable<never> {
-        return messageClient.issueIntent$(intent, payload).pipe(runInsideAngular(zone));
+      public issueIntent$(intent: Intent, body?: any, options?: MessageOptions): Observable<never> {
+        return messageClient.issueIntent$(intent, body, options).pipe(runInsideAngular(zone));
       }
 
-      public requestByIntent$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>> {
-        return messageClient.requestByIntent$<T>(intent, payload).pipe(runInsideAngular(zone));
+      public requestByIntent$<T>(intent: Intent, body?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
+        return messageClient.requestByIntent$<T>(intent, body, options).pipe(runInsideAngular(zone));
       }
 
       public handleIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {

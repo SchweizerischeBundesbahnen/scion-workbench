@@ -26,9 +26,9 @@ export class MessageListItemPO {
     return this._contentFinder.$('span.e2e-topic').getText();
   }
 
-  public async getPayload(): Promise<string> {
+  public async getBody(): Promise<string> {
     await this._switchToIframeFn();
-    return this._contentFinder.$('span.e2e-payload').getText();
+    return this._contentFinder.$('span.e2e-body').getText();
   }
 
   public async getReplyTo(): Promise<string | undefined> {

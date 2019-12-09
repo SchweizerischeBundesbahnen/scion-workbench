@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 // tslint:disable:unified-signatures
-import { MonoTypeOperatorFunction, NEVER, Observable } from 'rxjs';
+import { MonoTypeOperatorFunction, NEVER, Observable, OperatorFunction } from 'rxjs';
 import { Intent } from '../platform.model';
 import { IntentMessage, TopicMessage } from '../messaging.model';
-import { first, takeUntil } from 'rxjs/operators';
+import { first, map, takeUntil } from 'rxjs/operators';
 import { Beans } from '../bean-manager';
 
 /**
@@ -30,7 +30,7 @@ import { Beans } from '../bean-manager';
  *
  * Messages published to a topic can be marked as 'retained'. Retained messages help newly-subscribed
  * clients to immediately get the last message published to that topic. The broker stores one retained
- * message per topic. To delete a retained message, send a retained message without payload to the topic.
+ * message per topic. To delete a retained message, send a retained message without a body to the topic.
  */
 export abstract class MessageClient {
 
@@ -42,7 +42,7 @@ export abstract class MessageClient {
    * @param  message
    *         Specifies transfer data to be sent to the destination, if any.
    * @param  options
-   *         Controls how to publish the message.
+   *         Controls how to publish the message and allows setting message headers.
    * @return An Observable which completes immediately when dispatched the message, or which throws an error if the message
    *         could not be dispatched.
    */
@@ -53,12 +53,14 @@ export abstract class MessageClient {
    *
    * @param  topic
    *         Specifies the topic destination of the message.
-   * @param  message
+   * @param  request
    *         Specifies transfer data to be sent to the destination, if any.
+   * @param  options
+   *         Controls how to send the request and allows setting request headers.
    * @return An Observable that emits when receiving a reply. It never completes. It throws an error if the message could not be dispatched.
    *         If expecting a single reply, use {@link take(1)} operator to unsubscribe upon the receipt of the first reply.
    */
-  abstract request$<T>(topic: string, message?: any): Observable<TopicMessage<T>>;
+  abstract request$<T>(topic: string, request?: any, options?: MessageOptions): Observable<TopicMessage<T>>;
 
   /**
    * Receives messages published to the given topic.
@@ -70,10 +72,11 @@ export abstract class MessageClient {
    *
    * ```
    * Beans.get(MessageClient).observe$('topic').subscribe(request => {
+   *   const replyTo = request.headers.get(MessageHeaders.ReplyTo);
    *   stream$
    *     .pipe(
-   *       mergeMap(data => Beans.get(MessageClient).publish$(request.replyTo, data)),
-   *       takeUntilUnsubscribe(request.replyTo),
+   *       mergeMap(data => Beans.get(MessageClient).publish$(replyTo, data)),
+   *       takeUntilUnsubscribe(replyTo)),
    *     )
    *     .subscribe();
    * });
@@ -92,13 +95,15 @@ export abstract class MessageClient {
    *
    * @param  intent
    *         Describes the intent. It must not contain wildcard characters.
-   * @param  payload
-   *         Specifies transfer data to be carried with the intent, if any.
+   * @param  body
+   *         Specifies JSON serializable transfer data to be carried with the intent, if any.
+   * @param  options
+   *         Controls how to issue the intent and allows setting message headers.
    * @return An Observable which completes immediately when dispatched the intent, or which throws an error if the intent
    *         could not be dispatched, e.g., because if missing the intent, or because if no application is found to handle
    *         the intent.
    */
-  abstract issueIntent$(intent: Intent, payload?: any): Observable<never>;
+  abstract issueIntent$(intent: Intent, body?: any, options?: MessageOptions): Observable<never>;
 
   /**
    * Issues an intent and receives one or more replies.
@@ -109,12 +114,14 @@ export abstract class MessageClient {
    *
    * @param  intent
    *         Describes the intent. The qualifier must not contain wildcard characters.
-   * @param  payload
-   *         Specifies transfer data to be carried with the intent, if any.
+   * @param  body
+   *         Specifies JSON serializable transfer data to be carried with the intent, if any.
+   * @param  options
+   *         Controls how to send the request and allows setting request headers.
    * @return An Observable that emits when receiving a reply. It never completes. It throws an error if the intent could not be dispatched.
    *         If expecting a single reply, use {@link take(1)} operator to unsubscribe upon the receipt of the first reply.
    */
-  abstract requestByIntent$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>>;
+  abstract requestByIntent$<T>(intent: Intent, body?: any, options?: MessageOptions): Observable<TopicMessage<T>>;
 
   /**
    * Receives intents when some application intends to use some capability of this application.
@@ -129,10 +136,11 @@ export abstract class MessageClient {
    *
    * ```
    * Beans.get(MessageClient).handleIntent$({type: 'auth-token'}).subscribe(request => {
+   *   const replyTo = request.headers.get(MessageHeaders.ReplyTo);
    *   authToken$
    *     .pipe(
-   *       mergeMap(token => Beans.get(MessageClient).publish$(request.replyTo, token)),
-   *       takeUntilUnsubscribe(request.replyTo),
+   *       mergeMap(token => Beans.get(MessageClient).publish$(replyTo, token)),
+   *       takeUntilUnsubscribe(replyTo),
    *     )
    *     .subscribe();
    * });
@@ -164,20 +172,37 @@ export abstract class MessageClient {
 /**
  * Emits the values emitted by the source Observable until all consumers unsubscribe from the given topic. Then, it completes.
  */
-export function takeUntilUnsubscribe<T>(topic: string): MonoTypeOperatorFunction<T[]> {
+export function takeUntilUnsubscribe<T>(topic: string): MonoTypeOperatorFunction<T> {
   return takeUntil(Beans.get(MessageClient).subscriberCount$(topic).pipe(first(count => count === 0)));
+}
+
+/**
+ * Maps each message to its body.
+ */
+export function mapToBody<T>(): OperatorFunction<TopicMessage<T> | IntentMessage<T>, T> {
+  return map(message => message.body);
 }
 
 /**
  * Control how to publish the message.
  */
-export interface PublishOptions {
+export interface PublishOptions extends MessageOptions {
   /**
    * Instructs the broker to store this message as retained message for the topic. With the retained flag set to `true`,
    * a client receives this message immediately upon subscription. The broker stores only one retained message per topic.
-   * To delete the retained message, send a retained message without payload to the topic.
+   * To delete the retained message, send a retained message without a body to the topic.
    */
   retain?: boolean;
+}
+
+/**
+ * Control how to publish a message.
+ */
+export interface MessageOptions {
+  /**
+   * Sets headers to pass additional information with a message.
+   */
+  headers?: Map<string, any>;
 }
 
 /**
@@ -201,11 +226,11 @@ export class NullMessageClient implements MessageClient {
     return NEVER;
   }
 
-  public issueIntent$(intent: Intent, payload?: any): Observable<never> {
+  public issueIntent$(intent: Intent, body?: any): Observable<never> {
     return NEVER;
   }
 
-  public requestByIntent$<T>(intent: Intent, payload?: any): Observable<TopicMessage<T>> {
+  public requestByIntent$<T>(intent: Intent, body?: any): Observable<TopicMessage<T>> {
     return NEVER;
   }
 

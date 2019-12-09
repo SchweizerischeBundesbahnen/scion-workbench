@@ -11,7 +11,7 @@
 import { BeanDecorator, Beans, Initializer, PreDestroy, Type } from './bean-manager';
 import { fakeAsync, flush, tick } from '@angular/core/testing';
 import { MicrofrontendPlatform } from './microfrontend-platform';
-import { PlatformState, PlatformStates } from '@scion/microfrontend-platform';
+import { PlatformState, PlatformStates } from './platform-state';
 
 // tslint:disable:typedef
 describe('BeanManager', () => {
