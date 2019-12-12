@@ -1,0 +1,45 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  display: grid;
+  grid-template-rows: min-content 1fr;
+  gap: 1em;
+
+  > form {
+    display: grid;
+    grid-auto-rows: min-content;
+    row-gap: .25em;
+
+    > section.buttons {
+      display: grid;
+      grid-template-columns: 1fr 75px;
+      grid-auto-rows: min-content;
+      column-gap: .25em;
+    }
+  }
+
+  > sci-list.intentions {
+    min-height: 300px;
+
+    section.intention {
+      display: flex;
+      justify-content: space-between;
+
+      > sci-qualifier-chip-list {
+        flex: auto;
+      }
+
+      > span.id, > span.visibility, > span.app {
+        flex: none;
+        align-self: flex-start;
+        font-weight: bold;
+        @include chip(primaryColor(), null, primaryColor());
+        user-select: text;
+      }
+
+      > span.visibility {
+        user-select: none;
+      }
+    }
+  }
+}

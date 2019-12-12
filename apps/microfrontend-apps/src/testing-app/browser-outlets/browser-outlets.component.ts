@@ -24,13 +24,14 @@ export class BrowserOutletsComponent {
   public outletNames$: Observable<string[]>;
 
   constructor(route: ActivatedRoute) {
+    const identity = UUID.randomUUID();
     this.outletNames$ = route.paramMap.pipe(map(params => {
       if (params.get('names')) {
         return params.get('names').split(',');
       }
       else if (params.get('count')) {
         const count = coerceNumberProperty(params.get('count'));
-        return new Array(count).fill(undefined).map(() => UUID.randomUUID());
+        return new Array(count).fill(undefined).map((value, index) => `${identity}#${index}`);
       }
       else {
         return [UUID.randomUUID()];

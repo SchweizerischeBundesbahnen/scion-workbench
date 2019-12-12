@@ -1,0 +1,64 @@
+<section class="register e2e-register">
+  <header>Register a provider</header>
+  <form autocomplete="off" [formGroup]="registerForm">
+    <sci-form-field label="Type *">
+      <input [formControlName]="TYPE" class="e2e-type">
+    </sci-form-field>
+    <sci-form-field label="Qualifier">
+      <sci-params-enter [paramsFormArray]="registerForm.get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+    </sci-form-field>
+    <sci-form-field label="Private">
+      <sci-checkbox [formControlName]="PRIVATE" class="e2e-private"></sci-checkbox>
+    </sci-form-field>
+    <button type="submit" (click)="onRegister()" [disabled]="registerForm.invalid" class="e2e-register">Register</button>
+  </form>
+
+  <output class="error e2e-register-error" *ngIf="registerError">
+    {{registerError}}
+  </output>
+  <output class="response e2e-register-response" *ngIf="registerResponse">
+    Provider ID: <span class="e2e-provider-id">{{registerResponse}}</span>
+  </output>
+</section>
+
+<section class="unregister e2e-unregister">
+  <header>Unregister provider(s)</header>
+  <form autocomplete="off" [formGroup]="unregisterForm">
+    <sci-form-field label="ID">
+      <input [formControlName]="ID" class="e2e-id">
+    </sci-form-field>
+    <sci-form-field label="Type">
+      <input [formControlName]="TYPE" class="e2e-type">
+    </sci-form-field>
+    <sci-form-field label="Qualifier">
+      <sci-params-enter [paramsFormArray]="unregisterForm.get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+    </sci-form-field>
+    <sci-form-field label="NilQualifier if empty">
+      <sci-checkbox [formControlName]="NILQUALIFIER_IF_EMPTY" class="e2e-nilqualifier-if-empty"></sci-checkbox>
+    </sci-form-field>
+    <sci-form-field label="Application">
+      <input [formControlName]="APP_SYMBOLIC_NAME" class="e2e-app-symbolic-name">
+    </sci-form-field>
+    <button type="submit" (click)="onUnregister()" [disabled]="unregisterForm.invalid" class="e2e-unregister">Unregister</button>
+  </form>
+
+  <output class="error e2e-unregister-error" *ngIf="unregisterError">
+    {{unregisterError}}
+  </output>
+  <output class="response e2e-unregister-response" *ngIf="unregisterResponse">
+    {{unregisterResponse}}
+  </output>
+</section>
+
+<sci-list class="providers">
+  <ng-container *ngFor="let provider of providers$ | async">
+    <ng-template sciListItem>
+      <section class="provider">
+        <sci-qualifier-chip-list [qualifier]="provider.qualifier" [type]="provider.type"></sci-qualifier-chip-list>
+        <span class="app">{{provider.metadata.appSymbolicName}}</span>
+        <span class="id">{{provider.metadata.id}}</span>
+        <span class="visibility">{{provider.private ? 'PRIVATE' : 'PUBLIC'}}</span>
+      </section>
+    </ng-template>
+  </ng-container>
+</sci-list>

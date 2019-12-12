@@ -14,7 +14,7 @@ import { ConnectableObservable, Observable, Subject, throwError } from 'rxjs';
 import { IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
 import { MessageClient, takeUntilUnsubscribe } from './message-client';
 import { Logger } from '../logger';
-import { ManifestRegistry } from '../host/manifest.registry';
+import { ManifestRegistry } from '../host/manifest-registry/manifest-registry';
 import { ApplicationConfig } from '../host/platform-config';
 import { PLATFORM_SYMBOLIC_NAME } from '../host/platform.constants';
 import { collectToPromise, expectMap, expectToBeRejectedWithError, serveManifest, waitFor, waitForCondition } from '../spec.util.spec';
@@ -212,6 +212,37 @@ describe('Messaging', () => {
     await expectAsync(actual).toBeResolvedTo(['PING']);
   });
 
+  it('should reject a \'request-response\' intent if no replier is found', async () => {
+    const manifestUrl = serveManifest({name: 'Host Application', intentions: [{type: 'some-type'}]});
+    const clientManifestUrl = serveManifest({name: 'Client Application', capabilities: [{type: 'some-type', private: false}]});
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}, {symbolicName: 'client-app', manifestUrl: clientManifestUrl}];
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app'});
+
+    Beans.get(MessageClient).handleIntent$<string>().subscribe(intent => {
+      const replyTo = intent.headers.get(MessageHeaders.ReplyTo);
+      Beans.get(MessageClient).publish$(replyTo, intent.body.toUpperCase()).subscribe();
+    });
+
+    const ping$ = Beans.get(MessageClient).requestByIntent$({type: 'some-type'}, 'ping');
+    const actual = collectToPromise(ping$, {take: 1, projectFn: bodyExtractFn});
+    await expectAsync(actual).toBeRejectedWith('[RequestReplyError] No replier found to reply to intent \'{type=some-type, qualifier=undefined}\'.');
+  });
+
+  it('should reject an intent if no application provides a satisfying capability', async () => {
+    const manifestUrl = serveManifest({name: 'Host Application', intentions: [{type: 'some-type'}]});
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app'});
+
+    Beans.get(MessageClient).handleIntent$<string>().subscribe(intent => {
+      const replyTo = intent.headers.get(MessageHeaders.ReplyTo);
+      Beans.get(MessageClient).publish$(replyTo, intent.body.toUpperCase()).subscribe();
+    });
+
+    const ping$ = Beans.get(MessageClient).requestByIntent$({type: 'some-type'}, 'ping');
+    const actual = collectToPromise(ping$, {take: 1, projectFn: bodyExtractFn});
+    await expectAsync(actual).toBeRejectedWith('[NullProviderError] No application found to provide a capability of the type \'some-type\' and qualifiers \'{}\'. Maybe, the capability is not public API or the providing application not available.');
+  });
+
   it('should reject a client connect attempt if the app is not registered', async () => {
     const loggerSpy = jasmine.createSpyObj(Logger.name, ['error', 'warn', 'info']);
     Beans.register(Logger, {useValue: loggerSpy});
@@ -270,7 +301,7 @@ describe('Messaging', () => {
       await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app', messaging: {brokerDiscoverTimeout: 250}});
 
       // Register a platform capability. Intents should not be received by the host-app message client.
-      Beans.get(ManifestRegistry).registerCapability(PLATFORM_SYMBOLIC_NAME, [{type: 'some-capability'}]);
+      Beans.get(ManifestRegistry).registerCapabilityProvider({type: 'some-capability'}, PLATFORM_SYMBOLIC_NAME);
       const intentsReceivedByPlatformMessageClient = collectToPromise(Beans.get(PlatformMessageClient).handleIntent$(), {take: 1, projectFn: bodyExtractFn});
       const intentsReceivedByHostMessageClient = collectToPromise(Beans.get(MessageClient).handleIntent$(), {take: 1, projectFn: bodyExtractFn});
 
@@ -291,7 +322,7 @@ describe('Messaging', () => {
       await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app', messaging: {brokerDiscoverTimeout: 250}});
 
       // Register a host-app capability. Intents should not be received by the platform message client.
-      Beans.get(ManifestRegistry).registerCapability('host-app', [{type: 'some-host-app-capability'}]);
+      Beans.get(ManifestRegistry).registerCapabilityProvider({type: 'some-host-app-capability'}, 'host-app');
       const intentsReceivedByPlatformMessageClient = collectToPromise(Beans.get(PlatformMessageClient).handleIntent$(), {take: 1, projectFn: bodyExtractFn});
       const intentsReceivedByHostMessageClient = collectToPromise(Beans.get(MessageClient).handleIntent$(), {take: 1, projectFn: bodyExtractFn});
 
@@ -834,7 +865,7 @@ function mountBadClientAndConnect(badClientConfig: { symbolicName: string }): { 
       messageId: null,
       message: {
         topic: 'ɵCLIENT_CONNECT',
-        headers: new Map().set('APP_SYMBOLIC_NAME', symbolicName),
+        headers: new Map().set('ɵAPP_SYMBOLIC_NAME', symbolicName),
       },
     };
     window.parent.postMessage(env, '*');

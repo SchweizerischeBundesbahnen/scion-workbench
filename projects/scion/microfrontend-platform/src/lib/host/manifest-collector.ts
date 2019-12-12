@@ -34,7 +34,7 @@ export class ManifestCollector implements Initializer {
       .then((platformConfig: PlatformConfig) => {
         Defined.orElseThrow(platformConfig, () => Error('[PlatformConfigError] No platform config provided.'));
         Defined.orElseThrow(platformConfig.apps, () => Error('[PlatformConfigError] Missing \'apps\' property in platform config. Did you forget to register applications?'));
-        Beans.get(PlatformMessageClient).publish$(PlatformTopics.PLATFORM_PROPERTIES, platformConfig.properties || {}, {retain: true}).subscribe();
+        Beans.get(PlatformMessageClient).publish$(PlatformTopics.PlatformProperties, platformConfig.properties || {}, {retain: true}).subscribe();
         return [Beans.get(HostPlatformAppProvider).appConfig, ...platformConfig.apps];
       })
       .then((appConfigs: ApplicationConfig[]): Promise<void> => {

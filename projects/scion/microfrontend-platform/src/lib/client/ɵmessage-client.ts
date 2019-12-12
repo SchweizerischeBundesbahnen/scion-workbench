@@ -14,13 +14,13 @@ import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTran
 import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from '../operators';
 import { catchError, filter, finalize, first, map, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
 import { Defined, UUID } from '@scion/toolkit/util';
-import { Intent, Qualifier } from '../platform.model';
-import { IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
+import { Intent, IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
 import { matchesIntentQualifier } from '../qualifier-tester';
 import { BrokerGateway } from './broker-gateway';
 import { Beans, PreDestroy } from '../bean-manager';
 import { HostPlatformState } from './host-platform-state';
 import { TopicMatcher } from '../topic-matcher.util';
+import { Qualifier } from '../platform.model';
 
 // tslint:disable:unified-signatures
 export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:disable-line:class-name

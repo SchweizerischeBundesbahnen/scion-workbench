@@ -1,0 +1,35 @@
+<form autocomplete="off" [formGroup]="form">
+  <sci-form-field label="ID">
+    <input [formControlName]="ID" class="e2e-id">
+  </sci-form-field>
+  <sci-form-field label="Type">
+    <input [formControlName]="TYPE" class="e2e-type">
+  </sci-form-field>
+  <sci-form-field label="Qualifier">
+    <sci-params-enter [paramsFormArray]="form.get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+  </sci-form-field>
+  <sci-form-field label="NilQualifier if empty">
+    <sci-checkbox [formControlName]="NILQUALIFIER_IF_EMPTY" class="e2e-nilqualifier-if-empty"></sci-checkbox>
+  </sci-form-field>
+  <sci-form-field label="Application">
+    <input [formControlName]="APP_SYMBOLIC_NAME" class="e2e-app-symbolic-name">
+  </sci-form-field>
+
+  <section class="buttons">
+    <button type="submit" *ngIf="!intentions$" (click)="onLookup()" [disabled]="form.invalid" class="e2e-lookup">Lookup</button>
+    <button type="submit" *ngIf="intentions$" (click)="onLookupCancel()" class="e2e-cancel-lookup">Cancel the lookup</button>
+    <button type="button" (click)="onReset()" [disabled]="form.pristine" class="e2e-reset">Reset</button>
+  </section>
+</form>
+
+<sci-list class="intentions e2e-intentions">
+  <ng-container *ngFor="let intention of intentions$ | async">
+    <ng-template sciListItem>
+      <section class="intention">
+        <sci-qualifier-chip-list [qualifier]="intention.qualifier" [type]="intention.type"></sci-qualifier-chip-list>
+        <span class="app">{{intention.metadata.appSymbolicName}}</span>
+        <span class="id e2e-id">{{intention.metadata.id}}</span>
+      </section>
+    </ng-template>
+  </ng-container>
+</sci-list>

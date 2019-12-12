@@ -25,7 +25,7 @@ export class PlatformPropertyService implements PreDestroy {
   private _whenPropertiesLoaded: Promise<void>;
 
   constructor() {
-    this._whenPropertiesLoaded = Beans.get(MessageClient).observe$(PlatformTopics.PLATFORM_PROPERTIES)
+    this._whenPropertiesLoaded = Beans.get(MessageClient).observe$(PlatformTopics.PlatformProperties)
       .pipe(
         mapToBody(),
         map(properties => Dictionaries.toMap(properties || {})),

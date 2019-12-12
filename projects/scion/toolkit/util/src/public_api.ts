@@ -19,4 +19,4 @@ export { Defined } from './defined.util';
 export { Arrays } from './arrays.util';
 export { Objects } from './objects.util';
 export { Dictionaries, Dictionary } from './dictionaries.util';
-export { Maps } from './maps.util';
+export { Maps, PredicateFn } from './maps.util';

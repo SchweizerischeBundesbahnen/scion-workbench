@@ -20,8 +20,8 @@ import { SciViewportModule } from '@scion/toolkit/viewport';
 import { SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciListModule, SciParamsEnterModule, SciPropertyModule, SciQualifierChipListModule } from '@scion/ɵtoolkit/widgets';
 import { ReceiveMessageComponent } from './messaging/receive-message/receive-message.component';
 import { MessageListItemComponent } from './messaging/message-list-item/message-list-item.component';
-import { ManageCapabilitiesComponent } from './manifest/manage-capabilities/manage-capabilities.component';
-import { ManageIntentsComponent } from './manifest/manage-intents/manage-intents.component';
+import { RegisterCapabilityProvidersComponent } from './manifest/register-capability-providers/register-capability-providers.component';
+import { RegisterIntentionsComponent } from './manifest/register-intentions/register-intentions.component';
 import { TopicSubscriberCountPipe } from './messaging/topic-subscriber-count.pipe';
 import { Title } from '@angular/platform-browser';
 import { RouterOutletContextComponent } from './router-outlet-context/router-outlet-context.component';
@@ -37,6 +37,8 @@ import { ConsolePanelComponent } from './console/console-panel.component';
 import { RouterOutletSettingsComponent } from './router-outlet-settings/router-outlet-settings.component';
 import { PreferredSizeComponent } from './preferred-size/preferred-size.component';
 import { PlatformPropertiesComponent } from './platform-properties/platform-properties.component';
+import { LookupCapabilityProvidersComponent } from './manifest/lookup-capability-providers/lookup-capability-providers.component';
+import { LookupIntentionsComponent } from './manifest/lookup-intentions/lookup-intentions.component';
 
 @NgModule({
   imports: [
@@ -71,8 +73,10 @@ import { PlatformPropertiesComponent } from './platform-properties/platform-prop
     PublishMessageComponent,
     ReceiveMessageComponent,
     MessageListItemComponent,
-    ManageCapabilitiesComponent,
-    ManageIntentsComponent,
+    RegisterCapabilityProvidersComponent,
+    RegisterIntentionsComponent,
+    LookupCapabilityProvidersComponent,
+    LookupIntentionsComponent,
     TopicSubscriberCountPipe,
     MicrofrontendComponent,
     ScrollableMicrofrontendComponent,

@@ -13,8 +13,8 @@ import { TestingAppModule } from './testing-app.module';
 import { TestingAppComponent } from './testing-app.component';
 import { BrowserOutletsComponent } from './browser-outlets/browser-outlets.component';
 import { ReceiveMessageComponent } from './messaging/receive-message/receive-message.component';
-import { ManageCapabilitiesComponent } from './manifest/manage-capabilities/manage-capabilities.component';
-import { ManageIntentsComponent } from './manifest/manage-intents/manage-intents.component';
+import { RegisterCapabilityProvidersComponent } from './manifest/register-capability-providers/register-capability-providers.component';
+import { RegisterIntentionsComponent } from './manifest/register-intentions/register-intentions.component';
 import { TestingAppPlatformInitializerResolver } from './testing-app-platform-initializer.resolver';
 import { ContextComponent } from './context/context.component';
 import { OutletRouterComponent } from './outlet-router/outlet-router.component';
@@ -24,6 +24,8 @@ import { MicrofrontendComponent } from './microfrontend/microfrontend.component'
 import { ScrollableMicrofrontendComponent } from './scrollable-microfrontend/scrollable-microfrontend.component';
 import { PreferredSizeComponent } from './preferred-size/preferred-size.component';
 import { PlatformPropertiesComponent } from './platform-properties/platform-properties.component';
+import { LookupCapabilityProvidersComponent } from './manifest/lookup-capability-providers/lookup-capability-providers.component';
+import { LookupIntentionsComponent } from './manifest/lookup-intentions/lookup-intentions.component';
 
 const routes: Routes = [
   {
@@ -36,8 +38,10 @@ const routes: Routes = [
       {path: 'outlet-router', component: OutletRouterComponent, data: {pageTitle: 'Allowd controlling the web content to be displayed in a router outlet'}},
       {path: 'publish-message', component: PublishMessageComponent, data: {pageTitle: 'Allows publishing messages'}},
       {path: 'receive-message', component: ReceiveMessageComponent, data: {pageTitle: 'Allows receiving messages'}},
-      {path: 'manage-capabilities', component: ManageCapabilitiesComponent, data: {pageTitle: 'Allows managing capabilities'}},
-      {path: 'manage-intents', component: ManageIntentsComponent, data: {pageTitle: 'Allows managing intents'}},
+      {path: 'register-capability-providers', component: RegisterCapabilityProvidersComponent, data: {pageTitle: 'Allows managing capability providers'}},
+      {path: 'lookup-capability-providers', component: LookupCapabilityProvidersComponent, data: {pageTitle: 'Allows looking up capability providers'}},
+      {path: 'lookup-intentions', component: LookupIntentionsComponent, data: {pageTitle: 'Allows looking up intentions'}},
+      {path: 'register-intentions', component: RegisterIntentionsComponent, data: {pageTitle: 'Allows managing intentions'}},
       {path: 'context', component: ContextComponent, data: {pageTitle: 'Allows showing the context at this level in the context tree'}},
       {path: 'microfrontend-1', component: MicrofrontendComponent, data: {pageTitle: 'Displays the \'microfrontend-1\' page'}},
       {path: 'microfrontend-2', component: MicrofrontendComponent, data: {pageTitle: 'Displays the \'microfrontend-2\' page'}},

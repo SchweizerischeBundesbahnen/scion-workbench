@@ -27,7 +27,7 @@ export class HostPlatformAppProvider implements PreDestroy {
     const manifest: ApplicationManifest = {
       name: 'SCION Microfrontend Platform',
       capabilities: [],
-      intents: [],
+      intentions: [],
     };
 
     this.appConfig = {

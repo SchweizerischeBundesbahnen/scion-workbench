@@ -9,7 +9,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Qualifier } from '@scion/workbench-application.core';
 import { KeyValue } from '@angular/common';
 
 @Component({
@@ -38,4 +37,8 @@ export class SciQualifierChipListComponent implements OnChanges {
   public qualifierKeyCompareFn = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
     return this._qualifierKeys.indexOf(a.key) - this._qualifierKeys.indexOf(b.key);
   }
+}
+
+export interface Qualifier {
+  [key: string]: string | number | boolean;
 }

@@ -98,7 +98,11 @@ export enum PlatformTopics {
   /**
    * Allows reading the platform properties from this retained topic.
    */
-  PLATFORM_PROPERTIES = 'ɵPLATFORM_PROPERTIES',
+  PlatformProperties = 'ɵPLATFORM_PROPERTIES',
+  /**
+   * Allows reading the registered applications from this retained topic.
+   */
+  Applications = 'ɵAPPLICATIONS',
 }
 
 /**

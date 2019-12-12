@@ -67,29 +67,6 @@ describe('Arrays', () => {
     });
   });
 
-  describe('Arrays.last', () => {
-
-    it('should find the last item matching the predicate', () => {
-      const array = ['a', 'b', 'c', 'd', 'e'];
-      expect(Arrays.last(array, (item: string): boolean => item === 'c')).toEqual('c');
-    });
-
-    it('should return `undefined` if no element matches the predicate', () => {
-      const array = ['a', 'b', 'c', 'd', 'e'];
-      expect(Arrays.last(array, () => false)).toBeUndefined();
-    });
-
-    it('should return the last item in the array if no predicate is specified', () => {
-      const array = ['a', 'b', 'c', 'd', 'e'];
-      expect(Arrays.last(array)).toEqual('e');
-    });
-
-    it('should return `undefined` if the array is empty', () => {
-      expect(Arrays.last([])).toBeUndefined();
-      expect(Arrays.last([], () => true)).toBeUndefined();
-    });
-  });
-
   describe('Arrays.removeByItem', () => {
 
     it('should remove the specified element', () => {

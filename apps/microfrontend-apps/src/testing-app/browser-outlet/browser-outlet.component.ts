@@ -9,9 +9,8 @@
  */
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Injector, Input, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
-import { Application, Beans, MessageClient, OutletRouter, SciRouterOutletElement, TopicMessage } from '@scion/microfrontend-platform';
-import { Topics } from '../microfrontend-api';
+import { map } from 'rxjs/operators';
+import { Application, Beans, ManifestService, OutletRouter, SciRouterOutletElement } from '@scion/microfrontend-platform';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Overlay } from '@angular/cdk/overlay';
 import { RouterOutletContextComponent } from '../router-outlet-context/router-outlet-context.component';
@@ -103,13 +102,9 @@ export class BrowserOutletComponent {
   }
 
   private readAppEntryPoints(): Observable<AppEndpoint[]> {
-    return Beans.get(MessageClient).observe$(Topics.Applications)
-      .pipe(
-        take(1),
-        map((reply: TopicMessage<Application[]>) => {
+    return Beans.get(ManifestService).lookupApplications$()
+      .pipe(map((applications: Application[]) => {
           const endpoints: AppEndpoint[] = [];
-          const applications = reply.body;
-
           applications.forEach(application => {
             const origin = application.origin;
             const symbolicName = application.symbolicName;

@@ -10,8 +10,8 @@
 import { TestingAppOrigins, TestingAppPO } from '../testing-app.po';
 import { MessagingModel, PublishMessagePagePO } from './publish-message-page.po';
 import { ReceiveMessagePagePO } from './receive-message-page.po';
-import { ManageIntentsPagePO } from '../manifest/manage-intents-page.po';
-import { ManageCapabilitiesPagePO } from '../manifest/manage-capabilities-page.po';
+import { RegisterIntentionsPagePO } from '../manifest/register-intentions-page.po';
+import { RegisterCapabilityProvidersPagePO } from '../manifest/register-capability-providers-page.po';
 import { BrowserOutletPO } from '../browser-outlet/browser-outlet.po';
 import { expectToBeRejectedWithError } from '../spec.util';
 import { MessageListItemPO } from './message-list-item.po';
@@ -23,7 +23,7 @@ import { IntentMessage } from '@scion/microfrontend-platform';
 export namespace IntendBasedMessagingSpecs {
 
   /**
-   * Tests that an intent can only be issued if having declared a respective intent.
+   * Tests that an intent can only be issued if having declared a respective intention.
    */
   export async function publisherNotQualifiedSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
@@ -49,12 +49,12 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       publisher: PublishMessagePagePO,
-      intentManager: ManageIntentsPagePO,
+      intentionManager: RegisterIntentionsPagePO,
     });
 
-    // register the intent
-    const intentManagerPO = pagePOs.get<ManageIntentsPagePO>('intentManager');
-    await intentManagerPO.registerIntent('testing', {key: 'value'});
+    // register the intention
+    const intentionManagerPO = pagePOs.get<RegisterIntentionsPagePO>('intentionManager');
+    await intentionManagerPO.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // issue the intent
     const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher');
@@ -79,13 +79,13 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentManagerPO_4202.registerIntent('testing', {key: 'value'});
+    // register the intention
+    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManager_4202 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await capabilityManager_4202.registerCapability('testing', {key: 'value'}, {scope: 'private'});
+    const capabilityManager_4202 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await capabilityManager_4202.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: true});
 
     // receive the intent
     const receiverPO_4202 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
@@ -124,13 +124,13 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentManagerPO_4202.registerIntent('testing', {key: 'value'});
+    // register the intention
+    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerCapability('testing', {key: 'value'}, {scope: 'private'});
+    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
+    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: true});
 
     // receive the intent
     const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
@@ -166,13 +166,13 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentManagerPO_4202.registerIntent('testing', {key: 'value'});
+    // register the intention
+    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await capabilityManagerPO_4202.registerCapability('testing', {key: 'value'}, {scope: 'public'});
+    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await capabilityManagerPO_4202.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent
     const receiverPO = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
@@ -211,13 +211,13 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentManagerPO_4202.registerIntent('testing', {key: 'value'});
+    // register the intention
+    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerCapability('testing', {key: 'value'}, {scope: 'public'});
+    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
+    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent
     const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
@@ -258,17 +258,17 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4201 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4201});
-    await intentManagerPO_4201.registerIntent('testing', {key: 'value'});
+    // register the intention
+    const intentionManagerPO_4201 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4201});
+    await intentionManagerPO_4201.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability in app 4201
-    const capabilityManagerPO_4201 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4201});
-    await capabilityManagerPO_4201.registerCapability('testing', {key: 'value'}, {scope: 'public'});
+    const capabilityManagerPO_4201 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4201});
+    await capabilityManagerPO_4201.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // register the capability in app 4202
-    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await capabilityManagerPO_4202.registerCapability('testing', {key: 'value'}, {scope: 'public'});
+    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await capabilityManagerPO_4202.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent in app 4201
     const receiverPO_4201 = pagePOs.get<ReceiveMessagePagePO>('receiver_4201');
@@ -333,13 +333,13 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentManagerPO_4202.registerIntent('testing', {key: 'value'});
+    // register the intention
+    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerCapability('testing', {key: 'value'}, {scope: 'public'});
+    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
+    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent
     const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
@@ -391,13 +391,13 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentManagerPO_4202.registerIntent('testing', {key: 'value'});
+    // register the intention
+    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerCapability('testing', {key: 'value'}, {scope: 'public'});
+    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
+    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent
     const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
@@ -450,13 +450,13 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentManagerPO_4202.registerIntent('testing', {key1: 'value1', key2: '*'});
+    // register the intention
+    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key1: 'value1', key2: '*'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerCapability('testing', {key1: 'value1', key2: 'value2'}, {scope: 'public'});
+    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
+    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: 'value2'}, private: false});
 
     // receive the intent using qualifier: {key1: 'value1', key2: '*'}
     const receiverPO_4203_1 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_1');
@@ -510,18 +510,18 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intent
-    const intentManagerPO_4200 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4200});
-    await intentManagerPO_4200.registerIntent('testing', {'*': '*'});
+    // register the intention
+    const intentionManagerPO_4200 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4200});
+    await intentionManagerPO_4200.registerIntention({type: 'testing', qualifier: {'*': '*'}});
 
     // register the capability
     // app 4202: {key1: 'value1', key2: '*'}
     // app 4203: {key1: 'value1', key2: '?'}
-    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await capabilityManagerPO_4202.registerCapability('testing', {key1: 'value1', key2: '*'}, {scope: 'public'});
+    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
+    await capabilityManagerPO_4202.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: '*'}, private: false});
 
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<ManageCapabilitiesPagePO>({useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerCapability('testing', {key1: 'value1', key2: '?'}, {scope: 'public'});
+    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
+    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: '?'}, private: false});
 
     // receive the intent in 4202
     const receiverPO_4202 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
@@ -564,13 +564,13 @@ export namespace IntendBasedMessagingSpecs {
   export async function passHeadersSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      capabilityManager: {useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+      capabilityManager: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
       publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
       receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
     });
 
-    const capabilityManagerPO = await pagePOs.get<ManageCapabilitiesPagePO>('capabilityManager');
-    await capabilityManagerPO.registerCapability('testing', {q1: 'v1', q2: 'v2'});
+    const capabilityManagerPO = await pagePOs.get<RegisterCapabilityProvidersPagePO>('capabilityManager');
+    await capabilityManagerPO.registerProvider({type: 'testing', qualifier: {q1: 'v1', q2: 'v2'}, private: true});
 
     const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
     await receiverPO.selectMessagingModel(MessagingModel.Intent);

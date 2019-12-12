@@ -1,0 +1,60 @@
+<section class="register e2e-register">
+  <header>Register an intention</header>
+  <form autocomplete="off" [formGroup]="registerForm">
+    <sci-form-field label="Type *">
+      <input [formControlName]="TYPE" class="e2e-type">
+    </sci-form-field>
+    <sci-form-field label="Qualifier">
+      <sci-params-enter [paramsFormArray]="registerForm.get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+    </sci-form-field>
+    <button type="submit" (click)="onRegister()" [disabled]="registerForm.invalid" class="e2e-register">Register</button>
+  </form>
+
+  <output class="error e2e-register-error" *ngIf="registerError">
+    {{registerError}}
+  </output>
+  <output class="response e2e-register-response" *ngIf="registerResponse">
+    Intention ID: <span class="e2e-intention-id">{{registerResponse}}</span>
+  </output>
+</section>
+
+<section class="unregister e2e-unregister">
+  <header>Unregister intention(s)</header>
+  <form autocomplete="off" [formGroup]="unregisterForm">
+    <sci-form-field label="ID">
+      <input [formControlName]="ID" class="e2e-id">
+    </sci-form-field>
+    <sci-form-field label="Type">
+      <input [formControlName]="TYPE" class="e2e-type">
+    </sci-form-field>
+    <sci-form-field label="Qualifier">
+      <sci-params-enter [paramsFormArray]="unregisterForm.get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+    </sci-form-field>
+    <sci-form-field label="NilQualifier if empty">
+      <sci-checkbox [formControlName]="NILQUALIFIER_IF_EMPTY" class="e2e-nilqualifier-if-empty"></sci-checkbox>
+    </sci-form-field>
+    <sci-form-field label="Application">
+      <input [formControlName]="APP_SYMBOLIC_NAME" class="e2e-app-symbolic-name">
+    </sci-form-field>
+    <button type="submit" (click)="onUnregister()" [disabled]="unregisterForm.invalid" class="e2e-unregister">Unregister</button>
+  </form>
+
+  <output class="error e2e-unregister-error" *ngIf="unregisterError">
+    {{unregisterError}}
+  </output>
+  <output class="response e2e-unregister-response" *ngIf="unregisterResponse">
+    {{unregisterResponse}}
+  </output>
+</section>
+
+<sci-list class="intentions">
+  <ng-container *ngFor="let intention of intentions$ | async">
+    <ng-template sciListItem>
+      <section class="intention">
+        <sci-qualifier-chip-list [qualifier]="intention.qualifier" [type]="intention.type"></sci-qualifier-chip-list>
+        <span class="app">{{intention.metadata.appSymbolicName}}</span>
+        <span class="id">{{intention.metadata.id}}</span>
+      </section>
+    </ng-template>
+  </ng-container>
+</sci-list>

@@ -51,4 +51,12 @@ export interface ApplicationConfig {
    * By default, scope check is enabled.
    */
   scopeCheckDisabled?: boolean;
+  /**
+   * Sets whether or not the API to manage intentions is disabled for this application.
+   *
+   * With the API enabled (discouraged), the application can register and unregister intentions dynamically at runtime.
+   *
+   * By default, this API is disabled.
+   */
+  intentionRegisterApiDisabled?: boolean;
 }

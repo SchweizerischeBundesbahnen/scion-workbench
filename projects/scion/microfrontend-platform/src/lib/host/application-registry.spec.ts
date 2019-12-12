@@ -10,7 +10,10 @@
 import { ApplicationRegistry } from './application-registry';
 import { Beans } from '../bean-manager';
 import { MicrofrontendPlatform } from '../microfrontend-platform';
-import { ManifestRegistry } from './manifest.registry';
+import { ManifestRegistry } from './manifest-registry/manifest-registry';
+import { PlatformMessageClient } from './platform-message-client';
+import { NullMessageClient } from '../client/message-client';
+import { ɵManifestRegistry } from './manifest-registry/ɵmanifest-registry';
 
 describe('ApplicationRegistry', () => {
 
@@ -20,7 +23,8 @@ describe('ApplicationRegistry', () => {
     await MicrofrontendPlatform.destroy();
     await MicrofrontendPlatform.startPlatform(() => {
       Beans.register(ApplicationRegistry);
-      Beans.register(ManifestRegistry);
+      Beans.register(ManifestRegistry, {useClass: ɵManifestRegistry, eager: true});
+      Beans.register(PlatformMessageClient, {useClass: NullMessageClient});
     });
     registry = Beans.get(ApplicationRegistry);
   });
@@ -144,7 +148,7 @@ describe('ApplicationRegistry', () => {
       registry.registerApplication({symbolicName: app.symbolicName, manifestUrl: app.manifestUrl}, {
         name: app.symbolicName,
         capabilities: [],
-        intents: [],
+        intentions: [],
         baseUrl: app.baseUrl,
       });
     }
@@ -172,7 +176,7 @@ describe('ApplicationRegistry', () => {
       registry.registerApplication({symbolicName: app.symbolicName, manifestUrl: 'http://www.some-origin.com'}, {
         name: app.symbolicName,
         capabilities: [],
-        intents: [],
+        intentions: [],
       });
     }
   });

@@ -12,17 +12,17 @@ import { Maps } from '@scion/toolkit/util';
 
 describe('Maps', () => {
 
-  describe('Maps.addMultiValue', () => {
+  describe('Maps.addSetValue', () => {
 
     it('should allow adding values', () => {
-      const map = new Map();
-      expect(Maps.addMultiValue(map, 'keydown', 'a')).toBe(map);
-      expect(Maps.addMultiValue(map, 'keydown', 'b')).toBe(map);
-      expect(Maps.addMultiValue(map, 'keydown', 'c')).toBe(map);
-      expect(Maps.addMultiValue(map, 'keyup', 'x')).toBe(map);
-      expect(Maps.addMultiValue(map, 'keyup', 'y')).toBe(map);
-      expect(Maps.addMultiValue(map, 'keypress', 'k')).toBe(map);
-      expect(Maps.addMultiValue(map, 'keypress', 'l')).toBe(map);
+      const map = new Map<string, Set<string>>();
+      expect(Maps.addSetValue(map, 'keydown', 'a')).toBe(map);
+      expect(Maps.addSetValue(map, 'keydown', 'b')).toBe(map);
+      expect(Maps.addSetValue(map, 'keydown', 'c')).toBe(map);
+      expect(Maps.addSetValue(map, 'keyup', 'x')).toBe(map);
+      expect(Maps.addSetValue(map, 'keyup', 'y')).toBe(map);
+      expect(Maps.addSetValue(map, 'keypress', 'k')).toBe(map);
+      expect(Maps.addSetValue(map, 'keypress', 'l')).toBe(map);
 
       expect(map).toEqual(new Map()
         .set('keydown', new Set(['a', 'b', 'c']))
@@ -31,52 +31,146 @@ describe('Maps', () => {
     });
   });
 
-  describe('Maps.removeMultiValue', () => {
+  describe('Maps.removeSetValue', () => {
 
     it('should allow removing values', () => {
-      const map = new Map();
-      Maps.addMultiValue(map, 'keydown', 'a');
-      Maps.addMultiValue(map, 'keydown', 'b');
-      Maps.addMultiValue(map, 'keydown', 'c');
-      Maps.addMultiValue(map, 'keyup', 'x');
-      Maps.addMultiValue(map, 'keyup', 'y');
-      Maps.addMultiValue(map, 'keypress', 'k');
-      Maps.addMultiValue(map, 'keypress', 'l');
+      const map = new Map<string, Set<string>>();
+      Maps.addSetValue(map, 'keydown', 'a');
+      Maps.addSetValue(map, 'keydown', 'b');
+      Maps.addSetValue(map, 'keydown', 'c');
+      Maps.addSetValue(map, 'keyup', 'x');
+      Maps.addSetValue(map, 'keyup', 'y');
+      Maps.addSetValue(map, 'keypress', 'k');
+      Maps.addSetValue(map, 'keypress', 'l');
 
       // Remove a value
-      expect(Maps.removeMultiValue(map, 'keyup', 'x')).toEqual(true);
+      expect(Maps.removeSetValue(map, 'keyup', 'x')).toEqual(true);
       expect(map).toEqual(new Map()
         .set('keydown', new Set(['a', 'b', 'c']))
         .set('keyup', new Set(['y']))
         .set('keypress', new Set(['k', 'l'])));
 
       // Remove a value
-      expect(Maps.removeMultiValue(map, 'keyup', 'y')).toEqual(true);
+      expect(Maps.removeSetValue(map, 'keyup', 'y')).toEqual(true);
       expect(map).toEqual(new Map()
         .set('keydown', new Set(['a', 'b', 'c']))
         .set('keypress', new Set(['k', 'l'])));
 
       // Remove a value not contained in the Map
-      expect(Maps.removeMultiValue(map, 'keyup', 'y')).toEqual(false);
-      expect(Maps.removeMultiValue(map, 'click', 'div')).toEqual(false);
+      expect(Maps.removeSetValue(map, 'keyup', 'y')).toEqual(false);
+      expect(Maps.removeSetValue(map, 'click', 'div')).toEqual(false);
+    });
+
+    it('should allow removing values by predicate', () => {
+      const map = new Map<string, Set<string>>();
+      Maps.addSetValue(map, 'keydown', 'a');
+      Maps.addSetValue(map, 'keydown', 'b');
+      Maps.addSetValue(map, 'keydown', 'c');
+      Maps.addSetValue(map, 'keyup', 'a');
+      Maps.addSetValue(map, 'keyup', 'y');
+      Maps.addSetValue(map, 'keypress', 'k');
+      Maps.addSetValue(map, 'keypress', 'y');
+
+      // Remove a value
+      expect(Maps.removeSetValue(map, 'keyup', (value: string): boolean => value === 'a')).toEqual(true);
+      expect(map).toEqual(new Map()
+        .set('keydown', new Set(['a', 'b', 'c']))
+        .set('keyup', new Set(['y']))
+        .set('keypress', new Set(['k', 'y'])));
+
+      // Remove a value
+      expect(Maps.removeSetValue(map, 'keyup', (value: string): boolean => value === 'y')).toEqual(true);
+      expect(map).toEqual(new Map()
+        .set('keydown', new Set(['a', 'b', 'c']))
+        .set('keypress', new Set(['k', 'y'])));
+
+      // Remove a value
+      expect(Maps.removeSetValue(map, 'keypress', (value: string): boolean => value === 'y' || value === 'k')).toEqual(true);
+      expect(map).toEqual(new Map().set('keydown', new Set(['a', 'b', 'c'])));
+
+      // Remove a value not contained in the Map
+      expect(Maps.removeSetValue(map, 'keyup', (): boolean => false)).toEqual(false);
     });
   });
 
-  describe('Maps.hasMultiValue', () => {
+  describe('Maps.addListValue', () => {
 
-    it('should allow testing if a value is contained in the map', () => {
-      const map = new Map();
-      Maps.addMultiValue(map, 'keydown', 'a');
-      Maps.addMultiValue(map, 'keydown', 'b');
-      Maps.addMultiValue(map, 'keydown', 'c');
-      Maps.addMultiValue(map, 'keyup', 'x');
-      Maps.addMultiValue(map, 'keyup', 'y');
-      Maps.addMultiValue(map, 'keypress', 'k');
-      Maps.addMultiValue(map, 'keypress', 'l');
+    it('should allow adding values', () => {
+      const map = new Map<string, string[]>();
+      expect(Maps.addListValue(map, 'keydown', 'a')).toBe(map);
+      expect(Maps.addListValue(map, 'keydown', 'b')).toBe(map);
+      expect(Maps.addListValue(map, 'keydown', 'c')).toBe(map);
+      expect(Maps.addListValue(map, 'keyup', 'x')).toBe(map);
+      expect(Maps.addListValue(map, 'keyup', 'y')).toBe(map);
+      expect(Maps.addListValue(map, 'keypress', 'k')).toBe(map);
+      expect(Maps.addListValue(map, 'keypress', 'l')).toBe(map);
 
-      expect(Maps.hasMultiValue(map, 'keyup', 'x')).toEqual(true);
-      expect(Maps.hasMultiValue(map, 'keyup', 'a')).toEqual(false);
-      expect(Maps.hasMultiValue(map, 'click', 'div')).toEqual(false);
+      expect(map).toEqual(new Map()
+        .set('keydown', ['a', 'b', 'c'])
+        .set('keyup', ['x', 'y'])
+        .set('keypress', ['k', 'l']));
+    });
+  });
+
+  describe('Maps.removeListValue', () => {
+
+    it('should allow removing values', () => {
+      const map = new Map<string, string[]>();
+      Maps.addListValue(map, 'keydown', 'a');
+      Maps.addListValue(map, 'keydown', 'b');
+      Maps.addListValue(map, 'keydown', 'c');
+      Maps.addListValue(map, 'keyup', 'x');
+      Maps.addListValue(map, 'keyup', 'y');
+      Maps.addListValue(map, 'keypress', 'k');
+      Maps.addListValue(map, 'keypress', 'l');
+
+      // Remove a value
+      expect(Maps.removeListValue(map, 'keyup', 'x')).toEqual(true);
+      expect(map).toEqual(new Map()
+        .set('keydown', ['a', 'b', 'c'])
+        .set('keyup', ['y'])
+        .set('keypress', ['k', 'l']));
+
+      // Remove a value
+      expect(Maps.removeListValue(map, 'keyup', 'y')).toEqual(true);
+      expect(map).toEqual(new Map()
+        .set('keydown', ['a', 'b', 'c'])
+        .set('keypress', ['k', 'l']));
+
+      // Remove a value not contained in the Map
+      expect(Maps.removeListValue(map, 'keyup', 'y')).toEqual(false);
+      expect(Maps.removeListValue(map, 'click', 'div')).toEqual(false);
+    });
+
+    it('should allow removing values by predicate', () => {
+      const map = new Map<string, string[]>();
+      Maps.addListValue(map, 'keydown', 'a');
+      Maps.addListValue(map, 'keydown', 'b');
+      Maps.addListValue(map, 'keydown', 'c');
+      Maps.addListValue(map, 'keyup', 'a');
+      Maps.addListValue(map, 'keyup', 'y');
+      Maps.addListValue(map, 'keypress', 'k');
+      Maps.addListValue(map, 'keypress', 'y');
+
+      // Remove a value
+      expect(Maps.removeListValue(map, 'keyup', (value: string): boolean => value === 'a')).toEqual(true);
+      expect(map).toEqual(new Map()
+        .set('keydown', ['a', 'b', 'c'])
+        .set('keyup', ['y'])
+        .set('keypress', ['k', 'y']));
+
+      // Remove a value
+      expect(Maps.removeListValue(map, 'keyup', (value: string): boolean => value === 'y')).toEqual(true);
+      expect(map).toEqual(new Map()
+        .set('keydown', ['a', 'b', 'c'])
+        .set('keypress', ['k', 'y']));
+
+      // Remove a value
+      expect(Maps.removeListValue(map, 'keypress', (value: string): boolean => value === 'y' || value === 'k')).toEqual(true);
+      expect(map).toEqual(new Map().set('keydown', ['a', 'b', 'c']));
+
+      // Remove a value not contained in the Map
+      expect(Maps.removeListValue(map, 'keyup', (): boolean => false)).toEqual(false);
     });
   });
 });

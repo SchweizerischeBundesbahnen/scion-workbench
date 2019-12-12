@@ -9,7 +9,6 @@
  */
 import { ActivatedRouteSnapshot, Params, Resolve, RouterStateSnapshot } from '@angular/router';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
-import { ManifestRequestHandler } from './manifest/manifest-request-handler';
 import { Injectable, NgZone } from '@angular/core';
 import { AngularZoneMessageClientDecorator } from './angular-zone-message-client.decorator';
 import { Beans, MessageClient, MicrofrontendPlatform, PlatformMessageClient, PlatformState, PlatformStates } from '@scion/microfrontend-platform';
@@ -44,19 +43,19 @@ export class TestingAppPlatformInitializerResolver implements Resolve<void> {
 
   private startHostPlatform(port: number, queryParams: Params): Promise<void> {
     Beans.get(PlatformState).whenState(PlatformStates.Starting).then(() => {
-      Beans.register(ManifestRequestHandler, {eager: true});
       Beans.register(NgZone, {useValue: this._zone});
       Beans.registerDecorator(MessageClient, {useClass: AngularZoneMessageClientDecorator});
       Beans.registerDecorator(PlatformMessageClient, {useClass: AngularZoneMessageClientDecorator});
     });
 
     const hostUrl = `${window.location.protocol}//${window.location.hostname}`;
+    const intentionRegisterApiDisabled = new Set((queryParams['intentionRegisterApiDisabled'] || '').split(','));
     return MicrofrontendPlatform.forHost({
       apps: [
-        {manifestUrl: `${hostUrl}:4200/testing-app/assets/app-4200-manifest.json`, symbolicName: 'app-4200'},
-        {manifestUrl: `${hostUrl}:4201/testing-app/assets/app-4201-manifest.json`, symbolicName: 'app-4201'},
-        {manifestUrl: `${hostUrl}:4202/testing-app/assets/app-4202-manifest.json`, symbolicName: 'app-4202'},
-        {manifestUrl: `${hostUrl}:4203/testing-app/assets/app-4203-manifest.json`, symbolicName: 'app-4203'},
+        {manifestUrl: `${hostUrl}:4200/testing-app/assets/app-4200-manifest.json`, symbolicName: 'app-4200', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4200')},
+        {manifestUrl: `${hostUrl}:4201/testing-app/assets/app-4201-manifest.json`, symbolicName: 'app-4201', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4201')},
+        {manifestUrl: `${hostUrl}:4202/testing-app/assets/app-4202-manifest.json`, symbolicName: 'app-4202', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4202')},
+        {manifestUrl: `${hostUrl}:4203/testing-app/assets/app-4203-manifest.json`, symbolicName: 'app-4203', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4203')},
       ],
       properties: queryParams,
     }, {symbolicName: `app-${port}`});

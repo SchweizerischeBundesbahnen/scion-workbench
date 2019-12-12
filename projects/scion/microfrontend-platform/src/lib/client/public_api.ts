@@ -19,3 +19,4 @@ export { OutletRouter, NavigationOptions } from './router-outlet/outlet-router';
 export { ContextService } from './context/context-service';
 export { FocusMonitor } from './focus/focus-monitor';
 export { PreferredSizeService } from './preferred-size/preferred-size-service';
+export { ManifestService } from './manifest-service';

@@ -45,7 +45,7 @@ export class KeyboardEventDispatcher implements PreDestroy {
           .map(keystrokeContextName => keystrokeContextName.substring(KEYSTROKE_CONTEXT_NAME_PREFIX.length))
           .reduce((keystrokes, keystroke) => { // group keystrokes by event type (keydown, keyup)
             const {eventType, parts} = Keystroke.fromString(keystroke);
-            return Maps.addMultiValue(keystrokes, eventType, parts);
+            return Maps.addSetValue(keystrokes, eventType, parts);
           }, new Map<string, Set<string>>())
           .forEach((keystrokes, eventType) => {
             this.installKeyboardEventDispatcher(eventType, keystrokes);

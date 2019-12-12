@@ -1,0 +1,36 @@
+<form autocomplete="off" [formGroup]="form">
+  <sci-form-field label="ID">
+    <input [formControlName]="ID" class="e2e-id">
+  </sci-form-field>
+  <sci-form-field label="Type">
+    <input [formControlName]="TYPE" class="e2e-type">
+  </sci-form-field>
+  <sci-form-field label="Qualifier">
+    <sci-params-enter [paramsFormArray]="form.get(QUALIFIER)" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+  </sci-form-field>
+  <sci-form-field label="NilQualifier if empty">
+    <sci-checkbox [formControlName]="NILQUALIFIER_IF_EMPTY" class="e2e-nilqualifier-if-empty"></sci-checkbox>
+  </sci-form-field>
+  <sci-form-field label="Application">
+    <input [formControlName]="APP_SYMBOLIC_NAME" class="e2e-app-symbolic-name">
+  </sci-form-field>
+
+  <section class="buttons">
+    <button type="submit" *ngIf="!providers$" (click)="onLookup()" [disabled]="form.invalid" class="e2e-lookup">Lookup</button>
+    <button type="submit" *ngIf="providers$" (click)="onLookupCancel()" class="e2e-cancel-lookup">Cancel the lookup</button>
+    <button type="button" (click)="onReset()" [disabled]="form.pristine" class="e2e-reset">Reset</button>
+  </section>
+</form>
+
+<sci-list class="providers e2e-providers">
+  <ng-container *ngFor="let provider of providers$ | async">
+    <ng-template sciListItem>
+      <section class="provider">
+        <sci-qualifier-chip-list [qualifier]="provider.qualifier" [type]="provider.type"></sci-qualifier-chip-list>
+        <span class="app">{{provider.metadata.appSymbolicName}}</span>
+        <span class="id e2e-id">{{provider.metadata.id}}</span>
+        <span class="visibility">{{provider.private ? 'PRIVATE' : 'PUBLIC'}}</span>
+      </section>
+    </ng-template>
+  </ng-container>
+</sci-list>

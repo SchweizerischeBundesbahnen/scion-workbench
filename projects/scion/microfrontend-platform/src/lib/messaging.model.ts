@@ -33,6 +33,27 @@ export interface IntentMessage<BODY = any> extends Message {
 }
 
 /**
+ * An intent is the message that is passed to interact with functionality available in the system. An application must
+ * declare all its intents in the application manifest in the form of intentions. Otherwise, intents are rejected when
+ * issued. The enforced declaration allows to analyze which components depend on which functionality in the system.
+ *
+ * An intention or intent is formulated in an abstract way and consists of a type and an optional qualifier. When a
+ * component intends to use some functionality, it issues a respective intent.
+ */
+export interface Intent {
+  /**
+   * Type of functionality to intend.
+   */
+  type: string;
+  /**
+   * The qualifier is an abstract description of the intent and is expressed in the form of a dictionary.
+   *
+   * When issuing an intent, the qualifier must be exact, i.e. not contain wildcards.
+   */
+  qualifier?: Qualifier;
+}
+
+/**
  * Represents a message published to a topic.
  *
  * The message is transported to all consumers subscribed to the topic.
@@ -70,32 +91,32 @@ export enum MessageHeaders {
    * Identifies the sending client instance of a message.
    * This header is set by the platform when publishing a message or intent.
    */
-  ClientId = 'CLIENT_ID',
+  ClientId = 'ɵCLIENT_ID',
   /**
    * Identifies the sending application of a message.
    * This header is set by the platform when publishing a message or intent.
    */
-  AppSymbolicName = 'APP_SYMBOLIC_NAME',
+  AppSymbolicName = 'ɵAPP_SYMBOLIC_NAME',
   /**
    * Destination to which to send a response to this message.
    * This header is set by the platform when sending a request.
    */
-  ReplyTo = 'REPLY_TO',
+  ReplyTo = 'ɵREPLY_TO',
   /**
    * The time the message was sent.
    * This header is set by the platform when publishing a message or intent.
    */
-  Timestamp = 'TIMESTAMP',
+  Timestamp = 'ɵTIMESTAMP',
   /**
    * Use this header to set the request method to indicate the desired action to be performed for a given resource.
    * @see RequestMethods
    */
-  Method = 'METHOD',
+  Method = 'ɵMETHOD',
   /**
    * Use this header to set the response status code to indicate whether a request has been successfully completed.
    * @see ResponseStatusCodes
    */
-  Status = 'STATUS',
+  Status = 'ɵSTATUS',
   /**
    * Unique identity of a topic subscriber.
    *

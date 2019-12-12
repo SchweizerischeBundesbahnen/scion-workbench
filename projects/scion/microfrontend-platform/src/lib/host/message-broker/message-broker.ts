@@ -11,10 +11,9 @@ import { EMPTY, fromEvent, MonoTypeOperatorFunction, Observable, of, OperatorFun
 import { catchError, filter, mergeMap, share, takeUntil } from 'rxjs/operators';
 import { IntentMessage, Message, MessageHeaders, TopicMessage } from '../../messaging.model';
 import { ConnackMessage, MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../../ɵmessaging.model';
-import { matchesCapabilityQualifier } from '../../qualifier-tester';
 import { Beans, PreDestroy } from '../../bean-manager';
 import { ApplicationRegistry } from '../application-registry';
-import { ManifestRegistry } from '../manifest.registry';
+import { ManifestRegistry } from '../manifest-registry/manifest-registry';
 import { UUID } from '@scion/toolkit/util';
 import { PlatformState, PlatformStates } from '../../platform-state';
 import { Logger } from '../../logger';
@@ -314,28 +313,29 @@ export class MessageBroker implements PreDestroy {
           return;
         }
 
-        if (!this._manifestRegistry.hasIntent(senderClient.application.symbolicName, intent.type, intent.qualifier)) {
-          const error = {type: 'NotQualifiedError', details: `Application '${senderClient.application.symbolicName}' is not qualified to publish intents of the type '${intent.type}' and qualifier '${JSON.stringify(intent.qualifier || {})}'. Ensure to have listed the intent in the application manifest.`};
+        if (!this._manifestRegistry.hasIntention(intent, senderClient.application.symbolicName)) {
+          const error = {type: 'NotQualifiedError', details: `Application '${senderClient.application.symbolicName}' is not qualified to publish intents of the type '${intent.type}' and qualifier '${JSON.stringify(intent.qualifier || {})}'. Ensure to have listed the intention in the application manifest.`};
           sendDeliveryStatusError(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
           return;
         }
 
-        if (!this._manifestRegistry.isHandled(senderClient.application.symbolicName, intent.type, intent.qualifier)) {
+        // Find providers which provide a satisfying capability for the intent.
+        const capabilityProviders = this._manifestRegistry.getCapabilityProvidersByIntent(intent, senderClient.application.symbolicName);
+        if (!capabilityProviders.length) {
           const error = {type: 'NullProviderError', details: `No application found to provide a capability of the type '${intent.type}' and qualifiers '${JSON.stringify(intent.qualifier || {})}'. Maybe, the capability is not public API or the providing application not available.`};
           sendDeliveryStatusError(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
           return;
         }
 
-        // find clients fulfilling the intent.
-        const clients: Set<Client> = this._manifestRegistry.getCapabilitiesByType(intent.type)
-          .filter(capability => matchesCapabilityQualifier(capability.qualifier, intent.qualifier))
-          .filter(capability => this._manifestRegistry.isVisibleForApplication(capability, senderClient.application.symbolicName))
-          .map(capability => this._clientRegistry.getByApplication(capability.metadata.symbolicAppName))
+        // Resolve running provider instances.
+        const clients: Set<Client> = capabilityProviders
+          .map(capabilityProvider => this._clientRegistry.getByApplication(capabilityProvider.metadata.appSymbolicName))
           .reduce((combined, list) => new Set([...combined, ...list]), new Set<Client>());
 
+        // Dispatch the intent.
         clients.forEach(client => client.gatewayWindow.postMessage(envelope, client.application.origin));
 
-        // if request-reply communication, send an error if no replier is found to reply to the intent.
+        // If request-reply communication, send an error if no replier is found to reply to the intent.
         if (envelope.message.headers.has(MessageHeaders.ReplyTo) && clients.size === 0) {
           const error = {type: 'RequestReplyError', details: `No replier found to reply to intent '{type=${envelope.message.type}, qualifier=${JSON.stringify(envelope.message.qualifier)}}'.`};
           sendDeliveryStatusError(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);

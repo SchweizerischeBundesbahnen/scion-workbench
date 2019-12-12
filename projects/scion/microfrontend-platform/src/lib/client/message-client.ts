@@ -9,8 +9,7 @@
  */
 // tslint:disable:unified-signatures
 import { MonoTypeOperatorFunction, NEVER, Observable, of, OperatorFunction, throwError } from 'rxjs';
-import { Intent } from '../platform.model';
-import { IntentMessage, MessageHeaders, ResponseStatusCodes, TopicMessage } from '../messaging.model';
+import { Intent, IntentMessage, MessageHeaders, ResponseStatusCodes, TopicMessage } from '../messaging.model';
 import { first, map, mergeMap, takeUntil } from 'rxjs/operators';
 import { AbstractType, Beans, Type } from '../bean-manager';
 
@@ -226,7 +225,7 @@ export function mapToBody<T>(): OperatorFunction<TopicMessage<T> | IntentMessage
  */
 export function throwOnErrorStatus<BODY>(): MonoTypeOperatorFunction<TopicMessage<BODY>> {
   return mergeMap((message: TopicMessage<BODY>): Observable<TopicMessage<BODY>> => {
-    const status = message.headers.get(MessageHeaders.Status);
+    const status = message.headers.get(MessageHeaders.Status) || ResponseStatusCodes.ERROR;
     if (status === ResponseStatusCodes.OK) {
       return of(message);
     }

@@ -9,7 +9,6 @@
  */
 
 import { ElementFinder } from 'protractor';
-import { Qualifier } from '@scion/microfrontend-platform';
 
 /**
  * Page object for {@link SciQualifierChipListComponent}.
@@ -32,4 +31,8 @@ export class SciQualifierChipListPO {
       return {...qualifier, ...{[key]: value}};
     }, {});
   }
+}
+
+export interface Qualifier {
+  [key: string]: string | number | boolean;
 }

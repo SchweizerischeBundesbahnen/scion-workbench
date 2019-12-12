@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { MessageClient } from './client/message-client';
-import { ManifestRegistry } from './host/manifest.registry';
+import { ManifestRegistry } from './host/manifest-registry/manifest-registry';
 import { ApplicationRegistry } from './host/application-registry';
 import { BeanInstanceConstructInstructions, Beans, InstanceConstructInstructions, Type } from './bean-manager';
 import { ɵMessageClient } from './client/ɵmessage-client';
@@ -43,6 +43,8 @@ import { MouseMoveEventDispatcher } from './client/mouse-event/mouse-move-event-
 import { MouseUpEventDispatcher } from './client/mouse-event/mouse-up-event-dispatcher';
 import { HostPlatformAppProvider } from './host/host-platform-app-provider';
 import { KeyboardEventDispatcher } from './client/keyboard-event/keyboard-event-dispatcher';
+import { ManifestService } from './client/manifest-service';
+import { ɵManifestRegistry } from './host/manifest-registry/ɵmanifest-registry';
 
 /**
  * The central class of the SCION microfrontend platform.
@@ -99,6 +101,7 @@ export const MicrofrontendPlatform = new class {
         Beans.register(MouseUpEventDispatcher, {eager: true});
         Beans.register(PreferredSizeService);
         Beans.register(ContextService);
+        Beans.register(ManifestService);
         Beans.register(KeyboardEventDispatcher, {eager: true});
       },
     );
@@ -125,7 +128,7 @@ export const MicrofrontendPlatform = new class {
         Beans.register(PlatformPropertyService, {eager: true});
         Beans.registerIfAbsent(HttpClient);
         Beans.register(PlatformConfigLoader, createConfigLoaderBeanDescriptor(platformConfig));
-        Beans.register(ManifestRegistry, {eager: true, destroyPhase: PlatformStates.Stopped});
+        Beans.register(ManifestRegistry, {useClass: ɵManifestRegistry, eager: true, destroyPhase: PlatformStates.Stopped});
         Beans.register(ApplicationRegistry, {eager: true, destroyPhase: PlatformStates.Stopped});
         Beans.registerIfAbsent(PlatformMessageClient, provideMessageClient(PLATFORM_SYMBOLIC_NAME, clientConfig && clientConfig.messaging));
         Beans.register(HostPlatformState);
@@ -147,6 +150,7 @@ export const MicrofrontendPlatform = new class {
           Beans.registerIfAbsent(RouterOutletUrlAssigner);
           Beans.register(FocusMonitor);
           Beans.register(PreferredSizeService);
+          Beans.register(ManifestService);
           Beans.register(KeyboardEventDispatcher, {eager: true});
         }
         else {

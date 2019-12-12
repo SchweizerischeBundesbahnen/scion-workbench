@@ -69,6 +69,9 @@ export class TestingAppPO {
    * }
    * ```
    *
+   * ### Query params to instrument the 'Testing App':
+   * - intentionRegisterApiDisabled: Provide a comma-separated list of app symbolic names for which to disable the 'Intention Register API'.
+   *
    * @param outlets describes which microfrontends to load.
    * @param options controls the navigation
    * @return {@link OutletPageObjectMap} to get the page object for an outlet.
