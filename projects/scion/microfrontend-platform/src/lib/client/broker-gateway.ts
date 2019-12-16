@@ -156,6 +156,7 @@ export class BrokerGateway {
   private setSenderMessageHeaders(envelope: MessageEnvelope, clientId?: string): void {
     const headers = envelope.message.headers;
 
+    headers.set(MessageHeaders.Timestamp, Date.now());
     headers.set(MessageHeaders.AppSymbolicName, this._clientAppName);
     clientId && headers.set(MessageHeaders.ClientId, clientId);
   }

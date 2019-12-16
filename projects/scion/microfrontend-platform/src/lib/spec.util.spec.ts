@@ -9,6 +9,9 @@
  */
 
 import { ApplicationManifest } from './platform.model';
+import { Observable, throwError } from 'rxjs';
+import { reduce, take, timeoutWith } from 'rxjs/operators';
+import { Defined } from '@scion/toolkit/util';
 
 /**
  * Expects the given function to be rejected.
@@ -56,4 +59,25 @@ export async function expectToBeResolvedToMapContaining(actual: Promise<Map<any,
  */
 export function serveManifest(manifest: Partial<ApplicationManifest>): string {
   return URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
+}
+
+/**
+ * Returns a Promise that resolves after the given millis elapses.
+ */
+export function waitFor(millis: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, millis)); // tslint:disable-line:typedef
+}
+
+/**
+ * Subscribes to the given {@link Observable} and resolves to the emitted messages.
+ */
+export function collectToPromise<T, R = T>(observable$: Observable<T>, options: { take: number, timeout?: number, projectFn?: (msg: T) => R }): Promise<R[]> {
+  const timeout = Defined.orElse(options.timeout, 1000);
+  return observable$
+    .pipe(
+      take(options.take),
+      timeoutWith(new Date(Date.now() + timeout), throwError('[SpecTimeoutError] Timeout elapsed.')),
+      reduce((collected, item) => collected.concat(options.projectFn ? options.projectFn(item) : item), []),
+    )
+    .toPromise();
 }

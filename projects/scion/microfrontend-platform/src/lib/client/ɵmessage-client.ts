@@ -11,7 +11,7 @@
 import { mapToBody, MessageClient, MessageOptions, PublishOptions } from './message-client';
 import { EMPTY, from, merge, noop, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
 import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
-import { filterByChannel, filterByTopic, pluckMessage } from './operators';
+import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from './operators';
 import { catchError, filter, finalize, first, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
 import { Defined, UUID } from '@scion/toolkit/util';
 import { Intent, Qualifier } from '../platform.model';
@@ -20,6 +20,7 @@ import { matchesIntentQualifier } from '../qualifier-tester';
 import { BrokerGateway } from './broker-gateway';
 import { Beans, PreDestroy } from '../bean-manager';
 import { HostPlatformState } from './host-platform-state';
+import { TopicMatcher } from '../host/topic-matcher.util';
 
 // tslint:disable:unified-signatures
 export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:disable-line:class-name
@@ -32,12 +33,16 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
   }
 
   public publish$(topic: string, message?: any, options?: PublishOptions): Observable<never> {
+    assertTopic(topic, {allowWildcardSegments: false});
+
     const topicMessage: TopicMessage = {topic, retain: Defined.orElse(options && options.retain, false), headers: options && options.headers || new Map()};
     setBodyIfDefined(topicMessage, message);
     return this.postMessageToBroker$(MessagingChannel.Topic, topicMessage);
   }
 
   public request$<T>(topic: string, request?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
+    assertTopic(topic, {allowWildcardSegments: false});
+
     const topicMessage: TopicMessage = {topic, retain: false, headers: options && options.headers || new Map()};
     setBodyIfDefined(topicMessage, request);
     // Delay sending the request until the host platform started to not lose the request if handled by a replier in the host.
@@ -46,19 +51,22 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
   }
 
   public observe$<T>(topic: string): Observable<TopicMessage<T>> {
+    assertTopic(topic, {allowWildcardSegments: true});
     return this._observe$(topic);
   }
 
   public issueIntent$(intent: Intent, body?: any, options?: MessageOptions): Observable<never> {
+    assertIntentQualifier(intent.qualifier, {allowWildcards: false});
+
     const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: options && options.headers || new Map()};
-    assertNoWildcardCharacters(intentMessage.qualifier);
     setBodyIfDefined(intentMessage, body);
     return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
   }
 
   public requestByIntent$<T>(intent: Intent, body?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
+    assertIntentQualifier(intent.qualifier, {allowWildcards: false});
+
     const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: options && options.headers || new Map()};
-    assertNoWildcardCharacters(intentMessage.qualifier);
     setBodyIfDefined(intentMessage, body);
     // Delay sending the request until the host platform started to not lose the request if handled by a replier in the host.
     return from(Beans.get(HostPlatformState).whenStarted())
@@ -70,6 +78,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
   }
 
   public subscriberCount$(topic: string): Observable<number> {
+    assertTopic(topic, {allowWildcardSegments: false});
     return this.request$<number>(PlatformTopics.RequestSubscriberCount, topic).pipe(mapToBody());
   }
 
@@ -80,11 +89,14 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     return new Observable((observer: Observer<TopicMessage>): TeardownLogic => {
       const unsubscribe$ = new Subject<void>();
       const topicSubscribeError$ = new Subject<void>();
+      const subscriberId = UUID.randomUUID();
 
       // Receive messages sent to the given topic.
       merge(this._brokerGateway.message$, topicSubscribeError$)
         .pipe(
-          filterByTopic<T>(topic),
+          filterByChannel<TopicMessage>(MessagingChannel.Topic),
+          filterByHeader({key: MessageHeaders.ɵTopicSubscriberId, value: subscriberId}),
+          pluckMessage(),
           takeUntil(merge(this._destroy$, unsubscribe$)),
           finalize(() => {
             const command: TopicUnsubscribeCommand = {topic: topic, headers: new Map()};
@@ -96,7 +108,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
         .subscribe(observer);
 
       // Subscribe for the messages sent to the given topic.
-      const topicSubscribeMessage: TopicSubscribeCommand = {topic: topic, headers: new Map()};
+      const topicSubscribeMessage: TopicSubscribeCommand = {subscriberId: subscriberId, topic: topic, headers: new Map()};
       this.postMessageToBroker$(MessagingChannel.TopicSubscribe, topicSubscribeMessage)
         .pipe(takeUntil(merge(this._destroy$, unsubscribe$)))
         .subscribe(topicSubscribeError$);
@@ -188,9 +200,23 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
   }
 }
 
-function assertNoWildcardCharacters(qualifier: Qualifier): void {
-  if (qualifier && Object.entries(qualifier).some(([key, value]) => key === '*' || value === '*' || value === '?')) {
-    throw Error(`[IllegalQualifierError] Qualifier must not contain wildcards. [qualifier=${JSON.stringify(qualifier)}]`);
+function assertTopic(topic: string, options: { allowWildcardSegments: boolean }): void {
+  if (topic === undefined || topic === null || topic.length === 0) {
+    throw Error('[IllegalTopicError] Topic must not be `null`, `undefined` or empty');
+  }
+
+  if (!options.allowWildcardSegments && TopicMatcher.containsWildcardSegments(topic)) {
+    throw Error(`[IllegalTopicError] Topic not allowed to contain wildcard segments. [topic='${topic}']`);
+  }
+}
+
+function assertIntentQualifier(qualifier: Qualifier, options: { allowWildcards: boolean }): void {
+  if (!qualifier || Object.keys(qualifier).length === 0) {
+    return;
+  }
+
+  if (!options.allowWildcards && Object.entries(qualifier).some(([key, value]) => key === '*' || value === '*' || value === '?')) {
+    throw Error(`[IllegalQualifierError] Qualifier must not contain wildcards. [qualifier='${JSON.stringify(qualifier)}']`);
   }
 }
 

@@ -28,6 +28,13 @@ import { Beans } from '../bean-manager';
  * The intent is transported to all clients that provide a satisfying capability visible to
  * the sending application.
  *
+ * ### Wildcards
+ * A subscriber can subscribe to multiple topics simultaneously by using the colon syntax.
+ * If a topic segment begins with a colon (:), then the segment acts as a placeholder for any value.
+ * For example, subscribing to the topic 'person/:id' receives messages published to the topics 'person/5' and
+ * 'person/6'. Substituted segment values are available in the params map on the received message.
+ *
+ * ### Retained messages
  * Messages published to a topic can be marked as 'retained'. Retained messages help newly-subscribed
  * clients to immediately get the last message published to that topic. The broker stores one retained
  * message per topic. To delete a retained message, send a retained message without a body to the topic.
@@ -38,7 +45,9 @@ export abstract class MessageClient {
    * Publishes a message to the given topic. The message is transported to all consumers subscribed to the topic.
    *
    * @param  topic
-   *         Specifies the topic destination of the message.
+   *         Specifies the topic to which the message should be sent.
+   *         Topics are case-sensitive and consist of one or more segments each separated by a forward slash.
+   *         The topic is required and does not allow to use wildcards.
    * @param  message
    *         Specifies transfer data to be sent to the destination, if any.
    * @param  options
@@ -52,7 +61,9 @@ export abstract class MessageClient {
    * Sends a request to the given topic and receives one or more replies.
    *
    * @param  topic
-   *         Specifies the topic destination of the message.
+   *         Specifies the topic to which the requst should be sent.
+   *         Topics are case-sensitive and consist of one or more segments each separated by a forward slash.
+   *         The topic is required and does not allow to use wildcards.
    * @param  request
    *         Specifies transfer data to be sent to the destination, if any.
    * @param  options
@@ -67,6 +78,16 @@ export abstract class MessageClient {
    *
    * If the received message has the `replyTo` field set, the publisher expects the receiver to send one or more replies to that `replyTo` topic.
    * If replying with data from a stream, you can use {@link takeUntilUnsubscribe} operator to stop replying when the requestor unsubscribes.
+   *
+   *
+   * ### Example with a named parameter segment:
+   *
+   * ```
+   * Beans.get(MessageClient).observe$('person/:id').subscribe(message => {
+   *   const personId = message.params.get('id');
+   *   ...
+   * });
+   * ```
    *
    * ### Reply example:
    *
@@ -84,6 +105,11 @@ export abstract class MessageClient {
    *
    * @param  topic
    *         Specifies the topic which to observe.
+   *         Topics are case-sensitive and consist of one or more segments each separated by a forward slash.
+   *         You can subscribe to the exact topic of a published message, or use wildcards to subscribe to multiple
+   *         topics simultaneously. If a segment begins with a colon (:), then the segment acts as a placeholder for any
+   *         string value. When receiving a message, the actual placeholder values can then be read using the
+   *         {@link TopicMessage#params} property on the received message.
    * @return An Observable that emits messages sent to the given topic. It never completes.
    */
   abstract observe$<T>(topic: string): Observable<TopicMessage<T>>;
@@ -159,11 +185,11 @@ export abstract class MessageClient {
   abstract handleIntent$<T>(selector?: Intent): Observable<IntentMessage<T>>;
 
   /**
-   * Allows observing the subscriptions on a topic.
+   * Allows observing the number of subscriptions on a topic.
    *
    * @param  topic
-   *         Specifies the topic which to observe its subscribers.
-   * @return An Observable that, when subscribed, emits the current number of subscribers on this topic. It never completes and
+   *         Specifies the topic to observe. It is not allowed to use wildcards in the topic to observe.
+   * @return An Observable that, when subscribed, emits the current number of subscribers on it. It never completes and
    *         emits continuously when the number of subscribers changes.
    */
   abstract subscriberCount$(topic: string): Observable<number>;

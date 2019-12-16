@@ -98,6 +98,13 @@ export interface ConnackMessage {
 }
 
 export interface TopicSubscribeCommand extends Message {
+  /**
+   * Unique identifier to identify the subscriber.
+   */
+  subscriberId: string;
+  /**
+   * Topic to which to subscribe.
+   */
   topic: string;
 }
 

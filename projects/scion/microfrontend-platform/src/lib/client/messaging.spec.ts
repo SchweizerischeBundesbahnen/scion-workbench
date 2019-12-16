@@ -9,7 +9,7 @@
  */
 import { Beans } from '../bean-manager';
 import { PlatformMessageClient } from '../host/platform-message-client';
-import { first, publishReplay, reduce, take, timeoutWith } from 'rxjs/operators';
+import { first, publishReplay, timeoutWith } from 'rxjs/operators';
 import { ConnectableObservable, Observable, throwError } from 'rxjs';
 import { IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
 import { MessageClient } from './message-client';
@@ -17,7 +17,7 @@ import { Logger } from '../logger';
 import { ManifestRegistry } from '../host/manifest.registry';
 import { ApplicationConfig } from '../host/platform-config';
 import { PLATFORM_SYMBOLIC_NAME } from '../host/platform.constants';
-import { expectToBeRejectedWithError, expectToBeResolvedToMapContaining, serveManifest } from '../spec.util.spec';
+import { collectToPromise, expectToBeRejectedWithError, expectToBeResolvedToMapContaining, serveManifest, waitFor } from '../spec.util.spec';
 import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { Defined, Objects } from '@scion/toolkit/util';
 import Spy = jasmine.Spy;
@@ -61,6 +61,46 @@ describe('Messaging', () => {
     Beans.get(MessageClient).issueIntent$({type: 'some-capability'}, 'payload').subscribe();
 
     await expectAsync(actual).toBeResolvedTo(['payload']);
+  });
+
+  it('should dispatch a message to subscribers with a wildcard subscription', async () => {
+    await MicrofrontendPlatform.forHost([]);
+
+    const collectedMessages: TopicMessage[] = [];
+
+    // Subscribe to 'myhome/:room/temperature'
+    await Beans.get(PlatformMessageClient).observe$<string>('myhome/:room/temperature').subscribe(msg => collectedMessages.push(msg));
+
+    // Publish messages
+    await Beans.get(PlatformMessageClient).publish$('myhome/livingroom/temperature', '25°C').subscribe();
+    await Beans.get(PlatformMessageClient).publish$('myhome/livingroom/temperature', '26°C').subscribe();
+    await Beans.get(PlatformMessageClient).publish$('myhome/kitchen/temperature', '22°C').subscribe();
+    await Beans.get(PlatformMessageClient).publish$('myhome/kitchen/humidity', '15%').subscribe();
+
+    await waitFor(100);
+
+    expect(collectedMessages.length).toEqual(3);
+
+    expectMessage(collectedMessages[0]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map().set('room', 'livingroom'),
+      headers: new Map(),
+    });
+
+    expectMessage(collectedMessages[1]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '26°C',
+      params: new Map().set('room', 'livingroom'),
+      headers: new Map(),
+    });
+
+    expectMessage(collectedMessages[2]).toMatch({
+      topic: 'myhome/kitchen/temperature',
+      body: '22°C',
+      params: new Map().set('room', 'kitchen'),
+      headers: new Map(),
+    });
   });
 
   it('should allow passing headers when publishing a message', async () => {
@@ -417,6 +457,93 @@ describe('Messaging', () => {
     await expectAsync(receiver).toBeResolvedTo(['message 1', 'message 2']);
   });
 
+  it('should dispatch a retained message only to the newly subscribed subscriber', async () => {
+    const manifestUrl = serveManifest({name: 'Host Application'});
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app', messaging: {brokerDiscoverTimeout: 250}});
+
+    const collectedMessagesSub1: TopicMessage[] = [];
+    const collectedMessagesSub2: TopicMessage[] = [];
+    const collectedMessagesSub3: TopicMessage[] = [];
+    const collectedMessagesSub4: TopicMessage[] = [];
+    const collectedMessagesSub5: TopicMessage[] = [];
+    const collectedMessagesSub6: TopicMessage[] = [];
+
+    // Subscribe before publishing the retained message
+    await Beans.get(MessageClient).observe$<string>('myhome/livingroom/temperature').subscribe(msg => collectedMessagesSub1.push(msg));
+    await Beans.get(MessageClient).observe$<string>('myhome/:room/temperature').subscribe(msg => collectedMessagesSub2.push(msg));
+
+    // Publish the retained message
+    await Beans.get(PlatformMessageClient).publish$('myhome/livingroom/temperature', '25°C', {retain: true}).subscribe();
+
+    await waitFor(100);
+    expect(collectedMessagesSub1.length).toEqual(1);
+    expectMessage(collectedMessagesSub1[0]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map(),
+      headers: new Map(),
+    });
+
+    expect(collectedMessagesSub2.length).toEqual(1);
+    expectMessage(collectedMessagesSub2[0]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map().set('room', 'livingroom'),
+      headers: new Map(),
+    });
+
+    // Subscribe after publishing the retained message
+    await Beans.get(MessageClient).observe$<string>('myhome/livingroom/temperature').subscribe(msg => collectedMessagesSub3.push(msg));
+    await Beans.get(MessageClient).observe$<string>('myhome/:room/temperature').subscribe(msg => collectedMessagesSub4.push(msg));
+    await Beans.get(MessageClient).observe$<string>('myhome/:room/:measurement').subscribe(msg => collectedMessagesSub5.push(msg));
+    await Beans.get(MessageClient).observe$<string>('myhome/kitchen/:measurement').subscribe(msg => collectedMessagesSub6.push(msg));
+
+    await waitFor(100);
+
+    expect(collectedMessagesSub1.length).toEqual(1);
+    expectMessage(collectedMessagesSub1[0]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map(),
+      headers: new Map(),
+    });
+
+    expect(collectedMessagesSub2.length).toEqual(1);
+    expectMessage(collectedMessagesSub2[0]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map().set('room', 'livingroom'),
+      headers: new Map(),
+    });
+
+    expect(collectedMessagesSub3.length).toEqual(1);
+    expectMessage(collectedMessagesSub3[0]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map(),
+      headers: new Map(),
+    });
+
+    expect(collectedMessagesSub4.length).toEqual(1);
+    expectMessage(collectedMessagesSub4[0]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map().set('room', 'livingroom'),
+      headers: new Map(),
+    });
+
+    expect(collectedMessagesSub5.length).toEqual(1);
+    expectMessage(collectedMessagesSub5[0]).toMatch({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map().set('room', 'livingroom').set('measurement', 'temperature'),
+      headers: new Map(),
+    });
+
+    expect(collectedMessagesSub6.length).toEqual(0);
+  });
+
   it('should receive an intent once regardless of the number of subscribers in the same client', async () => {
     const manifestUrl = serveManifest({name: 'Host Application', capabilities: [{type: 'xyz'}]});
     const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
@@ -487,7 +614,7 @@ describe('Messaging', () => {
 
     Beans.get(MessageClient).publish$('some-topic', 'body', {retain: true, headers: new Map().set('custom-header', 'some-value')}).subscribe();
 
-    await sleep(500); // ensure the message to be delivered as retained message
+    await waitFor(500); // ensure the message to be delivered as retained message
 
     const actual$ = Beans.get(PlatformMessageClient).observe$<string>('some-topic');
     const message = await collectToPromise(actual$, {take: 1}).then(takeFirstElement);
@@ -496,20 +623,74 @@ describe('Messaging', () => {
     expect(message.headers.get(MessageHeaders.AppSymbolicName)).toEqual('host-app');
     expect(message.headers.get('custom-header')).toEqual('some-value');
   });
+
+  it('should throw if the topic of a message to publish is empty, `null` or `undefined`, or contains wildcard segments', async () => {
+    await MicrofrontendPlatform.forHost([]);
+    expect(() => Beans.get(PlatformMessageClient).publish$('myhome/:room/temperature')).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).publish$(null)).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).publish$(undefined)).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).publish$('')).toThrowError(/IllegalTopicError/);
+  });
+
+  it('should throw if the topic of a request is empty, `null` or `undefined`, or contains wildcard segments', async () => {
+    await MicrofrontendPlatform.forHost([]);
+    expect(() => Beans.get(PlatformMessageClient).request$('myhome/:room/temperature')).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).request$(null)).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).request$(undefined)).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).request$('')).toThrowError(/IllegalTopicError/);
+  });
+
+  it('should throw if the topic to observe the subscriber count is empty, `null` or `undefined`, or contains wildcard segments', async () => {
+    await MicrofrontendPlatform.forHost([]);
+    expect(() => Beans.get(PlatformMessageClient).subscriberCount$('myhome/:room/temperature')).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).subscriberCount$(null)).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).subscriberCount$(undefined)).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).subscriberCount$('')).toThrowError(/IllegalTopicError/);
+  });
+
+  it('should throw if the topic to observe is empty, `null` or `undefined`', async () => {
+    await MicrofrontendPlatform.forHost([]);
+    expect(() => Beans.get(PlatformMessageClient).observe$(null)).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).observe$(undefined)).toThrowError(/IllegalTopicError/);
+    expect(() => Beans.get(PlatformMessageClient).observe$('')).toThrowError(/IllegalTopicError/);
+  });
+
+  it('should throw if the qualifier of an intent contains wildcard characters', async () => {
+    await MicrofrontendPlatform.forHost([]);
+    expect(() => Beans.get(PlatformMessageClient).issueIntent$({type: 'type', qualifier: {entity: 'person', id: '*'}})).toThrowError(/IllegalQualifierError/);
+    expect(() => Beans.get(PlatformMessageClient).issueIntent$({type: 'type', qualifier: {entity: 'person', id: '?'}})).toThrowError(/IllegalQualifierError/);
+    expect(() => Beans.get(PlatformMessageClient).issueIntent$({type: 'type', qualifier: {entity: '*', id: '*'}})).toThrowError(/IllegalQualifierError/);
+  });
+
+  it('should throw if the qualifier of an intent request contains wildcard characters', async () => {
+    await MicrofrontendPlatform.forHost([]);
+    expect(() => Beans.get(PlatformMessageClient).requestByIntent$({type: 'type', qualifier: {entity: 'person', id: '*'}})).toThrowError(/IllegalQualifierError/);
+    expect(() => Beans.get(PlatformMessageClient).requestByIntent$({type: 'type', qualifier: {entity: 'person', id: '?'}})).toThrowError(/IllegalQualifierError/);
+    expect(() => Beans.get(PlatformMessageClient).requestByIntent$({type: 'type', qualifier: {entity: '*', id: '*'}})).toThrowError(/IllegalQualifierError/);
+  });
 });
 
 /**
- * Subscribes to the given {@link Observable} and resolves to the emitted messages.
+ * Expects the message to equal the expected message with its headers to contain at minimum the given map entries.
+ *
+ * Jasmine 3.5 provides 'mapContaining' matcher; when updated, this custom matcher can be removed.
  */
-function collectToPromise<T, R = T>(observable$: Observable<T>, options: { take: number, timeout?: number, projectFn?: (msg: T) => R }): Promise<R[]> {
-  const timeout = Defined.orElse(options.timeout, 1000);
-  return observable$
-    .pipe(
-      take(options.take),
-      timeoutWith(new Date(Date.now() + timeout), throwError('[SpecTimeoutError] Timeout elapsed.')),
-      reduce((acc, value) => acc.concat(options.projectFn ? options.projectFn(value) : value), []),
-    )
-    .toPromise();
+function expectMessage(actual: TopicMessage): { toMatch: (expected: TopicMessage) => void } {
+  return {
+    toMatch: (expected: TopicMessage): void => {
+      // Transform the 'headers' map to an array with tuples of map entries to allow using 'jasmine.objectContaining' matcher.
+      const actualWithHeaderMapAsArray = {
+        ...actual,
+        headers: [...actual.headers],
+        params: new Map(actual.params), // when posted with 'postMessage', then the Map is received as map-like object
+      };
+      const expectedWithMapsAsArray = {
+        ...expected,
+        headers: jasmine.arrayContaining([...expected.headers]),
+      };
+      expect(actualWithHeaderMapAsArray).toEqual(jasmine.objectContaining(expectedWithMapsAsArray) as any);
+    },
+  };
 }
 
 /**
@@ -554,8 +735,4 @@ async function waitUntilMessageReceived(observable$: Observable<TopicMessage<any
 
 function takeFirstElement<T>(array: T[]): T {
   return array[0];
-}
-
-function sleep(millis: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, millis)); // tslint:disable-line:typedef
 }

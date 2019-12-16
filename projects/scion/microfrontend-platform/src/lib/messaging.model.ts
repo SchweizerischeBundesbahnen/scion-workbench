@@ -43,15 +43,21 @@ export interface TopicMessage<BODY = any> extends Message {
    */
   topic: string;
   /**
+   * Optional JSON serializable data.
+   */
+  body?: BODY;
+  /**
    * Instructs the broker to store this message as retained message for the topic. With the retained flag set to `true`,
    * a client receives this message immediately upon subscription. The broker stores only one retained message per topic.
    * To delete the retained message, send a retained message without a body to the topic.
    */
   retain?: boolean;
   /**
-   * Optional JSON serializable data.
+   * Contains the resolved values of the wildcard segments as specified in the topic.
+   * For example: If subscribed to the topic 'person/:id' and a message is published to the topic 'person/5',
+   * the resolved id with the value '5' is contained in the params map.
    */
-  body?: BODY;
+  params?: Map<string, string>;
 }
 
 /**
@@ -63,15 +69,25 @@ export enum MessageHeaders {
   /**
    * Identifies the sending client instance of a message.
    */
-  ClientId = 'ɵClientId',
+  ClientId = 'CLIENT_ID',
   /**
    * Identifies the sending application of a message.
    */
-  AppSymbolicName = 'ɵAppSymbolicName',
+  AppSymbolicName = 'APP_SYMBOLIC_NAME',
   /**
    * Destination to which to send a response to this message.
    *
    * This header is set by the platform if the publisher expects the consumer to reply to the message.
    */
-  ReplyTo = 'ɵReplyTo',
+  ReplyTo = 'REPLY_TO',
+  /**
+   * The time the message was sent.
+   */
+  Timestamp = 'TIMESTAMP',
+  /**
+   * Unique identity of a topic subscriber.
+   *
+   * @internal
+   */
+  ɵTopicSubscriberId = 'ɵTOPIC_SUBSCRIBER_ID',
 }
