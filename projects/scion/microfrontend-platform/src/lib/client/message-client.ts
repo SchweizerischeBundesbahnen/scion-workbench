@@ -12,7 +12,7 @@ import { MonoTypeOperatorFunction, NEVER, Observable, OperatorFunction } from 'r
 import { Intent } from '../platform.model';
 import { IntentMessage, TopicMessage } from '../messaging.model';
 import { first, map, takeUntil } from 'rxjs/operators';
-import { Beans } from '../bean-manager';
+import { AbstractType, Beans, Type } from '../bean-manager';
 
 /**
  * The message client allows sending and receiving messages between applications across origins.
@@ -198,8 +198,8 @@ export abstract class MessageClient {
 /**
  * Emits the values emitted by the source Observable until all consumers unsubscribe from the given topic. Then, it completes.
  */
-export function takeUntilUnsubscribe<T>(topic: string): MonoTypeOperatorFunction<T> {
-  return takeUntil(Beans.get(MessageClient).subscriberCount$(topic).pipe(first(count => count === 0)));
+export function takeUntilUnsubscribe<T>(topic: string, /* @internal */ messageClientType?: Type<MessageClient> | AbstractType<MessageClient>): MonoTypeOperatorFunction<T> {
+  return takeUntil(Beans.get(messageClientType || MessageClient).subscriberCount$(topic).pipe(first(count => count === 0)));
 }
 
 /**

@@ -10,9 +10,9 @@
 import { Beans } from '../bean-manager';
 import { PlatformMessageClient } from '../host/platform-message-client';
 import { first, publishReplay, timeoutWith } from 'rxjs/operators';
-import { ConnectableObservable, Observable, throwError } from 'rxjs';
+import { ConnectableObservable, Observable, Subject, throwError } from 'rxjs';
 import { IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
-import { MessageClient } from './message-client';
+import { MessageClient, takeUntilUnsubscribe } from './message-client';
 import { Logger } from '../logger';
 import { ManifestRegistry } from '../host/manifest.registry';
 import { ApplicationConfig } from '../host/platform-config';
@@ -667,6 +667,39 @@ describe('Messaging', () => {
     expect(() => Beans.get(PlatformMessageClient).requestByIntent$({type: 'type', qualifier: {entity: 'person', id: '*'}})).toThrowError(/IllegalQualifierError/);
     expect(() => Beans.get(PlatformMessageClient).requestByIntent$({type: 'type', qualifier: {entity: 'person', id: '?'}})).toThrowError(/IllegalQualifierError/);
     expect(() => Beans.get(PlatformMessageClient).requestByIntent$({type: 'type', qualifier: {entity: '*', id: '*'}})).toThrowError(/IllegalQualifierError/);
+  });
+
+  describe('takeUntilUnsubscribe operator', () => {
+
+    it('should complete the source observable when all subscribers unsubscribed', async () => {
+      await MicrofrontendPlatform.forHost([]);
+
+      const subscription = Beans.get(PlatformMessageClient).observe$('some-topic').subscribe();
+      const testee = new Subject<void>()
+        .pipe(
+          takeUntilUnsubscribe('some-topic', PlatformMessageClient),
+          timeoutWith(new Date(Date.now() + 500), throwError('[SpecTimeoutError] Timeout elapsed.')),
+        )
+        .toPromise();
+
+      // unsubscribe from the topic
+      subscription.unsubscribe();
+
+      await expectAsync(testee).toBeResolved();
+    });
+
+    it('should complete the source observable immediately when no subscriber is subscribed', async () => {
+      await MicrofrontendPlatform.forHost([]);
+
+      const testee = new Subject<void>()
+        .pipe(
+          takeUntilUnsubscribe('nobody-subscribed-to-this-topic', PlatformMessageClient),
+          timeoutWith(new Date(Date.now() + 500), throwError('[SpecTimeoutError] Timeout elapsed.')),
+        )
+        .toPromise();
+
+      await expectAsync(testee).toBeResolved();
+    });
   });
 });
 
