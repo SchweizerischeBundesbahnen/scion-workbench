@@ -73,6 +73,7 @@ export const Beans = new class {
       eager: Defined.orElse(instructions && (instructions.eager || !!instructions.useValue), false),
       multi: multi,
       destroyPhase: Defined.orElse(instructions && instructions.destroyPhase as any, PlatformStates.Stopping),
+      useExisting: instructions && instructions.useExisting,
     };
 
     if (multi) {
@@ -108,6 +109,8 @@ export const Beans = new class {
    *        Symbol under which to register the bean.
    * @param instructions
    *        Control bean construction; see {@link BeanInstanceConstructInstructions} for more detail.
+   *
+   * @internal
    */
   public registerIfAbsent<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: BeanInstanceConstructInstructions<T>): void {
     if (!symbol) {
@@ -262,7 +265,8 @@ function getOrConstructBeanInstance<T>(beanInfo: BeanInfo): T {
 }
 
 function destroyBean(beanInfo: BeanInfo): void {
-  if (beanInfo.instance && typeof (beanInfo.instance as PreDestroy).preDestroy === 'function') {
+  // Destroy the bean instance unless it is an alias for another bean, or if the bean does not implement 'preDestroy' lifecycle hook.
+  if (!beanInfo.useExisting && beanInfo.instance && typeof (beanInfo.instance as PreDestroy).preDestroy === 'function') {
     beanInfo.instance.preDestroy();
   }
 
@@ -282,6 +286,9 @@ function deriveConstructFunction<T>(symbol: Type<T | any> | AbstractType<T | any
   }
   else if (instructions && instructions.useFactory) {
     return (): T => instructions.useFactory();
+  }
+  else if (instructions && instructions.useExisting) {
+    return (): T => Beans.get(instructions.useExisting);
   }
   else {
     return (): T => new (symbol as Type<T>)();
@@ -309,6 +316,7 @@ export interface BeanInfo<T = any> {
   beanConstructFn: () => T;
   eager: boolean;
   multi: boolean;
+  useExisting: Type<any> | AbstractType<any>;
   destroyPhase?: PlatformStates | 'none';
 }
 
@@ -328,6 +336,10 @@ export interface InstanceConstructInstructions<T = any> {
    * Set if to construct the instance with a factory function.
    */
   useFactory?: () => T;
+  /**
+   * Set if to create an alias for another bean.
+   */
+  useExisting?: Type<any> | AbstractType<any>;
 }
 
 /**

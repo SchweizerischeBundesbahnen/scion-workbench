@@ -535,4 +535,49 @@ describe('BeanManager', () => {
     await expect(Beans.opt(Bean3)).toBeUndefined();
     await expect(Beans.opt(Bean4)).toBeDefined();
   });
+
+  it('should allow registering an alias for an existing bean [useExisting]', async () => {
+    abstract class Bean {
+    }
+
+    abstract class Alias {
+    }
+
+    Beans.register(Bean);
+    Beans.register(Alias, {useExisting: Bean});
+
+    const actualBean = Beans.get(Bean);
+    const alias = Beans.get(Alias);
+    expect(actualBean).toBe(alias);
+    expect(alias instanceof Bean).toBeTruthy();
+    expect(alias instanceof Alias).toBeFalsy();
+  });
+
+  it('should not destroy the referenced bean when its alias is destroyed [useExisting]', async () => {
+    let beanDestroyed = false;
+
+    abstract class Bean implements PreDestroy {
+      public preDestroy(): void {
+        beanDestroyed = true;
+      }
+    }
+
+    abstract class Alias {
+    }
+
+    // Register the bean and its alias
+    Beans.register(Bean);
+    Beans.register(Alias, {useExisting: Bean});
+
+    const actualBean = Beans.get(Bean);
+    const alias = Beans.get(Alias);
+    expect(actualBean).toBe(alias as any);
+
+    // Replace the alias bean. When replacing a regular bean, the bean instance would be destroyed.
+    Beans.register(Alias, {useValue: 'some-other-bean'});
+
+    expect(Beans.get(Bean)).toBe(actualBean);
+    expect(beanDestroyed).toBeFalsy();
+    expect(Beans.get(Alias)).toEqual('some-other-bean' as any);
+  });
 });
