@@ -116,7 +116,7 @@ export class ViewPartGridComponent implements OnInit, OnDestroy {
       const prevPathToRoot = part.getPath();
       const newPathToRoot = newPartRootPaths.get(part.partId);
 
-      if (!Arrays.equal(newPathToRoot, prevPathToRoot)) {
+      if (!Arrays.isEqual(newPathToRoot, prevPathToRoot)) {
         acc.push(this._viewPartRegistry.getElseThrow(part.partId).portal);
       }
       return acc;

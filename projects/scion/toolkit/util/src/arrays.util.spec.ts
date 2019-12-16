@@ -16,54 +16,54 @@ describe('Arrays', () => {
 
     it('should be equal for same array references', () => {
       const array = ['a', 'b', 'c'];
-      expect(Arrays.equal(array, array)).toBeTruthy();
+      expect(Arrays.isEqual(array, array)).toBeTruthy();
     });
 
     it('should be equal for same elements (same order)', () => {
       const array1 = ['a', 'b', 'c'];
       const array2 = ['a', 'b', 'c'];
-      expect(Arrays.equal(array1, array2)).toBeTruthy();
+      expect(Arrays.isEqual(array1, array2)).toBeTruthy();
     });
 
     it('should be equal for same elements (unordered)', () => {
       const array1 = ['a', 'b', 'c'];
       const array2 = ['a', 'c', 'b'];
-      expect(Arrays.equal(array1, array2, false)).toBeTruthy();
+      expect(Arrays.isEqual(array1, array2, {exactOrder: false})).toBeTruthy();
     });
 
     it('should not be equal for different elements (1)', () => {
       const array1 = ['a', 'b', 'c'];
       const array2 = ['a', 'b', 'c', 'e'];
-      expect(Arrays.equal(array1, array2)).toBeFalsy();
+      expect(Arrays.isEqual(array1, array2)).toBeFalsy();
     });
 
     it('should not be equal for different elements (2)', () => {
       const array1 = ['a', 'b', 'c'];
       const array2 = ['a', 'B', 'c'];
-      expect(Arrays.equal(array1, array2)).toBeFalsy();
+      expect(Arrays.isEqual(array1, array2)).toBeFalsy();
     });
 
     it('should not be equal if ordered differently', () => {
       const array1 = ['a', 'b', 'c'];
       const array2 = ['a', 'c', 'b'];
-      expect(Arrays.equal(array1, array2)).toBeFalsy();
+      expect(Arrays.isEqual(array1, array2)).toBeFalsy();
     });
 
     it('should be equal if ordered differently', () => {
       const array1 = ['a', 'b', 'c'];
       const array2 = ['a', 'c', 'b'];
-      expect(Arrays.equal(array1, array2, false)).toBeTruthy();
+      expect(Arrays.isEqual(array1, array2, {exactOrder: false})).toBeTruthy();
     });
 
     it('should compare \'null\' and \'undefined\' arrays', () => {
-      expect(Arrays.equal(null, ['a', 'b', 'c'])).toBeFalsy();
-      expect(Arrays.equal(undefined, ['a', 'b', 'c'])).toBeFalsy();
-      expect(Arrays.equal(['a', 'b', 'c'], null)).toBeFalsy();
-      expect(Arrays.equal(['a', 'b', 'c'], undefined)).toBeFalsy();
-      expect(Arrays.equal(null, null)).toBeTruthy();
-      expect(Arrays.equal(undefined, undefined)).toBeTruthy();
-      expect(Arrays.equal(null, undefined)).toBeFalsy();
-      expect(Arrays.equal(undefined, null)).toBeFalsy();
+      expect(Arrays.isEqual(null, ['a', 'b', 'c'])).toBeFalsy();
+      expect(Arrays.isEqual(undefined, ['a', 'b', 'c'])).toBeFalsy();
+      expect(Arrays.isEqual(['a', 'b', 'c'], null)).toBeFalsy();
+      expect(Arrays.isEqual(['a', 'b', 'c'], undefined)).toBeFalsy();
+      expect(Arrays.isEqual(null, null)).toBeTruthy();
+      expect(Arrays.isEqual(undefined, undefined)).toBeTruthy();
+      expect(Arrays.isEqual(null, undefined)).toBeFalsy();
+      expect(Arrays.isEqual(undefined, null)).toBeFalsy();
     });
   });
 
@@ -90,30 +90,64 @@ describe('Arrays', () => {
     });
   });
 
-  describe('Arrays.remove', () => {
+  describe('Arrays.removeByItem', () => {
 
     it('should remove the specified element', () => {
       const array = ['a', 'b', 'c', 'd', 'e'];
-      expect(Arrays.remove(array, 'c', {firstOnly: true})).toBeTruthy();
+      expect(Arrays.remove(array, 'c', {firstOnly: true})).toEqual(['c']);
       expect(array).toEqual(['a', 'b', 'd', 'e']);
     });
 
     it('should remove the first occurrence of the specified element', () => {
       const array = ['a', 'b', 'c', 'd', 'e', 'c', 'g'];
-      expect(Arrays.remove(array, 'c', {firstOnly: true})).toBeTruthy();
+      expect(Arrays.remove(array, 'c', {firstOnly: true})).toEqual(['c']);
       expect(array).toEqual(['a', 'b', 'd', 'e', 'c', 'g']);
     });
 
     it('should remove all occurrences of the specified element', () => {
       const array = ['a', 'b', 'c', 'd', 'e', 'c', 'g'];
-      expect(Arrays.remove(array, 'c', {firstOnly: false})).toBeTruthy();
+      expect(Arrays.remove(array, 'c', {firstOnly: false})).toEqual(['c', 'c']);
       expect(array).toEqual(['a', 'b', 'd', 'e', 'g']);
     });
 
-    it('should return false if element not contained', () => {
+    it('should return an empty array if the element is not contained', () => {
       const array = ['a', 'b', 'c'];
-      expect(Arrays.remove(array, 'C', {firstOnly: false})).toBeFalsy();
+      expect(Arrays.remove(array, 'C', {firstOnly: false})).toEqual([]);
       expect(array).toEqual(['a', 'b', 'c']);
+    });
+  });
+
+  describe('Arrays.removeByPredicate', () => {
+    const a1 = {key: 'a', value: '1'};
+    const b2 = {key: 'b', value: '2'};
+    const c3 = {key: 'c', value: '3'};
+    const d4 = {key: 'd', value: '4'};
+    const e5 = {key: 'e', value: '5'};
+    const c6 = {key: 'c', value: '6'};
+    const g7 = {key: 'g', value: '7'};
+
+    it('should remove the specified element', () => {
+      const array = [a1, b2, c3, d4, e5];
+      expect(Arrays.remove(array, item => item.key === 'c', {firstOnly: true})).toEqual([c3]);
+      expect(array).toEqual([a1, b2, d4, e5]);
+    });
+
+    it('should remove the first occurrence of the specified element', () => {
+      const array = [a1, b2, c3, d4, e5, c6, g7];
+      expect(Arrays.remove(array, item => item.key === 'c', {firstOnly: true})).toEqual([c3]);
+      expect(array).toEqual([a1, b2, d4, e5, c6, g7]);
+    });
+
+    it('should remove all occurrences of the specified element', () => {
+      const array = [a1, b2, c3, d4, e5, c6, g7];
+      expect(Arrays.remove(array, item => item.key === 'c', {firstOnly: false})).toEqual([c3, c6]);
+      expect(array).toEqual([a1, b2, d4, e5, g7]);
+    });
+
+    it('should return an empty array if the element is not contained', () => {
+      const array = [a1, b2, c3];
+      expect(Arrays.remove(array, item => item.key === 'C', {firstOnly: false})).toEqual([]);
+      expect(array).toEqual([a1, b2, c3]);
     });
   });
 

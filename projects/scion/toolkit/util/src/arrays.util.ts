@@ -9,6 +9,7 @@
  */
 
 import { QueryList } from '@angular/core'; // FIXME this module must not have an Angular dependency
+import { Defined } from './defined.util';
 
 /**
  * Provides array utility methods.
@@ -31,9 +32,9 @@ export class Arrays {
   /**
    * Compares items of given arrays for reference equality.
    *
-   * Use the parameter `exactOrder` to control if the item order must be equal.
+   * Use the parameter `exactOrder` to control if the item order must be equal (which is by default) or not.
    */
-  public static equal(array1: any[], array2: any[], exactOrder: boolean = true): boolean {
+  public static isEqual(array1: any[], array2: any[], options?: { exactOrder?: boolean }): boolean {
     if (array1 === array2) {
       return true;
     }
@@ -44,6 +45,7 @@ export class Arrays {
       return false;
     }
 
+    const exactOrder = Defined.orElse(options && options.exactOrder, true);
     return array1.every((item, index) => {
       if (exactOrder) {
         return item === array2[index];
@@ -70,25 +72,36 @@ export class Arrays {
   }
 
   /**
-   * Removes the specified element from an array.
+   * Removes the specified element from an array, or the elements which satisfy the provided predicate function.
+   * The original array will be changed.
    *
-   * @param array
-   *        the array
-   * @param element
-   *        the element to be removed
-   * @param options
-   *        Control if to remove all occurrences of the element.
-   * @return `true` if an element in the array has been removed; otherwise `false`.
+   * @param  array
+   *         The array from which elements should be removed.
+   * @param  element
+   *         The element to be removed, or a predicate function to resolve elements which to be removed.
+   * @param  options
+   *         Control if to remove all occurrences of the element.
+   * @return the elements removed from the array.
    */
-  public static remove(array: any[], element: any, options: { firstOnly: boolean }): boolean {
+  public static remove<T>(array: T[], element: any | ((element: T) => boolean), options: { firstOnly: boolean }): T[] {
+    // define a function to resolve the element's index in the original array
+    const indexOfElementFn = ((): () => number => {
+      if (typeof element === 'function') {
+        return (): number => array.findIndex(element);
+      }
+      else {
+        return (): number => array.indexOf(element);
+      }
+    })();
+
     const removedElements = [];
-    for (let index = array.indexOf(element); index !== -1; index = array.indexOf(element)) {
-      removedElements.push(array.splice(index, 1));
+    for (let i = indexOfElementFn(); i !== -1; i = indexOfElementFn()) {
+      removedElements.push(...array.splice(i, 1)); // changes the original array
       if (options.firstOnly) {
         break;
       }
     }
-    return removedElements.length > 0;
+    return removedElements;
   }
 
   /**
