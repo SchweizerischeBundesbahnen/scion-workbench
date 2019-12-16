@@ -7,8 +7,14 @@
   </sci-form-field>
   <ng-container *ngIf="isTopicMessaging(); then topic_template else intent_template"></ng-container>
 </form>
+
 <button (click)="onSubscribe()" *ngIf="!isSubscribed" [disabled]="form.invalid" class="e2e-subscribe">Subscribe</button>
 <button (click)="onUnsubscribe()" *ngIf="isSubscribed" class="e2e-unsubscribe">Unsubscribe</button>
+
+<output class="subscribe-error" *ngIf="subscribeError">
+  {{subscribeError}}
+</output>
+
 
 <ng-container *ngIf="isSubscribed">
   <sci-list class="messages e2e-messages">

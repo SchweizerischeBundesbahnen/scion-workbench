@@ -12,6 +12,10 @@
     <textarea rows="10" [formControlName]="MESSAGE" class="e2e-message"></textarea>
   </sci-form-field>
 
+  <sci-form-field label="Headers">
+    <sci-params-enter [paramsFormArray]="form.get(HEADERS)" [addable]="true" [removable]="true" class="e2e-headers"></sci-params-enter>
+  </sci-form-field>
+
   <sci-form-field label="Request-Reply">
     <sci-checkbox [formControlName]="REQUEST_REPLY" class="e2e-request-reply"></sci-checkbox>
   </sci-form-field>

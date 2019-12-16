@@ -1,0 +1,17 @@
+:host {
+  display: grid;
+  grid-template-columns: max-content 3fr;
+  grid-column-gap: 1em;
+  grid-row-gap: .5em;
+  grid-auto-rows: auto;
+
+  > span.key {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  > span.value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

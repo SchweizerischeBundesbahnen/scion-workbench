@@ -69,9 +69,9 @@ export class SciParamsEnterComponent {
   /**
    * Creates a dictionary from the form controls in the given `FormArray`.
    *
-   * By default, if the qualifier is empty, `null` is returned.
+   * By default, if empty, `null` is returned.
    */
-  public static toParams(formArray: FormArray, returnNullIfEmpty: boolean = true): { [key: string]: any | null } {
+  public static toParamsDictionary(formArray: FormArray, returnNullIfEmpty: boolean = true): { [key: string]: any | null } {
     const params: { [key: string]: any } = {};
     formArray.controls.forEach(formGroup => {
       const paramName = formGroup.get(PARAM_NAME).value;
@@ -83,5 +83,18 @@ export class SciParamsEnterComponent {
     }
 
     return params;
+  }
+
+  /**
+   * Creates a {@link Map} from the form controls in the given `FormArray`.
+   *
+   * By default, if empty, `null` is returned.
+   */
+  public static toParamsMap(formArray: FormArray, returnNullIfEmpty: boolean = true): Map<string, any> | null {
+    const params = SciParamsEnterComponent.toParamsDictionary(formArray, returnNullIfEmpty);
+    if (!params) {
+      return null;
+    }
+    return Object.entries(params).reduce((map: Map<string, any>, [key, value]: [string, any]) => map.set(key, value), new Map<string, any>());
   }
 }

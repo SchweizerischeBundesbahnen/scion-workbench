@@ -7,7 +7,7 @@ import { TestingAppComponent } from './testing-app.component';
 import { OutletsComponent } from './outlets/outlets.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SciViewportModule } from '@scion/toolkit/viewport';
-import { SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciListModule, SciParamsEnterModule, SciQualifierChipListModule } from '@scion/ɵtoolkit/widgets';
+import { SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciListModule, SciParamsEnterModule, SciPropertyModule, SciQualifierChipListModule } from '@scion/ɵtoolkit/widgets';
 import { ReceiveMessageComponent } from './messaging/receive-message/receive-message.component';
 import { MessageListItemComponent } from './messaging/message-list-item/message-list-item.component';
 import { ManageCapabilitiesComponent } from './manifest/manage-capabilities/manage-capabilities.component';
@@ -31,6 +31,7 @@ import { OutletComponent } from './outlet/outlet.component';
     SciFormFieldModule,
     SciParamsEnterModule,
     SciQualifierChipListModule,
+    SciPropertyModule,
   ],
   declarations: [
     TestingAppComponent,

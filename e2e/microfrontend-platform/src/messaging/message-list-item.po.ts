@@ -9,7 +9,7 @@
  */
 
 import { SwitchToIframeFn } from '../outlet.po';
-import { SciListItemPO } from '@scion/ɵtoolkit/widgets.po';
+import { SciListItemPO, SciPropertyPO } from '@scion/ɵtoolkit/widgets.po';
 import { ElementFinder } from 'protractor';
 import { Qualifier } from '@scion/microfrontend-platform';
 
@@ -24,6 +24,16 @@ export class MessageListItemPO {
   public async getTopic(): Promise<string> {
     await this._switchToIframeFn();
     return this._contentFinder.$('span.e2e-topic').getText();
+  }
+
+  public async getParams(): Promise<Map<string, string>> {
+    await this._switchToIframeFn();
+    return new SciPropertyPO(this._contentFinder.$('sci-property.e2e-params')).readAsMap();
+  }
+
+  public async getHeaders(): Promise<Map<string, string>> {
+    await this._switchToIframeFn();
+    return new SciPropertyPO(this._contentFinder.$('sci-property.e2e-headers')).readAsMap();
   }
 
   public async getBody(): Promise<string> {
@@ -45,8 +55,7 @@ export class MessageListItemPO {
 
   public async getIntentQualifier(): Promise<Qualifier> {
     await this._switchToIframeFn();
-    const qualifier = await this._contentFinder.$('span.e2e-intent-qualifier').getText();
-    return JSON.parse(qualifier);
+    return new SciPropertyPO(this._contentFinder.$('sci-property.e2e-intent-qualifier')).readAsDictionary();
   }
 
   public async clickReply(): Promise<void> {

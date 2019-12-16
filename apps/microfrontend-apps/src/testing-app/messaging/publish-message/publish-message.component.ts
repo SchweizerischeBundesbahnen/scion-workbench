@@ -11,6 +11,7 @@ export const TOPIC = 'topic';
 export const TYPE = 'type';
 export const QUALIFIER = 'qualifier';
 export const MESSAGE = 'message';
+export const HEADERS = 'headers';
 export const REQUEST_REPLY = 'request-reply';
 export const RETAIN = 'retain';
 
@@ -31,6 +32,7 @@ export class PublishMessageComponent implements OnDestroy {
   public TYPE = TYPE;
   public QUALIFIER = QUALIFIER;
   public MESSAGE = MESSAGE;
+  public HEADERS = HEADERS;
   public REQUEST_REPLY = REQUEST_REPLY;
   public RETAIN = RETAIN;
 
@@ -50,6 +52,7 @@ export class PublishMessageComponent implements OnDestroy {
       [MESSAGING_MODEL]: new FormControl(MessagingModel.Topic, Validators.required),
       [DESTINATION]: this.createTopicDestinationFormGroup(),
       [MESSAGE]: new FormControl(''),
+      [HEADERS]: this._formBuilder.array([]),
       [REQUEST_REPLY]: new FormControl(false),
       [RETAIN]: new FormControl(false),
     });
@@ -121,52 +124,65 @@ export class PublishMessageComponent implements OnDestroy {
     const topic = this.form.get(DESTINATION).get(TOPIC).value;
     const message = this.form.get(MESSAGE).value === '' ? undefined : this.form.get(MESSAGE).value;
     const requestReply = this.form.get(REQUEST_REPLY).value;
+    const headers = SciParamsEnterComponent.toParamsMap(this.form.get(HEADERS) as FormArray);
 
     this.form.disable();
     this.publishError = null;
-
-    if (requestReply) {
-      this._subscription = this._messageClient.request$(topic, message)
-        .pipe(finalize(() => this.form.enable()))
-        .subscribe(
-          reply => this.replies.push(reply),
-          error => this.publishError = error,
-        );
+    try {
+      if (requestReply) {
+        this._subscription = this._messageClient.request$(topic, message, {headers: headers})
+          .pipe(finalize(() => this.form.enable()))
+          .subscribe(
+            reply => this.replies.push(reply),
+            error => this.publishError = error,
+          );
+      }
+      else {
+        this._subscription = this._messageClient.publish$(topic, message, {retain: this.form.get(RETAIN).value, headers: headers})
+          .pipe(finalize(() => this.form.enable()))
+          .subscribe(
+            noop,
+            error => this.publishError = error,
+          );
+      }
     }
-    else {
-      this._subscription = this._messageClient.publish$(topic, message, {retain: this.form.get(RETAIN).value})
-        .pipe(finalize(() => this.form.enable()))
-        .subscribe(
-          noop,
-          error => this.publishError = error,
-        );
+    catch (error) {
+      this.form.enable();
+      this.publishError = error;
     }
   }
 
   private issueIntent(): void {
     const type: string = this.form.get(DESTINATION).get(TYPE).value;
-    const qualifier: Qualifier = SciParamsEnterComponent.toParams(this.form.get(DESTINATION).get(QUALIFIER) as FormArray);
+    const qualifier: Qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(DESTINATION).get(QUALIFIER) as FormArray);
 
     const message = this.form.get(MESSAGE).value === '' ? undefined : this.form.get(MESSAGE).value;
     const requestReply = this.form.get(REQUEST_REPLY).value;
+    const headers = SciParamsEnterComponent.toParamsMap(this.form.get(HEADERS) as FormArray);
+
     this.form.disable();
     this.publishError = null;
-
-    if (requestReply) {
-      this._subscription = this._messageClient.requestByIntent$({type, qualifier}, message)
-        .pipe(finalize(() => this.form.enable()))
-        .subscribe(
-          reply => this.replies.push(reply),
-          error => this.publishError = error,
-        );
+    try {
+      if (requestReply) {
+        this._subscription = this._messageClient.requestByIntent$({type, qualifier}, message, {headers: headers})
+          .pipe(finalize(() => this.form.enable()))
+          .subscribe(
+            reply => this.replies.push(reply),
+            error => this.publishError = error,
+          );
+      }
+      else {
+        this._subscription = this._messageClient.issueIntent$({type, qualifier}, message, {headers: headers})
+          .pipe(finalize(() => this.form.enable()))
+          .subscribe(
+            noop,
+            error => this.publishError = error,
+          );
+      }
     }
-    else {
-      this._subscription = this._messageClient.issueIntent$({type, qualifier}, message)
-        .pipe(finalize(() => this.form.enable()))
-        .subscribe(
-          noop,
-          error => this.publishError = error,
-        );
+    catch (error) {
+      this.form.enable();
+      this.publishError = error;
     }
   }
 

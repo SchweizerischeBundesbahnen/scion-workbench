@@ -12,7 +12,7 @@ import { mapToBody, MessageClient, MessageOptions, PublishOptions } from './mess
 import { EMPTY, from, merge, noop, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
 import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
 import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from './operators';
-import { catchError, filter, finalize, first, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
+import { catchError, filter, finalize, first, map, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
 import { Defined, UUID } from '@scion/toolkit/util';
 import { Intent, Qualifier } from '../platform.model';
 import { IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
@@ -97,6 +97,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
           filterByChannel<TopicMessage>(MessagingChannel.Topic),
           filterByHeader({key: MessageHeaders.ɵTopicSubscriberId, value: subscriberId}),
           pluckMessage(),
+          map(message => ({...message, headers: copyMap(message.headers), params: copyMap(message.params)})),
           takeUntil(merge(this._destroy$, unsubscribe$)),
           finalize(() => {
             const command: TopicUnsubscribeCommand = {topic: topic, headers: new Map()};
@@ -125,6 +126,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
       .pipe(
         filterByChannel<IntentMessage<T>>(MessagingChannel.Intent),
         pluckMessage(),
+        map(message => ({...message, headers: copyMap(message.headers)})),
         filter(intent => !selector || !selector.type || selector.type === intent.type),
         filter(intent => !selector || !selector.qualifier || matchesIntentQualifier(selector.qualifier, intent.qualifier)),
       );
@@ -224,4 +226,18 @@ function setBodyIfDefined<T>(message: TopicMessage<T> | IntentMessage<T>, body?:
   if (body !== undefined) {
     message.body = body;
   }
+}
+
+/**
+ * Creates a copy from the given {@link Map}.
+ *
+ * Data sent from one JavaScript realm to another is serialized with the structured clone algorithm.
+ * Altought the algorithm supports the {@link Map} data type, a deserialized map object cannot be checked to be instance of {@link Map}.
+ * This is most likely because the serialization takes place in a different realm.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+ * @see http://man.hubwiz.com/docset/JavaScript.docset/Contents/Resources/Documents/developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm.html
+ */
+function copyMap<K, V>(data: Map<K, V>): Map<K, V> {
+  return new Map(data || new Map());
 }

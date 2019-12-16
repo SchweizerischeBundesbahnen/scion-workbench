@@ -18,3 +18,4 @@ export { SciCheckboxPO } from './checkbox/checkbox.po';
 export { SciListPO, WaitUntil } from './list/list.po';
 export { SciListItemPO } from './list/list-item.po';
 export { SciQualifierChipListPO } from './qualifier-chip-list/qualifier-chip-list.po';
+export { SciPropertyPO } from './property/property.po';

@@ -15,6 +15,8 @@ import { ManageIntentsPagePO } from '../manifest/manage-intents-page.po';
 import { ManageCapabilitiesPagePO } from '../manifest/manage-capabilities-page.po';
 import { OutletPO } from '../outlet.po';
 import { expectToBeRejectedWithError } from '../spec.util';
+import { MessageListItemPO } from './message-list-item.po';
+import { IntentMessage } from '@scion/microfrontend-platform';
 
 /**
  * Contains Specs for intent-based messaging.
@@ -555,5 +557,55 @@ export namespace IntendBasedMessagingSpecs {
     await expect((await receiverPO_4203.getFirstMessageOrElseReject()).getIntentQualifier()).toEqual({key1: 'value1'});
     await receiverPO_4202.clickClearMessages();
     await receiverPO_4203.clickClearMessages();
+  }
+
+  /**
+   * Tests to set headers on a message.
+   */
+  export async function passHeadersSpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      capabilityManager: {useClass: ManageCapabilitiesPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+      receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+    });
+
+    const capabilityManagerPO = await pagePOs.get<ManageCapabilitiesPagePO>('capabilityManager');
+    await capabilityManagerPO.registerCapability('testing', {q1: 'v1', q2: 'v2'});
+
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
+    await receiverPO.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO.clickSubscribe();
+
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO.enterIntent('testing', {q1: 'v1', q2: 'v2'});
+    await publisherPO.enterHeaders(new Map().set('header1', 'value').set('header2', '42'));
+    await publisherPO.clickPublish();
+
+    await expectIntent(receiverPO.getFirstMessageOrElseReject()).toEqual({
+      type: 'testing',
+      qualifier: {q1: 'v1', q2: 'v2'},
+      body: '',
+      headers: new Map().set('header1', 'value').set('header2', '42'),
+    });
+  }
+
+  /**
+   * Expects the intent to equal the expected intent with its headers to contain at minimum the given map entries.
+   */
+  function expectIntent(actual: Promise<MessageListItemPO>): { toEqual: (expected: IntentMessage) => void } {
+    return {
+      toEqual: async (expected: IntentMessage): Promise<void> => {
+        const actualMessage = await actual;
+        await expect(actualMessage.getIntentType()).toEqual(expected.type);
+        await expect(actualMessage.getIntentQualifier()).toEqual(expected.qualifier);
+        if (expected.body !== undefined) {
+          await expect(actualMessage.getBody()).toEqual(expected.body);
+        }
+        // Jasmine 3.5 provides 'mapContaining' matcher; when updated, this custom matcher can be removed.
+        await expect([...await actualMessage.getHeaders()]).toEqual(jasmine.arrayContaining([...expected.headers]));
+      },
+    };
   }
 }

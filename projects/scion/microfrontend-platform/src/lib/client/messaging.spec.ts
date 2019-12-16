@@ -17,7 +17,7 @@ import { Logger } from '../logger';
 import { ManifestRegistry } from '../host/manifest.registry';
 import { ApplicationConfig } from '../host/platform-config';
 import { PLATFORM_SYMBOLIC_NAME } from '../host/platform.constants';
-import { collectToPromise, expectToBeRejectedWithError, expectToBeResolvedToMapContaining, serveManifest, waitFor } from '../spec.util.spec';
+import { collectToPromise, expectToBeRejectedWithError, expectToBeResolvedToContain, serveManifest, waitFor } from '../spec.util.spec';
 import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { Defined, Objects } from '@scion/toolkit/util';
 import Spy = jasmine.Spy;
@@ -110,7 +110,7 @@ describe('Messaging', () => {
     const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
     Beans.get(PlatformMessageClient).publish$('some-topic', undefined, {headers: new Map().set('header1', 'value').set('header2', 42)}).subscribe();
-    await expectToBeResolvedToMapContaining(actual, new Map().set('header1', 'value').set('header2', 42));
+    await expectToBeResolvedToContain(actual, new Map().set('header1', 'value').set('header2', 42));
   });
 
   it('should allow passing headers when issuing an intent', async () => {
@@ -122,7 +122,7 @@ describe('Messaging', () => {
     const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
     Beans.get(MessageClient).issueIntent$({type: 'some-capability'}, undefined, {headers: new Map().set('header1', 'value').set('header2', 42)}).subscribe();
-    await expectToBeResolvedToMapContaining(actual, new Map().set('header1', 'value').set('header2', 42));
+    await expectToBeResolvedToContain(actual, new Map().set('header1', 'value').set('header2', 42));
   });
 
   it('should return an empty headers dictionary if no headers are set', async () => {
@@ -132,7 +132,7 @@ describe('Messaging', () => {
     const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
     Beans.get(PlatformMessageClient).publish$('some-topic', 'payload').subscribe();
-    await expectToBeResolvedToMapContaining(actual, new Map());
+    await expectToBeResolvedToContain(actual, new Map());
   });
 
   it('should allow passing headers when sending a request', async () => {
@@ -146,7 +146,7 @@ describe('Messaging', () => {
     const ping$ = Beans.get(PlatformMessageClient).request$('some-topic', undefined, {headers: new Map().set('request-header', 'ping')});
     const actual = collectToPromise(ping$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
-    await expectToBeResolvedToMapContaining(actual, new Map().set('reply-header', 'PING'));
+    await expectToBeResolvedToContain(actual, new Map().set('reply-header', 'PING'));
   });
 
   it('should allow passing headers when sending an intent request', async () => {
@@ -162,7 +162,7 @@ describe('Messaging', () => {
     const ping$ = Beans.get(MessageClient).requestByIntent$({type: 'some-capability'}, undefined, {headers: new Map().set('request-header', 'ping')});
     const actual = collectToPromise(ping$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
-    await expectToBeResolvedToMapContaining(actual, new Map().set('reply-header', 'PING'));
+    await expectToBeResolvedToContain(actual, new Map().set('reply-header', 'PING'));
   });
 
   it('should transport a topic message to both, the platform client and the host client, respectively', async () => {
@@ -669,6 +669,94 @@ describe('Messaging', () => {
     expect(() => Beans.get(PlatformMessageClient).requestByIntent$({type: 'type', qualifier: {entity: '*', id: '*'}})).toThrowError(/IllegalQualifierError/);
   });
 
+  it('should prevent overriding platform specific message headers [pub/sub]', async () => {
+    await MicrofrontendPlatform.forHost([]);
+
+    const actual$ = Beans.get(PlatformMessageClient).observe$('some-topic');
+    const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
+
+    await Beans.get(PlatformMessageClient).publish$('some-topic', 'payload', {
+        headers: new Map()
+          .set(MessageHeaders.Timestamp, 'should-not-be-set')
+          .set(MessageHeaders.ClientId, 'should-not-be-set')
+          .set(MessageHeaders.AppSymbolicName, 'should-not-be-set')
+          .set(MessageHeaders.ɵTopicSubscriberId, 'should-not-be-set'),
+      },
+    ).subscribe();
+
+    const headers = await actual;
+    expect(headers.get(MessageHeaders.Timestamp)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.ClientId)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.AppSymbolicName)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.ɵTopicSubscriberId)).not.toEqual('should-not-be-set');
+  });
+
+  it('should prevent overriding platform specific message headers [request/reply]', async () => {
+    await MicrofrontendPlatform.forHost([]);
+
+    const actual$ = Beans.get(PlatformMessageClient).observe$('some-topic');
+    const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
+
+    Beans.get(PlatformMessageClient).request$('some-topic', 'payload', {
+        headers: new Map()
+          .set(MessageHeaders.Timestamp, 'should-not-be-set')
+          .set(MessageHeaders.ClientId, 'should-not-be-set')
+          .set(MessageHeaders.AppSymbolicName, 'should-not-be-set')
+          .set(MessageHeaders.ɵTopicSubscriberId, 'should-not-be-set'),
+      },
+    ).subscribe();
+
+    const headers = await actual;
+    expect(headers.get(MessageHeaders.Timestamp)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.ClientId)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.AppSymbolicName)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.ɵTopicSubscriberId)).not.toEqual('should-not-be-set');
+  });
+
+  it('should prevent overriding platform specific intent message headers [pub/sub]', async () => {
+    const manifestUrl = serveManifest({name: 'Host Application', capabilities: [{type: 'some-capability'}]});
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app'});
+
+    const actual$ = Beans.get(MessageClient).handleIntent$();
+    const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
+
+    await Beans.get(MessageClient).issueIntent$({type: 'some-capability'}, 'payload', {
+        headers: new Map()
+          .set(MessageHeaders.Timestamp, 'should-not-be-set')
+          .set(MessageHeaders.ClientId, 'should-not-be-set')
+          .set(MessageHeaders.AppSymbolicName, 'should-not-be-set'),
+      },
+    ).subscribe();
+
+    const headers = await actual;
+    expect(headers.get(MessageHeaders.Timestamp)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.ClientId)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.AppSymbolicName)).not.toEqual('should-not-be-set');
+  });
+
+  it('should prevent overriding platform specific intent message headers [request/reply]', async () => {
+    const manifestUrl = serveManifest({name: 'Host Application', capabilities: [{type: 'some-capability'}]});
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app'});
+
+    const actual$ = Beans.get(MessageClient).handleIntent$();
+    const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
+
+    Beans.get(MessageClient).requestByIntent$({type: 'some-capability'}, 'payload', {
+        headers: new Map()
+          .set(MessageHeaders.Timestamp, 'should-not-be-set')
+          .set(MessageHeaders.ClientId, 'should-not-be-set')
+          .set(MessageHeaders.AppSymbolicName, 'should-not-be-set'),
+      },
+    ).subscribe();
+
+    const headers = await actual;
+    expect(headers.get(MessageHeaders.Timestamp)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.ClientId)).not.toEqual('should-not-be-set');
+    expect(headers.get(MessageHeaders.AppSymbolicName)).not.toEqual('should-not-be-set');
+  });
+
   describe('takeUntilUnsubscribe operator', () => {
 
     it('should complete the source observable when all subscribers unsubscribed', async () => {
@@ -715,7 +803,6 @@ function expectMessage(actual: TopicMessage): { toMatch: (expected: TopicMessage
       const actualWithHeaderMapAsArray = {
         ...actual,
         headers: [...actual.headers],
-        params: new Map(actual.params), // when posted with 'postMessage', then the Map is received as map-like object
       };
       const expectedWithMapsAsArray = {
         ...expected,

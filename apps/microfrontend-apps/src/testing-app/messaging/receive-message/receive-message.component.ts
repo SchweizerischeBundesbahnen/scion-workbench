@@ -36,6 +36,7 @@ export class ReceiveMessageComponent implements OnDestroy {
   public messages: (TopicMessage | IntentMessage)[] = [];
   public MessagingModel = MessagingModel;
   public MessageHeaders = MessageHeaders;
+  public subscribeError: string;
 
   constructor(private _formBuilder: FormBuilder) {
     this._messageClient = Beans.get(MessageClient);
@@ -67,22 +68,43 @@ export class ReceiveMessageComponent implements OnDestroy {
 
   public onSubscribe(): void {
     this.isTopicMessaging() ? this.subscribeTopic() : this.subscribeIntent();
-    this.form.disable();
   }
 
   private subscribeTopic(): void {
-    this._subscription = this._messageClient.observe$(this.form.get(DESTINATION).get(TOPIC).value)
-      .pipe(finalize(() => this.form.enable()))
-      .subscribe(message => this.messages.push(message));
+    this.form.disable();
+    this.subscribeError = null;
+    try {
+      this._subscription = this._messageClient.observe$(this.form.get(DESTINATION).get(TOPIC).value)
+        .pipe(finalize(() => this.form.enable()))
+        .subscribe(
+          message => this.messages.push(message),
+          error => this.subscribeError = error,
+        );
+    }
+    catch (error) {
+      this.form.enable();
+      this.subscribeError = error;
+    }
   }
 
   private subscribeIntent(): void {
     const type: string = this.form.get(DESTINATION).get(TYPE).value;
-    const qualifier: Qualifier = SciParamsEnterComponent.toParams(this.form.get(DESTINATION).get(QUALIFIER) as FormArray);
+    const qualifier: Qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(DESTINATION).get(QUALIFIER) as FormArray);
 
-    this._subscription = this._messageClient.handleIntent$({type, qualifier})
-      .pipe(finalize(() => this.form.enable()))
-      .subscribe(message => this.messages.push(message));
+    this.form.disable();
+    this.subscribeError = null;
+    try {
+      this._subscription = this._messageClient.handleIntent$({type, qualifier})
+        .pipe(finalize(() => this.form.enable()))
+        .subscribe(
+          message => this.messages.push(message),
+          error => this.subscribeError = error,
+        );
+    }
+    catch (error) {
+      this.form.enable();
+      this.subscribeError = error;
+    }
   }
 
   public onUnsubscribe(): void {

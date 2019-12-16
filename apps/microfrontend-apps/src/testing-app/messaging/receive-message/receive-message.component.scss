@@ -1,3 +1,5 @@
+@import 'ɵtoolkit-widget-theme';
+
 :host {
   display: flex;
   flex-direction: column;
@@ -16,6 +18,13 @@
 
     grid-auto-rows: min-content;
     row-gap: .25em;
+  }
+
+  > output.subscribe-error {
+    border: 1px solid errorColor(1);
+    background-color: errorColor(.2);
+    border-radius: 3px;
+    padding: 1em;
   }
 
   > sci-list.messages {

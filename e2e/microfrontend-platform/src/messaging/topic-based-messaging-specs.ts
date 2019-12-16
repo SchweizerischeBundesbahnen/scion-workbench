@@ -13,6 +13,8 @@ import { MessagingModel, PublishMessagePagePO } from './publish-message-page.po'
 import { ReceiveMessagePagePO } from './receive-message-page.po';
 import { OutletPO } from '../outlet.po';
 import { expectToBeRejectedWithError } from '../spec.util';
+import { MessageListItemPO } from './message-list-item.po';
+import { TopicMessage } from '@scion/microfrontend-platform';
 
 /**
  * Contains Specs for topic-based messaging.
@@ -506,5 +508,151 @@ export namespace TopicBasedMessagingSpecs {
     await publisherPO.clickPublish();
 
     await expect((await receiverPO.getFirstMessageOrElseReject()).getTopic()).toEqual('some-topic');
+  }
+
+  /**
+   * Tests receiving multiple message simultaneously if specifying wildcard topic segments.
+   */
+  export async function subscribeToMultipleTopicsSimultaneouslySpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+      receiver_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+      receiver_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
+      receiver_3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      receiver_4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+    });
+
+    const receiver1PO = await pagePOs.get<ReceiveMessagePagePO>('receiver_1');
+    await receiver1PO.selectMessagingModel(MessagingModel.Topic);
+    await receiver1PO.enterTopic('myhome/livingroom/temperature');
+    await receiver1PO.clickSubscribe();
+
+    const receiver2PO = await pagePOs.get<ReceiveMessagePagePO>('receiver_2');
+    await receiver2PO.selectMessagingModel(MessagingModel.Topic);
+    await receiver2PO.enterTopic('myhome/:room/temperature');
+    await receiver2PO.clickSubscribe();
+
+    const receiver3PO = await pagePOs.get<ReceiveMessagePagePO>('receiver_3');
+    await receiver3PO.selectMessagingModel(MessagingModel.Topic);
+    await receiver3PO.enterTopic('myhome/:room/:measurement');
+    await receiver3PO.clickSubscribe();
+
+    const receiver4PO = await pagePOs.get<ReceiveMessagePagePO>('receiver_4');
+    await receiver4PO.selectMessagingModel(MessagingModel.Topic);
+    await receiver4PO.enterTopic('myhome/kitchen/:measurement');
+    await receiver4PO.clickSubscribe();
+
+    // Publish a message to 'myhome/livingroom/temperature'
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Topic);
+    await publisherPO.enterTopic('myhome/livingroom/temperature');
+    await publisherPO.enterMessage('25°C');
+    await publisherPO.clickPublish();
+
+    // Verify receiver 1 subscribed to 'myhome/livingroom/temperature'
+    await expectMessage(receiver1PO.getFirstMessageOrElseReject()).toEqual({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map(),
+      headers: new Map(),
+    });
+    // Verify receiver 2 subscribed to 'myhome/:room/temperature'
+    await expectMessage(receiver2PO.getFirstMessageOrElseReject()).toEqual({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map().set('room', 'livingroom'),
+      headers: new Map(),
+    });
+    // Verify receiver 3 subscribed to 'myhome/:room/:measurement'
+    await expectMessage(receiver3PO.getFirstMessageOrElseReject()).toEqual({
+      topic: 'myhome/livingroom/temperature',
+      body: '25°C',
+      params: new Map().set('room', 'livingroom').set('measurement', 'temperature'),
+      headers: new Map(),
+    });
+    // Verify receiver 4 subscribed to 'myhome/kitchen/:measurement'
+    await expect(receiver4PO.getMessages()).toEqual([]);
+
+    await receiver1PO.clickClearMessages();
+    await receiver2PO.clickClearMessages();
+    await receiver3PO.clickClearMessages();
+    await receiver4PO.clickClearMessages();
+
+    // Publish a message to 'myhome/kitchen/temperature'
+    await publisherPO.selectMessagingModel(MessagingModel.Topic);
+    await publisherPO.enterTopic('myhome/kitchen/temperature');
+    await publisherPO.enterMessage('20°C');
+    await publisherPO.clickPublish();
+
+    // Verify receiver 1 subscribed to 'myhome/livingroom/temperature'
+    await expect(receiver1PO.getMessages()).toEqual([]);
+    // Verify receiver 2 subscribed to 'myhome/:room/temperature'
+    await expectMessage(receiver2PO.getFirstMessageOrElseReject()).toEqual({
+      topic: 'myhome/kitchen/temperature',
+      body: '20°C',
+      params: new Map().set('room', 'kitchen'),
+      headers: new Map(),
+    });
+    // Verify receiver 3 subscribed to 'myhome/:room/:measurement'
+    await expectMessage(receiver3PO.getFirstMessageOrElseReject()).toEqual({
+      topic: 'myhome/kitchen/temperature',
+      body: '20°C',
+      params: new Map().set('room', 'kitchen').set('measurement', 'temperature'),
+      headers: new Map(),
+    });
+    // Verify receiver 4 subscribed to 'myhome/kitchen/:measurement'
+    await expectMessage(receiver4PO.getFirstMessageOrElseReject()).toEqual({
+      topic: 'myhome/kitchen/temperature',
+      body: '20°C',
+      params: new Map().set('measurement', 'temperature'),
+      headers: new Map(),
+    });
+  }
+
+  /**
+   * Tests to set headers on a message.
+   */
+  export async function passHeadersSpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+      receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+    });
+
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
+    await receiverPO.selectMessagingModel(MessagingModel.Topic);
+    await receiverPO.enterTopic('some-topic');
+    await receiverPO.clickSubscribe();
+
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Topic);
+    await publisherPO.enterTopic('some-topic');
+    await publisherPO.enterMessage('some-payload');
+    await publisherPO.enterHeaders(new Map().set('header1', 'value').set('header2', '42'));
+    await publisherPO.clickPublish();
+
+    await expectMessage(receiverPO.getFirstMessageOrElseReject()).toEqual({
+      topic: 'some-topic',
+      body: 'some-payload',
+      headers: new Map().set('header1', 'value').set('header2', '42'),
+      params: new Map()
+    });
+  }
+
+  /**
+   * Expects the message to equal the expected message with its headers to contain at minimum the given map entries.
+   */
+  function expectMessage(actual: Promise<MessageListItemPO>): { toEqual: (expected: TopicMessage) => void } {
+    return {
+      toEqual: async (expected: TopicMessage): Promise<void> => {
+        const actualMessage = await actual;
+        await expect(actualMessage.getTopic()).toEqual(expected.topic);
+        await expect(actualMessage.getBody()).toEqual(expected.body);
+        await expect(actualMessage.getParams()).toEqual(expected.params);
+        // Jasmine 3.5 provides 'mapContaining' matcher; when updated, this custom matcher can be removed.
+        await expect([...await actualMessage.getHeaders()]).toEqual(jasmine.arrayContaining([...expected.headers]));
+      },
+    };
   }
 }

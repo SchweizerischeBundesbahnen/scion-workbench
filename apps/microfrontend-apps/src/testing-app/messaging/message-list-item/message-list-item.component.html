@@ -5,14 +5,23 @@
     replyTo: <span class="e2e-reply-to">{{replyTo}}</span>
   </ng-container>
   Body: <span class="e2e-body">{{message.body}}</span>
+  <ng-container *ngIf="message.params && message.params.size">
+    Params:
+    <sci-property [properties]="message.params" class="e2e-params"></sci-property>
+  </ng-container>
+  Headers:
+  <sci-property [properties]="message.headers" class="e2e-headers"></sci-property>
 </ng-template>
 
 <ng-template #intent_message_template>
-  Type: <span class="e2e-intent-type">{{message.type}}</span>
-  Qualifier: <span class="e2e-intent-qualifier">{{message.qualifier | json}}</span>
+  Type: <span class="e2e-intent-type intent-type">{{message.type}}</span>
+  Qualifier:
+  <sci-property [properties]="message.qualifier" class="e2e-intent-qualifier"></sci-property>
   <ng-container *ngIf="message.headers.get(MessageHeaders.ReplyTo) as replyTo">
     replyTo: <span class="e2e-reply-to">{{replyTo}}</span>
   </ng-container>
   Body: <span class="e2e-body">{{message.body}}</span>
+  Headers:
+  <sci-property [properties]="message.headers" class="e2e-headers"></sci-property>
 </ng-template>
 

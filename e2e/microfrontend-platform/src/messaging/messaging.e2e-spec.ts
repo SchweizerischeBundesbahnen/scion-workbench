@@ -67,6 +67,14 @@ describe('Messaging', () => {
     it('allows receiving messages without a payload', async () => {
       await TopicBasedMessagingSpecs.receiveMessagesWithoutPayloadSpec();
     });
+
+    it('allows subscribing to multiple topics simultaneously (using the colon syntax)', async () => {
+      await TopicBasedMessagingSpecs.subscribeToMultipleTopicsSimultaneouslySpec();
+    });
+
+    it('allows passing headers', async () => {
+      await TopicBasedMessagingSpecs.passHeadersSpec();
+    });
   });
 
   describe('intent-based', () => {
@@ -116,6 +124,10 @@ describe('Messaging', () => {
 
     it('allows receiving intents for a capability which declares wildcards in its qualifier', async () => {
       await IntendBasedMessagingSpecs.receiveIfMatchingCapabilityWildcardQualifierSpec();
+    });
+
+    it('allows passing headers', async () => {
+      await IntendBasedMessagingSpecs.passHeadersSpec();
     });
   });
 });

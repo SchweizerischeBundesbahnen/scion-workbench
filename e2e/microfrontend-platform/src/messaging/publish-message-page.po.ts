@@ -30,6 +30,13 @@ export class PublishMessagePagePO {
     await enterText(topic, this._pageFinder.$('input.e2e-topic'));
   }
 
+  public async enterHeaders(headers: Map<string, string>): Promise<void> {
+    await this._switchToIframeFn();
+    const headersEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-headers'));
+    await headersEnterPO.clear();
+    await headersEnterPO.enterParams(headers);
+  }
+
   public async enterIntent(type: string, qualifier?: Qualifier): Promise<void> {
     await this._switchToIframeFn();
     await enterText(type, this._pageFinder.$('input.e2e-intent-type'));
