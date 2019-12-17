@@ -9,21 +9,21 @@
  */
 import { concat, EMPTY, from, fromEvent, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pipe, Subject } from 'rxjs';
 import { catchError, filter, mergeMap, mergeMapTo, publishLast, refCount, share, take, takeUntil } from 'rxjs/operators';
-import { IntentMessage, Message, MessageHeaders, TopicMessage } from '../messaging.model';
-import { ConnackMessage, MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
-import { matchesCapabilityQualifier } from '../qualifier-tester';
-import { Beans, PreDestroy } from '../bean-manager';
-import { ApplicationRegistry } from './application.registry';
-import { ManifestRegistry } from './manifest.registry';
+import { IntentMessage, Message, MessageHeaders, TopicMessage } from '../../messaging.model';
+import { ConnackMessage, MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../../ɵmessaging.model';
+import { matchesCapabilityQualifier } from '../../qualifier-tester';
+import { Beans, PreDestroy } from '../../bean-manager';
+import { ApplicationRegistry } from '../application.registry';
+import { ManifestRegistry } from '../manifest.registry';
 import { UUID } from '@scion/toolkit/util';
-import { PlatformState, PlatformStates } from '../platform-state';
-import { Logger } from '../logger';
-import { runSafe } from '../safe-runner';
-import { PLATFORM_SYMBOLIC_NAME } from './platform.constants';
+import { PlatformState, PlatformStates } from '../../platform-state';
+import { Logger } from '../../logger';
+import { runSafe } from '../../safe-runner';
+import { PLATFORM_SYMBOLIC_NAME } from '../platform.constants';
 import { TopicSubscriptionRegistry } from './topic-subscription.registry';
 import { Client, ClientRegistry } from './client.registry';
 import { RetainedMessageStore } from './retained-message-store';
-import { TopicMatcher } from './topic-matcher.util';
+import { TopicMatcher } from '../../topic-matcher.util';
 
 /**
  * The broker is responsible for receiving all messages, filtering the messages, determining who is

@@ -27,7 +27,7 @@ import { PLATFORM_SYMBOLIC_NAME } from './host/platform.constants';
 import { PlatformInitializer } from './host/platform-initializer';
 import { Defined } from '@scion/toolkit/util';
 import { HostPlatformState } from './client/host-platform-state';
-import { MessageBroker } from './host/message-broker';
+import { MessageBroker } from './host/message-broker/message-broker';
 import { PlatformTopics } from './ɵmessaging.model';
 import { mergeMap, takeUntil } from 'rxjs/operators';
 

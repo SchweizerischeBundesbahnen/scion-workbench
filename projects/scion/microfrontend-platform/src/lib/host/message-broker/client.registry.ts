@@ -7,7 +7,7 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { Application } from '../platform.model';
+import { Application } from '../../platform.model';
 
 /**
  * Central point for managing client registrations.

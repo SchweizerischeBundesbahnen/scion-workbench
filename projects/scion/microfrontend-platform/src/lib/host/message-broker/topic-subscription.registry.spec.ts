@@ -10,7 +10,7 @@
 import { TopicSubscriptionRegistry } from './topic-subscription.registry';
 import { Client } from './client.registry';
 import { take } from 'rxjs/operators';
-import { collectToPromise } from '../spec.util.spec';
+import { collectToPromise } from '../../spec.util.spec';
 
 describe('TopicSubscriptionRegistry', () => {
 

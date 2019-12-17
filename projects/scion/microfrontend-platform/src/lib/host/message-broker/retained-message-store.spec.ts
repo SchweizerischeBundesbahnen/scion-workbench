@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { RetainedMessageStore } from './retained-message-store';
-import { MessageHeaders, TopicMessage } from '../messaging.model';
+import { MessageHeaders, TopicMessage } from '../../messaging.model';
 
 describe('RetainedMessageStore', () => {
 

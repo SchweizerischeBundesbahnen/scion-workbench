@@ -9,7 +9,7 @@
  */
 
 import { Arrays, Defined } from '@scion/toolkit/util';
-import { TopicMatcher } from './topic-matcher.util';
+import { TopicMatcher } from '../../topic-matcher.util';
 import { Observable, Subject } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
 import { Client } from './client.registry';

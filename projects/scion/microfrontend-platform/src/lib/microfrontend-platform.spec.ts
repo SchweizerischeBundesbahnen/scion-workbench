@@ -16,7 +16,7 @@ import { ApplicationConfig } from './host/platform-config';
 import { HostPlatformState } from './client/host-platform-state';
 import { serveManifest } from './spec.util.spec';
 import { PlatformMessageClient } from './host/platform-message-client';
-import { MessageBroker } from './host/message-broker';
+import { MessageBroker } from './host/message-broker/message-broker';
 import { ManifestRegistry } from './host/manifest.registry';
 import { ApplicationRegistry } from './host/application.registry';
 

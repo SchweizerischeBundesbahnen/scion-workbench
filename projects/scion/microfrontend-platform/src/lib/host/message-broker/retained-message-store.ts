@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { MessageHeaders, TopicMessage } from '../messaging.model';
-import { TopicMatcher } from './topic-matcher.util';
+import { MessageHeaders, TopicMessage } from '../../messaging.model';
+import { TopicMatcher } from '../../topic-matcher.util';
 import { Defined } from '@scion/toolkit/util';
 
 /**

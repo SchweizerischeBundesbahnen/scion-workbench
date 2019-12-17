@@ -20,7 +20,7 @@ import { matchesIntentQualifier } from '../qualifier-tester';
 import { BrokerGateway } from './broker-gateway';
 import { Beans, PreDestroy } from '../bean-manager';
 import { HostPlatformState } from './host-platform-state';
-import { TopicMatcher } from '../host/topic-matcher.util';
+import { TopicMatcher } from '../topic-matcher.util';
 
 // tslint:disable:unified-signatures
 export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:disable-line:class-name

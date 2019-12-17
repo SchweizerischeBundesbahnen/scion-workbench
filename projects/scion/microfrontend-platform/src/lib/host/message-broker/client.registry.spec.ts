@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { Client, ClientRegistry } from './client.registry';
-import { Application } from '../platform.model';
+import { Application } from '../../platform.model';
 
 describe('ClientRegistry', () => {
 

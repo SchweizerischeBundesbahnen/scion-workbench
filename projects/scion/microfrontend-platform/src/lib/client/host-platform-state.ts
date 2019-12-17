@@ -38,6 +38,6 @@ export class HostPlatformState {
     return this._state$
       .pipe(filter(it => it === PlatformStates.Started), take(1))
       .toPromise()
-      .then(state => state ? Promise.resolve() : new Promise(noop)); // {@link Observable.toPromise} resolves to `undefined` if not emitted a value and the stream completes, e.g. on shutdown. Then, never resolve the promise.
+      .then(state => state ? Promise.resolve() : new Promise<never>(noop)); // {@link Observable.toPromise} resolves to `undefined` if not emitted a value and the stream completes, e.g. on shutdown. Then, never resolve the promise.
   }
 }
