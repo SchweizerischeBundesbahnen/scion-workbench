@@ -17,3 +17,4 @@ export { UUID } from './uuid.util';
 export { Defined } from './defined.util';
 export { Arrays } from './arrays.util';
 export { Objects } from './objects.util';
+export { Dictionaries, Dictionary } from './dictionaries.util';

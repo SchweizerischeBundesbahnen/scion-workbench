@@ -8,6 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
+import { Dictionary } from '@scion/toolkit/util';
+
 /**
  * Provides platform properties.
  */
@@ -53,6 +55,3 @@ export class PlatformProperties {
   }
 }
 
-export interface Dictionary {
-  [key: string]: any;
-}

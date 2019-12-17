@@ -10,6 +10,7 @@
 
 import { Component, ElementRef, HostBinding, Input } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
+import { Dictionaries, Dictionary } from '@scion/toolkit/util';
 
 export const PARAM_NAME = 'paramName';
 export const PARAM_VALUE = 'paramValue';
@@ -71,8 +72,8 @@ export class SciParamsEnterComponent {
    *
    * By default, if empty, `null` is returned.
    */
-  public static toParamsDictionary(formArray: FormArray, returnNullIfEmpty: boolean = true): { [key: string]: any | null } {
-    const params: { [key: string]: any } = {};
+  public static toParamsDictionary(formArray: FormArray, returnNullIfEmpty: boolean = true): Dictionary | null {
+    const params: Dictionary = {};
     formArray.controls.forEach(formGroup => {
       const paramName = formGroup.get(PARAM_NAME).value;
       params[paramName] = formGroup.get(PARAM_VALUE).value;
@@ -95,6 +96,6 @@ export class SciParamsEnterComponent {
     if (!params) {
       return null;
     }
-    return Object.entries(params).reduce((map: Map<string, any>, [key, value]: [string, any]) => map.set(key, value), new Map<string, any>());
+    return Dictionaries.toMap(params);
   }
 }

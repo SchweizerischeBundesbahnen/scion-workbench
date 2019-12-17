@@ -9,6 +9,7 @@
  */
 
 import { ElementFinder } from 'protractor';
+import { Dictionary } from '@scion/toolkit/util';
 
 /**
  * Page object for {@link SciPropertyComponent}.
@@ -43,8 +44,4 @@ export class SciPropertyPO {
 
     return properties;
   }
-}
-
-export interface Dictionary {
-  [key: string]: string;
 }

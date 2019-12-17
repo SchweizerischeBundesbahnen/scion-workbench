@@ -9,6 +9,7 @@
  */
 
 import { ElementFinder } from 'protractor';
+import { Dictionaries, Dictionary } from '@scion/toolkit/util';
 
 /**
  * Page object for {@link SciParamsEnterComponent}.
@@ -20,7 +21,7 @@ export class SciParamsEnterPO {
 
   public async enterParams(params: Dictionary | Map<string, any>): Promise<void> {
     if (params instanceof Map) {
-      return this.enterParams(toDictionary(params));
+      return this.enterParams(Dictionaries.toDictionary(params));
     }
 
     const addButton = this._sciParamsEnterFinder.$('button.e2e-add');
@@ -37,14 +38,4 @@ export class SciParamsEnterPO {
   public async clear(): Promise<void> {
     await this._sciParamsEnterFinder.$('button.e2e-clear').click();
   }
-}
-
-function toDictionary(map: Map<string, any>): Dictionary {
-  return Array.from(map.entries()).reduce((obj: Dictionary, [key, value]: [string, any]): Dictionary => {
-    return {...obj, [key]: value};
-  }, {});
-}
-
-export interface Dictionary {
-  [key: string]: any;
 }

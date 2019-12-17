@@ -10,6 +10,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { KeyValue } from '@angular/common';
+import { Dictionaries, Dictionary } from '@scion/toolkit/util';
 
 /**
  * Show the properties of an object.
@@ -22,7 +23,7 @@ import { KeyValue } from '@angular/common';
 })
 export class SciPropertyComponent {
 
-  public flattenedProperties: { [key: string]: any };
+  public flattenedProperties: Dictionary;
   private _keys: string[];
 
   @Input()
@@ -38,13 +39,12 @@ export class SciPropertyComponent {
     return this._keys.indexOf(a.key) - this._keys.indexOf(b.key);
   };
 
-  private flattenObject(property: Dictionary | Map<string, any>, path: string[] = []): { [key: string]: any } {
+  private flattenObject(property: Dictionary | Map<string, any>, path: string[] = []): Dictionary {
     if (property instanceof Map) {
-      return this.flattenObject(toDictionary(property), path);
+      return this.flattenObject(Dictionaries.toDictionary(property), path);
     }
 
-    return Object.keys(property).reduce((acc, key) => {
-      const value = property[key];
+    return Object.entries(property).reduce((acc, [key, value]) => {
       if (typeof value === 'object') {
         return {...acc, ...this.flattenObject(value, [...path, key])};
       }
@@ -54,14 +54,4 @@ export class SciPropertyComponent {
       }
     }, {});
   }
-}
-
-function toDictionary(map: Map<string, any>): Dictionary {
-  return Array.from(map.entries()).reduce((obj: Dictionary, [key, value]: [string, any]): Dictionary => {
-    return {...obj, [key]: value};
-  }, {});
-}
-
-interface Dictionary {
-  [key: string]: any;
 }

@@ -12,6 +12,7 @@ import { Directive, ElementRef, Input, OnChanges, OnDestroy, Renderer2, SimpleCh
 import { NativeScrollbarTrackSize, SciNativeScrollbarTrackSizeProvider } from './native-scrollbar-track-size-provider.service';
 import { map, takeUntil } from 'rxjs/operators';
 import { merge, Subject } from 'rxjs';
+import { Dictionary } from '@scion/toolkit/util';
 
 /**
  * Makes the host element natively scrollable and hides native scrollbars by default, unless native scrollbars
@@ -85,7 +86,7 @@ export class SciScrollableDirective implements OnChanges, OnDestroy {
     });
   }
 
-  private setStyle(element: Element, style: { [key: string]: any }): void {
+  private setStyle(element: Element, style: Dictionary): void {
     Object.keys(style).forEach(key => this._renderer.setStyle(element, key, style[key]));
   }
 
