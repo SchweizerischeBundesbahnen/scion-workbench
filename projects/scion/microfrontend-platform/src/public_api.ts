@@ -13,7 +13,7 @@
  */
 export * from './lib/platform.model';
 export * from './lib/messaging.model';
-export * from './lib/bean-manager';
+export { Beans, PreDestroy, Type, AbstractType, InstanceConstructInstructions, InitializerFn, Initializer, BeanDecorator, BeanInstanceConstructInstructions } from './lib/bean-manager'; // do not export {@link BeanInfo}
 export * from './lib/microfrontend-platform';
 export * from './lib/platform-state';
 export * from './lib/logger';

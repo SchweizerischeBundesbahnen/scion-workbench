@@ -306,8 +306,6 @@ export interface PreDestroy {
 
 /**
  * Metadata about a bean.
- *
- * @internal
  */
 export interface BeanInfo<T = any> {
   symbol: Type<T | any> | AbstractType<T | any>;

@@ -72,7 +72,10 @@ export class TopicMatcher {
    * Checks if the given topic contains wildcard segments (colon syntax) to match any string value.
    */
   public static containsWildcardSegments(topic: string): boolean {
-    return toPathSegments(topic).some(isWildcardSegment);
+    // As of ng-packagr 8.x, the prod build fails if directly invoking a non-exported function from inside a static function.
+    // To workaround this build issue, we first assign the function to a local variable.
+    const toPathSegmentsFn = toPathSegments; //
+    return toPathSegmentsFn(topic).some(isWildcardSegment);
   }
 }
 
