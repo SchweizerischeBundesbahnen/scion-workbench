@@ -7,11 +7,10 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-
 import { Outlets, TestingAppOrigins, TestingAppPO } from '../testing-app.po';
 import { MessagingModel, PublishMessagePagePO } from './publish-message-page.po';
 import { ReceiveMessagePagePO } from './receive-message-page.po';
-import { OutletPO } from '../outlet.po';
+import { BrowserOutletPO } from '../browser-outlet.po';
 import { expectToBeRejectedWithError } from '../spec.util';
 import { MessageListItemPO } from './message-list-item.po';
 import { TopicMessage } from '@scion/microfrontend-platform';
@@ -403,7 +402,7 @@ export namespace TopicBasedMessagingSpecs {
     await expect(publisherPO.getTopicSubscriberCount()).toEqual(1);
 
     // unload page of 'receiver3'
-    const outlet = pagePOs.get<OutletPO>('receiver3:outlet');
+    const outlet = pagePOs.get<BrowserOutletPO>('receiver3:outlet');
     await outlet.enterUrl('about:blank');
 
     // assert subscriber count on 'topic-1'
@@ -452,7 +451,7 @@ export namespace TopicBasedMessagingSpecs {
     await publisherPO.enterMessage('retained message');
     await publisherPO.clickPublish();
 
-    const receiverOutletPO = pagePOs.get<OutletPO>('receiver');
+    const receiverOutletPO = pagePOs.get<BrowserOutletPO>('receiver');
 
     // test to receive retained message in LOCALHOST_4200
     const receiver4200PO = await receiverOutletPO.enterUrl<ReceiveMessagePagePO>({useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200});
@@ -636,7 +635,7 @@ export namespace TopicBasedMessagingSpecs {
       topic: 'some-topic',
       body: 'some-payload',
       headers: new Map().set('header1', 'value').set('header2', '42'),
-      params: new Map()
+      params: new Map(),
     });
   }
 

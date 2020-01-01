@@ -1,0 +1,10 @@
+:host {
+  display: grid;
+
+  > form {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: max-content;
+    row-gap: .25em;
+  }
+}

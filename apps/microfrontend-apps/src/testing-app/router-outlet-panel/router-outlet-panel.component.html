@@ -1,0 +1,24 @@
+<button *ngIf="!panelOpen"
+        type="button"
+        (click)="onPanelOpen()"
+        class="panel-open e2e-open material-icons"
+        title="Show detail panel">
+  more_vert
+</button>
+
+<div class="panel" *ngIf="panelOpen">
+  <header>
+    <span class="title">Router outlet activation log</span>
+    <button type="button" title="Clear log" class="e2e-clear material-icons" (click)="onLogClearClick()">not_interested</button>
+    <button type="button" title="Close" class="e2e-close material-icons" (click)="onPanelCloseClick()">close</button>
+  </header>
+  <sci-viewport>
+    <section class="log e2e-log">
+      <ng-container *ngFor="let logEntry of activationLog">
+        <span class="e2e-timestamp">{{logEntry.timestamp | date:'HH:mm:ss:SSS'}}</span>
+        <span class="e2e-type">{{logEntry.type}}</span>
+        <span class="e2e-url">{{logEntry.url}}</span>
+      </ng-container>
+    </section>
+  </sci-viewport>
+</div>

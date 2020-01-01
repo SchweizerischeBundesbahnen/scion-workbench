@@ -1,0 +1,48 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  background-color: #FFFFFF;
+  border: 1px solid accentColor(.25);
+  width: 100%;
+
+  > ul {
+    list-style: none;
+    margin: 1em;
+    padding: 0;
+
+    > li {
+      display: grid;
+      grid-template-columns: 1fr max-content;
+      align-items: center;
+      user-select: none;
+      gap: .25em 2em;
+      cursor: default;
+
+      > span.label {
+        grid-column: 1/2;
+        grid-row: 1/2;
+      }
+
+      > span.description {
+        grid-column: 1/2;
+        grid-row: 2/3;
+        font-size: smaller;
+        color: accentColor(.9);
+      }
+
+      > button.toggle {
+        grid-column: 2/3;
+        grid-row: 1/3;
+        color: accentColor(.25);
+
+        &.enabled {
+          color: #000000;
+        }
+      }
+
+      &:hover > span.label {
+        color: primaryColor();
+      }
+    }
+  }
+}

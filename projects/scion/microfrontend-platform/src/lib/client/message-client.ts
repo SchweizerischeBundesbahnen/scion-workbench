@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 // tslint:disable:unified-signatures
-import { MonoTypeOperatorFunction, NEVER, Observable, OperatorFunction } from 'rxjs';
+import { MonoTypeOperatorFunction, NEVER, Observable, of, OperatorFunction, throwError } from 'rxjs';
 import { Intent } from '../platform.model';
-import { IntentMessage, TopicMessage } from '../messaging.model';
-import { first, map, takeUntil } from 'rxjs/operators';
+import { IntentMessage, MessageHeaders, ResponseStatusCodes, TopicMessage } from '../messaging.model';
+import { first, map, mergeMap, takeUntil } from 'rxjs/operators';
 import { AbstractType, Beans, Type } from '../bean-manager';
 
 /**
@@ -122,7 +122,8 @@ export abstract class MessageClient {
    * @param  intent
    *         Describes the intent. It must not contain wildcard characters.
    * @param  body
-   *         Specifies JSON serializable transfer data to be carried with the intent, if any.
+   *         Specifies transfer data to be carried with the intent, if any.
+   *         It can be any object which is serializable with the structured clone algorithm.
    * @param  options
    *         Controls how to issue the intent and allows setting message headers.
    * @return An Observable which completes immediately when dispatched the intent, or which throws an error if the intent
@@ -141,7 +142,8 @@ export abstract class MessageClient {
    * @param  intent
    *         Describes the intent. The qualifier must not contain wildcard characters.
    * @param  body
-   *         Specifies JSON serializable transfer data to be carried with the intent, if any.
+   *         Specifies transfer data to be carried with the intent, if any.
+   *         It can be any object which is serializable with the structured clone algorithm.
    * @param  options
    *         Controls how to send the request and allows setting request headers.
    * @return An Observable that emits when receiving a reply. It never completes. It throws an error if the intent could not be dispatched.
@@ -207,6 +209,39 @@ export function takeUntilUnsubscribe<T>(topic: string, /* @internal */ messageCl
  */
 export function mapToBody<T>(): OperatorFunction<TopicMessage<T> | IntentMessage<T>, T> {
   return map(message => message.body);
+}
+
+/**
+ * Returns an Observable that mirrors the source Observable, unless receiving a message with
+ * a status code other than {@link ResponseStatusCodes#OK}. Then, the stream will end with an
+ * error and source Observable will be unsubscribed.
+ */
+export function throwOnErrorStatus<BODY>(): MonoTypeOperatorFunction<TopicMessage<BODY>> {
+  return mergeMap((message: TopicMessage<BODY>): Observable<TopicMessage<BODY>> => {
+    const status = message.headers.get(MessageHeaders.Status);
+    if (status === ResponseStatusCodes.OK) {
+      return of(message);
+    }
+
+    if (message.body) {
+      return throwError(`[${status}] ${message.body}`);
+    }
+
+    switch (status) {
+      case ResponseStatusCodes.BAD_REQUEST: {
+        return throwError(`${status}: The receiver could not understand the request due to invalid syntax.`);
+      }
+      case ResponseStatusCodes.NOT_FOUND: {
+        return throwError(`${status}: The receiver could not find the requested resource.`);
+      }
+      case ResponseStatusCodes.ERROR: {
+        return throwError(`${status}: The receiver encountered an internal error.`);
+      }
+      default: {
+        return throwError(`${status}: Request error.`);
+      }
+    }
+  });
 }
 
 /**

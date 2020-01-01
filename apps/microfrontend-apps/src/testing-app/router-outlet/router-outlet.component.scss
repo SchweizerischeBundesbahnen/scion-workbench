@@ -4,30 +4,29 @@
   display: flex;
   flex-direction: column;
 
-  > div.url {
+  > form {
     flex: none;
-    margin-bottom: .25em;
     display: flex;
     align-items: center;
+    margin-bottom: .25em;
 
-    > input.url {
+    > input.outlet-name {
       flex: auto;
     }
 
-    > button.go {
-      flex: none;
-      margin-left: .5em;
-    }
-
-    > button.clear {
+    > button {
       flex: none;
       margin-left: .25em;
     }
   }
 
-  > iframe {
+  > sci-router-outlet {
     flex: auto;
     border: 1px solid accentColor(.25);
     border-radius: 3px;
+  }
+
+  > div.app-router-outlet-panel {
+    flex: none;
   }
 }

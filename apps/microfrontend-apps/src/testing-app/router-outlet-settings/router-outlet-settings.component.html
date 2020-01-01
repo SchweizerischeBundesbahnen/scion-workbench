@@ -1,0 +1,11 @@
+<ul cdkTrapFocus>
+  <li (click)="onPageScrollingToggle()">
+    <span class="label">Page scrolling</span>
+    <span class="description">Enables native page scrolling in the embedded document</span>
+    <ng-container *ngTemplateOutlet="toggle_button; context: {$implicit: pageScrollingEnabled}"></ng-container>
+  </li>
+</ul>
+
+<ng-template #toggle_button let-enabled>
+  <button type="button" class="material-icons toggle" [class.enabled]="enabled">{{ enabled ? 'toggle_on' : 'toggle_off'}}</button>
+</ng-template>

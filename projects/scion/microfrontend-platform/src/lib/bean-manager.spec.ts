@@ -412,6 +412,19 @@ describe('BeanManager', () => {
     expect(Beans.get(SomeSymbol)).toBe(someObject);
   });
 
+  it('should allow registering a bean representing a boolean value', async () => {
+    abstract class TrueValueBean {
+    }
+    abstract class FalseValueBean {
+    }
+
+    Beans.register(TrueValueBean, {useValue: true});
+    Beans.register(FalseValueBean, {useValue: false});
+
+    expect(Beans.get(TrueValueBean)).toBe(true);
+    expect(Beans.get(FalseValueBean)).toBe(false);
+  });
+
   it('should allow registering a bean using a factory construction function', async () => {
     abstract class SomeSymbol {
     }

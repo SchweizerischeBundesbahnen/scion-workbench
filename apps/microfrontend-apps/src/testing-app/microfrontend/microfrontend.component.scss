@@ -1,0 +1,26 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: max-content;
+  row-gap: .5em;
+
+  > section {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid accentColor(.25);
+    border-radius: 3px;
+    padding: 1em;
+
+    > *:not(:last-child):not(h2) {
+      margin-bottom: .25em;
+    }
+
+    > h2 {
+      font-size: 1em;
+      margin-top: 0;
+      margin-bottom: .5em;
+    }
+  }
+}

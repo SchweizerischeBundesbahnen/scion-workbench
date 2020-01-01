@@ -1,27 +1,41 @@
-import { $, browser, ElementFinder, ExpectedConditions } from 'protractor';
+/*
+ * Copyright (c) 2018-2019 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
+import { $, browser, ElementFinder, WebElement } from 'protractor';
 import { enterText } from './spec.util';
 import { UUID } from '@scion/toolkit/util';
 import { Outlets } from './testing-app.po';
+import { RouterOutletContextPO } from './context/router-outlet-context.po';
 
 /**
- * Page object representing an `<app-outlet>` to show a microfrontend in an iframe.
+ * Page object for {@link BrowserOutletComponent} to show a microfrontend in an iframe inside `<sci-router-outlet>`.
  */
-export class OutletPO {
+export class BrowserOutletPO {
 
-  private static ATTR_IFRAME_ID = 'iframeid';
+  private static ATTR_WEBDRIVER_EXECUTION_CONTEXT_ID = 'webdriverExecutionContextId';
 
   private readonly _outletFinder: ElementFinder;
-  private readonly _iframeFinder: ElementFinder;
 
   /**
    * Unique iframe identity to determine if to switch the WebDriver execution context when interacting with the iframe.
    * The identity is computed and set when interacting with the iframe for the first time.
    */
-  private _iframeId: string;
+  private _webdriverExecutionContextId: string;
 
-  constructor(public outletName: string, private _parentOutletPO?: OutletPO) {
-    this._outletFinder = $(`app-outlet#${this.outletName}`);
-    this._iframeFinder = this._outletFinder.$(`iframe#${this.outletName}`);
+  /**
+   * Allows defining the context of this outlet.
+   */
+  public readonly outletContextPO: RouterOutletContextPO;
+
+  constructor(public outletName: string, private _parentOutletPO?: BrowserOutletPO) {
+    this._outletFinder = $(`app-browser-outlet#${this.outletName}`);
+    this.outletContextPO = new RouterOutletContextPO(this._outletFinder, (): Promise<void> => this.switchToOutlet());
   }
 
   /**
@@ -56,15 +70,15 @@ export class OutletPO {
   }
 
   /**
-   * Loads the site 'testing-app/outlets' into the outlet's iframe to show nested microfrontend(s).
+   * Loads the site 'testing-app/browser-outlets' into the outlet's iframe to show nested microfrontend(s).
    *
    * @param origin
-   *        the origin from where to load 'testing-app/outlets' page
+   *        the origin from where to load 'testing-app/browser-outlets' page
    * @param outletNames
    *        list of outlets for which to create an outlet. Each outlet has an iframe to show some microfrontend.
    */
   public async enterOutletsUrl(origin: string, outletNames: string[]): Promise<void> {
-    await this.enterUrl(new URL(`#/testing-app/outlets;names=${outletNames.join(',')}`, origin).toString());
+    await this.enterUrl(new URL(`#/testing-app/browser-outlets;names=${outletNames.join(',')}`, origin).toString());
   }
 
   /**
@@ -96,9 +110,18 @@ export class OutletPO {
    * Instead, the execution context must first be switched to the iframe.
    */
   public async switchToOutletIframe(trace: boolean = true): Promise<void> {
-    // Check if the WebDriver execution context for this iframe is already active.
-    if (this._iframeId && this._iframeId === await $('body').getAttribute(OutletPO.ATTR_IFRAME_ID)) {
-      return Promise.resolve();
+    // Check if the WebDriver execution context for this document is already active.
+
+    // Do not wait for Angular as the site must not necessarily be an Angular powered site, e.g. 'about:blank'.
+    const waitForAngularEnabledState = browser.waitForAngularEnabled();
+    await browser.waitForAngularEnabled(false);
+    try {
+      if (this._webdriverExecutionContextId && this._webdriverExecutionContextId === await $('body').getAttribute(BrowserOutletPO.ATTR_WEBDRIVER_EXECUTION_CONTEXT_ID)) {
+        return Promise.resolve();
+      }
+    }
+    finally {
+      await browser.waitForAngularEnabled(waitForAngularEnabledState);
     }
 
     // In order to activate this iframe's WebDriver execution context, its parent iframe execution contexts must be activated first,
@@ -111,21 +134,23 @@ export class OutletPO {
       await this._parentOutletPO.switchToOutletIframe(false);
     }
 
-    // Activate this iframe's WebDriver execution context.
-    await browser.wait(ExpectedConditions.visibilityOf(this._iframeFinder), 5000, `Iframe '${this.outletName}' not found within a timeout of 5000ms: ${this.iframePath.join('>')}`);
-    await browser.switchTo().frame(this._iframeFinder.getWebElement());
-    trace && console.log(`Switched WebDriver execution context to the iframe: ${this.iframePath.join('>')}.`);
+    // Get the iframe from the custom element (inside shadow DOM)
+    const iframe = await browser.executeScript('return arguments[0].iframe', this._outletFinder.$('sci-router-outlet').getWebElement()) as WebElement;
 
-    // Set the iframe's identity as attribute to its HTML body element (if not already set).
+    // Activate this iframe's WebDriver execution context.
+    await browser.switchTo().frame(iframe);
+    trace && console.log(`Switched WebDriver execution context to the iframe: ${this.iframePath.join(' > ')}.`);
+
+    // Set the webdriver execution context identity as attribute to the document's body element (if not already set).
     // It will be used by later interactions to decide if a context switch is required.
-    if (!this._iframeId) {
-      this._iframeId = UUID.randomUUID();
-      await browser.driver.executeScript(`document.body.setAttribute('${OutletPO.ATTR_IFRAME_ID}', '${this._iframeId}')`);
+    if (!this._webdriverExecutionContextId) {
+      this._webdriverExecutionContextId = UUID.randomUUID();
+      await browser.executeScript(`document.body.setAttribute('${BrowserOutletPO.ATTR_WEBDRIVER_EXECUTION_CONTEXT_ID}', '${this._webdriverExecutionContextId}')`);
     }
   }
 
   private get iframePath(): string[] {
-    const iframeIdentity = `iframe#${this.outletName}`;
+    const iframeIdentity = this.outletName;
 
     if (this._parentOutletPO) {
       return this._parentOutletPO.iframePath.concat(iframeIdentity);

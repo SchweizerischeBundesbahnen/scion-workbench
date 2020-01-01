@@ -1,6 +1,6 @@
 import { $ } from 'protractor';
 import { enterText, findAsync } from '../spec.util';
-import { SwitchToIframeFn } from '../outlet.po';
+import { SwitchToIframeFn } from '../browser-outlet.po';
 import { Qualifier } from '@scion/microfrontend-platform';
 import { SciListPO, SciParamsEnterPO } from '@scion/ɵtoolkit/widgets.po';
 import { IntentListItemPO } from './intent-list-item.po';

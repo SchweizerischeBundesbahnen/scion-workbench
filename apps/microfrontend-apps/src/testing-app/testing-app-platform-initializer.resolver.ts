@@ -1,10 +1,18 @@
+/*
+ * Copyright (c) 2018-2019 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
-import { Beans, MessageClient, MicrofrontendPlatform, PlatformState, PlatformStates } from '@scion/microfrontend-platform';
 import { ManifestRequestHandler } from './manifest/manifest-request-handler';
 import { Injectable, NgZone } from '@angular/core';
 import { AngularZoneMessageClientDecorator } from './angular-zone-message-client.decorator';
-import { PlatformMessageClient } from '../../../../projects/scion/microfrontend-platform/src/lib/host/platform-message-client';
+import { Beans, MessageClient, MicrofrontendPlatform, PlatformMessageClient, PlatformState, PlatformStates } from '@scion/microfrontend-platform';
 
 const ports = [4200, 4201, 4202, 4203];
 
@@ -42,11 +50,12 @@ export class TestingAppPlatformInitializerResolver implements Resolve<void> {
       Beans.registerDecorator(PlatformMessageClient, {useClass: AngularZoneMessageClientDecorator});
     });
 
+    const hostUrl = `${window.location.protocol}//${window.location.hostname}`;
     return MicrofrontendPlatform.forHost([
-      {manifestUrl: 'http://localhost:4200/testing-app/assets/app-4200-manifest.json', symbolicName: 'app-4200'},
-      {manifestUrl: 'http://localhost:4201/testing-app/assets/app-4201-manifest.json', symbolicName: 'app-4201'},
-      {manifestUrl: 'http://localhost:4202/testing-app/assets/app-4202-manifest.json', symbolicName: 'app-4202'},
-      {manifestUrl: 'http://localhost:4203/testing-app/assets/app-4203-manifest.json', symbolicName: 'app-4203'},
+      {manifestUrl: `${hostUrl}:4200/testing-app/assets/app-4200-manifest.json`, symbolicName: 'app-4200'},
+      {manifestUrl: `${hostUrl}:4201/testing-app/assets/app-4201-manifest.json`, symbolicName: 'app-4201'},
+      {manifestUrl: `${hostUrl}:4202/testing-app/assets/app-4202-manifest.json`, symbolicName: 'app-4202'},
+      {manifestUrl: `${hostUrl}:4203/testing-app/assets/app-4203-manifest.json`, symbolicName: 'app-4203'},
     ], {symbolicName: `app-${port}`});
   }
 

@@ -10,7 +10,7 @@
 import { from, fromEvent, noop, Observable, of, Subject, throwError } from 'rxjs';
 import { MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../ɵmessaging.model';
 import { first, map, mergeMap, share, switchMap, take, takeUntil, timeoutWith } from 'rxjs/operators';
-import { filterByOrigin, filterByTopic, filterByTransport, pluckEnvelope } from './operators';
+import { filterByOrigin, filterByTopic, filterByTransport, pluckEnvelope } from '../operators';
 import { UUID } from '@scion/toolkit/util';
 import { MessageHeaders, TopicMessage } from '../messaging.model';
 import { GatewayInfoResponse, getGatewayJavaScript } from './broker-gateway-script';

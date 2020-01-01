@@ -17,7 +17,7 @@ import { Logger } from '../logger';
 import { ManifestRegistry } from '../host/manifest.registry';
 import { ApplicationConfig } from '../host/platform-config';
 import { PLATFORM_SYMBOLIC_NAME } from '../host/platform.constants';
-import { collectToPromise, expectToBeRejectedWithError, expectToBeResolvedToContain, serveManifest, waitFor } from '../spec.util.spec';
+import { collectToPromise, expectToBeRejectedWithError, expectMap, serveManifest, waitFor } from '../spec.util.spec';
 import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { Defined, Objects } from '@scion/toolkit/util';
 import Spy = jasmine.Spy;
@@ -110,7 +110,7 @@ describe('Messaging', () => {
     const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
     Beans.get(PlatformMessageClient).publish$('some-topic', undefined, {headers: new Map().set('header1', 'value').set('header2', 42)}).subscribe();
-    await expectToBeResolvedToContain(actual, new Map().set('header1', 'value').set('header2', 42));
+    await expectMap(actual).toContain(new Map().set('header1', 'value').set('header2', 42));
   });
 
   it('should allow passing headers when issuing an intent', async () => {
@@ -122,7 +122,7 @@ describe('Messaging', () => {
     const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
     Beans.get(MessageClient).issueIntent$({type: 'some-capability'}, undefined, {headers: new Map().set('header1', 'value').set('header2', 42)}).subscribe();
-    await expectToBeResolvedToContain(actual, new Map().set('header1', 'value').set('header2', 42));
+    await expectMap(actual).toContain(new Map().set('header1', 'value').set('header2', 42));
   });
 
   it('should return an empty headers dictionary if no headers are set', async () => {
@@ -132,7 +132,7 @@ describe('Messaging', () => {
     const actual = collectToPromise(actual$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
     Beans.get(PlatformMessageClient).publish$('some-topic', 'payload').subscribe();
-    await expectToBeResolvedToContain(actual, new Map());
+    await expectMap(actual).toContain(new Map());
   });
 
   it('should allow passing headers when sending a request', async () => {
@@ -146,7 +146,7 @@ describe('Messaging', () => {
     const ping$ = Beans.get(PlatformMessageClient).request$('some-topic', undefined, {headers: new Map().set('request-header', 'ping')});
     const actual = collectToPromise(ping$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
-    await expectToBeResolvedToContain(actual, new Map().set('reply-header', 'PING'));
+    await expectMap(actual).toContain(new Map().set('reply-header', 'PING'));
   });
 
   it('should allow passing headers when sending an intent request', async () => {
@@ -162,7 +162,7 @@ describe('Messaging', () => {
     const ping$ = Beans.get(MessageClient).requestByIntent$({type: 'some-capability'}, undefined, {headers: new Map().set('request-header', 'ping')});
     const actual = collectToPromise(ping$, {take: 1, projectFn: headersExtractFn}).then(takeFirstElement);
 
-    await expectToBeResolvedToContain(actual, new Map().set('reply-header', 'PING'));
+    await expectMap(actual).toContain(new Map().set('reply-header', 'PING'));
   });
 
   it('should transport a topic message to both, the platform client and the host client, respectively', async () => {

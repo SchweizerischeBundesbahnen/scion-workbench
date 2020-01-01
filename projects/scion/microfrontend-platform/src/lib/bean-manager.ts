@@ -70,7 +70,7 @@ export const Beans = new class {
     const beanInfo: BeanInfo<T> = {
       symbol: symbol,
       beanConstructFn: deriveConstructFunction(symbol, instructions),
-      eager: Defined.orElse(instructions && (instructions.eager || !!instructions.useValue), false),
+      eager: Defined.orElse(instructions && (instructions.eager || instructions.useValue !== undefined), false),
       multi: multi,
       destroyPhase: Defined.orElse(instructions && instructions.destroyPhase as any, PlatformStates.Stopping),
       useExisting: instructions && instructions.useExisting,
@@ -278,7 +278,7 @@ function destroyBean(beanInfo: BeanInfo): void {
 }
 
 function deriveConstructFunction<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: InstanceConstructInstructions<T>): () => T {
-  if (instructions && instructions.useValue) {
+  if (instructions && instructions.useValue !== undefined) {
     return (): T => instructions.useValue;
   }
   else if (instructions && instructions.useClass) {

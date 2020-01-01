@@ -13,9 +13,9 @@ import { Logger } from './logger';
 /**
  * Runs the given function. Errors are catched and logged.
  */
-export function runSafe(runnable: () => void): void {
+export function runSafe<T = void>(runnable: () => T): T {
   try {
-    runnable();
+    return runnable();
   }
   catch (error) {
     Beans.get(Logger).error('[UnexpectedError] An unexpected error occurred.', error);

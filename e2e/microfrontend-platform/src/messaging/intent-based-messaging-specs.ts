@@ -2,18 +2,17 @@
  * Copyright (c) 2018-2019 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
- * available under the terms from the Eclipse Public License 2.0
+ * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-
 import { TestingAppOrigins, TestingAppPO } from '../testing-app.po';
 import { MessagingModel, PublishMessagePagePO } from './publish-message-page.po';
 import { ReceiveMessagePagePO } from './receive-message-page.po';
 import { ManageIntentsPagePO } from '../manifest/manage-intents-page.po';
 import { ManageCapabilitiesPagePO } from '../manifest/manage-capabilities-page.po';
-import { OutletPO } from '../outlet.po';
+import { BrowserOutletPO } from '../browser-outlet.po';
 import { expectToBeRejectedWithError } from '../spec.util';
 import { MessageListItemPO } from './message-list-item.po';
 import { IntentMessage } from '@scion/microfrontend-platform';
@@ -78,7 +77,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
@@ -123,7 +122,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
@@ -165,7 +164,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
@@ -210,7 +209,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
@@ -257,7 +256,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4202_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4201 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4201});
@@ -332,7 +331,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
@@ -390,7 +389,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
@@ -449,7 +448,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4203_4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4202 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
@@ -509,7 +508,7 @@ export namespace IntendBasedMessagingSpecs {
       receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
     });
 
-    const managerOutlet = await pagePOs.get<OutletPO>('managerOutlet');
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intent
     const intentManagerPO_4200 = await managerOutlet.enterUrl<ManageIntentsPagePO>({useClass: ManageIntentsPagePO, origin: TestingAppOrigins.LOCALHOST_4200});

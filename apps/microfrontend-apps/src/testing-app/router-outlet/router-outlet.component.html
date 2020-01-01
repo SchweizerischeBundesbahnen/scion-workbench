@@ -1,0 +1,14 @@
+<form autocomplete="off" [formGroup]="form">
+  <input [formControlName]="OUTLET_NAME" placeholder="Enter the name of this outlet" class="outlet-name e2e-outlet-name">
+  <button type="submit" class="e2e-apply" (click)="onApplyClick()">Apply</button>
+  <button type="button" class="material-icons e2e-context-define" #context_define_button title="Define the context of this outlet" (click)="onContextDefineClick()">input</button>
+  <button type="button" class="material-icons e2e-settings" #settings_button title="Settings" (click)="onSettingsClick()">more_vert</button>
+</form>
+
+<sci-router-outlet #router_outlet
+                   [name]="outletName"
+                   (activate)="onActivate($event)"
+                   (deactivate)="onDeactivate($event)">
+</sci-router-outlet>
+
+<app-router-outlet-panel [activationLog]="activationLog" (clearLog)="onLogClearClick()"></app-router-outlet-panel>

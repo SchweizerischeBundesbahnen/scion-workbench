@@ -7,8 +7,8 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { concat, EMPTY, from, fromEvent, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pipe, Subject } from 'rxjs';
-import { catchError, filter, mergeMap, mergeMapTo, publishLast, refCount, share, take, takeUntil } from 'rxjs/operators';
+import { EMPTY, fromEvent, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pipe, Subject } from 'rxjs';
+import { catchError, filter, mergeMap, share, takeUntil } from 'rxjs/operators';
 import { IntentMessage, Message, MessageHeaders, TopicMessage } from '../../messaging.model';
 import { ConnackMessage, MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../../ɵmessaging.model';
 import { matchesCapabilityQualifier } from '../../qualifier-tester';
@@ -24,6 +24,7 @@ import { TopicSubscriptionRegistry } from './topic-subscription.registry';
 import { Client, ClientRegistry } from './client.registry';
 import { RetainedMessageStore } from './retained-message-store';
 import { TopicMatcher } from '../../topic-matcher.util';
+import { bufferUntil } from '../../operators';
 
 /**
  * The broker is responsible for receiving all messages, filtering the messages, determining who is
@@ -488,15 +489,6 @@ function sendTopicMessage<T>(recipient: { window: Window; origin: string } | Cli
 interface ClientMessage<MSG extends Message = any> {
   envelope: MessageEnvelope<MSG>;
   client: Client;
-}
-
-/**
- * Buffers the source Observable values until `closingNotifier$` emits.
- * Once closed, items of the source Observable are emitted as they arrive.
- */
-function bufferUntil<T>(closingNotifier$: Observable<any> | Promise<any>): OperatorFunction<T, T> {
-  const guard$ = from(closingNotifier$).pipe(take(1), publishLast(), refCount(), mergeMapTo(EMPTY));
-  return mergeMap((item: T) => concat(guard$, of(item)));
 }
 
 /**

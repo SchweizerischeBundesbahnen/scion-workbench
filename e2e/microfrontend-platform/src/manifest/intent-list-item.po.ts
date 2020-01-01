@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { SwitchToIframeFn } from '../outlet.po';
+import { SwitchToIframeFn } from '../browser-outlet.po';
 import { SciListItemPO, SciQualifierChipListPO } from '@scion/ɵtoolkit/widgets.po';
 import { Qualifier } from '@scion/microfrontend-platform';
 

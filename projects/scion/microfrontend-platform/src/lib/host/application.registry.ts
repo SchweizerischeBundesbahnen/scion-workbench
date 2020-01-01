@@ -12,7 +12,7 @@ import { Application, ApplicationManifest } from '../platform.model';
 import { Beans } from '../bean-manager';
 import { Defined } from '@scion/toolkit/util';
 import { ManifestRegistry } from './manifest.registry';
-import { Url } from '../url.util';
+import { Urls } from '../url.util';
 import { ApplicationConfig } from './platform-config';
 
 /**
@@ -53,7 +53,7 @@ export class ApplicationRegistry {
       symbolicName: applicationConfig.symbolicName,
       name: manifest.name,
       baseUrl: this.computeBaseUrl(applicationConfig, manifest),
-      manifestUrl: new URL(applicationConfig.manifestUrl, Url.isAbsoluteUrl(applicationConfig.manifestUrl) ? applicationConfig.manifestUrl : window.origin).toString(),
+      manifestUrl: new URL(applicationConfig.manifestUrl, Urls.isAbsoluteUrl(applicationConfig.manifestUrl) ? applicationConfig.manifestUrl : window.origin).toString(),
       origin: new URL(this.computeBaseUrl(applicationConfig, manifest)).origin,
     });
 
@@ -77,7 +77,7 @@ export class ApplicationRegistry {
    * - if base URL is not specified in the manifest, the origin from 'manifestUrl' is used as the base URL, or the origin from the current window if the 'manifestUrl' is relative
    */
   private computeBaseUrl(applicationConfig: ApplicationConfig, manifest: ApplicationManifest): string {
-    const manifestOrigin = Url.isAbsoluteUrl(applicationConfig.manifestUrl) ? new URL(applicationConfig.manifestUrl).origin : window.origin;
+    const manifestOrigin = Urls.isAbsoluteUrl(applicationConfig.manifestUrl) ? new URL(applicationConfig.manifestUrl).origin : window.origin;
 
     if (!manifest.baseUrl) {
       return manifestOrigin;

@@ -1,0 +1,83 @@
+@import 'ɵtoolkit-widget-theme';
+
+$h-margin: 2em;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border: 1px solid primaryColor(1);
+  width: 100%;
+
+  > header {
+    flex: none;
+    display: flex;
+    padding: .5em .5em .5em $h-margin;
+    height: 100px;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: primaryColor(1);
+    color: #FFFFFF;;
+
+    > h1 {
+      font-size: 1.2em;
+      font-weight: normal;
+    }
+
+    > button.close {
+      &:hover, &:active, &:focus {
+        color: inherit;
+      }
+    }
+  }
+
+  > main {
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    margin: 0 $h-margin;
+    position: relative;
+    top: -3em;
+
+    > section.new-context-entry {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      padding: 1em;
+      background-color: #FFFFFF;
+      box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+
+      > header {
+        flex: none;
+        font-weight: bold;
+        margin-bottom: .75em;
+      }
+
+      > form {
+        flex: none;
+        display: flex;
+
+        > input.name {
+          flex: none;
+          margin-right: .25em;
+          width: 100px;
+        }
+
+        > input.value{
+          flex: auto;
+          margin-right: .25em;
+        }
+
+        > button.add {
+          flex: none;
+        }
+      }
+    }
+
+    > sci-list.context {
+      flex: auto;
+      position: relative;
+      top: 1.5em;
+    }
+  }
+}

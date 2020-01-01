@@ -142,3 +142,9 @@ export interface Intent {
     implicit: boolean;
   };
 }
+
+/**
+ * Token to determine if this app instance is running as the platform host.
+ */
+export abstract class IS_PLATFORM_HOST { // tslint:disable-line:class-name
+}

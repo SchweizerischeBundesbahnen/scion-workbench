@@ -37,13 +37,16 @@
 @mixin button-bar() {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   border-top: 1px solid rgba(50, 50, 50, .3);
   background-color: rgba(50, 50, 50, .075);
   margin-top: 1em;
   padding: .5em 1em;
 
   > button {
-    @include button();
+    &:not(.material-icons) {
+      @include button();
+    }
 
     &:not(:first-child) {
       margin-left: .2em;

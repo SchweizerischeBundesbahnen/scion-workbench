@@ -11,7 +11,7 @@
 import { mapToBody, MessageClient, MessageOptions, PublishOptions } from './message-client';
 import { EMPTY, from, merge, noop, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
 import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
-import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from './operators';
+import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from '../operators';
 import { catchError, filter, finalize, first, map, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
 import { Defined, UUID } from '@scion/toolkit/util';
 import { Intent, Qualifier } from '../platform.model';
@@ -95,8 +95,8 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
       merge(this._brokerGateway.message$, topicSubscribeError$)
         .pipe(
           filterByChannel<TopicMessage>(MessagingChannel.Topic),
-          filterByHeader({key: MessageHeaders.ɵTopicSubscriberId, value: subscriberId}),
           pluckMessage(),
+          filterByHeader({key: MessageHeaders.ɵTopicSubscriberId, value: subscriberId}),
           map(message => ({...message, headers: copyMap(message.headers), params: copyMap(message.params)})),
           takeUntil(merge(this._destroy$, unsubscribe$)),
           finalize(() => {

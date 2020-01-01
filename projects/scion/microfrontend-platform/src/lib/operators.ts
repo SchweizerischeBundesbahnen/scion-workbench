@@ -7,10 +7,11 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { MonoTypeOperatorFunction, OperatorFunction, pipe } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
-import { MessageEnvelope, MessagingChannel, MessagingTransport } from '../ɵmessaging.model';
-import { Message, TopicMessage } from '../messaging.model';
+import { concat, EMPTY, from, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pipe } from 'rxjs';
+import { filter, map, mergeMap, mergeMapTo, publishLast, refCount, take } from 'rxjs/operators';
+import { MessageEnvelope, MessagingChannel, MessagingTransport } from './ɵmessaging.model';
+import { Message, TopicMessage } from './messaging.model';
+import { TopicMatcher } from './topic-matcher.util';
 
 export function filterByChannel<T>(channel: MessagingChannel): MonoTypeOperatorFunction<MessageEnvelope<T>> {
   return filter((envelope: MessageEnvelope<any>): boolean => {
@@ -28,7 +29,7 @@ export function filterByTransport(transport: MessagingTransport): MonoTypeOperat
 export function filterByTopic<T>(topic: string): OperatorFunction<MessageEnvelope, TopicMessage<T>> {
   return pipe(
     filterByChannel<TopicMessage>(MessagingChannel.Topic),
-    filter(envelope => envelope.message.topic === topic),
+    filter(envelope => new TopicMatcher(topic).matcher(envelope.message.topic).matches),
     pluckMessage(),
   );
 }
@@ -51,9 +52,17 @@ export function filterByOrigin(origin: string): MonoTypeOperatorFunction<Message
   });
 }
 
-export function filterByHeader<T extends Message>(header: { key: string, value: any }): MonoTypeOperatorFunction<MessageEnvelope<T>> {
-  return filter((envelope: MessageEnvelope<T>): boolean => {
-    const headers = envelope.message.headers;
-    return headers.has(header.key) && headers.get(header.key) === header.value;
+export function filterByHeader<T extends Message>(header: { key: string, value: any }): MonoTypeOperatorFunction<T> {
+  return filter((message: T): boolean => {
+    return message.headers.has(header.key) && message.headers.get(header.key) === header.value;
   });
+}
+
+/**
+ * Buffers the source Observable values until `closingNotifier$` emits.
+ * Once closed, items of the source Observable are emitted as they arrive.
+ */
+export function bufferUntil<T>(closingNotifier$: Observable<any> | Promise<any>): OperatorFunction<T, T> {
+  const guard$ = from(closingNotifier$).pipe(take(1), publishLast(), refCount(), mergeMapTo(EMPTY));
+  return mergeMap((item: T) => concat(guard$, of(item)));
 }

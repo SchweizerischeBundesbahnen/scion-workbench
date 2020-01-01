@@ -1,0 +1,24 @@
+<section>
+  <h2>Identities</h2>
+  <sci-form-field label="App instance ID">
+    <input class="e2e-app-instance-id" [value]="appInstanceId" readonly>
+  </sci-form-field>
+  <sci-form-field label="Component instance ID">
+    <input class="e2e-component-instance-id" [value]="componentInstanceId" readonly>
+  </sci-form-field>
+</section>
+
+<section>
+  <h2>URL matrix parameters</h2>
+  <sci-property [properties]="params$ | async" class="e2e-matrix-params"></sci-property>
+</section>
+
+<section>
+  <h2>URL query parameters</h2>
+  <sci-property [properties]="queryParams$ | async" class="e2e-query-params"></sci-property>
+</section>
+
+<section>
+  <h2>URL fragment</h2>
+  <input [value]="fragment$ | async" class="e2e-fragment" readonly>
+</section>

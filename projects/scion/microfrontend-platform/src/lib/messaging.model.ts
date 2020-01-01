@@ -68,22 +68,34 @@ export interface TopicMessage<BODY = any> extends Message {
 export enum MessageHeaders {
   /**
    * Identifies the sending client instance of a message.
+   * This header is set by the platform when publishing a message or intent.
    */
   ClientId = 'CLIENT_ID',
   /**
    * Identifies the sending application of a message.
+   * This header is set by the platform when publishing a message or intent.
    */
   AppSymbolicName = 'APP_SYMBOLIC_NAME',
   /**
    * Destination to which to send a response to this message.
-   *
-   * This header is set by the platform if the publisher expects the consumer to reply to the message.
+   * This header is set by the platform when sending a request.
    */
   ReplyTo = 'REPLY_TO',
   /**
    * The time the message was sent.
+   * This header is set by the platform when publishing a message or intent.
    */
   Timestamp = 'TIMESTAMP',
+  /**
+   * Use this header to set the request method to indicate the desired action to be performed for a given resource.
+   * @see RequestMethods
+   */
+  Method = 'METHOD',
+  /**
+   * Use this header to set the response status code to indicate whether a request has been successfully completed.
+   * @see ResponseStatusCodes
+   */
+  Status = 'STATUS',
   /**
    * Unique identity of a topic subscriber.
    *
@@ -91,3 +103,52 @@ export enum MessageHeaders {
    */
   ɵTopicSubscriberId = 'ɵTOPIC_SUBSCRIBER_ID',
 }
+
+/**
+ * Defines a set of request methods to indicate the desired action to be performed for a given resource.
+ */
+export enum RequestMethods {
+  /**
+   * The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.
+   */
+  GET = 'GET',
+  /**
+   * The DELETE method deletes the specified resource.
+   */
+  DELETE = 'DELETE',
+  /**
+   * The PUT method replaces all current representations of the target resource with the request payload.
+   */
+  PUT = 'PUT',
+  /**
+   * The POST method is used to submit an entity to the specified resource, often causing a change in state or side effects on the server.
+   */
+  POST = 'POST',
+  /**
+   * The OBSERVE method is used to observe the specified resource.
+   */
+  OBSERVE = 'OBSERVE'
+}
+
+/**
+ * Defines a set of response status codes to indicate whether a request has been successfully completed.
+ */
+export enum ResponseStatusCodes {
+  /**
+   * The request has succeeded.
+   */
+  OK = 200,
+  /**
+   * The receiver could not understand the request due to invalid syntax.
+   */
+  BAD_REQUEST = 400,
+  /**
+   * The receiver could not find the requested resource.
+   */
+  NOT_FOUND = 404,
+  /**
+   * The receiver encountered an internal error. The error is transmitted in the message body.
+   */
+  ERROR = 500,
+}
+

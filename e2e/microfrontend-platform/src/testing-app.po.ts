@@ -1,5 +1,14 @@
+/*
+ * Copyright (c) 2018-2019 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
 import { browser } from 'protractor';
-import { OutletDescriptorTypes, OutletPageObjectClass, OutletPageObjectDescriptor, OutletPO } from './outlet.po';
+import { OutletDescriptorTypes, OutletPageObjectClass, OutletPageObjectDescriptor, BrowserOutletPO } from './browser-outlet.po';
 
 /**
  * The central page object of the testing app to perform the initial navigation.
@@ -67,39 +76,39 @@ export class TestingAppPO {
     return this.configureTestingApp(outlets);
   }
 
-  private async configureTestingApp(outlets: Outlets, parentOutletPO?: OutletPO): Promise<OutletPageObjectMap> {
+  private async configureTestingApp(outlets: Outlets, parentOutletPO?: BrowserOutletPO): Promise<OutletPageObjectMap> {
     // For root outlets, perform the initial page navigation, for child outlets navigate to the outlets page.
     const outletNames = Object.keys(outlets);
     if (parentOutletPO) {
       await parentOutletPO.enterOutletsUrl(TestingAppOrigins.LOCALHOST_4200, outletNames);
     }
     else {
-      await browser.get(`/#/testing-app/outlets;names=${outletNames.join(',')}`);
+      await browser.get(`/#/testing-app/browser-outlets;names=${outletNames.join(',')}`);
     }
 
-    const outletPOs = outletNames.map(outletName => new OutletPO(outletName, parentOutletPO));
+    const browserOutletPOs = outletNames.map(outletName => new BrowserOutletPO(outletName, parentOutletPO));
     const pageObjectMap = new Map<string, Object>();
 
     // Load the microfrontend of every outlet.
-    for (const outletPO of outletPOs) {
-      const outletDescriptor: string | OutletPageObjectClass | OutletPageObjectDescriptor | Outlets = outlets[outletPO.outletName];
+    for (const browserOutletPO of browserOutletPOs) {
+      const outletDescriptor: string | OutletPageObjectClass | OutletPageObjectDescriptor | Outlets = outlets[browserOutletPO.outletName];
 
       switch (OutletDescriptorTypes.of(outletDescriptor)) {
         case OutletDescriptorTypes.URL: {
-          await outletPO.enterUrl(outletDescriptor as string);
-          putIfAbsentOrElseThrow(pageObjectMap, `${outletPO.outletName}`, outletPO);
+          await browserOutletPO.enterUrl(outletDescriptor as string);
+          putIfAbsentOrElseThrow(pageObjectMap, `${browserOutletPO.outletName}`, browserOutletPO);
           break;
         }
         case OutletDescriptorTypes.PAGE_OBJECT_CLASS:
         case OutletDescriptorTypes.PAGE_OBJECT_DESCRIPTOR: {
-          const pageObject = await outletPO.enterUrl<any>(outletDescriptor as OutletPageObjectClass | OutletPageObjectDescriptor);
-          putIfAbsentOrElseThrow(pageObjectMap, `${outletPO.outletName}:outlet`, outletPO);
-          putIfAbsentOrElseThrow(pageObjectMap, outletPO.outletName, pageObject);
+          const pageObject = await browserOutletPO.enterUrl<any>(outletDescriptor as OutletPageObjectClass | OutletPageObjectDescriptor);
+          putIfAbsentOrElseThrow(pageObjectMap, `${browserOutletPO.outletName}:outlet`, browserOutletPO);
+          putIfAbsentOrElseThrow(pageObjectMap, browserOutletPO.outletName, pageObject);
           break;
         }
         case OutletDescriptorTypes.OUTLETS: {
-          putIfAbsentOrElseThrow(pageObjectMap, outletPO.outletName, outletPO);
-          const pageObjects = await this.configureTestingApp(outletDescriptor as Outlets, outletPO);
+          putIfAbsentOrElseThrow(pageObjectMap, browserOutletPO.outletName, browserOutletPO);
+          const pageObjects = await this.configureTestingApp(outletDescriptor as Outlets, browserOutletPO);
           pageObjects.outlets().forEach(outlet => putIfAbsentOrElseThrow(pageObjectMap, outlet, pageObjects.get(outlet)));
           break;
         }

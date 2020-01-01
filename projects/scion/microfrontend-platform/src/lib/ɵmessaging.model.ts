@@ -37,6 +37,10 @@ export enum MessagingTransport {
    * Transport to send messages from the broker to the gateway.
    */
   BrokerToGateway = 'sci://microfrontend-platform/broker-to-gateway',
+  /**
+   * Transport to send messages from the embedded outlet content to its containing outlet.
+   */
+  EmbeddedOutletContentToOutlet = 'sci://microfrontend-platform/embeddedOutletContent-to-outlet',
 }
 
 /**
