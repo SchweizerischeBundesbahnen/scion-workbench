@@ -32,10 +32,14 @@ import { PlatformTopics } from './ɵmessaging.model';
 import { mergeMap, takeUntil } from 'rxjs/operators';
 import { OutletRouter } from './client/router-outlet/outlet-router';
 import { SciRouterOutletElement } from './client/router-outlet/router-outlet.element';
+import { FocusInEventDispatcher } from './client/focus/focus-in-event-dispatcher';
+import { FocusMonitor } from './client/focus/focus-monitor';
 import { ContextService } from './client/context/context-service';
 import { RouterOutletUrlAssigner } from './client/router-outlet/router-outlet-url-assigner';
 import { IS_PLATFORM_HOST } from './platform.model';
 import { RelativePathResolver } from './client/router-outlet/relative-path-resolver';
+import { ClientRegistry } from './host/message-broker/client.registry';
+import { FocusTracker } from './host/focus/focus-tracker';
 
 /**
  * The central class of the SCION microfrontend platform.
@@ -79,6 +83,8 @@ export const MicrofrontendPlatform = new class {
         Beans.registerIfAbsent(OutletRouter);
         Beans.registerIfAbsent(RelativePathResolver);
         Beans.registerIfAbsent(RouterOutletUrlAssigner);
+        Beans.register(FocusInEventDispatcher, {eager: true});
+        Beans.register(FocusMonitor);
         Beans.register(ContextService);
       },
     );
@@ -100,6 +106,7 @@ export const MicrofrontendPlatform = new class {
         Beans.registerInitializer({useClass: ManifestCollector});
 
         Beans.register(IS_PLATFORM_HOST, {useValue: true});
+        Beans.register(ClientRegistry);
         Beans.registerIfAbsent(Logger);
         Beans.register(PlatformProperties);
         Beans.registerIfAbsent(HttpClient);
@@ -109,6 +116,9 @@ export const MicrofrontendPlatform = new class {
         Beans.registerIfAbsent(PlatformMessageClient, provideMessageClient(PLATFORM_SYMBOLIC_NAME, clientConfig && clientConfig.messaging));
         Beans.register(HostPlatformState);
         Beans.register(ContextService);
+        Beans.register(FocusTracker, {eager: true});
+        Beans.register(FocusInEventDispatcher, {eager: true});
+
         // Construct the bean manager instantly to receive connect requests of clients.
         Beans.registerIfAbsent(MessageBroker, {useValue: new MessageBroker(), destroyPhase: PlatformStates.Stopped});
 
@@ -119,6 +129,7 @@ export const MicrofrontendPlatform = new class {
           Beans.registerIfAbsent(OutletRouter);
           Beans.registerIfAbsent(RelativePathResolver);
           Beans.registerIfAbsent(RouterOutletUrlAssigner);
+          Beans.register(FocusMonitor);
         }
 
         // Notify clients about host platform state changes.
@@ -129,7 +140,7 @@ export const MicrofrontendPlatform = new class {
           )
           .subscribe();
       },
-    );
+    ).then(() => Beans.get(HostPlatformState).whenStarted()); // Wait until the host platform has reported its 'started' state via the message bus.
   }
 
   /**

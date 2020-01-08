@@ -87,6 +87,14 @@ export enum PlatformTopics {
    * Allows observing the platform state of the host. The last state is retained on the topic.
    */
   HostPlatformState = 'ɵHOST_PLATFORM_STATE',
+  /**
+   * When a client gains the focus it publishes a retained event to this topic.
+   */
+  FocusIn = 'ɵFOCUS_IN',
+  /**
+   * Allows testing whether the requester has received focus or contains embedded web content that has received focus.
+   */
+  IsFocusWithin = 'ɵIS_FOCUS_WITHIN',
 }
 
 /**

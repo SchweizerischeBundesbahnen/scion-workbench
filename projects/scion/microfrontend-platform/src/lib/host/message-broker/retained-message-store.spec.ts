@@ -30,16 +30,6 @@ describe('RetainedMessageStore', () => {
     expect(retainedMessageStore.findMostRecentRetainedMessage('myhome/livingroom/brightness')).toBeNull();
   });
 
-  it('should delete a retained message if its body is `null`', async () => {
-    const message1 = newTopicMessage('myhome/livingroom/temperature', {body: '25°C', timestamp: 0});
-    expect(retainedMessageStore.persistOrDelete(message1)).toEqual('persisted');
-    expect(retainedMessageStore.findMostRecentRetainedMessage('myhome/livingroom/temperature')).toEqual(message1);
-
-    const message2 = newTopicMessage('myhome/livingroom/temperature', {body: null, timestamp: 0});
-    expect(retainedMessageStore.persistOrDelete(message2)).toEqual('deleted');
-    expect(retainedMessageStore.findMostRecentRetainedMessage('myhome/livingroom/temperature')).toBeNull();
-  });
-
   it('should delete a retained message if its body is `undefined`', async () => {
     const message1 = newTopicMessage('myhome/livingroom/temperature', {body: '25°C', timestamp: 0});
     expect(retainedMessageStore.persistOrDelete(message1)).toEqual('persisted');
@@ -48,6 +38,12 @@ describe('RetainedMessageStore', () => {
     const message2 = newTopicMessage('myhome/livingroom/temperature', {body: undefined, timestamp: 0});
     expect(retainedMessageStore.persistOrDelete(message2)).toEqual('deleted');
     expect(retainedMessageStore.findMostRecentRetainedMessage('myhome/livingroom/temperature')).toBeNull();
+  });
+
+  it('should not delete a retained message if its body is `null`', async () => {
+    const message = newTopicMessage('myhome/livingroom/temperature', {body: null, timestamp: 0});
+    expect(retainedMessageStore.persistOrDelete(message)).toEqual('persisted');
+    expect(retainedMessageStore.findMostRecentRetainedMessage('myhome/livingroom/temperature')).toEqual(message);
   });
 
   it('should not delete a retained message if its body is 0 (zero as a number)', async () => {

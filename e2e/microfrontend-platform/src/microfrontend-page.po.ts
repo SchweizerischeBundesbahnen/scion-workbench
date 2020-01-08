@@ -11,6 +11,7 @@ import { $ } from 'protractor';
 import { SwitchToIframeFn } from './browser-outlet.po';
 import { getInputValue } from './spec.util';
 import { SciPropertyPO } from '@scion/ɵtoolkit/widgets.po';
+import { TestingAppPO } from './testing-app.po';
 
 export abstract class MicrofrontendPagePO {
 
@@ -42,5 +43,20 @@ export abstract class MicrofrontendPagePO {
   public async getFragment(): Promise<string> {
     await this._switchToIframeFn();
     return getInputValue(this._pageFinder.$('input.e2e-fragment'));
+  }
+
+  /**
+   * Clicks the fragment field to gain focus.
+   */
+  public async clickFragment(): Promise<void> {
+    await this._switchToIframeFn();
+    return this._pageFinder.$('input.e2e-fragment').click();
+  }
+
+  /**
+   * Returns `true` if this microfrontend has received focus, or `false` if not.
+   */
+  public async isFocusWithin(): Promise<boolean> {
+    return new TestingAppPO().isFocusWithin(() => this._switchToIframeFn());
   }
 }

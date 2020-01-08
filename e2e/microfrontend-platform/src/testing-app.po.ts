@@ -7,8 +7,8 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { browser } from 'protractor';
-import { OutletDescriptorTypes, OutletPageObjectClass, OutletPageObjectDescriptor, BrowserOutletPO } from './browser-outlet.po';
+import { $, browser } from 'protractor';
+import { BrowserOutletPO, OutletDescriptorTypes, OutletPageObjectClass, OutletPageObjectDescriptor, SwitchToIframeFn } from './browser-outlet.po';
 
 /**
  * The central page object of the testing app to perform the initial navigation.
@@ -129,6 +129,22 @@ export class TestingAppPO {
         return pageObject;
       }
     };
+  }
+
+  /**
+   * Returns `true` if the document in the specified iframe or its embedded web content has received focus, or `false` if not.
+   *
+   * If not specifying a 'switchTo' function, the root context is checked if it has the focus.
+   */
+  public async isFocusWithin(switchToIframeFn?: SwitchToIframeFn): Promise<boolean> {
+    if (switchToIframeFn) {
+      await switchToIframeFn();
+    }
+    else {
+      await browser.switchTo().defaultContent();
+    }
+
+    return $('testing-app').$('.e2e-focus-within').isPresent();
   }
 }
 

@@ -17,3 +17,4 @@ export { HostPlatformState } from './host-platform-state';
 export { SciRouterOutletElement, RouterOutlets, OutletContext } from './router-outlet/router-outlet.element';
 export { OutletRouter, NavigationOptions } from './router-outlet/outlet-router';
 export { ContextService } from './context/context-service';
+export { FocusMonitor } from './focus/focus-monitor';

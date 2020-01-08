@@ -8,8 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { Component, OnDestroy } from '@angular/core';
-import { Beans, ClientConfig, MicrofrontendPlatform } from '@scion/microfrontend-platform';
+import { Beans, ClientConfig, FocusMonitor, MicrofrontendPlatform } from '@scion/microfrontend-platform';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'testing-app', // tslint:disable-line:component-selector
@@ -18,17 +20,30 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class TestingAppComponent implements OnDestroy {
 
+  private _destroy$ = new Subject<void>();
+
   public appSymbolicName: string;
-  public appOrigin: string;
   public pageTitle: string;
+  public location: string;
+  public isFocusWithin: boolean;
+
+  constructor() {
+    this.appSymbolicName = Beans.get(ClientConfig).symbolicName;
+    this.location = window.location.href;
+
+    Beans.get(FocusMonitor).focusWithin$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(isFocusWithin => {
+        this.isFocusWithin = isFocusWithin;
+      });
+  }
 
   public onRouteActivate(route: ActivatedRoute): void {
     this.pageTitle = route.snapshot.data['title'];
-    this.appSymbolicName = Beans.get(ClientConfig).symbolicName;
-    this.appOrigin = window.origin;
   }
 
   public ngOnDestroy(): void {
+    this._destroy$.next();
     MicrofrontendPlatform.destroy().then(); // Platform is started in {@link TestingAppPlatformInitializerResolver}
   }
 }

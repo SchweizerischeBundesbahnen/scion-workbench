@@ -44,6 +44,9 @@ export abstract class MessageClient {
   /**
    * Publishes a message to the given topic. The message is transported to all consumers subscribed to the topic.
    *
+   * When publishing a retained message that has no or an 'undefined' payload, the broker deletes the retained message
+   * and does not dispatch it.
+   *
    * @param  topic
    *         Specifies the topic to which the message should be sent.
    *         Topics are case-sensitive and consist of one or more segments each separated by a forward slash.

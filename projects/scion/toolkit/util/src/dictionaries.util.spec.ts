@@ -10,7 +10,7 @@
 
 import { Dictionaries } from './dictionaries.util';
 
-fdescribe('Dictionaries', () => {
+describe('Dictionaries', () => {
 
   describe('Dictionaries.toDictionary', () => {
 

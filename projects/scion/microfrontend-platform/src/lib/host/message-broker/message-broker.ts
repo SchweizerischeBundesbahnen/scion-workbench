@@ -43,7 +43,7 @@ export class MessageBroker implements PreDestroy {
   private readonly _destroy$ = new Subject<void>();
   private readonly _clientRequests$: Observable<ClientMessage>;
 
-  private readonly _clientRegistry = new ClientRegistry();
+  private readonly _clientRegistry = Beans.get(ClientRegistry);
   private readonly _topicSubscriptionRegistry = new TopicSubscriptionRegistry();
   private readonly _retainedMessageRegistry = new RetainedMessageStore();
 
@@ -90,11 +90,11 @@ export class MessageBroker implements PreDestroy {
       )
       .subscribe((event: MessageEvent) => runSafe(() => {
         const envelope: MessageEnvelope<TopicMessage<void>> = event.data;
-        const clientWindow = event.source as Window;
+        const gatewayWindow = event.source as Window;
         const clientAppName = envelope.message.headers.get(MessageHeaders.AppSymbolicName);
 
         const replyTo = envelope.message.headers.get(MessageHeaders.ReplyTo);
-        const sender = {window: clientWindow, origin: event.origin};
+        const sender = {gatewayWindow, origin: event.origin};
 
         if (!clientAppName) {
           sendTopicMessage<ConnackMessage>(sender, MessagingTransport.BrokerToGateway, {
@@ -124,7 +124,7 @@ export class MessageBroker implements PreDestroy {
           return;
         }
 
-        const client: Client = new Client({id: UUID.randomUUID(), application: application, window: clientWindow});
+        const client: Client = new Client({id: UUID.randomUUID(), application, gatewayWindow, window: gatewayWindow.parent});
         this._clientRegistry.registerClient(client);
 
         sendTopicMessage<ConnackMessage>(sender, MessagingTransport.BrokerToGateway, {
@@ -326,7 +326,7 @@ export class MessageBroker implements PreDestroy {
           .map(capability => this._clientRegistry.getByApplication(capability.metadata.symbolicAppName))
           .reduce((combined, list) => new Set([...combined, ...list]), new Set<Client>());
 
-        clients.forEach(client => client.window.postMessage(envelope, client.application.origin));
+        clients.forEach(client => client.gatewayWindow.postMessage(envelope, client.application.origin));
 
         // if request-reply communication, send an error if no replier is found to reply to the intent.
         if (envelope.message.headers.has(MessageHeaders.ReplyTo) && clients.size === 0) {
@@ -363,7 +363,7 @@ export class MessageBroker implements PreDestroy {
         },
       };
       const client: Client = resolvedTopicDestination.subscription.client;
-      client.window.postMessage(envelope, client.application.origin);
+      client.gatewayWindow.postMessage(envelope, client.application.origin);
     });
 
     return true;
@@ -406,19 +406,19 @@ function filterByChannel(channel: MessagingChannel): MonoTypeOperatorFunction<Cl
 function checkOriginTrusted<MSG extends Message>(clientRegistry: ClientRegistry, rejectConfig: { transport: MessagingTransport }): OperatorFunction<MessageEvent, ClientMessage<MSG>> {
   return mergeMap((event: MessageEvent): Observable<ClientMessage> => {
     const envelope: MessageEnvelope = event.data;
-    const senderWindow = event.source as Window;
+    const senderGatewayWindow = event.source as Window;
     const clientId = envelope.message.headers.get(MessageHeaders.ClientId);
-    const client = (senderWindow ? clientRegistry.getByClientWindow(senderWindow) : clientRegistry.getByClientId(clientId));
+    const client = (senderGatewayWindow ? clientRegistry.getByGatewayWindow(senderGatewayWindow) : clientRegistry.getByClientId(clientId));
 
     if (!client) {
-      const sender = {window: senderWindow, origin: event.origin};
+      const sender = {gatewayWindow: senderGatewayWindow, origin: event.origin};
       const error = {type: 'MessagingError', details: `Message rejected: Client not registered [origin=${event.origin}]`};
-      sender.window && sendDeliveryStatusError(sender, {transport: rejectConfig.transport, topic: envelope.messageId}, error);
+      sender.gatewayWindow && sendDeliveryStatusError(sender, {transport: rejectConfig.transport, topic: envelope.messageId}, error);
       return EMPTY;
     }
 
     if (event.origin !== client.application.origin) {
-      const target = {window: client.window, origin: event.origin};
+      const target = {gatewayWindow: client.gatewayWindow, origin: event.origin};
       const error = {type: 'MessagingError', details: `Message rejected: Wrong origin [actual=${event.origin}, expected=${client.application.origin}, application=${client.application.symbolicName}]`};
       sendDeliveryStatusError(target, {transport: rejectConfig.transport, topic: envelope.messageId}, error);
       return EMPTY;
@@ -447,7 +447,7 @@ export function filterByTransportAndTopic(transport: MessagingTransport, topic: 
   );
 }
 
-function sendDeliveryStatusSuccess(recipient: { window: Window; origin: string } | Client, destination: { transport: MessagingTransport, topic: string }): void {
+function sendDeliveryStatusSuccess(recipient: { gatewayWindow: Window; origin: string } | Client, destination: { transport: MessagingTransport, topic: string }): void {
   sendTopicMessage<MessageDeliveryStatus>(recipient, destination.transport, {
     topic: destination.topic,
     body: {ok: true},
@@ -455,7 +455,7 @@ function sendDeliveryStatusSuccess(recipient: { window: Window; origin: string }
   });
 }
 
-function sendDeliveryStatusError(recipient: { window: Window; origin: string } | Client, destination: { transport: MessagingTransport, topic: string }, error: { type: string; details: string }): void {
+function sendDeliveryStatusError(recipient: { gatewayWindow: Window; origin: string } | Client, destination: { transport: MessagingTransport, topic: string }, error: { type: string; details: string }): void {
   sendTopicMessage<MessageDeliveryStatus>(recipient, destination.transport, {
     topic: destination.topic,
     body: {ok: false, details: `[${error.type}] ${error.details}`},
@@ -463,7 +463,7 @@ function sendDeliveryStatusError(recipient: { window: Window; origin: string } |
   });
 }
 
-function sendTopicMessage<T>(recipient: { window: Window; origin: string } | Client, transport: MessagingTransport, message: TopicMessage<T>): void {
+function sendTopicMessage<T>(recipient: { gatewayWindow: Window; origin: string } | Client, transport: MessagingTransport, message: TopicMessage<T>): void {
   const envelope: MessageEnvelope<TopicMessage<T>> = {
     messageId: UUID.randomUUID(),
     transport: transport,
@@ -479,8 +479,8 @@ function sendTopicMessage<T>(recipient: { window: Window; origin: string } | Cli
     headers.set(MessageHeaders.AppSymbolicName, PLATFORM_SYMBOLIC_NAME);
   }
 
-  const target = recipient instanceof Client ? {window: recipient.window, origin: recipient.application.origin} : recipient;
-  target.window.postMessage(envelope, target.origin);
+  const target = recipient instanceof Client ? {gatewayWindow: recipient.gatewayWindow, origin: recipient.application.origin} : recipient;
+  target.gatewayWindow.postMessage(envelope, target.origin);
 }
 
 /**

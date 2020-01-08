@@ -8,21 +8,19 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, tick } from '@angular/core/testing';
 import { Beans } from '../bean-manager';
 import { HttpClient } from './http-client';
 import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { ApplicationManifest } from '../platform.model';
 import { ApplicationRegistry } from './application.registry';
 import { Logger } from '../logger';
-import { PlatformState, PlatformStates } from '../platform-state';
 
 describe('ManifestCollector', () => {
 
   beforeEach(async () => await MicrofrontendPlatform.destroy());
   afterEach(async () => await MicrofrontendPlatform.destroy());
 
-  it('should collect and register applications', fakeAsync(async () => {
+  it('should collect and register applications', async () => {
     // mock {HttpClient}
     const httpClientSpy = jasmine.createSpyObj(HttpClient.name, ['fetch']);
     httpClientSpy.fetch
@@ -36,25 +34,20 @@ describe('ManifestCollector', () => {
     Beans.register(Logger, {useValue: loggerSpy});
 
     // start the platform
-    MicrofrontendPlatform.forHost([
+    await MicrofrontendPlatform.forHost([
       {symbolicName: 'app-1', manifestUrl: 'http://www.app-1/manifest'},
       {symbolicName: 'app-2', manifestUrl: 'http://www.app-2/manifest'},
       {symbolicName: 'app-3', manifestUrl: 'http://www.app-3/manifest'},
     ]);
-
-    tick(1000);
-    await Beans.get(PlatformState).whenState(PlatformStates.Started);
 
     // assert application registrations
     expect(Beans.get(ApplicationRegistry).getApplication('app-1').name).toEqual('application-1');
     expect(Beans.get(ApplicationRegistry).getApplication('app-2').name).toEqual('application-2');
     expect(Beans.get(ApplicationRegistry).getApplication('app-3').name).toEqual('application-3');
     expect(loggerSpy.error.calls.count()).toEqual(0);
+  });
 
-    await MicrofrontendPlatform.destroy(); // 'fakeAsync' tests for pending timers before 'afterEach' is invoked.
-  }));
-
-  it('should ignore applications which are not available', fakeAsync(async () => {
+  it('should ignore applications which are not available', async () => {
     // mock {HttpClient}
     const httpClientSpy = jasmine.createSpyObj(HttpClient.name, ['fetch']);
     httpClientSpy.fetch
@@ -69,15 +62,12 @@ describe('ManifestCollector', () => {
     Beans.register(Logger, {useValue: loggerSpy});
 
     // start the platform
-    MicrofrontendPlatform.forHost([
+    await MicrofrontendPlatform.forHost([
       {symbolicName: 'app-1', manifestUrl: 'http://www.app-1/manifest'},
       {symbolicName: 'app-2', manifestUrl: 'http://www.app-2/manifest'},
       {symbolicName: 'app-3', manifestUrl: 'http://www.app-3/manifest'},
       {symbolicName: 'app-4', manifestUrl: 'http://www.app-4/manifest'},
     ]);
-
-    tick(1000);
-    await Beans.get(PlatformState).whenState(PlatformStates.Started);
 
     // assert application registrations
     expect(Beans.get(ApplicationRegistry).getApplication('app-1').name).toEqual('application-1');
@@ -85,9 +75,7 @@ describe('ManifestCollector', () => {
     expect(Beans.get(ApplicationRegistry).getApplication('app-3').name).toEqual('application-3');
     expect(Beans.get(ApplicationRegistry).getApplication('app-4')).toBeUndefined();
     expect(loggerSpy.error.calls.count()).toEqual(2);
-
-    await MicrofrontendPlatform.destroy(); // 'fakeAsync' tests for pending timers before 'afterEach' is invoked.
-  }));
+  });
 });
 
 function okAnswer(answer: { body: ApplicationManifest, delay: number }): Promise<Partial<Response>> {

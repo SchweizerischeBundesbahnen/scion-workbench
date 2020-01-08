@@ -84,6 +84,28 @@ export function waitFor(millis: number): Promise<void> {
 }
 
 /**
+ * Returns a Promise that resolves when the condition returns `true` or that rejects when the timeout expires.
+ */
+export function waitForCondition(condition: () => boolean, timeout: number): Promise<void> {
+  return new Promise((resolve, reject) => {  // tslint:disable-line:typedef
+    const expiryDate = Date.now() + timeout;
+
+    const periodicConditionCheckerFn = (): void => {
+      if (condition()) {
+        resolve();
+      }
+      else if (Date.now() > expiryDate) {
+        reject(`[SpecTimeoutError] Timeout elapsed. Condition not fulfilled within ${timeout}ms.`);
+      }
+      else {
+        setTimeout(periodicConditionCheckerFn, 10);
+      }
+    };
+    periodicConditionCheckerFn();
+  });
+}
+
+/**
  * Subscribes to the given {@link Observable} and resolves to the emitted messages.
  */
 export function collectToPromise<T, R = T>(observable$: Observable<T>, options: { take: number, timeout?: number, projectFn?: (msg: T) => R }): Promise<R[]> {

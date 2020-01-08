@@ -10,7 +10,7 @@
 import { $, browser, ElementFinder, WebElement } from 'protractor';
 import { enterText } from './spec.util';
 import { UUID } from '@scion/toolkit/util';
-import { Outlets } from './testing-app.po';
+import { Outlets, TestingAppPO } from './testing-app.po';
 import { RouterOutletContextPO } from './context/router-outlet-context.po';
 
 /**
@@ -147,6 +147,21 @@ export class BrowserOutletPO {
       this._webdriverExecutionContextId = UUID.randomUUID();
       await browser.executeScript(`document.body.setAttribute('${BrowserOutletPO.ATTR_WEBDRIVER_EXECUTION_CONTEXT_ID}', '${this._webdriverExecutionContextId}')`);
     }
+  }
+
+  /**
+   * Clicks the URL field to gain focus.
+   */
+  public async clickUrl(): Promise<void> {
+    await this.switchToOutlet();
+    await this._outletFinder.$('input.e2e-url').click();
+  }
+
+  /**
+   * Returns `true` if the embedded web content or any descendant element has received focus, or `false` if not.
+   */
+  public async isFocusWithinIframe(): Promise<boolean> {
+    return new TestingAppPO().isFocusWithin(() => this.switchToOutletIframe());
   }
 
   private get iframePath(): string[] {

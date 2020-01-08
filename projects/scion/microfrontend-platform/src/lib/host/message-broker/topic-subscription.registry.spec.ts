@@ -456,7 +456,7 @@ describe('TopicSubscriptionRegistry', () => {
   }
 
   function newClient(id: string): Client {
-    return new Client({id, window: undefined, application: undefined});
+    return new Client({id, gatewayWindow: undefined, window: undefined, application: undefined});
   }
 });
 

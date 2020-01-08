@@ -25,7 +25,7 @@ export class RetainedMessageStore {
    * @return the status of whether the message was persisted or deleted.
    */
   public persistOrDelete(message: TopicMessage): 'deleted' | 'persisted' {
-    if (message.body === undefined || message.body === null) {
+    if (message.body === undefined) {
       this._retainedMessagesByTopic.delete(message.topic);
       return 'deleted';
     }

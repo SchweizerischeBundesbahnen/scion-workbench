@@ -1,6 +1,7 @@
 <header>
   <span class="page-title">{{pageTitle}}</span>
-  <span class="app-name" [title]="appOrigin">{{appSymbolicName}}</span>
+  <span class="focus-within e2e-focus-within" title="This document or its embedded web content has received focus" *ngIf="isFocusWithin">focus-within</span>
+  <span class="app-name" [title]="location">{{appSymbolicName}}</span>
 </header>
 
 <sci-viewport>

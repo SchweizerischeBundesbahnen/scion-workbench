@@ -1,5 +1,15 @@
 @import 'ɵtoolkit-widget-theme';
 
+@mixin badge($color) {
+  font-weight: bold;
+  background-color: rgba(red($color), green($color), blue($color), .25);
+  border: 1px solid rgba(red($color), green($color), blue($color), 1);
+  color: primaryColor();
+  border-radius: 5px;
+  padding: .25em 1.5em;
+  user-select: none;
+}
+
 :host {
   display: grid;
   grid-template-rows: max-content 1fr;
@@ -7,24 +17,29 @@
 
   > header {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1.5em;
 
+    > *:not(:first-child) {
+      margin-left: .25em;
+    }
+
     > span.page-title {
+      flex: auto;
       font-size: 1.2rem;
       font-weight: bold;
     }
 
-    > span.app-name {
-      font-weight: bold;
-      background-color: primaryColor(.15);
-      border: 1px solid primaryColor();
-      color: primaryColor();
-      border-radius: 10px;
+    > span.focus-within {
+      flex: none;
       justify-self: end;
-      padding: .25em 1.5em;
-      user-select: none;
-      align-self: flex-start;
+      @include badge(rgb(255, 150, 55));
+    }
+
+    > span.app-name {
+      flex: none;
+      justify-self: end;
+      @include badge(primaryColor());
     }
   }
 

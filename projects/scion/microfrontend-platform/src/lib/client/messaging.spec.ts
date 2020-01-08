@@ -17,9 +17,10 @@ import { Logger } from '../logger';
 import { ManifestRegistry } from '../host/manifest.registry';
 import { ApplicationConfig } from '../host/platform-config';
 import { PLATFORM_SYMBOLIC_NAME } from '../host/platform.constants';
-import { collectToPromise, expectToBeRejectedWithError, expectMap, serveManifest, waitFor } from '../spec.util.spec';
+import { collectToPromise, expectMap, expectToBeRejectedWithError, serveManifest, waitFor, waitForCondition } from '../spec.util.spec';
 import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { Defined, Objects } from '@scion/toolkit/util';
+import { ClientRegistry } from '../host/message-broker/client.registry';
 import Spy = jasmine.Spy;
 
 const bodyExtractFn = <T>(msg: TopicMessage<T> | IntentMessage<T>): T => msg.body;
@@ -613,7 +614,6 @@ describe('Messaging', () => {
     await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app'});
 
     Beans.get(MessageClient).publish$('some-topic', 'body', {retain: true, headers: new Map().set('custom-header', 'some-value')}).subscribe();
-
     await waitFor(500); // ensure the message to be delivered as retained message
 
     const actual$ = Beans.get(PlatformMessageClient).observe$<string>('some-topic');
@@ -622,6 +622,23 @@ describe('Messaging', () => {
     expect(message.headers.get(MessageHeaders.ClientId)).toBeDefined();
     expect(message.headers.get(MessageHeaders.AppSymbolicName)).toEqual('host-app');
     expect(message.headers.get('custom-header')).toEqual('some-value');
+  });
+
+  it('should deliver the client-id from the publisher when receiving a retained message upon subscription', async () => {
+    const manifestUrl = serveManifest({name: 'Host Application'});
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app'});
+
+    await waitForCondition((): boolean => Beans.get(ClientRegistry).getByApplication('host-app').length > 0, 1000);
+    const senderClientId = Beans.get(ClientRegistry).getByApplication('host-app')[0].id;
+
+    Beans.get(MessageClient).publish$('some-topic', 'body', {retain: true}).subscribe();
+    await waitFor(500); // ensure the message to be delivered as retained message
+
+    const actual$ = Beans.get(PlatformMessageClient).observe$<string>('some-topic');
+    const message = await collectToPromise(actual$, {take: 1}).then(takeFirstElement);
+
+    expect(message.headers.get(MessageHeaders.ClientId)).toEqual(senderClientId);
   });
 
   it('should throw if the topic of a message to publish is empty, `null` or `undefined`, or contains wildcard segments', async () => {
