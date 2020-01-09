@@ -34,6 +34,7 @@ import { RouterOutletComponent } from './router-outlet/router-outlet.component';
 import { MicrofrontendComponent } from './microfrontend/microfrontend.component';
 import { RouterOutletPanelComponent } from './router-outlet-panel/router-outlet-panel.component';
 import { RouterOutletSettingsComponent } from './router-outlet-settings/router-outlet-settings.component';
+import { PreferredSizeComponent } from './preferred-size/preferred-size.component';
 
 @NgModule({
   imports: [
@@ -72,6 +73,7 @@ import { RouterOutletSettingsComponent } from './router-outlet-settings/router-o
     ManageIntentsComponent,
     TopicSubscriberCountPipe,
     MicrofrontendComponent,
+    PreferredSizeComponent,
   ],
   entryComponents: [
     RouterOutletSettingsComponent,

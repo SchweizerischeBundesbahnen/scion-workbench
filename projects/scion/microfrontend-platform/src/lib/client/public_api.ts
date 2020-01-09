@@ -14,7 +14,8 @@
 export { MessageClient, PublishOptions, takeUntilUnsubscribe, mapToBody, NullMessageClient, MessageOptions } from './message-client';
 export { ClientConfig } from './client-config';
 export { HostPlatformState } from './host-platform-state';
-export { SciRouterOutletElement, RouterOutlets, OutletContext } from './router-outlet/router-outlet.element';
+export { SciRouterOutletElement, RouterOutlets, OutletContext, PreferredSize } from './router-outlet/router-outlet.element';
 export { OutletRouter, NavigationOptions } from './router-outlet/outlet-router';
 export { ContextService } from './context/context-service';
 export { FocusMonitor } from './focus/focus-monitor';
+export { PreferredSizeService } from './preferred-size/preferred-size-service';

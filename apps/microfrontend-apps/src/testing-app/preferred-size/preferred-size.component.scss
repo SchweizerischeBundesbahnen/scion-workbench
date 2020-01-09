@@ -1,0 +1,16 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  --width: unset;
+  --height: unset;
+  display: grid;
+  width: var(--width);
+  height: var(--height);
+
+  > form {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: max-content;
+    row-gap: .5em;
+  }
+}

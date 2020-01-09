@@ -213,7 +213,7 @@ describe('RouterOutlet', () => {
 
     // Verify the outlet context to be set
     const contextPO = new ContextPagePO((): Promise<void> => routerOutletPO.switchToRouterOutletIframe());
-    await expectMap(contextPO.getContext()).toContain(new Map().set('ɵOUTLET', {name: 'microfrontend-outlet'}));  // OUTLET_CONTEXT constant cannot be accessed in protractor test
+    await expectMap(contextPO.getContext()).toContain(new Map().set('ɵOUTLET', jasmine.objectContaining({name: 'microfrontend-outlet'})));  // OUTLET_CONTEXT constant cannot be accessed in protractor test
   });
 
   it('should show the requested page when mounting the outlet after navigation has taken place', async () => {

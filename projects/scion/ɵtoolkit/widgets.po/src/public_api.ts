@@ -11,7 +11,7 @@
 /*
  * Secondary entrypoint: '@scion/ɵtoolkit/widgets.po'
  *
- *  See https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
+ * @see https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
  */
 export { SciParamsEnterPO } from './params-enter/params-enter.po';
 export { SciCheckboxPO } from './checkbox/checkbox.po';

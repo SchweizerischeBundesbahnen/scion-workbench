@@ -10,10 +10,11 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { RouterOutletContextProvider } from '../context/router-outlet-context-provider';
 import { runSafe } from '../../safe-runner';
-import { distinctUntilChanged, pairwise, startWith, switchMap, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, map, pairwise, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { RouterOutletUrlAssigner } from './router-outlet-url-assigner';
 import { Beans } from '../../bean-manager';
 import { mapToBody, MessageClient } from '../message-client';
+import { UUID } from '@scion/toolkit/util';
 
 const ELEMENT_NAME = 'sci-router-outlet';
 const ATTR_NAME = 'name';
@@ -22,6 +23,7 @@ const HTML_TEMPLATE = `
   <style>
     :host {
       display: block;
+      overflow: hidden;
     }
 
     iframe {
@@ -69,6 +71,7 @@ export class SciRouterOutletElement extends HTMLElement {
   private _shadowRoot: ShadowRoot;
   private _disconnect$ = new Subject<void>();
 
+  private _uid = UUID.randomUUID();
   private _iframe: HTMLIFrameElement;
   private _outletName$: BehaviorSubject<string>;
   private _contextProvider: RouterOutletContextProvider;
@@ -81,40 +84,6 @@ export class SciRouterOutletElement extends HTMLElement {
     this._shadowRoot.innerHTML = HTML_TEMPLATE.trim();
     this._iframe = this._shadowRoot.querySelector('iframe');
     this._contextProvider = new RouterOutletContextProvider(this._iframe);
-  }
-
-  /**
-   * Sets a value to be associated with a given name in this outlet context.
-   *
-   * @param name
-   *        Specifies the name to store a value for.
-   * @param value
-   *        Specifies the value to be stored. It can be any object which is serializable with the structured clone algorithm.
-   */
-  public setContextValue(name: string, value: any): void {
-    this._contextProvider.set(name, value);
-  }
-
-  /**
-   * Removes the given name and any corresponding value from this outlet context.
-   *
-   * Removal does not affect parent contexts, so it is possible that a subsequent call to {@link ContextService#observe$} with the same name
-   * will return a non-null result, due to a value being stored in a parent context.
-   *
-   * @param  name
-   *         Specifies the name to remove.
-   * @return `true` if the value in the outlet context has been removed successfully; otherwise `false`.
-   */
-  public removeContextValue(name: string): boolean {
-    return this._contextProvider.remove(name);
-  }
-
-  /**
-   * Returns an Observable that emits the values registered in this outlet. Values inherited from parent contexts are not returned.
-   * The Observable never completes, and emits when a context value is added or removed.
-   */
-  public get contextValues$(): Observable<Map<string, any>> {
-    return this._contextProvider.entries$;
   }
 
   /**
@@ -164,6 +133,65 @@ export class SciRouterOutletElement extends HTMLElement {
   }
 
   /**
+   * Sets a value to be associated with a given name in this outlet context.
+   *
+   * @param name
+   *        Specifies the name to store a value for.
+   * @param value
+   *        Specifies the value to be stored. It can be any object which is serializable with the structured clone algorithm.
+   */
+  public setContextValue(name: string, value: any): void {
+    this._contextProvider.set(name, value);
+  }
+
+  /**
+   * Removes the given name and any corresponding value from this outlet context.
+   *
+   * Removal does not affect parent contexts, so it is possible that a subsequent call to {@link ContextService#observe$} with the same name
+   * will return a non-null result, due to a value being stored in a parent context.
+   *
+   * @param  name
+   *         Specifies the name to remove.
+   * @return `true` if the value in the outlet context has been removed successfully; otherwise `false`.
+   */
+  public removeContextValue(name: string): boolean {
+    return this._contextProvider.remove(name);
+  }
+
+  /**
+   * Returns an Observable that emits the values registered in this outlet. Values inherited from parent contexts are not returned.
+   * The Observable never completes, and emits when a context value is added or removed.
+   */
+  public get contextValues$(): Observable<Map<string, any>> {
+    return this._contextProvider.entries$;
+  }
+
+  /**
+   * Resets the preferred size which may have been set by the embedded content.
+   */
+  public resetPreferredSize(): void {
+    Beans.get(MessageClient).publish$(RouterOutlets.outletPreferredSizeTopic(this._uid), null).subscribe();
+  }
+
+  /**
+   * Returns the preferred size, if any, or `undefined` otherwise.
+   */
+  public get preferredSize(): PreferredSize | undefined {
+    const preferredSize: PreferredSize = {
+      minWidth: this.style.minWidth || undefined,
+      width: this.style.width || undefined,
+      maxWidth: this.style.maxWidth || undefined,
+      minHeight: this.style.minHeight || undefined,
+      height: this.style.height || undefined,
+      maxHeight: this.style.maxHeight || undefined,
+    };
+    if (Object.values(preferredSize).some(Boolean)) {
+      return preferredSize;
+    }
+    return undefined;
+  }
+
+  /**
    * Returns the reference to the {@link HTMLIFrameElement} of this outlet.
    */
   public get iframe(): HTMLIFrameElement {
@@ -174,7 +202,7 @@ export class SciRouterOutletElement extends HTMLElement {
     this._outletName$
       .pipe(takeUntil(this._disconnect$))
       .subscribe((name: string) => {
-        const outletContext: OutletContext = {name: name};
+        const outletContext: OutletContext = {name: name, uid: this._uid};
         this.setContextValue(RouterOutlets.OUTLET_CONTEXT, outletContext);
       });
   }
@@ -186,17 +214,32 @@ export class SciRouterOutletElement extends HTMLElement {
         // If the outlet name is changed, the empty page 'about:blank' is displayed before the actual content is displayed.
         // This is for the case that no navigation has yet taken place for the specified URL, and to initialize {@link pairwise} operator.
         switchMap((name: string) => Beans.get(MessageClient).observe$<string>(RouterOutlets.outletUrlTopic(name)).pipe(mapToBody(), startWith('about:blank'))),
+        map(url => url || 'about:blank'),
         distinctUntilChanged(),
         pairwise(),
         takeUntil(this._disconnect$),
       )
       .subscribe(([prevUrl, currUrl]: [string, string]) => runSafe(() => {
-        if (prevUrl) {
-          this.dispatchEvent(new CustomEvent('deactivate', {detail: prevUrl}));
-        }
+        this.dispatchEvent(new CustomEvent('deactivate', {detail: prevUrl}));
         Beans.get(RouterOutletUrlAssigner).assign(this._iframe, currUrl, prevUrl);
         this.dispatchEvent(new CustomEvent('activate', {detail: currUrl}));
       }));
+  }
+
+  private installPreferredSizeListener(): void {
+    Beans.get(MessageClient).observe$<PreferredSize>(RouterOutlets.outletPreferredSizeTopic(this._uid))
+      .pipe(
+        takeUntil(this._disconnect$),
+        mapToBody(),
+      )
+      .subscribe((preferredSize: PreferredSize) => {
+        this.style.minWidth = preferredSize && preferredSize.minWidth || null;
+        this.style.width = preferredSize && preferredSize.width || null;
+        this.style.maxWidth = preferredSize && preferredSize.maxWidth || null;
+        this.style.minHeight = preferredSize && preferredSize.minHeight || null;
+        this.style.height = preferredSize && preferredSize.height || null;
+        this.style.maxHeight = preferredSize && preferredSize.maxHeight || null;
+      });
   }
 
   /**
@@ -210,6 +253,7 @@ export class SciRouterOutletElement extends HTMLElement {
   public connectedCallback(): void {
     this.installOutletUrlListener();
     this.installOutletContext();
+    this.installPreferredSizeListener();
     this._contextProvider.onOutletMount();
   }
 
@@ -275,6 +319,19 @@ export class SciRouterOutletElement extends HTMLElement {
  */
 export interface OutletContext {
   name: string;
+  uid: string;
+}
+
+/**
+ * Represents the minimum size that will allow the element to display normally.
+ */
+export interface PreferredSize {
+  minWidth?: string;
+  width?: string;
+  maxWidth?: string;
+  minHeight?: string;
+  height?: string;
+  maxHeight?: string;
 }
 
 /**
@@ -294,8 +351,17 @@ export namespace RouterOutlets {
    *
    * @internal
    */
-  export function outletUrlTopic(outlet: string): string {
-    return `sci-router-outlet/${outlet}/url`;
+  export function outletUrlTopic(outletName: string): string {
+    return `sci-router-outlets/${outletName}/url`;
+  }
+
+  /**
+   * Computes the topic to which the preferred outlet size can be published to.
+   *
+   * @internal
+   */
+  export function outletPreferredSizeTopic(outletUid: string): string {
+    return `sci-router-outlets/${outletUid}/preferred-size`;
   }
 
   /**

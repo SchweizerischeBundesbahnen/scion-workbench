@@ -4,6 +4,17 @@
     <span class="description">Enables native page scrolling in the embedded document</span>
     <ng-container *ngTemplateOutlet="toggle_button; context: {$implicit: pageScrollingEnabled}"></ng-container>
   </li>
+  <li class="e2e-preferred-size">
+    <span class="label">Preferred size</span>
+    <span class="description" *ngIf="!preferredSize">
+      There is no preferred size set.
+    </span>
+    <span class="description" *ngIf="preferredSize">
+      The following preferred size is set:
+      <code class="preferred-size">{{preferredSize | json}}</code>
+    </span>
+    <button type="button" class="e2e-reset" (click)="onPreferredSizeResetClick()" [disabled]="!preferredSize">reset</button>
+  </li>
 </ul>
 
 <ng-template #toggle_button let-enabled>

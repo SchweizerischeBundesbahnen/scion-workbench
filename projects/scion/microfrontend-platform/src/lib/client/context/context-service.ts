@@ -7,7 +7,7 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { EMPTY, Observable, Observer, of, Subject, TeardownLogic } from 'rxjs';
+import { concat, EMPTY, NEVER, Observable, Observer, of, Subject, TeardownLogic } from 'rxjs';
 import { expand, filter, map, mergeMapTo, share, take, takeUntil } from 'rxjs/operators';
 import { UUID } from '@scion/toolkit/util';
 import { Beans } from '../../bean-manager';
@@ -46,7 +46,7 @@ export class ContextService {
    */
   public observe$<T>(name: string): Observable<T | null> {
     if (Beans.get(IS_PLATFORM_HOST)) {
-      return of(null);
+      return concat(of(null), NEVER);
     }
 
     const lookupOnChange$ = this._contextTreeChange$.pipe(filter(event => event.name === name), mergeMapTo(this.lookupContextValue$<T>(name)));
@@ -62,7 +62,7 @@ export class ContextService {
    */
   public names$(): Observable<Set<string>> {
     if (Beans.get(IS_PLATFORM_HOST)) {
-      return of(new Set<string>());
+      return concat(of(new Set<string>()), NEVER);
     }
 
     const lookupOnChange$ = this._contextTreeChange$.pipe(mergeMapTo(this.lookupContextNames$()));

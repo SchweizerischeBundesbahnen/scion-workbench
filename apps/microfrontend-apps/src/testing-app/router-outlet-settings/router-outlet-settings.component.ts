@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { Component, ElementRef, HostListener, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { SciRouterOutletElement } from '@scion/microfrontend-platform';
+import { PreferredSize, SciRouterOutletElement } from '@scion/microfrontend-platform';
 import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { Subject } from 'rxjs';
@@ -50,8 +50,27 @@ export class RouterOutletSettingsComponent implements OnInit, OnDestroy {
     this._routerOutlet.scrollable = !this._routerOutlet.scrollable;
   }
 
+  public onPreferredSizeResetClick(): void {
+    this._routerOutlet.resetPreferredSize();
+  }
+
   public get pageScrollingEnabled(): boolean {
     return this._routerOutlet.scrollable;
+  }
+
+  public get preferredSize(): PreferredSize | undefined {
+    const preferredSize = this._routerOutlet.preferredSize;
+    if (!preferredSize) {
+      return undefined;
+    }
+
+    // Remove properties which are not set.
+    return Object.keys(preferredSize).reduce((obj, key) => {
+      if (preferredSize[key] !== undefined) {
+        return {...obj, [key]: preferredSize[key]};
+      }
+      return obj;
+    }, {});
   }
 
   @HostListener('keydown.escape')

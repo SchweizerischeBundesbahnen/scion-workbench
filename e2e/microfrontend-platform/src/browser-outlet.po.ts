@@ -12,6 +12,7 @@ import { enterText } from './spec.util';
 import { UUID } from '@scion/toolkit/util';
 import { Outlets, TestingAppPO } from './testing-app.po';
 import { RouterOutletContextPO } from './context/router-outlet-context.po';
+import { RouterOutletSettingsPO } from './settings/router-outlet-settings.po';
 
 /**
  * Page object for {@link BrowserOutletComponent} to show a microfrontend in an iframe inside `<sci-router-outlet>`.
@@ -33,9 +34,15 @@ export class BrowserOutletPO {
    */
   public readonly outletContextPO: RouterOutletContextPO;
 
+  /**
+   * Allows configuring the settings of this outlet.
+   */
+  public readonly outletSettingsPO: RouterOutletSettingsPO;
+
   constructor(public outletName: string, private _parentOutletPO?: BrowserOutletPO) {
     this._outletFinder = $(`app-browser-outlet#${this.outletName}`);
     this.outletContextPO = new RouterOutletContextPO(this._outletFinder, (): Promise<void> => this.switchToOutlet());
+    this.outletSettingsPO = new RouterOutletSettingsPO(this._outletFinder, (): Promise<void> => this.switchToOutlet());
   }
 
   /**

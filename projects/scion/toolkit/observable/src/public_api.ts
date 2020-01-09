@@ -9,9 +9,10 @@
  */
 
 /*
- * Secondary entrypoint: '@scion/toolkit/dimension'
+ * Secondary entrypoint: '@scion/toolkit/observable'
+ * This module does not depend on Angular.
  *
  * @see https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
  */
-export { SciDimensionModule } from './dimension.module';
-export { SciDimensionDirective, SciDimension } from './dimension.directive';
+export { fromDimension$, Dimension, FromDimension } from './dimension.observable';
+export { fromMutation$ } from './mutation.observable';

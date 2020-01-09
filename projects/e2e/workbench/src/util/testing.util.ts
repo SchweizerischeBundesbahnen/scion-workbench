@@ -81,11 +81,19 @@ export async function getCssClasses(elementFinder: ElementFinder): Promise<strin
   return classAttr.split(/\s+/);
 }
 
+/**
+ * Reads the errors from the browser console.
+ * Note that log buffers are reset after this call.
+ */
 export async function browserErrors(): Promise<Entry[]> {
   const logs = await browser.manage().logs().get('browser');
   return logs.filter(log => log.level === Level.SEVERE);
 }
 
+/**
+ * Checks if the following error was logged on the browser console.
+ * Note that log buffers are reset after this call.
+ */
 export async function hasBrowserError(error: string): Promise<boolean> {
   const logs = await this.browserErrors();
   return logs.some(log => log.message.includes(error));

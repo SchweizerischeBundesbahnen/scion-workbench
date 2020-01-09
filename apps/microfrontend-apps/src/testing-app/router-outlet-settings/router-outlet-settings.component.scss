@@ -18,6 +18,10 @@
       gap: .25em 2em;
       cursor: default;
 
+      &:not(:last-child) {
+        margin-bottom: 1em;
+      }
+
       > span.label {
         grid-column: 1/2;
         grid-row: 1/2;
@@ -38,6 +42,16 @@
         &.enabled {
           color: #000000;
         }
+      }
+
+      > button:not(.toggle) {
+        padding: .25em .75em;
+        font-size: smaller;
+      }
+
+      code.preferred-size {
+        display: block;
+        margin: .5em 0;
       }
 
       &:hover > span.label {

@@ -8,8 +8,5 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-/*
- *  See https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
- */
 export { SciFormFieldModule } from './form-field.module';
 export { SciFormFieldComponent } from './form-field.component';

@@ -17,7 +17,7 @@
 
   > header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 1.5em;
 
     > *:not(:first-child) {

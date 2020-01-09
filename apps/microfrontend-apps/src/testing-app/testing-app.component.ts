@@ -12,6 +12,7 @@ import { Beans, ClientConfig, FocusMonitor, MicrofrontendPlatform } from '@scion
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { Defined } from '@scion/toolkit/util';
 
 @Component({
   selector: 'testing-app', // tslint:disable-line:component-selector
@@ -39,7 +40,8 @@ export class TestingAppComponent implements OnDestroy {
   }
 
   public onRouteActivate(route: ActivatedRoute): void {
-    this.pageTitle = route.snapshot.data['title'];
+    const isPageTitleVisible = Defined.orElse(route.snapshot.data['pageTitleVisible'], true);
+    this.pageTitle = isPageTitleVisible ? route.snapshot.data['pageTitle'] : null;
   }
 
   public ngOnDestroy(): void {

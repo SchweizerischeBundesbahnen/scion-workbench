@@ -7,8 +7,10 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { browser, ElementFinder, WebElement } from 'protractor';
+import { browser, ElementFinder, Key, logging, WebElement } from 'protractor';
 import { SciListItemPO } from '@scion/ɵtoolkit/widgets.po';
+import Entry = logging.Entry;
+import Level = logging.Level;
 
 /**
  * Returns if given CSS class is present on given element.
@@ -48,7 +50,9 @@ export async function enterText(text: string, elementFinder: ElementFinder, inpu
     }
     case 'setValue': {
       // fire the 'input' event manually because not fired when setting the value with javascript
+      await elementFinder.click();
       await browser.executeScript('arguments[0].value=arguments[1]; arguments[0].dispatchEvent(new Event(\'input\'));', elementFinder.getWebElement(), text);
+      await sendKeys(Key.TAB);
       break;
     }
     default: {
@@ -231,4 +235,13 @@ export interface ToContainMatcher {
  */
 export function getInputValue(elementFinder: ElementFinder): Promise<any> {
   return browser.executeScript('return arguments[0].value', elementFinder.getWebElement()) as Promise<any>;
+}
+
+/**
+ * Reads the errors from the browser console.
+ * Note that log buffers are reset after this call.
+ */
+export async function browserErrors(): Promise<Entry[]> {
+  const logs = await browser.manage().logs().get('browser');
+  return logs.filter(log => log.level === Level.SEVERE);
 }

@@ -12,6 +12,8 @@ import { enterText } from '../spec.util';
 import { SwitchToIframeFn } from '../browser-outlet.po';
 import { RouterOutletContextPO } from '../context/router-outlet-context.po';
 import { RouterOutletPanelPO } from './router-outlet-panel.po';
+import { ISize } from 'selenium-webdriver';
+import { RouterOutletSettingsPO } from '../settings/router-outlet-settings.po';
 
 export class RouterOutletPagePO {
 
@@ -29,9 +31,15 @@ export class RouterOutletPagePO {
    */
   public readonly outletPanelPO: RouterOutletPanelPO;
 
+  /**
+   * Allows configuring the settings of this outlet.
+   */
+  public readonly outletSettingsPO: RouterOutletSettingsPO;
+
   constructor(private _switchToIframeFn: SwitchToIframeFn) {
     this.outletContextPO = new RouterOutletContextPO(this._pageFinder, (): Promise<void> => this._switchToIframeFn());
     this.outletPanelPO = new RouterOutletPanelPO(this._pageFinder.$('app-router-outlet-panel'), (): Promise<void> => this._switchToIframeFn());
+    this.outletSettingsPO = new RouterOutletSettingsPO(this._pageFinder, (): Promise<void> => this._switchToIframeFn());
   }
 
   public async enterOutletName(outlet: string): Promise<void> {
@@ -59,6 +67,14 @@ export class RouterOutletPagePO {
     finally {
       await browser.waitForAngularEnabled(waitForAngularEnabledState);
     }
+  }
+
+  /**
+   * Returns the size of the router outlet.
+   */
+  public async getRouterOutletSize(): Promise<ISize> {
+    await this._switchToIframeFn();
+    return this._pageFinder.$('sci-router-outlet').getSize();
   }
 
   /**

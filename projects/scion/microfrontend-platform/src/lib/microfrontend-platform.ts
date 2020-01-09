@@ -7,7 +7,6 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-
 import { MessageClient } from './client/message-client';
 import { ManifestRegistry } from './host/manifest.registry';
 import { ApplicationRegistry } from './host/application.registry';
@@ -40,6 +39,7 @@ import { IS_PLATFORM_HOST } from './platform.model';
 import { RelativePathResolver } from './client/router-outlet/relative-path-resolver';
 import { ClientRegistry } from './host/message-broker/client.registry';
 import { FocusTracker } from './host/focus/focus-tracker';
+import { PreferredSizeService } from './client/preferred-size/preferred-size-service';
 
 /**
  * The central class of the SCION microfrontend platform.
@@ -85,6 +85,7 @@ export const MicrofrontendPlatform = new class {
         Beans.registerIfAbsent(RouterOutletUrlAssigner);
         Beans.register(FocusInEventDispatcher, {eager: true});
         Beans.register(FocusMonitor);
+        Beans.register(PreferredSizeService);
         Beans.register(ContextService);
       },
     );
@@ -130,6 +131,7 @@ export const MicrofrontendPlatform = new class {
           Beans.registerIfAbsent(RelativePathResolver);
           Beans.registerIfAbsent(RouterOutletUrlAssigner);
           Beans.register(FocusMonitor);
+          Beans.register(PreferredSizeService);
         }
 
         // Notify clients about host platform state changes.

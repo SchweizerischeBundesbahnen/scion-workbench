@@ -244,7 +244,7 @@ export class MessageBroker implements PreDestroy {
   }
 
   /**
-   * Listens for topic subscribe requests.
+   * Dispatches topic messages to subscribed clients.
    */
   private installTopicMessageDispatcher(): void {
     this._clientRequests$
@@ -278,7 +278,7 @@ export class MessageBroker implements PreDestroy {
   }
 
   /**
-   * Listens for intents issued by clients.
+   * Dispatches intents to subscribed clients.
    */
   private installIntentMessageDispatcher(): void {
     this._clientRequests$

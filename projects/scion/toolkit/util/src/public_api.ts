@@ -10,8 +10,9 @@
 
 /*
  * Secondary entrypoint: '@scion/toolkit/util'
+ * This module does not depend on Angular.
  *
- *  See https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
+ * @see https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
  */
 export { UUID } from './uuid.util';
 export { Defined } from './defined.util';

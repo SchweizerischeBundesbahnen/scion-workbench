@@ -8,8 +8,5 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-/*
- *  See https://github.com/ng-packagr/ng-packagr/blob/master/docs/secondary-entrypoints.md
- */
 export { SciListModule } from './list.module';
 export { SciListItemDirective } from './list-item.directive';

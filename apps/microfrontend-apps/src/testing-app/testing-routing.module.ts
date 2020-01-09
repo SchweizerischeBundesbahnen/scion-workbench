@@ -21,6 +21,7 @@ import { OutletRouterComponent } from './outlet-router/outlet-router.component';
 import { PublishMessageComponent } from './messaging/publish-message/publish-message.component';
 import { RouterOutletComponent } from './router-outlet/router-outlet.component';
 import { MicrofrontendComponent } from './microfrontend/microfrontend.component';
+import { PreferredSizeComponent } from './preferred-size/preferred-size.component';
 
 const routes: Routes = [
   {
@@ -28,16 +29,18 @@ const routes: Routes = [
     component: TestingAppComponent,
     resolve: {platform: TestingAppPlatformInitializerResolver},
     children: [
-      {path: 'browser-outlets', component: BrowserOutletsComponent},
-      {path: 'router-outlet', component: RouterOutletComponent, data: {title: 'Displays web content in a router outlet'}},
-      {path: 'outlet-router', component: OutletRouterComponent, data: {title: 'Controls the web content to be displayed in a router outlet'}},
-      {path: 'publish-message', component: PublishMessageComponent, data: {title: 'Publish messages'}},
-      {path: 'receive-message', component: ReceiveMessageComponent, data: {title: 'Receive messages'}},
-      {path: 'manage-capabilities', component: ManageCapabilitiesComponent, data: {title: 'Manage capabilities'}},
-      {path: 'manage-intents', component: ManageIntentsComponent, data: {title: 'Manage intents'}},
-      {path: 'context', component: ContextComponent, data: {title: 'Shows the context at this level in the context tree'}},
-      {path: 'microfrontend-1', component: MicrofrontendComponent, data: {title: 'Displays the microfrontend-1 page'}},
-      {path: 'microfrontend-2', component: MicrofrontendComponent, data: {title: 'Displays the microfrontend-2 page'}},
+      {path: 'browser-outlets', component: BrowserOutletsComponent, data: {pageTitle: 'Allows displaying web content in one or more browser outlets', matrixParams: new Map().set('count', 2), pageTitleVisible: false}},
+      {path: 'router-outlet', component: RouterOutletComponent, data: {pageTitle: 'Allows displaying web content in a router outlet'}},
+      {path: 'outlet-router', component: OutletRouterComponent, data: {pageTitle: 'Allowd controlling the web content to be displayed in a router outlet'}},
+      {path: 'publish-message', component: PublishMessageComponent, data: {pageTitle: 'Allows publishing messages'}},
+      {path: 'receive-message', component: ReceiveMessageComponent, data: {pageTitle: 'Allows receiving messages'}},
+      {path: 'manage-capabilities', component: ManageCapabilitiesComponent, data: {pageTitle: 'Allows managing capabilities'}},
+      {path: 'manage-intents', component: ManageIntentsComponent, data: {pageTitle: 'Allows managing intents'}},
+      {path: 'context', component: ContextComponent, data: {pageTitle: 'Allows showing the context at this level in the context tree'}},
+      {path: 'microfrontend-1', component: MicrofrontendComponent, data: {pageTitle: 'Displays the \'microfrontend-1\' page'}},
+      {path: 'microfrontend-2', component: MicrofrontendComponent, data: {pageTitle: 'Displays the \'microfrontend-2\' page'}},
+      {path: 'preferred-size', component: PreferredSizeComponent, data: {pageTitle: 'Allows playing around with the microfrontend\'s preferred size'}},
+      {path: '', redirectTo: 'browser-outlets;count=2', pathMatch: 'full'},
     ],
   },
 ];

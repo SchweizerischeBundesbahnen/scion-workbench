@@ -10,13 +10,21 @@
 import { TestingAppPO } from '../testing-app.po';
 import { ContextPagePO } from './context-page.po';
 import { BrowserOutletPO } from '../browser-outlet.po';
-import { expectMap, seleniumWebDriverClickFix, SeleniumWebDriverClickFix } from '../spec.util';
+import { browserErrors, expectMap, seleniumWebDriverClickFix, SeleniumWebDriverClickFix } from '../spec.util';
+import { browser } from 'protractor';
 
 describe('Context', () => {
 
   let fix: SeleniumWebDriverClickFix;
   beforeAll(() => fix = seleniumWebDriverClickFix().install());
   afterAll(() => fix.uninstall());
+
+  it('should be a noop when looking up a context value outside of an outlet context', async () => {
+    await browser.get(`/#/testing-app/${ContextPagePO.pageUrl}`);
+    const contextPagePO = new ContextPagePO((): Promise<void> => browser.switchTo().defaultContent() as Promise<void>);
+    await expect(contextPagePO.getContext()).toEqual(new Map());
+    await expect(browserErrors()).toEqual([]);
+  });
 
   it('should allow setting a context value', async () => {
     const testingAppPO = new TestingAppPO();

@@ -13,6 +13,7 @@
  */
 export * from '@scion/toolkit/dimension';
 export * from '@scion/toolkit/operators';
+export * from '@scion/toolkit/observable';
 export * from '@scion/toolkit/sashbox';
 export * from '@scion/toolkit/util';
 export * from '@scion/toolkit/viewport';
