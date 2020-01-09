@@ -12,7 +12,7 @@ import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Inject, Input, NgZone, OnDestroy, ViewChild } from '@angular/core';
 import { concat, EMPTY, fromEvent, merge, of, Subject, timer } from 'rxjs';
 import { debounceTime, first, map, startWith, switchMap, takeUntil, takeWhile, withLatestFrom } from 'rxjs/operators';
-import { SciDimensionService, SciMutationService } from '@scion/toolkit/dimension';
+import { FromDimension, fromDimension$, fromMutation$ } from '@scion/toolkit/observable';
 
 /**
  * Renders a vertical or horizontal scrollbar.
@@ -71,9 +71,7 @@ export class SciScrollbarComponent implements OnDestroy {
 
   constructor(private _host: ElementRef<HTMLElement>,
               @Inject(DOCUMENT) private _document: any,
-              private _zone: NgZone,
-              private _dimensionService: SciDimensionService,
-              private _mutationService: SciMutationService) {
+              private _zone: NgZone) {
   }
 
   public ngOnDestroy(): void {
@@ -203,12 +201,12 @@ export class SciScrollbarComponent implements OnDestroy {
 
     this._zone.runOutsideAngular(() => {
       // update the scroll position on scroll or viewport dimension change
-      merge(this._dimensionService.dimension$(viewport), fromEvent(viewport, 'scroll', {passive: true}))
+      merge(fromDimension$(viewport), fromEvent(viewport, 'scroll', {passive: true}))
         .pipe(takeUntil(merge(this._destroy$, this._viewportRefChange$)))
         .subscribe(() => this.render());
 
       // update the scroll position on viewport client change
-      const viewportChildListChange$ = this._mutationService.mutation$(viewport, {subtree: false, childList: true, attributeFilter: []}); // listen for addition or removal of child nodes
+      const viewportChildListChange$ = fromMutation$(viewport, {subtree: false, childList: true, attributeFilter: []}); // listen for addition or removal of child nodes
       concat(of(null), viewportChildListChange$)
         .pipe(
           map(() => this.getChildList(viewport)),
@@ -216,9 +214,9 @@ export class SciScrollbarComponent implements OnDestroy {
           switchMap(children => children.reduce((acc$, child) => merge(
             acc$,
             // element dimension change
-            this._dimensionService.dimension$(child),
+            fromDimension$(child),
             // style mutation (i.e. some transformations change the scroll position without necessarily triggering a dimension change, e.g., 'scale' or 'translate' used for virtual scrolling)
-            this._mutationService.mutation$(child, {subtree: false, childList: false, attributeFilter: ['style']}),
+            fromMutation$(child, {subtree: false, childList: false, attributeFilter: ['style']}),
           ), EMPTY)),
           takeUntil(merge(this._destroy$, this._viewportRefChange$)),
         )
@@ -289,6 +287,6 @@ export class SciScrollbarComponent implements OnDestroy {
     return Array.from(viewport.children)
       .filter(child => child instanceof HTMLElement)
       .map(child => child as HTMLElement)
-      .filter(child => !this._dimensionService.isSynthResizeObservableObject(child));
+      .filter(child => !FromDimension.isSynthResizeObservableObject(child));
   }
 }

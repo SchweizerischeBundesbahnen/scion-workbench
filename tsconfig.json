@@ -96,6 +96,9 @@
     //      "@scion/toolkit/sashbox": [
     //        "projects/scion/toolkit/sashbox/src/public_api"
     //      ],
+    //      "@scion/toolkit/observable": [
+    //        "projects/scion/toolkit/observable/src/public_api"
+    //      ],
     //      "@scion/toolkit/operators": [
     //        "projects/scion/toolkit/operators/src/public_api"
     //      ],

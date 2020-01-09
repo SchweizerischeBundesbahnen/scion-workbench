@@ -11,12 +11,12 @@
 import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { captureElementDimension, SciDimension, SciDimensionService } from './dimension.service';
+import { Dimension, FromDimension, fromDimension$ } from '@scion/toolkit/observable';
 
 /**
  * Allows observing changes to host element's size.
  *
- * See {SciDimensionService} for more information.
+ * See {@link fromDimension$} Observable for more information.
  *
  * ---
  * Usage:
@@ -45,9 +45,7 @@ export class SciDimensionDirective implements OnInit, OnDestroy {
   @Input()
   public emitOutsideAngular: boolean;
 
-  constructor(host: ElementRef<HTMLElement>,
-              private _dimensionService: SciDimensionService,
-              private _ngZone: NgZone) {
+  constructor(host: ElementRef<HTMLElement>, private _ngZone: NgZone) {
     this._host = host.nativeElement;
   }
 
@@ -57,7 +55,7 @@ export class SciDimensionDirective implements OnInit, OnDestroy {
 
   private installDimensionListener(): void {
     this._ngZone.runOutsideAngular(() => {
-      this._dimensionService.dimension$(this._host)
+      fromDimension$(this._host)
         .pipe(takeUntil(this._destroy$))
         .subscribe((dimension: SciDimension) => {
           if (this.emitOutsideAngular) {
@@ -74,7 +72,7 @@ export class SciDimensionDirective implements OnInit, OnDestroy {
    * Returns the current dimension of its host element.
    */
   public get dimension(): SciDimension {
-    return captureElementDimension(this._host);
+    return FromDimension.captureElementDimension(this._host);
   }
 
   public ngOnDestroy(): void {
@@ -82,3 +80,7 @@ export class SciDimensionDirective implements OnInit, OnDestroy {
   }
 }
 
+/**
+ * Represents the dimension of an element.
+ */
+export type SciDimension = Dimension;

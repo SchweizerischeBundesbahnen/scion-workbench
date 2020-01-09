@@ -8,28 +8,19 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { TestBed } from '@angular/core/testing';
-import { SciDimensionService } from './dimension.service';
+import { FromDimension, fromDimension$ } from './dimension.observable';
 
-describe('DimensionService', () => {
+describe('fromDimension$', () => {
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      providers: [
-        SciDimensionService,
-      ],
-    });
-  });
+  beforeEach(() => FromDimension.objectObservableRegistry.clear());
 
   it('should emit on size change of the element', async () => {
-    const dimensionService = TestBed.get<SciDimensionService>(SciDimensionService);
-
     // create the testee <div> and subscribe for dimension changes
     const testeeDiv = document.createElement('div');
     testeeDiv.style.width = '100px';
 
     const reportedSizes: number[] = [];
-    dimensionService.dimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes.push(dimension.clientWidth));
+    fromDimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes.push(dimension.clientWidth));
 
     // append the testee <div> to the DOM
     document.body.appendChild(testeeDiv);
@@ -49,8 +40,6 @@ describe('DimensionService', () => {
   });
 
   it('should emit on size change of the parent element', async () => {
-    const dimensionService: SciDimensionService = TestBed.get(SciDimensionService);
-
     // create a parent <div> with a width of 300px
     const parentDiv = document.createElement('div');
     parentDiv.style.width = '100px';
@@ -60,7 +49,7 @@ describe('DimensionService', () => {
     const testeeDiv = document.createElement('div');
 
     const reportedSizes: number[] = [];
-    dimensionService.dimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes.push(dimension.clientWidth));
+    fromDimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes.push(dimension.clientWidth));
 
     // append the testee <div> to the DOM
     parentDiv.appendChild(testeeDiv);
@@ -80,8 +69,6 @@ describe('DimensionService', () => {
   });
 
   it('should allocate a single HTML object element for multiple observers', async () => {
-    const dimensionService: SciDimensionService = TestBed.get(SciDimensionService);
-
     // create the testee <div>
     const testeeDiv = document.createElement('div');
     testeeDiv.style.width = '100px';
@@ -90,29 +77,29 @@ describe('DimensionService', () => {
 
     // 1. subscription
     const reportedSizes1: number[] = [];
-    const subscription1 = dimensionService.dimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes1.push(dimension.clientWidth));
+    const subscription1 = fromDimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes1.push(dimension.clientWidth));
     await waitUntilRendered();
 
     expect(reportedSizes1).toEqual([100]);
-    expect(dimensionService._objectObservableRegistry.size).toEqual(1);
+    expect(FromDimension.objectObservableRegistry.size).toEqual(1);
     expect(testeeDiv.querySelectorAll('object.synth-resize-observable').length).toEqual(1);
 
     // 2. subscription
     const reportedSizes2: number[] = [];
-    const subscription2 = dimensionService.dimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes2.push(dimension.clientWidth));
+    const subscription2 = fromDimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes2.push(dimension.clientWidth));
     await waitUntilRendered();
 
     expect(reportedSizes2).toEqual([100]);
-    expect(dimensionService._objectObservableRegistry.size).toEqual(1);
+    expect(FromDimension.objectObservableRegistry.size).toEqual(1);
     expect(testeeDiv.querySelectorAll('object.synth-resize-observable').length).toEqual(1);
 
     // 3. subscription
     const reportedSizes3: number[] = [];
-    const subscription3 = dimensionService.dimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes3.push(dimension.clientWidth));
+    const subscription3 = fromDimension$(testeeDiv, {useNativeResizeObserver: false}).subscribe(dimension => reportedSizes3.push(dimension.clientWidth));
     await waitUntilRendered();
 
     expect(reportedSizes3).toEqual([100]);
-    expect(dimensionService._objectObservableRegistry.size).toEqual(1);
+    expect(FromDimension.objectObservableRegistry.size).toEqual(1);
     expect(testeeDiv.querySelectorAll('object.synth-resize-observable').length).toEqual(1);
 
     // change the size of the <div> to 200px and wait until the changed size is reported
@@ -125,7 +112,7 @@ describe('DimensionService', () => {
     // Unsubscribe the 3. subscriber
     subscription3.unsubscribe();
     await waitUntilRendered();
-    expect(dimensionService._objectObservableRegistry.size).toEqual(1);
+    expect(FromDimension.objectObservableRegistry.size).toEqual(1);
     expect(testeeDiv.querySelectorAll('object.synth-resize-observable').length).toEqual(1);
 
     // change the size of the <div> to 300px and wait until the changed size is reported
@@ -138,7 +125,7 @@ describe('DimensionService', () => {
     // Unsubscribe the 2. subscriber
     subscription2.unsubscribe();
     await waitUntilRendered();
-    expect(dimensionService._objectObservableRegistry.size).toEqual(1);
+    expect(FromDimension.objectObservableRegistry.size).toEqual(1);
     expect(testeeDiv.querySelectorAll('object.synth-resize-observable').length).toEqual(1);
 
     // change the size of the <div> to 400px and wait until the changed size is reported
@@ -151,7 +138,7 @@ describe('DimensionService', () => {
     // Unsubscribe the 1. subscriber
     subscription1.unsubscribe();
     await waitUntilRendered();
-    expect(dimensionService._objectObservableRegistry.size).toEqual(0);
+    expect(FromDimension.objectObservableRegistry.size).toEqual(0);
     expect(testeeDiv.querySelectorAll('object.synth-resize-observable').length).toEqual(0);
 
     // change the size of the <div> to 500px and wait until the changed size is reported
