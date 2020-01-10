@@ -13,7 +13,7 @@ import { IntentMessage, Message, MessageHeaders, TopicMessage } from '../../mess
 import { ConnackMessage, MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../../ɵmessaging.model';
 import { matchesCapabilityQualifier } from '../../qualifier-tester';
 import { Beans, PreDestroy } from '../../bean-manager';
-import { ApplicationRegistry } from '../application.registry';
+import { ApplicationRegistry } from '../application-registry';
 import { ManifestRegistry } from '../manifest.registry';
 import { UUID } from '@scion/toolkit/util';
 import { PlatformState, PlatformStates } from '../../platform-state';
@@ -97,9 +97,11 @@ export class MessageBroker implements PreDestroy {
         const sender = {gatewayWindow, origin: event.origin};
 
         if (!clientAppName) {
+          const warning = `Client connect attempt rejected by the message broker: Bad request. [origin='${event.origin}']`;
+          Beans.get(Logger).warn(`[WARNING] ${warning}`);
           sendTopicMessage<ConnackMessage>(sender, MessagingTransport.BrokerToGateway, {
             topic: replyTo,
-            body: {returnCode: 'refused:bad-request', returnMessage: `[MessageClientConnectError] Client connect attempt rejected by the message broker: Bad request. [origin='${event.origin}']`},
+            body: {returnCode: 'refused:bad-request', returnMessage: `[MessageClientConnectError] ${warning}`},
             headers: new Map(),
           });
           return;
@@ -107,18 +109,23 @@ export class MessageBroker implements PreDestroy {
 
         const application = this._applicationRegistry.getApplication(clientAppName);
         if (!application) {
+          const warning = `Client connect attempt rejected by the message broker: Unknown client. [app='${clientAppName}']`;
+          Beans.get(Logger).warn(`[WARNING] ${warning}`);
           sendTopicMessage<ConnackMessage>(sender, MessagingTransport.BrokerToGateway, {
             topic: replyTo,
-            body: {returnCode: 'refused:rejected', returnMessage: `[MessageClientConnectError] Client connect attempt rejected by the message broker: Unknown client. [app='${clientAppName}']`},
+            body: {returnCode: 'refused:rejected', returnMessage: `[MessageClientConnectError] ${warning}`},
             headers: new Map(),
           });
           return;
         }
 
         if (event.origin !== application.origin) {
+          const warning = `Client connect attempt blocked by the message broker: Wrong origin [actual='${event.origin}', expected='${application.origin}', app='${application.symbolicName}']`;
+          Beans.get(Logger).warn(`[WARNING] ${warning}`);
+
           sendTopicMessage<ConnackMessage>(sender, MessagingTransport.BrokerToGateway, {
             topic: replyTo,
-            body: {returnCode: 'refused:blocked', returnMessage: `[MessageClientConnectError] Client connect attempt blocked by the message broker: Wrong origin [actual='${event.origin}', expected='${application.origin}', app='${application.symbolicName}']`},
+            body: {returnCode: 'refused:blocked', returnMessage: `[MessageClientConnectError] ${warning}`},
             headers: new Map(),
           });
           return;
@@ -442,7 +449,7 @@ export function filterByTransportAndTopic(transport: MessagingTransport, topic: 
     filterMessage(transport, MessagingChannel.Topic),
     filter((event: MessageEvent): boolean => {
       const envelope = event.data as MessageEnvelope<TopicMessage>;
-      return envelope.message.topic === topic;
+      return envelope.message && envelope.message.topic === topic;
     }),
   );
 }

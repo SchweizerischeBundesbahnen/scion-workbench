@@ -9,7 +9,7 @@
  */
 import { MessageClient } from './client/message-client';
 import { ManifestRegistry } from './host/manifest.registry';
-import { ApplicationRegistry } from './host/application.registry';
+import { ApplicationRegistry } from './host/application-registry';
 import { BeanInstanceConstructInstructions, Beans, InstanceConstructInstructions, Type } from './bean-manager';
 import { ɵMessageClient } from './client/ɵmessage-client';
 import { PlatformState, PlatformStates } from './platform-state';
@@ -23,7 +23,6 @@ import { HttpClient } from './host/http-client';
 import { ManifestCollector } from './host/manifest-collector';
 import { PlatformMessageClient } from './host/platform-message-client';
 import { PLATFORM_SYMBOLIC_NAME } from './host/platform.constants';
-import { PlatformInitializer } from './host/platform-initializer';
 import { Defined } from '@scion/toolkit/util';
 import { HostPlatformState } from './client/host-platform-state';
 import { MessageBroker } from './host/message-broker/message-broker';
@@ -40,6 +39,7 @@ import { RelativePathResolver } from './client/router-outlet/relative-path-resol
 import { ClientRegistry } from './host/message-broker/client.registry';
 import { FocusTracker } from './host/focus/focus-tracker';
 import { PreferredSizeService } from './client/preferred-size/preferred-size-service';
+import { HostPlatformAppProvider } from './host/host-platform-app-provider';
 
 /**
  * The central class of the SCION microfrontend platform.
@@ -103,10 +103,10 @@ export const MicrofrontendPlatform = new class {
    */
   public forHost(platformConfig: ApplicationConfig[] | PlatformConfig | Type<PlatformConfigLoader>, clientConfig?: ClientConfig): Promise<void> {
     return this.startPlatform(() => {
-        Beans.registerInitializer({useClass: PlatformInitializer});
         Beans.registerInitializer({useClass: ManifestCollector});
 
         Beans.register(IS_PLATFORM_HOST, {useValue: true});
+        Beans.register(HostPlatformAppProvider);
         Beans.register(ClientRegistry);
         Beans.registerIfAbsent(Logger);
         Beans.register(PlatformProperties);
@@ -132,6 +132,9 @@ export const MicrofrontendPlatform = new class {
           Beans.registerIfAbsent(RouterOutletUrlAssigner);
           Beans.register(FocusMonitor);
           Beans.register(PreferredSizeService);
+        }
+        else {
+          Beans.registerIfAbsent(MessageClient, {useExisting: PlatformMessageClient});
         }
 
         // Notify clients about host platform state changes.

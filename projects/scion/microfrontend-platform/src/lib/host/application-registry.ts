@@ -77,12 +77,17 @@ export class ApplicationRegistry {
    * - if base URL is not specified in the manifest, the origin from 'manifestUrl' is used as the base URL, or the origin from the current window if the 'manifestUrl' is relative
    */
   private computeBaseUrl(applicationConfig: ApplicationConfig, manifest: ApplicationManifest): string {
-    const manifestOrigin = Urls.isAbsoluteUrl(applicationConfig.manifestUrl) ? new URL(applicationConfig.manifestUrl).origin : window.origin;
+    const manifestURL = Urls.isAbsoluteUrl(applicationConfig.manifestUrl) ? new URL(applicationConfig.manifestUrl) : new URL(applicationConfig.manifestUrl, window.origin);
 
     if (!manifest.baseUrl) {
-      return manifestOrigin;
+      return manifestURL.origin;
     }
 
-    return new URL(manifest.baseUrl, manifestOrigin).toString();
+    if (Urls.isAbsoluteUrl(manifest.baseUrl)) {
+      return new URL(manifest.baseUrl).toString(); // normalize the URL
+    }
+    else {
+      return new URL(manifest.baseUrl, manifestURL.origin).toString();
+    }
   }
 }

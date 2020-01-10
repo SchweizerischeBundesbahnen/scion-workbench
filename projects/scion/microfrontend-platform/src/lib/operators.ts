@@ -62,7 +62,7 @@ export function filterByHeader<T extends Message>(header: { key: string, value: 
  * Buffers the source Observable values until `closingNotifier$` emits.
  * Once closed, items of the source Observable are emitted as they arrive.
  */
-export function bufferUntil<T>(closingNotifier$: Observable<any> | Promise<any>): OperatorFunction<T, T> {
+export function bufferUntil<T>(closingNotifier$: Observable<any> | Promise<any>): MonoTypeOperatorFunction<T> {
   const guard$ = from(closingNotifier$).pipe(take(1), publishLast(), refCount(), mergeMapTo(EMPTY));
   return mergeMap((item: T) => concat(guard$, of(item)));
 }

@@ -14,5 +14,5 @@
 export { PlatformConfigLoader } from './platform-config-loader';
 export { PlatformProperties } from './platform-properties';
 export { ManifestRegistry } from './manifest.registry'; // TODO do not export as public API
-export { ApplicationRegistry } from './application.registry'; // TODO do not export as public API
+export { ApplicationRegistry } from './application-registry'; // TODO do not export as public API
 export { PlatformMessageClient } from './platform-message-client'; // TODO do not export as public API

@@ -12,7 +12,7 @@ import { Beans } from '../bean-manager';
 import { HttpClient } from './http-client';
 import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { ApplicationManifest } from '../platform.model';
-import { ApplicationRegistry } from './application.registry';
+import { ApplicationRegistry } from './application-registry';
 import { Logger } from '../logger';
 
 describe('ManifestCollector', () => {
@@ -26,7 +26,8 @@ describe('ManifestCollector', () => {
     httpClientSpy.fetch
       .withArgs('http://www.app-1/manifest').and.returnValue(okAnswer({body: {name: 'application-1', intents: [], capabilities: []}, delay: 50}))
       .withArgs('http://www.app-2/manifest').and.returnValue(okAnswer({body: {name: 'application-2', intents: [], capabilities: []}, delay: 120}))
-      .withArgs('http://www.app-3/manifest').and.returnValue(okAnswer({body: {name: 'application-3', intents: [], capabilities: []}, delay: 30}));
+      .withArgs('http://www.app-3/manifest').and.returnValue(okAnswer({body: {name: 'application-3', intents: [], capabilities: []}, delay: 30}))
+      .and.callFake((arg) => fetch(arg)); // fetches the manifest of 'scion-platform' host app
     Beans.register(HttpClient, {useValue: httpClientSpy});
 
     // mock {Logger}
@@ -54,7 +55,9 @@ describe('ManifestCollector', () => {
       .withArgs('http://www.app-1/manifest').and.returnValue(okAnswer({body: {name: 'application-1', intents: [], capabilities: []}, delay: 12}))
       .withArgs('http://www.app-2/manifest').and.returnValue(nokAnswer({status: 500, delay: 100}))
       .withArgs('http://www.app-3/manifest').and.returnValue(okAnswer({body: {name: 'application-3', intents: [], capabilities: []}, delay: 600}))
-      .withArgs('http://www.app-4/manifest').and.returnValue(nokAnswer({status: 502, delay: 200}));
+      .withArgs('http://www.app-4/manifest').and.returnValue(nokAnswer({status: 502, delay: 200}))
+      .and.callFake((arg) => fetch(arg)); // fetches the manifest of 'scion-platform' host app
+
     Beans.register(HttpClient, {useValue: httpClientSpy});
 
     // mock {Logger}

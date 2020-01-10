@@ -14,9 +14,10 @@ import { PlatformConfigLoader } from './platform-config-loader';
 import { Defined } from '@scion/toolkit/util';
 import { PlatformProperties } from './platform-properties';
 import { ApplicationConfig, PlatformConfig } from './platform-config';
-import { ApplicationRegistry } from './application.registry';
+import { ApplicationRegistry } from './application-registry';
 import { HttpClient } from './http-client';
 import { Logger } from '../logger';
+import { HostPlatformAppProvider } from './host-platform-app-provider';
 
 /**
  * Collects manifests of registered applications.
@@ -33,7 +34,7 @@ export class ManifestCollector implements Initializer {
         Defined.orElseThrow(platformConfig, () => Error('[PlatformConfigError] No platform config provided.'));
         Defined.orElseThrow(platformConfig.apps, () => Error('[PlatformConfigError] Missing \'apps\' property in platform config. Did you forget to register applications?'));
         Beans.get(PlatformProperties).registerProperties(platformConfig.properties);
-        return platformConfig.apps;
+        return [Beans.get(HostPlatformAppProvider).appConfig, ...platformConfig.apps];
       })
       .then((appConfigs: ApplicationConfig[]): Promise<void> => {
         return Promise.all(this.fetchAndRegisterManifests(appConfigs)).then();

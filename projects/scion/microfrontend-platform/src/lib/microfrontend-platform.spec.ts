@@ -16,9 +16,6 @@ import { ApplicationConfig } from './host/platform-config';
 import { HostPlatformState } from './client/host-platform-state';
 import { serveManifest } from './spec.util.spec';
 import { PlatformMessageClient } from './host/platform-message-client';
-import { MessageBroker } from './host/message-broker/message-broker';
-import { ManifestRegistry } from './host/manifest.registry';
-import { ApplicationRegistry } from './host/application.registry';
 
 describe('MicrofrontendPlatform', () => {
 
@@ -45,7 +42,6 @@ describe('MicrofrontendPlatform', () => {
   });
 
   it('should reject starting the host platform multiple times', async () => {
-    Beans.register(MessageClient, {useClass: NullMessageClient});
     await expectAsync(MicrofrontendPlatform.forHost([])).toBeResolved();
 
     try {
@@ -65,36 +61,21 @@ describe('MicrofrontendPlatform', () => {
     await expectAsync(Beans.get(HostPlatformState).whenStarted()).toBeResolved();
   });
 
-  it('should register platform beans of the host platform correctly', async () => {
+  it('should register the `MessageClient` as alias for `PlatformMessageClient` when starting the host platform without app', async () => {
     await MicrofrontendPlatform.forHost([]);
 
-    // MessageBroker
-    expect(getBeanInfo(MessageBroker)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
-    // PlatformMessageClient
-    expect(getBeanInfo(PlatformMessageClient)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
-    // MessageClient
-    expect(getBeanInfo(MessageClient)).toBeUndefined();
-    // ManifestRegistry
-    expect(getBeanInfo(ManifestRegistry)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
-    // ApplicationRegistry
-    expect(getBeanInfo(ApplicationRegistry)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    expect(getBeanInfo(MessageClient)).toEqual(jasmine.objectContaining({useExisting: PlatformMessageClient}));
+    expect(Beans.get(MessageClient)).toBe(Beans.get(PlatformMessageClient));
   });
 
-  it('should register platform beans of the client platform correctly', async () => {
+  it('should not register the `MessageClient` as alias for `PlatformMessageClient` when starting the host platform with an app', async () => {
     const manifestUrl = serveManifest({name: 'Host Application'});
     const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
     await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app', messaging: {brokerDiscoverTimeout: 250, deliveryTimeout: 250}});
 
-    // MessageBroker
-    expect(getBeanInfo(MessageBroker)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
-    // PlatformMessageClient
-    expect(getBeanInfo(PlatformMessageClient)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
-    // MessageClient
-    expect(getBeanInfo(PlatformMessageClient)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
-    // ManifestRegistry
-    expect(getBeanInfo(ManifestRegistry)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
-    // ApplicationRegistry
-    expect(getBeanInfo(ApplicationRegistry)).toEqual(jasmine.objectContaining({eager: true, multi: false, destroyPhase: PlatformStates.Stopped}));
+    expect(getBeanInfo(MessageClient)).toEqual(jasmine.objectContaining({eager: true, destroyPhase: PlatformStates.Stopped}));
+    expect(getBeanInfo(PlatformMessageClient)).toEqual(jasmine.objectContaining({eager: true, destroyPhase: PlatformStates.Stopped}));
+    expect(Beans.get(MessageClient)).not.toBe(Beans.get(PlatformMessageClient));
   });
 });
 

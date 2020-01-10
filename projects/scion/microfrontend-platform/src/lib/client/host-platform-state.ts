@@ -13,7 +13,6 @@ import { PlatformTopics } from '../ɵmessaging.model';
 import { PlatformStates } from '../platform-state';
 import { mapToBody, MessageClient } from './message-client';
 import { Beans } from '../bean-manager';
-import { PlatformMessageClient } from '../host/platform-message-client';
 
 /**
  * Allows observing the state of the host platform.
@@ -23,8 +22,7 @@ export class HostPlatformState {
   private _state$: Observable<PlatformStates>;
 
   constructor() {
-    const messageClient = Beans.get(PlatformMessageClient, {orElseSupply: (): MessageClient => Beans.get(MessageClient)});
-    this._state$ = messageClient.observe$<PlatformStates>(PlatformTopics.HostPlatformState)
+    this._state$ = Beans.get(MessageClient).observe$<PlatformStates>(PlatformTopics.HostPlatformState)
       .pipe(
         mapToBody(),
         shareReplay(1),

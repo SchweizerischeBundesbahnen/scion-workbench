@@ -45,8 +45,7 @@ export function getGatewayJavaScript(config: GatewayConfig): string {
        }
      };
 
-     ${initGateway.name}(config, constants);
-     ${initGateway.toString()}
+     (${initGateway.toString()})(config, constants);
    })();`;
 }
 

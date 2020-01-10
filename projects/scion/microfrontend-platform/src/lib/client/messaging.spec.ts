@@ -21,6 +21,7 @@ import { collectToPromise, expectMap, expectToBeRejectedWithError, serveManifest
 import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { Defined, Objects } from '@scion/toolkit/util';
 import { ClientRegistry } from '../host/message-broker/client.registry';
+import { MessageEnvelope } from '../ɵmessaging.model';
 import Spy = jasmine.Spy;
 
 const bodyExtractFn = <T>(msg: TopicMessage<T> | IntentMessage<T>): T => msg.body;
@@ -212,26 +213,37 @@ describe('Messaging', () => {
   });
 
   it('should reject a client connect attempt if the app is not registered', async () => {
-    const manifestUrl = serveManifest({name: 'Trusted Client'});
-    const registeredApps: ApplicationConfig[] = [{symbolicName: 'trusted-client', manifestUrl: manifestUrl}];
-    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'untrusted-client'});
+    const loggerSpy = jasmine.createSpyObj(Logger.name, ['error', 'warn', 'info']);
+    Beans.register(Logger, {useValue: loggerSpy});
+    await MicrofrontendPlatform.forHost([]); // no app is registered
 
-    const expected = '[MessageClientConnectError] Client connect attempt rejected by the message broker: Unknown client. [app=\'untrusted-client\'] [code: \'refused:rejected\']';
-    await expectAsync(Beans.get(MessageClient).publish$('some-topic').toPromise()).toBeRejectedWith(expected);
+    const badClient = mountBadClientAndConnect({symbolicName: 'bad-client'});
+    try {
+      await waitForCondition(() => loggerSpy.warn.calls.all().length > 0, 1000);
+      await expect(loggerSpy.warn.calls.mostRecent().args[0]).toEqual('[WARNING] Client connect attempt rejected by the message broker: Unknown client. [app=\'bad-client\']');
+    }
+    finally {
+      badClient.dispose();
+    }
+    await expect(true).toBeTruthy();
   });
 
-  it('should reject a client connect attempt if the app is not trusted (wrong origin)', async () => {
-    const loggerSpy = jasmine.createSpyObj(Logger.name, ['error', 'info']);
+  it('should reject a client connect attempt if the client\'s origin is different to the registered app origin', async () => {
+    const loggerSpy = jasmine.createSpyObj(Logger.name, ['error', 'warn', 'info']);
     Beans.register(Logger, {useValue: loggerSpy});
 
-    const manifestUrl = serveManifest({name: 'Trusted Client', baseUrl: 'http://not-karma-testrunner-origin'});
+    const manifestUrl = serveManifest({name: 'Client', baseUrl: 'http://app-origin'});
     const registeredApps: ApplicationConfig[] = [{symbolicName: 'client', manifestUrl: manifestUrl}];
-    const logCapturePromise = waitUntilInvoked(loggerSpy.error);
+    await MicrofrontendPlatform.forHost(registeredApps);
 
-    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'client'});
-
-    await expectAsync(logCapturePromise).toBeResolved('\'Logger.error\' not invoked within 1s');
-    await expect(loggerSpy.error.calls.mostRecent().args[0]).toMatch(/\[MessageClientConnectError] Client connect attempt blocked by the message broker: Wrong origin.*\[code: 'refused:blocked']/);
+    const badClient = mountBadClientAndConnect({symbolicName: 'client'}); // bad client connects under karma test runner origin (window.origin)
+    try {
+      await waitForCondition(() => loggerSpy.warn.calls.all().length > 0, 1000);
+      await expect(loggerSpy.warn.calls.mostRecent().args[0]).toEqual(`[WARNING] Client connect attempt blocked by the message broker: Wrong origin [actual='${window.origin}', expected='http://app-origin', app='client']`);
+    }
+    finally {
+      badClient.dispose();
+    }
   });
 
   it('should log an error if the message broker cannot be discovered', async () => {
@@ -807,6 +819,39 @@ describe('Messaging', () => {
     });
   });
 });
+
+/**
+ * Mounts an iframe that tries to connect to the platform.
+ */
+function mountBadClientAndConnect(badClientConfig: { symbolicName: string }): { dispose(): void } {
+  // Note: DO NOT USE CODE FROM OTHER MODULES BECAUSE SOLELY THE 'TO-STRING' REPRESENTATION OF FOLLOWING FUNCTION
+  //       IS LOADED INTO THE IFRAME. THE ONLY EXCEPTION ARE REFERENCES TO INTERFACE TYPES AS NOT TRANSPILED INTO
+  //       JAVASCRIPT.
+  function sendConnnectRequest(symbolicName: string): void {
+    const env: MessageEnvelope = {
+      transport: 'sci://microfrontend-platform/gateway-to-broker' as any,
+      channel: 'topic' as any,
+      messageId: null,
+      message: {
+        topic: 'ɵCLIENT_CONNECT',
+        headers: new Map().set('APP_SYMBOLIC_NAME', symbolicName),
+      },
+    };
+    window.parent.postMessage(env, '*');
+  }
+
+  const script = `(${sendConnnectRequest.toString()})('${badClientConfig.symbolicName}');`; // invokes the transpiled function
+  const html = `<html><head><script>${script}</script></head><body>BAD CLIENT</body></html>`;
+  const iframeUrl = URL.createObjectURL(new Blob([html], {type: 'text/html'}));
+  const iframe = document.body.appendChild(document.createElement('iframe'));
+  iframe.setAttribute('src', iframeUrl);
+  return {
+    dispose(): void {
+      URL.revokeObjectURL(iframeUrl);
+      document.body.removeChild(iframe);
+    },
+  };
+}
 
 /**
  * Expects the message to equal the expected message with its headers to contain at minimum the given map entries.
