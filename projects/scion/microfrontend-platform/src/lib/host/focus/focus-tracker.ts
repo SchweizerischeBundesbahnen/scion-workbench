@@ -75,8 +75,11 @@ export class FocusTracker implements PreDestroy {
    * Tests whether the given client has received focus or contains embedded web content that has received focus.
    */
   private isFocusWithin(clientId: string, focusOwner: Client | undefined): boolean {
+    const clientWindow = Beans.get(ClientRegistry).getByClientId(clientId).window;
     for (let client = focusOwner; client !== undefined; client = this.getParentClient(client)) {
-      if (client.id === clientId) {
+      // Compare against the window instead of the client id because in the host app the
+      // {@link MessageClient} and {@link PlatformMessageClient} share the same window
+      if (client.window === clientWindow) {
         return true;
       }
     }
