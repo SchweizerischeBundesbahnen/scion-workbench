@@ -32,7 +32,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     this._brokerGateway = new BrokerGateway(clientAppName, {discoveryTimeout: this._config.discoveryTimeout});
   }
 
-  public publish$(topic: string, message?: any, options?: PublishOptions): Observable<never> {
+  public publish$<T = any>(topic: string, message?: T, options?: PublishOptions): Observable<never> {
     assertTopic(topic, {allowWildcardSegments: false});
 
     const topicMessage: TopicMessage = {topic, retain: Defined.orElse(options && options.retain, false), headers: options && options.headers || new Map()};
@@ -55,7 +55,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     return this._observe$(topic);
   }
 
-  public issueIntent$(intent: Intent, body?: any, options?: MessageOptions): Observable<never> {
+  public issueIntent$<T = any>(intent: Intent, body?: T, options?: MessageOptions): Observable<never> {
     assertIntentQualifier(intent.qualifier, {allowWildcards: false});
 
     const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: options && options.headers || new Map()};

@@ -58,7 +58,7 @@ export abstract class MessageClient {
    * @return An Observable which completes immediately when dispatched the message, or which throws an error if the message
    *         could not be dispatched.
    */
-  abstract publish$(topic: string, message?: any, options?: PublishOptions): Observable<never>;
+  abstract publish$<T = any>(topic: string, message?: T, options?: PublishOptions): Observable<never>;
 
   /**
    * Sends a request to the given topic and receives one or more replies.
@@ -133,7 +133,7 @@ export abstract class MessageClient {
    *         could not be dispatched, e.g., because if missing the intent, or because if no application is found to handle
    *         the intent.
    */
-  abstract issueIntent$(intent: Intent, body?: any, options?: MessageOptions): Observable<never>;
+  abstract issueIntent$<T = any>(intent: Intent, body?: T, options?: MessageOptions): Observable<never>;
 
   /**
    * Issues an intent and receives one or more replies.
@@ -278,11 +278,11 @@ export class NullMessageClient implements MessageClient {
     console.log('[NullMessageClient] Using \'NullMessageClient\' for messaging. Messages cannot be sent or received.');
   }
 
-  public publish$(topic: string, message?: any, options?: PublishOptions): Observable<never> {
+  public publish$<T = any>(topic: string, message?: T, options?: PublishOptions): Observable<never> {
     return NEVER;
   }
 
-  public request$<T>(topic: string, message?: any): Observable<TopicMessage<T>> {
+  public request$<T>(topic: string, request?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
     return NEVER;
   }
 
@@ -290,11 +290,11 @@ export class NullMessageClient implements MessageClient {
     return NEVER;
   }
 
-  public issueIntent$(intent: Intent, body?: any): Observable<never> {
+  public issueIntent$<T = any>(intent: Intent, body?: T, options?: MessageOptions): Observable<never> {
     return NEVER;
   }
 
-  public requestByIntent$<T>(intent: Intent, body?: any): Observable<TopicMessage<T>> {
+  public requestByIntent$<T>(intent: Intent, body?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
     return NEVER;
   }
 

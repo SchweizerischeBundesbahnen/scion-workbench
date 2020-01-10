@@ -32,7 +32,7 @@ export class AngularZoneMessageClientDecorator implements BeanDecorator<MessageC
     const zone = Beans.get(NgZone);
     return new class implements MessageClient {
 
-      public publish$(topic: string, message?: any, options?: PublishOptions): Observable<never> {
+      public publish$<T = any>(topic: string, message?: T, options?: PublishOptions): Observable<never> {
         return messageClient.publish$(topic, message, options).pipe(runInsideAngular(zone));
       }
 
@@ -44,7 +44,7 @@ export class AngularZoneMessageClientDecorator implements BeanDecorator<MessageC
         return messageClient.observe$<T>(topic).pipe(runInsideAngular(zone));
       }
 
-      public issueIntent$(intent: Intent, body?: any, options?: MessageOptions): Observable<never> {
+      public issueIntent$<T = any>(intent: Intent, body?: T, options?: MessageOptions): Observable<never> {
         return messageClient.issueIntent$(intent, body, options).pipe(runInsideAngular(zone));
       }
 
