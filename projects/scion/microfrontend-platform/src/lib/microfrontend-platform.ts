@@ -39,6 +39,8 @@ import { RelativePathResolver } from './client/router-outlet/relative-path-resol
 import { ClientRegistry } from './host/message-broker/client.registry';
 import { FocusTracker } from './host/focus/focus-tracker';
 import { PreferredSizeService } from './client/preferred-size/preferred-size-service';
+import { MouseMoveEventDispatcher } from './client/mouse-event/mouse-move-event-dispatcher';
+import { MouseUpEventDispatcher } from './client/mouse-event/mouse-up-event-dispatcher';
 import { HostPlatformAppProvider } from './host/host-platform-app-provider';
 
 /**
@@ -85,6 +87,8 @@ export const MicrofrontendPlatform = new class {
         Beans.registerIfAbsent(RouterOutletUrlAssigner);
         Beans.register(FocusInEventDispatcher, {eager: true});
         Beans.register(FocusMonitor);
+        Beans.register(MouseMoveEventDispatcher, {eager: true});
+        Beans.register(MouseUpEventDispatcher, {eager: true});
         Beans.register(PreferredSizeService);
         Beans.register(ContextService);
       },
@@ -119,6 +123,8 @@ export const MicrofrontendPlatform = new class {
         Beans.register(ContextService);
         Beans.register(FocusTracker, {eager: true});
         Beans.register(FocusInEventDispatcher, {eager: true});
+        Beans.register(MouseMoveEventDispatcher, {eager: true});
+        Beans.register(MouseUpEventDispatcher, {eager: true});
 
         // Construct the bean manager instantly to receive connect requests of clients.
         Beans.registerIfAbsent(MessageBroker, {useValue: new MessageBroker(), destroyPhase: PlatformStates.Stopped});

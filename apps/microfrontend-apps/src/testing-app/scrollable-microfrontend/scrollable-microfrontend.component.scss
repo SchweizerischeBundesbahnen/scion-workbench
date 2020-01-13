@@ -1,0 +1,9 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  display: grid;
+
+  > sci-viewport div.scrollable-content {
+    height: 200%;
+  }
+}

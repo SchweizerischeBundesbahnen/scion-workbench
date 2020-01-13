@@ -21,6 +21,7 @@ import { OutletRouterComponent } from './outlet-router/outlet-router.component';
 import { PublishMessageComponent } from './messaging/publish-message/publish-message.component';
 import { RouterOutletComponent } from './router-outlet/router-outlet.component';
 import { MicrofrontendComponent } from './microfrontend/microfrontend.component';
+import { ScrollableMicrofrontendComponent } from './scrollable-microfrontend/scrollable-microfrontend.component';
 import { PreferredSizeComponent } from './preferred-size/preferred-size.component';
 
 const routes: Routes = [
@@ -39,6 +40,7 @@ const routes: Routes = [
       {path: 'context', component: ContextComponent, data: {pageTitle: 'Allows showing the context at this level in the context tree'}},
       {path: 'microfrontend-1', component: MicrofrontendComponent, data: {pageTitle: 'Displays the \'microfrontend-1\' page'}},
       {path: 'microfrontend-2', component: MicrofrontendComponent, data: {pageTitle: 'Displays the \'microfrontend-2\' page'}},
+      {path: 'scrollable-microfrontend', component: ScrollableMicrofrontendComponent, data: {pageTitle: 'Displays a microfrontend with some tall content displayed in a viewport'}},
       {path: 'preferred-size', component: PreferredSizeComponent, data: {pageTitle: 'Allows playing around with the microfrontend\'s preferred size'}},
       {path: '', redirectTo: 'browser-outlets;count=2', pathMatch: 'full'},
     ],
