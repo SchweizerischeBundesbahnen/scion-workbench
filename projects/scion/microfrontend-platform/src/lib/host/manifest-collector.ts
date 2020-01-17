@@ -12,12 +12,13 @@ import { first } from 'rxjs/operators';
 import { Beans, Initializer } from '../bean-manager';
 import { PlatformConfigLoader } from './platform-config-loader';
 import { Defined } from '@scion/toolkit/util';
-import { PlatformProperties } from './platform-properties';
 import { ApplicationConfig, PlatformConfig } from './platform-config';
 import { ApplicationRegistry } from './application-registry';
 import { HttpClient } from './http-client';
 import { Logger } from '../logger';
 import { HostPlatformAppProvider } from './host-platform-app-provider';
+import { PlatformMessageClient } from '../host/platform-message-client';
+import { PlatformTopics } from '../ɵmessaging.model';
 
 /**
  * Collects manifests of registered applications.
@@ -33,7 +34,7 @@ export class ManifestCollector implements Initializer {
       .then((platformConfig: PlatformConfig) => {
         Defined.orElseThrow(platformConfig, () => Error('[PlatformConfigError] No platform config provided.'));
         Defined.orElseThrow(platformConfig.apps, () => Error('[PlatformConfigError] Missing \'apps\' property in platform config. Did you forget to register applications?'));
-        Beans.get(PlatformProperties).registerProperties(platformConfig.properties);
+        Beans.get(PlatformMessageClient).publish$(PlatformTopics.PLATFORM_PROPERTIES, platformConfig.properties || {}, {retain: true}).subscribe();
         return [Beans.get(HostPlatformAppProvider).appConfig, ...platformConfig.apps];
       })
       .then((appConfigs: ApplicationConfig[]): Promise<void> => {

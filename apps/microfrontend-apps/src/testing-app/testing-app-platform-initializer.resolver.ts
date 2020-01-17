@@ -7,7 +7,7 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Params, Resolve, RouterStateSnapshot } from '@angular/router';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
 import { ManifestRequestHandler } from './manifest/manifest-request-handler';
 import { Injectable, NgZone } from '@angular/core';
@@ -35,14 +35,14 @@ export class TestingAppPlatformInitializerResolver implements Resolve<void> {
     }
 
     if (window === window.top) {
-      return this.startHostPlatform(port);
+      return this.startHostPlatform(port, route.queryParams);
     }
     else {
       return this.startClientPlatform(port);
     }
   }
 
-  private startHostPlatform(port: number): Promise<void> {
+  private startHostPlatform(port: number, queryParams: Params): Promise<void> {
     Beans.get(PlatformState).whenState(PlatformStates.Starting).then(() => {
       Beans.register(ManifestRequestHandler, {eager: true});
       Beans.register(NgZone, {useValue: this._zone});
@@ -51,12 +51,15 @@ export class TestingAppPlatformInitializerResolver implements Resolve<void> {
     });
 
     const hostUrl = `${window.location.protocol}//${window.location.hostname}`;
-    return MicrofrontendPlatform.forHost([
-      {manifestUrl: `${hostUrl}:4200/testing-app/assets/app-4200-manifest.json`, symbolicName: 'app-4200'},
-      {manifestUrl: `${hostUrl}:4201/testing-app/assets/app-4201-manifest.json`, symbolicName: 'app-4201'},
-      {manifestUrl: `${hostUrl}:4202/testing-app/assets/app-4202-manifest.json`, symbolicName: 'app-4202'},
-      {manifestUrl: `${hostUrl}:4203/testing-app/assets/app-4203-manifest.json`, symbolicName: 'app-4203'},
-    ], {symbolicName: `app-${port}`});
+    return MicrofrontendPlatform.forHost({
+      apps: [
+        {manifestUrl: `${hostUrl}:4200/testing-app/assets/app-4200-manifest.json`, symbolicName: 'app-4200'},
+        {manifestUrl: `${hostUrl}:4201/testing-app/assets/app-4201-manifest.json`, symbolicName: 'app-4201'},
+        {manifestUrl: `${hostUrl}:4202/testing-app/assets/app-4202-manifest.json`, symbolicName: 'app-4202'},
+        {manifestUrl: `${hostUrl}:4203/testing-app/assets/app-4203-manifest.json`, symbolicName: 'app-4203'},
+      ],
+      properties: queryParams,
+    }, {symbolicName: `app-${port}`});
   }
 
   private startClientPlatform(port: number): Promise<void> {

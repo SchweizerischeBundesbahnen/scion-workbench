@@ -17,7 +17,7 @@ import { PlatformConfigLoader } from './host/platform-config-loader';
 import { from, Observable, of } from 'rxjs';
 import { ClientConfig } from './client/client-config';
 import { ApplicationConfig, PlatformConfig } from './host/platform-config';
-import { PlatformProperties } from './host/platform-properties';
+import { PlatformPropertyService } from './platform-property-service';
 import { Logger } from './logger';
 import { HttpClient } from './host/http-client';
 import { ManifestCollector } from './host/manifest-collector';
@@ -75,10 +75,17 @@ export const MicrofrontendPlatform = new class {
    */
   public forClient(config: ClientConfig): Promise<void> {
     return this.startPlatform(() => {
-        Beans.registerInitializer((): Promise<void> => SciRouterOutletElement.define());
+        Beans.registerInitializer(() => SciRouterOutletElement.define());
+        // Obtain all platform properties before signalling the platform as started to allow synchronous retrieval of platform properties.
+        Beans.registerInitializer(async () => {
+          if (!await MicrofrontendPlatform.isRunningStandalone()) {
+            await Beans.get(PlatformPropertyService).whenPropertiesLoaded;
+          }
+        });
 
         Beans.register(IS_PLATFORM_HOST, {useValue: false});
         Beans.register(ClientConfig, {useValue: config});
+        Beans.register(PlatformPropertyService, {eager: true});
         Beans.registerIfAbsent(Logger);
         Beans.registerIfAbsent(HttpClient);
         Beans.registerIfAbsent(MessageClient, provideMessageClient(config.symbolicName, config.messaging));
@@ -115,7 +122,7 @@ export const MicrofrontendPlatform = new class {
         Beans.register(HostPlatformAppProvider);
         Beans.register(ClientRegistry);
         Beans.registerIfAbsent(Logger);
-        Beans.register(PlatformProperties);
+        Beans.register(PlatformPropertyService, {eager: true});
         Beans.registerIfAbsent(HttpClient);
         Beans.register(PlatformConfigLoader, createConfigLoaderBeanDescriptor(platformConfig));
         Beans.register(ManifestRegistry, {eager: true, destroyPhase: PlatformStates.Stopped});
@@ -132,7 +139,7 @@ export const MicrofrontendPlatform = new class {
         Beans.registerIfAbsent(MessageBroker, {useValue: new MessageBroker(), destroyPhase: PlatformStates.Stopped});
 
         if (clientConfig) {
-          Beans.registerInitializer((): Promise<void> => SciRouterOutletElement.define());
+          Beans.registerInitializer(() => SciRouterOutletElement.define());
           Beans.register(ClientConfig, {useValue: clientConfig});
           Beans.registerIfAbsent(MessageClient, provideMessageClient(clientConfig.symbolicName, clientConfig.messaging));
           Beans.registerIfAbsent(OutletRouter);

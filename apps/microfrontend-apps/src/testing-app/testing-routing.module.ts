@@ -23,6 +23,7 @@ import { RouterOutletComponent } from './router-outlet/router-outlet.component';
 import { MicrofrontendComponent } from './microfrontend/microfrontend.component';
 import { ScrollableMicrofrontendComponent } from './scrollable-microfrontend/scrollable-microfrontend.component';
 import { PreferredSizeComponent } from './preferred-size/preferred-size.component';
+import { PlatformPropertiesComponent } from './platform-properties/platform-properties.component';
 
 const routes: Routes = [
   {
@@ -42,6 +43,7 @@ const routes: Routes = [
       {path: 'microfrontend-2', component: MicrofrontendComponent, data: {pageTitle: 'Displays the \'microfrontend-2\' page'}},
       {path: 'scrollable-microfrontend', component: ScrollableMicrofrontendComponent, data: {pageTitle: 'Displays a microfrontend with some tall content displayed in a viewport'}},
       {path: 'preferred-size', component: PreferredSizeComponent, data: {pageTitle: 'Allows playing around with the microfrontend\'s preferred size'}},
+      {path: 'platform-properties', component: PlatformPropertiesComponent, data: {pageTitle: 'Shows properties that are registered in the platform'}},
       {path: '', redirectTo: 'browser-outlets;count=2', pathMatch: 'full'},
     ],
   },

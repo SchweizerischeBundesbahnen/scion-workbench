@@ -14,8 +14,14 @@ import { Beans } from '../../bean-manager';
 
 describe('ClientRegistry', () => {
 
-  beforeEach(async () => await MicrofrontendPlatform.startPlatform((): void => Beans.register(ClientRegistry)));
-  afterEach(async () => await MicrofrontendPlatform.destroy());
+  beforeEach(async () => {
+    await MicrofrontendPlatform.destroy();
+    await MicrofrontendPlatform.startPlatform((): void => Beans.register(ClientRegistry));
+  });
+
+  afterEach(async () => {
+    await MicrofrontendPlatform.destroy();
+  });
 
   it('should register a client by its id', async () => {
     const client1 = newClient('1', 'app-1');

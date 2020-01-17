@@ -70,21 +70,26 @@ export class TestingAppPO {
    * ```
    *
    * @param outlets describes which microfrontends to load.
+   * @param options controls the navigation
    * @return {@link OutletPageObjectMap} to get the page object for an outlet.
    */
-  public async navigateTo(outlets: Outlets): Promise<OutletPageObjectMap> {
+  public async navigateTo(outlets: Outlets, options?: { queryParams?: Map<string, string> }): Promise<OutletPageObjectMap> {
     browser.resetUrl = 'about:blank';
-    return this.configureTestingApp(outlets);
+    return this.configureTestingApp(outlets, options);
   }
 
-  private async configureTestingApp(outlets: Outlets, parentOutletPO?: BrowserOutletPO): Promise<OutletPageObjectMap> {
+  private async configureTestingApp(outlets: Outlets, options?: { parentOutletPO?: BrowserOutletPO, queryParams?: Map<string, string> }): Promise<OutletPageObjectMap> {
+    const parentOutletPO = options && options.parentOutletPO;
+    const queryParams = options && options.queryParams || new Map<string, string>();
+
     // For root outlets, perform the initial page navigation, for child outlets navigate to the outlets page.
     const outletNames = Object.keys(outlets);
     if (parentOutletPO) {
       await parentOutletPO.enterOutletsUrl(TestingAppOrigins.LOCALHOST_4200, outletNames);
     }
     else {
-      await browser.get(`/#/testing-app/browser-outlets;names=${outletNames.join(',')}`);
+      const queryParamsEncoded = (queryParams.size ? `?${new URLSearchParams([...queryParams]).toString()}` : '');
+      await browser.get(`/#/testing-app/browser-outlets;names=${outletNames.join(',')}${queryParamsEncoded}`);
     }
 
     const browserOutletPOs = outletNames.map(outletName => new BrowserOutletPO(outletName, parentOutletPO));
@@ -109,7 +114,7 @@ export class TestingAppPO {
         }
         case OutletDescriptorTypes.OUTLETS: {
           putIfAbsentOrElseThrow(pageObjectMap, browserOutletPO.outletName, browserOutletPO);
-          const pageObjects = await this.configureTestingApp(outletDescriptor as Outlets, browserOutletPO);
+          const pageObjects = await this.configureTestingApp(outletDescriptor as Outlets, {parentOutletPO: browserOutletPO});
           pageObjects.outlets().forEach(outlet => putIfAbsentOrElseThrow(pageObjectMap, outlet, pageObjects.get(outlet)));
           break;
         }

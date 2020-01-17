@@ -95,6 +95,10 @@ export enum PlatformTopics {
    * Allows testing whether the requester has received focus or contains embedded web content that has received focus.
    */
   IsFocusWithin = 'ɵIS_FOCUS_WITHIN',
+  /**
+   * Allows reading the platform properties from this retained topic.
+   */
+  PLATFORM_PROPERTIES = 'ɵPLATFORM_PROPERTIES',
 }
 
 /**

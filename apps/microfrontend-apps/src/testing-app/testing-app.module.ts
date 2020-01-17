@@ -36,6 +36,7 @@ import { ScrollableMicrofrontendComponent } from './scrollable-microfrontend/scr
 import { ConsolePanelComponent } from './console/console-panel.component';
 import { RouterOutletSettingsComponent } from './router-outlet-settings/router-outlet-settings.component';
 import { PreferredSizeComponent } from './preferred-size/preferred-size.component';
+import { PlatformPropertiesComponent } from './platform-properties/platform-properties.component';
 
 @NgModule({
   imports: [
@@ -76,6 +77,7 @@ import { PreferredSizeComponent } from './preferred-size/preferred-size.componen
     MicrofrontendComponent,
     ScrollableMicrofrontendComponent,
     PreferredSizeComponent,
+    PlatformPropertiesComponent,
   ],
   entryComponents: [
     RouterOutletSettingsComponent,

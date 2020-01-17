@@ -17,7 +17,7 @@ export abstract class PlatformConfig {
    */
   apps: ApplicationConfig[];
   /**
-   * Defines properties available in {@link PlatformProperties} bean.
+   * Defines properties which can be read by microfrontends via {@link PlatformPropertyService}.
    */
   properties?: {
     [key: string]: any;
