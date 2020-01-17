@@ -9,8 +9,8 @@
  */
 import { seleniumWebDriverClickFix, SeleniumWebDriverClickFix, sendKeys } from '../spec.util';
 import { TestingAppPO } from '../testing-app.po';
-import { BrowserOutletPO } from '../browser-outlet.po';
-import { Microfrontend1PagePO } from '../microfrontend-1-page.po';
+import { BrowserOutletPO } from '../browser-outlet/browser-outlet.po';
+import { Microfrontend1PagePO } from '../microfrontend/microfrontend-1-page.po';
 import { ConsoleLog } from '../console/console-panel.po';
 import { Key } from 'protractor';
 

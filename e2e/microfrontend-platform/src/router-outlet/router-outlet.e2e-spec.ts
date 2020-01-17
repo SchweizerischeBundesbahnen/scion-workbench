@@ -13,9 +13,9 @@ import { browser } from 'protractor';
 import { OutletRouterPagePO } from './outlet-router-page.po';
 import { ContextPagePO } from '../context/context-page.po';
 import { RouterOutletPagePO } from './router-outlet-page.po';
-import { BrowserOutletPO } from '../browser-outlet.po';
-import { Microfrontend1PagePO } from '../microfrontend-1-page.po';
-import { Microfrontend2PagePO } from '../microfrontend-2-page.po';
+import { BrowserOutletPO } from '../browser-outlet/browser-outlet.po';
+import { Microfrontend1PagePO } from '../microfrontend/microfrontend-1-page.po';
+import { Microfrontend2PagePO } from '../microfrontend/microfrontend-2-page.po';
 import { ConsoleLog } from '../console/console-panel.po';
 
 describe('RouterOutlet', () => {

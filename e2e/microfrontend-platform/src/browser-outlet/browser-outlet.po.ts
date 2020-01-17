@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { $, browser, ElementFinder, WebElement } from 'protractor';
-import { enterText, setAttribute } from './spec.util';
+import { enterText, setAttribute } from '../spec.util';
 import { UUID } from '@scion/toolkit/util';
-import { Outlets, TestingAppPO } from './testing-app.po';
-import { RouterOutletContextPO } from './context/router-outlet-context.po';
-import { RouterOutletSettingsPO } from './settings/router-outlet-settings.po';
+import { Outlets, TestingAppPO } from '../testing-app.po';
+import { RouterOutletContextPO } from '../context/router-outlet-context.po';
+import { RouterOutletSettingsPO } from '../settings/router-outlet-settings.po';
 
 /**
  * Page object for {@link BrowserOutletComponent} to show a microfrontend in an iframe inside `<sci-router-outlet>`.

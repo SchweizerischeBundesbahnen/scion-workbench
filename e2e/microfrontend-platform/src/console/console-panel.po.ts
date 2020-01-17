@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { $, ElementFinder } from 'protractor';
-import { SwitchToIframeFn } from '../browser-outlet.po';
+import { SwitchToIframeFn } from '../browser-outlet/browser-outlet.po';
 
 export class ConsolePanelPO {
 

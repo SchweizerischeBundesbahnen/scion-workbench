@@ -9,7 +9,7 @@
  */
 import { $ } from 'protractor';
 import { enterText } from '../spec.util';
-import { SwitchToIframeFn } from '../browser-outlet.po';
+import { SwitchToIframeFn } from '../browser-outlet/browser-outlet.po';
 
 export class OutletRouterPagePO {
 

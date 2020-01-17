@@ -9,7 +9,7 @@
  */
 import { $ } from 'protractor';
 import { enterText, selectOption } from '../spec.util';
-import { SwitchToIframeFn } from '../browser-outlet.po';
+import { SwitchToIframeFn } from '../browser-outlet/browser-outlet.po';
 import { Qualifier } from '@scion/microfrontend-platform';
 import { SciCheckboxPO, SciListPO, SciParamsEnterPO, WaitUntil } from '@scion/ɵtoolkit/widgets.po';
 import { MessageListItemPO } from './message-list-item.po';

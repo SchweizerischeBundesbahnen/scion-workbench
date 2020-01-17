@@ -10,7 +10,7 @@
 import { Outlets, TestingAppOrigins, TestingAppPO } from '../testing-app.po';
 import { MessagingModel, PublishMessagePagePO } from './publish-message-page.po';
 import { ReceiveMessagePagePO } from './receive-message-page.po';
-import { BrowserOutletPO } from '../browser-outlet.po';
+import { BrowserOutletPO } from '../browser-outlet/browser-outlet.po';
 import { expectToBeRejectedWithError } from '../spec.util';
 import { MessageListItemPO } from './message-list-item.po';
 import { TopicMessage } from '@scion/microfrontend-platform';

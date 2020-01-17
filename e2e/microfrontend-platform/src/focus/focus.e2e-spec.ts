@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { TestingAppPO } from '../testing-app.po';
-import { BrowserOutletPO } from '../browser-outlet.po';
+import { BrowserOutletPO } from '../browser-outlet/browser-outlet.po';
 import { seleniumWebDriverClickFix, SeleniumWebDriverClickFix } from '../spec.util';
-import { Microfrontend1PagePO } from '../microfrontend-1-page.po';
+import { Microfrontend1PagePO } from '../microfrontend/microfrontend-1-page.po';
 
 describe('Focus', () => {
 

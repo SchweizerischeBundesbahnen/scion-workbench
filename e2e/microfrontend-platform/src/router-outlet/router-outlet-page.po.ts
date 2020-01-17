@@ -9,7 +9,7 @@
  */
 import { $, browser, WebElement } from 'protractor';
 import { enterText } from '../spec.util';
-import { SwitchToIframeFn } from '../browser-outlet.po';
+import { SwitchToIframeFn } from '../browser-outlet/browser-outlet.po';
 import { RouterOutletContextPO } from '../context/router-outlet-context.po';
 import { ISize } from 'selenium-webdriver';
 import { RouterOutletSettingsPO } from '../settings/router-outlet-settings.po';

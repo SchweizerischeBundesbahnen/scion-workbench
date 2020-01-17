@@ -12,7 +12,7 @@ import { MessagingModel, PublishMessagePagePO } from './publish-message-page.po'
 import { ReceiveMessagePagePO } from './receive-message-page.po';
 import { ManageIntentsPagePO } from '../manifest/manage-intents-page.po';
 import { ManageCapabilitiesPagePO } from '../manifest/manage-capabilities-page.po';
-import { BrowserOutletPO } from '../browser-outlet.po';
+import { BrowserOutletPO } from '../browser-outlet/browser-outlet.po';
 import { expectToBeRejectedWithError } from '../spec.util';
 import { MessageListItemPO } from './message-list-item.po';
 import { IntentMessage } from '@scion/microfrontend-platform';
