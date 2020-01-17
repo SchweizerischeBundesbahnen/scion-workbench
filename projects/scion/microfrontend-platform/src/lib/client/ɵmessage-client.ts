@@ -82,6 +82,10 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     return this.request$<number>(PlatformTopics.RequestSubscriberCount, topic).pipe(mapToBody());
   }
 
+  public isConnected(): Promise<boolean> {
+    return this._brokerGateway.isConnected();
+  }
+
   /**
    * Receives messages from the broker published to the given topic.
    */

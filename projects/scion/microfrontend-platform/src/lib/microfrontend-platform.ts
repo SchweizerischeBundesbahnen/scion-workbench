@@ -154,14 +154,15 @@ export const MicrofrontendPlatform = new class {
           )
           .subscribe();
       },
-    ).then(() => Beans.get(HostPlatformState).whenStarted()); // Wait until the host platform has reported its 'started' state via the message bus.
+    ).then(() => Beans.get(HostPlatformState).whenStarted()); // Wait until the host platform reported its 'started' state before signalling the platform as started.
   }
 
   /**
-   * Checks if this application is running in the context of the microfrontend platform.
+   * Checks if this microfrontend is connected to the platform host. If not, the client platform may not be started,
+   * or the microfrontend is running as a top-level app in the browser.
    */
-  public isRunningStandalone(): boolean {
-    throw Error('[UnsupportedOperationError] Method not implemented yet.'); // TODO implement this functionality
+  public async isRunningStandalone(): Promise<boolean> {
+    return Beans.get(PlatformState).state === PlatformStates.Stopped || !(await Beans.get(MessageClient).isConnected());
   }
 
   /**

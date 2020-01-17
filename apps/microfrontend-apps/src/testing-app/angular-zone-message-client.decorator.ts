@@ -59,6 +59,10 @@ export class AngularZoneMessageClientDecorator implements BeanDecorator<MessageC
       public subscriberCount$(topic: string): Observable<number> {
         return messageClient.subscriberCount$(topic).pipe(runInsideAngular(zone));
       }
+
+      public isConnected(): Promise<boolean> {
+        return zone.run(() => messageClient.isConnected());
+      }
     };
   }
 }

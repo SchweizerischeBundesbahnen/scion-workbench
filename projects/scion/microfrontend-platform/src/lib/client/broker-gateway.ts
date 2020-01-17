@@ -54,6 +54,13 @@ export class BrokerGateway {
   }
 
   /**
+   * Returns whether this gateway is connected to the message broker.
+   */
+  public isConnected(): Promise<boolean> {
+    return this._whenGatewayInfo.then(() => true).catch(() => false);
+  }
+
+  /**
    * Posts a message to the message broker. The message is buffered until broker discovery completed and connected to the broker.
    *
    * @return a Promise that resolves when the message is dispatched to the broker, or that rejects if not connected to the broker.

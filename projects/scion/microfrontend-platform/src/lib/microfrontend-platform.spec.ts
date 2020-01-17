@@ -22,6 +22,22 @@ describe('MicrofrontendPlatform', () => {
   beforeEach(async () => await MicrofrontendPlatform.destroy());
   afterEach(async () => await MicrofrontendPlatform.destroy());
 
+  it('should report that the app is running standalone when the host platform is not found', async () => {
+    await MicrofrontendPlatform.forClient({symbolicName: 'client-app', messaging: {brokerDiscoverTimeout: 250}});
+    await expect(await MicrofrontendPlatform.isRunningStandalone()).toBe(true);
+  });
+
+  it('should report that the app is running standalone when the client platform is not started', async () => {
+    await expect(await MicrofrontendPlatform.isRunningStandalone()).toBe(true);
+  });
+
+  it('should report that the app is running as part of the platform when connected to the host platform', async () => {
+    const manifestUrl = serveManifest({name: 'Host Application'});
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}];
+    await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app', messaging: {brokerDiscoverTimeout: 250}});
+    await expect(await MicrofrontendPlatform.isRunningStandalone()).toBe(false);
+  });
+
   it('should enter state \'started\' when started', async () => {
     Beans.register(MessageClient, {useClass: NullMessageClient});
     await expectAsync(MicrofrontendPlatform.forClient({symbolicName: 'A'})).toBeResolved();

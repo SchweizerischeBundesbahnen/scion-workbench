@@ -198,6 +198,11 @@ export abstract class MessageClient {
    *         emits continuously when the number of subscribers changes.
    */
   abstract subscriberCount$(topic: string): Observable<number>;
+
+  /**
+   * Returns whether this client is connected to the message broker.
+   */
+  abstract isConnected(): Promise<boolean>;
 }
 
 /**
@@ -304,5 +309,9 @@ export class NullMessageClient implements MessageClient {
 
   public subscriberCount$(topic: string): Observable<number> {
     return NEVER;
+  }
+
+  public isConnected(): Promise<boolean> {
+    return Promise.resolve(false);
   }
 }
