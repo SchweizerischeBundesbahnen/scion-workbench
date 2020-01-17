@@ -62,6 +62,20 @@ export async function enterText(text: string, elementFinder: ElementFinder, inpu
 }
 
 /**
+ * Sets an attribute of the given name and value on the specified element.
+ */
+export async function setAttribute(elementFinder: ElementFinder, name: string, value: string): Promise<void> {
+  await browser.executeScript('arguments[0].setAttribute(arguments[1], arguments[2]);', elementFinder.getWebElement(), name, value);
+}
+
+/**
+ * Removes the given attribute from the specified element.
+ */
+export async function removeAttribute(elementFinder: ElementFinder, name: string): Promise<void> {
+  await browser.executeScript('arguments[0].removeAttribute(arguments[1]);', elementFinder.getWebElement(), name);
+}
+
+/**
  * Due to an issue with the Selenium WebDriver, elements within an iframe cannot be clicked if the iframe is part of a shadow DOM.
  *
  * Error: 'Failed: unknown error: no element reference returned by script'.

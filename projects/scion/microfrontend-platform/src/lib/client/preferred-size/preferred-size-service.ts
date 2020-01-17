@@ -100,7 +100,7 @@ export class PreferredSizeService implements PreDestroy {
     return Beans.get(ContextService).observe$<OutletContext>(RouterOutlets.OUTLET_CONTEXT)
       .pipe(take(1), takeUntil(this._destroy$))
       .toPromise()
-      .then(outletContext => outletContext ? Promise.resolve(RouterOutlets.outletPreferredSizeTopic(outletContext.uid)) : new Promise<never>(noop)); // do not resolve the Promise if not running in the context of an outlet
+      .then(outletContext => outletContext ? Promise.resolve(RouterOutlets.preferredSizeTopic(outletContext.uid)) : new Promise<never>(noop)); // do not resolve the Promise if not running in the context of an outlet
   }
 
   public preDestroy(): void {

@@ -15,10 +15,13 @@ import { RouterOutletUrlAssigner } from './router-outlet-url-assigner';
 import { Beans } from '../../bean-manager';
 import { mapToBody, MessageClient } from '../message-client';
 import { UUID } from '@scion/toolkit/util';
+import { TopicMessage } from '../../messaging.model';
+import { Keystroke } from './keystroke';
 
 const ELEMENT_NAME = 'sci-router-outlet';
 const ATTR_NAME = 'name';
 const ATTR_SCROLLABLE = 'scrollable';
+const ATTR_KEYSTROKES = 'keystrokes';
 const HTML_TEMPLATE = `
   <style>
     :host {
@@ -39,21 +42,29 @@ const HTML_TEMPLATE = `
 /**
  * Allows embedding web content from any origin. The content is displayed inside an iframe to provide a separate browsing context.
  *
+ * ### Navigation
  * Using the router service {@link OutletRouter}, you can navigate to a site displayed in the outlet. The content can be any web content allowed to
- * be embedded in an iframe, that is which has the HTTP response header 'X-Frame-Options' not set.
- *
- * The outlet can be given a name by the optional name attribute. If not set, it defaults to {@link RouterOutlets.PRIMARY_OUTLET primary}.
+ * be embedded in an iframe, that is which has the HTTP response header 'X-Frame-Options' not set. The outlet can be given a name by the optional
+ * name attribute to reference the outlet during navigation. If not set, it defaults to {@link RouterOutlets.PRIMARY_OUTLET primary}.
  *
  * The outlet does not necessarily have to exist for navigation yet. As soon as the outlet is mounted, the last routed URL for that outlet
  * is loaded and displayed. When navigation is repeated for an outlet, its content is replaced.
  *
  * The router supports multiple outlets to co-exist and outlets can be nested. If outlets have the same name, then they show the same content.
  *
+ * ### Contextual data
  * The outlet allows arbitrary data to be associated which is available in its embedded web content using {@link ContextService}. To do this, the
  * embedded app must be registered in the platform.
+ *
  * A context is a hierarchical key-value map which are linked together to form a tree structure. When a key is
  * not found in a context, the lookup is retried on the parent, repeating until either a value is found or the root of the tree has been reached.
  *
+ * ### Keystrokes
+ * The outlet allows the registration of keystrokes to receive keyboard events triggered in embedded content even across the iframe boundaries.
+ * Keystrokes can be set via the 'keystrokes' attribute in the HTML template, or via the 'keystrokes' property on the DOM element. When setting
+ * keystrokes via the HTML template, multiple keystrokes are separated by a comma.
+ *
+ * ### Events
  * The router outlet will emit an `activate` event when a URL is set, and a `deactivate` event when navigating away from the URL.
  *
  * ```
@@ -78,7 +89,6 @@ export class SciRouterOutletElement extends HTMLElement {
 
   constructor() {
     super();
-
     this._outletName$ = new BehaviorSubject<string>(RouterOutlets.PRIMARY_OUTLET);
     this._shadowRoot = this.attachShadow({mode: 'closed'});
     this._shadowRoot.innerHTML = HTML_TEMPLATE.trim();
@@ -133,6 +143,38 @@ export class SciRouterOutletElement extends HTMLElement {
   }
 
   /**
+   * Allows the registration of keystrokes to receive keyboard events triggered in embedded content even across the iframe boundaries.
+   *
+   * It instructs embedded content (and all indirectly embedded content) to propagate keyboard events to this outlet, which then are dispatched
+   * as synthetic keyboard events via this element's event dispatcher bubbling up the DOM tree like regular events. Propagated events are of the
+   * original type, meaning that when the user presses a key on the keyboard, a 'keydown' keyboard event is triggered, or a 'keyup' event when
+   * releasing a key, respectively.
+   *
+   * @param keystrokes
+   *        A keystroke is specified as a string which has several parts separated by a dot.
+   *        The first part specifies the event type (keydown or keyup), followed by optional modifier part(s) (alt, shift, control, meta, or a
+   *        combination thereof) and with the keyboard key as the last part. The key is a case-insensitive value of the {@link KeyboardEvent#key}
+   *        property. For a complete list of valid key values, see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values.
+   *        Two keys are an exception to the value of the {@link KeyboardEvent#key} property: dot and space.
+   *        Examples: 'keydown.control.z', 'keydown.escape', 'keyup.enter', 'keydown.control.alt.enter', 'keydown.control.space'.
+   */
+  public set keystrokes(keystrokes: string[]) {
+    if (keystrokes && keystrokes.length) {
+      this.setAttribute(ATTR_KEYSTROKES, KeystrokesAttributeUtil.join(keystrokes));
+    }
+    else {
+      this.removeAttribute(ATTR_KEYSTROKES);
+    }
+  }
+
+  /**
+   * Returns the keystrokes which should bubble across the iframe boundary.
+   */
+  public get keystrokes(): string[] {
+    return KeystrokesAttributeUtil.split(this.getAttribute(ATTR_KEYSTROKES));
+  }
+
+  /**
    * Sets a value to be associated with a given name in this outlet context.
    *
    * @param name
@@ -170,7 +212,7 @@ export class SciRouterOutletElement extends HTMLElement {
    * Resets the preferred size which may have been set by the embedded content.
    */
   public resetPreferredSize(): void {
-    Beans.get(MessageClient).publish$(RouterOutlets.outletPreferredSizeTopic(this._uid), null).subscribe();
+    Beans.get(MessageClient).publish$(RouterOutlets.preferredSizeTopic(this._uid), null).subscribe();
   }
 
   /**
@@ -213,7 +255,7 @@ export class SciRouterOutletElement extends HTMLElement {
         // Listen for navigations directed to this outlet.
         // If the outlet name is changed, the empty page 'about:blank' is displayed before the actual content is displayed.
         // This is for the case that no navigation has yet taken place for the specified URL, and to initialize {@link pairwise} operator.
-        switchMap((name: string) => Beans.get(MessageClient).observe$<string>(RouterOutlets.outletUrlTopic(name)).pipe(mapToBody(), startWith('about:blank'))),
+        switchMap((name: string) => Beans.get(MessageClient).observe$<string>(RouterOutlets.urlTopic(name)).pipe(mapToBody(), startWith('about:blank'))),
         map(url => url || 'about:blank'),
         distinctUntilChanged(),
         pairwise(),
@@ -227,7 +269,7 @@ export class SciRouterOutletElement extends HTMLElement {
   }
 
   private installPreferredSizeListener(): void {
-    Beans.get(MessageClient).observe$<PreferredSize>(RouterOutlets.outletPreferredSizeTopic(this._uid))
+    Beans.get(MessageClient).observe$<PreferredSize>(RouterOutlets.preferredSizeTopic(this._uid))
       .pipe(
         takeUntil(this._disconnect$),
         mapToBody(),
@@ -239,6 +281,15 @@ export class SciRouterOutletElement extends HTMLElement {
         this.style.minHeight = preferredSize && preferredSize.minHeight || null;
         this.style.height = preferredSize && preferredSize.height || null;
         this.style.maxHeight = preferredSize && preferredSize.maxHeight || null;
+      });
+  }
+
+  private installKeyboardEventDispatcher(): void {
+    Beans.get(MessageClient).observe$<KeyboardEventInit>(RouterOutlets.keyboardEventTopic(this._uid, ':eventType'))
+      .pipe(takeUntil(this._disconnect$))
+      .subscribe((event: TopicMessage<KeyboardEventInit>) => {
+        const type = event.params.get('eventType');
+        this.dispatchEvent(new KeyboardEvent(type, event.body));
       });
   }
 
@@ -254,6 +305,7 @@ export class SciRouterOutletElement extends HTMLElement {
     this.installOutletUrlListener();
     this.installOutletContext();
     this.installPreferredSizeListener();
+    this.installKeyboardEventDispatcher();
     this._contextProvider.onOutletMount();
   }
 
@@ -276,7 +328,7 @@ export class SciRouterOutletElement extends HTMLElement {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks
    */
-  public static observedAttributes = [ATTR_NAME, ATTR_SCROLLABLE]; // tslint:disable-line:member-ordering
+  public static observedAttributes = [ATTR_NAME, ATTR_SCROLLABLE, ATTR_KEYSTROKES]; // tslint:disable-line:member-ordering
 
   /**
    * Lifecycle callback of the 'Custom element' Web Component standard.
@@ -293,6 +345,11 @@ export class SciRouterOutletElement extends HTMLElement {
       }
       case ATTR_SCROLLABLE: {
         this._iframe.setAttribute('scrolling', coerceBooleanProperty(newValue) ? 'yes' : 'no');
+        break;
+      }
+      case ATTR_KEYSTROKES: {
+        KeystrokesAttributeUtil.split(oldValue).forEach(keystroke => this.removeContextValue(KEYSTROKE_CONTEXT_NAME_PREFIX + Keystroke.fromString(keystroke).parts));
+        KeystrokesAttributeUtil.split(newValue).forEach(keystroke => this.setContextValue(KEYSTROKE_CONTEXT_NAME_PREFIX + Keystroke.fromString(keystroke).parts, undefined));
         break;
       }
     }
@@ -351,8 +408,17 @@ export namespace RouterOutlets {
    *
    * @internal
    */
-  export function outletUrlTopic(outletName: string): string {
+  export function urlTopic(outletName: string): string {
     return `sci-router-outlets/${outletName}/url`;
+  }
+
+  /**
+   * Computes the topic where to post keyboard events to be dispatched.
+   *
+   * @internal
+   */
+  export function keyboardEventTopic(outletUid: string, eventType: string): string {
+    return `sci-router-outlets/${outletUid}/keyboard-events/${eventType}`;
   }
 
   /**
@@ -360,7 +426,7 @@ export namespace RouterOutlets {
    *
    * @internal
    */
-  export function outletPreferredSizeTopic(outletUid: string): string {
+  export function preferredSizeTopic(outletUid: string): string {
     return `sci-router-outlets/${outletUid}/preferred-size`;
   }
 
@@ -374,3 +440,22 @@ export namespace RouterOutlets {
    */
   export const PRIMARY_OUTLET = 'primary';
 }
+
+namespace KeystrokesAttributeUtil {
+
+  const delimiter = ',';
+
+  export function split(attributeValue: string | null): string[] {
+    return attributeValue ? attributeValue.split(delimiter) : [];
+  }
+
+  export function join(keystrokes: string[] | null): string | null {
+    return keystrokes ? keystrokes.join(delimiter) : null;
+  }
+}
+
+/**
+ * Keystroke bindings are prefixed with `keystroke:` when registered in the outlet context.
+ * @internal
+ */
+export const KEYSTROKE_CONTEXT_NAME_PREFIX = 'keystroke:';

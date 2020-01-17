@@ -11,11 +11,12 @@
 }
 
 :host {
-  display: grid;
-  grid-template-rows: max-content 1fr;
+  display: flex;
+  flex-direction: column;
   padding: 1em;
 
   > header {
+    flex: none;
     display: flex;
     align-items: flex-start;
     margin-bottom: 1.5em;
@@ -40,11 +41,20 @@
       flex: none;
       justify-self: end;
       @include badge(primaryColor());
+      cursor: pointer;
     }
   }
 
-  > sci-viewport router-outlet {
-    position: absolute; // out of the document flow
+  > sci-viewport {
+    flex: auto;
+
+    router-outlet {
+      position: absolute; // out of the document flow
+    }
+  }
+
+  > app-console-panel {
+    flex: none;
   }
 }
 

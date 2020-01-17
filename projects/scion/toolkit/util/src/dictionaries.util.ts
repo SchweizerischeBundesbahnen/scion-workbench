@@ -9,7 +9,7 @@
  */
 
 /**
- * Provides dictionary and map utility methods.
+ * Provides dictionary utility methods.
  */
 export class Dictionaries {
 

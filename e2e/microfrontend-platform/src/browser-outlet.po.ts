@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { $, browser, ElementFinder, WebElement } from 'protractor';
-import { enterText } from './spec.util';
+import { enterText, setAttribute } from './spec.util';
 import { UUID } from '@scion/toolkit/util';
 import { Outlets, TestingAppPO } from './testing-app.po';
 import { RouterOutletContextPO } from './context/router-outlet-context.po';
@@ -95,7 +95,7 @@ export class BrowserOutletPO {
    * Elements contained within iframes can not be accessed from inside the root execution context.
    * Instead, the execution context must first be switched to the iframe.
    */
-  private async switchToOutlet(): Promise<void> {
+  public async switchToOutlet(): Promise<void> {
     if (await this._outletFinder.isPresent()) {
       return; // WebDriver execution context for this iframe is already active
     }
@@ -152,7 +152,7 @@ export class BrowserOutletPO {
     // It will be used by later interactions to decide if a context switch is required.
     if (!this._webdriverExecutionContextId) {
       this._webdriverExecutionContextId = UUID.randomUUID();
-      await browser.executeScript(`document.body.setAttribute('${BrowserOutletPO.ATTR_WEBDRIVER_EXECUTION_CONTEXT_ID}', '${this._webdriverExecutionContextId}')`);
+      await setAttribute($('body'), BrowserOutletPO.ATTR_WEBDRIVER_EXECUTION_CONTEXT_ID, this._webdriverExecutionContextId);
     }
   }
 
@@ -169,6 +169,24 @@ export class BrowserOutletPO {
    */
   public async isFocusWithinIframe(): Promise<boolean> {
     return new TestingAppPO().isFocusWithin(() => this.switchToOutletIframe());
+  }
+
+  /**
+   * Instructs embedded content to propagate keyboard events for the given keystrokes.
+   * The keystrokes are set to the 'keystrokes' attribute in the HTML template.
+   */
+  public async setKeystrokesViaAttr(keystrokes: string): Promise<void> {
+    await this.switchToOutlet();
+    await setAttribute(this._outletFinder.$('sci-router-outlet'), 'keystrokes', keystrokes);
+  }
+
+  /**
+   * Instructs embedded content to propagate keyboard events for the given keystrokes.
+   * The keystrokes are set to the 'keystrokes' property in the DOM element.
+   */
+  public async setKeystrokesViaDom(keystrokes: string[]): Promise<void> {
+    await this.switchToOutlet();
+    await browser.executeScript('arguments[0].keystrokes = arguments[1];', this._outletFinder.$('sci-router-outlet').getWebElement(), keystrokes);
   }
 
   private get iframePath(): string[] {

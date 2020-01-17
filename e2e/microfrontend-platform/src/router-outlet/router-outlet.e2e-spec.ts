@@ -16,7 +16,7 @@ import { RouterOutletPagePO } from './router-outlet-page.po';
 import { BrowserOutletPO } from '../browser-outlet.po';
 import { Microfrontend1PagePO } from '../microfrontend-1-page.po';
 import { Microfrontend2PagePO } from '../microfrontend-2-page.po';
-import { OutletActivationLogEntry } from './router-outlet-panel.po';
+import { ConsoleLog } from '../console/console-panel.po';
 
 describe('RouterOutlet', () => {
 
@@ -574,14 +574,14 @@ describe('RouterOutlet', () => {
 
     // Verify the navigation and the emitted activation events
     await expect(routerOutletPO.getRouterOutletUrl()).toEqual(getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200}));
-    await routerOutletPO.outletPanelPO.open();
-    await expect(routerOutletPO.outletPanelPO.getActivationLog()).toEqual([
-      jasmine.objectContaining({type: 'deactivate', url: 'about:blank'} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'activate', url: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
+    await routerOutletPO.consolePanelPO.open();
+    await expect(routerOutletPO.consolePanelPO.getLog(['sci-router-outlet:deactivate', 'sci-router-outlet:activate'])).toEqual([
+      jasmine.objectContaining({type: 'sci-router-outlet:deactivate', message: 'about:blank'} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:activate', message: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
     ]);
 
-    await routerOutletPO.outletPanelPO.clearActivationLog();
-    await routerOutletPO.outletPanelPO.close();
+    await routerOutletPO.consolePanelPO.clearLog();
+    await routerOutletPO.consolePanelPO.close();
 
     // Navigate to the 'microfrontend-2' page
     await routerPO.enterOutletName('microfrontend-outlet');
@@ -590,10 +590,10 @@ describe('RouterOutlet', () => {
 
     // Verify the emitted events
     await expect(routerOutletPO.getRouterOutletUrl()).toEqual(getPageUrl({path: Microfrontend2PagePO.pageUrl, port: 4200}));
-    await routerOutletPO.outletPanelPO.open();
-    await expect(routerOutletPO.outletPanelPO.getActivationLog()).toEqual([
-      jasmine.objectContaining({type: 'deactivate', url: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'activate', url: await getPageUrl({path: Microfrontend2PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
+    await routerOutletPO.consolePanelPO.open();
+    await expect(routerOutletPO.consolePanelPO.getLog(['sci-router-outlet:deactivate', 'sci-router-outlet:activate'])).toEqual([
+      jasmine.objectContaining({type: 'sci-router-outlet:deactivate', message: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:activate', message: await getPageUrl({path: Microfrontend2PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
     ]);
   });
 
@@ -616,10 +616,10 @@ describe('RouterOutlet', () => {
     await routerOutletPO.clickApply();
 
     // Verify the emitted events
-    await routerOutletPO.outletPanelPO.open();
-    await expect(routerOutletPO.outletPanelPO.getActivationLog()).toEqual([
-      jasmine.objectContaining({type: 'deactivate', url: 'about:blank'} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'activate', url: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
+    await routerOutletPO.consolePanelPO.open();
+    await expect(routerOutletPO.consolePanelPO.getLog(['sci-router-outlet:deactivate', 'sci-router-outlet:activate'])).toEqual([
+      jasmine.objectContaining({type: 'sci-router-outlet:deactivate', message: 'about:blank'} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:activate', message: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
     ]);
   });
 
@@ -646,12 +646,12 @@ describe('RouterOutlet', () => {
     await routerPO.clickNavigate();
 
     // Verify the emitted events
-    await routerOutletPO.outletPanelPO.open();
-    await expect(routerOutletPO.outletPanelPO.getActivationLog()).toEqual([
-      jasmine.objectContaining({type: 'deactivate', url: 'about:blank'} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'activate', url: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'deactivate', url: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'activate', url: 'about:blank'} as Partial<OutletActivationLogEntry>),
+    await routerOutletPO.consolePanelPO.open();
+    await expect(routerOutletPO.consolePanelPO.getLog(['sci-router-outlet:deactivate', 'sci-router-outlet:activate'])).toEqual([
+      jasmine.objectContaining({type: 'sci-router-outlet:deactivate', message: 'about:blank'} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:activate', message: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:deactivate', message: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:activate', message: 'about:blank'} as Partial<ConsoleLog>),
     ]);
   });
 
@@ -680,25 +680,25 @@ describe('RouterOutlet', () => {
     await routerOutletPO.clickApply();
 
     // Verify the emitted events
-    await routerOutletPO.outletPanelPO.open();
-    await expect(routerOutletPO.outletPanelPO.getActivationLog()).toEqual([
-      jasmine.objectContaining({type: 'deactivate', url: 'about:blank'} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'activate', url: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
+    await routerOutletPO.consolePanelPO.open();
+    await expect(routerOutletPO.consolePanelPO.getLog(['sci-router-outlet:deactivate', 'sci-router-outlet:activate'])).toEqual([
+      jasmine.objectContaining({type: 'sci-router-outlet:deactivate', message: 'about:blank'} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:activate', message: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
     ]);
-    await routerOutletPO.outletPanelPO.clearActivationLog();
-    await routerOutletPO.outletPanelPO.close();
+    await routerOutletPO.consolePanelPO.clearLog();
+    await routerOutletPO.consolePanelPO.close();
 
     // Mount the outlet under the name 'microfrontend-outlet-2'
     await routerOutletPO.enterOutletName('microfrontend-outlet-2');
     await routerOutletPO.clickApply();
 
     // Verify the emitted events
-    await routerOutletPO.outletPanelPO.open();
-    await expect(routerOutletPO.outletPanelPO.getActivationLog()).toEqual([
-      jasmine.objectContaining({type: 'deactivate', url: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'activate', url: 'about:blank'} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'deactivate', url: 'about:blank'} as Partial<OutletActivationLogEntry>),
-      jasmine.objectContaining({type: 'activate', url: await getPageUrl({path: Microfrontend2PagePO.pageUrl, port: 4200})} as Partial<OutletActivationLogEntry>),
+    await routerOutletPO.consolePanelPO.open();
+    await expect(routerOutletPO.consolePanelPO.getLog(['sci-router-outlet:deactivate', 'sci-router-outlet:activate'])).toEqual([
+      jasmine.objectContaining({type: 'sci-router-outlet:deactivate', message: await getPageUrl({path: Microfrontend1PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:activate', message: 'about:blank'} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:deactivate', message: 'about:blank'} as Partial<ConsoleLog>),
+      jasmine.objectContaining({type: 'sci-router-outlet:activate', message: await getPageUrl({path: Microfrontend2PagePO.pageUrl, port: 4200})} as Partial<ConsoleLog>),
     ]);
   });
 

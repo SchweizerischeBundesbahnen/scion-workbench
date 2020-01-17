@@ -1,13 +1,17 @@
 <form autocomplete="off" [formGroup]="form">
-  <input [formControlName]="URL" placeholder="Enter a URL for a microfrontend" class="url e2e-url" list="endpoints">
+  <input [formControlName]="URL" placeholder="Enter a URL for a microfrontend" class="url e2e-url" list="appEntryPoints">
   <button type="submit" class="e2e-go" (click)="onNavigateClick()" [disabled]="form.invalid">Go</button>
   <button type="button" class="e2e-clear" (click)="onUrlClearClick()">Clear</button>
   <button type="button" class="material-icons e2e-context-define" #context_define_button title="Defines the context of this outlet" (click)="onContextDefineClick()">input</button>
   <button type="button" class="material-icons e2e-settings" #settings_button title="Settings" (click)="onSettingsClick()">more_vert</button>
 
-  <datalist id="endpoints">
-    <option *ngFor="let endpoint of endpoints$ | async" [value]="endpoint.url">{{endpoint.label}}</option>
+  <datalist id="appEntryPoints">
+    <option *ngFor="let appEntryPoint of appEntryPoints$ | async" [value]="appEntryPoint.url">{{appEntryPoint.label}}</option>
   </datalist>
 </form>
 
-<sci-router-outlet [name]="outletName" #router_outlet></sci-router-outlet>
+<sci-router-outlet #router_outlet
+                   [name]="outletName"
+                   (activate)="onActivate($event)"
+                   (deactivate)="onDeactivate($event)">
+</sci-router-outlet>

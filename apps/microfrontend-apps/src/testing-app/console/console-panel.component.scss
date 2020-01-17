@@ -1,0 +1,34 @@
+@import 'ɵtoolkit-widget-theme';
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > header {
+    @include button-bar();
+    flex: none;
+    border: 1px solid rgba(85, 85, 85, 0.25);
+
+    > span.title {
+      flex: auto; // flex-layout given by the button-bar mixin
+      font-weight: bold;
+    }
+  }
+
+  > sci-viewport {
+    flex: auto;
+    height: 200px;
+    border: 1px solid rgba(85, 85, 85, 0.25);
+    border-top: none;
+
+    section.log {
+      padding: 1em;
+      display: grid;
+      grid-template-columns: 100px 150px 1fr;
+      grid-auto-rows: max-content;
+      gap: .5em 1em;
+      font-family: monospace;
+      font-size: .9em;
+    }
+  }
+}

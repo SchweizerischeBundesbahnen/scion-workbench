@@ -1,0 +1,14 @@
+<header>
+  <span class="title">Console</span>
+  <button type="button" title="Clear log" class="e2e-clear material-icons" (click)="onClearClick()">block</button>
+  <button type="button" title="Close" class="e2e-close material-icons" (click)="onCloseClick()">close</button>
+</header>
+<sci-viewport>
+  <section class="log e2e-log">
+    <ng-container *ngFor="let log of consoleService.log$ | async">
+      <span class="e2e-timestamp">{{log.timestamp | date:'HH:mm:ss:SSS'}}</span>
+      <span class="e2e-type">{{log.type}}</span>
+      <span class="e2e-message">{{log.message}}</span>
+    </ng-container>
+  </section>
+</sci-viewport>

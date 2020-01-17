@@ -86,12 +86,11 @@ export function waitFor(millis: number): Promise<void> {
 /**
  * Returns a Promise that resolves when the condition returns `true` or that rejects when the timeout expires.
  */
-export function waitForCondition(condition: () => boolean, timeout: number): Promise<void> {
+export function waitForCondition(condition: () => boolean | Promise<boolean>, timeout: number): Promise<void> {
   return new Promise((resolve, reject) => {  // tslint:disable-line:typedef
     const expiryDate = Date.now() + timeout;
-
-    const periodicConditionCheckerFn = (): void => {
-      if (condition()) {
+    const periodicConditionCheckerFn = async (): Promise<void> => {
+      if (await condition()) {
         resolve();
       }
       else if (Date.now() > expiryDate) {
@@ -101,7 +100,7 @@ export function waitForCondition(condition: () => boolean, timeout: number): Pro
         setTimeout(periodicConditionCheckerFn, 10);
       }
     };
-    periodicConditionCheckerFn();
+    periodicConditionCheckerFn().then();
   });
 }
 

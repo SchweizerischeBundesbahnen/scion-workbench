@@ -45,6 +45,11 @@ export abstract class MicrofrontendPagePO {
     return getInputValue(this._pageFinder.$('input.e2e-fragment'));
   }
 
+  public async clickInputField(): Promise<void> {
+    await this._switchToIframeFn();
+    await this._pageFinder.$('input.e2e-input').click();
+  }
+
   /**
    * Clicks the fragment field to gain focus.
    */

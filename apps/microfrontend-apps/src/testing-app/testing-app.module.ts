@@ -33,7 +33,7 @@ import { OutletRouterComponent } from './outlet-router/outlet-router.component';
 import { RouterOutletComponent } from './router-outlet/router-outlet.component';
 import { MicrofrontendComponent } from './microfrontend/microfrontend.component';
 import { ScrollableMicrofrontendComponent } from './scrollable-microfrontend/scrollable-microfrontend.component';
-import { RouterOutletPanelComponent } from './router-outlet-panel/router-outlet-panel.component';
+import { ConsolePanelComponent } from './console/console-panel.component';
 import { RouterOutletSettingsComponent } from './router-outlet-settings/router-outlet-settings.component';
 import { PreferredSizeComponent } from './preferred-size/preferred-size.component';
 
@@ -63,7 +63,7 @@ import { PreferredSizeComponent } from './preferred-size/preferred-size.componen
     RouterOutletComponent,
     RouterOutletSettingsComponent,
     RouterOutletContextComponent,
-    RouterOutletPanelComponent,
+    ConsolePanelComponent,
     OutletRouterComponent,
     ContextComponent,
     ContextEntryComponent,

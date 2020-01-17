@@ -1,9 +1,11 @@
 <header>
   <span class="page-title">{{pageTitle}}</span>
   <span class="focus-within e2e-focus-within" title="This document or its embedded web content has received focus" *ngIf="isFocusWithin">focus-within</span>
-  <span class="app-name" [title]="location">{{appSymbolicName}}</span>
+  <span class="app-name e2e-console" title="Click to show the console" (click)="onConsoleToggle()">{{appSymbolicName}}</span>
 </header>
 
 <sci-viewport>
   <router-outlet #outlet=outlet (activate)="onRouteActivate(outlet.activatedRoute)"></router-outlet>
 </sci-viewport>
+
+<app-console-panel *ngIf="isConsoleVisible" (close)="onConsoleToggle()"></app-console-panel>

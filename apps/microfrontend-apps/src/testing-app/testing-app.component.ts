@@ -7,12 +7,13 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { Component, OnDestroy } from '@angular/core';
-import { Beans, ClientConfig, FocusMonitor, MicrofrontendPlatform } from '@scion/microfrontend-platform';
+import { Component, ElementRef, OnDestroy } from '@angular/core';
+import { Beans, ClientConfig, ContextService, FocusMonitor, MicrofrontendPlatform, OutletContext, RouterOutlets } from '@scion/microfrontend-platform';
 import { ActivatedRoute } from '@angular/router';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { filter, switchMapTo, takeUntil } from 'rxjs/operators';
+import { fromEvent, merge, Subject } from 'rxjs';
 import { Defined } from '@scion/toolkit/util';
+import { ConsoleService } from './console/console.service';
 
 @Component({
   selector: 'testing-app', // tslint:disable-line:component-selector
@@ -22,16 +23,37 @@ import { Defined } from '@scion/toolkit/util';
 export class TestingAppComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-
+  private _routeActivate$ = new Subject<void>();
   public appSymbolicName: string;
   public pageTitle: string;
-  public location: string;
   public isFocusWithin: boolean;
+  public isConsoleVisible = false;
 
-  constructor() {
+  constructor(host: ElementRef<HTMLElement>, private _consoleService: ConsoleService) {
     this.appSymbolicName = Beans.get(ClientConfig).symbolicName;
-    this.location = window.location.href;
 
+    this.installFocusWithinListener();
+    this.installRouteActivateListener();
+    this.installKeyboardEventListener(host);
+  }
+
+  private installRouteActivateListener(): void {
+    this._routeActivate$
+      .pipe(
+        switchMapTo(Beans.get(ContextService).observe$<OutletContext>(RouterOutlets.OUTLET_CONTEXT)),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(outletContext => {
+        if (outletContext) {
+          this._consoleService.log('onload', `${window.location.href} [app='${this.appSymbolicName}', outlet='${outletContext.name}']`);
+        }
+        else {
+          this._consoleService.log('onload', `${window.location.href} [app='${this.appSymbolicName}']`);
+        }
+      });
+  }
+
+  private installFocusWithinListener(): void {
     Beans.get(FocusMonitor).focusWithin$
       .pipe(takeUntil(this._destroy$))
       .subscribe(isFocusWithin => {
@@ -39,9 +61,25 @@ export class TestingAppComponent implements OnDestroy {
       });
   }
 
+  private installKeyboardEventListener(host: ElementRef<HTMLElement>): void {
+    merge(fromEvent<KeyboardEvent>(host.nativeElement, 'keydown'), fromEvent<KeyboardEvent>(host.nativeElement, 'keyup'))
+      .pipe(
+        filter(event => (event.target as Element).tagName === 'SCI-ROUTER-OUTLET'),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(event => {
+        this._consoleService.log(event.type, `[key='${event.key}', control=${event.ctrlKey}, shift=${event.shiftKey}, alt=${event.altKey}, meta=${event.metaKey}]`);
+      });
+  }
+
   public onRouteActivate(route: ActivatedRoute): void {
     const isPageTitleVisible = Defined.orElse(route.snapshot.data['pageTitleVisible'], true);
     this.pageTitle = isPageTitleVisible ? route.snapshot.data['pageTitle'] : null;
+    this._routeActivate$.next();
+  }
+
+  public onConsoleToggle(): void {
+    this.isConsoleVisible = !this.isConsoleVisible;
   }
 
   public ngOnDestroy(): void {

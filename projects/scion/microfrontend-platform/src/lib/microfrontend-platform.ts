@@ -42,6 +42,7 @@ import { PreferredSizeService } from './client/preferred-size/preferred-size-ser
 import { MouseMoveEventDispatcher } from './client/mouse-event/mouse-move-event-dispatcher';
 import { MouseUpEventDispatcher } from './client/mouse-event/mouse-up-event-dispatcher';
 import { HostPlatformAppProvider } from './host/host-platform-app-provider';
+import { KeyboardEventDispatcher } from './client/keyboard-event/keyboard-event-dispatcher';
 
 /**
  * The central class of the SCION microfrontend platform.
@@ -91,6 +92,7 @@ export const MicrofrontendPlatform = new class {
         Beans.register(MouseUpEventDispatcher, {eager: true});
         Beans.register(PreferredSizeService);
         Beans.register(ContextService);
+        Beans.register(KeyboardEventDispatcher, {eager: true});
       },
     );
   }
@@ -138,6 +140,7 @@ export const MicrofrontendPlatform = new class {
           Beans.registerIfAbsent(RouterOutletUrlAssigner);
           Beans.register(FocusMonitor);
           Beans.register(PreferredSizeService);
+          Beans.register(KeyboardEventDispatcher, {eager: true});
         }
         else {
           Beans.registerIfAbsent(MessageClient, {useExisting: PlatformMessageClient});

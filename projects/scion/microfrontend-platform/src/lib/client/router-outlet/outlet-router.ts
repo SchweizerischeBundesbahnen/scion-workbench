@@ -35,7 +35,7 @@ export class OutletRouter {
    */
   public async navigate(url: string | null, options?: NavigationOptions): Promise<void> {
     const outlet = await this.resolveOutlet(options);
-    const outletUrlTopic = RouterOutlets.outletUrlTopic(outlet);
+    const outletUrlTopic = RouterOutlets.urlTopic(outlet);
     const navigationUrl = this.computeNavigationUrl(url);
     const messageClient = options && options.messageClient || Beans.get(MessageClient);
 

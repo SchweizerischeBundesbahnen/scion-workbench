@@ -7,56 +7,66 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { ElementFinder } from 'protractor';
+import { $, ElementFinder } from 'protractor';
 import { SwitchToIframeFn } from '../browser-outlet.po';
 
-export class RouterOutletPanelPO {
+export class ConsolePanelPO {
 
   constructor(private _panelFinder: ElementFinder, private _switchToIframeFn: SwitchToIframeFn) {
   }
 
   public async open(): Promise<void> {
     await this._switchToIframeFn();
-    if (await this._panelFinder.$('button.e2e-open').isPresent()) {
-      await this._panelFinder.$('button.e2e-open').click();
+
+    if (!await this._panelFinder.isPresent()) {
+      await $('testing-app').$('span.e2e-console').click();
     }
   }
 
   public async close(): Promise<void> {
     await this._switchToIframeFn();
-    if (await this._panelFinder.$('button.e2e-close').isPresent()) {
+    if (await this._panelFinder.isPresent()) {
       await this._panelFinder.$('button.e2e-close').click();
     }
   }
 
-  public async getActivationLog(): Promise<OutletActivationLogEntry[]> {
+  /**
+   * Returns the log displayed in the console.
+   *
+   * @param filterByType
+   *        allows filtering the console logs by type.
+   */
+  public async getLog(filterByType?: string[]): Promise<ConsoleLog[]> {
     await this._switchToIframeFn();
 
     const logFinder = this._panelFinder.$('section.e2e-log');
     const timestampColumn: string[] = await logFinder.$$('span.e2e-timestamp').map(cell => cell.getText());
-    const typeColumn: ('activate' | 'deactivate')[] = await logFinder.$$('span.e2e-type').map(cell => cell.getText());
-    const urlColumn: string[] = await logFinder.$$('span.e2e-url').map(cell => cell.getText());
+    const typeColumn: string[] = await logFinder.$$('span.e2e-type').map(cell => cell.getText());
+    const messageColumn: string[] = await logFinder.$$('span.e2e-message').map(cell => cell.getText());
 
-    const log: OutletActivationLogEntry[] = [];
+    const log: ConsoleLog[] = [];
     for (let rowIndex = 0; rowIndex < timestampColumn.length; rowIndex++) {
-      log.push({
+      const logEntry: ConsoleLog = {
         timestamp: timestampColumn[rowIndex],
         type: typeColumn[rowIndex],
-        url: urlColumn[rowIndex],
-      });
-    }
+        message: messageColumn[rowIndex],
+      };
 
+      if (!filterByType || filterByType.includes(logEntry.type)) {
+        log.push(logEntry);
+      }
+    }
     return log;
   }
 
-  public async clearActivationLog(): Promise<void> {
+  public async clearLog(): Promise<void> {
     await this._switchToIframeFn();
     await this._panelFinder.$('button.e2e-clear').click();
   }
 }
 
-export interface OutletActivationLogEntry {
+export interface ConsoleLog {
   timestamp: string;
-  type: 'activate' | 'deactivate';
-  url: string;
+  type: string;
+  message: string;
 }

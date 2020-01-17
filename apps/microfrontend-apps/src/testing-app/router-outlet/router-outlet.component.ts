@@ -12,8 +12,8 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { RouterOutletContextComponent } from '../router-outlet-context/router-outlet-context.component';
 import { Overlay } from '@angular/cdk/overlay';
 import { SciRouterOutletElement } from '@scion/microfrontend-platform';
-import { OutletActivationLogEntry } from '../router-outlet-panel/router-outlet-panel.component';
 import { RouterOutletSettingsComponent } from '../router-outlet-settings/router-outlet-settings.component';
+import { ConsoleService } from '../console/console.service';
 
 export const OUTLET_NAME = 'outletName';
 
@@ -29,7 +29,6 @@ export class RouterOutletComponent {
 
   public form: FormGroup;
   public outletName: string;
-  public activationLog: OutletActivationLogEntry[] = [];
 
   @ViewChild('settings_button', {static: true})
   public _settingsButton: ElementRef<HTMLButtonElement>;
@@ -40,7 +39,10 @@ export class RouterOutletComponent {
   @ViewChild('router_outlet', {static: true})
   public _routerOutlet: ElementRef<SciRouterOutletElement>;
 
-  constructor(formBuilder: FormBuilder, private _overlay: Overlay, private _injector: Injector) {
+  constructor(formBuilder: FormBuilder,
+              private _consoleService: ConsoleService,
+              private _overlay: Overlay,
+              private _injector: Injector) {
     this.form = formBuilder.group({
       [OUTLET_NAME]: new FormControl(''),
     });
@@ -70,14 +72,10 @@ export class RouterOutletComponent {
   }
 
   public onActivate(event: CustomEvent): void {
-    this.activationLog = this.activationLog.concat({timestamp: Date.now(), type: 'activate', url: event.detail});
+    this._consoleService.log('sci-router-outlet:activate', event.detail);
   }
 
   public onDeactivate(event: CustomEvent): void {
-    this.activationLog = this.activationLog.concat({timestamp: Date.now(), type: 'deactivate', url: event.detail});
-  }
-
-  public onLogClearClick(): void {
-    this.activationLog = [];
+    this._consoleService.log('sci-router-outlet:deactivate', event.detail);
   }
 }
