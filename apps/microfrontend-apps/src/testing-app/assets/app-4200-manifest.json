@@ -2,7 +2,29 @@
   "name": "Testing App 4200",
   "baseUrl": "#/testing-app",
   "capabilities": [
-   ],
+    {
+      "type": "activator",
+      "qualifier": {
+        "activator": "A"
+      },
+      "private": false,
+      "properties": {
+        "path": "activator",
+        "X-APP-NAME": "app-4200"
+      }
+    },
+    {
+      "type": "activator",
+      "qualifier": {
+        "activator": "B"
+      },
+      "private": false,
+      "properties": {
+        "path": "activator",
+        "X-APP-NAME": "app-4200"
+      }
+    }
+  ],
   "intents": [
   ]
 }

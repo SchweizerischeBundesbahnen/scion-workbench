@@ -12,7 +12,7 @@ import { first } from 'rxjs/operators';
 import { Beans, Initializer } from '../bean-manager';
 import { PlatformConfigLoader } from './platform-config-loader';
 import { Defined } from '@scion/toolkit/util';
-import { ApplicationConfig, PlatformConfig } from './platform-config';
+import { ApplicationConfig, PlatformConfig, PlatformRestrictions } from './platform-config';
 import { ApplicationRegistry } from './application-registry';
 import { HttpClient } from './http-client';
 import { Logger } from '../logger';
@@ -34,6 +34,7 @@ export class ManifestCollector implements Initializer {
       .then((platformConfig: PlatformConfig) => {
         Defined.orElseThrow(platformConfig, () => Error('[PlatformConfigError] No platform config provided.'));
         Defined.orElseThrow(platformConfig.apps, () => Error('[PlatformConfigError] Missing \'apps\' property in platform config. Did you forget to register applications?'));
+        Beans.register(PlatformRestrictions, {useValue: this.computePlatformRestrictions(platformConfig)});
         Beans.get(PlatformMessageClient).publish$(PlatformTopics.PlatformProperties, platformConfig.properties || {}, {retain: true}).subscribe();
         return [Beans.get(HostPlatformAppProvider).appConfig, ...platformConfig.apps];
       })
@@ -70,5 +71,12 @@ export class ManifestCollector implements Initializer {
       // See https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#Checking_that_the_fetch_was_successful
       Beans.get(Logger).error(`[ManifestFetchError] Failed to fetch manifest for application '${appConfig.symbolicName}':`, error);
     }
+  }
+
+  private computePlatformRestrictions(platformConfig: PlatformConfig): PlatformRestrictions {
+    return {
+      ...platformConfig.restrictions,
+      activatorApiDisabled: Defined.orElse(platformConfig.restrictions && platformConfig.restrictions.activatorApiDisabled, false),
+    };
   }
 }

@@ -70,7 +70,13 @@ export class TestingAppPO {
    * ```
    *
    * ### Query params to instrument the 'Testing App':
-   * - intentionRegisterApiDisabled: Provide a comma-separated list of app symbolic names for which to disable the 'Intention Register API'.
+   * - intentionRegisterApiDisabled:
+   *   Provide a comma-separated list of app symbolic names for which to disable the 'Intention Register API'.
+   * - manifestClassifier:
+   *   Control which manifest files to collect by providing a classifier which is appended to the manifest filename.
+   *   E.g. if setting the classifier 'blank', the manifest 'app-4200-manifest-blank.json' is collected instead of 'app-4200-manifest.json'.
+   * - activatorApiDisabled:
+   *   Controls if the 'Activator API' is disabled.
    *
    * @param outlets describes which microfrontends to load.
    * @param options controls the navigation

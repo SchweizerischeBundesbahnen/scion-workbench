@@ -8,12 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { Component, ElementRef, OnDestroy } from '@angular/core';
-import { Beans, ClientConfig, ContextService, FocusMonitor, MicrofrontendPlatform, OutletContext, RouterOutlets } from '@scion/microfrontend-platform';
+import { Beans, ClientConfig, ContextService, FocusMonitor, mapToBody, MessageClient, MicrofrontendPlatform, OutletContext, RouterOutlets } from '@scion/microfrontend-platform';
 import { ActivatedRoute } from '@angular/router';
 import { filter, switchMapTo, takeUntil } from 'rxjs/operators';
 import { fromEvent, merge, Subject } from 'rxjs';
 import { Defined } from '@scion/toolkit/util';
 import { ConsoleService } from './console/console.service';
+import { TestingAppTopics } from './testing-app.topics';
 
 @Component({
   selector: 'testing-app', // tslint:disable-line:component-selector
@@ -35,6 +36,7 @@ export class TestingAppComponent implements OnDestroy {
     this.installFocusWithinListener();
     this.installRouteActivateListener();
     this.installKeyboardEventListener(host);
+    this.installApplicationActivatedEventListener();
   }
 
   private installRouteActivateListener(): void {
@@ -69,6 +71,17 @@ export class TestingAppComponent implements OnDestroy {
       )
       .subscribe(event => {
         this._consoleService.log(event.type, `[key='${event.key}', control=${event.ctrlKey}, shift=${event.shiftKey}, alt=${event.altKey}, meta=${event.metaKey}]`);
+      });
+  }
+
+  private installApplicationActivatedEventListener(): void {
+    Beans.get(MessageClient).observe$<string>(TestingAppTopics.ApplicationActivated)
+      .pipe(
+        mapToBody(),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(event => {
+        this._consoleService.log('onActivate', event);
       });
   }
 

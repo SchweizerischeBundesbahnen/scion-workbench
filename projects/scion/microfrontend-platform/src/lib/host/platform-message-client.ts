@@ -13,7 +13,7 @@ import { MessageClient } from '../client/message-client';
 /**
  * Message client used by the platform to send and receive messages.
  *
- * Messages are sent and received in the context of the platform app {@link PLATFORM_SYMBOLIC_NAME}.
+ * Messages are sent and received on behalf of the platform app {@link PLATFORM_SYMBOLIC_NAME}.
  */
 export abstract class PlatformMessageClient extends MessageClient {
 }

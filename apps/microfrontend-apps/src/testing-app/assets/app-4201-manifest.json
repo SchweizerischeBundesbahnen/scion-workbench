@@ -2,6 +2,14 @@
   "name": "Testing App 4201",
   "baseUrl": "#/testing-app",
   "capabilities": [
+    {
+      "type": "activator",
+      "private": false,
+      "properties": {
+        "path": "activator",
+        "X-APP-NAME": "app-4201"
+      }
+    }
    ],
   "intents": [
   ]

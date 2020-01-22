@@ -22,13 +22,16 @@ import { CapabilityProviderFilter, IntentionFilter } from '../host/manifest-regi
  */
 export class ManifestService {
 
+  constructor(private _messageClient: MessageClient = Beans.get(MessageClient)) {
+  }
+
   /**
    * Allows to look up the applications installed in the system.
    *
    * @retun an Observable that emits the applications in the system and then completes.
    */
   public lookupApplications$(): Observable<Application[]> {
-    return Beans.get(MessageClient).observe$<Application[]>(PlatformTopics.Applications)
+    return this._messageClient.observe$<Application[]>(PlatformTopics.Applications)
       .pipe(
         take(1),
         throwOnErrorStatus(),
@@ -52,8 +55,8 @@ export class ManifestService {
    * @return An Observable that, when subscribed, emits the requested capabilities.
    *         It never completes and emits continuously when satisfying capabilities are registered or unregistered.
    */
-  public lookupCapabilityProviders$(filter?: CapabilityProviderFilter): Observable<CapabilityProvider[]> {
-    return Beans.get(MessageClient).request$<CapabilityProvider[]>(ManifestRegistryTopics.LookupCapabilityProviders, filter)
+  public lookupCapabilityProviders$<T extends CapabilityProvider>(filter?: CapabilityProviderFilter): Observable<T[]> {
+    return this._messageClient.request$<T[]>(ManifestRegistryTopics.LookupCapabilityProviders, filter)
       .pipe(
         throwOnErrorStatus(),
         mapToBody(),
@@ -74,7 +77,7 @@ export class ManifestService {
    *         It never completes and emits continuously when satisfying intentions are registered or unregistered.
    */
   public lookupIntentions$(filter?: IntentionFilter): Observable<Intention[]> {
-    return Beans.get(MessageClient).request$<Intention[]>(ManifestRegistryTopics.LookupIntentions, filter)
+    return this._messageClient.request$<Intention[]>(ManifestRegistryTopics.LookupIntentions, filter)
       .pipe(
         throwOnErrorStatus(),
         mapToBody(),
@@ -88,7 +91,7 @@ export class ManifestService {
    *         or which throws an error if the registration failed.
    */
   public registerCapabilityProvider$(capabilityProvider: CapabilityProvider): Observable<string> {
-    return Beans.get(MessageClient).request$<string>(ManifestRegistryTopics.RegisterCapabilityProvider, capabilityProvider)
+    return this._messageClient.request$<string>(ManifestRegistryTopics.RegisterCapabilityProvider, capabilityProvider)
       .pipe(
         throwOnErrorStatus(),
         take(1),
@@ -108,7 +111,7 @@ export class ManifestService {
    *         or which throws an error if the unregistration failed.
    */
   public unregisterCapabilityProviders$(filter?: CapabilityProviderFilter): Observable<never> {
-    return Beans.get(MessageClient).request$<void>(ManifestRegistryTopics.UnregisterCapabilityProviders, filter)
+    return this._messageClient.request$<void>(ManifestRegistryTopics.UnregisterCapabilityProviders, filter)
       .pipe(
         throwOnErrorStatus(),
         take(1),
@@ -125,7 +128,7 @@ export class ManifestService {
    *         or which throws an error if the registration failed.
    */
   public registerIntention$(intention: Intention): Observable<string> {
-    return Beans.get(MessageClient).request$<string>(ManifestRegistryTopics.RegisterIntention, intention)
+    return this._messageClient.request$<string>(ManifestRegistryTopics.RegisterIntention, intention)
       .pipe(
         throwOnErrorStatus(),
         take(1),
@@ -145,7 +148,7 @@ export class ManifestService {
    *         or which throws an error if the unregistration failed.
    */
   public unregisterIntentions$(filter?: IntentionFilter): Observable<never> {
-    return Beans.get(MessageClient).request$<void>(ManifestRegistryTopics.UnregisterIntentions, filter)
+    return this._messageClient.request$<void>(ManifestRegistryTopics.UnregisterIntentions, filter)
       .pipe(
         throwOnErrorStatus(),
         take(1),

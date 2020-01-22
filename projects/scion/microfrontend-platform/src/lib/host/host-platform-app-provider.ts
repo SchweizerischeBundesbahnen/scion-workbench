@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { PreDestroy } from '../bean-manager';
-import { ApplicationManifest } from '../platform.model';
-import { ApplicationConfig } from './platform-config';
+import { Beans, PreDestroy } from '../bean-manager';
+import { AnyQualifier, ApplicationManifest, Intention, PlatformCapabilityTypes } from '../platform.model';
+import { ApplicationConfig, PlatformRestrictions } from './platform-config';
 import { PLATFORM_SYMBOLIC_NAME } from './platform.constants';
 
 /**
@@ -27,7 +27,9 @@ export class HostPlatformAppProvider implements PreDestroy {
     const manifest: ApplicationManifest = {
       name: 'SCION Microfrontend Platform',
       capabilities: [],
-      intentions: [],
+      intentions: [
+        ...provideActivatorApiIntentions(),
+      ],
     };
 
     this.appConfig = {
@@ -39,4 +41,11 @@ export class HostPlatformAppProvider implements PreDestroy {
   public preDestroy(): void {
     URL.revokeObjectURL(this.appConfig.manifestUrl);
   }
+}
+
+/**
+ * If the 'Activator API' is enabled, authorize the host platform app to read activators from the manifest registry.
+ */
+function provideActivatorApiIntentions(): Intention[] {
+  return Beans.get(PlatformRestrictions).activatorApiDisabled ? [] : [{type: PlatformCapabilityTypes.Activator, qualifier: AnyQualifier}];
 }

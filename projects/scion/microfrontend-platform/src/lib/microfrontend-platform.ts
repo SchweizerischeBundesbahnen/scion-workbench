@@ -45,6 +45,8 @@ import { HostPlatformAppProvider } from './host/host-platform-app-provider';
 import { KeyboardEventDispatcher } from './client/keyboard-event/keyboard-event-dispatcher';
 import { ManifestService } from './client/manifest-service';
 import { ɵManifestRegistry } from './host/manifest-registry/ɵmanifest-registry';
+import { ApplicationActivator } from './host/activator/application-activator';
+import { PlatformManifestService } from './client/platform-manifest-service';
 
 /**
  * The central class of the SCION microfrontend platform.
@@ -137,6 +139,8 @@ export const MicrofrontendPlatform = new class {
         Beans.register(FocusInEventDispatcher, {eager: true});
         Beans.register(MouseMoveEventDispatcher, {eager: true});
         Beans.register(MouseUpEventDispatcher, {eager: true});
+        Beans.register(ApplicationActivator, {eager: true});
+        Beans.register(PlatformManifestService);
 
         // Construct the bean manager instantly to receive connect requests of clients.
         Beans.registerIfAbsent(MessageBroker, {useValue: new MessageBroker(), destroyPhase: PlatformStates.Stopped});

@@ -48,6 +48,7 @@ const routes: Routes = [
       {path: 'scrollable-microfrontend', component: ScrollableMicrofrontendComponent, data: {pageTitle: 'Displays a microfrontend with some tall content displayed in a viewport'}},
       {path: 'preferred-size', component: PreferredSizeComponent, data: {pageTitle: 'Allows playing around with the microfrontend\'s preferred size'}},
       {path: 'platform-properties', component: PlatformPropertiesComponent, data: {pageTitle: 'Shows properties that are registered in the platform'}},
+      {path: 'activator', loadChildren: (): any => import('./activator.module').then(m => m.ActivatorModule)},
       {path: '', redirectTo: 'browser-outlets;count=2', pathMatch: 'full'},
     ],
   },

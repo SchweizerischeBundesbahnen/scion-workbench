@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { ActivatedRouteSnapshot, Params, Resolve, RouterStateSnapshot } from '@angular/router';
-import { coerceNumberProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, coerceNumberProperty } from '@angular/cdk/coercion';
 import { Injectable, NgZone } from '@angular/core';
 import { AngularZoneMessageClientDecorator } from './angular-zone-message-client.decorator';
 import { Beans, MessageClient, MicrofrontendPlatform, PlatformMessageClient, PlatformState, PlatformStates } from '@scion/microfrontend-platform';
@@ -24,10 +24,19 @@ const ports = [4200, 4201, 4202, 4203];
 @Injectable({providedIn: 'root'})
 export class TestingAppPlatformInitializerResolver implements Resolve<void> {
 
+  private resolved = false;
+
   constructor(private _zone: NgZone) {
   }
 
   public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<void> {
+    // Make sure that this resolver is called only once per app instance.
+    // For example, if activators are loaded via lazy-loaded routes, Angular will call this resolver twice.
+    if (this.resolved) {
+      return Promise.resolve();
+    }
+    this.resolved = true;
+
     const port = coerceNumberProperty(window.location.port || 80);
     if (!ports.includes(port)) {
       return Promise.reject(`[PortError] Application served on port ${port} which is not supported. Supported ports are: ${JSON.stringify(ports)}`);
@@ -49,15 +58,21 @@ export class TestingAppPlatformInitializerResolver implements Resolve<void> {
     });
 
     const hostUrl = `${window.location.protocol}//${window.location.hostname}`;
+    const manifestClassifier = queryParams['manifestClassifier'] ? `-${queryParams['manifestClassifier']}` : '';
+    const activatorApiDisabled = coerceBooleanProperty(queryParams['activatorApiDisabled']);
     const intentionRegisterApiDisabled = new Set((queryParams['intentionRegisterApiDisabled'] || '').split(','));
+
     return MicrofrontendPlatform.forHost({
       apps: [
-        {manifestUrl: `${hostUrl}:4200/testing-app/assets/app-4200-manifest.json`, symbolicName: 'app-4200', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4200')},
-        {manifestUrl: `${hostUrl}:4201/testing-app/assets/app-4201-manifest.json`, symbolicName: 'app-4201', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4201')},
-        {manifestUrl: `${hostUrl}:4202/testing-app/assets/app-4202-manifest.json`, symbolicName: 'app-4202', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4202')},
-        {manifestUrl: `${hostUrl}:4203/testing-app/assets/app-4203-manifest.json`, symbolicName: 'app-4203', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4203')},
+        {manifestUrl: `${hostUrl}:4200/testing-app/assets/app-4200-manifest${manifestClassifier}.json`, symbolicName: 'app-4200', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4200')},
+        {manifestUrl: `${hostUrl}:4201/testing-app/assets/app-4201-manifest${manifestClassifier}.json`, symbolicName: 'app-4201', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4201')},
+        {manifestUrl: `${hostUrl}:4202/testing-app/assets/app-4202-manifest${manifestClassifier}.json`, symbolicName: 'app-4202', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4202')},
+        {manifestUrl: `${hostUrl}:4203/testing-app/assets/app-4203-manifest${manifestClassifier}.json`, symbolicName: 'app-4203', intentionRegisterApiDisabled: intentionRegisterApiDisabled.has('app-4203')},
       ],
       properties: queryParams,
+      restrictions: {
+        activatorApiDisabled: activatorApiDisabled,
+      },
     }, {symbolicName: `app-${port}`});
   }
 

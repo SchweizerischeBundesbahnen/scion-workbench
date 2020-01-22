@@ -11,8 +11,4 @@
 /**
  * Entry point for all public APIs of this package.
  */
-export { PlatformConfigLoader } from './platform-config-loader';
-export { PlatformPropertyService } from '../platform-property-service';
-export { PlatformMessageClient } from './platform-message-client';
-export * from './manifest-registry/public_api';
-export * from './activator/public_api';
+export { ACTIVATION_CONTEXT, ActivationContext } from './application-activator';

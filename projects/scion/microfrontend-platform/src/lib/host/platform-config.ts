@@ -11,7 +11,7 @@
 /**
  * Configures the platform and defines the applications running in the platform.
  */
-export abstract class PlatformConfig {
+export interface PlatformConfig {
   /**
    * Defines applications running in the platform.
    */
@@ -22,6 +22,10 @@ export abstract class PlatformConfig {
   properties?: {
     [key: string]: any;
   };
+  /**
+   * Configures restricted platform functionality.
+   */
+  restrictions?: PlatformRestrictions;
 }
 
 /**
@@ -59,4 +63,18 @@ export interface ApplicationConfig {
    * By default, this API is disabled.
    */
   intentionRegisterApiDisabled?: boolean;
+}
+
+/**
+ * Configures restricted platform functionality.
+ */
+export abstract class PlatformRestrictions {
+  /**
+   * Sets whether or not the API to provide application activators is disabled.
+   *
+   * By default, this API is enabled.
+   *
+   * @see ActivatorProvider
+   */
+  activatorApiDisabled?: boolean;
 }

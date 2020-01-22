@@ -182,7 +182,7 @@ export class SciRouterOutletElement extends HTMLElement {
    * @param value
    *        Specifies the value to be stored. It can be any object which is serializable with the structured clone algorithm.
    */
-  public setContextValue(name: string, value: any): void {
+  public setContextValue<T = any>(name: string, value: T): void {
     this._contextProvider.set(name, value);
   }
 

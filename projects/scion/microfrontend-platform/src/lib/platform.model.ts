@@ -184,3 +184,41 @@ export interface Intention {
  */
 export abstract class IS_PLATFORM_HOST { // tslint:disable-line:class-name
 }
+
+/**
+ * Built in capability types.
+ */
+export enum PlatformCapabilityTypes {
+  /**
+   * Defines the capability type under which applications can provide application activators.
+   *
+   * Activators are loaded on platform startup so that applications can interact with the system
+   * even when no microfrontend of that app is currently displayed. For example, it allows an
+   * application to handle intents, or to flexibly provide capabilities.
+   *
+   * Activator providers must have public visibility.
+   *
+   * @see ActivatorProvider
+   */
+  Activator = 'activator'
+}
+
+/**
+ * Activators are loaded on platform startup so that applications can interact with the system
+ * even when no microfrontend of that app is currently displayed. For example, it allows an
+ * application to handle intents, or to flexibly provide capabilities.
+ *
+ * Activator providers must have public visibility.
+ */
+export interface ActivatorProvider extends CapabilityProvider {
+  type: PlatformCapabilityTypes.Activator;
+  private: false;
+  properties: {
+    /**
+     * Path where the pseudo-microfrontend is provided which operates as application activator.
+     * When the platform is started, this microfrontend is loaded into the platform for the entire
+     * platform lifecycle. The path is relative to the base URL as specified in the application manifest.
+     */
+    path: string;
+  };
+}
