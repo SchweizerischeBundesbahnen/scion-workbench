@@ -57,14 +57,8 @@ export class SciSashDirective implements OnInit, OnChanges {
   @Input()
   public minSize: string;
 
-  /**
-   * @internal
-   */
   public element: HTMLElement;
 
-  /**
-   * @internal
-   */
   public set rowDirection(rowDirection: boolean) {
     this._rowDirection = rowDirection;
     this.flexGrowNormalized = this.normalizeFlexGrow(this.flexGrow);
@@ -74,36 +68,22 @@ export class SciSashDirective implements OnInit, OnChanges {
     return this._rowDirection;
   }
 
-  /**
-   * @internal
-   */
   public set flexGrow(flexGrow: number) {
     this._flexGrow = flexGrow;
     this.flexGrowNormalized = this.normalizeFlexGrow(this.flexGrow);
   }
 
-  /**
-   * @internal
-   */
   public get flexGrow(): number {
     return this._flexGrow;
   }
 
   /**
    * Normalized flex-grow proportion of this sash, which is a value >= 1.
-   *
-   * @internal
    */
   public flexGrowNormalized: number;
 
-  /**
-   * @internal
-   */
   public flexShrink: number;
 
-  /**
-   * @internal
-   */
   public flexBasis: string;
 
   constructor(public readonly sashTemplate: TemplateRef<void>) {
@@ -119,8 +99,6 @@ export class SciSashDirective implements OnInit, OnChanges {
 
   /**
    * Returns if this sash has a fixed size, meaning that it has not the ability to grow or shrink if necessary.
-   *
-   * @internal
    */
   public get isFixedSize(): boolean {
     return Number.isNaN(+this.size);
@@ -128,8 +106,6 @@ export class SciSashDirective implements OnInit, OnChanges {
 
   /**
    * Returns the effective sash size as rendered in the DOM.
-   *
-   * @internal
    */
   public get computedSize(): number {
     // Note: Use `boundingClientRect` to get the fractional size.

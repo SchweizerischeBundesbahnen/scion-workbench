@@ -71,7 +71,6 @@ export class SciSashboxComponent implements OnDestroy {
 
   public sashes: SciSashDirective[] = [];
 
-  /** @internal **/
   @HostBinding('class.sashing')
   public sashing = false;
 
@@ -93,7 +92,6 @@ export class SciSashboxComponent implements OnDestroy {
   @Output()
   public sashEnd = new EventEmitter<void>();
 
-  /** @internal **/
   @ContentChildren(SciSashDirective)
   public set setSashes(queryList: QueryList<SciSashDirective>) {
     queryList.changes
@@ -106,7 +104,6 @@ export class SciSashboxComponent implements OnDestroy {
   constructor(private _host: ElementRef<HTMLElement>, private _zone: NgZone) {
   }
 
-  /** @internal **/
   public onSashStart(): void {
     this.sashing = true;
     this.sashStart.emit();
@@ -121,7 +118,6 @@ export class SciSashboxComponent implements OnDestroy {
     });
   }
 
-  /** @internal **/
   public onSashEnd(): void {
     this.sashing = false;
 
@@ -137,7 +133,6 @@ export class SciSashboxComponent implements OnDestroy {
     this.sashEnd.emit();
   }
 
-  /** @internal **/
   public onSash(splitter: HTMLElement, sashIndex: number, moveEvent: SplitterMoveEvent): void {
     const delta = moveEvent.delta;
     if (delta === 0) {
@@ -198,7 +193,6 @@ export class SciSashboxComponent implements OnDestroy {
     });
   }
 
-  /** @internal **/
   public onSashReset(sashIndex: number): void {
     const sash1 = this.sashes[sashIndex];
     const sash2 = this.sashes[sashIndex + 1];
