@@ -23,11 +23,11 @@ describe('Activator', () => {
     const consolePanelPO = testingAppPO.consolePanelPO();
     await consolePanelPO.open();
     await expect(consolePanelPO.getLog(['onActivate'])).toEqual(jasmine.arrayWithExactContents([
-        jasmine.objectContaining({type: 'onActivate', message: 'app-4200 [primary: true, X-APP-NAME: app-4200]'}),
-        jasmine.objectContaining({type: 'onActivate', message: 'app-4200 [primary: false, X-APP-NAME: app-4200]'}),
-        jasmine.objectContaining({type: 'onActivate', message: 'app-4201 [primary: true, X-APP-NAME: app-4201]'}),
-        jasmine.objectContaining({type: 'onActivate', message: 'app-4202 [primary: true, X-APP-NAME: app-4202]'}),
-        jasmine.objectContaining({type: 'onActivate', message: 'app-4203 [primary: true, X-APP-NAME: app-4203]'}),
+        jasmine.objectContaining({type: 'onActivate', message: 'app-1 [primary: true, X-APP-NAME: app-1]'}),
+        jasmine.objectContaining({type: 'onActivate', message: 'app-1 [primary: false, X-APP-NAME: app-1]'}),
+        jasmine.objectContaining({type: 'onActivate', message: 'app-2 [primary: true, X-APP-NAME: app-2]'}),
+        jasmine.objectContaining({type: 'onActivate', message: 'app-3 [primary: true, X-APP-NAME: app-3]'}),
+        jasmine.objectContaining({type: 'onActivate', message: 'app-4 [primary: true, X-APP-NAME: app-4]'}),
       ],
     ));
   });

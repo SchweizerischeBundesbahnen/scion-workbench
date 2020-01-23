@@ -1,7 +1,7 @@
 {
   "name": "@scion/microfrontend-platform",
-  "version": "0.0.0-beta.32",
-  "description": "Provides the mechanics to integrate microfrontends and cross-origin messaging between microfrontends.",
+  "version": "0.0.0-beta.1",
+  "description": "SCION Microfrontend Platform provides the building blocks for integrating microfrontends based on iframes. It is a pure TypeScript framework allowing to integrate any web content. It comes with a powerful messaging facility for cross-origin intent- or topic-based communication supporting wildcard addressing, request-response message exchange pattern, retained messaging and more. Web content is embedded using a responsive web component which encapsulates the iframe. The component solves many of the cumbersome quirks of iframes and sets up a context in which data can be made available to the embedded content.",
   "license": "EPL-2.0",
   "private": false,
   "publishConfig": {
@@ -12,19 +12,30 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
   },
   "author": {
-    "name": "SCION Workbench contributors",
+    "name": "SCION contributors",
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "dependencies": {
   },
   "peerDependencies": {
     "rxjs": "^6.0.0",
-    "@scion/toolkit": "0.0.0-beta.32"
+    "@scion/toolkit": "0.0.0-beta.1"
   },
   "keywords": [
+    "scion",
+    "microfrontend",
+    "micro frontend",
+    "iframe",
+    "web component",
+    "webcomponent",
+    "typescript",
+    "javascript",
+    "messaging",
+    "cross-origin"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
   }
 }
+

@@ -7,9 +7,9 @@ node_js:
 - '10.16.0'
 env:
   global:
-  - BETA_RC_TAG_REGEX="^[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
-  - RELEASE_TAG_REGEX="^[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
-  - secure: "W2MbFhPYKn4nBzW9uV5GlRBU7Bsml3CA2sGapskwHouAW/5KApc8OPirhlu37LdUKaPmJwacWOugK9SPU5Fh2kBEad4ktlyVpbwIbzt3R29EpdolnaeUX2cpGfqUWxSN3EA02mlKyExfTQL7AYJlrysgVc+5D1FyvZQ/Ej4sw8NvbUbuRxUXiOCP9FpZ3GYa3Tprl3cfQpgHPUqxO64kvym1kZZAYXkrLiidGA5riiWyY8b4waBv7cg+tpYzsqkPCSdlnTaisy1Lo5vMaAXsKroWnJHRH6ONPJr8qw1YmffSslpXYeENDKJQNKPdd9i5M56Vq7sV2jHb9vWP8CdOUxO9298pC6ymQ28EJFttEG/0CrLCZdkDbf9HcKy6ZygOyrow/FDOaOCJSilNzecfeNJmF5Av+tt7tg4zSLVK33mKFJSrrPvalG44iIHIgHHWd8LOGAy7k4pzquW1zbTVMqcqctYxUWYTy8s2r/7Nxy/f0bdb5XHwj91TOnp8+mSR1FI8UGgvmc8Y8BuXSwz9cdihX6nM7u+gVpEwgRpelej05dathtmUtuSTAZBdETBspFrCCjzSy7J/9M5/nVXArf875qzqWfj4/KNqqAeg/YNWdI2wlW90JQgt5msOe1awwuWttFVyO3mdT6gvkaPrkpxbDW/yHgr8pXiGIHm1iAE=" # $NOW_TOKEN
+  - BETA_RC_TAG_REGEX="^microfrontend-platform-[0-9]+.[0-9]+.[0-9]+-" # Matches 'next' versions x.x.x-beta and x.x.x-rc (npm tag: next)
+  - RELEASE_TAG_REGEX="^microfrontend-platform-[0-9]+.[0-9]+.[0-9]+$" # Matches 'stable' versions x.x.x (npm tag: latest)
+  - secure: "hghs643vBOf+zs0J3VdRkwq0eHJrf56iP5z4Mk7lUWsZCRwfobghsfpxP3ZTlqvlGM3I/bRPZf+RJVOr8tDrViDhfrB05LnPI0LIp4MqAPpovf7TaEqsN+Lj135qcYFnKpvHN/j0QXFonqdvIVOaP2HNm1mqFRJ/kUkQcZKZOGmsM75g3a73ZYdzJpsq5bd2iYS59vs/GuUiyBlAtACE2v6AOAeTNVCcAbw2OShpWuLB698r581SRvs0pW2oGtUtNfSbGjcr6VYHQimMuwxHJEI7EnL/wqgXPY1iiVEyzbEbUU1cRK4Xtcd5512XcpdJHZhlTw4UmZG/pXTzqa9O4DFyTGHfcNUJWG8KBblwL3VUrUazyvudpodWSpePUQBi/e9h/yrKfM28huNL+CtMGiHU5uGus/oK9pA5MPgmO+konQ1esHAvUhTWVto3e/gzuX8mDaTqBZ3YNe8JW+gImk5L6ZrFrMM8ZzbCZM9UzY3D3khgsJpD8tHBz4gHndBh+cTFAmENUQi9aT/tdKHxMmKgKS+xTRTja+WIwzjUZBWl7aZ6/GcAI9fme13VOYJaVuXF8AAu9iJFjDyDYYK+xor3eed/+FUF4C6FogiAm2PqF1QcMC5cjaq8bWmuYwhgvY4HU2daoa1Wuf9SQPg46WBXlU8VFmPFXG9CMyKRfWI=" # $NOW_TOKEN
   - secure: "S3fGMms92geqAHCJXPhN66iLGYh18NOXYHLjb7Jwg/ohLWhAUcFkn04NkeS0QXXmQGVPzqITddT20PMBcyEE8MJVRpY4s89VCLORxI8qeNcf3FiG/Rk5zGQ3hvf+kzjupWXutHKLXZLL+mWiKM9HNfvLqumDC71J+fYmOuDwGVXRKw4elscTmyVaqoPkqS7i4cfJCynbTPRDgB57vLxJCARuRt95m685MAezg/F8h1V4/9LK2Ko347Khn3KUNPl1f3L1puGiHYtEdtU9f+WzBgmKEgJIEjxuoJqEsWAuKu0aew5bl/pWwtDRc9z6PF1atyR64rrvTeKUrfKEsFgN41x7k7gs1hZmgVsYzpwN+PTeK3H+Egfp1kTjIix4MwpbT9Eyb+unRPmyxypIMeCLGHXb8JBFOSBjDpHG7NeySVfFkSu5po495W7wMVgE7GMdrDjQTBfTrja4oHKnfi4PmYzWEcVASYCrFKYnZPkb7NJhWz4gArS4F+juxfwbMSDL96dWTTbB9b+MXgkB0l14lYlLE8Xi0dXIwoRGVNc1eJ8yf3zeQgaLGbdkSAeJ45w9tnylRIQDf5roEHS//UQ1TGGuv4tvgwr4VC1jn+sE9U9sh/LuReL5/XF2YtfZClQsAmwOmxPN62hA+8JL8Zbo523Zbyi9fEXYIca5DdsRH6E=" # $NPM_TOKEN
 install:
 - npm ci
@@ -18,129 +18,33 @@ jobs:
   - stage: "Lint stage"
     name: "lints all libraries"
     script:
-      - npm run lint
-  -
-    name: "lints all applications"
-    script:
-      - npm run app:workbench:lint
-      - npm run app:workbench-application-platform:lint
+      - npm run lint-all
   - stage: "Build stage"
-    name: "builds all, tests all, deploys demo apps (if branch=master) to 'https://zeit.co/scion', publishes libraries to NPM (if branch=master AND if release tag)"
+    name: "builds all, tests all, deploys apps (if branch=issue/198) to 'https://zeit.co/scion', publishes libraries to NPM (if branch=issue/198 AND if release tag)"
     script:
-    - npm run build
-    - npm run test-headless
-    - npm run app:common:build
-    - npm run app:workbench:e2e-headless
-    - npm run app:workbench-application-platform:e2e-headless
-    - npm run app:workbench-application-platform:build-now
+    - npm run build-all
+    - npm run test-all:headless
+    - npm run e2e-all:headless
     deploy:
+      # Deploy microfrontend-apps
       - provider: script
-        script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/host-app $NOW_TOKEN
+        script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/apps/microfrontend-apps $NOW_TOKEN
         skip_cleanup: true
         on:
-          branch: master
+          branch: issue/198
+      # Publish @scion/microfrontend-platform
       - provider: script
-        script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/contact-app $NOW_TOKEN
+        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/microfrontend-platform $NPM_TOKEN "--tag next"
         skip_cleanup: true
         on:
-          branch: master
-      - provider: script
-        script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/communication-app $NOW_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-      - provider: script
-        script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/dev-tools-app $NOW_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-      # Publish @scion/mouse-dispatcher
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/mouse-dispatcher $NPM_TOKEN "--tag next"
-        skip_cleanup: true
-        on:
-          branch: master
+          branch: issue/198
           tags: true
           condition: "$TRAVIS_TAG =~ $BETA_RC_TAG_REGEX"
+      # Publish @scion/toolkit
       - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/mouse-dispatcher $NPM_TOKEN
+        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/toolkit $NPM_TOKEN "--tag next"
         skip_cleanup: true
         on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"
-      # Publish @scion/workbench
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench $NPM_TOKEN "--tag next"
-        skip_cleanup: true
-        on:
-          branch: master
+          branch: issue/198
           tags: true
           condition: "$TRAVIS_TAG =~ $BETA_RC_TAG_REGEX"
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench $NPM_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"
-      # Publish @scion/workbench-application-platform.api
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application-platform.api $NPM_TOKEN "--tag next"
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $BETA_RC_TAG_REGEX"
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application-platform.api $NPM_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"
-      # Publish @scion/workbench-application-platform
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application-platform $NPM_TOKEN "--tag next"
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $BETA_RC_TAG_REGEX"
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application-platform $NPM_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"
-      # Publish @scion/workbench-application.core
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application.core $NPM_TOKEN "--tag next"
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $BETA_RC_TAG_REGEX"
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application.core $NPM_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"
-      # Publish @scion/workbench-application.angular
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application.angular $NPM_TOKEN "--tag next"
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $BETA_RC_TAG_REGEX"
-      - provider: script
-        script: bash ./travis-scripts/npm-publish.sh $TRAVIS_BUILD_DIR dist/scion/workbench-application.angular $NPM_TOKEN
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
-          condition: "$TRAVIS_TAG =~ $RELEASE_TAG_REGEX"

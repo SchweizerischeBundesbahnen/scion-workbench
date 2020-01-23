@@ -12,6 +12,12 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "scripts": {
+    "build-all": "run-s *:build",
+    "lint-all": "run-p *:lint",
+    "test-all": "run-s *:test",
+    "test-all:headless": "cross-env HEADLESS=true run-s *:test",
+    "e2e-all": "run-p *:e2e",
+    "e2e-all:headless": "run-p *:e2e-headless",
     "toolkit:build": "ng build --prod @scion/toolkit",
     "toolkit:lint": "ng lint @scion/toolkit",
     "toolkit:test": "ng test @scion/toolkit",
@@ -25,12 +31,9 @@
     "toolkit-apps:lint": "ng lint toolkit-apps",
     "toolkit-apps:build": "ng build --configuration=production toolkit-apps",
 
-    "workbench:build": "ng build --prod @scion/workbench",
-    "postworkbench:build": "scss-bundle -e projects/scion/workbench/src/theme/_theming.scss -o dist/scion/workbench/theming.scss",
-
     "microfrontend-platform:build": "ng build --prod @scion/microfrontend-platform",
     "microfrontend-platform:lint": "ng lint @scion/microfrontend-platform",
-    "microfrontend-platform:lint:e2e-specs": "ng lint e2e-microfrontend-platform",
+    "microfrontend-platform-e2e-specs:lint": "ng lint e2e-microfrontend-platform",
     "microfrontend-platform:test": "ng test @scion/microfrontend-platform",
     "microfrontend-platform:e2e": "run-p -r microfrontend-apps:serve microfrontend-platform:await-then-protractor",
     "microfrontend-platform:e2e-headless": "cross-env HEADLESS=true run-p -r microfrontend-apps:serve microfrontend-platform:await-then-protractor",
@@ -39,85 +42,17 @@
     "microfrontend-platform:run-protractor-headless": "cross-env HEADLESS=true ng e2e e2e-microfrontend-platform",
 
     "microfrontend-apps:serve": "run-p -r microfrontend-apps:serve:*",
-    "microfrontend-apps:serve:4200": "ng serve microfrontend-apps --aot --port 4200",
     "microfrontend-apps:serve:4201": "ng serve microfrontend-apps --aot --port 4201",
     "microfrontend-apps:serve:4202": "ng serve microfrontend-apps --aot --port 4202",
     "microfrontend-apps:serve:4203": "ng serve microfrontend-apps --aot --port 4203",
-    "microfrontend-apps:await:4200": "wait-on http-get://localhost:4200",
+    "microfrontend-apps:serve:4204": "ng serve microfrontend-apps --aot --port 4204",
     "microfrontend-apps:await:4201": "wait-on http-get://localhost:4201",
     "microfrontend-apps:await:4202": "wait-on http-get://localhost:4202",
     "microfrontend-apps:await:4203": "wait-on http-get://localhost:4203",
+    "microfrontend-apps:await:4204": "wait-on http-get://localhost:4204",
     "microfrontend-apps:lint": "ng lint microfrontend-apps",
     "microfrontend-apps:build": "ng build --configuration=production microfrontend-apps",
-
-    "build-all": "run-s build app:common:build app:workbench-application-platform:build-now",
-    "lint-all": "run-p -r lint app:common:lint app:workbench:lint app:workbench-application-platform:lint",
-
-    "build": "run-s build:*",
-    "build:mouse-dispatcher": "ng build --prod @scion/mouse-dispatcher",
-    "build:workbench": "ng build --prod @scion/workbench",
-    "postbuild:workbench": "scss-bundle -e projects/scion/workbench/src/theme/_theming.scss -o dist/scion/workbench/theming.scss",
-    "build:workbench-application-platform.api": "ng build --prod @scion/workbench-application-platform.api",
-    "build:workbench-application-platform": "ng build --prod @scion/workbench-application-platform",
-    "build:workbench-application.core": "ng build --prod @scion/workbench-application.core",
-    "build:workbench-application.angular": "ng build --prod @scion/workbench-application.angular",
-
-    "test": "run-s test:*",
-    "test-headless": "cross-env HEADLESS=true run-s test:*",
-    "test:workbench": "ng test @scion/workbench",
-    "test:workbench-application-platform": "ng test @scion/workbench-application-platform",
-    "test:workbench-application.core": "ng test @scion/workbench-application.core",
-    "test:workbench-application.angular": "ng test @scion/workbench-application.angular",
-
-    "lint": "run-p lint:*",
-    "lint:workbench": "ng lint @scion/workbench",
-    "lint:workbench-application-platform.api": "ng lint @scion/workbench-application-platform.api",
-    "lint:workbench-application-platform": "ng lint @scion/workbench-application-platform",
-    "lint:workbench-application.core": "ng lint @scion/workbench-application.core",
-    "lint:workbench-application.angular": "ng lint @scion/workbench-application.angular",
-    "lint:mouse-dispatcher": "ng lint @scion/mouse-dispatcher",
-
-    "app:common:build": "ng build --prod app/common",
-    "app:common:lint": "ng lint app/common",
-
-    "app:workbench:e2e": "ng e2e e2e/workbench",
-    "app:workbench:e2e-headless": "cross-env HEADLESS=true ng e2e e2e/workbench --prod",
-    "app:workbench:lint": "ng lint app/workbench/workbench-app && ng lint e2e/workbench",
-    "app:workbench:serve": "ng serve app/workbench/workbench-app --aot",
-
-    "app:workbench-application-platform:e2e": "run-p -r app:workbench-application-platform:serve app:workbench-application-platform:await-then-protractor",
-    "app:workbench-application-platform:e2e-headless": "cross-env HEADLESS=true run-p -r app:workbench-application-platform:serve app:workbench-application-platform:await-then-protractor",
-    "app:workbench-application-platform:await-then-protractor": "run-s app:workbench-application-platform:await:* app:workbench-application-platform:e2e:run-protractor",
-    "app:workbench-application-platform:build-now": "run-p --aggregate-output app:workbench-application-platform:build-now:*",
-    "app:workbench-application-platform:lint": "run-p app:workbench-application-platform:lint:*",
-    "app:workbench-application-platform:serve": "run-p -r app:workbench-application-platform:serve:*",
-
-    "app:workbench-application-platform:lint:specs": "ng lint e2e/workbench-application-platform",
-    "app:workbench-application-platform:e2e:run-protractor": "ng e2e e2e/workbench-application-platform",
-
-    "app:workbench-application-platform:build-now:host-app": "ng build --configuration=now app/workbench-application-platform/host-app",
-    "app:workbench-application-platform:lint:host-app": "ng lint app/workbench-application-platform/host-app",
-    "app:workbench-application-platform:serve:host-app": "ng serve app/workbench-application-platform/host-app --aot --port 5000",
-    "app:workbench-application-platform:await:host-app": "wait-on http-get://localhost:5000",
-
-    "app:workbench-application-platform:build-now:contact-app": "ng build --configuration=now app/workbench-application-platform/contact-app",
-    "app:workbench-application-platform:lint:contact-app": "ng lint app/workbench-application-platform/contact-app",
-    "app:workbench-application-platform:serve:contact-app": "ng serve app/workbench-application-platform/contact-app --aot --port 5001",
-    "app:workbench-application-platform:await:contact-app": "wait-on http-get://localhost:5001",
-
-    "app:workbench-application-platform:build-now:communication-app": "ng build --configuration=now app/workbench-application-platform/communication-app",
-    "app:workbench-application-platform:lint:communication-app": "ng lint app/workbench-application-platform/communication-app",
-    "app:workbench-application-platform:serve:communication-app": "ng serve app/workbench-application-platform/communication-app --aot --port 5002",
-    "app:workbench-application-platform:await:communication-app": "wait-on http-get://localhost:5002",
-
-    "app:workbench-application-platform:build-now:dev-tools-app": "ng build --configuration=now app/workbench-application-platform/dev-tools-app",
-    "app:workbench-application-platform:lint:dev-tools-app": "ng lint app/workbench-application-platform/dev-tools-app",
-    "app:workbench-application-platform:serve:dev-tools-app": "ng serve app/workbench-application-platform/dev-tools-app --aot --port 5003",
-    "app:workbench-application-platform:await:dev-tools-app": "wait-on http-get://localhost:5003",
-
-    "app:workbench-application-platform:lint:testing-app": "ng lint app/workbench-application-platform/testing-app",
-    "app:workbench-application-platform:serve:testing-app": "ng serve app/workbench-application-platform/testing-app --aot --port 5004",
-    "app:workbench-application-platform:await:testing-app": "wait-on http-get://localhost:5004"
+    "microfrontend-apps:build-local": "ng build --configuration=local microfrontend-apps"
   },
   "private": true,
   "dependencies": {
@@ -155,7 +90,7 @@
     "karma-jasmine": "2.0.1",
     "karma-jasmine-html-reporter": "1.4.2",
     "ng-packagr": "5.3.0",
-    "now": "15.4.0",
+    "now": "16.7.3",
     "npm-run-all": "4.1.5",
     "protractor": "5.4.2",
     "puppeteer": "1.13.0",

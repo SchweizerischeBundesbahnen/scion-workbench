@@ -262,7 +262,8 @@
             "assets": [
               "apps/microfrontend-apps/src/favicon.ico",
               "apps/microfrontend-apps/src/assets",
-              "apps/microfrontend-apps/src/testing-app/assets"
+              "apps/microfrontend-apps/src/testing-app/assets",
+              "apps/microfrontend-apps/src/now.json"
             ],
             "styles": [
               "apps/microfrontend-apps/src/styles.scss"
@@ -280,6 +281,23 @@
                 {
                   "replace": "apps/microfrontend-apps/src/environments/environment.ts",
                   "with": "apps/microfrontend-apps/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
+            "local": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/microfrontend-apps/src/environments/environment.ts",
+                  "with": "apps/microfrontend-apps/src/environments/environment.local.ts"
                 }
               ],
               "optimization": true,

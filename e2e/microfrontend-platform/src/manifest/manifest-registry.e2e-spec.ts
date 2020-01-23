@@ -180,38 +180,38 @@ describe('Manifest Registry', () => {
     it('should not allow to unregister capability providers from other applications', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        registrator_4201: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-        registrator_4202: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-        lookup_4201: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-        lookup_4202: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+        registrator_app2: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_2},
+        registrator_app3: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3},
+        lookup_app2: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_2},
+        lookup_app3: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
-      const registrator4201PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator_4201');
-      const registrator4202PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator_4202');
-      const lookup4201PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_4201');
-      const lookup4202PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_4202');
+      const registratorApp2PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator_app2');
+      const registratorApp3PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator_app3');
+      const lookupApp2PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_app2');
+      const lookupApp3PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_app3');
 
       // Register providers
-      const provider4201Id = await registrator4201PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: false});
-      const provider4202Id = await registrator4202PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: false});
+      const providerApp2Id = await registratorApp2PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: false});
+      const providerApp3Id = await registratorApp3PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: false});
 
-      await lookup4201PO.lookup();
-      await expect(lookup4201PO.getLookedUpProviderIds()).toEqual([provider4201Id]);
-      await lookup4202PO.lookup();
-      await expect(lookup4202PO.getLookedUpProviderIds()).toEqual([provider4202Id]);
+      await lookupApp2PO.lookup();
+      await expect(lookupApp2PO.getLookedUpProviderIds()).toEqual([providerApp2Id]);
+      await lookupApp3PO.lookup();
+      await expect(lookupApp3PO.getLookedUpProviderIds()).toEqual([providerApp3Id]);
 
-      // Unregister the provider in 'app-4201'
-      await registrator4201PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}});
-      await registrator4201PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-4201'});
-      await registrator4201PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-4202'});
-      await expect(lookup4201PO.getLookedUpProviderIds()).toEqual([]);
-      await expect(lookup4202PO.getLookedUpProviderIds()).toEqual([provider4202Id]);
+      // Unregister the provider in 'app-2'
+      await registratorApp2PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}});
+      await registratorApp2PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-2'});
+      await registratorApp2PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-3'});
+      await expect(lookupApp2PO.getLookedUpProviderIds()).toEqual([]);
+      await expect(lookupApp3PO.getLookedUpProviderIds()).toEqual([providerApp3Id]);
 
-      // Unregister the provider in 'app-4202'
-      await registrator4202PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}});
-      await registrator4202PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-4201'});
-      await registrator4202PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-4202'});
-      await expect(lookup4201PO.getLookedUpProviderIds()).toEqual([]);
-      await expect(lookup4202PO.getLookedUpProviderIds()).toEqual([]);
+      // Unregister the provider in 'app-3'
+      await registratorApp3PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}});
+      await registratorApp3PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-2'});
+      await registratorApp3PO.unregisterProvider({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-3'});
+      await expect(lookupApp2PO.getLookedUpProviderIds()).toEqual([]);
+      await expect(lookupApp3PO.getLookedUpProviderIds()).toEqual([]);
     });
   });
 
@@ -220,27 +220,27 @@ describe('Manifest Registry', () => {
     it('should allow to look up capabilities of the requesting application', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        registrator_4200: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-        registrator_4201: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-        lookup_4200: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+        registrator_app1: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_1},
+        registrator_app3: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3},
+        lookup_app1: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_1},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
-      const registrator4200PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator_4200');
-      const registrator4201PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator_4201');
-      const lookup4200PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_4200');
+      const registratorApp1PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator_app1');
+      const registratorApp3PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator_app3');
+      const lookupApp1PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_app1');
 
-      // Register providers in 'app-4200'
-      const provider1Id = await registrator4200PO.registerProvider({type: 'type1', qualifier: {key: 'a'}, private: false});
-      const provider2Id = await registrator4200PO.registerProvider({type: 'type1', qualifier: {key: 'b'}, private: false});
-      const provider3Id = await registrator4200PO.registerProvider({type: 'type1', qualifier: {key: 'c'}, private: false});
+      // Register providers in 'app-1'
+      const provider1Id = await registratorApp1PO.registerProvider({type: 'type1', qualifier: {key: 'a'}, private: false});
+      const provider2Id = await registratorApp1PO.registerProvider({type: 'type1', qualifier: {key: 'b'}, private: false});
+      const provider3Id = await registratorApp1PO.registerProvider({type: 'type1', qualifier: {key: 'c'}, private: false});
 
-      // Register providers in 'app-4201'
-      await registrator4201PO.registerProvider({type: 'type2', qualifier: {key: 'a'}, private: false});
-      await registrator4201PO.registerProvider({type: 'type2', qualifier: {key: 'b'}, private: false});
-      await registrator4201PO.registerProvider({type: 'type2', qualifier: {key: 'c'}, private: false});
+      // Register providers in 'app-2'
+      await registratorApp3PO.registerProvider({type: 'type2', qualifier: {key: 'a'}, private: false});
+      await registratorApp3PO.registerProvider({type: 'type2', qualifier: {key: 'b'}, private: false});
+      await registratorApp3PO.registerProvider({type: 'type2', qualifier: {key: 'c'}, private: false});
 
       // Verify the lookup when setting the app explicitly via filter
-      await lookup4200PO.lookup({appSymbolicName: 'app-4200'});
-      await expect(lookup4200PO.getLookedUpProviderIds()).toEqual(jasmine.arrayWithExactContents([provider1Id, provider2Id, provider3Id]));
+      await lookupApp1PO.lookup({appSymbolicName: 'app-1'});
+      await expect(lookupApp1PO.getLookedUpProviderIds()).toEqual(jasmine.arrayWithExactContents([provider1Id, provider2Id, provider3Id]));
     });
 
     it('should allow to look up capabilities by id', async () => {
@@ -369,65 +369,65 @@ describe('Manifest Registry', () => {
     it('should allow to look up public capabilities from other apps for which the requesting app has declared an intention', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        providerRegistrator_4200: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-        intentionRegistrator_4201: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-        lookup_4201: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
+        providerRegistrator_app1: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_1},
+        intentionRegistrator_app2: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_2},
+        lookup_app2: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_2},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
-      const providerRegistrator4200PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('providerRegistrator_4200');
-      const intentionRegistrator4201PO = pagePOs.get<RegisterIntentionsPagePO>('intentionRegistrator_4201');
-      const lookup4201PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_4201');
+      const providerRegistratorApp1PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('providerRegistrator_app1');
+      const intentionRegistratorApp2PO = pagePOs.get<RegisterIntentionsPagePO>('intentionRegistrator_app2');
+      const lookupApp2PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_app2');
 
-      // Register a public provider in 'app-4200'
-      const publicProvider4200Id = await providerRegistrator4200PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: false});
+      // Register a public provider in 'app-1'
+      const publicProviderApp1Id = await providerRegistratorApp1PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: false});
 
-      // Register the intention in 'app-4201' for that capability
-      await intentionRegistrator4201PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
+      // Register the intention in 'app-2' for that capability
+      await intentionRegistratorApp2PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
 
-      // Lookup the provider from 'app-4201'
-      await lookup4201PO.lookup();
-      await expect(lookup4201PO.getLookedUpProviderIds()).toEqual([publicProvider4200Id]);
+      // Lookup the provider from 'app-2'
+      await lookupApp2PO.lookup();
+      await expect(lookupApp2PO.getLookedUpProviderIds()).toEqual([publicProviderApp1Id]);
 
-      await lookup4201PO.lookup({appSymbolicName: 'app-4200'});
-      await expect(lookup4201PO.getLookedUpProviderIds()).toEqual([publicProvider4200Id]);
+      await lookupApp2PO.lookup({appSymbolicName: 'app-1'});
+      await expect(lookupApp2PO.getLookedUpProviderIds()).toEqual([publicProviderApp1Id]);
     });
 
     it('should not allow to look up private capabilities from other apps for which the requesting app has declared an intention', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        providerRegistrator_4200: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-        intentionRegistrator_4201: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-        lookup_4201: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
+        providerRegistrator_app1: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_1},
+        intentionRegistrator_app2: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_2},
+        lookup_app2: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_2},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
-      const providerRegistrator4200PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('providerRegistrator_4200');
-      const intentionRegistrator4201PO = pagePOs.get<RegisterIntentionsPagePO>('intentionRegistrator_4201');
-      const lookup4201PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_4201');
+      const providerRegistratorApp1PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('providerRegistrator_app1');
+      const intentionRegistratorApp2PO = pagePOs.get<RegisterIntentionsPagePO>('intentionRegistrator_app2');
+      const lookupApp2PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_app2');
 
-      // Register a private provider in 'app-4200'
-      await providerRegistrator4200PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: true});
+      // Register a private provider in 'app-1'
+      await providerRegistratorApp1PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: true});
 
-      // Register the intention in 'app-4201' for that capability
-      await intentionRegistrator4201PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
+      // Register the intention in 'app-2' for that capability
+      await intentionRegistratorApp2PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
 
-      // Lookup the provider from 'app-4201'
-      await lookup4201PO.lookup();
-      await expect(lookup4201PO.getLookedUpProviderIds()).toEqual([]);
+      // Lookup the provider from 'app-2'
+      await lookupApp2PO.lookup();
+      await expect(lookupApp2PO.getLookedUpProviderIds()).toEqual([]);
     });
 
     it('should not allow to look up public capabilities from other apps for which the requesting app has not declared an intention', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        providerRegistrator_4200: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-        lookup_4201: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
+        providerRegistrator_app1: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_1},
+        lookup_app2: {useClass: LookupCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_2},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
-      const providerRegistrator4200PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('providerRegistrator_4200');
-      const lookup4201PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_4201');
+      const providerRegistratorApp1PO = pagePOs.get<RegisterCapabilityProvidersPagePO>('providerRegistrator_app1');
+      const lookupApp2PO = pagePOs.get<LookupCapabilityProvidersPagePO>('lookup_app2');
 
-      // Register a public provider in 'app-4200'
-      await providerRegistrator4200PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: false});
+      // Register a public provider in 'app-1'
+      await providerRegistratorApp1PO.registerProvider({type: 'type', qualifier: {key: 'value'}, private: false});
 
-      // Lookup the provider from 'app-4201'
-      await lookup4201PO.lookup();
-      await expect(lookup4201PO.getLookedUpProviderIds()).toEqual([]);
+      // Lookup the provider from 'app-2'
+      await lookupApp2PO.lookup();
+      await expect(lookupApp2PO.getLookedUpProviderIds()).toEqual([]);
     });
 
     it('should allow observing capabilities', async () => {
@@ -471,8 +471,8 @@ describe('Manifest Registry', () => {
     it('should allow to register an intention if the API to manage intentions is enabled for the requesting application', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        registrator: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-        lookup: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+        registrator: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3},
+        lookup: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.APP_3},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
       const registratorPO = pagePOs.get<RegisterIntentionsPagePO>('registrator');
       const lookupPO = pagePOs.get<LookupIntentionsPagePO>('lookup');
@@ -488,8 +488,8 @@ describe('Manifest Registry', () => {
     it('should not allow to register an intention if the API to manage intentions is disabled for the requesting application', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        registrator: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4203},
-      }, {queryParams: new Map().set('manifestClassifier', 'blank').set('intentionRegisterApiDisabled', 'app-4203').set('activatorApiDisabled', true)});
+        registrator: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_4},
+      }, {queryParams: new Map().set('manifestClassifier', 'blank').set('intentionRegisterApiDisabled', 'app-4').set('activatorApiDisabled', true)});
       const registratorPO = pagePOs.get<RegisterIntentionsPagePO>('registrator');
 
       // Try to register the intention
@@ -502,8 +502,8 @@ describe('Manifest Registry', () => {
     it('should not allow to unregister an intention if the API to manage intentions is disabled for the requesting application', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        registrator: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4203},
-      }, {queryParams: new Map().set('manifestClassifier', 'blank').set('intentionRegisterApiDisabled', 'app-4203').set('activatorApiDisabled', true)});
+        registrator: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_4},
+      }, {queryParams: new Map().set('manifestClassifier', 'blank').set('intentionRegisterApiDisabled', 'app-4').set('activatorApiDisabled', true)});
       const registratorPO = pagePOs.get<RegisterIntentionsPagePO>('registrator');
 
       // Try to unregister an intention
@@ -648,34 +648,34 @@ describe('Manifest Registry', () => {
     it('should not allow to unregister intentions from other applications', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        registrator_4201: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-        registrator_4202: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-        lookup_4201: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-        lookup_4202: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+        registrator_app2: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_2},
+        registrator_app3: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3},
+        lookup_app2: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.APP_2},
+        lookup_app3: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.APP_3},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
-      const registrator4201PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_4201');
-      const registrator4202PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_4202');
-      const lookup4201PO = pagePOs.get<LookupIntentionsPagePO>('lookup_4201');
+      const registratorApp2PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_app2');
+      const registratorApp3PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_app3');
+      const lookupApp2PO = pagePOs.get<LookupIntentionsPagePO>('lookup_app2');
 
       // Register intentions
-      const intention4201Id = await registrator4201PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
-      const intention4202Id = await registrator4202PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
+      const intentionApp2Id = await registratorApp2PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
+      const intentionApp3Id = await registratorApp3PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
 
-      await lookup4201PO.lookup();
-      await expect(lookup4201PO.getLookedUpIntentionIds()).toEqual([intention4201Id, intention4202Id]);
+      await lookupApp2PO.lookup();
+      await expect(lookupApp2PO.getLookedUpIntentionIds()).toEqual([intentionApp2Id, intentionApp3Id]);
 
-      // Unregister the intention in 'app-4201'
-      await registrator4201PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}});
-      await registrator4201PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-4201'});
-      await registrator4201PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-4202'});
-      await expect(lookup4201PO.getLookedUpIntentionIds()).toEqual([intention4202Id]);
+      // Unregister the intention in 'app-2'
+      await registratorApp2PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}});
+      await registratorApp2PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-2'});
+      await registratorApp2PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-3'});
+      await expect(lookupApp2PO.getLookedUpIntentionIds()).toEqual([intentionApp3Id]);
 
-      // Unregister the intention in 'app-4202'
-      await registrator4202PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}});
-      await registrator4202PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-4201'});
-      await registrator4202PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-4202'});
-      await expect(lookup4201PO.getLookedUpIntentionIds()).toEqual([]);
-      await expect(lookup4201PO.getLookedUpIntentionIds()).toEqual([]);
+      // Unregister the intention in 'app-3'
+      await registratorApp3PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}});
+      await registratorApp3PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-2'});
+      await registratorApp3PO.unregisterIntentions({type: 'type', qualifier: {key: 'value'}, appSymbolicName: 'app-3'});
+      await expect(lookupApp2PO.getLookedUpIntentionIds()).toEqual([]);
+      await expect(lookupApp2PO.getLookedUpIntentionIds()).toEqual([]);
     });
   });
 
@@ -684,27 +684,27 @@ describe('Manifest Registry', () => {
     it('should allow to look up intentions of the requesting application', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        registrator_4200: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-        registrator_4201: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-        lookup_4200: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+        registrator_app1: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_1},
+        registrator_app2: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3},
+        lookup_app1: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.APP_1},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
-      const registrator4200PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_4200');
-      const registrator4201PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_4201');
-      const lookup4200PO = pagePOs.get<LookupIntentionsPagePO>('lookup_4200');
+      const registratorApp1PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_app1');
+      const registratorApp2PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_app2');
+      const lookupApp1PO = pagePOs.get<LookupIntentionsPagePO>('lookup_app1');
 
-      // Register intentions in 'app-4200'
-      const intention1Id = await registrator4200PO.registerIntention({type: 'type1', qualifier: {key: 'a'}});
-      const intention2Id = await registrator4200PO.registerIntention({type: 'type1', qualifier: {key: 'b'}});
-      const intention3Id = await registrator4200PO.registerIntention({type: 'type1', qualifier: {key: 'c'}});
+      // Register intentions in 'app-1'
+      const intention1Id = await registratorApp1PO.registerIntention({type: 'type1', qualifier: {key: 'a'}});
+      const intention2Id = await registratorApp1PO.registerIntention({type: 'type1', qualifier: {key: 'b'}});
+      const intention3Id = await registratorApp1PO.registerIntention({type: 'type1', qualifier: {key: 'c'}});
 
-      // Register intentions in 'app-4201'
-      await registrator4201PO.registerIntention({type: 'type2', qualifier: {key: 'a'}});
-      await registrator4201PO.registerIntention({type: 'type2', qualifier: {key: 'b'}});
-      await registrator4201PO.registerIntention({type: 'type2', qualifier: {key: 'c'}});
+      // Register intentions in 'app-2'
+      await registratorApp2PO.registerIntention({type: 'type2', qualifier: {key: 'a'}});
+      await registratorApp2PO.registerIntention({type: 'type2', qualifier: {key: 'b'}});
+      await registratorApp2PO.registerIntention({type: 'type2', qualifier: {key: 'c'}});
 
       // Verify the lookup when setting the app explicitly via filter
-      await lookup4200PO.lookup({appSymbolicName: 'app-4200'});
-      await expect(lookup4200PO.getLookedUpIntentionIds()).toEqual(jasmine.arrayWithExactContents([intention1Id, intention2Id, intention3Id]));
+      await lookupApp1PO.lookup({appSymbolicName: 'app-1'});
+      await expect(lookupApp1PO.getLookedUpIntentionIds()).toEqual(jasmine.arrayWithExactContents([intention1Id, intention2Id, intention3Id]));
     });
 
     it('should allow to look up intentions by id', async () => {
@@ -833,21 +833,21 @@ describe('Manifest Registry', () => {
     it('should allow to look up intentions from other apps', async () => {
       const testingAppPO = new TestingAppPO();
       const pagePOs = await testingAppPO.navigateTo({
-        registrator_4200: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-        lookup_4201: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4201},
+        registrator_app1: {useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_1},
+        lookup_app2: {useClass: LookupIntentionsPagePO, origin: TestingAppOrigins.APP_2},
       }, {queryParams: new Map().set('manifestClassifier', 'blank').set('activatorApiDisabled', true)});
-      const registrator4200PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_4200');
-      const lookup4201PO = pagePOs.get<LookupIntentionsPagePO>('lookup_4201');
+      const registratorApp1PO = pagePOs.get<RegisterIntentionsPagePO>('registrator_app1');
+      const lookupApp2PO = pagePOs.get<LookupIntentionsPagePO>('lookup_app2');
 
-      // Register an intention in 'app-4200'
-      const intention4200Id = await registrator4200PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
+      // Register an intention in 'app-1'
+      const intentionApp1Id = await registratorApp1PO.registerIntention({type: 'type', qualifier: {key: 'value'}});
 
-      // Lookup the intention from 'app-4201'
-      await lookup4201PO.lookup();
-      await expect(lookup4201PO.getLookedUpIntentionIds()).toEqual([intention4200Id]);
+      // Lookup the intention from 'app-2'
+      await lookupApp2PO.lookup();
+      await expect(lookupApp2PO.getLookedUpIntentionIds()).toEqual([intentionApp1Id]);
 
-      await lookup4201PO.lookup({appSymbolicName: 'app-4200'});
-      await expect(lookup4201PO.getLookedUpIntentionIds()).toEqual([intention4200Id]);
+      await lookupApp2PO.lookup({appSymbolicName: 'app-1'});
+      await expect(lookupApp2PO.getLookedUpIntentionIds()).toEqual([intentionApp1Id]);
     });
 
     it('should allow observing intentions', async () => {

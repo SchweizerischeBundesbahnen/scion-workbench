@@ -49,18 +49,21 @@ import { ApplicationActivator } from './host/activator/application-activator';
 import { PlatformManifestService } from './client/platform-manifest-service';
 
 /**
- * The central class of the SCION microfrontend platform.
+ * SCION Microfrontend Platform provides the building blocks for integrating microfrontends based on iframes.
  *
- * This class cannot be instantiated; all functionality is provided by static methods.
+ * It is a pure TypeScript framework allowing to integrate any web content. It comes with a powerful messaging facility for
+ * cross-origin intent- or topic-based communication supporting wildcard addressing, request-response message exchange pattern,
+ * retained messaging and more. Web content is embedded using a responsive web component which encapsulates the iframe.
+ * The component solves many of the cumbersome quirks of iframes and sets up a context in which data can be made available
+ * to the embedded content.
  *
- * Features include:
- * - cross-origin messaging between applications
- * - concept of intents and capabilities to interact with microfrontends
- * - registry of installed microfrontends
- * - outlet to embed a microfrontend
- * - ...
- *
- * TODO: Complete feature list
+ * @see MessageClient
+ * @see SciRouterOutletElement
+ * @see OutletRouter
+ * @see ContextService
+ * @see PreferredSizeService
+ * @see ManifestService
+ * @see FocusMonitor
  */
 export const MicrofrontendPlatform = new class {
 

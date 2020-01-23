@@ -73,37 +73,37 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      publisher_app3: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
+    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManager_4202 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await capabilityManager_4202.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: true});
+    const capabilityManager_app3 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3});
+    await capabilityManager_app3.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: true});
 
     // receive the intent
-    const receiverPO_4202 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
-    await receiverPO_4202.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4202.enterIntentSelector('testing', {key: 'value'});
-    await receiverPO_4202.clickSubscribe();
+    const receiverPO_app3 = pagePOs.get<ReceiveMessagePagePO>('receiver_app3');
+    await receiverPO_app3.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app3.enterIntentSelector('testing', {key: 'value'});
+    await receiverPO_app3.clickSubscribe();
 
     // issue the intent
-    const publisherPO_4202 = pagePOs.get<PublishMessagePagePO>('publisher_4202');
-    await publisherPO_4202.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4202.enterIntent('testing', {key: 'value'});
-    await publisherPO_4202.enterMessage('some payload');
-    await publisherPO_4202.clickPublish();
+    const publisherPO_app3 = pagePOs.get<PublishMessagePagePO>('publisher_app3');
+    await publisherPO_app3.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app3.enterIntent('testing', {key: 'value'});
+    await publisherPO_app3.enterMessage('some payload');
+    await publisherPO_app3.clickPublish();
 
-    await expect(publisherPO_4202.getPublishError()).toBeNull();
+    await expect(publisherPO_app3.getPublishError()).toBeNull();
 
     // assert intent to be received
-    const intent = await receiverPO_4202.getFirstMessageOrElseReject();
+    const intent = await receiverPO_app3.getFirstMessageOrElseReject();
     await expect(intent.getIntentType()).toEqual('testing');
     await expect(intent.getBody()).toEqual('some payload');
     await expect(intent.getIntentQualifier()).toEqual({key: 'value'});
@@ -118,38 +118,38 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      publisher_app3: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
+    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: true});
+    const capabilityManagerPO_app4 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_4});
+    await capabilityManagerPO_app4.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: true});
 
     // receive the intent
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
-    await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203.enterIntentSelector('testing', {key: 'value'});
-    await receiverPO_4203.clickSubscribe();
+    const receiverPO_app4 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4');
+    await receiverPO_app4.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4.enterIntentSelector('testing', {key: 'value'});
+    await receiverPO_app4.clickSubscribe();
 
     // issue the intent
-    const publisherPO_4202 = pagePOs.get<PublishMessagePagePO>('publisher_4202');
-    await publisherPO_4202.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4202.enterIntent('testing', {key: 'value'});
-    await publisherPO_4202.enterMessage('some payload');
-    await publisherPO_4202.clickPublish();
+    const publisherPO_app3 = pagePOs.get<PublishMessagePagePO>('publisher_app3');
+    await publisherPO_app3.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app3.enterIntent('testing', {key: 'value'});
+    await publisherPO_app3.enterMessage('some payload');
+    await publisherPO_app3.clickPublish();
 
     // assert intent not to be dispatched
-    await expect(publisherPO_4202.getPublishError()).toContain('[NullProviderError]');
+    await expect(publisherPO_app3.getPublishError()).toContain('[NullProviderError]');
 
     // assert intent not to be received
-    await expect(receiverPO_4203.getMessages()).toEqual([]);
+    await expect(receiverPO_app4.getMessages()).toEqual([]);
   }
 
   /**
@@ -160,28 +160,28 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      publisher_app3: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
+    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await capabilityManagerPO_4202.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
+    const capabilityManagerPO_app3 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3});
+    await capabilityManagerPO_app3.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent
-    const receiverPO = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
+    const receiverPO = pagePOs.get<ReceiveMessagePagePO>('receiver_app3');
     await receiverPO.selectMessagingModel(MessagingModel.Intent);
     await receiverPO.enterIntentSelector('testing', {key: 'value'});
     await receiverPO.clickSubscribe();
 
     // issue the intent
-    const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher_4202');
+    const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher_app3');
     await publisherPO.selectMessagingModel(MessagingModel.Intent);
     await publisherPO.enterIntent('testing', {key: 'value'});
     await publisherPO.enterMessage('some payload');
@@ -205,37 +205,37 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      publisher_app3: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
+    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
+    const capabilityManagerPO_app4 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_4});
+    await capabilityManagerPO_app4.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
-    await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203.enterIntentSelector('testing', {key: 'value'});
-    await receiverPO_4203.clickSubscribe();
+    const receiverPO_app4 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4');
+    await receiverPO_app4.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4.enterIntentSelector('testing', {key: 'value'});
+    await receiverPO_app4.clickSubscribe();
 
     // issue the intent
-    const publisherPO_4202 = pagePOs.get<PublishMessagePagePO>('publisher_4202');
-    await publisherPO_4202.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4202.enterIntent('testing', {key: 'value'});
-    await publisherPO_4202.enterMessage('some payload');
-    await publisherPO_4202.clickPublish();
+    const publisherPO_app3 = pagePOs.get<PublishMessagePagePO>('publisher_app3');
+    await publisherPO_app3.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app3.enterIntent('testing', {key: 'value'});
+    await publisherPO_app3.enterMessage('some payload');
+    await publisherPO_app3.clickPublish();
 
-    await expect(publisherPO_4202.getPublishError()).toBeNull();
+    await expect(publisherPO_app3.getPublishError()).toBeNull();
 
     // assert intent to be received
-    const intent = await receiverPO_4203.getFirstMessageOrElseReject();
+    const intent = await receiverPO_app4.getFirstMessageOrElseReject();
     await expect(intent.getIntentType()).toEqual('testing');
     await expect(intent.getBody()).toEqual('some payload');
     await expect(intent.getIntentQualifier()).toEqual({key: 'value'});
@@ -250,73 +250,73 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4201: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver_4201: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver_4202_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4202_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      publisher_app2: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver_app2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver_app3_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app3_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4201 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4201});
-    await intentionManagerPO_4201.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    const intentionManagerPO_app2 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_2});
+    await intentionManagerPO_app2.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
-    // register the capability in app 4201
-    const capabilityManagerPO_4201 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4201});
-    await capabilityManagerPO_4201.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
+    // register the capability in app-2
+    const capabilityManagerPO_app2 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_2});
+    await capabilityManagerPO_app2.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
-    // register the capability in app 4202
-    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await capabilityManagerPO_4202.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
+    // register the capability in app-3
+    const capabilityManagerPO_app3 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3});
+    await capabilityManagerPO_app3.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
-    // receive the intent in app 4201
-    const receiverPO_4201 = pagePOs.get<ReceiveMessagePagePO>('receiver_4201');
-    await receiverPO_4201.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4201.enterIntentSelector('testing', {key: 'value'});
-    await receiverPO_4201.clickSubscribe();
+    // receive the intent in app-2
+    const receiverPO_app2 = pagePOs.get<ReceiveMessagePagePO>('receiver_app2');
+    await receiverPO_app2.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app2.enterIntentSelector('testing', {key: 'value'});
+    await receiverPO_app2.clickSubscribe();
 
-    // receive the intent in app 4202_1
-    const receiverPO_4202_1 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202_1');
-    await receiverPO_4202_1.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4202_1.enterIntentSelector('testing', {key: 'value'});
-    await receiverPO_4202_1.clickSubscribe();
+    // receive the intent in app-3_1
+    const receiverPO_app3_1 = pagePOs.get<ReceiveMessagePagePO>('receiver_app3_1');
+    await receiverPO_app3_1.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app3_1.enterIntentSelector('testing', {key: 'value'});
+    await receiverPO_app3_1.clickSubscribe();
 
-    // receive the intent in app 4202_2
-    const receiverPO_4202_2 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202_2');
-    await receiverPO_4202_2.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4202_2.enterIntentSelector('testing', {key: 'value'});
-    await receiverPO_4202_2.clickSubscribe();
+    // receive the intent in app-3_2
+    const receiverPO_app3_2 = pagePOs.get<ReceiveMessagePagePO>('receiver_app3_2');
+    await receiverPO_app3_2.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app3_2.enterIntentSelector('testing', {key: 'value'});
+    await receiverPO_app3_2.clickSubscribe();
 
-    // issue the intent from app 4201
-    const publisherPO_4201 = pagePOs.get<PublishMessagePagePO>('publisher_4201');
-    await publisherPO_4201.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4201.enterIntent('testing', {key: 'value'});
-    await publisherPO_4201.enterMessage('some payload');
-    await publisherPO_4201.clickPublish();
+    // issue the intent from app-2
+    const publisherPO_app2 = pagePOs.get<PublishMessagePagePO>('publisher_app2');
+    await publisherPO_app2.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app2.enterIntent('testing', {key: 'value'});
+    await publisherPO_app2.enterMessage('some payload');
+    await publisherPO_app2.clickPublish();
 
-    await expect(publisherPO_4201.getPublishError()).toBeNull();
+    await expect(publisherPO_app2.getPublishError()).toBeNull();
 
-    // assert intent to be received by app 4201
-    const intent_4201 = await receiverPO_4201.getFirstMessageOrElseReject();
-    await expect(intent_4201.getIntentType()).toEqual('testing');
-    await expect(intent_4201.getBody()).toEqual('some payload');
-    await expect(intent_4201.getIntentQualifier()).toEqual({key: 'value'});
-    await expect(intent_4201.getReplyTo()).toBeUndefined();
+    // assert intent to be received by app-2
+    const intent_app2 = await receiverPO_app2.getFirstMessageOrElseReject();
+    await expect(intent_app2.getIntentType()).toEqual('testing');
+    await expect(intent_app2.getBody()).toEqual('some payload');
+    await expect(intent_app2.getIntentQualifier()).toEqual({key: 'value'});
+    await expect(intent_app2.getReplyTo()).toBeUndefined();
 
-    // assert intent to be received by app 4202_1
-    const intent_4202_1 = await receiverPO_4202_1.getFirstMessageOrElseReject();
-    await expect(intent_4202_1.getIntentType()).toEqual('testing');
-    await expect(intent_4202_1.getBody()).toEqual('some payload');
-    await expect(intent_4202_1.getIntentQualifier()).toEqual({key: 'value'});
-    await expect(intent_4202_1.getReplyTo()).toBeUndefined();
+    // assert intent to be received by app-3_1
+    const intent_app3_1 = await receiverPO_app3_1.getFirstMessageOrElseReject();
+    await expect(intent_app3_1.getIntentType()).toEqual('testing');
+    await expect(intent_app3_1.getBody()).toEqual('some payload');
+    await expect(intent_app3_1.getIntentQualifier()).toEqual({key: 'value'});
+    await expect(intent_app3_1.getReplyTo()).toBeUndefined();
 
-    // assert intent to be received by app 4202_2
-    const intent_4202_2 = await receiverPO_4202_2.getFirstMessageOrElseReject();
-    await expect(intent_4202_2.getIntentType()).toEqual('testing');
-    await expect(intent_4202_2.getBody()).toEqual('some payload');
-    await expect(intent_4202_2.getIntentQualifier()).toEqual({key: 'value'});
-    await expect(intent_4202_2.getReplyTo()).toBeUndefined();
+    // assert intent to be received by app-3_2
+    const intent_app3_2 = await receiverPO_app3_2.getFirstMessageOrElseReject();
+    await expect(intent_app3_2.getIntentType()).toEqual('testing');
+    await expect(intent_app3_2.getBody()).toEqual('some payload');
+    await expect(intent_app3_2.getIntentQualifier()).toEqual({key: 'value'});
+    await expect(intent_app3_2.getReplyTo()).toBeUndefined();
   }
 
   /**
@@ -327,54 +327,54 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      publisher_app3: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
+    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
+    const capabilityManagerPO_app4 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_4});
+    await capabilityManagerPO_app4.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
-    await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203.enterIntentSelector('testing', {key: 'value'});
-    await receiverPO_4203.clickSubscribe();
+    const receiverPO_app4 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4');
+    await receiverPO_app4.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4.enterIntentSelector('testing', {key: 'value'});
+    await receiverPO_app4.clickSubscribe();
 
     // issue the intent
-    const publisherPO_4202 = pagePOs.get<PublishMessagePagePO>('publisher_4202');
-    await publisherPO_4202.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4202.enterIntent('testing', {key: 'value'});
+    const publisherPO_app3 = pagePOs.get<PublishMessagePagePO>('publisher_app3');
+    await publisherPO_app3.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app3.enterIntent('testing', {key: 'value'});
 
     // assert receiving the first intent
-    await publisherPO_4202.clickPublish();
-    const intent1 = await receiverPO_4203.getFirstMessageOrElseReject();
+    await publisherPO_app3.clickPublish();
+    const intent1 = await receiverPO_app4.getFirstMessageOrElseReject();
     await expect(intent1.getIntentType()).toEqual('testing');
     await expect(intent1.getIntentQualifier()).toEqual({key: 'value'});
-    await receiverPO_4203.clickClearMessages();
-    await expect(receiverPO_4203.getMessages()).toEqual([]);
+    await receiverPO_app4.clickClearMessages();
+    await expect(receiverPO_app4.getMessages()).toEqual([]);
 
     // assert receiving the second intent
-    await publisherPO_4202.clickPublish();
-    const intent2 = await receiverPO_4203.getFirstMessageOrElseReject();
+    await publisherPO_app3.clickPublish();
+    const intent2 = await receiverPO_app4.getFirstMessageOrElseReject();
     await expect(intent2.getIntentType()).toEqual('testing');
     await expect(intent2.getIntentQualifier()).toEqual({key: 'value'});
-    await receiverPO_4203.clickClearMessages();
-    await expect(receiverPO_4203.getMessages()).toEqual([]);
+    await receiverPO_app4.clickClearMessages();
+    await expect(receiverPO_app4.getMessages()).toEqual([]);
 
     // assert receiving the second intent
-    await publisherPO_4202.clickPublish();
-    const intent3 = await receiverPO_4203.getFirstMessageOrElseReject();
+    await publisherPO_app3.clickPublish();
+    const intent3 = await receiverPO_app4.getFirstMessageOrElseReject();
     await expect(intent3.getIntentType()).toEqual('testing');
     await expect(intent3.getIntentQualifier()).toEqual({key: 'value'});
-    await receiverPO_4203.clickClearMessages();
-    await expect(receiverPO_4203.getMessages()).toEqual([]);
+    await receiverPO_app4.clickClearMessages();
+    await expect(receiverPO_app4.getMessages()).toEqual([]);
   }
 
   /**
@@ -385,52 +385,52 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      publisher_app3: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
+    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key: 'value'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
+    const capabilityManagerPO_app4 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_4});
+    await capabilityManagerPO_app4.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
 
     // receive the intent
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
-    await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203.enterIntentSelector('testing', {key: 'value'});
-    await receiverPO_4203.clickSubscribe();
+    const receiverPO_app4 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4');
+    await receiverPO_app4.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4.enterIntentSelector('testing', {key: 'value'});
+    await receiverPO_app4.clickSubscribe();
 
     // issue the intent
-    const publisherPO_4202 = pagePOs.get<PublishMessagePagePO>('publisher_4202');
-    await publisherPO_4202.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4202.toggleRequestReply(true);
-    await publisherPO_4202.enterIntent('testing', {key: 'value'});
-    await publisherPO_4202.clickPublish();
+    const publisherPO_app3 = pagePOs.get<PublishMessagePagePO>('publisher_app3');
+    await publisherPO_app3.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app3.toggleRequestReply(true);
+    await publisherPO_app3.enterIntent('testing', {key: 'value'});
+    await publisherPO_app3.clickPublish();
 
     // assert receiving the intent
-    const intent = await receiverPO_4203.getFirstMessageOrElseReject();
+    const intent = await receiverPO_app4.getFirstMessageOrElseReject();
     await expect(intent.getIntentType()).toEqual('testing');
     await expect(intent.getIntentQualifier()).toEqual({key: 'value'});
     await expect(intent.getReplyTo()).not.toBeUndefined();
 
     // send the first reply
     await intent.clickReply();
-    const reply1 = await publisherPO_4202.getFirstReplyOrElseReject();
+    const reply1 = await publisherPO_app3.getFirstReplyOrElseReject();
     await expect(reply1.getReplyTo()).toBeUndefined();
     await expect(reply1.getBody()).toEqual('this is a reply');
-    await publisherPO_4202.clickClearReplies();
+    await publisherPO_app3.clickClearReplies();
 
     // send the second reply
     await intent.clickReply();
-    const reply2 = await publisherPO_4202.getFirstReplyOrElseReject();
+    const reply2 = await publisherPO_app3.getFirstReplyOrElseReject();
     await expect(reply2.getReplyTo()).toBeUndefined();
     await expect(reply2.getBody()).toEqual('this is a reply');
-    await publisherPO_4202.clickClearReplies();
+    await publisherPO_app3.clickClearReplies();
   }
 
   /**
@@ -441,58 +441,58 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
-      receiver_4203_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
-      receiver_4203_3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
-      receiver_4203_4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      publisher_app3: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app4_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
+      receiver_app4_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
+      receiver_app4_3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
+      receiver_app4_4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4202 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await intentionManagerPO_4202.registerIntention({type: 'testing', qualifier: {key1: 'value1', key2: '*'}});
+    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
+    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key1: 'value1', key2: '*'}});
 
     // register the capability
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: 'value2'}, private: false});
+    const capabilityManagerPO_app4 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_4});
+    await capabilityManagerPO_app4.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: 'value2'}, private: false});
 
     // receive the intent using qualifier: {key1: 'value1', key2: '*'}
-    const receiverPO_4203_1 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_1');
-    await receiverPO_4203_1.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203_1.enterIntentSelector('testing', {key1: 'value1', key2: '*'});
-    await receiverPO_4203_1.clickSubscribe();
+    const receiverPO_app4_1 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4_1');
+    await receiverPO_app4_1.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4_1.enterIntentSelector('testing', {key1: 'value1', key2: '*'});
+    await receiverPO_app4_1.clickSubscribe();
 
     // receive the intent using qualifier: {key1: 'value1', key2: '*', key3: '?'}
-    const receiverPO_4203_2 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_2');
-    await receiverPO_4203_2.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203_2.enterIntentSelector('testing', {key1: 'value1', key2: '*', key3: '?'});
-    await receiverPO_4203_2.clickSubscribe();
+    const receiverPO_app4_2 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4_2');
+    await receiverPO_app4_2.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4_2.enterIntentSelector('testing', {key1: 'value1', key2: '*', key3: '?'});
+    await receiverPO_app4_2.clickSubscribe();
 
     // receive the intent using qualifier: {'*': '*'}
-    const receiverPO_4203_3 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_3');
-    await receiverPO_4203_3.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203_3.enterIntentSelector('testing', {'*': '*'});
-    await receiverPO_4203_3.clickSubscribe();
+    const receiverPO_app4_3 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4_3');
+    await receiverPO_app4_3.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4_3.enterIntentSelector('testing', {'*': '*'});
+    await receiverPO_app4_3.clickSubscribe();
 
     // receive the intent using qualifier: undefined
-    const receiverPO_4203_4 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203_4');
-    await receiverPO_4203_4.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203_4.enterIntentSelector('testing');
-    await receiverPO_4203_4.clickSubscribe();
+    const receiverPO_app4_4 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4_4');
+    await receiverPO_app4_4.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4_4.enterIntentSelector('testing');
+    await receiverPO_app4_4.clickSubscribe();
 
     // issue the intent
-    const publisherPO_4202 = pagePOs.get<PublishMessagePagePO>('publisher_4202');
-    await publisherPO_4202.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4202.enterIntent('testing', {key1: 'value1', key2: 'value2'});
-    await publisherPO_4202.clickPublish();
+    const publisherPO_app3 = pagePOs.get<PublishMessagePagePO>('publisher_app3');
+    await publisherPO_app3.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app3.enterIntent('testing', {key1: 'value1', key2: 'value2'});
+    await publisherPO_app3.clickPublish();
 
     // assert receiving the intent
-    await receiverPO_4203_1.getFirstMessageOrElseReject();
-    await receiverPO_4203_2.getFirstMessageOrElseReject();
-    await receiverPO_4203_3.getFirstMessageOrElseReject();
-    await receiverPO_4203_4.getFirstMessageOrElseReject();
+    await receiverPO_app4_1.getFirstMessageOrElseReject();
+    await receiverPO_app4_2.getFirstMessageOrElseReject();
+    await receiverPO_app4_3.getFirstMessageOrElseReject();
+    await receiverPO_app4_4.getFirstMessageOrElseReject();
   }
 
   /**
@@ -503,59 +503,59 @@ export namespace IntendBasedMessagingSpecs {
 
     const pagePOs = await testingAppPO.navigateTo({
       managerOutlet: 'about:blank',
-      publisher_4200: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-      receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4203: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      publisher_app1: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_1},
+      receiver_app3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_app4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
     });
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
     // register the intention
-    const intentionManagerPO_4200 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.LOCALHOST_4200});
-    await intentionManagerPO_4200.registerIntention({type: 'testing', qualifier: {'*': '*'}});
+    const intentionManagerPO_app1 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_1});
+    await intentionManagerPO_app1.registerIntention({type: 'testing', qualifier: {'*': '*'}});
 
     // register the capability
-    // app 4202: {key1: 'value1', key2: '*'}
-    // app 4203: {key1: 'value1', key2: '?'}
-    const capabilityManagerPO_4202 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4202});
-    await capabilityManagerPO_4202.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: '*'}, private: false});
+    // app-3: {key1: 'value1', key2: '*'}
+    // app-4: {key1: 'value1', key2: '?'}
+    const capabilityManagerPO_app3 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3});
+    await capabilityManagerPO_app3.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: '*'}, private: false});
 
-    const capabilityManagerPO_4203 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await capabilityManagerPO_4203.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: '?'}, private: false});
+    const capabilityManagerPO_app4 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_4});
+    await capabilityManagerPO_app4.registerProvider({type: 'testing', qualifier: {key1: 'value1', key2: '?'}, private: false});
 
-    // receive the intent in 4202
-    const receiverPO_4202 = pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
-    await receiverPO_4202.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4202.clickSubscribe();
+    // receive the intent in app-3
+    const receiverPO_app3 = pagePOs.get<ReceiveMessagePagePO>('receiver_app3');
+    await receiverPO_app3.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app3.clickSubscribe();
 
-    // receive the intent in 4203
-    const receiverPO_4203 = pagePOs.get<ReceiveMessagePagePO>('receiver_4203');
-    await receiverPO_4203.selectMessagingModel(MessagingModel.Intent);
-    await receiverPO_4203.clickSubscribe();
+    // receive the intent in app-4
+    const receiverPO_app4 = pagePOs.get<ReceiveMessagePagePO>('receiver_app4');
+    await receiverPO_app4.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO_app4.clickSubscribe();
 
     // issue the intent: {key1: 'value1', key2: 'value2'}
-    const publisherPO_4200 = pagePOs.get<PublishMessagePagePO>('publisher_4200');
-    await publisherPO_4200.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4200.enterIntent('testing', {key1: 'value1', key2: 'value2'});
-    await publisherPO_4200.clickPublish();
+    const publisherPO_app1 = pagePOs.get<PublishMessagePagePO>('publisher_app1');
+    await publisherPO_app1.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app1.enterIntent('testing', {key1: 'value1', key2: 'value2'});
+    await publisherPO_app1.clickPublish();
 
     // assert receiving the intent
-    await expect((await receiverPO_4202.getFirstMessageOrElseReject()).getIntentQualifier()).toEqual({key1: 'value1', key2: 'value2'});
-    await expect((await receiverPO_4203.getFirstMessageOrElseReject()).getIntentQualifier()).toEqual({key1: 'value1', key2: 'value2'});
+    await expect((await receiverPO_app3.getFirstMessageOrElseReject()).getIntentQualifier()).toEqual({key1: 'value1', key2: 'value2'});
+    await expect((await receiverPO_app4.getFirstMessageOrElseReject()).getIntentQualifier()).toEqual({key1: 'value1', key2: 'value2'});
 
-    await receiverPO_4202.clickClearMessages();
-    await receiverPO_4203.clickClearMessages();
+    await receiverPO_app3.clickClearMessages();
+    await receiverPO_app4.clickClearMessages();
 
     // issue the intent: {key1: 'value1'}
-    await publisherPO_4200.selectMessagingModel(MessagingModel.Intent);
-    await publisherPO_4200.enterIntent('testing', {key1: 'value1'});
-    await publisherPO_4200.clickPublish();
+    await publisherPO_app1.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO_app1.enterIntent('testing', {key1: 'value1'});
+    await publisherPO_app1.clickPublish();
 
     // assert receiving the intent
-    await expectToBeRejectedWithError(receiverPO_4202.getFirstMessageOrElseReject(), /[TimeoutError]/);
-    await expect((await receiverPO_4203.getFirstMessageOrElseReject()).getIntentQualifier()).toEqual({key1: 'value1'});
-    await receiverPO_4202.clickClearMessages();
-    await receiverPO_4203.clickClearMessages();
+    await expectToBeRejectedWithError(receiverPO_app3.getFirstMessageOrElseReject(), /[TimeoutError]/);
+    await expect((await receiverPO_app4.getFirstMessageOrElseReject()).getIntentQualifier()).toEqual({key1: 'value1'});
+    await receiverPO_app3.clickClearMessages();
+    await receiverPO_app4.clickClearMessages();
   }
 
   /**
@@ -564,9 +564,9 @@ export namespace IntendBasedMessagingSpecs {
   export async function passHeadersSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      capabilityManager: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-      receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+      capabilityManager: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_1},
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_1},
+      receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_1},
     });
 
     const capabilityManagerPO = await pagePOs.get<RegisterCapabilityProvidersPagePO>('capabilityManager');

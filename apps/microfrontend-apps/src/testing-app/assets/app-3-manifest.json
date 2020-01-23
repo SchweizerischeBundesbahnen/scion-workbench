@@ -1,5 +1,5 @@
 {
-  "name": "Testing App 4201",
+  "name": "Testing App 3",
   "baseUrl": "#/testing-app",
   "capabilities": [
     {
@@ -7,7 +7,7 @@
       "private": false,
       "properties": {
         "path": "activator",
-        "X-APP-NAME": "app-4201"
+        "X-APP-NAME": "app-3"
       }
     }
    ],

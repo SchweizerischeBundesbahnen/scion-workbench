@@ -10,7 +10,7 @@
 import { $, browser, ElementFinder, WebElement } from 'protractor';
 import { enterText, setAttribute } from '../spec.util';
 import { UUID } from '@scion/toolkit/util';
-import { Outlets, TestingAppPO } from '../testing-app.po';
+import { Outlets, TestingAppOrigins, TestingAppPO } from '../testing-app.po';
 import { RouterOutletContextPO } from '../context/router-outlet-context.po';
 import { RouterOutletSettingsPO } from '../settings/router-outlet-settings.po';
 
@@ -61,7 +61,7 @@ export class BrowserOutletPO {
       case OutletDescriptorTypes.PAGE_OBJECT_CLASS: {
         await this.switchToOutlet();
         const pageObjectClass = command as OutletPageObjectClass;
-        await this.enterUrlAndNavigate(new URL(`#/testing-app/${pageObjectClass.pageUrl}`, 'http://localhost:4200').toString());
+        await this.enterUrlAndNavigate(new URL(`#/testing-app/${pageObjectClass.pageUrl}`, TestingAppOrigins.APP_1).toString());
         return new pageObjectClass((): Promise<void> => this.switchToOutletIframe(true));
       }
       case OutletDescriptorTypes.PAGE_OBJECT_DESCRIPTOR: {

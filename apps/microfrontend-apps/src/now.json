@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "scion-microfrontend-platform-app",
+  "alias": [
+    "scion-microfrontend-platform-app-1",
+    "scion-microfrontend-platform-app-2",
+    "scion-microfrontend-platform-app-3",
+    "scion-microfrontend-platform-app-4"
+  ]
+}

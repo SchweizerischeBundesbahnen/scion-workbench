@@ -198,10 +198,10 @@ export namespace TopicBasedMessagingSpecs {
   export async function subscribersReceiveSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
     });
 
     const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher');
@@ -251,7 +251,7 @@ export namespace TopicBasedMessagingSpecs {
   export async function throwIfNoReplierFoundSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_2},
     });
 
     const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher');
@@ -269,10 +269,10 @@ export namespace TopicBasedMessagingSpecs {
   export async function subscribersReplySpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
     });
 
     const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher');
@@ -320,14 +320,14 @@ export namespace TopicBasedMessagingSpecs {
     const testingAppPO = new TestingAppPO();
 
     const pagePOs = await testingAppPO.navigateTo({
-      publisher_4202: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-      receiver2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      publisher_app3: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_1},
+      receiver2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
     });
 
-    const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher_4202');
+    const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher_app3');
     await publisherPO.selectMessagingModel(MessagingModel.Topic);
 
     // 'receiver1' subscribes to 'topic-1'
@@ -439,12 +439,12 @@ export namespace TopicBasedMessagingSpecs {
   export async function receiveRetainedMessagesSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      publisher_4201: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
+      publisher_app2: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_2},
       receiver: 'about:blank',
     });
 
     // publish a retained message
-    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher_4201');
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher_app2');
     await publisherPO.selectMessagingModel(MessagingModel.Topic);
     await publisherPO.enterTopic('some-topic');
     await publisherPO.toggleRetain(true);
@@ -453,35 +453,35 @@ export namespace TopicBasedMessagingSpecs {
 
     const receiverOutletPO = pagePOs.get<BrowserOutletPO>('receiver');
 
-    // test to receive retained message in LOCALHOST_4200
-    const receiver4200PO = await receiverOutletPO.enterUrl<ReceiveMessagePagePO>({useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200});
-    await receiver4200PO.selectMessagingModel(MessagingModel.Topic);
-    await receiver4200PO.enterTopic('some-topic');
-    await receiver4200PO.clickSubscribe();
-    await expect((await receiver4200PO.getFirstMessageOrElseReject()).getBody()).toEqual('retained message');
+    // test to receive retained message in app-1
+    const receiverApp1PO = await receiverOutletPO.enterUrl<ReceiveMessagePagePO>({useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_1});
+    await receiverApp1PO.selectMessagingModel(MessagingModel.Topic);
+    await receiverApp1PO.enterTopic('some-topic');
+    await receiverApp1PO.clickSubscribe();
+    await expect((await receiverApp1PO.getFirstMessageOrElseReject()).getBody()).toEqual('retained message');
 
-    // test to receive retained message in LOCALHOST_4201
-    let receiver4201PO = await receiverOutletPO.enterUrl<ReceiveMessagePagePO>({useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201});
-    await receiver4201PO.selectMessagingModel(MessagingModel.Topic);
-    await receiver4201PO.enterTopic('some-topic');
-    await receiver4201PO.clickSubscribe();
-    await expect((await receiver4201PO.getFirstMessageOrElseReject()).getBody()).toEqual('retained message');
-    await receiver4201PO.clickClearMessages();
+    // test to receive retained message in app-2
+    let receiverApp2PO = await receiverOutletPO.enterUrl<ReceiveMessagePagePO>({useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2});
+    await receiverApp2PO.selectMessagingModel(MessagingModel.Topic);
+    await receiverApp2PO.enterTopic('some-topic');
+    await receiverApp2PO.clickSubscribe();
+    await expect((await receiverApp2PO.getFirstMessageOrElseReject()).getBody()).toEqual('retained message');
+    await receiverApp2PO.clickClearMessages();
 
     // clear the retained message
     await publisherPO.enterMessage('');
     await publisherPO.clickPublish();
 
     // expect the empty message not to be dispatched
-    await expectToBeRejectedWithError(receiver4201PO.getFirstMessageOrElseReject(1000), /[TimeoutError]/);
+    await expectToBeRejectedWithError(receiverApp2PO.getFirstMessageOrElseReject(1000), /[TimeoutError]/);
 
-    // test not to receive the retained message in LOCALHOST_4201
-    receiver4201PO = await receiverOutletPO.enterUrl<ReceiveMessagePagePO>({useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203});
-    await receiver4201PO.selectMessagingModel(MessagingModel.Topic);
-    await receiver4201PO.enterTopic('some-topic');
-    await receiver4201PO.clickSubscribe();
+    // test not to receive the retained message in app-4
+    receiverApp2PO = await receiverOutletPO.enterUrl<ReceiveMessagePagePO>({useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4});
+    await receiverApp2PO.selectMessagingModel(MessagingModel.Topic);
+    await receiverApp2PO.enterTopic('some-topic');
+    await receiverApp2PO.clickSubscribe();
 
-    await expectToBeRejectedWithError(receiver4201PO.getFirstMessageOrElseReject(1000), /[TimeoutError1]/);
+    await expectToBeRejectedWithError(receiverApp2PO.getFirstMessageOrElseReject(1000), /[TimeoutError1]/);
   }
 
   /**
@@ -490,18 +490,18 @@ export namespace TopicBasedMessagingSpecs {
   export async function receiveMessagesWithoutPayloadSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      publisher_4201: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver_4202: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
+      publisher_app2: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver_app3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
     });
 
-    // test to receive retained message in LOCALHOST_4200
-    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver_4202');
+    // test to receive retained message in app-3
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver_app3');
     await receiverPO.selectMessagingModel(MessagingModel.Topic);
     await receiverPO.enterTopic('some-topic');
     await receiverPO.clickSubscribe();
 
     // publish a retained message
-    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher_4201');
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher_app2');
     await publisherPO.selectMessagingModel(MessagingModel.Topic);
     await publisherPO.enterTopic('some-topic');
     await publisherPO.clickPublish();
@@ -515,11 +515,11 @@ export namespace TopicBasedMessagingSpecs {
   export async function subscribeToMultipleTopicsSimultaneouslySpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-      receiver_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-      receiver_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4201},
-      receiver_3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4202},
-      receiver_4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4203},
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_1},
+      receiver_1: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_1},
+      receiver_2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver_3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver_4: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_4},
     });
 
     const receiver1PO = await pagePOs.get<ReceiveMessagePagePO>('receiver_1');
@@ -615,8 +615,8 @@ export namespace TopicBasedMessagingSpecs {
   export async function passHeadersSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
-      receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.LOCALHOST_4200},
+      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_1},
+      receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_1},
     });
 
     const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');

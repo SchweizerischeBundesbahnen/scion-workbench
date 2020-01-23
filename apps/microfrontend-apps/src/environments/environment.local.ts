@@ -7,24 +7,25 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
+
 export const environment = {
   production: true,
   apps: {
     app_1: {
       symbolicName: 'app-1',
-      url: 'https://scion-microfrontend-platform-app-1.now.sh',
+      url: 'http://localhost:4201',
     },
     app_2: {
       symbolicName: 'app-2',
-      url: 'https://scion-microfrontend-platform-app-2.now.sh',
+      url: 'http://localhost:4202',
     },
     app_3: {
       symbolicName: 'app-3',
-      url: 'https://scion-microfrontend-platform-app-3.now.sh',
+      url: 'http://localhost:4203',
     },
     app_4: {
       symbolicName: 'app-4',
-      url: 'https://scion-microfrontend-platform-app-4.now.sh',
+      url: 'http://localhost:4204',
     },
   },
 };

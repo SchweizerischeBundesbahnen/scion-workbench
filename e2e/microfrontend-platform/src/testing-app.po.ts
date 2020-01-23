@@ -21,7 +21,7 @@ export class TestingAppPO {
    *
    * A microfrontend is displayed inside an outlet. Multiple outlets can be configured, allowing to test multiple microfrontends in a single page.
    * Outlets can be nested. Each outlet must be given a unique name and a page object class representing the microfrontend.
-   * To load a microfrontend from a different origin than from 'http://localhost:4200', also specify the origin of the microfrontend.
+   * To load a microfrontend from a different origin than from 'http://localhost:4201', also specify the origin of the microfrontend.
    *
    * This method returns a {@link OutletPageObjectMap}. Call {@link OutletPageObjectMap#get} with the microfrontend's outlet name to get a
    * reference to the page object of that microfrontend. To get a reference to the containing outlet, append the outlet name with the suffix ':outlet'.
@@ -42,7 +42,7 @@ export class TestingAppPO {
    *   left: LeftPagePO,
    *   middle: {
    *     main: MainPagePO,
-   *     panel: {origin: TestingAppOrigins.LOCALHOST_4201, useClass: PanelPagePO},
+   *     panel: {origin: TestingAppOrigins.APP_2, useClass: PanelPagePO},
    *   },
    *   right: RightPagePO,
    * });
@@ -74,7 +74,7 @@ export class TestingAppPO {
    *   Provide a comma-separated list of app symbolic names for which to disable the 'Intention Register API'.
    * - manifestClassifier:
    *   Control which manifest files to collect by providing a classifier which is appended to the manifest filename.
-   *   E.g. if setting the classifier 'blank', the manifest 'app-4200-manifest-blank.json' is collected instead of 'app-4200-manifest.json'.
+   *   E.g. if setting the classifier 'blank', the manifest 'app-1-manifest-blank.json' is collected instead of 'app-1-manifest.json'.
    * - activatorApiDisabled:
    *   Controls if the 'Activator API' is disabled.
    *
@@ -94,7 +94,7 @@ export class TestingAppPO {
     // For root outlets, perform the initial page navigation, for child outlets navigate to the outlets page.
     const outletNames = Object.keys(outlets);
     if (parentOutletPO) {
-      await parentOutletPO.enterOutletsUrl(TestingAppOrigins.LOCALHOST_4200, outletNames);
+      await parentOutletPO.enterOutletsUrl(TestingAppOrigins.APP_1, outletNames);
     }
     else {
       const queryParamsEncoded = (queryParams.size ? `?${new URLSearchParams([...queryParams]).toString()}` : '');
@@ -184,7 +184,7 @@ function putIfAbsentOrElseThrow(map: Map<string, Object>, outletName: string, pa
  *
  * Add an entry to this dictionary for every microfrontend to load. The key is used as the outlet name. Outlets can be nested.
  * An outlet specifies the page object class which represents the microfrontend. If only specifying the page object class,
- * the microfrontend is loaded from the origin 'http://localhost:4200'. To load a microfrontend from a different origin, use
+ * the microfrontend is loaded from the origin 'http://localhost:4201'. To load a microfrontend from a different origin, use
  * a {@link OutletPageObjectDescriptor} object to configure the microfrontend instead.
  */
 export interface Outlets {
@@ -209,8 +209,8 @@ export interface OutletPageObjectMap {
  * Origins under which the testing app is served.
  */
 export enum TestingAppOrigins {
-  LOCALHOST_4200 = 'http://localhost:4200',
-  LOCALHOST_4201 = 'http://localhost:4201',
-  LOCALHOST_4202 = 'http://localhost:4202',
-  LOCALHOST_4203 = 'http://localhost:4203',
+  APP_1 = 'http://localhost:4201',
+  APP_2 = 'http://localhost:4202',
+  APP_3 = 'http://localhost:4203',
+  APP_4 = 'http://localhost:4204',
 }

@@ -14,38 +14,38 @@ describe('Messaging', () => {
     describe(`[same-origin]`, (): void => {
 
       it('allows publishing and receiving a message in root outlets', async () => {
-        await TopicBasedMessagingSpecs.RootOutlets.publishSpec(TestingAppOrigins.LOCALHOST_4201, TestingAppOrigins.LOCALHOST_4201);
+        await TopicBasedMessagingSpecs.RootOutlets.publishSpec(TestingAppOrigins.APP_2, TestingAppOrigins.APP_2);
       });
 
       it('allows publishing and receiving a message in child outlets', async () => {
-        await TopicBasedMessagingSpecs.ChildOutlets.publishSpec(TestingAppOrigins.LOCALHOST_4201, TestingAppOrigins.LOCALHOST_4201);
+        await TopicBasedMessagingSpecs.ChildOutlets.publishSpec(TestingAppOrigins.APP_2, TestingAppOrigins.APP_2);
       });
 
       it('allows replying to a message in root outlets', async () => {
-        await TopicBasedMessagingSpecs.RootOutlets.replySpec(TestingAppOrigins.LOCALHOST_4201, TestingAppOrigins.LOCALHOST_4201);
+        await TopicBasedMessagingSpecs.RootOutlets.replySpec(TestingAppOrigins.APP_2, TestingAppOrigins.APP_2);
       });
 
       it('allows replying to a message in child outlets', async () => {
-        await TopicBasedMessagingSpecs.ChildOutlets.replySpec(TestingAppOrigins.LOCALHOST_4201, TestingAppOrigins.LOCALHOST_4201);
+        await TopicBasedMessagingSpecs.ChildOutlets.replySpec(TestingAppOrigins.APP_2, TestingAppOrigins.APP_2);
       });
     });
 
     describe(`[cross-origin]`, (): void => {
 
       it('allows publishing and receiving a message in root outlets', async () => {
-        await TopicBasedMessagingSpecs.RootOutlets.publishSpec(TestingAppOrigins.LOCALHOST_4201, TestingAppOrigins.LOCALHOST_4202);
+        await TopicBasedMessagingSpecs.RootOutlets.publishSpec(TestingAppOrigins.APP_2, TestingAppOrigins.APP_3);
       });
 
       it('allows publishing and receiving a message in child outlets', async () => {
-        await TopicBasedMessagingSpecs.ChildOutlets.publishSpec(TestingAppOrigins.LOCALHOST_4201, TestingAppOrigins.LOCALHOST_4202);
+        await TopicBasedMessagingSpecs.ChildOutlets.publishSpec(TestingAppOrigins.APP_2, TestingAppOrigins.APP_3);
       });
 
       it('allows replying to a message in root outlets', async () => {
-        await TopicBasedMessagingSpecs.RootOutlets.replySpec(TestingAppOrigins.LOCALHOST_4201, TestingAppOrigins.LOCALHOST_4202);
+        await TopicBasedMessagingSpecs.RootOutlets.replySpec(TestingAppOrigins.APP_2, TestingAppOrigins.APP_3);
       });
 
       it('allows replying to a message in child outlets', async () => {
-        await TopicBasedMessagingSpecs.ChildOutlets.replySpec(TestingAppOrigins.LOCALHOST_4201, TestingAppOrigins.LOCALHOST_4202);
+        await TopicBasedMessagingSpecs.ChildOutlets.replySpec(TestingAppOrigins.APP_2, TestingAppOrigins.APP_3);
       });
     });
 
