@@ -92,6 +92,7 @@ export class SciSashboxComponent implements OnDestroy {
   @Output()
   public sashEnd = new EventEmitter<void>();
 
+  /** @internal **/
   @ContentChildren(SciSashDirective)
   public set setSashes(queryList: QueryList<SciSashDirective>) {
     queryList.changes
