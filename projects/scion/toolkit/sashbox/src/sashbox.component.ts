@@ -16,7 +16,7 @@ import { SciSashDirective } from './sash.directive';
 
 /**
  * The <sci-sashbox> is like a flexbox container and lays out its content children (sashes) in a row (which is by default)
- * or column arrangement (as specified by the direction property). A splitter is added between each sash to allow the user to
+ * or column arrangement (as specified by the direction property). A splitter is added between each child to allow the user to
  * shrink or stretch the individual sashes.
  *
  * Sashes are modelled as content children inside a <ng-template> decorated with 'sciSash' directive.
@@ -27,11 +27,15 @@ import { SciSashDirective } from './sash.directive';
  * ### Usage:
  *
  * <sci-sashbox direction="row">
- *   <ng-template sciSash size="200px" minSize="200px">
+ *   <ng-template sciSash size="1">
  *     ...
  *   </ng-template>
  *
- *   <ng-template sciSash>
+ *   <ng-template sciSash size="2">
+ *     ...
+ *   </ng-template>
+ *
+ *   <ng-template sciSash size="1">
  *     ...
  *   </ng-template>
  * </sci-sashbox>
@@ -227,7 +231,10 @@ export class SciSashboxComponent implements OnDestroy {
     this._destroy$.next();
   }
 
-  private toPixel(value: string): number {
+  private toPixel(value: string | number): number {
+    if (typeof value === 'number') {
+      return value;
+    }
     if (value.endsWith('%')) {
       const hostBounds = this._host.nativeElement.getBoundingClientRect();
       const hostSize = (this.isRowDirection ? hostBounds.width : hostBounds.height);

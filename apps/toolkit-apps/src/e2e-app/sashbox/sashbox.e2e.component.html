@@ -1,1 +1,37 @@
-sashbox-e2e
+<h1>sci-sashbox</h1>
+
+<sci-sashbox [direction]="direction">
+  <ng-container *ngFor="let sash of sashes; index as i;">
+    <ng-template sciSash *ngIf="sash.visible" [size]="sash.size" [minSize]="sash.minSize">
+      <section class="sash-{{i + 1}}">Sash {{i + 1}}</section>
+    </ng-template>
+  </ng-container>
+</sci-sashbox>
+
+<section class="settings sashbox">
+  <header>Settings</header>
+  <sci-form-field label="Direction">
+    <select [(ngModel)]="direction">
+      <option value="column">column</option>
+      <option value="row">row</option>
+    </select>
+  </sci-form-field>
+</section>
+
+<ng-container *ngFor="let sash of sashes; index as i">
+  <section class="settings">
+    <header>Settings of sash {{i + 1}}</header>
+    <sci-form-field label="Visible">
+      <sci-checkbox [(ngModel)]="sash.visible"></sci-checkbox>
+    </sci-form-field>
+
+    <sci-form-field label="Size">
+      <input [(ngModel)]="sash.size" placeholder="Value in any CSS unit or unitless as a ratio">
+    </sci-form-field>
+
+    <sci-form-field label="Min size">
+      <input [(ngModel)]="sash.minSize" placeholder="Value in pixel or percent">
+    </sci-form-field>
+  </section>
+</ng-container>
+

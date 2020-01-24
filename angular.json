@@ -143,6 +143,11 @@
             "styles": [
               "apps/toolkit-apps/src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/scion/ɵtoolkit/widgets/src/theming"
+              ]
+            },
             "scripts": []
           },
           "configurations": {

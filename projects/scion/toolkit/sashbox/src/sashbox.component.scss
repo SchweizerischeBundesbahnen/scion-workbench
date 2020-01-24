@@ -6,7 +6,10 @@
   --sci-sashbox-splitter_size: 1px; // size of the splitter along the main axis (width if direction is row, or height if direction is column)
   --sci-sashbox-splitter_sizeOnHover: 8px; // size of the splitter along the main axis when hovered
   --sci-sashbox-splitter_touchTargetSize: 15px; // touch target size to move the splitter
-  --sci-sashbox-splitter_crossAxisSize: 100%; // handle size along the cross axis (height if direction is row, or width if direction is column)
+  // Use 'auto' instead of '100%' for the cross-axis size, i.e., if the sashbox is not given an explicit height or is not placed inside a
+  // growinig/shrinking container, then the splitter height computes to 0px even if set to 100%. This is because the splitter is a flex item
+  // that is relatively positioned to form a positioning context for the 'touch-target'.
+  --sci-sashbox-splitter_crossAxisSize: auto; // handle size along the cross axis (height if direction is row, or width if direction is column)
   --sci-sashbox-splitter_borderRadius: 0; // border radius of the handle
   --sci-sashbox-splitter_opacityWhenActive: 1; // opacity of the splitter when active
   --sci-sashbox-splitter_opacityOnHover: .3; // opacity of the splitter on hover
@@ -14,6 +17,7 @@
   display: flex;
   align-items: stretch;
   box-sizing: border-box;
+  overflow: hidden;
 
   * {
     box-sizing: border-box;
@@ -102,7 +106,7 @@
 
         > div.handle {
           width: var(--sci-sashbox-splitter_size);
-          height: var(--sci-sashbox-splitter_crossAxisSize);
+          height: 100%;
         }
       }
     }
@@ -116,7 +120,7 @@
         height: var(--sci-sashbox-splitter_touchTargetSize);
 
         > div.handle {
-          width: var(--sci-sashbox-splitter_crossAxisSize);
+          width: 100%;
           height: var(--sci-sashbox-splitter_size);
         }
       }
@@ -126,18 +130,14 @@
       opacity: var(--sci-sashbox-splitter_opacityWhenActive);
     }
 
-    &.vertical:hover, &.vertical.moving {
-      > div.touch-target > div.handle {
-        background-color: var(--sci-sashbox-splitter_backgroundColor_hover);
-        width: var(--sci-sashbox-splitter_sizeOnHover);
-      }
+    &.vertical.moving > div.touch-target > div.handle, &.vertical > div.touch-target:hover > div.handle {
+      background-color: var(--sci-sashbox-splitter_backgroundColor_hover);
+      width: var(--sci-sashbox-splitter_sizeOnHover);
     }
 
-    &.horizontal:hover, &.horizontal.moving {
-      > div.touch-target > div.handle {
-        background-color: var(--sci-sashbox-splitter_backgroundColor_hover);
-        height: var(--sci-sashbox-splitter_sizeOnHover);
-      }
+    &.horizontal.moving > div.touch-target > div.handle, &.horizontal > div.touch-target:hover > div.handle {
+      background-color: var(--sci-sashbox-splitter_backgroundColor_hover);
+      height: var(--sci-sashbox-splitter_sizeOnHover);
     }
   }
 }

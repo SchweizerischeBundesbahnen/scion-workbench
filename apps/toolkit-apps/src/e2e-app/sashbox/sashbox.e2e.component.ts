@@ -6,4 +6,18 @@ import { Component } from '@angular/core';
   styleUrls: ['./sashbox.e2e.component.scss'],
 })
 export class SashboxE2eComponent {
+
+  public direction: 'row' | 'column' = 'row';
+
+  public sashes: Sash[] = [
+    {visible: true, size: '100px', minSize: 75},
+    {visible: true, size: '1', minSize: 50},
+    {visible: true, size: '100px', minSize: 75},
+  ];
+}
+
+export interface Sash {
+  visible: boolean;
+  size?: string;
+  minSize?: number;
 }

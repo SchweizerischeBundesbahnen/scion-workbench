@@ -1,2 +1,60 @@
+@import 'ɵtoolkit-widget-theme';
+
 :host {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  grid-auto-rows: min-content;
+  padding: 1em;
+  gap: 1em;
+
+  > h1 {
+    margin: 0 0 1em 0;
+    grid-column: 1/-1;
+  }
+
+  > sci-sashbox {
+    grid-column: 1/-1;
+    height: 300px;
+
+    section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.5em;
+
+      &.sash-1 {
+        background-color: #ff4d26;
+      }
+
+      &.sash-2 {
+        background-color: #307eb7;
+      }
+
+      &.sash-3 {
+        background-color: #ffa21a;
+      }
+    }
+  }
+
+  > section.settings {
+    width: 350px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: max-content;
+    row-gap: .5em;
+    margin-top: 2em;
+    border: 1px solid accentColor(.25);
+    border-radius: 5px;
+    padding: 1em;
+
+    &.sashbox {
+      grid-column: 1/-1;
+    }
+
+    > header {
+      font-weight: bold;
+      margin-bottom: 1em;
+    }
+  }
 }

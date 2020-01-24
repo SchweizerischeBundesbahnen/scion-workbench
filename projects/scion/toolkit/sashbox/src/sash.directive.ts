@@ -37,6 +37,7 @@ export class SciSashDirective implements OnInit, OnChanges {
 
   private _flexGrow: number;
   private _rowDirection: boolean;
+  private _size: string = '1'; // tslint:disable-line:no-inferrable-types
 
   /**
    * Specifies the sash size, either as fixed size with an explicit unit,
@@ -46,7 +47,9 @@ export class SciSashDirective implements OnInit, OnChanges {
    * If not set, remaining space is distributed equally.
    */
   @Input()
-  public size: string = '1'; // tslint:disable-line:no-inferrable-types
+  public set size(size: string) {
+    this._size = size || '1';
+  }
 
   /**
    * Specifies the minimal sash size in pixel or percent.
@@ -55,7 +58,7 @@ export class SciSashDirective implements OnInit, OnChanges {
    * If the unit is omitted, the value is interpreted as a pixel value.
    */
   @Input()
-  public minSize: string;
+  public minSize: string | number;
 
   /**
    * @internal
@@ -158,6 +161,10 @@ export class SciSashDirective implements OnInit, OnChanges {
       this.flexShrink = 1;
       this.flexBasis = '0';
     }
+  }
+
+  public get size(): string {
+    return this._size;
   }
 
   /**

@@ -17,7 +17,23 @@ import { SciDimensionModule } from '@scion/toolkit/dimension';
 import { SciSashInitializerDirective } from './sash-initializer.directive';
 
 /**
- * Provides a container to lay out sashes in a row or column arrangement which can be resized by the user.
+ * Provides a sashbox component that lays out its children in a row or column arrangement and places a splitter between each child.
+ *
+ * ### Usage:
+ *
+ * <sci-sashbox direction="row">
+ *   <ng-template sciSash size="1">
+ *     ...
+ *   </ng-template>
+ *
+ *   <ng-template sciSash size="2">
+ *     ...
+ *   </ng-template>
+ *
+ *   <ng-template sciSash size="1">
+ *     ...
+ *   </ng-template>
+ * </sci-sashbox>
  */
 @NgModule({
   declarations: [
