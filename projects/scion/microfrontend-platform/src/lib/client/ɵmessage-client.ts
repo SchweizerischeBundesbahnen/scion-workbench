@@ -9,7 +9,7 @@
  */
 
 import { mapToBody, MessageClient, MessageOptions, PublishOptions } from './message-client';
-import { EMPTY, from, merge, noop, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
+import { defer, EMPTY, from, merge, noop, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
 import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
 import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from '../operators';
 import { catchError, filter, finalize, first, map, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
@@ -34,47 +34,59 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
 
   public publish$<T = any>(topic: string, message?: T, options?: PublishOptions): Observable<never> {
     assertTopic(topic, {allowWildcardSegments: false});
-
-    const topicMessage: TopicMessage = {topic, retain: Defined.orElse(options && options.retain, false), headers: options && options.headers || new Map()};
-    setBodyIfDefined(topicMessage, message);
-    return this.postMessageToBroker$(MessagingChannel.Topic, topicMessage);
+    // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
+    // must be done per subscription and each subscription must be given its own headers map instance.
+    return defer(() => {
+      const topicMessage: TopicMessage = {topic, retain: Defined.orElse(options && options.retain, false), headers: copyMap(options && options.headers)};
+      setBodyIfDefined(topicMessage, message);
+      return this.postMessageToBroker$(MessagingChannel.Topic, topicMessage);
+    });
   }
 
   public request$<T>(topic: string, request?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
     assertTopic(topic, {allowWildcardSegments: false});
-
-    const topicMessage: TopicMessage = {topic, retain: false, headers: options && options.headers || new Map()};
-    setBodyIfDefined(topicMessage, request);
-    // Delay sending the request until the host platform started to not lose the request if handled by a replier in the host.
-    return from(Beans.get(HostPlatformState).whenStarted())
-      .pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Topic, topicMessage)));
+    // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
+    // must be done per subscription and each subscription must be given its own headers map instance.
+    return defer(() => {
+      const topicMessage: TopicMessage = {topic, retain: false, headers: copyMap(options && options.headers)};
+      setBodyIfDefined(topicMessage, request);
+      // Delay the request until the host has completed its startup to not lose the request if handled by a replier in the host.
+      return from(Beans.get(HostPlatformState).whenStarted()).pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Topic, topicMessage)));
+    });
   }
 
   public observe$<T>(topic: string): Observable<TopicMessage<T>> {
     assertTopic(topic, {allowWildcardSegments: true});
-    return this._observe$(topic);
+    // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization must be done per subscription.
+    return defer(() => this._observe$<T>(topic));
   }
 
   public issueIntent$<T = any>(intent: Intent, body?: T, options?: MessageOptions): Observable<never> {
     assertIntentQualifier(intent.qualifier, {allowWildcards: false});
-
-    const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: options && options.headers || new Map()};
-    setBodyIfDefined(intentMessage, body);
-    return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
+    // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
+    // must be done per subscription and each subscription must be given its own headers map instance.
+    return defer(() => {
+      const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: copyMap(options && options.headers)};
+      setBodyIfDefined(intentMessage, body);
+      return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
+    });
   }
 
   public requestByIntent$<T>(intent: Intent, body?: any, options?: MessageOptions): Observable<TopicMessage<T>> {
     assertIntentQualifier(intent.qualifier, {allowWildcards: false});
-
-    const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: options && options.headers || new Map()};
-    setBodyIfDefined(intentMessage, body);
-    // Delay sending the request until the host platform started to not lose the request if handled by a replier in the host.
-    return from(Beans.get(HostPlatformState).whenStarted())
-      .pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage)));
+    // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
+    // must be done per subscription and each subscription must be given its own headers map instance.
+    return defer(() => {
+      const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: copyMap(options && options.headers)};
+      setBodyIfDefined(intentMessage, body);
+      // Delay the request until the host has completed its startup to not lose the request if handled by a replier in the host.
+      return from(Beans.get(HostPlatformState).whenStarted()).pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage)));
+    });
   }
 
   public handleIntent$<T>(selector?: Intent): Observable<IntentMessage<T>> {
-    return this._handleIntent$(selector);
+    // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization must be done per subscription.
+    return defer(() => this._handleIntent$<T>(selector));
   }
 
   public subscriberCount$(topic: string): Observable<number> {
@@ -142,17 +154,17 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
    * @return An Observable that completes upon successful delivery, or errors otherwise.
    */
   private postMessageToBroker$(channel: MessagingChannel, message: any): Observable<never> {
-    const messageId = UUID.randomUUID();
-    const envelope: MessageEnvelope = {
-      transport: MessagingTransport.ClientToBroker,
-      channel: channel,
-      message: message,
-      messageId: messageId,
-    };
-
     return new Observable((observer: Observer<never>): TeardownLogic => {
+      const messageId = UUID.randomUUID();
       const unsubscribe$ = new Subject<void>();
       const deliveryError$ = new Subject<never>();
+
+      const envelope: MessageEnvelope = {
+        transport: MessagingTransport.ClientToBroker,
+        channel: channel,
+        message: message,
+        messageId: messageId,
+      };
 
       // Wait until the message is delivered.
       merge(this._brokerGateway.message$, deliveryError$)
@@ -176,9 +188,8 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
    * Posts a message to the message broker and receives replies.
    */
   private postMessageToBrokerAndReceiveReplies$<T = any>(channel: MessagingChannel, message: IntentMessage | TopicMessage): Observable<TopicMessage<T>> {
-    message.headers.set(MessageHeaders.ReplyTo, UUID.randomUUID());
-
     return new Observable((observer: Observer<TopicMessage>): TeardownLogic => {
+      message.headers.set(MessageHeaders.ReplyTo, UUID.randomUUID());
       const unsubscribe$ = new Subject<void>();
       const deliveryError$ = new Subject<void>();
 
