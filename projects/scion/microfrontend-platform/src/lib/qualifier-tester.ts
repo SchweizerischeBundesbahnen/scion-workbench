@@ -11,6 +11,11 @@
 import { NilQualifier, Qualifier } from './platform.model';
 
 /**
+ * Matcher function to test if two qualifiers matches.
+ */
+export type QualifierMatcher = (qualifier1: Qualifier, qualifier2: Qualifier) => boolean;
+
+/**
  * Tests if the given qualifiers are equal.
  */
 export function isEqualQualifier(qualifier1: Qualifier, qualifier2: Qualifier): boolean {

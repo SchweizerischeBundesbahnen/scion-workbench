@@ -161,4 +161,98 @@ describe('Arrays', () => {
       expect(array).toEqual(['a', 'a', 'b', 'c', 'd', 'e', 'c']);
     });
   });
+
+  describe('Arrays.intersect', () => {
+
+    it('should return an empty array if no array is given', () => {
+      expect(Arrays.intersect()).toEqual([]);
+    });
+
+    it('should return a new empty array if an empty array is given', () => {
+      const array = [];
+      expect(Arrays.intersect(array)).not.toBe(array);
+      expect(Arrays.intersect(array)).toEqual(array);
+    });
+
+    it('should return a copy of the array when a single array is given', () => {
+      const array = ['a', 'b', 'c'];
+      expect(Arrays.intersect(array)).not.toBe(array);
+      expect(Arrays.intersect(array)).toEqual(array);
+    });
+
+    it('should intersect empty arrays', () => {
+      const array1 = [];
+      const array2 = [];
+      expect(Arrays.intersect(array1, array2)).not.toBe(array1);
+      expect(Arrays.intersect(array1, array2)).not.toBe(array2);
+      expect(Arrays.intersect(array1, array2)).toEqual([]);
+    });
+
+    it('should intersect same-element arrays (same order)', () => {
+      const array1 = ['a', 'b', 'c'];
+      const array2 = ['a', 'b', 'c'];
+      expect(Arrays.intersect(array1, array2)).toEqual(['a', 'b', 'c']);
+    });
+
+    it('should intersect same-element arrays (unordered)', () => {
+      const array1 = ['a', 'b', 'c'];
+      const array2 = ['c', 'b', 'a'];
+      expect(Arrays.intersect(array1, array2)).toEqual(jasmine.arrayContaining(['a', 'b', 'c']));
+    });
+
+    it('should return an empty array if intersecting with an empty array', () => {
+      const array1 = ['a', 'b', 'c'];
+      const array2 = [];
+      expect(Arrays.intersect(array1, array2)).toEqual([]);
+      expect(Arrays.intersect(array2, array1)).toEqual([]);
+    });
+
+    it('should intersect multiple arrays', () => {
+      const array1 = ['a', 'e', 'b', 'c', 'd'];
+      const array2 = ['a', 'b', 'd', 'c'];
+      const array3 = ['c', 'a', 'b'];
+      expect(Arrays.intersect(array1, array2, array3)).toEqual(jasmine.arrayContaining(['a', 'b', 'c']));
+      expect(Arrays.intersect(array3, array1, array2)).toEqual(jasmine.arrayContaining(['a', 'b', 'c']));
+      expect(Arrays.intersect(array2, array3, array1)).toEqual(jasmine.arrayContaining(['a', 'b', 'c']));
+    });
+
+    it('should ignore `undefined` arrays', () => {
+      const array1 = ['a', 'b', 'c'];
+      const array2 = undefined;
+      const array3 = ['c', 'd', 'e'];
+      expect(Arrays.intersect(array1, array2, array3)).toEqual(jasmine.arrayContaining(['c']));
+      expect(Arrays.intersect(array3, array1, array2)).toEqual(jasmine.arrayContaining(['c']));
+      expect(Arrays.intersect(array2, array3, array1)).toEqual(jasmine.arrayContaining(['c']));
+    });
+
+    it('should ignore `null` arrays', () => {
+      const array1 = ['a', 'b', 'c'];
+      const array2 = null;
+      const array3 = ['c', 'd', 'e'];
+      expect(Arrays.intersect(array1, array2, array3)).toEqual(jasmine.arrayContaining(['c']));
+      expect(Arrays.intersect(array3, array1, array2)).toEqual(jasmine.arrayContaining(['c']));
+      expect(Arrays.intersect(array2, array3, array1)).toEqual(jasmine.arrayContaining(['c']));
+    });
+  });
+
+  describe('Arrays.from', () => {
+
+    it('should return an empty array if given a `null` value', () => {
+      expect(Arrays.from(null)).toEqual([]);
+    });
+
+    it('should return an empty array if given an `undefined` value', () => {
+      expect(Arrays.from(undefined)).toEqual([]);
+    });
+
+    it('should pack a \'non-array\' value as array', () => {
+      expect(Arrays.from('value')).toEqual(['value']);
+    });
+
+    it('should return a given array', () => {
+      const array = ['a', 'b', 'c'];
+      expect(Arrays.from(array)).toEqual(array);
+      expect(array).toBe(array);
+    });
+  });
 });

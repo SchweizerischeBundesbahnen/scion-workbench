@@ -79,9 +79,7 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intention
-    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
-    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    // do not register intention, an application can always issue intents to its private capabilities
 
     // register the capability
     const capabilityManager_app3 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3});
@@ -166,9 +164,7 @@ export namespace IntendBasedMessagingSpecs {
 
     const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
 
-    // register the intention
-    const intentionManagerPO_app3 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_3});
-    await intentionManagerPO_app3.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+    // do not register intention, an application can always issue intents to its public capabilities
 
     // register the capability
     const capabilityManagerPO_app3 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3});

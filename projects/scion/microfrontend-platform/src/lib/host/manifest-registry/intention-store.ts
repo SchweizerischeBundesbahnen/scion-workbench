@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { isEqualQualifier, matchesIntentQualifier, matchesWildcardQualifier } from '../../qualifier-tester';
-import { Intention, Qualifier } from '../../platform.model';
+import { isEqualQualifier, matchesWildcardQualifier, QualifierMatcher } from '../../qualifier-tester';
+import { Intention } from '../../platform.model';
 import { Observable, Subject } from 'rxjs';
-import { Maps } from '@scion/toolkit/util';
+import { Arrays, Maps } from '@scion/toolkit/util';
 import { IntentionFilter } from './manifest-registry';
 
 /**
@@ -19,8 +19,9 @@ import { IntentionFilter } from './manifest-registry';
  */
 export class IntentionStore {
 
-  private _intentionsByApplication = new Map<string, Intention[]>();
   private _intentionsById = new Map<string, Intention>();
+  private _intentionsByType = new Map<string, Intention[]>();
+  private _intentionsByApplication = new Map<string, Intention[]>();
   private readonly _change$ = new Subject<void>();
 
   /**
@@ -28,6 +29,7 @@ export class IntentionStore {
    */
   public add(intention: Intention): void {
     this._intentionsById.set(intention.metadata.id, intention);
+    Maps.addListValue(this._intentionsByType, intention.type, intention);
     Maps.addListValue(this._intentionsByApplication, intention.metadata.appSymbolicName, intention);
     this._change$.next();
   }
@@ -40,27 +42,11 @@ export class IntentionStore {
    * @param filter
    *        Control which intentions to remove by specifying filter criteria which are "AND"ed together.
    *        Wildcards in the qualifier criterion, if any, are not interpreted as wildcards, but as exact values instead.
-   * @param options
-   *        Control if to remove implicit or explicit (which is by default) intentions.
    */
-  public remove(appSymbolicName: string, filter: IntentionFilter & { providedBy?: string }, options?: { kind: 'implicit' | 'explicit' }): void {
-    const kind = options && options.kind || 'explicit';
-    const intentionsToRemove = (this._intentionsByApplication.get(appSymbolicName) || [])
-      .filter(intention => kind === 'explicit' ? (intention.metadata.implicitlyProvidedBy === undefined) : (intention.metadata.implicitlyProvidedBy !== undefined))
-      .filter(intention => filter.id === undefined || filter.id === intention.metadata.id)
-      .filter(intention => filter.type === undefined || filter.type === intention.type)
-      .filter(intention => filter.qualifier === undefined || isEqualQualifier(filter.qualifier, intention.qualifier))
-      .filter(intention => filter.providedBy === undefined || filter.providedBy === intention.metadata.implicitlyProvidedBy);
+  public remove(appSymbolicName: string, filter: IntentionFilter): void {
+    filter = {...filter, appSymbolicName};
+    const intentionsToRemove = this.find(filter, isEqualQualifier);
     this._remove(intentionsToRemove);
-  }
-
-  /**
-   * Returns the intention of the given id, or `undefined` if not found.
-   *
-   * @deprecated remove as only used by tests; use find(...) instead
-   */
-  public findById(id: string): Intention | undefined {
-    return this._intentionsById.get(id);
   }
 
   /**
@@ -70,24 +56,26 @@ export class IntentionStore {
    *        Control which intentions to return. The filter allows to use wildcards in the qualifier.
    *        All specified filter criteria are "AND"ed together. If no filter criterion is specified,
    *        no filtering takes place.
+   * @param qualifierMatcher
+   *        Control how to match the qualifier, if any. If not specified, {@link matchesWildcardQualifier} is used.
+   *        Use {@link matchesIntentQualifier} to find intentions matching the given intent qualifier, e.g. to check if the application has declared a respective intention.
+   *        Use {@link matchesWildcardQualifier} to find intentions matching the given wildcard qualifier, e.g. to find all the intentions matching a pattern.
    */
-  public find(filter: IntentionFilter): Intention[] {
-    return Array.from(this._intentionsById.values())
-      .filter(intention => filter.appSymbolicName === undefined || filter.appSymbolicName === intention.metadata.appSymbolicName)
-      .filter(intention => filter.id === undefined || filter.id === intention.metadata.id)
-      .filter(intention => filter.type === undefined || filter.type === intention.type)
-      .filter(intention => filter.qualifier === undefined || matchesWildcardQualifier(filter.qualifier, intention.qualifier));
-  }
+  public find(filter: IntentionFilter, qualifierMatcher: QualifierMatcher = matchesWildcardQualifier): Intention[] {
+    const filterById = filter.id !== undefined;
+    const filterByType = filter.type !== undefined;
+    const filterByApp = filter.appSymbolicName !== undefined;
 
-  /**
-   * Returns the intentions of the given application which match the given qualifier.
-   *
-   * You can use either 'intentMatcher' or 'wildcardMatcher' strategy. Use the intent matcher strategy to find intentions
-   * matching the given intent qualifier, e.g. to check if the application has declared a respective intention.
-   */
-  public findByApplication(appSymbolicName: string, qualifier: Qualifier, options: { strategy: 'intentMatcher' | 'wildcardMatcher' }): Intention[] {
-    return (this._intentionsByApplication.get(appSymbolicName) || [])
-      .filter(intention => options.strategy === 'intentMatcher' ? matchesIntentQualifier(intention.qualifier, qualifier) : matchesWildcardQualifier(intention.qualifier, qualifier));
+    return Arrays
+      .intersect(
+        filterById ? Arrays.from(this._intentionsById.get(filter.id)) : undefined,
+        filterByType ? Arrays.from(this._intentionsByType.get(filter.type)) : undefined,
+        filterByApp ? Arrays.from(this._intentionsByApplication.get(filter.appSymbolicName)) : undefined,
+        (filterById || filterByType || filterByApp) ? undefined : Array.from(this._intentionsById.values()),
+      )
+      .filter(intention => {
+        return filter.qualifier === undefined || qualifierMatcher(intention.qualifier, filter.qualifier);
+      });
   }
 
   /**
@@ -104,6 +92,7 @@ export class IntentionStore {
     let deleted = false;
     intentions.forEach(intention => {
       deleted = this._intentionsById.delete(intention.metadata.id) || deleted;
+      deleted = Maps.removeListValue(this._intentionsByType, intention.type, candidate => candidate.metadata.id === intention.metadata.id) || deleted;
       deleted = Maps.removeListValue(this._intentionsByApplication, intention.metadata.appSymbolicName, candidate => candidate.metadata.id === intention.metadata.id) || deleted;
     });
     deleted && this._change$.next();

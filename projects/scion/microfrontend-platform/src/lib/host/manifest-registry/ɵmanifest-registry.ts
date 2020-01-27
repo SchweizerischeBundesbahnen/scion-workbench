@@ -23,6 +23,7 @@ import { ApplicationRegistry } from '../application-registry';
 import { runSafe } from '../../safe-runner';
 import { filterArray } from '@scion/toolkit/operators';
 import { CapabilityProviderFilter, IntentionFilter, ManifestRegistry } from './manifest-registry';
+import { matchesIntentQualifier, matchesWildcardQualifier } from '../../qualifier-tester';
 
 // tslint:disable:unified-signatures
 export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tslint:disable-line:class-name
@@ -45,28 +46,35 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
     this.installIntentionsLookupRequestHandler();
   }
 
+  /**
+   * @inheritDoc
+   */
   public getCapabilityProvidersByIntent(intent: Intent, appSymbolicName: string): CapabilityProvider[] {
-    return this._providerStore
-      .findByType(intent.type, intent.qualifier, {strategy: 'intentMatcher'})
+    const filter = {type: intent.type, qualifier: intent.qualifier || {}};
+    return this._providerStore.find(filter, matchesIntentQualifier)
       .filter(provider => this.isProviderVisibleToApplication(provider, appSymbolicName));
   }
 
+  /**
+   * @inheritDoc
+   */
   public hasIntention(intent: Intent, appSymbolicName: string): boolean {
-    return this._intentionStore
-      .findByApplication(appSymbolicName, intent.qualifier, {strategy: 'intentMatcher'})
-      .some(intention => intention.type === intent.type);
+    const filter = {appSymbolicName, type: intent.type, qualifier: intent.qualifier || {}};
+    return (
+      this._intentionStore.find(filter, matchesIntentQualifier).length > 0 ||
+      this._providerStore.find(filter, matchesIntentQualifier).length > 0
+    );
   }
 
   /**
    * Tests whether the given app has declared a satisfying intention for the given provider.
    */
   private hasIntentionForProvider(appSymbolicName: string, provider: CapabilityProvider): boolean {
-    return this._intentionStore
-      .findByApplication(appSymbolicName, provider.qualifier, {strategy: 'wildcardMatcher'})
-      // Implicit intentions must only apply to own providers.
-      // TODO: Discuss with [mspi] if we still need implicit intentions; see test 'should not allow to unregister capability providers from other applications'
-      .filter(intention => provider.metadata.appSymbolicName === appSymbolicName || !intention.metadata.implicitlyProvidedBy)
-      .some(intention => intention.type === provider.type);
+    const filter = {appSymbolicName, type: provider.type, qualifier: provider.qualifier};
+    return (
+      provider.metadata.appSymbolicName === appSymbolicName ||
+      this._intentionStore.find(filter, matchesWildcardQualifier).length > 0
+    );
   }
 
   /**
@@ -97,20 +105,15 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
 
     // Register the provider.
     this._providerStore.add(registeredProvider);
-    // Register the provider's implicit intentions.
-    this.registerIntention({type: registeredProvider.type, qualifier: registeredProvider.qualifier}, appSymbolicName, registeredProvider.metadata.id);
 
     return registeredProvider.metadata.id;
   }
 
-  public unregisterCapabilityProviders(appSymbolicName: string, providerFilter: CapabilityProviderFilter): void {
-    this._providerStore.remove(appSymbolicName, providerFilter).forEach(provider => {
-      // Unregister the providers' implicit intentions.
-      this._intentionStore.remove(appSymbolicName, {type: provider.type, qualifier: provider.qualifier, providedBy: provider.metadata.id}, {kind: 'implicit'});
-    });
+  private unregisterCapabilityProviders(appSymbolicName: string, providerFilter: CapabilityProviderFilter): void {
+    this._providerStore.remove(appSymbolicName, providerFilter);
   }
 
-  public registerIntention(intention: Intention, appSymbolicName: string, providerId?: string): string | undefined {
+  public registerIntention(intention: Intention, appSymbolicName: string): string | undefined {
     if (!intention) {
       throw Error(`[IntentionRegisterError] Missing required intention.`);
     }
@@ -118,9 +121,8 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
     const registeredIntention: Intention = {
       ...intention,
       metadata: {
-        id: sha256(JSON.stringify({application: appSymbolicName, type: intention.type, ...intention.qualifier, providerId: providerId})).substr(0, 7), // use the first 7 digits of the intent hash as intent id
+        id: sha256(JSON.stringify({application: appSymbolicName, type: intention.type, ...intention.qualifier})).substr(0, 7), // use the first 7 digits of the intent hash as intent id
         appSymbolicName: appSymbolicName,
-        implicitlyProvidedBy: providerId,
       },
     };
 
@@ -128,8 +130,8 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
     return registeredIntention.metadata.id;
   }
 
-  public unregisterIntention(appSymbolicName: string, intentionFilter: IntentionFilter): void {
-    this._intentionStore.remove(appSymbolicName, intentionFilter, {kind: 'explicit'});
+  private unregisterIntention(appSymbolicName: string, intentionFilter: IntentionFilter): void {
+    this._intentionStore.remove(appSymbolicName, intentionFilter);
   }
 
   private installProviderRegisterRequestHandler(): void {
@@ -217,7 +219,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
         // The queried capabilities may change on both, provider or intention change, because the computation
         // of visible and qualified capabilities depends on registered providers and manifested intentions.
         const registryChange$ = merge(this._providerStore.change$, this._intentionStore.change$);
-        const finder$ = defer(() => of(this._providerStore.find(lookupFilter)));
+        const finder$ = defer(() => of(this._providerStore.find(lookupFilter, matchesWildcardQualifier)));
         return finder$
           .pipe(
             expand(() => registryChange$.pipe(take(1), mergeMapTo(finder$))),
@@ -239,7 +241,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
         const replyTo = request.headers.get(MessageHeaders.ReplyTo);
         const lookupFilter = request.body || {};
 
-        const finder$ = defer(() => of(this._intentionStore.find(lookupFilter)));
+        const finder$ = defer(() => of(this._intentionStore.find(lookupFilter, matchesWildcardQualifier)));
         return finder$
           .pipe(
             expand(() => this._intentionStore.change$.pipe(take(1), mergeMapTo(finder$))),

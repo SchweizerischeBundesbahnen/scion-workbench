@@ -23,7 +23,7 @@ export abstract class ManifestRegistry {
   abstract getCapabilityProvidersByIntent(intent: Intent, appSymbolicName: string): CapabilityProvider[];
 
   /**
-   * Tests whether the given app has declared an intention (explicit or implicit) for the given intent.
+   * Tests whether the given app has declared an intention for the given intent, or is providing a capability fulfilling the given intent.
    */
   abstract hasIntention(intent: Intent, appSymbolicName: string): boolean;
 
@@ -33,25 +33,9 @@ export abstract class ManifestRegistry {
   abstract registerCapabilityProvider(provider: CapabilityProvider, appSymbolicName: string): string | undefined;
 
   /**
-   * Unregisters capability providers which match the given filter from the given application.
-   *
-   * If given a qualifier in the filter, wildcards, if any, are not interpreted as wildcards, but as exact values instead.
-   */
-  abstract unregisterCapabilityProviders(appSymbolicName: string, providerFilter: CapabilityProviderFilter): void;
-
-  /**
    * Registers the given intention for the given application.
-   *
-   * If registering the intention as an implicit intention, also provide the provider's identity.
    */
-  abstract registerIntention(intention: Intention, appSymbolicName: string, providerId?: string): string | undefined;
-
-  /**
-   * Unregisters intentions which match the given filter from the given application.
-   *
-   * If given a qualifier in the filter, wildcards, if any, are not interpreted as wildcards, but as exact values instead.
-   */
-  abstract unregisterIntention(appSymbolicName: string, intentFilter: IntentionFilter): void;
+  abstract registerIntention(intention: Intention, appSymbolicName: string): string | undefined;
 }
 
 /**

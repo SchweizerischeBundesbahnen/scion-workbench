@@ -9,6 +9,7 @@
  */
 import { ProviderStore } from './provider-store';
 import { CapabilityProvider } from '../../platform.model';
+import { matchesIntentQualifier, matchesWildcardQualifier } from '../../qualifier-tester';
 
 describe('CapabilityProviderStore', () => {
   let store: ProviderStore;
@@ -19,34 +20,124 @@ describe('CapabilityProviderStore', () => {
 
   describe('add and find capability providers', () => {
 
+    describe('find using no matching strategy', () => {
+
+      it('should find providers by id', () => {
+        const undefinedQualifierProvider: CapabilityProvider = {type: 'type1', metadata: {id: 'id_undefinedQualifierProvider', appSymbolicName: 'app'}};
+        const nullQualifierProvider: CapabilityProvider = {type: 'type1', qualifier: null, metadata: {id: 'id_nullQualifierProvider', appSymbolicName: 'app'}};
+        const emptyQualifierProvider: CapabilityProvider = {type: 'type1', qualifier: {}, metadata: {id: 'id_emptyQualifierProvider', appSymbolicName: 'app'}};
+        const asteriskQualifierProvider: CapabilityProvider = {type: 'type2', qualifier: {entity: '*'}, metadata: {id: 'id_asteriskQualifierProvider', appSymbolicName: 'app'}};
+        const optionalQualifierProvider: CapabilityProvider = {type: 'type2', qualifier: {entity: '?'}, metadata: {id: 'id_optionalQualifierProvider', appSymbolicName: 'app'}};
+        const exactQualifierProvider: CapabilityProvider = {type: 'type3', qualifier: {entity: 'test'}, metadata: {id: 'id_exactQualifierProvider', appSymbolicName: 'app'}};
+
+        store.add(undefinedQualifierProvider);
+        store.add(nullQualifierProvider);
+        store.add(emptyQualifierProvider);
+        store.add(asteriskQualifierProvider);
+        store.add(optionalQualifierProvider);
+        store.add(exactQualifierProvider);
+
+        expect(store.find({id: 'id_undefinedQualifierProvider'})).toEqual([undefinedQualifierProvider]);
+        expect(store.find({id: 'id_nullQualifierProvider'})).toEqual([nullQualifierProvider]);
+        expect(store.find({id: 'id_emptyQualifierProvider'})).toEqual([emptyQualifierProvider]);
+        expect(store.find({id: 'id_asteriskQualifierProvider'})).toEqual([asteriskQualifierProvider]);
+        expect(store.find({id: 'id_optionalQualifierProvider'})).toEqual([optionalQualifierProvider]);
+        expect(store.find({id: 'id_exactQualifierProvider'})).toEqual([exactQualifierProvider]);
+      });
+
+      it('should find providers by type', () => {
+        const undefinedQualifierProvider: CapabilityProvider = {type: 'type1', metadata: {id: 'id_undefinedQualifierProvider', appSymbolicName: 'app'}};
+        const nullQualifierProvider: CapabilityProvider = {type: 'type1', qualifier: null, metadata: {id: 'id_nullQualifierProvider', appSymbolicName: 'app'}};
+        const emptyQualifierProvider: CapabilityProvider = {type: 'type1', qualifier: {}, metadata: {id: 'id_emptyQualifierProvider', appSymbolicName: 'app'}};
+        const asteriskQualifierProvider: CapabilityProvider = {type: 'type2', qualifier: {entity: '*'}, metadata: {id: 'id_asteriskQualifierProvider', appSymbolicName: 'app'}};
+        const optionalQualifierProvider: CapabilityProvider = {type: 'type2', qualifier: {entity: '?'}, metadata: {id: 'id_optionalQualifierProvider', appSymbolicName: 'app'}};
+        const exactQualifierProvider: CapabilityProvider = {type: 'type3', qualifier: {entity: 'test'}, metadata: {id: 'id_exactQualifierProvider', appSymbolicName: 'app'}};
+
+        store.add(undefinedQualifierProvider);
+        store.add(nullQualifierProvider);
+        store.add(emptyQualifierProvider);
+        store.add(asteriskQualifierProvider);
+        store.add(optionalQualifierProvider);
+        store.add(exactQualifierProvider);
+
+        expect(store.find({type: 'type1'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider]);
+        expect(store.find({type: 'type2'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({type: 'type3'})).toEqual([exactQualifierProvider]);
+      });
+
+      it('should find providers by qualifier', () => {
+        const undefinedQualifierProvider: CapabilityProvider = {type: 'type1', metadata: {id: 'id_undefinedQualifierProvider', appSymbolicName: 'app'}};
+        const nullQualifierProvider: CapabilityProvider = {type: 'type1', qualifier: null, metadata: {id: 'id_nullQualifierProvider', appSymbolicName: 'app'}};
+        const emptyQualifierProvider: CapabilityProvider = {type: 'type1', qualifier: {}, metadata: {id: 'id_emptyQualifierProvider', appSymbolicName: 'app'}};
+        const asteriskQualifierProvider: CapabilityProvider = {type: 'type2', qualifier: {entity: '*'}, metadata: {id: 'id_asteriskQualifierProvider', appSymbolicName: 'app'}};
+        const optionalQualifierProvider: CapabilityProvider = {type: 'type2', qualifier: {entity: '?'}, metadata: {id: 'id_optionalQualifierProvider', appSymbolicName: 'app'}};
+        const exactQualifierProvider: CapabilityProvider = {type: 'type3', qualifier: {entity: 'test'}, metadata: {id: 'id_exactQualifierProvider', appSymbolicName: 'app'}};
+
+        store.add(undefinedQualifierProvider);
+        store.add(nullQualifierProvider);
+        store.add(emptyQualifierProvider);
+        store.add(asteriskQualifierProvider);
+        store.add(optionalQualifierProvider);
+        store.add(exactQualifierProvider);
+
+        expect(store.find({qualifier: undefined})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({qualifier: null})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({qualifier: {}})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({qualifier: {'*': '*'}})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({qualifier: {'entity': '*'}})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({qualifier: {'entity': '?'}})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({qualifier: {'entity': 'test'}})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+      });
+
+      it('should find providers by application', () => {
+        const undefinedQualifierProvider: CapabilityProvider = {type: 'type1', metadata: {id: 'id_undefinedQualifierProvider', appSymbolicName: 'app1'}};
+        const nullQualifierProvider: CapabilityProvider = {type: 'type1', qualifier: null, metadata: {id: 'id_nullQualifierProvider', appSymbolicName: 'app1'}};
+        const emptyQualifierProvider: CapabilityProvider = {type: 'type1', qualifier: {}, metadata: {id: 'id_emptyQualifierProvider', appSymbolicName: 'app2'}};
+        const asteriskQualifierProvider: CapabilityProvider = {type: 'type2', qualifier: {entity: '*'}, metadata: {id: 'id_asteriskQualifierProvider', appSymbolicName: 'app2'}};
+        const optionalQualifierProvider: CapabilityProvider = {type: 'type2', qualifier: {entity: '?'}, metadata: {id: 'id_optionalQualifierProvider', appSymbolicName: 'app3'}};
+        const exactQualifierProvider: CapabilityProvider = {type: 'type3', qualifier: {entity: 'test'}, metadata: {id: 'id_exactQualifierProvider', appSymbolicName: 'app3'}};
+
+        store.add(undefinedQualifierProvider);
+        store.add(nullQualifierProvider);
+        store.add(emptyQualifierProvider);
+        store.add(asteriskQualifierProvider);
+        store.add(optionalQualifierProvider);
+        store.add(exactQualifierProvider);
+
+        expect(store.find({appSymbolicName: 'app1'})).toEqual([undefinedQualifierProvider, nullQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app2'})).toEqual([emptyQualifierProvider, asteriskQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app3'})).toEqual([optionalQualifierProvider, exactQualifierProvider]);
+      });
+    });
+
     describe('find using \'wildcardMatcher\' strategy', () => {
       it('should not find providers if the store is empty', () => {
-        expect(store.findById('id')).toBeUndefined();
-        expect(store.findByType('type', undefined, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByType('type', null, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByType('type', {}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByType('type', {entity: '?'}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByApplication('app', undefined)).toEqual([]);
-        expect(store.findByApplication('app', null)).toEqual([]);
-        expect(store.findByApplication('app', {})).toEqual([]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([]);
+        expect(store.find({id: 'id'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: undefined}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: null}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {entity: '?'}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: undefined}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: null}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
       });
 
       it('should find providers by id, type and app', () => {
         const provider: CapabilityProvider = {type: 'type', metadata: {id: 'id', appSymbolicName: 'app'}};
         store.add(provider);
 
-        expect(store.findById('id')).toEqual(provider);
-        expect(store.findByType('type', undefined, {strategy: 'wildcardMatcher'})).toEqual([provider]);
-        expect(store.findByType('type', null, {strategy: 'wildcardMatcher'})).toEqual([provider]);
-        expect(store.findByType('type', {}, {strategy: 'wildcardMatcher'})).toEqual([provider]);
-        expect(store.findByType('type', {entity: '?'}, {strategy: 'wildcardMatcher'})).toEqual([provider]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([provider]);
-        expect(store.findByApplication('app', undefined)).toEqual([provider]);
-        expect(store.findByApplication('app', null)).toEqual([provider]);
-        expect(store.findByApplication('app', {})).toEqual([provider]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([provider]);
+        expect(store.find({id: 'id'})).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: undefined}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: null}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: {entity: '?'}}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: undefined}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: null}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider]);
       });
 
       it('should find providers of the same type', () => {
@@ -55,23 +146,23 @@ describe('CapabilityProviderStore', () => {
         store.add(provider1);
         store.add(provider2);
 
-        expect(store.findById('id1')).toEqual(provider1);
-        expect(store.findById('id2')).toEqual(provider2);
-        expect(store.findByType('type', undefined, {strategy: 'wildcardMatcher'})).toEqual([provider1, provider2]);
-        expect(store.findByType('type', null, {strategy: 'wildcardMatcher'})).toEqual([provider1, provider2]);
-        expect(store.findByType('type', {}, {strategy: 'wildcardMatcher'})).toEqual([provider1, provider2]);
-        expect(store.findByType('type', {entity: '?'}, {strategy: 'wildcardMatcher'})).toEqual([provider1, provider2]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([provider1, provider2]);
-        expect(store.findByApplication('app1', undefined)).toEqual([provider1]);
-        expect(store.findByApplication('app1', null)).toEqual([provider1]);
-        expect(store.findByApplication('app1', {})).toEqual([provider1]);
-        expect(store.findByApplication('app1', {entity: '?'})).toEqual([provider1]);
-        expect(store.findByApplication('app1', {'*': '*'})).toEqual([provider1]);
-        expect(store.findByApplication('app2', undefined)).toEqual([provider2]);
-        expect(store.findByApplication('app2', null)).toEqual([provider2]);
-        expect(store.findByApplication('app2', {})).toEqual([provider2]);
-        expect(store.findByApplication('app2', {entity: '?'})).toEqual([provider2]);
-        expect(store.findByApplication('app2', {'*': '*'})).toEqual([provider2]);
+        expect(store.find({id: 'id1'})).toEqual([provider1]);
+        expect(store.find({id: 'id2'})).toEqual([provider2]);
+        expect(store.find({type: 'type', qualifier: undefined}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({type: 'type', qualifier: null}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({type: 'type', qualifier: {entity: '?'}}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({appSymbolicName: 'app1', qualifier: undefined}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({appSymbolicName: 'app1', qualifier: null}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({appSymbolicName: 'app1', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({appSymbolicName: 'app1', qualifier: {entity: '?'}}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({appSymbolicName: 'app1', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({appSymbolicName: 'app2', qualifier: undefined}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({appSymbolicName: 'app2', qualifier: null}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({appSymbolicName: 'app2', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({appSymbolicName: 'app2', qualifier: {entity: '?'}}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({appSymbolicName: 'app2', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider2]);
       });
 
       it('should find providers of the same app', () => {
@@ -80,23 +171,23 @@ describe('CapabilityProviderStore', () => {
         store.add(provider1);
         store.add(provider2);
 
-        expect(store.findById('id1')).toEqual(provider1);
-        expect(store.findById('id2')).toEqual(provider2);
-        expect(store.findByType('type1', undefined, {strategy: 'wildcardMatcher'})).toEqual([provider1]);
-        expect(store.findByType('type1', null, {strategy: 'wildcardMatcher'})).toEqual([provider1]);
-        expect(store.findByType('type1', {}, {strategy: 'wildcardMatcher'})).toEqual([provider1]);
-        expect(store.findByType('type1', {entity: '?'}, {strategy: 'wildcardMatcher'})).toEqual([provider1]);
-        expect(store.findByType('type1', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([provider1]);
-        expect(store.findByType('type2', undefined, {strategy: 'wildcardMatcher'})).toEqual([provider2]);
-        expect(store.findByType('type2', null, {strategy: 'wildcardMatcher'})).toEqual([provider2]);
-        expect(store.findByType('type2', {}, {strategy: 'wildcardMatcher'})).toEqual([provider2]);
-        expect(store.findByType('type2', {entity: '?'}, {strategy: 'wildcardMatcher'})).toEqual([provider2]);
-        expect(store.findByType('type2', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([provider2]);
-        expect(store.findByApplication('app', undefined)).toEqual([provider1, provider2]);
-        expect(store.findByApplication('app', null)).toEqual([provider1, provider2]);
-        expect(store.findByApplication('app', {})).toEqual([provider1, provider2]);
-        expect(store.findByApplication('app', {entity: '?'})).toEqual([provider1, provider2]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([provider1, provider2]);
+        expect(store.find({id: 'id1'})).toEqual([provider1]);
+        expect(store.find({id: 'id2'})).toEqual([provider2]);
+        expect(store.find({type: 'type1', qualifier: undefined}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({type: 'type1', qualifier: null}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({type: 'type1', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({type: 'type1', qualifier: {entity: '?'}}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({type: 'type1', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider1]);
+        expect(store.find({type: 'type2', qualifier: undefined}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({type: 'type2', qualifier: null}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({type: 'type2', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({type: 'type2', qualifier: {entity: '?'}}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({type: 'type2', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider2]);
+        expect(store.find({appSymbolicName: 'app', qualifier: undefined}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({appSymbolicName: 'app', qualifier: null}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {entity: '?'}}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider1, provider2]);
       });
 
       it('should find providers by app and qualifier', () => {
@@ -114,34 +205,34 @@ describe('CapabilityProviderStore', () => {
         store.add(optionalQualifierProvider);
         store.add(exactQualifierProvider);
 
-        expect(store.findByApplication('app', undefined)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByApplication('app', null)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByApplication('app', {})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'entity': '*'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'entity': '?'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'entity': 'test'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: undefined}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: null}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {}}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '*'}}, matchesWildcardQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '?'}}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'entity': 'test'}}, matchesWildcardQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
       });
     });
 
     describe('find using \'intentMatcher\' strategy', () => {
       it('should not find providers if the store is empty', () => {
-        expect(store.findByType('type', undefined, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type', null, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type', {}, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type', {entity: '?'}, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'intentMatcher'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: undefined}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: null}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {entity: '?'}}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesIntentQualifier)).toEqual([]);
       });
 
       it('should find provider by type', () => {
         const provider: CapabilityProvider = {type: 'type', metadata: {id: 'id', appSymbolicName: 'app'}};
         store.add(provider);
 
-        expect(store.findByType('type', undefined, {strategy: 'intentMatcher'})).toEqual([provider]);
-        expect(store.findByType('type', null, {strategy: 'intentMatcher'})).toEqual([provider]);
-        expect(store.findByType('type', {}, {strategy: 'intentMatcher'})).toEqual([provider]);
-        expect(store.findByType('type', {entity: '?'}, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'intentMatcher'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: undefined}, matchesIntentQualifier)).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: null}, matchesIntentQualifier)).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesIntentQualifier)).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: {entity: '?'}}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesIntentQualifier)).toEqual([]);
       });
 
       it('should find providers of the same type', () => {
@@ -150,11 +241,11 @@ describe('CapabilityProviderStore', () => {
         store.add(provider1);
         store.add(provider2);
 
-        expect(store.findByType('type', undefined, {strategy: 'intentMatcher'})).toEqual([provider1, provider2]);
-        expect(store.findByType('type', null, {strategy: 'intentMatcher'})).toEqual([provider1, provider2]);
-        expect(store.findByType('type', {}, {strategy: 'intentMatcher'})).toEqual([provider1, provider2]);
-        expect(store.findByType('type', {entity: '?'}, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'intentMatcher'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: undefined}, matchesIntentQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({type: 'type', qualifier: null}, matchesIntentQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesIntentQualifier)).toEqual([provider1, provider2]);
+        expect(store.find({type: 'type', qualifier: {entity: '?'}}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesIntentQualifier)).toEqual([]);
       });
 
       it('should find providers of the same app', () => {
@@ -163,16 +254,16 @@ describe('CapabilityProviderStore', () => {
         store.add(provider1);
         store.add(provider2);
 
-        expect(store.findByType('type1', undefined, {strategy: 'intentMatcher'})).toEqual([provider1]);
-        expect(store.findByType('type1', null, {strategy: 'intentMatcher'})).toEqual([provider1]);
-        expect(store.findByType('type1', {}, {strategy: 'intentMatcher'})).toEqual([provider1]);
-        expect(store.findByType('type1', {entity: '?'}, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type1', {'*': '*'}, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type2', undefined, {strategy: 'intentMatcher'})).toEqual([provider2]);
-        expect(store.findByType('type2', null, {strategy: 'intentMatcher'})).toEqual([provider2]);
-        expect(store.findByType('type2', {}, {strategy: 'intentMatcher'})).toEqual([provider2]);
-        expect(store.findByType('type2', {entity: '?'}, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type2', {'*': '*'}, {strategy: 'intentMatcher'})).toEqual([]);
+        expect(store.find({type: 'type1', qualifier: undefined}, matchesIntentQualifier)).toEqual([provider1]);
+        expect(store.find({type: 'type1', qualifier: null}, matchesIntentQualifier)).toEqual([provider1]);
+        expect(store.find({type: 'type1', qualifier: {}}, matchesIntentQualifier)).toEqual([provider1]);
+        expect(store.find({type: 'type1', qualifier: {entity: '?'}}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type1', qualifier: {'*': '*'}}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type2', qualifier: undefined}, matchesIntentQualifier)).toEqual([provider2]);
+        expect(store.find({type: 'type2', qualifier: null}, matchesIntentQualifier)).toEqual([provider2]);
+        expect(store.find({type: 'type2', qualifier: {}}, matchesIntentQualifier)).toEqual([provider2]);
+        expect(store.find({type: 'type2', qualifier: {entity: '?'}}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type2', qualifier: {'*': '*'}}, matchesIntentQualifier)).toEqual([]);
       });
 
       it('should find providers by type and qualifier', () => {
@@ -190,13 +281,13 @@ describe('CapabilityProviderStore', () => {
         store.add(optionalQualifierProvider);
         store.add(exactQualifierProvider);
 
-        expect(store.findByType('type', undefined, {strategy: 'intentMatcher'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByType('type', null, {strategy: 'intentMatcher'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByType('type', {}, {strategy: 'intentMatcher'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'intentMatcher'})).toEqual([]);
-        expect(store.findByType('type', {'entity': '*'}, {strategy: 'intentMatcher'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByType('type', {'entity': '?'}, {strategy: 'intentMatcher'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByType('type', {'entity': 'test'}, {strategy: 'intentMatcher'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: undefined}, matchesIntentQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: null}, matchesIntentQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesIntentQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesIntentQualifier)).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'entity': '*'}}, matchesIntentQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'entity': '?'}}, matchesIntentQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'entity': 'test'}}, matchesIntentQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
       });
     });
   });
@@ -206,7 +297,7 @@ describe('CapabilityProviderStore', () => {
       it('should do nothing if no provider with the given id exists', () => {
         store.remove('app', {id: 'non_existant_id'});
 
-        expect(store.findById('non_existant_id')).toBeUndefined();
+        expect(store.find({id: 'non_existant_id'})).toEqual([]);
       });
 
       it('should do nothing if no provider of given type and qualifier exists (empty qualifier)', () => {
@@ -214,19 +305,19 @@ describe('CapabilityProviderStore', () => {
         store.remove('app', {type: 'type', qualifier: null});
         store.remove('app', {type: 'type', qualifier: {}});
 
-        expect(store.findByType('type', {}, {strategy: 'wildcardMatcher'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesWildcardQualifier)).toEqual([]);
       });
 
       it('should do nothing if no provider of given type and qualifier exists (absolute wildcard qualifier)', () => {
         store.remove('app', {type: 'type', qualifier: {'*': '*'}});
 
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
       });
 
       it('should do nothing if no provider of given type and qualifier exists (exact qualifier)', () => {
         store.remove('app', {type: 'type', qualifier: {entity: 'test'}});
 
-        expect(store.findByType('type', {entity: 'test'}, {strategy: 'wildcardMatcher'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {entity: 'test'}}, matchesWildcardQualifier)).toEqual([]);
       });
     });
 
@@ -236,9 +327,9 @@ describe('CapabilityProviderStore', () => {
         store.add(provider);
         store.remove('app', {id: 'id'});
 
-        expect(store.findById('id')).toBeUndefined();
-        expect(store.findByType('type', {}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByApplication('app', {})).toEqual([]);
+        expect(store.find({id: 'id'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {}})).toEqual([]);
       });
 
       it('should not remove any provider if no provider with the given id exists', () => {
@@ -246,9 +337,9 @@ describe('CapabilityProviderStore', () => {
         store.add(provider);
         store.remove('app', {id: 'non-existent'});
 
-        expect(store.findById('id')).toBe(provider);
-        expect(store.findByType('type', {}, {strategy: 'wildcardMatcher'})).toEqual([provider]);
-        expect(store.findByApplication('app', {})).toEqual([provider]);
+        expect(store.find({id: 'id'})).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {}})).toEqual([provider]);
       });
     });
 
@@ -261,11 +352,11 @@ describe('CapabilityProviderStore', () => {
 
         store.remove('app', {type: 'type1', qualifier: {'*': '*'}});
 
-        expect(store.findById('id1')).toBeUndefined();
-        expect(store.findById('id2')).toBe(type2QualifierProvider);
-        expect(store.findByType('type1', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByType('type2', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([type2QualifierProvider]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([type2QualifierProvider]);
+        expect(store.find({id: 'id1'})).toEqual([]);
+        expect(store.find({id: 'id2'})).toEqual([type2QualifierProvider]);
+        expect(store.find({type: 'type1', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({type: 'type2', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([type2QualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([type2QualifierProvider]);
       });
 
       it('should remove providers of the app \'app1\'', () => {
@@ -276,11 +367,11 @@ describe('CapabilityProviderStore', () => {
 
         store.remove('app1', {type: 'type', qualifier: {'*': '*'}});
 
-        expect(store.findById('id1')).toBeUndefined();
-        expect(store.findById('id2')).toBe(app2QualifierProvider);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([app2QualifierProvider]);
-        expect(store.findByApplication('app1', {'*': '*'})).toEqual([]);
-        expect(store.findByApplication('app2', {'*': '*'})).toEqual([app2QualifierProvider]);
+        expect(store.find({id: 'id1'})).toEqual([]);
+        expect(store.find({id: 'id2'})).toEqual([app2QualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([app2QualifierProvider]);
+        expect(store.find({appSymbolicName: 'app1', qualifier: {'*': '*'}})).toEqual([]);
+        expect(store.find({appSymbolicName: 'app2', qualifier: {'*': '*'}})).toEqual([app2QualifierProvider]);
       });
     });
 
@@ -296,12 +387,12 @@ describe('CapabilityProviderStore', () => {
         store.add(provider4);
         store.remove('app', {type: 'type', qualifier: undefined});
 
-        expect(store.findById('id1')).toBeUndefined();
-        expect(store.findById('id2')).toBeUndefined();
-        expect(store.findById('id3')).toBeUndefined();
-        expect(store.findById('id4')).toBeUndefined();
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([]);
+        expect(store.find({id: 'id1'})).toEqual([]);
+        expect(store.find({id: 'id2'})).toEqual([]);
+        expect(store.find({id: 'id3'})).toEqual([]);
+        expect(store.find({id: 'id4'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([]);
       });
 
       it('should remove providers matching the `null` qualifier', () => {
@@ -315,12 +406,12 @@ describe('CapabilityProviderStore', () => {
         store.add(provider4);
         store.remove('app', {type: 'type', qualifier: null});
 
-        expect(store.findById('id1')).toBeUndefined();
-        expect(store.findById('id2')).toBeUndefined();
-        expect(store.findById('id3')).toBeUndefined();
-        expect(store.findById('id4')).toBeUndefined();
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([]);
+        expect(store.find({id: 'id1'})).toEqual([]);
+        expect(store.find({id: 'id2'})).toEqual([]);
+        expect(store.find({id: 'id3'})).toEqual([]);
+        expect(store.find({id: 'id4'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([]);
       });
 
       it('should remove providers matching the empty qualifier', () => {
@@ -334,12 +425,12 @@ describe('CapabilityProviderStore', () => {
         store.add(provider4);
         store.remove('app', {type: 'type', qualifier: {}});
 
-        expect(store.findById('id1')).toBeUndefined();
-        expect(store.findById('id2')).toBeUndefined();
-        expect(store.findById('id3')).toBeUndefined();
-        expect(store.findById('id4')).toBeUndefined();
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([]);
+        expect(store.find({id: 'id1'})).toEqual([]);
+        expect(store.find({id: 'id2'})).toEqual([]);
+        expect(store.find({id: 'id3'})).toEqual([]);
+        expect(store.find({id: 'id4'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([]);
       });
 
       it('should not interpret wildcards in the qualifier when removing providers (optional wildcard as qualifier value)', () => {
@@ -353,12 +444,12 @@ describe('CapabilityProviderStore', () => {
         store.add(provider4);
         store.remove('app', {type: 'type', qualifier: {entity: '?'}});
 
-        expect(store.findById('id1')).toBe(provider1);
-        expect(store.findById('id2')).toBe(provider2);
-        expect(store.findById('id3')).toBe(provider3);
-        expect(store.findById('id4')).toBe(provider4);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([provider1, provider2, provider3, provider4]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([provider1, provider2, provider3, provider4]);
+        expect(store.find({id: 'id1'})).toEqual([provider1]);
+        expect(store.find({id: 'id2'})).toEqual([provider2]);
+        expect(store.find({id: 'id3'})).toEqual([provider3]);
+        expect(store.find({id: 'id4'})).toEqual([provider4]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider1, provider2, provider3, provider4]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([provider1, provider2, provider3, provider4]);
       });
 
       it('should not interpret wildcards in the qualifier when removing providers (asterisk wildcard as qualifier key and value)', () => {
@@ -372,12 +463,12 @@ describe('CapabilityProviderStore', () => {
         store.add(provider4);
         store.remove('app', {type: 'type', qualifier: {'*': '*'}});
 
-        expect(store.findById('id1')).toBe(provider1);
-        expect(store.findById('id2')).toBe(provider2);
-        expect(store.findById('id3')).toBe(provider3);
-        expect(store.findById('id4')).toBe(provider4);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([provider1, provider2, provider3, provider4]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([provider1, provider2, provider3, provider4]);
+        expect(store.find({id: 'id1'})).toEqual([provider1]);
+        expect(store.find({id: 'id2'})).toEqual([provider2]);
+        expect(store.find({id: 'id3'})).toEqual([provider3]);
+        expect(store.find({id: 'id4'})).toEqual([provider4]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([provider1, provider2, provider3, provider4]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([provider1, provider2, provider3, provider4]);
       });
 
       it('should remove providers using an exact qualifier as deletion criterion', () => {
@@ -385,9 +476,9 @@ describe('CapabilityProviderStore', () => {
         store.add(provider);
         store.remove('app', {type: 'type', qualifier: {'entity': 'test'}});
 
-        expect(store.findById('id')).toBeUndefined();
-        expect(store.findByType('type', {'entity': 'test'}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByApplication('app', {'entity': 'test'})).toEqual([]);
+        expect(store.find({id: 'id'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'entity': 'test'}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'entity': 'test'}})).toEqual([]);
       });
 
       it('should remove providers which contain the asterisk value wildcard in their qualifier', () => {
@@ -395,9 +486,9 @@ describe('CapabilityProviderStore', () => {
         store.add(provider);
         store.remove('app', {type: 'type', qualifier: {'entity': 'test'}});
 
-        expect(store.findById('id')).toBe(provider);
-        expect(store.findByType('type', {'entity': '*'}, {strategy: 'wildcardMatcher'})).toEqual([provider]);
-        expect(store.findByApplication('app', {'entity': '*'})).toEqual([provider]);
+        expect(store.find({id: 'id'})).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: {'entity': '*'}}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '*'}})).toEqual([provider]);
       });
 
       it('should remove providers which contain the optional value wildcard in their qualifier', () => {
@@ -405,9 +496,9 @@ describe('CapabilityProviderStore', () => {
         store.add(provider);
         store.remove('app', {type: 'type', qualifier: {'entity': 'test'}});
 
-        expect(store.findById('id')).toBe(provider);
-        expect(store.findByType('type', {'entity': '?'}, {strategy: 'wildcardMatcher'})).toEqual([provider]);
-        expect(store.findByApplication('app', {'entity': '?'})).toEqual([provider]);
+        expect(store.find({id: 'id'})).toEqual([provider]);
+        expect(store.find({type: 'type', qualifier: {'entity': '?'}}, matchesWildcardQualifier)).toEqual([provider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '?'}})).toEqual([provider]);
       });
 
       it('should remove providers matching the `undefined` qualifier', () => {
@@ -427,16 +518,16 @@ describe('CapabilityProviderStore', () => {
 
         store.remove('app', {type: 'type', qualifier: undefined});
 
-        expect(store.findById('id_undefinedQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_nullQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_emptyQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_asteriskQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_optionalQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_exactQualifierProvider')).toBeUndefined();
-        expect(store.findByType('type', undefined, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByApplication('app', undefined)).toEqual([]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([]);
+        expect(store.find({id: 'id_undefinedQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_nullQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_emptyQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_asteriskQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_optionalQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_exactQualifierProvider'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: undefined}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: undefined})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([]);
       });
 
       it('should remove providers matching the `null` qualifier', () => {
@@ -456,16 +547,16 @@ describe('CapabilityProviderStore', () => {
 
         store.remove('app', {type: 'type', qualifier: null});
 
-        expect(store.findById('id_undefinedQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_nullQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_emptyQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_asteriskQualifierProvider')).toBe(asteriskQualifierProvider);
-        expect(store.findById('id_optionalQualifierProvider')).toBe(optionalQualifierProvider);
-        expect(store.findById('id_exactQualifierProvider')).toBe(exactQualifierProvider);
-        expect(store.findByType('type', null, {strategy: 'wildcardMatcher'})).toEqual([optionalQualifierProvider]);
-        expect(store.findByApplication('app', null)).toEqual([optionalQualifierProvider]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({id: 'id_undefinedQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_nullQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_emptyQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_asteriskQualifierProvider'})).toEqual([asteriskQualifierProvider]);
+        expect(store.find({id: 'id_optionalQualifierProvider'})).toEqual([optionalQualifierProvider]);
+        expect(store.find({id: 'id_exactQualifierProvider'})).toEqual([exactQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: null}, matchesWildcardQualifier)).toEqual([optionalQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: null})).toEqual([optionalQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
       });
 
       it('should remove providers matching the empty qualifier', () => {
@@ -485,16 +576,16 @@ describe('CapabilityProviderStore', () => {
 
         store.remove('app', {type: 'type', qualifier: {}});
 
-        expect(store.findById('id_undefinedQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_nullQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_emptyQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_asteriskQualifierProvider')).toBe(asteriskQualifierProvider);
-        expect(store.findById('id_optionalQualifierProvider')).toBe(optionalQualifierProvider);
-        expect(store.findById('id_exactQualifierProvider')).toBe(exactQualifierProvider);
-        expect(store.findByType('type', {}, {strategy: 'wildcardMatcher'})).toEqual([optionalQualifierProvider]);
-        expect(store.findByApplication('app', {})).toEqual([optionalQualifierProvider]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({id: 'id_undefinedQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_nullQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_emptyQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_asteriskQualifierProvider'})).toEqual([asteriskQualifierProvider]);
+        expect(store.find({id: 'id_optionalQualifierProvider'})).toEqual([optionalQualifierProvider]);
+        expect(store.find({id: 'id_exactQualifierProvider'})).toEqual([exactQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {}}, matchesWildcardQualifier)).toEqual([optionalQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {}})).toEqual([optionalQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([asteriskQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
       });
 
       it('should remove providers which contain the asterisk value wildcard in their qualifier', () => {
@@ -514,16 +605,16 @@ describe('CapabilityProviderStore', () => {
 
         store.remove('app', {type: 'type', qualifier: {'entity': '*'}});
 
-        expect(store.findById('id_undefinedQualifierProvider')).toBe(undefinedQualifierProvider);
-        expect(store.findById('id_nullQualifierProvider')).toBe(nullQualifierProvider);
-        expect(store.findById('id_emptyQualifierProvider')).toBe(emptyQualifierProvider);
-        expect(store.findById('id_asteriskQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_optionalQualifierProvider')).toBe(optionalQualifierProvider);
-        expect(store.findById('id_exactQualifierProvider')).toBe(exactQualifierProvider);
-        expect(store.findByType('type', {'entity': '*'}, {strategy: 'wildcardMatcher'})).toEqual([optionalQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'entity': '*'})).toEqual([optionalQualifierProvider, exactQualifierProvider]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({id: 'id_undefinedQualifierProvider'})).toEqual([undefinedQualifierProvider]);
+        expect(store.find({id: 'id_nullQualifierProvider'})).toEqual([nullQualifierProvider]);
+        expect(store.find({id: 'id_emptyQualifierProvider'})).toEqual([emptyQualifierProvider]);
+        expect(store.find({id: 'id_asteriskQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_optionalQualifierProvider'})).toEqual([optionalQualifierProvider]);
+        expect(store.find({id: 'id_exactQualifierProvider'})).toEqual([exactQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'entity': '*'}}, matchesWildcardQualifier)).toEqual([optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '*'}})).toEqual([optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, optionalQualifierProvider, exactQualifierProvider]);
       });
 
       it('should remove providers which contain the optional value wildcard in their qualifier', () => {
@@ -543,16 +634,16 @@ describe('CapabilityProviderStore', () => {
 
         store.remove('app', {type: 'type', qualifier: {'entity': '?'}});
 
-        expect(store.findById('id_undefinedQualifierProvider')).toBe(undefinedQualifierProvider);
-        expect(store.findById('id_nullQualifierProvider')).toBe(nullQualifierProvider);
-        expect(store.findById('id_emptyQualifierProvider')).toBe(emptyQualifierProvider);
-        expect(store.findById('id_asteriskQualifierProvider')).toBe(asteriskQualifierProvider);
-        expect(store.findById('id_optionalQualifierProvider')).toBeUndefined();
-        expect(store.findById('id_exactQualifierProvider')).toBe(exactQualifierProvider);
-        expect(store.findByType('type', {'entity': '?'}, {strategy: 'wildcardMatcher'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'entity': '?'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, exactQualifierProvider]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, exactQualifierProvider]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, exactQualifierProvider]);
+        expect(store.find({id: 'id_undefinedQualifierProvider'})).toEqual([undefinedQualifierProvider]);
+        expect(store.find({id: 'id_nullQualifierProvider'})).toEqual([nullQualifierProvider]);
+        expect(store.find({id: 'id_emptyQualifierProvider'})).toEqual([emptyQualifierProvider]);
+        expect(store.find({id: 'id_asteriskQualifierProvider'})).toEqual([asteriskQualifierProvider]);
+        expect(store.find({id: 'id_optionalQualifierProvider'})).toEqual([]);
+        expect(store.find({id: 'id_exactQualifierProvider'})).toEqual([exactQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'entity': '?'}}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '?'}})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, exactQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, exactQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, exactQualifierProvider]);
       });
 
       it('should remove providers using an exact qualifier as deletion criterion', () => {
@@ -572,16 +663,16 @@ describe('CapabilityProviderStore', () => {
 
         store.remove('app', {type: 'type', qualifier: {'entity': 'test'}});
 
-        expect(store.findById('id_undefinedQualifierProvider')).toBe(undefinedQualifierProvider);
-        expect(store.findById('id_nullQualifierProvider')).toBe(nullQualifierProvider);
-        expect(store.findById('id_emptyQualifierProvider')).toBe(emptyQualifierProvider);
-        expect(store.findById('id_asteriskQualifierProvider')).toBe(asteriskQualifierProvider);
-        expect(store.findById('id_optionalQualifierProvider')).toBe(optionalQualifierProvider);
-        expect(store.findById('id_exactQualifierProvider')).toBeUndefined();
-        expect(store.findByType('type', {'entity': 'test'}, {strategy: 'wildcardMatcher'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByType('type', {'entity': 'test'}, {strategy: 'wildcardMatcher'})).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByType('type', {'*': '*'}, {strategy: 'wildcardMatcher'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider]);
-        expect(store.findByApplication('app', {'*': '*'})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({id: 'id_undefinedQualifierProvider'})).toEqual([undefinedQualifierProvider]);
+        expect(store.find({id: 'id_nullQualifierProvider'})).toEqual([nullQualifierProvider]);
+        expect(store.find({id: 'id_emptyQualifierProvider'})).toEqual([emptyQualifierProvider]);
+        expect(store.find({id: 'id_asteriskQualifierProvider'})).toEqual([asteriskQualifierProvider]);
+        expect(store.find({id: 'id_optionalQualifierProvider'})).toEqual([optionalQualifierProvider]);
+        expect(store.find({id: 'id_exactQualifierProvider'})).toEqual([]);
+        expect(store.find({type: 'type', qualifier: {'entity': 'test'}}, matchesWildcardQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'entity': 'test'}}, matchesWildcardQualifier)).toEqual([asteriskQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({type: 'type', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider]);
+        expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}})).toEqual([undefinedQualifierProvider, nullQualifierProvider, emptyQualifierProvider, asteriskQualifierProvider, optionalQualifierProvider]);
       });
     });
   });

@@ -20,9 +20,10 @@ export class Arrays {
 
   /**
    * Creates an array from the given value, or returns the value if already an array.
+   * If `null` or `undefined` is given, an empty array is returned.
    */
-  public static from(value: string | string[]): string[] {
-    if (!value || !value.length) {
+  public static from<T>(value: T | T[]): T[] {
+    if (value === null || value === undefined) {
       return [];
     }
     return Array.isArray(value) ? value : [value];
@@ -103,5 +104,24 @@ export class Arrays {
       visitedItems.add(identity);
       return true;
     });
+  }
+
+  /**
+   * Intersects the given arrays, returning a new array containing all the elements contained in every array.
+   * Arrays which are `undefined` or `null` are ignored.
+   */
+  public static intersect<T>(...arrays: T[][] | undefined): T[] | undefined {
+    arrays = arrays.filter(array => array !== undefined && array !== null);
+
+    if (!arrays.length) {
+      return [];
+    }
+
+    if (arrays.length === 1) {
+      return [...arrays[0]];
+    }
+
+    const first = [...arrays.pop()];
+    return arrays.reduce((intersection, array) => intersection.filter(value => array.includes(value)), first);
   }
 }

@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { CapabilityProvider, Qualifier } from '../../platform.model';
-import { isEqualQualifier, matchesIntentQualifier, matchesWildcardQualifier } from '../../qualifier-tester';
+import { CapabilityProvider } from '../../platform.model';
+import { isEqualQualifier, matchesWildcardQualifier, QualifierMatcher } from '../../qualifier-tester';
 import { Observable, Subject } from 'rxjs';
-import { Maps } from '@scion/toolkit/util';
+import { Arrays, Maps } from '@scion/toolkit/util';
 import { CapabilityProviderFilter } from './manifest-registry';
 
 /**
@@ -19,8 +19,9 @@ import { CapabilityProviderFilter } from './manifest-registry';
  */
 export class ProviderStore {
 
-  private readonly _providersByType = new Map<string, CapabilityProvider[]>();
   private readonly _providersById = new Map<string, CapabilityProvider>();
+  private readonly _providersByType = new Map<string, CapabilityProvider[]>();
+  private readonly _providersByApplication = new Map<string, CapabilityProvider[]>();
   private readonly _change$ = new Subject<void>();
 
   /**
@@ -29,6 +30,7 @@ export class ProviderStore {
   public add(provider: CapabilityProvider): void {
     this._providersById.set(provider.metadata.id, provider);
     Maps.addListValue(this._providersByType, provider.type, provider);
+    Maps.addListValue(this._providersByApplication, provider.metadata.appSymbolicName, provider);
     this._change$.next();
   }
 
@@ -40,62 +42,38 @@ export class ProviderStore {
    *        Wildcards in the qualifier criterion, if any, are not interpreted as wildcards, but as exact values instead.
    * @param filter
    *        Control which providers to remove by specifying filter criteria which are "AND"ed together.
+   *        Wildcards in the qualifier criterion, if any, are not interpreted as wildcards, but as exact values instead.
    */
-  public remove(appSymbolicName: string, filter: CapabilityProviderFilter): CapabilityProvider[] {
-    const providersToRemove = Array.from(this._providersById.values())
-      .filter(provider => provider.metadata.appSymbolicName === appSymbolicName)
-      .filter(provider => filter.id === undefined || filter.id === provider.metadata.id)
-      .filter(provider => filter.type === undefined || filter.type === provider.type)
-      .filter(provider => filter.qualifier === undefined || isEqualQualifier(filter.qualifier, provider.qualifier));
+  public remove(appSymbolicName: string, filter: CapabilityProviderFilter): void {
+    filter = {...filter, appSymbolicName};
+    const providersToRemove = this.find(filter, isEqualQualifier);
     this._remove(providersToRemove);
-    return providersToRemove;
-  }
-
-  /**
-   * Returns the provider of the given id, or `undefined` if not found.
-   *
-   * @deprecated remove as only used by tests; use find(...) instead
-   */
-  public findById(id: string): CapabilityProvider | undefined {
-    return this._providersById.get(id);
   }
 
   /**
    * Finds providers that match the given filter.
    *
    * @param filter
-   *        Control which providers to return. The filter allows to use wildcards in the qualifier.
-   *        All specified filter criteria are "AND"ed together. If no filter criterion is specified,
-   *        no filtering takes place.
+   *        Control which providers to return.
+   *        All specified filter criteria are "AND"ed together. If no filter criterion is specified, no filtering takes place.
+   * @param qualifierMatcher
+   *        Control how to match the qualifier, if any. If not specified, {@link matchesWildcardQualifier} is used.
    */
-  public find(filter: CapabilityProviderFilter): CapabilityProvider[] {
-    return Array.from(this._providersById.values())
-      .filter(provider => filter.appSymbolicName === undefined || filter.appSymbolicName === provider.metadata.appSymbolicName)
-      .filter(provider => filter.id === undefined || filter.id === provider.metadata.id)
-      .filter(provider => filter.type === undefined || filter.type === provider.type)
-      .filter(provider => filter.qualifier === undefined || matchesWildcardQualifier(filter.qualifier, provider.qualifier));
-  }
+  public find(filter: CapabilityProviderFilter, qualifierMatcher: QualifierMatcher = matchesWildcardQualifier): CapabilityProvider[] {
+    const filterById = filter.id !== undefined;
+    const filterByType = filter.type !== undefined;
+    const filterByApp = filter.appSymbolicName !== undefined;
 
-  /**
-   * Returns the providers of the given type matching the given qualifier.
-   *
-   * You can use either 'intentMatcher' or 'wildcardMatcher' strategy. Use the intent matcher strategy to find providers
-   * matching the given intent qualifier.
-   */
-  public findByType(type: string, qualifier: Qualifier, options: { strategy: 'intentMatcher' | 'wildcardMatcher' }): CapabilityProvider[] {
-    return (this._providersByType.get(type) || [])
-      .filter(provider => options.strategy === 'intentMatcher' ? matchesIntentQualifier(provider.qualifier, qualifier) : matchesWildcardQualifier(provider.qualifier, qualifier));
-  }
-
-  /**
-   * Returns the providers of the given application matching the given qualifier. The qualifier may contain wildcards.
-   *
-   * @deprecated remove as only used by tests; use find(...) instead
-   */
-  public findByApplication(appSymbolicName: string, qualifier: Qualifier): CapabilityProvider[] {
-    return Array.from(this._providersById.values())
-      .filter(provider => provider.metadata.appSymbolicName === appSymbolicName)
-      .filter(provider => matchesWildcardQualifier(provider.qualifier, qualifier));
+    return Arrays
+      .intersect(
+        filterById ? Arrays.from(this._providersById.get(filter.id)) : undefined,
+        filterByType ? Arrays.from(this._providersByType.get(filter.type)) : undefined,
+        filterByApp ? Arrays.from(this._providersByApplication.get(filter.appSymbolicName)) : undefined,
+        (filterById || filterByType || filterByApp) ? undefined : Array.from(this._providersById.values()),
+      )
+      .filter(provider => {
+        return filter.qualifier === undefined || qualifierMatcher(provider.qualifier, filter.qualifier);
+      });
   }
 
   /**
@@ -111,8 +89,9 @@ export class ProviderStore {
   private _remove(providers: CapabilityProvider[]): void {
     let deleted = false;
     providers.forEach(provider => {
-      deleted = this._providersById.delete(provider.metadata.id);
-      deleted = Maps.removeListValue(this._providersByType, provider.type, candidate => candidate.metadata.id === provider.metadata.id);
+      deleted = this._providersById.delete(provider.metadata.id) || deleted;
+      deleted = Maps.removeListValue(this._providersByType, provider.type, candidate => candidate.metadata.id === provider.metadata.id) || deleted;
+      deleted = Maps.removeListValue(this._providersByApplication, provider.metadata.appSymbolicName, candidate => candidate.metadata.id === provider.metadata.id) || deleted;
     });
     deleted && this._change$.next();
   }

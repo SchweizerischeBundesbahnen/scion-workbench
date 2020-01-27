@@ -102,7 +102,7 @@ export interface CapabilityProvider {
    */
   qualifier?: Qualifier;
   /**
-   * Specifies if this is an application private capability and not part of the aplication's public API.
+   * Specifies if this is an application private capability and not part of the application's public API.
    * If private (or if not specified), other applications cannot issue an intent to this capability.
    */
   private?: boolean;
@@ -169,13 +169,6 @@ export interface Intention {
      * Symbolic name of the application which declares this intention.
      */
     appSymbolicName: string;
-    /**
-     * This field is only set for implicit intentions and allows to infer the capability provider.
-     *
-     * When providing a capability, the platform automatically declares an implicit intention for the providing application,
-     * allowing the application to invoke its self-provided capabilities without prior intention declaration.
-     */
-    implicitlyProvidedBy?: string;
   };
 }
 
