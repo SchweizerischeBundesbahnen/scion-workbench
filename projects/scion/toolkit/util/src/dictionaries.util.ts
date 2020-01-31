@@ -19,7 +19,7 @@ export class Dictionaries {
   /**
    * Creates a {@link Dictionary} from the given map.
    */
-  public static toDictionary(map: Map<string, any>): Dictionary | null {
+  public static toDictionary<T = any>(map: Map<string, T>): Dictionary<T> | null {
     if (map === null) {
       return null;
     }
@@ -38,7 +38,7 @@ export class Dictionaries {
   /**
    * Creates a {@link Map} from the given dictionary.
    */
-  public static toMap(dictionary: Dictionary): Map<string, any> | null {
+  public static toMap<T = any>(dictionary: Dictionary<T>): Map<string, T> | null {
     if (dictionary === null) {
       return null;
     }
@@ -58,6 +58,6 @@ export class Dictionaries {
 /**
  * Represents an object with a variable number of properties, whose keys are not known at development time.
  */
-export interface Dictionary {
-  [key: string]: any;
+export interface Dictionary<T = any> {
+  [key: string]: T;
 }

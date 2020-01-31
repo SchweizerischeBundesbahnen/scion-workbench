@@ -615,8 +615,8 @@ export namespace TopicBasedMessagingSpecs {
   export async function passHeadersSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_1},
-      receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_1},
+      publisher: PublishMessagePagePO,
+      receiver: ReceiveMessagePagePO,
     });
 
     const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
@@ -637,6 +637,88 @@ export namespace TopicBasedMessagingSpecs {
       headers: new Map().set('header1', 'value').set('header2', '42'),
       params: new Map(),
     });
+  }
+
+  /**
+   * Tests message interception by changing the message body to upper case characters.
+   * The testing app is configured to uppercase messages sent to the topic 'uppercase'.
+   */
+  export async function interceptMessageSpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      publisher: PublishMessagePagePO,
+      receiver: ReceiveMessagePagePO,
+    }, {queryParams: new Map().set('intercept-message:uppercase', 'uppercase')});
+
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
+    await receiverPO.selectMessagingModel(MessagingModel.Topic);
+    await receiverPO.enterTopic('uppercase');
+    await receiverPO.clickSubscribe();
+
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Topic);
+    await publisherPO.enterTopic('uppercase');
+    await publisherPO.enterMessage('payload');
+    await publisherPO.clickPublish();
+
+    await expectMessage(receiverPO.getFirstMessageOrElseReject()).toEqual({
+      topic: 'uppercase',
+      body: 'PAYLOAD',
+      headers: new Map(),
+      params: new Map(),
+    });
+  }
+
+  /**
+   * Tests message rejection.
+   * The testing app is configured to reject messages sent to the topic 'reject'.
+   */
+  export async function rejectMessageSpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      publisher: PublishMessagePagePO,
+      receiver: ReceiveMessagePagePO,
+    }, {queryParams: new Map().set('intercept-message:reject', 'reject')});
+
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
+    await receiverPO.selectMessagingModel(MessagingModel.Topic);
+    await receiverPO.enterTopic('reject');
+    await receiverPO.clickSubscribe();
+
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Topic);
+    await publisherPO.enterTopic('reject');
+    await publisherPO.enterMessage('payload');
+    await publisherPO.clickPublish();
+
+    await expect(publisherPO.getPublishError()).toEqual('Message rejected by interceptor');
+    await expect(receiverPO.getMessages()).toEqual([]);
+  }
+
+  /**
+   * Tests swallowing a message.
+   * The testing app is configured to swallow messages sent to the topic 'swallow'.
+   */
+  export async function swallowMessageSpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      publisher: PublishMessagePagePO,
+      receiver: ReceiveMessagePagePO,
+    }, {queryParams: new Map().set('intercept-message:swallow', 'swallow')});
+
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
+    await receiverPO.selectMessagingModel(MessagingModel.Topic);
+    await receiverPO.enterTopic('swallow');
+    await receiverPO.clickSubscribe();
+
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Topic);
+    await publisherPO.enterTopic('swallow');
+    await publisherPO.enterMessage('payload');
+    await publisherPO.clickPublish();
+
+    await expect(publisherPO.getPublishError()).toBeNull();
+    await expect(receiverPO.getMessages()).toEqual([]);
   }
 
   /**

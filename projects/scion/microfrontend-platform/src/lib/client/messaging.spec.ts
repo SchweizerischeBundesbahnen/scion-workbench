@@ -225,7 +225,7 @@ describe('Messaging', () => {
 
     const ping$ = Beans.get(MessageClient).requestByIntent$({type: 'some-type'}, 'ping');
     const actual = collectToPromise(ping$, {take: 1, projectFn: bodyExtractFn});
-    await expectAsync(actual).toBeRejectedWith('[RequestReplyError] No replier found to reply to intent \'{type=some-type, qualifier=undefined}\'.');
+    await expectAsync(actual).toBeRejectedWith('[RequestReplyError] No client is currently running which could answer the intent \'{type=some-type, qualifier=undefined}\'.');
   });
 
   it('should reject an intent if no application provides a satisfying capability', async () => {
@@ -859,13 +859,14 @@ function mountBadClientAndConnect(badClientConfig: { symbolicName: string }): { 
   //       IS LOADED INTO THE IFRAME. THE ONLY EXCEPTION ARE REFERENCES TO INTERFACE TYPES AS NOT TRANSPILED INTO
   //       JAVASCRIPT.
   function sendConnnectRequest(symbolicName: string): void {
-    const env: MessageEnvelope = {
+    const env: MessageEnvelope<TopicMessage> = {
       transport: 'sci://microfrontend-platform/gateway-to-broker' as any,
       channel: 'topic' as any,
-      messageId: null,
       message: {
         topic: 'ɵCLIENT_CONNECT',
-        headers: new Map().set('ɵAPP_SYMBOLIC_NAME', symbolicName),
+        headers: new Map()
+          .set('ɵMESSAGE_ID', '123')
+          .set('ɵAPP_SYMBOLIC_NAME', symbolicName),
       },
     };
     window.parent.postMessage(env, '*');

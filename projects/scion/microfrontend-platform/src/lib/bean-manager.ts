@@ -236,7 +236,7 @@ export const Beans = new class {
   public runInitializers(): Promise<void> {
     return Promise.all(initializers.map(fn => fn()))
       .then(() => Promise.resolve())
-      .catch(error => Promise.reject(`[BeanManagerInitializerError] Initializer rejected with error: ${error}.`));
+      .catch(error => Promise.reject(`[BeanManagerInitializerError] Initializer rejected with an error: ${error}`));
   }
 
   /** @internal **/

@@ -125,10 +125,11 @@ export class BrokerGateway {
     const request: MessageEnvelope<TopicMessage> = {
       transport: MessagingTransport.ClientToGateway,
       channel: MessagingChannel.Topic,
-      messageId: UUID.randomUUID(),
       message: {
         topic: PlatformTopics.RequestGatewayInfo,
-        headers: new Map().set(MessageHeaders.ReplyTo, replyToTopic),
+        headers: new Map()
+          .set(MessageHeaders.MessageId, UUID.randomUUID())
+          .set(MessageHeaders.ReplyTo, replyToTopic),
       },
     };
 

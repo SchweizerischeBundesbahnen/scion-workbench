@@ -24,6 +24,7 @@ import { Client, ClientRegistry } from './client.registry';
 import { RetainedMessageStore } from './retained-message-store';
 import { TopicMatcher } from '../../topic-matcher.util';
 import { bufferUntil } from '../../operators';
+import { chainInterceptors, IntentInterceptor, MessageInterceptor, PublishInterceptorChain } from './message-interception';
 
 /**
  * The broker is responsible for receiving all messages, filtering the messages, determining who is
@@ -49,6 +50,9 @@ export class MessageBroker implements PreDestroy {
   private readonly _applicationRegistry: ApplicationRegistry;
   private readonly _manifestRegistry: ManifestRegistry;
 
+  private _messagePublisher: PublishInterceptorChain<TopicMessage>;
+  private _intentPublisher: PublishInterceptorChain<IntentMessage>;
+
   constructor() {
     this._applicationRegistry = Beans.get(ApplicationRegistry);
     this._manifestRegistry = Beans.get(ManifestRegistry);
@@ -63,20 +67,22 @@ export class MessageBroker implements PreDestroy {
         share(),
       );
 
-    // client connect listeners
+    // Install client connect listeners.
     this.installClientConnectListener();
     this.installClientDisconnectListener();
 
-    // message listeners
-    this.installIntentMessageDispatcher();
+    // Install message dispatchers.
     this.installTopicMessageDispatcher();
+    this.installIntentMessageDispatcher();
 
-    // topic subscription listeners
+    // Install topic subscriptions listeners.
     this.installTopicSubscribeListener();
     this.installTopicUnsubscribeListener();
-
-    // reply to requests observing topic subscriptions
     this.installTopicSubscriberCountObserver();
+
+    // Assemble message interceptors to a chain of handlers which are called one after another. The publisher is added as terminal handler.
+    this._messagePublisher = this.createMessagePublisher();
+    this._intentPublisher = this.createIntentPublisher();
   }
 
   private installClientConnectListener(): void {
@@ -173,17 +179,17 @@ export class MessageBroker implements PreDestroy {
         const envelope = clientMessage.envelope;
         const topic = envelope.message.topic;
         const subscriberId = envelope.message.subscriberId;
+        const messageId = envelope.message.headers.get(MessageHeaders.MessageId);
 
         if (!topic) {
-          const error = {type: 'TopicSubscribeError', details: 'Topic required'};
-          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
+          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, '[TopicSubscribeError] Topic required');
           return;
         }
 
         this._topicSubscriptionRegistry.subscribe(topic, client, subscriberId);
-        sendDeliveryStatusSuccess(client, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId});
+        sendDeliveryStatusSuccess(client, {transport: MessagingTransport.BrokerToClient, topic: messageId});
 
-        // Dispatch the retained message on the topic, if any.
+        // Dispatch a retained message, if any.
         const retainedMessage = this._retainedMessageRegistry.findMostRecentRetainedMessage(topic);
         if (retainedMessage) {
           const retainedMessageWorkingCopy = {
@@ -209,15 +215,15 @@ export class MessageBroker implements PreDestroy {
         const client = clientMessage.client;
         const envelope = clientMessage.envelope;
         const topic = envelope.message.topic;
+        const messageId = envelope.message.headers.get(MessageHeaders.MessageId);
 
         if (!topic) {
-          const error = {type: 'TopicUnsubscribeError', details: 'Topic required'};
-          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
+          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, '[TopicUnsubscribeError] Topic required');
           return;
         }
 
         this._topicSubscriptionRegistry.unsubscribe(topic, client.id);
-        sendDeliveryStatusSuccess(client, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId});
+        sendDeliveryStatusSuccess(client, {transport: MessagingTransport.BrokerToClient, topic: messageId});
       }));
   }
 
@@ -233,17 +239,21 @@ export class MessageBroker implements PreDestroy {
       )
       .subscribe((clientMessage: ClientMessage<TopicMessage<string>>) => runSafe(() => {
         const client = clientMessage.client;
-        const topic = clientMessage.envelope.message.body;
-        const replyTo = clientMessage.envelope.message.headers.get(MessageHeaders.ReplyTo);
-        sendDeliveryStatusSuccess(client, {transport: MessagingTransport.BrokerToClient, topic: clientMessage.envelope.messageId});
+        const request = clientMessage.envelope.message;
+        const topic = request.body;
+        const replyTo = request.headers.get(MessageHeaders.ReplyTo);
+        const messageId = request.headers.get(MessageHeaders.MessageId);
+        sendDeliveryStatusSuccess(client, {transport: MessagingTransport.BrokerToClient, topic: messageId});
 
         this._topicSubscriptionRegistry.subscriptionCount$(topic)
           .pipe(takeUntil(this._topicSubscriptionRegistry.subscriptionCount$(replyTo).pipe(filter(count => count === 0))))
           .subscribe((count: number) => runSafe(() => {
-            this.dispatchTopicMessage(UUID.randomUUID(), {
+            this.dispatchTopicMessage({
               topic: replyTo,
               body: count,
-              headers: new Map().set(MessageHeaders.AppSymbolicName, PLATFORM_SYMBOLIC_NAME),
+              headers: new Map()
+                .set(MessageHeaders.MessageId, UUID.randomUUID())
+                .set(MessageHeaders.AppSymbolicName, PLATFORM_SYMBOLIC_NAME),
             });
           }));
       }));
@@ -256,35 +266,25 @@ export class MessageBroker implements PreDestroy {
     this._clientRequests$
       .pipe(
         filterByChannel(MessagingChannel.Topic),
-        filter(clientMessage => clientMessage.envelope.message.topic !== PlatformTopics.RequestSubscriberCount), // do not dispatch messages sent to `SubscriberCount` topic
+        filter(clientMessage => clientMessage.envelope.message.topic !== PlatformTopics.RequestSubscriberCount), // do not dispatch messages sent to the `RequestSubscriberCount` topic as handled separately
         takeUntil(this._destroy$),
       )
       .subscribe((clientMessage: ClientMessage<TopicMessage>) => runSafe(() => {
-        const messageId = clientMessage.envelope.messageId;
         const topicMessage = clientMessage.envelope.message;
+        const messageId = topicMessage.headers.get(MessageHeaders.MessageId);
 
-        // If the message is marked as 'retained', store it, or if without a body, delete it.
-        if (topicMessage.retain && this._retainedMessageRegistry.persistOrDelete(topicMessage) === 'deleted') {
+        try {
+          this._messagePublisher.publish(topicMessage);
           sendDeliveryStatusSuccess(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId});
-          return; // delete event is not dispatched
         }
-
-        // Dispatch the message.
-        const dispatched = this.dispatchTopicMessage(messageId, topicMessage);
-
-        // If request-reply communication, send an error if no replier is found to reply to the topic.
-        if (topicMessage.headers.has(MessageHeaders.ReplyTo) && !dispatched) {
-          const error = {type: 'RequestReplyError', details: `No replier found to reply to requests sent to topic '${topicMessage.topic}'.`};
-          sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
-        }
-        else {
-          sendDeliveryStatusSuccess(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId});
+        catch (error) {
+          sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error.message || error.message.toString());
         }
       }));
   }
 
   /**
-   * Dispatches intents to subscribed clients.
+   * Dispatches intents to qualified clients.
    */
   private installIntentMessageDispatcher(): void {
     this._clientRequests$
@@ -293,57 +293,86 @@ export class MessageBroker implements PreDestroy {
         takeUntil(this._destroy$),
       )
       .subscribe((clientMessage: ClientMessage<IntentMessage>) => runSafe(() => {
-        const envelope: MessageEnvelope<IntentMessage> = {
-          ...clientMessage.envelope,
-          transport: MessagingTransport.BrokerToClient,
-        };
-
-        const intent = envelope.message;
-        const senderClient = clientMessage.client;
+        const intent = clientMessage.envelope.message;
+        const messageId = intent.headers.get(MessageHeaders.MessageId);
 
         if (!intent) {
-          const error = {type: 'IntentDispatchrror', details: 'Intent must not be null'};
-          sendDeliveryStatusError(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
+          const error = '[IntentDispatchError] Intent must not be null';
+          sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
           return;
         }
 
         if (!intent.type) {
-          const error = {type: 'IntentDispatchError', details: 'Intent type required'};
-          sendDeliveryStatusError(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
+          const error = '[IntentDispatchError] Intent type required';
+          sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
           return;
         }
 
-        if (!this._manifestRegistry.hasIntention(intent, senderClient.application.symbolicName)) {
-          const error = {type: 'NotQualifiedError', details: `Application '${senderClient.application.symbolicName}' is not qualified to publish intents of the type '${intent.type}' and qualifier '${JSON.stringify(intent.qualifier || {})}'. Ensure to have listed the intention in the application manifest.`};
-          sendDeliveryStatusError(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
+        if (!this._manifestRegistry.hasIntention(intent, clientMessage.client.application.symbolicName)) {
+          const error = `[NotQualifiedError] Application '${clientMessage.client.application.symbolicName}' is not qualified to publish intents of the type '${intent.type}' and qualifier '${JSON.stringify(intent.qualifier || {})}'. Ensure to have listed the intention in the application manifest.`;
+          sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
           return;
         }
 
-        // Find providers which provide a satisfying capability for the intent.
-        const capabilityProviders = this._manifestRegistry.getCapabilityProvidersByIntent(intent, senderClient.application.symbolicName);
-        if (!capabilityProviders.length) {
-          const error = {type: 'NullProviderError', details: `No application found to provide a capability of the type '${intent.type}' and qualifiers '${JSON.stringify(intent.qualifier || {})}'. Maybe, the capability is not public API or the providing application not available.`};
-          sendDeliveryStatusError(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
-          return;
+        try {
+          this._intentPublisher.publish(intent);
+          sendDeliveryStatusSuccess(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId});
         }
-
-        // Resolve running provider instances.
-        const clients: Set<Client> = capabilityProviders
-          .map(capabilityProvider => this._clientRegistry.getByApplication(capabilityProvider.metadata.appSymbolicName))
-          .reduce((combined, list) => new Set([...combined, ...list]), new Set<Client>());
-
-        // Dispatch the intent.
-        clients.forEach(client => client.gatewayWindow.postMessage(envelope, client.application.origin));
-
-        // If request-reply communication, send an error if no replier is found to reply to the intent.
-        if (envelope.message.headers.has(MessageHeaders.ReplyTo) && clients.size === 0) {
-          const error = {type: 'RequestReplyError', details: `No replier found to reply to intent '{type=${envelope.message.type}, qualifier=${JSON.stringify(envelope.message.qualifier)}}'.`};
-          sendDeliveryStatusError(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId}, error);
-        }
-        else {
-          sendDeliveryStatusSuccess(senderClient, {transport: MessagingTransport.BrokerToClient, topic: envelope.messageId});
+        catch (error) {
+          sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error.message || error.message.toString());
         }
       }));
+  }
+
+  /**
+   * Creates the interceptor chain to intercept message publishing. The publisher is added as terminal handler.
+   */
+  private createMessagePublisher(): PublishInterceptorChain<TopicMessage> {
+    return chainInterceptors(Beans.all(MessageInterceptor), (message: TopicMessage): void => {
+      // If the message is marked as 'retained', store it, or if without a body, delete it.
+      if (message.retain && this._retainedMessageRegistry.persistOrDelete(message) === 'deleted') {
+        return; // Deletion events for retained messages are swallowed.
+      }
+
+      // Dispatch the message.
+      const dispatched = this.dispatchTopicMessage(message);
+
+      // If request-reply communication, throw an error if no replier is found to reply to the topic.
+      if (!dispatched && message.headers.has(MessageHeaders.ReplyTo)) {
+        throw Error(`[RequestReplyError] No client is currently running which could answer the request sent to the topic '${message.topic}'.`);
+      }
+    });
+  }
+
+  /**
+   * Creates the interceptor chain to intercept intent publishing. The publisher is added as terminal handler.
+   */
+  private createIntentPublisher(): PublishInterceptorChain<IntentMessage> {
+    return chainInterceptors(Beans.all(IntentInterceptor), (intent: IntentMessage): void => {
+      // Find providers which provide a satisfying capability for the intent.
+      const capabilityProviders = this._manifestRegistry.getCapabilityProvidersByIntent(intent, intent.headers.get(MessageHeaders.AppSymbolicName));
+      if (capabilityProviders.length === 0) {
+        throw Error(`[NullProviderError] No application found to provide a capability of the type '${intent.type}' and qualifiers '${JSON.stringify(intent.qualifier || {})}'. Maybe, the capability is not public API or the providing application not available.`);
+      }
+
+      // Find respective clients.
+      const clients: Set<Client> = capabilityProviders
+        .map(capabilityProvider => this._clientRegistry.getByApplication(capabilityProvider.metadata.appSymbolicName))
+        .reduce((combined, list) => new Set([...combined, ...list]), new Set<Client>());
+
+      // If request-reply communication, send an error if no replier is found to reply to the intent.
+      if (clients.size === 0 && intent.headers.has(MessageHeaders.ReplyTo)) {
+        throw Error(`[RequestReplyError] No client is currently running which could answer the intent '{type=${intent.type}, qualifier=${JSON.stringify(intent.qualifier)}}'.`);
+      }
+
+      // Dispatch the intent.
+      const envelope: MessageEnvelope<IntentMessage> = {
+        transport: MessagingTransport.BrokerToClient,
+        channel: MessagingChannel.Intent,
+        message: intent,
+      };
+      clients.forEach(client => client.gatewayWindow.postMessage(envelope, client.application.origin));
+    });
   }
 
   /**
@@ -351,7 +380,7 @@ export class MessageBroker implements PreDestroy {
    *
    * @return `true` if dispatched the message to at minimum one subscriber, or `false` if no subscriber is subscribed to the given message topic.
    */
-  private dispatchTopicMessage<BODY>(messageId: string, topicMessage: TopicMessage<BODY>): boolean {
+  private dispatchTopicMessage<BODY>(topicMessage: TopicMessage<BODY>): boolean {
     const destinations = this._topicSubscriptionRegistry.resolveTopicDestinations(topicMessage.topic);
     if (!destinations.length) {
       return false;
@@ -359,7 +388,6 @@ export class MessageBroker implements PreDestroy {
 
     destinations.forEach(resolvedTopicDestination => {
       const envelope: MessageEnvelope<TopicMessage> = {
-        messageId: messageId,
         transport: MessagingTransport.BrokerToClient,
         channel: MessagingChannel.Topic,
         message: {
@@ -415,19 +443,20 @@ function checkOriginTrusted<MSG extends Message>(clientRegistry: ClientRegistry,
     const envelope: MessageEnvelope = event.data;
     const senderGatewayWindow = event.source as Window;
     const clientId = envelope.message.headers.get(MessageHeaders.ClientId);
+    const messageId = envelope.message.headers.get(MessageHeaders.MessageId);
     const client = (senderGatewayWindow ? clientRegistry.getByGatewayWindow(senderGatewayWindow) : clientRegistry.getByClientId(clientId));
 
     if (!client) {
       const sender = {gatewayWindow: senderGatewayWindow, origin: event.origin};
-      const error = {type: 'MessagingError', details: `Message rejected: Client not registered [origin=${event.origin}]`};
-      sender.gatewayWindow && sendDeliveryStatusError(sender, {transport: rejectConfig.transport, topic: envelope.messageId}, error);
+      const error = `[MessagingError] Message rejected: Client not registered [origin=${event.origin}]`;
+      sender.gatewayWindow && sendDeliveryStatusError(sender, {transport: rejectConfig.transport, topic: messageId}, error);
       return EMPTY;
     }
 
     if (event.origin !== client.application.origin) {
       const target = {gatewayWindow: client.gatewayWindow, origin: event.origin};
-      const error = {type: 'MessagingError', details: `Message rejected: Wrong origin [actual=${event.origin}, expected=${client.application.origin}, application=${client.application.symbolicName}]`};
-      sendDeliveryStatusError(target, {transport: rejectConfig.transport, topic: envelope.messageId}, error);
+      const error = `[MessagingError] Message rejected: Wrong origin [actual=${event.origin}, expected=${client.application.origin}, application=${client.application.symbolicName}]`;
+      sendDeliveryStatusError(target, {transport: rejectConfig.transport, topic: messageId}, error);
       return EMPTY;
     }
 
@@ -462,17 +491,16 @@ function sendDeliveryStatusSuccess(recipient: { gatewayWindow: Window; origin: s
   });
 }
 
-function sendDeliveryStatusError(recipient: { gatewayWindow: Window; origin: string } | Client, destination: { transport: MessagingTransport, topic: string }, error: { type: string; details: string }): void {
+function sendDeliveryStatusError(recipient: { gatewayWindow: Window; origin: string } | Client, destination: { transport: MessagingTransport, topic: string }, error: string): void {
   sendTopicMessage<MessageDeliveryStatus>(recipient, destination.transport, {
     topic: destination.topic,
-    body: {ok: false, details: `[${error.type}] ${error.details}`},
+    body: {ok: false, details: error},
     headers: new Map(),
   });
 }
 
 function sendTopicMessage<T>(recipient: { gatewayWindow: Window; origin: string } | Client, transport: MessagingTransport, message: TopicMessage<T>): void {
   const envelope: MessageEnvelope<TopicMessage<T>> = {
-    messageId: UUID.randomUUID(),
     transport: transport,
     channel: MessagingChannel.Topic,
     message: {...message},
@@ -482,6 +510,9 @@ function sendTopicMessage<T>(recipient: { gatewayWindow: Window; origin: string 
   envelope.message.headers = new Map(envelope.message.headers || new Map());
 
   const headers = envelope.message.headers;
+  if (!headers.has(MessageHeaders.MessageId)) {
+    headers.set(MessageHeaders.MessageId, UUID.randomUUID());
+  }
   if (!headers.has(MessageHeaders.AppSymbolicName)) {
     headers.set(MessageHeaders.AppSymbolicName, PLATFORM_SYMBOLIC_NAME);
   }

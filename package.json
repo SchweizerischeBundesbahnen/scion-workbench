@@ -18,6 +18,7 @@
     "test-all:headless": "cross-env HEADLESS=true run-s *:test",
     "e2e-all": "run-p *:e2e",
     "e2e-all:headless": "run-p *:e2e-headless",
+
     "toolkit:build": "ng build --prod @scion/toolkit",
     "toolkit:lint": "ng lint @scion/toolkit",
     "toolkit:test": "ng test @scion/toolkit",

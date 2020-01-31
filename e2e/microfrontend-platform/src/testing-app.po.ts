@@ -77,6 +77,18 @@ export class TestingAppPO {
    *   E.g. if setting the classifier 'blank', the manifest 'app-1-manifest-blank.json' is collected instead of 'app-1-manifest.json'.
    * - activatorApiDisabled:
    *   Controls if the 'Activator API' is disabled.
+   * - intercept-message:reject
+   *   Messages sent to the specified topic are rejected
+   * - intercept-message:swallow
+   *   Messages sent to the specified topic are swallowed
+   * - intercept-message:uppercase
+   *   The message body of messages sent to the specified topic are changed to all upper case characters
+   * - intercept-intent:reject
+   *   Intents of the specified type are rejected
+   * - intercept-intent:swallow
+   *   Intents of the specified type are swallowed
+   * - intercept-intent:uppercase
+   *   The intent body of intents having the specified intent type are changed to all upper case characters
    *
    * @param outlets describes which microfrontends to load.
    * @param options controls the navigation

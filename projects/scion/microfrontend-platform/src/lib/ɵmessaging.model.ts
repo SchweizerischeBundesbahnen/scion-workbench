@@ -7,7 +7,7 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { IntentMessage, Message, TopicMessage } from './messaging.model';
+import { Message } from './messaging.model';
 
 /**
  * Declares the message transports.
@@ -56,8 +56,7 @@ export enum MessagingChannel {
 /**
  * Envelope for all messages.
  */
-export interface MessageEnvelope<MSG = IntentMessage | TopicMessage | TopicSubscribeCommand | TopicUnsubscribeCommand> {
-  messageId: string;
+export interface MessageEnvelope<MSG extends Message = Message> {
   transport: MessagingTransport;
   channel: MessagingChannel;
   message: MSG;

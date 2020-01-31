@@ -35,7 +35,7 @@ const routes: Routes = [
     children: [
       {path: 'browser-outlets', component: BrowserOutletsComponent, data: {pageTitle: 'Allows displaying web content in one or more browser outlets', matrixParams: new Map().set('count', 2), pageTitleVisible: false}},
       {path: 'router-outlet', component: RouterOutletComponent, data: {pageTitle: 'Allows displaying web content in a router outlet'}},
-      {path: 'outlet-router', component: OutletRouterComponent, data: {pageTitle: 'Allowd controlling the web content to be displayed in a router outlet'}},
+      {path: 'outlet-router', component: OutletRouterComponent, data: {pageTitle: 'Allows controlling the web content to be displayed in a router outlet'}},
       {path: 'publish-message', component: PublishMessageComponent, data: {pageTitle: 'Allows publishing messages'}},
       {path: 'receive-message', component: ReceiveMessageComponent, data: {pageTitle: 'Allows receiving messages'}},
       {path: 'register-capability-providers', component: RegisterCapabilityProvidersComponent, data: {pageTitle: 'Allows managing capability providers'}},

@@ -16,3 +16,4 @@ export * from './platform-config-loader';
 export * from './platform-message-client';
 export * from './manifest-registry/public_api';
 export * from './activator/public_api';
+export * from './message-broker/message-interception';

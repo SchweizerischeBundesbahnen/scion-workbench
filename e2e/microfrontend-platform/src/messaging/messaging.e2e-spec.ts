@@ -80,6 +80,21 @@ describe('Messaging', () => {
     it('allows passing headers', async () => {
       await TopicBasedMessagingSpecs.passHeadersSpec();
     });
+
+    describe('message-interception', () => {
+
+      it('allows intercepting messages', async () => {
+        await TopicBasedMessagingSpecs.interceptMessageSpec();
+      });
+
+      it('allows rejecting messages', async () => {
+        await TopicBasedMessagingSpecs.rejectMessageSpec();
+      });
+
+      it('allows swallowing messages', async () => {
+        await TopicBasedMessagingSpecs.swallowMessageSpec();
+      });
+    });
   });
 
   describe('intent-based', () => {
@@ -133,6 +148,22 @@ describe('Messaging', () => {
 
     it('allows passing headers', async () => {
       await IntendBasedMessagingSpecs.passHeadersSpec();
+    });
+
+
+    describe('intent-interception', () => {
+
+      it('allows intercepting intents', async () => {
+        await IntendBasedMessagingSpecs.interceptIntentSpec();
+      });
+
+      it('allows rejecting intents', async () => {
+        await IntendBasedMessagingSpecs.rejectIntentSpec();
+      });
+
+      it('allows swallowing intents', async () => {
+        await IntendBasedMessagingSpecs.swallowIntentSpec();
+      });
     });
   });
 });

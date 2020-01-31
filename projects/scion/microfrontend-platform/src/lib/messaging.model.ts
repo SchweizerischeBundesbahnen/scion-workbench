@@ -98,6 +98,11 @@ export enum MessageHeaders {
    */
   AppSymbolicName = 'ɵAPP_SYMBOLIC_NAME',
   /**
+   * Unique identity of the message.
+   * This header is set by the platform when publishing a message or intent.
+   */
+  MessageId = 'ɵMESSAGE_ID',
+  /**
    * Destination to which to send a response to this message.
    * This header is set by the platform when sending a request.
    */

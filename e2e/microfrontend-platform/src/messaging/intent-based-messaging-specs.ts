@@ -560,9 +560,9 @@ export namespace IntendBasedMessagingSpecs {
   export async function passHeadersSpec(): Promise<void> {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({
-      capabilityManager: {useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_1},
-      publisher: {useClass: PublishMessagePagePO, origin: TestingAppOrigins.APP_1},
-      receiver: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_1},
+      capabilityManager: RegisterCapabilityProvidersPagePO,
+      publisher: PublishMessagePagePO,
+      receiver: ReceiveMessagePagePO,
     });
 
     const capabilityManagerPO = await pagePOs.get<RegisterCapabilityProvidersPagePO>('capabilityManager');
@@ -584,6 +584,99 @@ export namespace IntendBasedMessagingSpecs {
       body: '',
       headers: new Map().set('header1', 'value').set('header2', '42'),
     });
+  }
+
+  /**
+   * Tests intent interception by changing the intent body to upper case characters.
+   * The testing app is configured to uppercase the intent body of intents of the type 'uppercase'.
+   */
+  export async function interceptIntentSpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      registrator: RegisterCapabilityProvidersPagePO,
+      publisher: PublishMessagePagePO,
+      receiver: ReceiveMessagePagePO,
+    }, {queryParams: new Map().set('intercept-intent:uppercase', 'uppercase')});
+
+    const capabilityRegisterPO = await pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator');
+    await capabilityRegisterPO.registerProvider({type: 'uppercase', qualifier: {}, private: true});
+
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
+    await receiverPO.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO.enterIntentSelector('uppercase');
+    await receiverPO.clickSubscribe();
+
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO.enterIntent('uppercase');
+    await publisherPO.enterMessage('payload');
+    await publisherPO.clickPublish();
+
+    await expectIntent(receiverPO.getFirstMessageOrElseReject()).toEqual({
+      type: 'uppercase',
+      qualifier: {},
+      body: 'PAYLOAD',
+      headers: new Map(),
+    });
+  }
+
+  /**
+   * Tests intent rejection.
+   * The testing app is configured to reject intents of the type 'reject'.
+   */
+  export async function rejectIntentSpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      registrator: RegisterCapabilityProvidersPagePO,
+      publisher: PublishMessagePagePO,
+      receiver: ReceiveMessagePagePO,
+    }, {queryParams: new Map().set('intercept-intent:reject', 'reject')});
+
+    const capabilityRegisterPO = await pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator');
+    await capabilityRegisterPO.registerProvider({type: 'reject', qualifier: {}, private: true});
+
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
+    await receiverPO.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO.enterIntentSelector('reject');
+    await receiverPO.clickSubscribe();
+
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO.enterIntent('reject');
+    await publisherPO.enterMessage('payload');
+    await publisherPO.clickPublish();
+
+    await expect(publisherPO.getPublishError()).toEqual('Intent rejected by interceptor');
+    await expect(receiverPO.getMessages()).toEqual([]);
+  }
+
+  /**
+   * Tests swallowing an intent.
+   * The testing app is configured to swallow intents of the type 'swallow'.
+   */
+  export async function swallowIntentSpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      registrator: RegisterCapabilityProvidersPagePO,
+      publisher: PublishMessagePagePO,
+      receiver: ReceiveMessagePagePO,
+    }, {queryParams: new Map().set('intercept-intent:swallow', 'swallow')});
+
+    const capabilityRegisterPO = await pagePOs.get<RegisterCapabilityProvidersPagePO>('registrator');
+    await capabilityRegisterPO.registerProvider({type: 'swallow', qualifier: {}, private: true});
+
+    const receiverPO = await pagePOs.get<ReceiveMessagePagePO>('receiver');
+    await receiverPO.selectMessagingModel(MessagingModel.Intent);
+    await receiverPO.enterIntentSelector('swallow');
+    await receiverPO.clickSubscribe();
+
+    const publisherPO = await pagePOs.get<PublishMessagePagePO>('publisher');
+    await publisherPO.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO.enterIntent('swallow');
+    await publisherPO.enterMessage('payload');
+    await publisherPO.clickPublish();
+
+    await expect(receiverPO.getMessages()).toEqual([]);
   }
 
   /**

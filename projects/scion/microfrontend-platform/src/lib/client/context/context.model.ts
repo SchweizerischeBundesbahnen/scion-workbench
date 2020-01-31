@@ -47,12 +47,13 @@ export namespace Contexts {
    */
   export function newContextValueLookupRequest(name: string, replyTo: string): MessageEnvelope<TopicMessage<void>> {
     return {
-      messageId: UUID.randomUUID(),
       transport: MessagingTransport.EmbeddedOutletContentToOutlet,
       channel: MessagingChannel.Topic,
       message: {
         topic: contextValueLookupTopic(name),
-        headers: new Map().set(MessageHeaders.ReplyTo, replyTo),
+        headers: new Map()
+          .set(MessageHeaders.MessageId, UUID.randomUUID())
+          .set(MessageHeaders.ReplyTo, replyTo),
       },
     };
   }
@@ -67,13 +68,14 @@ export namespace Contexts {
    */
   export function newContextTreeNamesLookupRequest(replyTo: string, names?: Set<string>): MessageEnvelope<TopicMessage<Set<string>>> {
     return {
-      messageId: UUID.randomUUID(),
       transport: MessagingTransport.EmbeddedOutletContentToOutlet,
       channel: MessagingChannel.Topic,
       message: {
         topic: Contexts.contextTreeNamesLookupTopic(),
         body: names || new Set<string>(),
-        headers: new Map().set(MessageHeaders.ReplyTo, replyTo),
+        headers: new Map()
+          .set(MessageHeaders.MessageId, UUID.randomUUID())
+          .set(MessageHeaders.ReplyTo, replyTo),
       },
     };
   }
@@ -86,12 +88,13 @@ export namespace Contexts {
    */
   export function newContextTreeObserveRequest(replyTo: string): MessageEnvelope<TopicMessage<void>> {
     return {
-      messageId: UUID.randomUUID(),
       transport: MessagingTransport.EmbeddedOutletContentToOutlet,
       channel: MessagingChannel.Topic,
       message: {
         topic: Contexts.contextTreeChangeTopic(),
-        headers: new Map().set(MessageHeaders.ReplyTo, replyTo),
+        headers: new Map()
+          .set(MessageHeaders.MessageId, UUID.randomUUID())
+          .set(MessageHeaders.ReplyTo, replyTo),
       },
     };
   }

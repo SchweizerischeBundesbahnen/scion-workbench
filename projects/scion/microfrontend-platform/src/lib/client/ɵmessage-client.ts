@@ -13,8 +13,8 @@ import { defer, EMPTY, from, merge, noop, Observable, Observer, Subject, Teardow
 import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
 import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from '../operators';
 import { catchError, filter, finalize, first, map, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
-import { Defined, UUID } from '@scion/toolkit/util';
-import { Intent, IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
+import { Defined, Dictionaries, UUID } from '@scion/toolkit/util';
+import { Intent, IntentMessage, Message, MessageHeaders, TopicMessage } from '../messaging.model';
 import { matchesIntentQualifier } from '../qualifier-tester';
 import { BrokerGateway } from './broker-gateway';
 import { Beans, PreDestroy } from '../bean-manager';
@@ -153,7 +153,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
    *
    * @return An Observable that completes upon successful delivery, or errors otherwise.
    */
-  private postMessageToBroker$(channel: MessagingChannel, message: any): Observable<never> {
+  private postMessageToBroker$(channel: MessagingChannel, message: Message): Observable<never> {
     return new Observable((observer: Observer<never>): TeardownLogic => {
       const messageId = UUID.randomUUID();
       const unsubscribe$ = new Subject<void>();
@@ -163,15 +163,15 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
         transport: MessagingTransport.ClientToBroker,
         channel: channel,
         message: message,
-        messageId: messageId,
       };
+      envelope.message.headers.set(MessageHeaders.MessageId, messageId);
 
       // Wait until the message is delivered.
       merge(this._brokerGateway.message$, deliveryError$)
         .pipe(
           filterByTopic<MessageDeliveryStatus>(messageId),
           first(),
-          timeoutWith(new Date(Date.now() + this._config.deliveryTimeout), throwError(`[MessageDispatchError] Broker did not report message delivery state within the ${this._config.deliveryTimeout}ms timeout. [message=${JSON.stringify(envelope)}]`)),
+          timeoutWith(new Date(Date.now() + this._config.deliveryTimeout), throwError(`[MessageDispatchError] Broker did not report message delivery state within the ${this._config.deliveryTimeout}ms timeout. [envelope=${stringifyEnvelope(envelope)}]`)),
           takeUntil(merge(this._destroy$, unsubscribe$)),
           mergeMap(statusMessage => statusMessage.body.ok ? EMPTY : throwError(statusMessage.body.details)),
         )
@@ -255,4 +255,11 @@ function setBodyIfDefined<T>(message: TopicMessage<T> | IntentMessage<T>, body?:
  */
 function copyMap<K, V>(data: Map<K, V>): Map<K, V> {
   return new Map(data || new Map());
+}
+
+/**
+ * Creates a string representation of the given {@link MessageEnvelope}.
+ */
+function stringifyEnvelope(envelope: MessageEnvelope): string {
+  return JSON.stringify(envelope, (key, value) => (value instanceof Map) ? Dictionaries.toDictionary(value) : value);
 }

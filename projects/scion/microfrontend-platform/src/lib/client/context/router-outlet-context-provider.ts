@@ -42,7 +42,7 @@ export class RouterOutletContextProvider {
         filter(event => event.source === iframe.contentWindow),
         filterByTransport(MessagingTransport.EmbeddedOutletContentToOutlet),
         pluckEnvelope(),
-        filterByChannel(MessagingChannel.Topic),
+        filterByChannel<TopicMessage>(MessagingChannel.Topic),
         share(),
       );
   }

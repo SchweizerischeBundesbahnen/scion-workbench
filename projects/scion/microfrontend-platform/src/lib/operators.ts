@@ -13,7 +13,7 @@ import { MessageEnvelope, MessagingChannel, MessagingTransport } from './ɵmessa
 import { Message, TopicMessage } from './messaging.model';
 import { TopicMatcher } from './topic-matcher.util';
 
-export function filterByChannel<T>(channel: MessagingChannel): MonoTypeOperatorFunction<MessageEnvelope<T>> {
+export function filterByChannel<T extends Message>(channel: MessagingChannel): MonoTypeOperatorFunction<MessageEnvelope<T>> {
   return filter((envelope: MessageEnvelope<any>): boolean => {
     return envelope.channel === channel;
   });
@@ -34,13 +34,13 @@ export function filterByTopic<T>(topic: string): OperatorFunction<MessageEnvelop
   );
 }
 
-export function pluckMessage<T>(): OperatorFunction<MessageEnvelope<T>, T> {
+export function pluckMessage<T extends Message>(): OperatorFunction<MessageEnvelope<T>, T> {
   return map((envelope: MessageEnvelope<T>): T => {
     return envelope.message;
   });
 }
 
-export function pluckEnvelope<T = any>(): OperatorFunction<MessageEvent, MessageEnvelope<T>> {
+export function pluckEnvelope<T extends Message>(): OperatorFunction<MessageEvent, MessageEnvelope<T>> {
   return map((messageEvent: MessageEvent): MessageEnvelope<T> => {
     return messageEvent.data;
   });

@@ -39,6 +39,7 @@ export function getGatewayJavaScript(config: GatewayConfig): string {
          GatewayInfoRequest: '${PlatformTopics.RequestGatewayInfo}',
        },
        headers: {
+         MessageId: '${MessageHeaders.MessageId}',
          ReplyTo: '${MessageHeaders.ReplyTo}',
          ClientId: '${MessageHeaders.ClientId}',
          AppSymbolicName: '${MessageHeaders.AppSymbolicName}',
@@ -123,13 +124,13 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
 
     function newReply(replyTo: string, response: GatewayInfoResponse): MessageEnvelope<TopicMessage<GatewayInfoResponse>> {
       return {
-        messageId: randomUUID(),
         transport: constants.transports.GatewayToClient,
         channel: constants.channels.Topic,
         message: {
           topic: replyTo,
           body: response,
           headers: new Map()
+            .set(constants.headers.MessageId, randomUUID())
             .set(constants.headers.ClientId, response.clientId)
             .set(constants.headers.AppSymbolicName, config.clientAppName),
         },
@@ -155,12 +156,12 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
       .catch(() => disposables.forEach(fn => fn()));
 
     const connectMessage: MessageEnvelope<TopicMessage<void>> = {
-      messageId: randomUUID(),
       transport: constants.transports.GatewayToBroker,
       channel: constants.channels.Topic,
       message: {
         topic: constants.topics.ClientConnect,
         headers: new Map()
+          .set(constants.headers.MessageId, randomUUID())
           .set(constants.headers.AppSymbolicName, config.clientAppName)
           .set(constants.headers.ReplyTo, replyTo),
       },
@@ -228,12 +229,12 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
     whenUnload.then(() => whenConnected)
       .then(broker => {
         const clientDisposeMessage: MessageEnvelope<TopicMessage<void>> = {
-          messageId: randomUUID(),
           transport: constants.transports.GatewayToBroker,
           channel: constants.channels.Topic,
           message: {
             topic: constants.topics.ClientDisconnect,
             headers: new Map()
+              .set(constants.headers.MessageId, randomUUID())
               .set(constants.headers.ClientId, broker.clientId)
               .set(constants.headers.AppSymbolicName, config.clientAppName),
           },
@@ -308,6 +309,7 @@ interface Constants {
     GatewayInfoRequest: string,
   };
   headers: {
+    MessageId: string,
     ReplyTo: string,
     ClientId: string,
     AppSymbolicName: string,
