@@ -11,4 +11,4 @@
 /**
  * Entry point for all public APIs of this package.
  */
-export { IntentionFilter, CapabilityProviderFilter } from './manifest-registry';
+export { ManifestObjectFilter } from './manifest-object-store';

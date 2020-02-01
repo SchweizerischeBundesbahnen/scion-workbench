@@ -8,15 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { IntentionStore } from './intention-store';
 import { Intention } from '../../platform.model';
 import { matchesIntentQualifier, matchesWildcardQualifier } from '../../qualifier-tester';
+import { ManifestObjectStore } from './manifest-object-store';
 
 describe('IntentionStore', () => {
-  let store: IntentionStore;
+  let store: ManifestObjectStore<Intention>;
 
   beforeEach(() => {
-    store = new IntentionStore();
+    store = new ManifestObjectStore<Intention>();
   });
 
   describe('add and find intentions', () => {
@@ -134,10 +134,10 @@ describe('IntentionStore', () => {
 
   describe('remove intentions', () => {
     it('should do nothing if the store is empty', () => {
-      store.remove('app', {type: 'type', qualifier: undefined});
-      store.remove('app', {type: 'type', qualifier: null});
-      store.remove('app', {type: 'type', qualifier: {}});
-      store.remove('app', {type: 'type', qualifier: {'*': '*'}});
+      store.remove({type: 'type', qualifier: undefined, appSymbolicName: 'app'});
+      store.remove({type: 'type', qualifier: null, appSymbolicName: 'app'});
+      store.remove({type: 'type', qualifier: {}, appSymbolicName: 'app'});
+      store.remove({type: 'type', qualifier: {'*': '*'}, appSymbolicName: 'app'});
 
       expect(store.find({appSymbolicName: 'app', qualifier: {}}, matchesWildcardQualifier)).toEqual([]);
     });
@@ -151,7 +151,7 @@ describe('IntentionStore', () => {
       store.add(intention2);
       store.add(intention3);
       store.add(intention4);
-      store.remove('app', {type: 'type', qualifier: undefined});
+      store.remove({type: 'type', qualifier: undefined, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id1'})).toEqual([]);
       expect(store.find({id: 'id2'})).toEqual([]);
@@ -169,7 +169,7 @@ describe('IntentionStore', () => {
       store.add(intention2);
       store.add(intention3);
       store.add(intention4);
-      store.remove('app', {type: 'type', qualifier: null});
+      store.remove({type: 'type', qualifier: null, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id1'})).toEqual([]);
       expect(store.find({id: 'id2'})).toEqual([]);
@@ -187,7 +187,7 @@ describe('IntentionStore', () => {
       store.add(intention2);
       store.add(intention3);
       store.add(intention4);
-      store.remove('app', {type: 'type', qualifier: {}});
+      store.remove({type: 'type', qualifier: {}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id1'})).toEqual([]);
       expect(store.find({id: 'id2'})).toEqual([]);
@@ -199,7 +199,7 @@ describe('IntentionStore', () => {
     it('should remove absolute wildcard intentions', () => {
       const intention: Intention = {type: 'type', qualifier: {'*': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'*': '*'}});
+      store.remove({type: 'type', qualifier: {'*': '*'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
@@ -208,7 +208,7 @@ describe('IntentionStore', () => {
     it('should remove intentions which contain the asterisk value wildcard in their qualifier', () => {
       const intention: Intention = {type: 'type', qualifier: {'entity': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'entity': '*'}});
+      store.remove({type: 'type', qualifier: {'entity': '*'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '*'}}, matchesWildcardQualifier)).toEqual([]);
@@ -217,7 +217,7 @@ describe('IntentionStore', () => {
     it('should remove intentions which contain the optional value wildcard in their qualifier', () => {
       const intention: Intention = {type: 'type', qualifier: {'entity': '?'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'entity': '?'}});
+      store.remove({type: 'type', qualifier: {'entity': '?'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '?'}}, matchesWildcardQualifier)).toEqual([]);
@@ -226,7 +226,7 @@ describe('IntentionStore', () => {
     it('should remove intentions using an exact qualifier as deletion criterion', () => {
       const intention: Intention = {type: 'type', qualifier: {'entity': 'test'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'entity': 'test'}});
+      store.remove({type: 'type', qualifier: {'entity': 'test'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'entity': 'test'}}, matchesWildcardQualifier)).toEqual([]);
@@ -235,7 +235,7 @@ describe('IntentionStore', () => {
     it('should not interpret wildcards in the qualifier when removing intentions (asterisk wildcard as qualifier key and value)', () => {
       const intention: Intention = {type: 'type', qualifier: {'entity': 'test'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'*': '*'}});
+      store.remove({type: 'type', qualifier: {'*': '*'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([intention]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([intention]);
@@ -244,7 +244,7 @@ describe('IntentionStore', () => {
     it('should not interpret wildcards in the qualifier when removing intentions (asterisk wildcard as qualifier value)', () => {
       const intention: Intention = {type: 'type', qualifier: {'entity': 'test'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'entity': '*'}});
+      store.remove({type: 'type', qualifier: {'entity': '*'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([intention]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '*'}}, matchesWildcardQualifier)).toEqual([intention]);
@@ -253,7 +253,7 @@ describe('IntentionStore', () => {
     it('should not interpret wildcards in the qualifier when removing intentions (optional wildcard as qualifier value)', () => {
       const intention: Intention = {type: 'type', qualifier: {'entity': 'test'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'entity': '?'}});
+      store.remove({type: 'type', qualifier: {'entity': '?'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([intention]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '?'}}, matchesWildcardQualifier)).toEqual([intention]);
@@ -262,7 +262,7 @@ describe('IntentionStore', () => {
     it('should not remove wildcard intentions when using an exact qualifier as deletion criterion', () => {
       const intention: Intention = {type: 'type', qualifier: {'*': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'entity': 'test'}});
+      store.remove({type: 'type', qualifier: {'entity': 'test'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([intention]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'entity': 'test'}}, matchesWildcardQualifier)).toEqual([intention]);
@@ -272,7 +272,7 @@ describe('IntentionStore', () => {
     it('should not remove absolute wildcard intentions when specifying the asterisk wildcard only as qualifier value', () => {
       const intention: Intention = {type: 'type', qualifier: {'*': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'entity': '*'}});
+      store.remove({type: 'type', qualifier: {'entity': '*'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([intention]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '*'}}, matchesWildcardQualifier)).toEqual([intention]);
@@ -282,7 +282,7 @@ describe('IntentionStore', () => {
     it('should not remove absolute wildcard intentions when specifying the optional wildcard as qualifier value', () => {
       const intention: Intention = {type: 'type', qualifier: {'*': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {'entity': '?'}});
+      store.remove({type: 'type', qualifier: {'entity': '?'}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([intention]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'entity': '?'}}, matchesWildcardQualifier)).toEqual([intention]);
@@ -292,7 +292,7 @@ describe('IntentionStore', () => {
     it('should remove absolute wildcard intentions if not specifying a qualifier in the filter', () => {
       const intention: Intention = {type: 'type', qualifier: {'*': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type'});
+      store.remove({type: 'type', appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
@@ -301,7 +301,7 @@ describe('IntentionStore', () => {
     it('should remove absolute wildcard intentions if an `undefined` qualifier is passed in the filter', () => {
       const intention: Intention = {type: 'type', qualifier: {'*': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: undefined});
+      store.remove({type: 'type', qualifier: undefined, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([]);
       expect(store.find({appSymbolicName: 'app', qualifier: {'*': '*'}}, matchesWildcardQualifier)).toEqual([]);
@@ -310,7 +310,7 @@ describe('IntentionStore', () => {
     it('should not remove absolute wildcard intentions if a `null` qualifier is passed in the filter', () => {
       const intention: Intention = {type: 'type', qualifier: {'*': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: null});
+      store.remove({type: 'type', qualifier: null, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([intention]);
       expect(store.find({appSymbolicName: 'app', qualifier: null}, matchesWildcardQualifier)).toEqual([intention]);
@@ -320,7 +320,7 @@ describe('IntentionStore', () => {
     it('should not remove absolute wildcard intentions if an empty qualifier is passed in the filter', () => {
       const intention: Intention = {type: 'type', qualifier: {'*': '*'}, metadata: {id: 'id', appSymbolicName: 'app'}};
       store.add(intention);
-      store.remove('app', {type: 'type', qualifier: {}});
+      store.remove({type: 'type', qualifier: {}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id'})).toEqual([intention]);
       expect(store.find({appSymbolicName: 'app', qualifier: {}}, matchesWildcardQualifier)).toEqual([intention]);
@@ -332,7 +332,7 @@ describe('IntentionStore', () => {
       const intention2: Intention = {type: 'type2', metadata: {id: 'id2', appSymbolicName: 'app'}};
       store.add(intention1);
       store.add(intention2);
-      store.remove('app', {type: 'type1', qualifier: {}});
+      store.remove({type: 'type1', qualifier: {}, appSymbolicName: 'app'});
 
       expect(store.find({id: 'id1'})).toEqual([]);
       expect(store.find({id: 'id2'})).toEqual([intention2]);
@@ -344,7 +344,7 @@ describe('IntentionStore', () => {
       const intention2: Intention = {type: 'type', metadata: {id: 'id2', appSymbolicName: 'app2'}};
       store.add(intention1);
       store.add(intention2);
-      store.remove('app1', {type: 'type', qualifier: {}});
+      store.remove({type: 'type', qualifier: {}, appSymbolicName: 'app1'});
 
       expect(store.find({id: 'id1'})).toEqual([]);
       expect(store.find({id: 'id2'})).toEqual([intention2]);

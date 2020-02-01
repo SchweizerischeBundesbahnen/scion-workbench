@@ -1,6 +1,6 @@
 import { $ } from 'protractor';
 import { enterText } from '../spec.util';
-import { CapabilityProviderFilter } from '@scion/microfrontend-platform';
+import { ManifestObjectFilter } from '@scion/microfrontend-platform';
 import { SciCheckboxPO, SciListPO, SciParamsEnterPO, WaitUntil } from '@scion/ɵtoolkit/widgets.po';
 import { SwitchToIframeFn } from '../browser-outlet/browser-outlet.po';
 
@@ -19,7 +19,7 @@ export class LookupCapabilityProvidersPagePO {
    * Looks up capability providers matching the given filter. The lookup never completes.
    * Looked up providers can be read via {@link getLookedUpProviderIds} method.
    */
-  public async lookup(filter?: CapabilityProviderFilter): Promise<void> {
+  public async lookup(filter?: ManifestObjectFilter): Promise<void> {
     await this._switchToIframeFn();
 
     if (await this._pageFinder.$('button.e2e-cancel-lookup').isPresent()) {

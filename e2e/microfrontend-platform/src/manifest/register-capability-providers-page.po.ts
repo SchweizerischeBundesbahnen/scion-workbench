@@ -1,6 +1,6 @@
 import { $, browser, protractor } from 'protractor';
 import { enterText } from '../spec.util';
-import { CapabilityProviderFilter, Qualifier } from '@scion/microfrontend-platform';
+import { ManifestObjectFilter, Qualifier } from '@scion/microfrontend-platform';
 import { SciCheckboxPO, SciParamsEnterPO } from '@scion/ɵtoolkit/widgets.po';
 import { SwitchToIframeFn } from '../browser-outlet/browser-outlet.po';
 
@@ -49,7 +49,7 @@ export class RegisterCapabilityProvidersPagePO {
    *
    * Returns a Promise that resolves upon successful unregistration, or that rejects on unregistration error.
    */
-  public async unregisterProvider(filter: CapabilityProviderFilter): Promise<void> {
+  public async unregisterProvider(filter: ManifestObjectFilter): Promise<void> {
     await this._switchToIframeFn();
     if (filter.id) {
       await enterText(filter.id, this._unregisterSectionFinder.$('input.e2e-id'));

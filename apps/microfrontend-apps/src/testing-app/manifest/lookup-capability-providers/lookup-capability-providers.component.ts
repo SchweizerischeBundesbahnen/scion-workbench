@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { Beans, CapabilityProvider, CapabilityProviderFilter, ManifestService } from '@scion/microfrontend-platform';
+import { Beans, CapabilityProvider, ManifestObjectFilter, ManifestService } from '@scion/microfrontend-platform';
 import { SciParamsEnterComponent } from '@scion/ɵtoolkit/widgets';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -41,7 +41,7 @@ export class LookupCapabilityProvidersComponent {
     const nilQualifierIfEmtpy = this.form.get(NILQUALIFIER_IF_EMPTY).value;
     const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray, false);
 
-    const filter: CapabilityProviderFilter = {
+    const filter: ManifestObjectFilter = {
       id: this.form.get(ID).value || undefined,
       type: this.form.get(TYPE).value || undefined,
       qualifier: Object.keys(qualifier).length ? qualifier : (nilQualifierIfEmtpy ? {} : undefined),

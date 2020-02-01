@@ -1,7 +1,7 @@
 import { $, browser, protractor } from 'protractor';
 import { enterText } from '../spec.util';
 import { SwitchToIframeFn } from '../browser-outlet/browser-outlet.po';
-import { IntentionFilter, Qualifier } from '@scion/microfrontend-platform';
+import { ManifestObjectFilter, Qualifier } from '@scion/microfrontend-platform';
 import { SciCheckboxPO, SciParamsEnterPO } from '@scion/ɵtoolkit/widgets.po';
 
 const EC = protractor.ExpectedConditions;
@@ -48,7 +48,7 @@ export class RegisterIntentionsPagePO {
    *
    * Returns a Promise that resolves upon successful unregistration, or that rejects on unregistration error.
    */
-  public async unregisterIntentions(filter: IntentionFilter): Promise<void> {
+  public async unregisterIntentions(filter: ManifestObjectFilter): Promise<void> {
     await this._switchToIframeFn();
     if (filter.id) {
       await enterText(filter.id, this._unregisterSectionFinder.$('input.e2e-id'));

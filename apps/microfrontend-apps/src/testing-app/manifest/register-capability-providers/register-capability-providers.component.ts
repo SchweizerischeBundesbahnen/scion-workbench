@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Beans, CapabilityProvider, CapabilityProviderFilter, ClientConfig, ManifestService } from '@scion/microfrontend-platform';
+import { Beans, CapabilityProvider, ManifestObjectFilter, ClientConfig, ManifestService } from '@scion/microfrontend-platform';
 import { SciParamsEnterComponent } from '@scion/ɵtoolkit/widgets';
 import { noop, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -82,7 +82,7 @@ export class RegisterCapabilityProvidersComponent {
     const nilQualifierIfEmtpy = this.unregisterForm.get(NILQUALIFIER_IF_EMPTY).value;
     const qualifier = SciParamsEnterComponent.toParamsDictionary(this.unregisterForm.get(QUALIFIER) as FormArray, false);
 
-    const filter: CapabilityProviderFilter = {
+    const filter: ManifestObjectFilter = {
       id: this.unregisterForm.get(ID).value || undefined,
       type: this.unregisterForm.get(TYPE).value || undefined,
       qualifier: Object.keys(qualifier).length ? qualifier : (nilQualifierIfEmtpy ? {} : undefined),

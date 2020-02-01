@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { CapabilityProvider, Intention, Qualifier } from '../../platform.model';
+import { CapabilityProvider, Intention } from '../../platform.model';
 import { Intent } from '../../messaging.model';
 
 /**
@@ -36,28 +36,4 @@ export abstract class ManifestRegistry {
    * Registers the given intention for the given application.
    */
   abstract registerIntention(intention: Intention, appSymbolicName: string): string | undefined;
-}
-
-/**
- * Allows filtering capability providers.
- *
- * All specified filter criteria are "AND"ed together. If no filter criterion is specified, no filtering takes place.
- */
-export interface CapabilityProviderFilter {
-  id?: string;
-  type?: string;
-  qualifier?: Qualifier;
-  appSymbolicName?: string;
-}
-
-/**
- * Allows filtering intentions.
- *
- * All specified filter criteria are "AND"ed together. If no filter criterion is specified, no filtering takes place.
- */
-export interface IntentionFilter {
-  id?: string;
-  type?: string;
-  qualifier?: Qualifier;
-  appSymbolicName?: string;
 }

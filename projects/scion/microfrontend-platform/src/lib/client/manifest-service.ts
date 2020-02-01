@@ -15,7 +15,7 @@ import { Application, CapabilityProvider, Intention } from '../platform.model';
 import { mergeMapTo, take } from 'rxjs/operators';
 import { PlatformTopics } from '../ɵmessaging.model';
 import { ManifestRegistryTopics } from '../host/manifest-registry/ɵmanifest-registry';
-import { CapabilityProviderFilter, IntentionFilter } from '../host/manifest-registry/manifest-registry';
+import { ManifestObjectFilter } from '../host/manifest-registry/manifest-object-store';
 
 /**
  * Central point for looking up or managing capability providers or intentions available in the system.
@@ -42,8 +42,9 @@ export class ManifestService {
   /**
    * Allows to look up capabilities that match the given filter.
    *
-   * Only those capabilities are returned for which the requesting application has declared an intention,
-   * and which either have public visibility or are provided by the app itself.
+   * Only those capabilities are returned for which the requesting app has declared an intention or which are
+   * provided by the app itself. Only public capabilities are returned, except for capabilities provided by the
+   * app itself.
    *
    * @param  filter
    *         Control which capabilities to return. If no or an empty filter is given, all capabilities visible
@@ -55,7 +56,7 @@ export class ManifestService {
    * @return An Observable that, when subscribed, emits the requested capabilities.
    *         It never completes and emits continuously when satisfying capabilities are registered or unregistered.
    */
-  public lookupCapabilityProviders$<T extends CapabilityProvider>(filter?: CapabilityProviderFilter): Observable<T[]> {
+  public lookupCapabilityProviders$<T extends CapabilityProvider>(filter?: ManifestObjectFilter): Observable<T[]> {
     return this._messageClient.request$<T[]>(ManifestRegistryTopics.LookupCapabilityProviders, filter)
       .pipe(
         throwOnErrorStatus(),
@@ -76,7 +77,7 @@ export class ManifestService {
    * @return An Observable that, when subscribed, emits the requested intentions.
    *         It never completes and emits continuously when satisfying intentions are registered or unregistered.
    */
-  public lookupIntentions$(filter?: IntentionFilter): Observable<Intention[]> {
+  public lookupIntentions$(filter?: ManifestObjectFilter): Observable<Intention[]> {
     return this._messageClient.request$<Intention[]>(ManifestRegistryTopics.LookupIntentions, filter)
       .pipe(
         throwOnErrorStatus(),
@@ -110,7 +111,7 @@ export class ManifestService {
    * @return An Observable that completes immediately when unregistered the providers,
    *         or which throws an error if the unregistration failed.
    */
-  public unregisterCapabilityProviders$(filter?: CapabilityProviderFilter): Observable<never> {
+  public unregisterCapabilityProviders$(filter?: ManifestObjectFilter): Observable<never> {
     return this._messageClient.request$<void>(ManifestRegistryTopics.UnregisterCapabilityProviders, filter)
       .pipe(
         throwOnErrorStatus(),
@@ -139,6 +140,8 @@ export class ManifestService {
   /**
    * Unregisters intentions of the requesting application which match the given filter.
    *
+   * This operation requires that the 'Intention Registration API' is enabled for the requesting application.
+   *
    * @param  filter
    *         Control which intentions to unregister by specifying filter criteria which are "AND"ed together.
    *         If no or an empty filter is given, all intentions of the requesting app are unregistered.
@@ -147,7 +150,7 @@ export class ManifestService {
    * @return An Observable that completes immediately when unregistered the intentions,
    *         or which throws an error if the unregistration failed.
    */
-  public unregisterIntentions$(filter?: IntentionFilter): Observable<never> {
+  public unregisterIntentions$(filter?: ManifestObjectFilter): Observable<never> {
     return this._messageClient.request$<void>(ManifestRegistryTopics.UnregisterIntentions, filter)
       .pipe(
         throwOnErrorStatus(),

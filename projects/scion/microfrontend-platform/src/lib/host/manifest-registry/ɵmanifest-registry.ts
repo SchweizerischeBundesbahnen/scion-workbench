@@ -11,8 +11,7 @@
 import { CapabilityProvider, Intention, NilQualifier } from '../../platform.model';
 import { sha256 } from 'js-sha256';
 import { Defined } from '@scion/toolkit/util';
-import { IntentionStore } from './intention-store';
-import { ProviderStore } from './provider-store';
+import { ManifestObjectFilter, ManifestObjectStore } from './manifest-object-store';
 import { defer, merge, of, Subject } from 'rxjs';
 import { Beans, PreDestroy } from '../../bean-manager';
 import { distinctUntilChanged, expand, mergeMapTo, take, takeUntil } from 'rxjs/operators';
@@ -22,19 +21,19 @@ import { takeUntilUnsubscribe } from '../../client/message-client';
 import { ApplicationRegistry } from '../application-registry';
 import { runSafe } from '../../safe-runner';
 import { filterArray } from '@scion/toolkit/operators';
-import { CapabilityProviderFilter, IntentionFilter, ManifestRegistry } from './manifest-registry';
+import { ManifestRegistry } from './manifest-registry';
 import { matchesIntentQualifier, matchesWildcardQualifier } from '../../qualifier-tester';
 
 // tslint:disable:unified-signatures
 export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tslint:disable-line:class-name
 
-  private _providerStore: ProviderStore;
-  private _intentionStore: IntentionStore;
+  private _providerStore: ManifestObjectStore<CapabilityProvider>;
+  private _intentionStore: ManifestObjectStore<Intention>;
   private _destroy$ = new Subject<void>();
 
   constructor() {
-    this._providerStore = new ProviderStore();
-    this._intentionStore = new IntentionStore();
+    this._providerStore = new ManifestObjectStore<CapabilityProvider>();
+    this._intentionStore = new ManifestObjectStore<Intention>();
 
     this.installProviderRegisterRequestHandler();
     this.installProviderUnregisterRequestHandler();
@@ -50,7 +49,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
    * @inheritDoc
    */
   public getCapabilityProvidersByIntent(intent: Intent, appSymbolicName: string): CapabilityProvider[] {
-    const filter = {type: intent.type, qualifier: intent.qualifier || {}};
+    const filter: ManifestObjectFilter = {type: intent.type, qualifier: intent.qualifier || {}};
     return this._providerStore.find(filter, matchesIntentQualifier)
       .filter(provider => this.isProviderVisibleToApplication(provider, appSymbolicName));
   }
@@ -59,7 +58,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
    * @inheritDoc
    */
   public hasIntention(intent: Intent, appSymbolicName: string): boolean {
-    const filter = {appSymbolicName, type: intent.type, qualifier: intent.qualifier || {}};
+    const filter: ManifestObjectFilter = {appSymbolicName, type: intent.type, qualifier: intent.qualifier || {}};
     return (
       this._intentionStore.find(filter, matchesIntentQualifier).length > 0 ||
       this._providerStore.find(filter, matchesIntentQualifier).length > 0
@@ -70,10 +69,9 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
    * Tests whether the given app has declared a satisfying intention for the given provider.
    */
   private hasIntentionForProvider(appSymbolicName: string, provider: CapabilityProvider): boolean {
-    const filter = {appSymbolicName, type: provider.type, qualifier: provider.qualifier};
     return (
       provider.metadata.appSymbolicName === appSymbolicName ||
-      this._intentionStore.find(filter, matchesWildcardQualifier).length > 0
+      this._intentionStore.find({appSymbolicName, type: provider.type, qualifier: provider.qualifier}, matchesWildcardQualifier).length > 0
     );
   }
 
@@ -109,8 +107,8 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
     return registeredProvider.metadata.id;
   }
 
-  private unregisterCapabilityProviders(appSymbolicName: string, providerFilter: CapabilityProviderFilter): void {
-    this._providerStore.remove(appSymbolicName, providerFilter);
+  private unregisterCapabilityProviders(appSymbolicName: string, filter: ManifestObjectFilter): void {
+    this._providerStore.remove({...filter, appSymbolicName});
   }
 
   public registerIntention(intention: Intention, appSymbolicName: string): string | undefined {
@@ -130,8 +128,8 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
     return registeredIntention.metadata.id;
   }
 
-  private unregisterIntention(appSymbolicName: string, intentionFilter: IntentionFilter): void {
-    this._intentionStore.remove(appSymbolicName, intentionFilter);
+  private unregisterIntention(appSymbolicName: string, filter: ManifestObjectFilter): void {
+    this._intentionStore.remove({...filter, appSymbolicName});
   }
 
   private installProviderRegisterRequestHandler(): void {
@@ -155,7 +153,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
   private installProviderUnregisterRequestHandler(): void {
     Beans.get(PlatformMessageClient).observe$(ManifestRegistryTopics.UnregisterCapabilityProviders)
       .pipe(takeUntil(this._destroy$))
-      .subscribe((request: TopicMessage<CapabilityProviderFilter>) => runSafe(() => {
+      .subscribe((request: TopicMessage<ManifestObjectFilter>) => runSafe(() => {
         const replyTo = request.headers.get(MessageHeaders.ReplyTo);
         const providerFilter = request.body || {};
         const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
@@ -192,7 +190,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
   private installIntentionUnregisterRequestHandler(): void {
     Beans.get(PlatformMessageClient).observe$(ManifestRegistryTopics.UnregisterIntentions)
       .pipe(takeUntil(this._destroy$))
-      .subscribe((request: TopicMessage<IntentionFilter>) => runSafe(() => {
+      .subscribe((request: TopicMessage<ManifestObjectFilter>) => runSafe(() => {
         const replyTo = request.headers.get(MessageHeaders.ReplyTo);
         const intentFilter = request.body || {};
         const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
@@ -211,7 +209,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
   private installProvidersLookupRequestHandler(): void {
     Beans.get(PlatformMessageClient).observe$(ManifestRegistryTopics.LookupCapabilityProviders)
       .pipe(takeUntil(this._destroy$))
-      .subscribe((request: TopicMessage<CapabilityProviderFilter>) => runSafe(() => {
+      .subscribe((request: TopicMessage<ManifestObjectFilter>) => runSafe(() => {
         const replyTo = request.headers.get(MessageHeaders.ReplyTo);
         const appSymbolicName = request.headers.get(MessageHeaders.AppSymbolicName);
         const lookupFilter = request.body || {};
@@ -237,7 +235,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
   private installIntentionsLookupRequestHandler(): void {
     Beans.get(PlatformMessageClient).observe$(ManifestRegistryTopics.LookupIntentions)
       .pipe(takeUntil(this._destroy$))
-      .subscribe((request: TopicMessage<IntentionFilter>) => runSafe(() => {
+      .subscribe((request: TopicMessage<ManifestObjectFilter>) => runSafe(() => {
         const replyTo = request.headers.get(MessageHeaders.ReplyTo);
         const lookupFilter = request.body || {};
 
