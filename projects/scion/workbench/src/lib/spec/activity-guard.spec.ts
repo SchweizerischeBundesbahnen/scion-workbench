@@ -45,7 +45,7 @@ describe('Activity part', () => {
       imports: [AppTestModule, CommonModule],
     });
 
-    TestBed.get(Router).initialNavigation();
+    TestBed.inject(Router).initialNavigation();
   }));
 
   it('does not activate activity if prevented by routing guard', fakeAsync(inject([Router, RouteReuseStrategy], (router: Router, routeReuseStrategy: RouteReuseStrategy) => {

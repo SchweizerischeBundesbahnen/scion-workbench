@@ -52,7 +52,7 @@ describe('Lazily loaded view', () => {
       imports: [AppTestModule],
     });
 
-    TestBed.get(Router).initialNavigation();
+    TestBed.inject(Router).initialNavigation();
   }));
 
   // TODO [Angular 9]:
@@ -147,7 +147,7 @@ export class FeatureService {
     WorkbenchTestingModule.forRoot(),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
-      {path: 'feature', loadChildren: './feature/feature.module'},
+      {path: 'feature', loadChildren: './feature/feature.module'}
     ]),
   ],
   declarations: [AppComponent],

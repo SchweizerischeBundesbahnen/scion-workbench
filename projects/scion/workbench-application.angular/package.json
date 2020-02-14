@@ -19,9 +19,9 @@
     "@scion/workbench-application.core": "0.0.0-beta.32"
   },
   "peerDependencies": {
-    "@angular/common": "^8.0.0-rc.0 || ^8.0.0",
-    "@angular/core": "^8.0.0-rc.0 || ^8.0.0",
-    "@angular/cdk": "^8.0.0-rc.0 || ^8.0.0",
+    "@angular/common": "^9.0.0-rc.0 || ^9.0.0",
+    "@angular/core": "^9.0.0-rc.0 || ^9.0.0",
+    "@angular/cdk": "^9.0.0-rc.0 || ^9.0.0",
     "rxjs": "^6.0.0"
   },
   "keywords": [

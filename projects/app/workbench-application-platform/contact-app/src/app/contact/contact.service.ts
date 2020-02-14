@@ -35,7 +35,7 @@ export class ContactService implements OnDestroy {
       .pipe(
         options && options.once ? take(1) : tap(),
         map(dictionary => dictionary[id]),
-        filter(Boolean),
+        filter<Contact>(Boolean),
       );
   }
 

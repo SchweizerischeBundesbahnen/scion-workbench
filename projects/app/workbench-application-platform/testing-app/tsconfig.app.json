@@ -3,5 +3,9 @@
   "compilerOptions": {
     "outDir": "../../../../out-tsc/testing-app",
     "types": []
-  }
+  },
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts"
+  ]
 }

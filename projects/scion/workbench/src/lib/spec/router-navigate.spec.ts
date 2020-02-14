@@ -64,7 +64,7 @@ describe('Router', () => {
       imports: [AppTestModule],
     });
 
-    TestBed.get(Router).initialNavigation();
+    TestBed.inject(Router).initialNavigation();
   }));
 
   // TODO [Angular 9]:

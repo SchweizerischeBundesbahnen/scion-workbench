@@ -31,6 +31,6 @@ export class ViewPartGridProvider {
    * Upon subscription, the current grid is emitted, if any, and then emits continuously when the grid changes. It never completes.
    */
   public get grid$(): Observable<ViewPartGrid> {
-    return this._grid$.pipe(filter(Boolean));
+    return this._grid$.pipe(filter<ViewPartGrid>(Boolean));
   }
 }

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ANALYZE_FOR_ENTRY_COMPONENTS, Inject, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
+import { Inject, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { WorkbenchComponent } from './workbench.component';
@@ -128,7 +128,6 @@ import { ViewMenuService } from './view-part/view-context-menu/view-menu.service
     WorkbenchComponent,
     WbActivityDirective,
     WbActivityActionDirective,
-    SashDirective,
     WbRouterLinkDirective,
     WbRouterLinkWithHrefDirective,
     RemoteSiteComponent,
@@ -170,7 +169,7 @@ export class WorkbenchModule {
    * export class AppModule { }
    * ```
    */
-  public static forRoot(config: WorkbenchConfig = {}): ModuleWithProviders {
+  public static forRoot(config: WorkbenchConfig = {}): ModuleWithProviders<WorkbenchModule> {
     return {
       ngModule: WorkbenchModule,
       providers: [
@@ -213,41 +212,6 @@ export class WorkbenchModule {
         },
         {provide: WorkbenchConfig, useValue: config},
         {
-          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
-          multi: true,
-          useValue: ViewPartComponent,
-        },
-        {
-          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
-          multi: true,
-          useValue: ViewComponent,
-        },
-        {
-          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
-          multi: true,
-          useValue: ViewTabContentComponent,
-        },
-        {
-          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
-          multi: true,
-          useValue: ViewMenuComponent,
-        },
-        {
-          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
-          multi: true,
-          useValue: TextComponent,
-        },
-        {
-          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
-          multi: true,
-          useValue: EmptyOutletComponent,
-        },
-        {
-          provide: ANALYZE_FOR_ENTRY_COMPONENTS,
-          multi: true,
-          useValue: ViewListComponent,
-        },
-        {
           provide: ROUTE_REUSE_PROVIDER,
           multi: true,
           useClass: WbActivityRouteReuseProvider,
@@ -268,7 +232,7 @@ export class WorkbenchModule {
   /**
    * To manifest a dependency to the 'workbench.module' from within a feature module.
    */
-  public static forChild(): ModuleWithProviders {
+  public static forChild(): ModuleWithProviders<WorkbenchModule> {
     return {
       ngModule: WorkbenchModule,
       providers: [], // do not register any providers in 'forChild' but in 'forRoot' instead

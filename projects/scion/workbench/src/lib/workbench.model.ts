@@ -183,7 +183,7 @@ export class InternalWorkbenchView implements WorkbenchView {
       .pipe(
         map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
         mapArray(menuItemFactoryFn => menuItemFactoryFn(this)),
-        filterArray(Boolean),
+        filterArray<WorkbenchMenuItem>(Boolean),
       );
   }
 

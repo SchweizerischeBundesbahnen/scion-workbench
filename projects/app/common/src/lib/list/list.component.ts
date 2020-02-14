@@ -97,7 +97,7 @@ export class SciListComponent implements AfterViewInit, OnDestroy {
   @ViewChildren(SciListItemComponent)
   private _listItemComponents: QueryList<SciListItemComponent>;
 
-  @ViewChild(SciFilterFieldComponent, {static: false})
+  @ViewChild(SciFilterFieldComponent)
   private _filterField: SciFilterFieldComponent;
 
   @HostBinding('attr.tabindex')

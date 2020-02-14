@@ -29,7 +29,7 @@ describe('ViewOutletNavigator', () => {
       imports: [AppTestModule],
     });
 
-    TestBed.get(Router).initialNavigation();
+    TestBed.inject(Router).initialNavigation();
   }));
 
   it('resolves present views by path', fakeAsync(inject([WorkbenchRouter, ViewOutletNavigator], (wbRouter: WorkbenchRouter, viewOutletNavigator: ViewOutletNavigator) => {

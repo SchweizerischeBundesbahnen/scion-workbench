@@ -43,7 +43,7 @@ describe('url.util', () => {
       },
     });
 
-    const urlTree = TestBed.get(Router).createUrlTree(['foo', matrixParam]);
+    const urlTree = TestBed.inject(Router).createUrlTree(['foo', matrixParam]);
 
     const {matrixParams, queryParams} = Url.readMatrixParamObject(urlTree.root.children[PRIMARY_OUTLET].segments[0].parameters);
     expect(matrixParams).toEqual({
@@ -66,7 +66,7 @@ describe('url.util', () => {
       imports: [RouterTestingModule.withRoutes([])],
     });
 
-    const urlTree = TestBed.get(Router).createUrlTree(['foo']);
+    const urlTree = TestBed.inject(Router).createUrlTree(['foo']);
     const {matrixParams, queryParams} = Url.readMatrixParamObject(urlTree.root.children[PRIMARY_OUTLET].segments[0].parameters);
     expect(matrixParams).toBeUndefined();
     expect(queryParams).toBeUndefined();

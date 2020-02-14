@@ -33,7 +33,7 @@ describe('ViewComponent', () => {
       imports: [AppTestModule],
     });
 
-    TestBed.get(Router).initialNavigation();
+    TestBed.inject(Router).initialNavigation();
   }));
 
   it('should render dirty state', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -54,8 +54,11 @@ describe('ViewComponent', () => {
     // Clear dirty flag
     viewDebugElement.view.dirty = false;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'e2e-dirty': false}), '(B)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).not.toEqual(jasmine.objectContaining({'e2e-dirty': true}), '(B)');
 
+    viewDebugElement.view.dirty = true;
+    advance(fixture);
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'e2e-dirty': true}), '(C)');
     tick();
   })));
 
@@ -360,7 +363,7 @@ describe('ViewComponent', () => {
   })));
 
   function getViewDebugElement<T>(viewRef: string): ViewDebugElement<T> {
-    const view = TestBed.get(WorkbenchViewRegistry).getElseThrow(viewRef);
+    const view = TestBed.inject(WorkbenchViewRegistry).getElseThrow(viewRef);
     const viewComponent = view.portal.componentRef.instance as ViewComponent;
     const component = viewComponent.routerOutlet.component as T;
 
@@ -393,5 +396,5 @@ class AppTestModule {
 
 function getWorkbenchService(): WorkbenchService {
   // TODO [Angular 9]: remove type cast for abstract symbols once 'angular/issues/29905' and 'angular/issues/23611' are fixed
-  return TestBed.get(WorkbenchService as Type<WorkbenchService>);
+  return TestBed.inject(WorkbenchService as Type<WorkbenchService>);
 }
