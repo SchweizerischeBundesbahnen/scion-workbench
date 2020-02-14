@@ -81,6 +81,10 @@ export interface Application {
    * Sets whether or not 'Intention Registration API' is disabled for this application.
    */
   intentionRegisterApiDisabled: boolean;
+  /**
+   * Indicates whether or not this application can issue intents for which it has not declared a respective intention.
+   */
+  intentionRegisteredCheckDisabled: boolean;
 }
 
 /**

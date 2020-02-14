@@ -63,6 +63,12 @@ export interface ApplicationConfig {
    * By default, this API is disabled.
    */
   intentionRegisterApiDisabled?: boolean;
+  /**
+   * Sets whether or not this application can issue intents for which it has not declared a respective intention.
+   *
+   * By default, intention registered check is enabled. Disabling intention registered check is discouraged.
+   */
+  intentionRegisteredCheckDisabled?: boolean;
 }
 
 /**

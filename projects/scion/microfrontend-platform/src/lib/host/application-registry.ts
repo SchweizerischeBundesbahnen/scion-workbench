@@ -56,6 +56,7 @@ export class ApplicationRegistry {
       origin: new URL(this.computeBaseUrl(applicationConfig, manifest)).origin,
       scopeCheckDisabled: Defined.orElse(applicationConfig.scopeCheckDisabled, false),
       intentionRegisterApiDisabled: Defined.orElse(applicationConfig.intentionRegisterApiDisabled, true),
+      intentionRegisteredCheckDisabled: Defined.orElse(applicationConfig.intentionRegisteredCheckDisabled, false),
     });
 
     manifest.capabilities && manifest.capabilities.forEach(capabilityProvider => Beans.get(ManifestRegistry).registerCapabilityProvider(capabilityProvider, applicationConfig.symbolicName));
@@ -72,7 +73,7 @@ export class ApplicationRegistry {
   }
 
   /**
-   * Returns whether or not provider scope check is disabled for the given application.
+   * Returns whether or not provider 'scope check' is disabled for the given application.
    */
   public isScopeCheckDisabled(appSymbolicName: string): boolean {
     return this._applications.get(appSymbolicName).scopeCheckDisabled;
@@ -83,6 +84,13 @@ export class ApplicationRegistry {
    */
   public isIntentionRegisterApiDisabled(appSymbolicName: string): boolean {
     return this._applications.get(appSymbolicName).intentionRegisterApiDisabled;
+  }
+
+  /**
+   * Returns whether or not 'intention registered check' is disabled for the given application.
+   */
+  public isIntentionRegisteredCheckDisabled(appSymbolicName: string): boolean {
+    return this._applications.get(appSymbolicName).intentionRegisteredCheckDisabled;
   }
 
   /**

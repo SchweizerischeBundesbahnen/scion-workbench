@@ -60,16 +60,19 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
   public hasIntention(intent: Intent, appSymbolicName: string): boolean {
     const filter: ManifestObjectFilter = {appSymbolicName, type: intent.type, qualifier: intent.qualifier || {}};
     return (
+      Beans.get(ApplicationRegistry).isIntentionRegisteredCheckDisabled(appSymbolicName) ||
       this._intentionStore.find(filter, matchesIntentQualifier).length > 0 ||
       this._providerStore.find(filter, matchesIntentQualifier).length > 0
     );
   }
 
   /**
-   * Tests whether the given app has declared a satisfying intention for the given provider.
+   * Tests whether the given app has declared a satisfying intention for the given provider, or whether the app provides the provider itself,
+   * or 'intention registered check' is disabled for the app.
    */
   private hasIntentionForProvider(appSymbolicName: string, provider: CapabilityProvider): boolean {
     return (
+      Beans.get(ApplicationRegistry).isIntentionRegisteredCheckDisabled(appSymbolicName) ||
       provider.metadata.appSymbolicName === appSymbolicName ||
       this._intentionStore.find({appSymbolicName, type: provider.type, qualifier: provider.qualifier}, matchesWildcardQualifier).length > 0
     );
@@ -77,10 +80,14 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
 
   /**
    * Tests whether the given app can see the given provider, i.e. the app provides the provider itself, or the provider has public visibility,
-   * or scope check is disabled for the app.
+   * or 'scope check' is disabled for the app.
    */
   private isProviderVisibleToApplication(provider: CapabilityProvider, appSymbolicName: string): boolean {
-    return !provider.private || provider.metadata.appSymbolicName === appSymbolicName || Beans.get(ApplicationRegistry).isScopeCheckDisabled(appSymbolicName);
+    return (
+      Beans.get(ApplicationRegistry).isScopeCheckDisabled(appSymbolicName) ||
+      !provider.private ||
+      provider.metadata.appSymbolicName === appSymbolicName
+    );
   }
 
   public registerCapabilityProvider(provider: CapabilityProvider, appSymbolicName: string): string | undefined {
