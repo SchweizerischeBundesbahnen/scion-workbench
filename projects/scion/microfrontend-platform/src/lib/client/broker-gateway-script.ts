@@ -36,7 +36,7 @@ export function getGatewayJavaScript(config: GatewayConfig): string {
        topics: {
          ClientConnect: '${PlatformTopics.ClientConnect}',
          ClientDisconnect: '${PlatformTopics.ClientDisconnect}',
-         GatewayInfoRequest: '${PlatformTopics.RequestGatewayInfo}',
+         RequestGatewayInfo: '${PlatformTopics.RequestGatewayInfo}',
        },
        headers: {
          MessageId: '${MessageHeaders.MessageId}',
@@ -62,7 +62,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
   const whenConnected = discoverBrokerAndConnect();
 
   installClientMessageDispatcher();
-  installGatewayInfoRequestReplier();
+  installRequestGatewayInfoReplier();
   installClientDisposeFunction();
 
   /**
@@ -87,7 +87,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
   /**
    * Installs a message listener to reply to the gateway info request.
    */
-  function installGatewayInfoRequestReplier(): void {
+  function installRequestGatewayInfoReplier(): void {
     const onmessage = (event: MessageEvent): void => {
       if (event.origin !== config.clientOrigin) {
         return;
@@ -98,7 +98,7 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
       if (event.data.channel !== constants.channels.Topic) {
         return;
       }
-      if (event.data.message.topic !== constants.topics.GatewayInfoRequest) {
+      if (event.data.message.topic !== constants.topics.RequestGatewayInfo) {
         return;
       }
 
@@ -306,7 +306,7 @@ interface Constants {
   topics: {
     ClientConnect: string,
     ClientDisconnect: string,
-    GatewayInfoRequest: string,
+    RequestGatewayInfo: string,
   };
   headers: {
     MessageId: string,
