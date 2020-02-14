@@ -579,8 +579,7 @@ export namespace IntendBasedMessagingSpecs {
     await publisherPO.clickPublish();
 
     await expectIntent(receiverPO.getFirstMessageOrElseReject()).toEqual({
-      type: 'testing',
-      qualifier: {q1: 'v1', q2: 'v2'},
+      intent: {type: 'testing', qualifier: {q1: 'v1', q2: 'v2'}},
       body: '',
       headers: new Map().set('header1', 'value').set('header2', '42'),
     });
@@ -613,8 +612,7 @@ export namespace IntendBasedMessagingSpecs {
     await publisherPO.clickPublish();
 
     await expectIntent(receiverPO.getFirstMessageOrElseReject()).toEqual({
-      type: 'uppercase',
-      qualifier: {},
+      intent: {type: 'uppercase', qualifier: {}},
       body: 'PAYLOAD',
       headers: new Map(),
     });
@@ -686,8 +684,8 @@ export namespace IntendBasedMessagingSpecs {
     return {
       toEqual: async (expected: IntentMessage): Promise<void> => {
         const actualMessage = await actual;
-        await expect(actualMessage.getIntentType()).toEqual(expected.type);
-        await expect(actualMessage.getIntentQualifier()).toEqual(expected.qualifier);
+        await expect(actualMessage.getIntentType()).toEqual(expected.intent.type);
+        await expect(actualMessage.getIntentQualifier()).toEqual(expected.intent.qualifier);
         if (expected.body !== undefined) {
           await expect(actualMessage.getBody()).toEqual(expected.body);
         }

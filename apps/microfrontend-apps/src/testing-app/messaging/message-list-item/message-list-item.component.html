@@ -14,9 +14,9 @@
 </ng-template>
 
 <ng-template #intent_message_template>
-  Type: <span class="e2e-intent-type intent-type">{{message.type}}</span>
+  Type: <span class="e2e-intent-type intent-type">{{message.intent.type}}</span>
   Qualifier:
-  <sci-property [properties]="message.qualifier" class="e2e-intent-qualifier"></sci-property>
+  <sci-property [properties]="message.intent.qualifier" class="e2e-intent-qualifier"></sci-property>
   <ng-container *ngIf="message.headers.get(MessageHeaders.ReplyTo) as replyTo">
     replyTo: <span class="e2e-reply-to">{{replyTo}}</span>
   </ng-container>

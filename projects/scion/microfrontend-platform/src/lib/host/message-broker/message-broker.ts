@@ -293,29 +293,29 @@ export class MessageBroker implements PreDestroy {
         takeUntil(this._destroy$),
       )
       .subscribe((clientMessage: ClientMessage<IntentMessage>) => runSafe(() => {
-        const intent = clientMessage.envelope.message;
-        const messageId = intent.headers.get(MessageHeaders.MessageId);
+        const intentMessage = clientMessage.envelope.message;
+        const messageId = intentMessage.headers.get(MessageHeaders.MessageId);
 
-        if (!intent) {
-          const error = '[IntentDispatchError] Intent must not be null';
+        if (!intentMessage.intent) {
+          const error = '[IntentDispatchError] Intent required';
           sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
           return;
         }
 
-        if (!intent.type) {
+        if (!intentMessage.intent.type) {
           const error = '[IntentDispatchError] Intent type required';
           sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
           return;
         }
 
-        if (!this._manifestRegistry.hasIntention(intent, clientMessage.client.application.symbolicName)) {
-          const error = `[NotQualifiedError] Application '${clientMessage.client.application.symbolicName}' is not qualified to publish intents of the type '${intent.type}' and qualifier '${JSON.stringify(intent.qualifier || {})}'. Ensure to have listed the intention in the application manifest.`;
+        if (!this._manifestRegistry.hasIntention(intentMessage.intent, clientMessage.client.application.symbolicName)) {
+          const error = `[NotQualifiedError] Application '${clientMessage.client.application.symbolicName}' is not qualified to publish intents of the type '${intentMessage.intent.type}' and qualifier '${JSON.stringify(intentMessage.intent.qualifier || {})}'. Ensure to have listed the intention in the application manifest.`;
           sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
           return;
         }
 
         try {
-          this._intentPublisher.publish(intent);
+          this._intentPublisher.publish(intentMessage);
           sendDeliveryStatusSuccess(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId});
         }
         catch (error) {
@@ -348,11 +348,11 @@ export class MessageBroker implements PreDestroy {
    * Creates the interceptor chain to intercept intent publishing. The publisher is added as terminal handler.
    */
   private createIntentPublisher(): PublishInterceptorChain<IntentMessage> {
-    return chainInterceptors(Beans.all(IntentInterceptor), (intent: IntentMessage): void => {
+    return chainInterceptors(Beans.all(IntentInterceptor), (message: IntentMessage): void => {
       // Find providers which provide a satisfying capability for the intent.
-      const capabilityProviders = this._manifestRegistry.getCapabilityProvidersByIntent(intent, intent.headers.get(MessageHeaders.AppSymbolicName));
+      const capabilityProviders = this._manifestRegistry.getCapabilityProvidersByIntent(message.intent, message.headers.get(MessageHeaders.AppSymbolicName));
       if (capabilityProviders.length === 0) {
-        throw Error(`[NullProviderError] No application found to provide a capability of the type '${intent.type}' and qualifiers '${JSON.stringify(intent.qualifier || {})}'. Maybe, the capability is not public API or the providing application not available.`);
+        throw Error(`[NullProviderError] No application found to provide a capability of the type '${message.intent.type}' and qualifiers '${JSON.stringify(message.intent.qualifier || {})}'. Maybe, the capability is not public API or the providing application not available.`);
       }
 
       // Find respective clients.
@@ -361,15 +361,15 @@ export class MessageBroker implements PreDestroy {
         .reduce((combined, list) => new Set([...combined, ...list]), new Set<Client>());
 
       // If request-reply communication, send an error if no replier is found to reply to the intent.
-      if (clients.size === 0 && intent.headers.has(MessageHeaders.ReplyTo)) {
-        throw Error(`[RequestReplyError] No client is currently running which could answer the intent '{type=${intent.type}, qualifier=${JSON.stringify(intent.qualifier)}}'.`);
+      if (clients.size === 0 && message.headers.has(MessageHeaders.ReplyTo)) {
+        throw Error(`[RequestReplyError] No client is currently running which could answer the intent '{type=${message.intent.type}, qualifier=${JSON.stringify(message.intent.qualifier)}}'.`);
       }
 
       // Dispatch the intent.
       const envelope: MessageEnvelope<IntentMessage> = {
         transport: MessagingTransport.BrokerToClient,
         channel: MessagingChannel.Intent,
-        message: intent,
+        message: message,
       };
       clients.forEach(client => client.gatewayWindow.postMessage(envelope, client.application.origin));
     });

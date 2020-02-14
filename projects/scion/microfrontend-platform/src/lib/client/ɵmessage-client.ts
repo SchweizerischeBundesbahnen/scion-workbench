@@ -66,7 +66,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
     // must be done per subscription and each subscription must be given its own headers map instance.
     return defer(() => {
-      const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: copyMap(options && options.headers)};
+      const intentMessage: IntentMessage = {intent, headers: copyMap(options && options.headers)};
       setBodyIfDefined(intentMessage, body);
       return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
     });
@@ -77,7 +77,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
     // must be done per subscription and each subscription must be given its own headers map instance.
     return defer(() => {
-      const intentMessage: IntentMessage = {type: intent.type, qualifier: intent.qualifier, headers: copyMap(options && options.headers)};
+      const intentMessage: IntentMessage = {intent, headers: copyMap(options && options.headers)};
       setBodyIfDefined(intentMessage, body);
       // Delay the request until the host has completed its startup to not lose the request if handled by a replier in the host.
       return from(Beans.get(HostPlatformState).whenStarted()).pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage)));
@@ -143,8 +143,8 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
         filterByChannel<IntentMessage<T>>(MessagingChannel.Intent),
         pluckMessage(),
         map(message => ({...message, headers: copyMap(message.headers)})),
-        filter(intent => !selector || !selector.type || selector.type === intent.type),
-        filter(intent => !selector || !selector.qualifier || matchesIntentQualifier(selector.qualifier, intent.qualifier)),
+        filter(message => !selector || !selector.type || selector.type === message.intent.type),
+        filter(message => !selector || !selector.qualifier || matchesIntentQualifier(selector.qualifier, message.intent.qualifier)),
       );
   }
 

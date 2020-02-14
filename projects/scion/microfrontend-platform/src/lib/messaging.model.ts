@@ -19,13 +19,9 @@ export interface Message {
  */
 export interface IntentMessage<BODY = any> extends Message {
   /**
-   * Type of functionality which to intent.
+   * The intent that represents this message.
    */
-  type: string;
-  /**
-   * Dictionary of key-value pairs to express the intent.
-   */
-  qualifier?: Qualifier;
+  intent: Intent;
   /**
    * Optional JSON serializable data to pass with the intent.
    */

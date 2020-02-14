@@ -156,14 +156,14 @@ describe('Intent Interception', () => {
   it('should invoke the publisher even if no interceptors are given', async () => {
     publisher = createSpy('publisher');
     publishChain = chainInterceptors([], publisher);
-    const intent: IntentMessage = {headers: new Map(), type: 'type'};
+    const intent: IntentMessage = {headers: new Map(), intent: {type: 'type'}};
 
     publishChain.publish(intent);
     expect(publisher).toHaveBeenCalledWith(intent);
   });
 
   it('should pass an intent through the interceptors in registration order', async () => {
-    const intent: IntentMessage = {headers: new Map(), type: 'type'};
+    const intent: IntentMessage = {headers: new Map(), intent: {type: 'type'}};
     publishChain.publish(intent);
 
     // assert interceptor invocation arguments
@@ -188,7 +188,7 @@ describe('Intent Interception', () => {
     interceptor2.intercept.and.throwError('INTENT REJECTED BY INTERCEPTOR 2');
 
     // Run the test
-    const intent: IntentMessage = {headers: new Map(), type: 'type'};
+    const intent: IntentMessage = {headers: new Map(), intent: {type: 'type'}};
     expect(() => publishChain.publish(intent)).toThrowError(/INTENT REJECTED BY INTERCEPTOR 2/);
 
     //  Verify
@@ -202,7 +202,7 @@ describe('Intent Interception', () => {
     interceptor2.intercept.and.callFake(noop);
 
     // Run the test
-    const intent: IntentMessage = {headers: new Map(), type: 'type'};
+    const intent: IntentMessage = {headers: new Map(), intent: {type: 'type'}};
     publishChain.publish(intent);
 
     // Verify
@@ -230,7 +230,7 @@ describe('Intent Interception', () => {
     });
 
     // Run the test
-    const intent: IntentMessage = {headers: new Map(), type: 'type', body: []};
+    const intent: IntentMessage = {headers: new Map(), intent: {type: 'type'}, body: []};
     publishChain.publish(intent);
 
     // Verify
@@ -240,7 +240,7 @@ describe('Intent Interception', () => {
     expect(publisher).toHaveBeenCalledWith({
       body: ['INTERCEPTOR_1', 'INTERCEPTOR_2', 'INTERCEPTOR_3'],
       headers: new Map().set('HEADER_INTERCEPTOR_1', true).set('HEADER_INTERCEPTOR_2', true).set('HEADER_INTERCEPTOR_3', true),
-      type: 'type',
+      intent: {type: 'type'},
     } as IntentMessage);
   });
 });

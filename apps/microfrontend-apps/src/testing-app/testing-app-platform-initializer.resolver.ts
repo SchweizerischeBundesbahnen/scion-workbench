@@ -133,34 +133,34 @@ export class TestingAppPlatformInitializerResolver implements Resolve<void> {
   private installIntentInterceptors(queryParams: ParamMap): void {
     if (queryParams.has('intercept-intent:reject')) {
       const interceptor = new class implements IntentInterceptor {
-        public intercept(intent: IntentMessage, next: Handler<IntentMessage>): void {
-          if (intent.type === queryParams.get('intercept-intent:reject')) {
+        public intercept(message: IntentMessage, next: Handler<IntentMessage>): void {
+          if (message.intent.type === queryParams.get('intercept-intent:reject')) {
             throw Error('Intent rejected by interceptor');
           }
-          next.handle(intent);
+          next.handle(message);
         }
       };
       Beans.register(IntentInterceptor, {useValue: interceptor, multi: true});
     }
     if (queryParams.has('intercept-intent:swallow')) {
       const interceptor = new class implements IntentInterceptor {
-        public intercept(intent: IntentMessage, next: Handler<IntentMessage>): void {
-          if (intent.type === queryParams.get('intercept-intent:swallow')) {
+        public intercept(message: IntentMessage, next: Handler<IntentMessage>): void {
+          if (message.intent.type === queryParams.get('intercept-intent:swallow')) {
             return;
           }
-          next.handle(intent);
+          next.handle(message);
         }
       };
       Beans.register(IntentInterceptor, {useValue: interceptor, multi: true});
     }
     if (queryParams.has('intercept-intent:uppercase')) {
       const interceptor = new class implements IntentInterceptor {
-        public intercept(intent: IntentMessage<string>, next: Handler<IntentMessage<string>>): void {
-          if (intent.type === queryParams.get('intercept-intent:uppercase')) {
-            next.handle({...intent, body: intent.body.toUpperCase()});
+        public intercept(message: IntentMessage<string>, next: Handler<IntentMessage<string>>): void {
+          if (message.intent.type === queryParams.get('intercept-intent:uppercase')) {
+            next.handle({...message, body: message.body.toUpperCase()});
           }
           else {
-            next.handle(intent);
+            next.handle(message);
           }
         }
       };
