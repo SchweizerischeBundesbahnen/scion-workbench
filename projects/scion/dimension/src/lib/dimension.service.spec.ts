@@ -22,7 +22,7 @@ describe('DimensionService', () => {
   });
 
   it('should emit on size change of the element', async () => {
-    const dimensionService = TestBed.get<SciDimensionService>(SciDimensionService);
+    const dimensionService = TestBed.inject<SciDimensionService>(SciDimensionService);
 
     // create the testee <div> and subscribe for dimension changes
     const testeeDiv = document.createElement('div');
@@ -49,7 +49,7 @@ describe('DimensionService', () => {
   });
 
   it('should emit on size change of the parent element', async () => {
-    const dimensionService: SciDimensionService = TestBed.get(SciDimensionService);
+    const dimensionService: SciDimensionService = TestBed.inject(SciDimensionService);
 
     // create a parent <div> with a width of 300px
     const parentDiv = document.createElement('div');
@@ -80,7 +80,7 @@ describe('DimensionService', () => {
   });
 
   it('should allocate a single HTML object element for multiple observers', async () => {
-    const dimensionService: SciDimensionService = TestBed.get(SciDimensionService);
+    const dimensionService: SciDimensionService = TestBed.inject(SciDimensionService);
 
     // create the testee <div>
     const testeeDiv = document.createElement('div');

@@ -19,6 +19,7 @@ export * from './lib/workbench-activity';
 export * from './lib/workbench-popup';
 export * from './lib/workbench-view-open-activity-action.directive';
 export * from './lib/workbench-url-open-activity-action.directive';
+export * from './lib/workbench-popup-open-activity-action.directive';
 
 export * from '@scion/workbench-application-platform.api';
 export * from '@scion/workbench-application.core';

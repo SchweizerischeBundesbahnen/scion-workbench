@@ -44,7 +44,7 @@ describe('Activity part', () => {
       imports: [AppTestModule, CommonModule],
     });
 
-    TestBed.get(Router).initialNavigation();
+    TestBed.inject(Router).initialNavigation();
   }));
 
   it('renders the correct actions in the activity part header', fakeAsync(inject([Router, RouteReuseStrategy], (router: Router, routeReuseStrategy: RouteReuseStrategy) => {

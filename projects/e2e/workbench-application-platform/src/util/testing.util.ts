@@ -15,6 +15,14 @@ export async function switchToIFrameContext(iframeCssClasses: string[]): Promise
   const selector = ['iframe', ...iframeCssClasses].join('.');
   await browser.switchTo().defaultContent();
   await browser.switchTo().frame($(selector).getWebElement());
+  // TODO [Angular 9]: remove this hack as soon as protractor detects angular in iframes
+  const waitForAngularEnabled = await browser.waitForAngularEnabled();
+  await browser.waitForAngularEnabled(false);
+  try {
+    await browser.wait(protractor.ExpectedConditions.presenceOf($('*[ng-version]')));
+  } finally {
+    await browser.waitForAngularEnabled(waitForAngularEnabled);
+  }
   console.log(`Browser testing context switched: commands are sent to the following iframe: '${selector}'`);
 }
 

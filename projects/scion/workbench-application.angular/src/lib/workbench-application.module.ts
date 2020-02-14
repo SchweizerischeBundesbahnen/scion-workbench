@@ -51,7 +51,7 @@ export class WorkbenchApplicationModule {
    *
    * Call `forRoot` only in the root application module. Calling it in any other module, particularly in a lazy-loaded module, will produce a runtime error.
    */
-  public static forRoot(config: WorkbenchApplicationConfig = {}): ModuleWithProviders {
+  public static forRoot(config: WorkbenchApplicationConfig = {}): ModuleWithProviders<WorkbenchApplicationModule> {
     return {
       ngModule: WorkbenchApplicationModule,
       providers: [
@@ -100,7 +100,7 @@ export class WorkbenchApplicationModule {
   /**
    * To manifest a dependency to the 'workbench-application-platform.module' from within a feature module.
    */
-  public static forChild(): ModuleWithProviders {
+  public static forChild(): ModuleWithProviders<WorkbenchApplicationModule> {
     return {
       ngModule: WorkbenchApplicationModule,
       providers: [], // do not register any providers in 'forChild' but in 'forRoot' instead

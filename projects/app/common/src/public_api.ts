@@ -46,6 +46,7 @@ export { UUID } from './lib/uuid/uuid.util';
  */
 export { SciListModule } from './lib/list/list.module';
 export { SciListComponent } from './lib/list/list.component';
+export { SciListItemComponent } from './lib/list/list-item/list-item.component';
 export { SciListItemDirective } from './lib/list/list-item.directive';
 export { SciListStyle } from './lib/list/metadata';
 

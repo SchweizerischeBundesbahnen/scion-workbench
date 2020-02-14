@@ -16,7 +16,9 @@
             "project": "projects/scion/workbench/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/scion/workbench/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -54,7 +56,9 @@
             "project": "projects/scion/workbench-application-platform/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/scion/workbench-application-platform/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -92,7 +96,9 @@
             "project": "projects/scion/workbench-application-platform.api/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/scion/workbench-application-platform.api/tsconfig.lib.prod.json"
+            }
           }
         },
         "lint": {
@@ -121,7 +127,9 @@
             "project": "projects/scion/workbench-application.core/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/scion/workbench-application.core/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -159,7 +167,9 @@
             "project": "projects/scion/workbench-application.angular/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/scion/workbench-application.angular/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -197,7 +207,9 @@
             "project": "projects/scion/mouse-dispatcher/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/scion/mouse-dispatcher/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -235,7 +247,9 @@
             "project": "projects/scion/dimension/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/scion/dimension/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -273,7 +287,9 @@
             "project": "projects/scion/viewport/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/scion/viewport/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -311,7 +327,9 @@
             "project": "projects/app/common/ng-package.json"
           },
           "configurations": {
-            "production": {}
+            "production": {
+              "tsConfig": "projects/app/common/tsconfig.lib.prod.json"
+            }
           }
         },
         "lint": {
@@ -389,6 +407,12 @@
           },
           "configurations": {
             "now": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/app/workbench-application-platform/host-app/src/environments/environment.ts",
@@ -445,6 +469,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/app/workbench-application-platform/contact-app",
             "index": "projects/app/workbench-application-platform/contact-app/src/index.html",
             "main": "projects/app/workbench-application-platform/contact-app/src/main.ts",
@@ -466,6 +491,12 @@
           },
           "configurations": {
             "now": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/app/workbench-application-platform/contact-app/src/environments/environment.ts",
@@ -522,6 +553,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/app/workbench-application-platform/communication-app",
             "index": "projects/app/workbench-application-platform/communication-app/src/index.html",
             "main": "projects/app/workbench-application-platform/communication-app/src/main.ts",
@@ -543,6 +575,12 @@
           },
           "configurations": {
             "now": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/app/workbench-application-platform/communication-app/src/environments/environment.ts",
@@ -599,6 +637,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/app/workbench-application-platform/dev-tools-app",
             "index": "projects/app/workbench-application-platform/dev-tools-app/src/index.html",
             "main": "projects/app/workbench-application-platform/dev-tools-app/src/main.ts",
@@ -620,6 +659,12 @@
           },
           "configurations": {
             "now": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/app/workbench-application-platform/dev-tools-app/src/environments/environment.ts",
@@ -676,6 +721,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/app/workbench-application-platform/testing-app",
             "index": "projects/app/workbench-application-platform/testing-app/src/index.html",
             "main": "projects/app/workbench-application-platform/testing-app/src/main.ts",
@@ -696,6 +742,12 @@
           },
           "configurations": {
             "now": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/app/workbench-application-platform/testing-app/src/environments/environment.ts",
@@ -752,6 +804,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/app/workbench/workbench-app",
             "index": "projects/app/workbench/workbench-app/src/index.html",
             "main": "projects/app/workbench/workbench-app/src/main.ts",
@@ -773,6 +826,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/app/workbench/workbench-app/src/environments/environment.ts",

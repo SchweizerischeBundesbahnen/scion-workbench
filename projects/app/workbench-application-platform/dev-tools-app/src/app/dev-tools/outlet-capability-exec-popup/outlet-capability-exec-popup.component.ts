@@ -66,7 +66,7 @@ export class OutletCapabilityExecPopupComponent implements OnDestroy {
           title: 'Capability not found',
           text: `No capability found with given id '${route.snapshot.params['id']}'`,
         })),
-        filter(Boolean),
+        filter<Capability>(Boolean),
         takeUntil(this._destroy$),
       )
       .subscribe(capability => {

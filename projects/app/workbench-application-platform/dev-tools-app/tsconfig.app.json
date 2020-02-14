@@ -3,5 +3,9 @@
   "compilerOptions": {
     "outDir": "../../../../out-tsc/dev-tools-app",
     "types": []
-  }
+  },
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts"
+  ]
 }

@@ -31,7 +31,7 @@ describe('ViewPartGridComponent', () => {
       imports: [AppTestModule],
     });
 
-    TestBed.get(Router).initialNavigation();
+    TestBed.inject(Router).initialNavigation();
   }));
 
   it('allows to move a view into a new view part in the east', fakeAsync(() => {
@@ -820,6 +820,6 @@ class AppTestModule {
 
 // TODO [Angular 9]: remove once 'angular/issues/29905' and 'angular/issues/23611' are fixed
 function getService<T>(token: Type<T> | AbstractType<T> | InjectionToken<T>): T {
-  return TestBed.get(token as Type<T>);
+  return TestBed.inject(token as Type<T>);
 }
 

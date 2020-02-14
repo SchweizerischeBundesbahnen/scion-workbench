@@ -5,6 +5,12 @@
 
 # Changelog
 
+# [0.0.0-beta.33](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.32...0.0.0-beta.33) (2020-02-21)
+
+### Features
+
+* chore: add support for angular 9, drop support for angular < 9 [#197](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/197)
+
 # [0.0.0-beta.32](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.31...0.0.0-beta.32) (2019-11-13)
 
 
