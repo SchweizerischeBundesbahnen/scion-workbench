@@ -36,8 +36,10 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     assertTopic(topic, {allowWildcardSegments: false});
     // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
     // must be done per subscription and each subscription must be given its own headers map instance.
+    // The headers are copied on initialization to prevent modifications before the effective subscription.
+    const headers = new Map(options && options.headers);
     return defer(() => {
-      const topicMessage: TopicMessage = {topic, retain: Defined.orElse(options && options.retain, false), headers: copyMap(options && options.headers)};
+      const topicMessage: TopicMessage = {topic, retain: Defined.orElse(options && options.retain, false), headers: new Map(headers)};
       setBodyIfDefined(topicMessage, message);
       return this.postMessageToBroker$(MessagingChannel.Topic, topicMessage);
     });
@@ -47,8 +49,10 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     assertTopic(topic, {allowWildcardSegments: false});
     // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
     // must be done per subscription and each subscription must be given its own headers map instance.
+    // The headers are copied on initialization to prevent modifications before the effective subscription.
+    const headers = new Map(options && options.headers);
     return defer(() => {
-      const topicMessage: TopicMessage = {topic, retain: false, headers: copyMap(options && options.headers)};
+      const topicMessage: TopicMessage = {topic, retain: false, headers: new Map(headers)};
       setBodyIfDefined(topicMessage, request);
       // Delay the request until the host has completed its startup to not lose the request if handled by a replier in the host.
       return from(Beans.get(HostPlatformState).whenStarted()).pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Topic, topicMessage)));
@@ -65,8 +69,10 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     assertIntentQualifier(intent.qualifier, {allowWildcards: false});
     // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
     // must be done per subscription and each subscription must be given its own headers map instance.
+    // The headers are copied on initialization to prevent modifications before the effective subscription.
+    const headers = new Map(options && options.headers);
     return defer(() => {
-      const intentMessage: IntentMessage = {intent, headers: copyMap(options && options.headers)};
+      const intentMessage: IntentMessage = {intent, headers: new Map(headers)};
       setBodyIfDefined(intentMessage, body);
       return this.postMessageToBroker$(MessagingChannel.Intent, intentMessage);
     });
@@ -76,8 +82,10 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
     assertIntentQualifier(intent.qualifier, {allowWildcards: false});
     // IMPORTANT: In order to support multiple subscriptions to the returned Observable, initialization
     // must be done per subscription and each subscription must be given its own headers map instance.
+    // The headers are copied on initialization to prevent modifications before the effective subscription.
+    const headers = new Map(options && options.headers);
     return defer(() => {
-      const intentMessage: IntentMessage = {intent, headers: copyMap(options && options.headers)};
+      const intentMessage: IntentMessage = {intent, headers: new Map(headers)};
       setBodyIfDefined(intentMessage, body);
       // Delay the request until the host has completed its startup to not lose the request if handled by a replier in the host.
       return from(Beans.get(HostPlatformState).whenStarted()).pipe(mergeMapTo(this.postMessageToBrokerAndReceiveReplies$(MessagingChannel.Intent, intentMessage)));
@@ -254,7 +262,7 @@ function setBodyIfDefined<T>(message: TopicMessage<T> | IntentMessage<T>, body?:
  * @see http://man.hubwiz.com/docset/JavaScript.docset/Contents/Resources/Documents/developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm.html
  */
 function copyMap<K, V>(data: Map<K, V>): Map<K, V> {
-  return new Map(data || new Map());
+  return new Map(data);
 }
 
 /**
