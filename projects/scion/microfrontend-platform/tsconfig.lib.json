@@ -18,5 +18,48 @@
   "exclude": [
     "src/test.ts",
     "**/*.spec.ts"
-  ]
+  ],
+  "typedocOptions": {
+    "mode": "file",
+    "out": "dist/typedoc/microfrontend-platform",
+    "includeVersion": true,
+    "listInvalidSymbolLinks": true,
+    "excludeNotExported": true,
+    "excludeProtected": false,
+    "excludePrivate": true,
+    "excludeExternals": true,
+    "exclude": "**/ɵ*.ts",
+    "toc": [
+      "MicrofrontendPlatform",
+      "MessageClient",
+      "OutletRouter",
+      "SciRouterOutletElement",
+      "ManifestService",
+      "ContextService",
+      "FocusMonitor",
+      "PreferredSizeService",
+      "MessageInterceptor",
+      "IntentInterceptor",
+      "HostPlatformState",
+      "PlatformConfigLoader",
+      "PlatformPropertyService",
+      "Beans",
+      "Intention",
+      "Intent",
+      "CapabilityProvider",
+      "ActivatorProvider",
+      "ApplicationManifest",
+      "ApplicationConfig",
+      "PlatformConfigLoader",
+      "PlatformConfig"
+    ],
+    "categoryOrder": [
+      "Platform",
+      "Messaging",
+      "Routing"
+    ],
+    "categorizeByGroup": true,
+    "defaultCategory": "Platform",
+    "theme": "minimal"
+  }
 }

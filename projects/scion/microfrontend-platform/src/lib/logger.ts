@@ -9,7 +9,11 @@
  */
 
 /**
- * Logs to the console if the console is available.
+ * Logger used by the platform to log to the console.
+ *
+ * Replace this bean to capture the log output.
+ *
+ * @category Platform
  */
 export class Logger {
 

@@ -10,7 +10,7 @@
 
 import { AbstractType, BeanInfo, Beans, Type } from './bean-manager';
 import { MicrofrontendPlatform } from './microfrontend-platform';
-import { MessageClient, NullMessageClient } from './client/message-client';
+import { MessageClient, NullMessageClient } from './client/messaging/message-client';
 import { PlatformState, PlatformStates } from './platform-state';
 import { ApplicationConfig } from './host/platform-config';
 import { HostPlatformState } from './client/host-platform-state';
@@ -96,5 +96,5 @@ describe('MicrofrontendPlatform', () => {
 });
 
 function getBeanInfo<T>(symbol: Type<T | any> | AbstractType<T | any>): BeanInfo<T> {
-  return Array.from(Beans.getBeanInfo<T>(symbol) || new Set())[0];
+  return Array.from(Beans.getBeanInfo<T>(symbol) || new Set<BeanInfo<T>>())[0];
 }

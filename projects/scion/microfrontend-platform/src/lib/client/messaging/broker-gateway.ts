@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { from, fromEvent, noop, Observable, of, Subject, throwError } from 'rxjs';
-import { MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../ɵmessaging.model';
+import { MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../../ɵmessaging.model';
 import { first, map, mergeMap, share, switchMap, take, takeUntil, timeoutWith } from 'rxjs/operators';
-import { filterByOrigin, filterByTopic, filterByTransport, pluckEnvelope } from '../operators';
+import { filterByOrigin, filterByTopic, filterByTransport, pluckEnvelope } from '../../operators';
 import { UUID } from '@scion/toolkit/util';
-import { MessageHeaders, TopicMessage } from '../messaging.model';
+import { MessageHeaders, TopicMessage } from '../../messaging.model';
 import { GatewayInfoResponse, getGatewayJavaScript } from './broker-gateway-script';
-import { Beans } from '../bean-manager';
-import { Logger } from '../logger';
+import { Beans } from '../../bean-manager';
+import { Logger } from '../../logger';
 
 /**
  * The gateway is responsible for dispatching messages between the client and the broker.
@@ -27,6 +27,8 @@ import { Logger } from '../logger';
  * and no messages are received.
  *
  * When the gateway is disposed, it sends a DISCONNECT message to the broker.
+ *
+ * @ignore
  */
 export class BrokerGateway {
 
@@ -176,6 +178,8 @@ export class BrokerGateway {
 
 /**
  * Information about the gateway and the broker.
+ *
+ * @ignore
  */
 export interface GatewayInfo {
   window: Window;
@@ -188,6 +192,8 @@ export interface GatewayInfo {
  *
  * For instance, if creating a Promise from an Observable, the Promise resolves to `undefined`
  * if the Observable did not emit a value before its completion, e.g., on shutdown.
+ *
+ * @ignore
  */
 function neverResolveIfUndefined<T>(value: T): Promise<T> {
   return value !== undefined ? Promise.resolve(value) : NEVER_PROMISE;
@@ -195,5 +201,7 @@ function neverResolveIfUndefined<T>(value: T): Promise<T> {
 
 /**
  * Promise which never resolves.
+ *
+ * @ignore
  */
 const NEVER_PROMISE = new Promise<never>(noop);

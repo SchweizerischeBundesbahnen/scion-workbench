@@ -20,6 +20,8 @@ import { PlatformTopics } from '../ɵmessaging.model';
 
 /**
  * Registry with all registered applications.
+ *
+ * @ignore
  */
 export class ApplicationRegistry {
 

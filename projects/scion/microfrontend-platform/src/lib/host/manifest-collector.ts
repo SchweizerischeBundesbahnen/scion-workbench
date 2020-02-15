@@ -24,6 +24,7 @@ import { PlatformTopics } from '../ɵmessaging.model';
  * Collects manifests of registered applications.
  *
  * This collector is registered as {@link Initializer}. The platform waits to initialize until manifests are collected.
+ * @ignore
  */
 export class ManifestCollector implements Initializer {
 

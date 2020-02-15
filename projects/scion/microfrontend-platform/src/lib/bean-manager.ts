@@ -11,27 +11,83 @@
 import { Defined } from '@scion/toolkit/util';
 import { PlatformState, PlatformStates } from './platform-state';
 
+/** @ignore **/
 const initializers: InitializerFn[] = [];
+/** @ignore **/
 const beanRegistry = new Map<Type<any> | AbstractType<any>, Set<BeanInfo>>();
+/** @ignore **/
 const beanDecoratorRegistry = new Map<Type<any> | AbstractType<any>, BeanDecorator<any>[]>();
 
 /**
- * Allows looking up beans registered with the platform.
+ * Provides the platform with a bean manager responsible for managing the lifecycle of beans.
  *
- * A bean can be any object and is registered under some symbol with this bean manager. A symbol is either a class type
- * or an abstract class type.
+ * The bean manager is the central point to obtain bean instances. A bean can be any object which to register under some symbol.
+ * A symbol is either a class type or an abstract class type. Beans are application-scoped (singleton) and are, by default,
+ * constructed lazily when looked up for the first time.
  *
- * Beans are application-scoped and, by default, are constructed lazily when looked up for the first time.
- * Beans with an eager construction strategy are constructed after all initializers completed, in the order as registered.
+ * Some platform beans can be overridden if necessary, e.g., to override built-in platform behavior, or to mock beans in tests. For that, register the
+ * overridden bean(s) under its original symbol before starting the platform.
  *
- * Beans do not support field or constructor injection. Instead, beans are looked up programmatically.
+ * #### Initializers
+ * To perform some initialization before eager beans are constructed, you can register an {@link Initializer} or {@link InitializerFn}. Initializers may
+ * run in parallel. For this reason, there must be no dependency in any initializer on the order of the execution of the initializers.
  *
- * If a bean implements {@link PreDestroy} lifecycle hook, it is invoked when the platform is shutting down.
+ * #### Bean decoration
+ * The bean manager allows decorating a bean to intercept invocations to its methods and properties. For that, register a {@link BeanDecorator}
+ * via {@link Beans.registerDecorator} method and return a proxy for the actual bean.
+ *
+ * *Bean decoration can be particularly useful for the {@link MessageClient}. The interaction between the message client and the broker happens in a separate browsing
+ * context. In Angular, for example, the separate browsing context prevents Angular (or more precisely zone.js) from triggering a change detection cycle when receiving
+ * messages, causing the UI not to update as expected. By decorating the message client, you can run the emissions of its Observables inside the Angular zone, which then
+ * triggers a change detection cycle to synchronize the UI accordingly.*
+ *
+ * #### Bean registration
+ * The API for registering beans is very much based on the providers API of Angular. Thus a bean is provided under some class symbol, and the bean instance can be
+ * specified as following:
+ *
+ * |Strategy|Description|Example|
+ * |-|-|-|
+ * |useClass    |if to create an instance of a class                                   |```Beans.register(ContextService);```|
+ * |useValue    |if to use a static value as bean                                      |```Beans.register(IS_PLATFORM_HOST, {useValue: true});```|
+ * |useFactory  |if to construct the bean with a factory function                      |```Beans.register(MessageClient, {useFactory: () => new ɵMessageClient(...)});```|
+ * |useExisting |if to create an alias for another bean registered in the bean manager |```Beans.register(MessageClient, {useExisting: PlatformMessageClient);```|
+ *
+ *
+ * Multiple beans can be registered on the same symbol by setting the flag `multi` to `true`.
+ * ```ts
+ * Beans.register(MessageInterceptor, {useClass: SomeInterceptor, multi: true});
+ * ```
+ *
+ * Beans can be configured to be constructed eagerly after all initializers completed. For that, set the flag `eager` to `true`.
+ * ```ts
+ * Beans.register(KeyboardEventDispatcher, {eager: true});
+ * ```
+ *
+ * #### Bean destruction
+ * If a bean implements the {@link PreDestroy} lifecycle hook, it is invoked when the platform is shutting down.\
+ * Beans can be configured in which platform lifecycle phase to get destroyed. For that, set the `destroyPhase` accordingly when registering
+ * the bean. If not specified, by default, beans are destroyed in the phase {@link PlatformStates.Stopping}. Set the phase to 'none' to not
+ * destroy the bean at all. See {@link PlatformStates} for the different platform lifecycle phases.
+ *
+ * ```ts
+ * Beans.register(MessageBroker, {destroyPhase: PlatformStates.Stopped});
+ * Beans.register(PlatformState, {destroyPhase: 'none'});
+ * ```
+ *
+ * ***
+ *
+ * <p>
+ * The bean manager may also be used by the app to register application-specific beans, or to make framework-specific beans available to message interceptors or bean decorators.
+ * </p>
+ *
+ * @category Platform
  */
-export const Beans = new class {
+// @dynamic `ng-packagr` does not support lamdas in statics if `strictMetaDataEmit` is enabled. `ng-packagr` is used to build this library. See https://github.com/ng-packagr/ng-packagr/issues/696#issuecomment-373487183.
+export class Beans {
 
-  constructor() {
-    this.register(PlatformState, {destroyPhase: 'none', eager: true});
+  /** @internal */
+  public static initialize(): void {
+    Beans.register(PlatformState, {destroyPhase: 'none', eager: true});
   }
 
   /**
@@ -40,15 +96,13 @@ export const Beans = new class {
    * If not providing instructions, the given symbol is used as the constructor function to construct the bean.
    *
    * By default, bean construction is lazy, meaning that the bean is constructed when looked up for the first time.
-   * If another bean is registered under the same symbol, by default, it is disposed and replaced with the given bean.
-   * To register multiple beans on the same symbol, register it with the flag 'multi' set to `true`.
+   * If another bean is registered under the same symbol, that other bean is disposed and replaced with the given bean.
+   * To register multiple beans on the same symbol, register it with the flag `multi` set to `true`.
    *
-   * @param  symbol
-   *         Symbol under which to register the bean.
-   * @param  instructions
-   *         Control bean construction; see {@link BeanInstanceConstructInstructions} for more detail.
+   * @param  symbol - Symbol under which to register the bean.
+   * @param  instructions - Control bean construction; see {@link BeanInstanceConstructInstructions} for more detail.
    */
-  public register<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: BeanInstanceConstructInstructions<T>): void {
+  public static register<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: BeanInstanceConstructInstructions<T>): void {
     if (!symbol) {
       throw Error('[BeanRegisterError] Missing bean lookup symbol.');
     }
@@ -85,7 +139,7 @@ export const Beans = new class {
     }
 
     // Construct the bean if eager unless the platform is not startet yet.
-    beanInfo.eager && this.get(PlatformState).whenState(PlatformStates.Started).then(() => {
+    beanInfo.eager && Beans.get(PlatformState).whenState(PlatformStates.Started).then(() => {
       // Check if the bean is still registered in the bean manager
       if (beanRegistry.has(beanInfo.symbol) && beanRegistry.get(beanInfo.symbol).has(beanInfo)) {
         getOrConstructBeanInstance(beanInfo);
@@ -105,35 +159,31 @@ export const Beans = new class {
    *
    * For detailed information about how to register a bean, see {@link register}.
    *
-   * @param symbol
-   *        Symbol under which to register the bean.
-   * @param instructions
-   *        Control bean construction; see {@link BeanInstanceConstructInstructions} for more detail.
+   * @param symbol - Symbol under which to register the bean.
+   * @param instructions - Control bean construction; see {@link BeanInstanceConstructInstructions} for more detail.
    *
    * @internal
    */
-  public registerIfAbsent<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: BeanInstanceConstructInstructions<T>): void {
+  public static registerIfAbsent<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: BeanInstanceConstructInstructions<T>): void {
     if (!symbol) {
       throw Error('[BeanRegisterError] Missing bean lookup symbol.');
     }
 
     if (!beanRegistry.has(symbol)) {
-      this.register(symbol, instructions);
+      Beans.register(symbol, instructions);
     }
   }
 
   /**
-   * Registers a decorator to proxy a bean allowing to intercept invocations.
+   * Registers a decorator to proxy a bean allowing to intercept invocations to its methods and properties.
    *
    * The decorator is invoked when the bean is constructed. Multiple decorators can be registered
    * to decorate a bean. They are invoked in the order as registered.
    *
-   * @param symbol
-   *        Identifies the bean(s) which to decorate. If multiple beans are registered under that symbol, they all are decorated.
-   * @param decorator
-   *        Specifies the decorator.
+   * @param symbol - Identifies the bean(s) which to decorate. If multiple beans are registered under that symbol, they all are decorated.
+   * @param decorator - Specifies the decorator.
    */
-  public registerDecorator<T extends BeanDecorator<any>>(symbol: Type<any> | AbstractType<any>, decorator: { useValue: T } | { useClass?: Type<T> } | { useFactory?: () => T }): void {
+  public static registerDecorator<T extends BeanDecorator<any>>(symbol: Type<any> | AbstractType<any>, decorator: { useValue: T } | { useClass?: Type<T> } | { useFactory?: () => T }): void {
     if (!symbol) {
       throw Error('[BeanDecoratorRegisterError] A decorator requires a symbol.');
     }
@@ -143,9 +193,9 @@ export const Beans = new class {
   }
 
   /**
-   * Registers an initializer which is executed before the construction of beans with an eager construction strategy.
+   * Registers an initializer which is executed before the construction of beans having an eager construction strategy.
    */
-  public registerInitializer(initializer: InitializerFn | { useFunction?: InitializerFn, useClass?: Type<Initializer> }): void {
+  public static registerInitializer(initializer: InitializerFn | { useFunction?: InitializerFn, useClass?: Type<Initializer> }): void {
     if (typeof initializer === 'function') {
       initializers.push(initializer);
     }
@@ -165,20 +215,19 @@ export const Beans = new class {
    *
    * By default, if no or multiple beans are registered under the given symbol, an error is thrown.
    *
-   * @param symbol
-   *        Symbol to lookup the bean.
-   * @param nullBeanOptions
-   *        Controls what to do if no bean is registered under the given symbol. If not set, an error is thrown if no bean is found.
+   * @param symbol - Symbol to lookup the bean.
+   * @param orElse - Controls what to do if no bean is found under the given symbol. If not set and if no bean is found, the bean manager throws an error.
+   * @throws if not finding a bean, or if multiple beans are found under the given symbol.
    */
-  public get<T>(symbol: Type<T> | AbstractType<T> | Type<any> | AbstractType<any>, nullBeanOptions?: { orElseGet?: T, orElseSupply?: () => T }): T {
-    const beans = this.all(symbol);
+  public static get<T>(symbol: Type<T> | AbstractType<T> | Type<any> | AbstractType<any>, orElse?: { orElseGet?: T, orElseSupply?: () => T }): T {
+    const beans = Beans.all(symbol);
     switch (beans.length) {
       case 0: {
-        if (nullBeanOptions && nullBeanOptions.orElseGet) {
-          return nullBeanOptions.orElseGet;
+        if (orElse && orElse.orElseGet) {
+          return orElse.orElseGet;
         }
-        if (nullBeanOptions && nullBeanOptions.orElseSupply) {
-          return nullBeanOptions.orElseSupply();
+        if (orElse && orElse.orElseSupply) {
+          return orElse.orElseSupply();
         }
         throw Error(`[NullBeanError] No bean registered under the symbol '${symbol.name}'.`);
       }
@@ -192,24 +241,21 @@ export const Beans = new class {
   }
 
   /**
-   * Returns the bean registered under the given symbol.
+   * Returns the bean registered under the given symbol, if any, or returns `undefined` otherwise.
    *
-   * Does not throw if no bean is found, but returns `undefined` instead; throws if multiple beans are found.
-   *
-   * @param symbol
-   *        Symbol to lookup the bean.
+   * @param symbol - Symbol to lookup the bean.
+   * @throws if multiple beans are found under the given symbol.
    */
-  public opt<T>(symbol: Type<T> | AbstractType<T> | Type<any> | AbstractType<any>): T | undefined {
-    return this.get(symbol, {orElseSupply: (): undefined => undefined});
+  public static opt<T>(symbol: Type<T> | AbstractType<T> | Type<any> | AbstractType<any>): T | undefined {
+    return Beans.get(symbol, {orElseSupply: (): undefined => undefined});
   }
 
   /**
    * Returns all beans registered under the given symbol. Returns an empty array if no bean is found.
    *
-   * @param symbol
-   *        Symbol to lookup the beans.
+   * @param symbol - Symbol to lookup the beans.
    */
-  public all<T>(symbol: Type<T> | AbstractType<T> | Type<any> | AbstractType<any>): T[] {
+  public static all<T>(symbol: Type<T> | AbstractType<T> | Type<any> | AbstractType<any>): T[] {
     const beanInfos = Array.from(beanRegistry.get(symbol) || new Set<BeanInfo>());
     if (!beanInfos || !beanInfos.length) {
       return [];
@@ -226,26 +272,29 @@ export const Beans = new class {
    *
    * @internal
    */
-  public getBeanInfo<T>(symbol: Type<T | any> | AbstractType<T | any>): Set<BeanInfo<T>> {
+  public static getBeanInfo<T>(symbol: Type<T | any> | AbstractType<T | any>): Set<BeanInfo<T>> {
     return beanRegistry.get(symbol);
   }
 
   /**
    * @internal
    */
-  public runInitializers(): Promise<void> {
+  public static runInitializers(): Promise<void> {
     return Promise.all(initializers.map(fn => fn()))
       .then(() => Promise.resolve())
       .catch(error => Promise.reject(`[BeanManagerInitializerError] Initializer rejected with an error: ${error}`));
   }
 
   /** @internal **/
-  public destroy(): void {
+  public static destroy(): void {
     beanDecoratorRegistry.clear();
     initializers.length = 0;
   }
-};
+}
 
+Beans.initialize();
+
+/** @ignore **/
 function getOrConstructBeanInstance<T>(beanInfo: BeanInfo): T {
   // Check if the bean is already constructed.
   if (beanInfo.instance) {
@@ -264,6 +313,7 @@ function getOrConstructBeanInstance<T>(beanInfo: BeanInfo): T {
   }
 }
 
+/** @ignore **/
 function destroyBean(beanInfo: BeanInfo): void {
   // Destroy the bean instance unless it is an alias for another bean, or if the bean does not implement 'preDestroy' lifecycle hook.
   if (!beanInfo.useExisting && beanInfo.instance && typeof (beanInfo.instance as PreDestroy).preDestroy === 'function') {
@@ -277,6 +327,7 @@ function destroyBean(beanInfo: BeanInfo): void {
   }
 }
 
+/** @ignore **/
 function deriveConstructFunction<T>(symbol: Type<T | any> | AbstractType<T | any>, instructions?: InstanceConstructInstructions<T>): () => T {
   if (instructions && instructions.useValue !== undefined) {
     return (): T => instructions.useValue;
@@ -299,6 +350,8 @@ function deriveConstructFunction<T>(symbol: Type<T | any> | AbstractType<T | any
  * Lifecycle hook will be executed before destroying this bean.
  *
  * On platform shutdown, beans are destroyed when the platform enters {@link PlatformStates.Stopping} state.
+ *
+ * @category Platform
  */
 export interface PreDestroy {
   preDestroy(): void;
@@ -306,6 +359,8 @@ export interface PreDestroy {
 
 /**
  * Metadata about a bean.
+ *
+ * @ignore
  */
 export interface BeanInfo<T = any> {
   symbol: Type<T | any> | AbstractType<T | any>;
@@ -320,10 +375,12 @@ export interface BeanInfo<T = any> {
 
 /**
  * Describes how an instance is created.
+ *
+ * @category Platform
  */
 export interface InstanceConstructInstructions<T = any> {
   /**
-   * Set if to use a static value as instance.
+   * Set if to use a static value as bean.
    */
   useValue?: T;
   /**
@@ -342,6 +399,8 @@ export interface InstanceConstructInstructions<T = any> {
 
 /**
  * Describes how a bean instance is created.
+ *
+ * @category Platform
  */
 export interface BeanInstanceConstructInstructions<T = any> extends InstanceConstructInstructions {
   /**
@@ -360,37 +419,51 @@ export interface BeanInstanceConstructInstructions<T = any> extends InstanceCons
 }
 
 /**
- * Allows executing some asynchronous work before initializing the bean manager.
+ * Allows executing some asynchronous work before constructing eager beans.
  *
  * Initializers may run in parallel. For this reason, there must be no dependency in any initializer on the order
  * of execution of the initializers.
  *
  * It is allowed to lookup beans inside an initializer.
+ *
+ * @see {@link Beans.registerInitializer}
+ * @category Platform
  */
 export interface Initializer {
+  /**
+   * Invoked at platform startup to execute some work before constructing eager beans.
+   *
+   * @return a Promise that resolves when this initializer completes its initialization.
+   */
   init(): Promise<void>;
 }
 
 /**
- * Allows executing some asynchronous work before initializing the bean manager.
+ * Allows executing some asynchronous work before constructing eager beans.
  *
  * Initializers may run in parallel. For this reason, there must be no dependency in any initializer on the order
  * of execution of the initializers.
  *
  * It is allowed to lookup beans inside an initializer.
+ * The initializer function must return a Promise that resolves when completed its initialization.
+ *
+ * @see {@link Beans.registerInitializer}
+ * @category Platform
  */
 export declare type InitializerFn = () => Promise<void>;
 
 /**
- * Allows intercepting invocations for a certain bean.
+ * Allows intercepting bean method or property invocations.
  * When the bean is constructed, it is passed to the decorator in order to be proxied.
+ *
+ * @see {@link Beans.registerDecorator}
+ * @category Platform
  */
 export interface BeanDecorator<T> {
   /**
    * Method invoked when the bean is instantiated.
    *
-   * @param  bean
-   *         The actual bean instance; use it to delegate invoations to the actual bean.
+   * @param  bean - The actual bean instance; use it to delegate invoations to the actual bean.
    * @return proxied bean
    */
   decorate(bean: T): T;
@@ -398,6 +471,8 @@ export interface BeanDecorator<T> {
 
 /**
  * Represents a symbol of an abstract class.
+ *
+ * @category Platform
  */
 export interface AbstractType<T> extends Function {
   prototype: T;
@@ -405,6 +480,8 @@ export interface AbstractType<T> extends Function {
 
 /**
  * Represents a symbol of a class.
+ *
+ * @category Platform
  */
 export interface Type<T> extends Function {
   new(...args: any[]): T; // tslint:disable-line:callable-types

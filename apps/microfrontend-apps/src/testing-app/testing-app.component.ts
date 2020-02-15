@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { Component, ElementRef, OnDestroy } from '@angular/core';
-import { Beans, ClientConfig, ContextService, FocusMonitor, mapToBody, MessageClient, MicrofrontendPlatform, OutletContext, RouterOutlets } from '@scion/microfrontend-platform';
+import { Beans, ClientConfig, ContextService, FocusMonitor, mapToBody, MessageClient, MicrofrontendPlatform, OutletContext, OUTLET_CONTEXT } from '@scion/microfrontend-platform';
 import { ActivatedRoute } from '@angular/router';
 import { filter, switchMapTo, takeUntil } from 'rxjs/operators';
 import { fromEvent, merge, Subject } from 'rxjs';
@@ -42,7 +42,7 @@ export class TestingAppComponent implements OnDestroy {
   private installRouteActivateListener(): void {
     this._routeActivate$
       .pipe(
-        switchMapTo(Beans.get(ContextService).observe$<OutletContext>(RouterOutlets.OUTLET_CONTEXT)),
+        switchMapTo(Beans.get(ContextService).observe$<OutletContext>(OUTLET_CONTEXT)),
         takeUntil(this._destroy$),
       )
       .subscribe(outletContext => {

@@ -12,12 +12,17 @@ import { Observable } from 'rxjs';
 import { PlatformConfig } from './platform-config';
 
 /**
- * Loads applications running in the platform.
+ * Allows loading the config of applications running in the platform and platform properties asynchronously, e.g. from a backend.
+ *
+ * Using a {@link PlatformConfigLoader} allows a more flexible platform setup than providing a static config. For example, depending
+ * on the browser URL, a different config can be loaded, or the config can be read from a database from the backend.
+ *
+ * @category Platform
  */
 export abstract class PlatformConfigLoader {
 
   /**
-   * Loads applications running in the platform.
+   * Loads the platform config asynchronously. The platform unsubscribes from the Observable after emitted the config.
    */
   public abstract load$(): Observable<PlatformConfig>;
 }

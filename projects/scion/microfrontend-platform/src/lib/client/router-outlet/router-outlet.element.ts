@@ -13,15 +13,21 @@ import { runSafe } from '../../safe-runner';
 import { distinctUntilChanged, map, pairwise, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { RouterOutletUrlAssigner } from './router-outlet-url-assigner';
 import { Beans } from '../../bean-manager';
-import { mapToBody, MessageClient } from '../message-client';
+import { mapToBody, MessageClient } from '../messaging/message-client';
 import { UUID } from '@scion/toolkit/util';
 import { TopicMessage } from '../../messaging.model';
-import { Keystroke } from './keystroke';
+import { Keystroke } from '../keyboard-event/keystroke';
+import { PreferredSize } from '../preferred-size/preferred-size';
 
+/** @ignore **/
 const ELEMENT_NAME = 'sci-router-outlet';
+/** @ignore **/
 const ATTR_NAME = 'name';
+/** @ignore **/
 const ATTR_SCROLLABLE = 'scrollable';
+/** @ignore **/
 const ATTR_KEYSTROKES = 'keystrokes';
+/** @ignore **/
 const HTML_TEMPLATE = `
   <style>
     :host {
@@ -36,46 +42,109 @@ const HTML_TEMPLATE = `
       margin: 0;
     }
   </style>
-  <iframe src="about:blank" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+  <iframe src="about:blank" scrolling="yes" marginheight="0" marginwidth="0"></iframe>
 `;
 
 /**
- * Allows embedding web content from any origin. The content is displayed inside an iframe to provide a separate browsing context.
+ * Web component allowing to embed web content from any origin. The content is displayed inside an iframe to provide the highest possible
+ * isolation between the microfrontends via a separate browsing context.
  *
- * ### Navigation
- * Using the router service {@link OutletRouter}, you can navigate to a site displayed in the outlet. The content can be any web content allowed to
- * be embedded in an iframe, that is which has the HTTP response header 'X-Frame-Options' not set. The outlet can be given a name by the optional
- * name attribute to reference the outlet during navigation. If not set, it defaults to {@link RouterOutlets.PRIMARY_OUTLET primary}.
+ * To embed a microfrontend, place this custom HMTL element `<sci-router-outlet></sci-router-outlet>` in an HTML template, give it a name via
+ * its `name` attribute and navigate via {@link OutletRouter} to instruct the outlet to load the microfrontend.
  *
- * The outlet does not necessarily have to exist for navigation yet. As soon as the outlet is mounted, the last routed URL for that outlet
- * is loaded and displayed. When navigation is repeated for an outlet, its content is replaced.
- *
- * The router supports multiple outlets to co-exist and outlets can be nested. If outlets have the same name, then they show the same content.
- *
- * ### Contextual data
- * The outlet allows arbitrary data to be associated which is available in its embedded web content using {@link ContextService}. To do this, the
- * embedded app must be registered in the platform.
- *
- * A context is a hierarchical key-value map which are linked together to form a tree structure. When a key is
- * not found in a context, the lookup is retried on the parent, repeating until either a value is found or the root of the tree has been reached.
- *
- * ### Keystrokes
- * The outlet allows the registration of keystrokes to receive keyboard events triggered in embedded content even across the iframe boundaries.
- * Keystrokes can be set via the 'keystrokes' attribute in the HTML template, or via the 'keystrokes' property on the DOM element. When setting
- * keystrokes via the HTML template, multiple keystrokes are separated by a comma.
- *
- * ### Events
- * The router outlet will emit an `activate` event when a URL is set, and a `deactivate` event when navigating away from the URL.
- *
- * ```
- * <sci-router-outlet></sci-router-outlet>
+ * 1. Place the web component in an HTML template:
+ * ```html
  * <sci-router-outlet name="detail"></router-outlet>
  * ```
  *
- * ---
- * The outlet is registered as a custom element as defined by the Web Components standard. See https://developer.mozilla.org/en-US/docs/Web/Web_Components.
+ * 2. Control the outlet's content:
+ * ```ts
+ * Beans.get(OutletRouter).navigate('https://micro-frontends.org', {outlet: 'detail'});
+ * ```
  *
- * @see OutletRouter
+ * ***
+ *
+ * #### Navigation
+ * Using the {@link OutletRouter}, you can control which site to display in the outlet. Any site can be displayed unless having set the HTTP header `X-Frame-Options`.
+ * By giving the outlet a name, you can reference the outlet when navigating. The name is optional; if not set, it defaults to {@link RouterOutlets.PRIMARY_OUTLET primary},
+ * which is also the name used if not specifying an outlet for the navigation.
+ *
+ * Multiple outlets can co-exist, and outlets can be nested. If multiple outlets have the same name, then they all show the same content.
+ *
+ * The outlet does not necessarily have to exist at the time of the navigation. When it is added to the DOM, the outlet will display the last URL navigated
+ * for it. When navigation is repeated for an outlet, its content is replaced.
+ *
+ * #### Outlet size
+ * The embedded microfrontend can report its preferred size via {@link PreferredSizeService.setPreferredSize}, causing the outlet to adapt its size to the content's preferred size.
+ * The preferred size of an element is the minimum size that allows it to display normally. Setting a preferred size is useful if the outlet is displayed in a layout
+ * that aligns its items based on the items' content size.
+ *
+ * The platform provides a convenience API to bind an arbitrary DOM element via {@link PreferredSizeService.fromDimension} to automatically report size changes of that
+ * element to the outlet.
+ *
+ * #### Contextual data
+ * The platform allows associating contextual data with an outlet, which then is available in embedded content using {@link ContextService}.
+ * Contextual data must be serializable with the structured clone algorithm.
+ *
+ * Each outlet spans a new context. A context is similar to a `Map`, but is linked to its parent outlet context, if any, thus forming a hierarchical tree structure.
+ * When looking up a value and if the value is not found in the outlet context, the lookup is retried on the parent context, repeating until either a value
+ * is found or the root of the context tree has been reached.
+ *
+ * ```ts
+ *  // set some contextual data
+ *  const outlet: SciRouterOutletElement = document.querySelector('sci-router-outlet');
+ *  outlet.setContextValue('key', 'value');
+ *
+ *  // observe contextual data in embedded content:
+ *  Beans.get(ContextService).observe$('key').subscribe(value => {
+ *    ...
+ *  });
+ * ```
+ *
+ * #### Keystrokes
+ * The outlet allows the registration of keystrokes to receive keyboard events triggered in embedded content at any nesting level across iframe boundaries.
+ * You can register keystrokes via the `keystrokes` attribute in the HTML template, or via the `keystrokes` property on the DOM element. If setting keystrokes via
+ * the HTML template, multiple keystrokes are separated by a comma.
+ *
+ * A keystroke is specified as a string that has several parts, each separated with a dot. The first part specifies the event type (`keydown` or `keyup`), followed by
+ * optional modifier part(s) (`alt`, `shift`, `control`, `meta`, or a combination thereof) and with the keyboard key as the last part. The key is a case-insensitive
+ * value of the `KeyboardEvent#key` property. For a complete list of valid key values, see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values.
+ * Two keys are an exception to the value of the `KeyboardEvent#key` property: `dot` and `space`.
+ *
+ * Keyboard events are dispatched as synthetic keyboard events via this outlet's event dispatcher, thus bubbling up the DOM tree like regular events.
+ * They are of the original type, meaning that when the user presses a key on the keyboard, a `keydown` keyboard event is triggered, or a `keyup` event
+ * when releasing a key, respectively.
+ *
+ * HTML template:
+ * ```html
+ * <sci-router-outlet keystrokes="keydown.control.alt.enter,keydown.escape,keydown.control.space"></router-outlet>
+ * ```
+ * TypeScript:
+ * ```ts
+ *  const outlet: SciRouterOutletElement = document.querySelector('sci-router-outlet');
+ *  outlet.keystrokes = [
+ *      'keydown.control.alt.enter',
+ *      'keydown.escape',
+ *      'keydown.control.space'
+ *  ];
+ * ```
+ *
+ * #### Page scrolling
+ * By default, native page scrolling is enabled for the embedded content. If disabled, the embedded microfrontend cannot enable it and must
+ * provide a scrollable viewport itself. Native page scrolling can be disabled using {@link SciRouterOutletElement.scrollable}.
+ *
+ * #### Lifecycle events
+ * The router outlet emits an `activate` event when a URL is set, and a `deactivate` event when navigating away from the URL.
+ *
+ * #### Web component
+ * The outlet is registered as a custom element in the browser's custom element registry as defined by the Web Components standard.
+ * See https://developer.mozilla.org/en-US/docs/Web/Web_Components for more information.
+ *
+ * @see {@link OutletRouter}
+ * @see {@link PreferredSizeService}
+ * @see {@link ContextService}
+ *
+ * @category Routing
  */
 export class SciRouterOutletElement extends HTMLElement {
 
@@ -99,10 +168,8 @@ export class SciRouterOutletElement extends HTMLElement {
   /**
    * Sets the name of this outlet.
    *
-   * The outlet name is used to obtain the URL from {@link OutletRouter}. When a navigation for that outlet
-   * name takes place, the web content of this outlet is replaced.
-   *
-   * If not specifying an outlet name, it defaults to {@link RouterOutlets.PRIMARY_OUTLET primary}.
+   * By giving the outlet a name, you can reference the outlet when navigating. The name is optional;
+   * if not set, it defaults to {@link RouterOutlets.PRIMARY_OUTLET primary}
    */
   public set name(name: string) {
     if (name) {
@@ -121,7 +188,7 @@ export class SciRouterOutletElement extends HTMLElement {
   }
 
   /**
-   * Specifies whether to enable or disable page scrolling in the embedded document. If not set, page scrolling is disabled.
+   * Specifies whether to enable or disable native page scrolling in the embedded document. If not set, page scrolling is enabled.
    *
    * If set to `false`, native page scrolling cannot be enabled in the embedded document. Instead, the embedded web content
    * must provide a scrollable viewport itself.
@@ -143,20 +210,17 @@ export class SciRouterOutletElement extends HTMLElement {
   }
 
   /**
-   * Allows the registration of keystrokes to receive keyboard events triggered in embedded content even across the iframe boundaries.
+   * Instructs embedded content at any nesting level to propagate keyboard events to this outlet. The keyboard events are then dispatched as synthetic
+   * keyboard events via this outlet's event dispatcher, thus bubbling up the DOM tree like regular events. They are of the original type, meaning that
+   * when the user presses a key on the keyboard, a `keydown` keyboard event is triggered, or a `keyup` event when releasing a key, respectively.
    *
-   * It instructs embedded content (and all indirectly embedded content) to propagate keyboard events to this outlet, which then are dispatched
-   * as synthetic keyboard events via this element's event dispatcher bubbling up the DOM tree like regular events. Propagated events are of the
-   * original type, meaning that when the user presses a key on the keyboard, a 'keydown' keyboard event is triggered, or a 'keyup' event when
-   * releasing a key, respectively.
+   * @param keystrokes - A keystroke is specified as a string that has several parts, each separated with a dot. The first part specifies the event type
+   *                   (`keydown` or `keyup`), followed by optional modifier part(s) (`alt`, `shift`, `control`, `meta`, or a combination thereof) and
+   *                   with the keyboard key as the last part. The key is a case-insensitive value of the `KeyboardEvent#key` property. For a complete
+   *                   list of valid key values, see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values. Two keys are an
+   *                   exception to the value of the `KeyboardEvent#key` property: `dot` and `space`.
    *
-   * @param keystrokes
-   *        A keystroke is specified as a string which has several parts separated by a dot.
-   *        The first part specifies the event type (keydown or keyup), followed by optional modifier part(s) (alt, shift, control, meta, or a
-   *        combination thereof) and with the keyboard key as the last part. The key is a case-insensitive value of the {@link KeyboardEvent#key}
-   *        property. For a complete list of valid key values, see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values.
-   *        Two keys are an exception to the value of the {@link KeyboardEvent#key} property: dot and space.
-   *        Examples: 'keydown.control.z', 'keydown.escape', 'keyup.enter', 'keydown.control.alt.enter', 'keydown.control.space'.
+   * `keydown.control.z`, `keydown.escape`, `keyup.enter`, `keydown.control.alt.enter`, `keydown.control.space`.
    */
   public set keystrokes(keystrokes: string[]) {
     if (keystrokes && keystrokes.length) {
@@ -168,32 +232,26 @@ export class SciRouterOutletElement extends HTMLElement {
   }
 
   /**
-   * Returns the keystrokes which should bubble across the iframe boundary.
+   * Returns the keystrokes which to bubble across the iframe boundaries.
    */
   public get keystrokes(): string[] {
     return KeystrokesAttributeUtil.split(this.getAttribute(ATTR_KEYSTROKES));
   }
 
   /**
-   * Sets a value to be associated with a given name in this outlet context.
-   *
-   * @param name
-   *        Specifies the name to store a value for.
-   * @param value
-   *        Specifies the value to be stored. It can be any object which is serializable with the structured clone algorithm.
+   * Sets contextual data to be available in embedded content using {@link ContextService}.
+   * Contextual data must be serializable with the structured clone algorithm.
    */
   public setContextValue<T = any>(name: string, value: T): void {
     this._contextProvider.set(name, value);
   }
 
   /**
-   * Removes the given name and any corresponding value from this outlet context.
+   * Removes given contextual data from this outlet context.
    *
-   * Removal does not affect parent contexts, so it is possible that a subsequent call to {@link ContextService#observe$} with the same name
+   * Removal does not affect parent contexts, so it is possible that a subsequent call to {@link ContextService.observe$} with the same name
    * will return a non-null result, due to a value being stored in a parent context.
    *
-   * @param  name
-   *         Specifies the name to remove.
    * @return `true` if the value in the outlet context has been removed successfully; otherwise `false`.
    */
   public removeContextValue(name: string): boolean {
@@ -201,8 +259,8 @@ export class SciRouterOutletElement extends HTMLElement {
   }
 
   /**
-   * Returns an Observable that emits the values registered in this outlet. Values inherited from parent contexts are not returned.
-   * The Observable never completes, and emits when a context value is added or removed.
+   * Returns an Observable that emits the contextual values registered in this outlet. Values inherited from parent contexts are not returned.
+   * The Observable never completes, and emits when a context value is added to or removed from the outlet context.
    */
   public get contextValues$(): Observable<Map<string, any>> {
     return this._contextProvider.entries$;
@@ -234,7 +292,7 @@ export class SciRouterOutletElement extends HTMLElement {
   }
 
   /**
-   * Returns the reference to the {@link HTMLIFrameElement} of this outlet.
+   * Returns the reference to the iframe of this outlet.
    */
   public get iframe(): HTMLIFrameElement {
     return this._iframe;
@@ -245,7 +303,7 @@ export class SciRouterOutletElement extends HTMLElement {
       .pipe(takeUntil(this._disconnect$))
       .subscribe((name: string) => {
         const outletContext: OutletContext = {name: name, uid: this._uid};
-        this.setContextValue(RouterOutlets.OUTLET_CONTEXT, outletContext);
+        this.setContextValue(OUTLET_CONTEXT, outletContext);
       });
   }
 
@@ -300,6 +358,7 @@ export class SciRouterOutletElement extends HTMLElement {
    * This will happen each time the node is moved, and may happen before the element's contents have been fully parsed.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks
+   * @internal
    */
   public connectedCallback(): void {
     this.installOutletUrlListener();
@@ -315,6 +374,7 @@ export class SciRouterOutletElement extends HTMLElement {
    * Invoked each time the custom element is disconnected from the document's DOM.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks
+   * @internal
    */
   public disconnectedCallback(): void {
     this._disconnect$.next();
@@ -327,6 +387,7 @@ export class SciRouterOutletElement extends HTMLElement {
    * Specifies the attributes which to observe in {@link attributeChangedCallback} method.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks
+   * @internal
    */
   public static observedAttributes = [ATTR_NAME, ATTR_SCROLLABLE, ATTR_KEYSTROKES]; // tslint:disable-line:member-ordering
 
@@ -336,6 +397,7 @@ export class SciRouterOutletElement extends HTMLElement {
    * Invoked each time one of the custom element's attributes is added, removed, or changed.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks
+   * @internal
    */
   public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
     switch (name) {
@@ -359,6 +421,7 @@ export class SciRouterOutletElement extends HTMLElement {
    * Defines this outlet as custom element in the browser custom element registry; has no effect if the element was already defined.
    *
    * @return A Promise that resolves once this custom element is defined.
+   * @internal
    */
   public static define(): Promise<void> {
     if (customElements.get(ELEMENT_NAME)) {
@@ -372,7 +435,19 @@ export class SciRouterOutletElement extends HTMLElement {
 }
 
 /**
- * Contains information about the outlet in which web content is displayed.
+ * Information about the outlet which embeds a microfrontend.
+ *
+ * This object can be obtained from the {@link ContextService} using the name {@link OUTLET_CONTEXT}.
+ *
+ * ```ts
+ * Beans.get(ContextService).observe$(OUTLET_CONTEXT).subscribe((outletContext: OutletContext) => {
+ *   ...
+ * });
+ * ```
+ *
+ * @see {@link OUTLET_CONTEXT}
+ * @see {@link ContextService}
+ * @category Routing
  */
 export interface OutletContext {
   name: string;
@@ -380,26 +455,26 @@ export interface OutletContext {
 }
 
 /**
- * Represents the minimum size that will allow the element to display normally.
- */
-export interface PreferredSize {
-  minWidth?: string;
-  width?: string;
-  maxWidth?: string;
-  minHeight?: string;
-  height?: string;
-  maxHeight?: string;
-}
-
-/**
  * Coerces a data-bound value (typically a string) to a boolean.
+ *
+ * @ignore
  */
 function coerceBooleanProperty(value: any): boolean {
   return value != null && `${value}` !== 'false';
 }
 
 /**
- * Provides constants for {@link SciRouterOutletElement} and {@link OutletRouter}.
+ * Key for obtaining the current outlet context using {@link ContextService}.
+ *
+ * @see {@link OutletContext}
+ * @see {@link ContextService}
+ */
+export const OUTLET_CONTEXT = 'ɵOUTLET';
+
+/**
+ * Defines constants for {@link SciRouterOutletElement} and {@link OutletRouter}.
+ *
+ * @category Routing
  */
 export namespace RouterOutlets {
 
@@ -431,16 +506,14 @@ export namespace RouterOutlets {
   }
 
   /**
-   * Key for obtaining the current outlet context using {@link ContextService}.
-   */
-  export const OUTLET_CONTEXT = 'ɵOUTLET';
-
-  /**
    * Default name for an outlet if no explicit name is specified.
    */
   export const PRIMARY_OUTLET = 'primary';
 }
 
+/**
+ * @ignore
+ */
 namespace KeystrokesAttributeUtil {
 
   const delimiter = ',';

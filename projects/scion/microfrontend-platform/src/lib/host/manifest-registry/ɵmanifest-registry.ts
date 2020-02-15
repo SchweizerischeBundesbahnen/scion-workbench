@@ -17,7 +17,7 @@ import { Beans, PreDestroy } from '../../bean-manager';
 import { distinctUntilChanged, expand, mergeMapTo, take, takeUntil } from 'rxjs/operators';
 import { PlatformMessageClient } from '../platform-message-client';
 import { Intent, MessageHeaders, ResponseStatusCodes, TopicMessage } from '../../messaging.model';
-import { takeUntilUnsubscribe } from '../../client/message-client';
+import { takeUntilUnsubscribe } from '../../client/messaging/message-client';
 import { ApplicationRegistry } from '../application-registry';
 import { runSafe } from '../../safe-runner';
 import { filterArray } from '@scion/toolkit/operators';

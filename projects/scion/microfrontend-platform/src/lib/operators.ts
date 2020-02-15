@@ -13,12 +13,14 @@ import { MessageEnvelope, MessagingChannel, MessagingTransport } from './ɵmessa
 import { Message, TopicMessage } from './messaging.model';
 import { TopicMatcher } from './topic-matcher.util';
 
+/** @ignore */
 export function filterByChannel<T extends Message>(channel: MessagingChannel): MonoTypeOperatorFunction<MessageEnvelope<T>> {
   return filter((envelope: MessageEnvelope<any>): boolean => {
     return envelope.channel === channel;
   });
 }
 
+/** @ignore */
 export function filterByTransport(transport: MessagingTransport): MonoTypeOperatorFunction<MessageEvent> {
   return filter((event: MessageEvent): boolean => {
     const envelope: MessageEnvelope = event.data;
@@ -26,6 +28,7 @@ export function filterByTransport(transport: MessagingTransport): MonoTypeOperat
   });
 }
 
+/** @ignore */
 export function filterByTopic<T>(topic: string): OperatorFunction<MessageEnvelope, TopicMessage<T>> {
   return pipe(
     filterByChannel<TopicMessage>(MessagingChannel.Topic),
@@ -34,24 +37,28 @@ export function filterByTopic<T>(topic: string): OperatorFunction<MessageEnvelop
   );
 }
 
+/** @ignore */
 export function pluckMessage<T extends Message>(): OperatorFunction<MessageEnvelope<T>, T> {
   return map((envelope: MessageEnvelope<T>): T => {
     return envelope.message;
   });
 }
 
+/** @ignore */
 export function pluckEnvelope<T extends Message>(): OperatorFunction<MessageEvent, MessageEnvelope<T>> {
   return map((messageEvent: MessageEvent): MessageEnvelope<T> => {
     return messageEvent.data;
   });
 }
 
+/** @ignore */
 export function filterByOrigin(origin: string): MonoTypeOperatorFunction<MessageEvent> {
   return filter((event: MessageEvent): boolean => {
     return event.origin === origin;
   });
 }
 
+/** @ignore */
 export function filterByHeader<T extends Message>(header: { key: string, value: any }): MonoTypeOperatorFunction<T> {
   return filter((message: T): boolean => {
     return message.headers.has(header.key) && message.headers.get(header.key) === header.value;
@@ -61,6 +68,7 @@ export function filterByHeader<T extends Message>(header: { key: string, value: 
 /**
  * Buffers the source Observable values until `closingNotifier$` emits.
  * Once closed, items of the source Observable are emitted as they arrive.
+ * @ignore
  */
 export function bufferUntil<T>(closingNotifier$: Observable<any> | Promise<any>): MonoTypeOperatorFunction<T> {
   const guard$ = from(closingNotifier$).pipe(take(1), publishLast(), refCount(), mergeMapTo(EMPTY));

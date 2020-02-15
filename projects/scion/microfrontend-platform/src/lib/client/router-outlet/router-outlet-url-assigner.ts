@@ -9,30 +9,30 @@
  */
 import { runSafe } from '../../safe-runner';
 
+/** @ignore **/
 const BLANK_URL = new URL('about:blank');
 
 /**
- * Assigns a URL to the iframe of a {@link SciRouterOutletElement}.
+ * Assigns a URL to the iframe of a {@link SciRouterOutletElement `<sci-router-outlet>`}.
  *
- * The iframe URL is set using {@link Location#replace} method. A session history entry is not created.
+ * The iframe URL is set using `Location#replace` method. A session history entry is not created.
  *
  * To work around a content loading issue in nested iframes in Chrome browser, the URL is added a fixed query parameter,
- * unless the URL already has some query parameter.
+ * unless the URL already has some query parameter. See {@link RouterOutletUrlAssigner.patchUrl} for more information.
  *
- * To change this behavior, create a class which extends {@link RouterOutletUrlAssigner} and register it
+ * To change this behavior, create a class that extends {@link RouterOutletUrlAssigner} and register it
  * under the symbol {@link RouterOutletUrlAssigner} in the bean manager.
+ *
+ * @category Routing
  */
 export class RouterOutletUrlAssigner {
 
   /**
-   * Assigns a URL to the iframe of a {@link SciRouterOutletElement}.
+   * Assigns a URL to the iframe of a {@link SciRouterOutletElement `<sci-router-outlet>`}.
    *
-   * @param iframe
-   *        Iframe for which the URL should be set.
-   * @param currUrl
-   *        URL to be set.
-   * @param prevUrl
-   *        Previous URL, if any.
+   * @param iframe - Iframe for which to set the URL.
+   * @param currUrl - URL to be set.
+   * @param prevUrl - Previous URL, if any.
    */
   public assign(iframe: HTMLIFrameElement, currUrl: string, prevUrl?: string): void {
     // Patch the URL to force Chrome to load the content of specified URL.
@@ -46,33 +46,31 @@ export class RouterOutletUrlAssigner {
   }
 
   /**
-   * Patches the URL to force Chrome to load the content of specified URL into an iframe.
+   * Patches the URL to force Chrome to load the content of the given URL into an iframe.
    *
-   * ## Problem:
+   * #### Problem:
    * Chrome browser does not load the content of a nested iframe if already loaded a document from the same origin and path in a parent iframe.
    * The problem does not occur if the URL contains query parameters. Also, the hash fragment of the URL does not matter.
    *
    * This problem could not be observed in Firefox and Edge.
    *
-   * ## Motivation:
+   * #### Motivation:
    * If using hash-based routing, the microfrontends of an application are served under the same origin and path, and routing is based on the URL hash fragment only.
-   * This problem would prevent a microfrontend to include other microfrontends of its own.
+   * This Chrome issue would prevent a microfrontend from embedding other microfrontends of its application.
    *
-   * ## Fix:
+   * #### Fix:
    * If the URL does not contain a query parameter, an arbitrary query parameter is appended to the URL to force Chrome to load the content.
    * The name and value of the query param do not matter. However, it is crucial always to use the same param to allow the browser to cache the request.
    *
-   * The only exception to appending a query param is when navigating within the same application and if using hash-based routing. Then, the browser already
-   * loaded the application. Otherwise, if appending a query param, the application would load anew.
+   * The only exception to appending a query param is when replacing an outlet's content with content from the same app. Then, the browser already loaded
+   * the application. Otherwise, if appending a query param, the application would load anew.
    *
-   * ## Alternative fix:
-   * An alternative (but partial) fix would be to initialize the iframe with a `null` source. This fix is partial, because only working when setting the initial URL
+   * #### Alternative fix:
+   * An alternative (but partial) fix would be to initialize the iframe with a `null` source. This fix is partial because only working when setting the initial URL
    * of the iframe and not when changing it. Also, it has the drawback of temporarily loading the main entry point of the outlet host.
    *
-   * @param currUrl
-   *        Specifies the URL to be patched.
-   * @param prevUrl
-   *        Specifies the previous URL, if any.
+   * @param currUrl - Specifies the URL to be patched.
+   * @param prevUrl - Specifies the previous URL, if any.
    *
    * @see https://stackoverflow.com/q/36985731
    */

@@ -10,17 +10,17 @@
 
 import { mapToBody, MessageClient, MessageOptions, PublishOptions } from './message-client';
 import { defer, EMPTY, from, merge, noop, Observable, Observer, Subject, TeardownLogic, throwError } from 'rxjs';
-import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../ɵmessaging.model';
-import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from '../operators';
+import { MessageDeliveryStatus, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics, TopicSubscribeCommand, TopicUnsubscribeCommand } from '../../ɵmessaging.model';
+import { filterByChannel, filterByHeader, filterByTopic, pluckMessage } from '../../operators';
 import { catchError, filter, finalize, first, map, mergeMap, mergeMapTo, takeUntil, timeoutWith } from 'rxjs/operators';
 import { Defined, Dictionaries, UUID } from '@scion/toolkit/util';
-import { Intent, IntentMessage, Message, MessageHeaders, TopicMessage } from '../messaging.model';
-import { matchesIntentQualifier } from '../qualifier-tester';
+import { Intent, IntentMessage, Message, MessageHeaders, TopicMessage } from '../../messaging.model';
+import { matchesIntentQualifier } from '../../qualifier-tester';
 import { BrokerGateway } from './broker-gateway';
-import { Beans, PreDestroy } from '../bean-manager';
-import { HostPlatformState } from './host-platform-state';
-import { TopicMatcher } from '../topic-matcher.util';
-import { Qualifier } from '../platform.model';
+import { Beans, PreDestroy } from '../../bean-manager';
+import { HostPlatformState } from '../host-platform-state';
+import { TopicMatcher } from '../../topic-matcher.util';
+import { Qualifier } from '../../platform.model';
 
 // tslint:disable:unified-signatures
 export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:disable-line:class-name
@@ -252,10 +252,10 @@ function setBodyIfDefined<T>(message: TopicMessage<T> | IntentMessage<T>, body?:
 }
 
 /**
- * Creates a copy from the given {@link Map}.
+ * Creates a copy from the given `Map`.
  *
  * Data sent from one JavaScript realm to another is serialized with the structured clone algorithm.
- * Altought the algorithm supports the {@link Map} data type, a deserialized map object cannot be checked to be instance of {@link Map}.
+ * Altought the algorithm supports the `Map` data type, a deserialized map object cannot be checked to be instance of `Map`.
  * This is most likely because the serialization takes place in a different realm.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm

@@ -12,7 +12,7 @@ import { Beans } from '../bean-manager';
 import { MicrofrontendPlatform } from '../microfrontend-platform';
 import { ManifestRegistry } from './manifest-registry/manifest-registry';
 import { PlatformMessageClient } from './platform-message-client';
-import { NullMessageClient } from '../client/message-client';
+import { NullMessageClient } from '../client/messaging/message-client';
 import { ɵManifestRegistry } from './manifest-registry/ɵmanifest-registry';
 
 describe('ApplicationRegistry', () => {

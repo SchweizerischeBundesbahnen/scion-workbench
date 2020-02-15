@@ -12,6 +12,8 @@ import { Logger } from './logger';
 
 /**
  * Runs the given function. Errors are catched and logged.
+ *
+ * @ignore
  */
 export function runSafe<T = void>(runnable: () => T): T {
   try {

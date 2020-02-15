@@ -26,6 +26,19 @@ jobs:
     - npm run test-all:headless
     - npm run e2e-all:headless
     deploy:
+      # Deploy TypeDoc of microfrontend-platform
+      - provider: script
+        script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/typedoc/microfrontend-platform $NOW_TOKEN
+        skip_cleanup: true
+        on:
+          branch: issue/198
+          tags: true
+      - provider: script
+        script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/typedoc/microfrontend-platform $NOW_TOKEN
+        skip_cleanup: true
+        on:
+          branch: issue/198
+          tags: false
       # Deploy microfrontend-apps
       - provider: script
         script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/apps/microfrontend-apps $NOW_TOKEN

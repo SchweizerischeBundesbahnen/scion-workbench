@@ -11,11 +11,13 @@
 import { Arrays } from '@scion/toolkit/util';
 
 /**
- * Allows checking whether the topic of a message matches the subscribed topic of a subscriber. The subscriber can use wildcard segments in
- * its subscription topic to subscribe to multiple topics simultaneously.
+ * Allows checking whether an exact topic matches a subscription topic. The subscription topic may contain wildcard segments.
  *
- * Topics are case-sensitive and consist of one or more segments each separated by a forward slash. If a segment begins with a colon (:),
- * then the segment acts as a placeholder for any string value. Placeholders can only be used to subscribe to topics, not to publish a message.
+ * Topics are case-sensitive and consist of one or more segments, each separated by a forward slash. If a segment begins with a colon (:),
+ * then the segment acts as a placeholder for any string value. Placeholders can only be used in subscription topics. When publishing a
+ * message, the topic must be exact.
+ *
+ * @ignore
  */
 export class TopicMatcher {
 
@@ -31,8 +33,8 @@ export class TopicMatcher {
   /**
    * Attempts to match the given topic against the subscription topic which was passed to the constructor as an argument.
    *
-   * If the match succeeds, then {@link MatcherResult#matches} evaluates to `true`. If the subscription topic contains wildcard segments,
-   * the segment values can be read using the property {@link TopicMessage#params} property.
+   * If the match succeeds, then {@link MatcherResult.matches} evaluates to `true`. If the subscription topic contains wildcard segments,
+   * the segment values can be read using the property {@link TopicMessage.params} property.
    */
   public matcher(publishTopic: string): MatcherResult {
     const publishTopicSegments = toPathSegments(publishTopic || '');
@@ -79,14 +81,20 @@ export class TopicMatcher {
   }
 }
 
+/** @ignore */
 function isWildcardSegment(segment: string): boolean {
   return segment.startsWith(':') && segment.length > 1;
 }
 
+/** @ignore */
 function toPathSegments(topic: string): string[] {
   return topic.split('/').filter(Boolean);
 }
 
+/**
+ * Represents the result of a topic matcher test.
+ * @ignore
+ */
 export interface MatcherResult {
   /**
    * Indicates if the topic matches the subscription topic.

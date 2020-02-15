@@ -10,14 +10,35 @@
 import { IntentMessage, TopicMessage } from '../../messaging.model';
 
 /**
- * Allows the interception of messages before their publication.
+ * Allows intercepting messages before their publication.
  *
- * Use this symbol to register a message interceptor as `multi` bean in the bean manager.
+ * The platform in the host app allows the registration of interceptors to intercept messages before their publication.
+ * Multiple interceptors are supported, forming a chain in which each interceptor is called one by one in registration order.
  *
- * ### Example registration:
+ * When a message is about to be published, it travels along the chain of interceptors. If all interceptors let the message pass, it is finally published.
+ * An interceptor can let a message pass, reject it, or swallow it.
+ *
+ * To register a message interceptor, create a class implementing {@link MessageInterceptor} and register it under the symbol {@link MessageInterceptor}
+ * as a `multi` bean in the {@link Beans bean manager}.
+ *
+ * ```ts
+ * class YourMessageInterceptor implements MessageInterceptor {
+ *
+ *   public intercept(message: TopicMessage, next: Handler<TopicMessage>): void {
+ *     if (message.topic === 'a/b/c') {
+ *       next.handle(message); // let the message pass by calling the next handler
+ *     }
+ *     else {
+ *       throw Error('reason'); // or throw an error to reject publishing
+ *     }
+ *   }
+ * }
+ *
+ * // Register the interceptor as `multi` bean in the bean manager.
+ * Beans.register(MessageInterceptor, {useClass: YourMessageInterceptor, multi: true});
  * ```
- * Beans.register(MessageInterceptor, {useClass: MessageLogger, multi: true});
- * ```
+ * @see {@link IntentInterceptor}
+ * @category Messaging
  */
 export abstract class MessageInterceptor implements Interceptor<TopicMessage, Handler<TopicMessage>> {
 
@@ -28,24 +49,44 @@ export abstract class MessageInterceptor implements Interceptor<TopicMessage, Ha
    * or to swallow the message by not calling the next handler at all. If rejecting publishing, the error is transported to the
    * message publisher.
    *
-   * @param  message
-   *         the message to be published to its topic
-   * @param  next
-   *         the next handler in the chain; invoke its {@link Handler#handle} method to continue publishing
+   * @param  message - the message to be published to its topic
+   * @param  next - the next handler in the chain; invoke its {@link Handler.handle} method to continue publishing.
    * @throws throw an error to reject publishing; the error is transported to the message publisher.
    */
   abstract intercept(message: TopicMessage, next: Handler<TopicMessage>): void;
 }
 
 /**
- * Allows the interception of intents before their publication.
+ * Allows intercepting intents before their publication.
  *
- * Use this symbol to register an intent interceptor as `multi` bean in the bean manager.
+ * The platform in the host app allows the registration of interceptors to intercept intents before their publication.
+ * Multiple interceptors are supported, forming a chain in which each interceptor is called one by one in registration order.
  *
- * ### Example registration:
+ * When an intent is about to be published, it travels along the chain of interceptors. If all interceptors let the intent pass, it is finally published.
+ * An interceptor can let an intent pass, reject it, or swallow it.
+ *
+ * To register an intent interceptor, create a class implementing {@link IntentInterceptor} and register it under the symbol {@link IntentInterceptor}
+ * as a `multi` bean in the {@link Beans bean manager}.
+ *
+ * ```ts
+ * class YourIntentInterceptor implements IntentInterceptor {
+ *
+ *   public intercept(intent: IntentMessage, next: Handler<IntentMessage>): void {
+ *     if (intent.type === 'abc') {
+ *       next.handle(intent); // let the intent pass by calling the next handler
+ *     }
+ *     else {
+ *       throw Error('reason'); // or throw an error to reject publishing
+ *     }
+ *   }
+ * }
+ *
+ * // Register the interceptor as `multi` bean in the bean manager.
+ * Beans.register(IntentInterceptor, {useClass: YourIntentInterceptor, multi: true});
  * ```
- * Beans.register(IntentInterceptor, {useClass: IntentLogger, multi: true});
- * ```
+ *
+ * @see {@link MessageInterceptor}
+ * @category Messaging
  */
 export abstract class IntentInterceptor implements Interceptor<IntentMessage, Handler<IntentMessage>> {
 
@@ -56,10 +97,8 @@ export abstract class IntentInterceptor implements Interceptor<IntentMessage, Ha
    * or to swallow the intent by not calling the next handler at all. If rejecting publishing, the error is transported to
    * the intent issuer.
    *
-   * @param  intent
-   *         the intent to be published
-   * @param  next
-   *         the next handler in the chain; invoke its {@link Handler#handle} method to continue publishing
+   * @param  intent - the intent to be published
+   * @param  next - the next handler in the chain; invoke its {@link Handler.handle} method to continue publishing.
    * @throws throw an error to reject publishing; the error is transported to the intent issuer.
    */
   abstract intercept(intent: IntentMessage, next: Handler<IntentMessage>): void;
@@ -88,10 +127,8 @@ export interface PublishInterceptorChain<T> {
 /**
  * Assembles the given interceptors to a chain of handlers which are called one after another. The publisher is added as terminal handler.
  *
- * @param interceptors
- *        interceptors to be assembled to a chain
- * @param publisher
- *        terminal handler to publish messages
+ * @param interceptors - interceptors to be assembled to a chain
+ * @param publisher - terminal handler to publish messages
  * @internal
  */
 export function chainInterceptors<T>(interceptors: Interceptor<T, Handler<T>>[], publisher: (message: T) => void): PublishInterceptorChain<T> {
@@ -115,7 +152,12 @@ export function chainInterceptors<T>(interceptors: Interceptor<T, Handler<T>>[],
 }
 
 /**
- * Allows the interception of messages before their publication.
+ * Allows the interception of messages or intents before their publication.
+ *
+ * @see {@link MessageInterceptor}
+ * @see {@link IntentInterceptor}
+ *
+ * @ignore
  */
 export interface Interceptor<T, H extends Handler<T>> {
 
@@ -124,6 +166,8 @@ export interface Interceptor<T, H extends Handler<T>> {
 
 /**
  * Represents a handler in the chain of interceptors.
+ *
+ * @category Messaging
  */
 export abstract class Handler<T> {
   /**

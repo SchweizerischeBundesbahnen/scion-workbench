@@ -37,6 +37,8 @@ import { chainInterceptors, IntentInterceptor, MessageInterceptor, PublishInterc
  * However, when the client unloads, the window is not set because already been destroyed. Then, the broker identifies
  * the client using the unique client id. In both cases, the broker checks the origin of the message to match the
  * origin of the registered application.
+ *
+ * @ignore
  */
 export class MessageBroker implements PreDestroy {
 
@@ -410,6 +412,7 @@ export class MessageBroker implements PreDestroy {
   }
 }
 
+/** @ignore **/
 function filterMessage<M>(transport: MessagingTransport, channel?: MessagingChannel): MonoTypeOperatorFunction<MessageEvent> {
   return filter((messageEvent: MessageEvent): boolean => {
     const envelope: MessageEnvelope = messageEvent.data;
@@ -428,6 +431,8 @@ function filterMessage<M>(transport: MessagingTransport, channel?: MessagingChan
 
 /**
  * Returns a filter which passes all messages of given {@link MessagingChannel}.
+ *
+ * @ignore
  */
 function filterByChannel(channel: MessagingChannel): MonoTypeOperatorFunction<ClientMessage> {
   return filter((message: ClientMessage): boolean => {
@@ -437,6 +442,8 @@ function filterByChannel(channel: MessagingChannel): MonoTypeOperatorFunction<Cl
 
 /**
  * Passes only messages originating from trusted and registered clients.
+ *
+ * @ignore
  */
 function checkOriginTrusted<MSG extends Message>(clientRegistry: ClientRegistry, rejectConfig: { transport: MessagingTransport }): OperatorFunction<MessageEvent, ClientMessage<MSG>> {
   return mergeMap((event: MessageEvent): Observable<ClientMessage> => {
@@ -467,12 +474,14 @@ function checkOriginTrusted<MSG extends Message>(clientRegistry: ClientRegistry,
   });
 }
 
+/** @ignore **/
 export function filterByTopic(topic: string): MonoTypeOperatorFunction<ClientMessage<TopicMessage>> {
   return filter((clientMessage: ClientMessage<TopicMessage>): boolean => {
     return clientMessage.envelope.message.topic === topic;
   });
 }
 
+/** @ignore **/
 export function filterByTransportAndTopic(transport: MessagingTransport, topic: string): MonoTypeOperatorFunction<MessageEvent> {
   return pipe(
     filterMessage(transport, MessagingChannel.Topic),
@@ -483,6 +492,7 @@ export function filterByTransportAndTopic(transport: MessagingTransport, topic: 
   );
 }
 
+/** @ignore **/
 function sendDeliveryStatusSuccess(recipient: { gatewayWindow: Window; origin: string } | Client, destination: { transport: MessagingTransport, topic: string }): void {
   sendTopicMessage<MessageDeliveryStatus>(recipient, destination.transport, {
     topic: destination.topic,
@@ -491,6 +501,7 @@ function sendDeliveryStatusSuccess(recipient: { gatewayWindow: Window; origin: s
   });
 }
 
+/** @ignore **/
 function sendDeliveryStatusError(recipient: { gatewayWindow: Window; origin: string } | Client, destination: { transport: MessagingTransport, topic: string }, error: string): void {
   sendTopicMessage<MessageDeliveryStatus>(recipient, destination.transport, {
     topic: destination.topic,
@@ -499,6 +510,7 @@ function sendDeliveryStatusError(recipient: { gatewayWindow: Window; origin: str
   });
 }
 
+/** @ignore **/
 function sendTopicMessage<T>(recipient: { gatewayWindow: Window; origin: string } | Client, transport: MessagingTransport, message: TopicMessage<T>): void {
   const envelope: MessageEnvelope<TopicMessage<T>> = {
     transport: transport,
@@ -523,6 +535,8 @@ function sendTopicMessage<T>(recipient: { gatewayWindow: Window; origin: string 
 
 /**
  * Represents a message send by a client connected to the message broker.
+ *
+ * @ignore
  */
 interface ClientMessage<MSG extends Message = any> {
   envelope: MessageEnvelope<MSG>;
@@ -531,6 +545,8 @@ interface ClientMessage<MSG extends Message = any> {
 
 /**
  * Catches and logs errors, and resubscribes to the source observable.
+ *
+ * @ignore
  */
 function catchErrorAndRetry<T>(): MonoTypeOperatorFunction<T> {
   return catchError((error, caught) => {

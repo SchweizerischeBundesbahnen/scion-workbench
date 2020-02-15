@@ -11,11 +11,13 @@ import { noop, Observable } from 'rxjs';
 import { filter, shareReplay, take } from 'rxjs/operators';
 import { PlatformTopics } from '../ɵmessaging.model';
 import { PlatformStates } from '../platform-state';
-import { mapToBody, MessageClient } from './message-client';
+import { mapToBody, MessageClient } from './messaging/message-client';
 import { Beans } from '../bean-manager';
 
 /**
  * Allows observing the state of the host platform.
+ *
+ * @category Platform
  */
 export class HostPlatformState {
 

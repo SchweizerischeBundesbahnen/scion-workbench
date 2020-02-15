@@ -11,6 +11,8 @@ import { Application } from '../../platform.model';
 
 /**
  * Central point for managing client registrations.
+ *
+ * @ignore
  */
 export class ClientRegistry {
 
@@ -49,6 +51,8 @@ export class ClientRegistry {
 
 /**
  * Represents a client which is connected to the message broker.
+ *
+ * @ignore
  */
 export class Client {
 

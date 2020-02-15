@@ -13,6 +13,8 @@ import { Intent } from '../../messaging.model';
 
 /**
  * Central point for looking up or managing capability providers or intentions available in the system.
+ *
+ * @ignore
  */
 export abstract class ManifestRegistry {
 

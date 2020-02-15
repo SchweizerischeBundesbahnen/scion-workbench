@@ -32,12 +32,15 @@ import { map, multicast, refCount, switchMap, takeUntil, tap } from 'rxjs/operat
  * [2] https://caniuse.com/#feat=resizeobserver
  * [3] http://www.backalleycoder.com/2013/03/18/cross-browser-event-based-element-resize-detection/
  *
- * @param target
- *        HTMLElement to observe its dimension.
- * @param options
- *        - useNativeResizeObserver: boolean
- *          Flag to control if to use {ResizeObserver} to listen natively for element dimension changes, if supported by the user agent.
- *          By default, this flag is enabled.
+ * @param  target - HTMLElement to observe its dimension.
+ * @param  options - Controls how to listen for dimension changes:
+ *         <p>
+ *         <ul>
+ *           <li>**`useNativeResizeObserver`**\
+ *               Flag to control if to use {ResizeObserver} to listen natively for element dimension changes, if supported by the user agent.
+ *               By default, this flag is enabled.
+ *           </li>
+ *         </ul>
  */
 export function fromDimension$(target: HTMLElement, options?: { useNativeResizeObserver?: boolean }): Observable<Dimension> {
   options = {

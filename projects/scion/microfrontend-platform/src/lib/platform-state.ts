@@ -3,6 +3,8 @@ import { filter, take } from 'rxjs/operators';
 
 /**
  * Allows observing the state of the microfrontend platform.
+ *
+ * @category Platform
  */
 export class PlatformState {
 
@@ -16,8 +18,7 @@ export class PlatformState {
   }
 
   /**
-   * @param  state
-   *         the state to wait for.
+   * @param  state - the state to wait for.
    * @return A promise that resolves when the platform enters the given state.
    *         If already in that state, the promise resolve instantly.
    */
@@ -51,7 +52,9 @@ export class PlatformState {
 }
 
 /**
- * Represents states of the microfrontend platform.
+ * Lifecycle states of the microfrontend platform.
+ *
+ * @category Platform
  */
 export enum PlatformStates {
   /**

@@ -14,6 +14,8 @@ import { Defined } from '@scion/toolkit/util';
 
 /**
  * Central point for persisting and looking up retained messages sent to a topic.
+ *
+ * @ignore
  */
 export class RetainedMessageStore {
 

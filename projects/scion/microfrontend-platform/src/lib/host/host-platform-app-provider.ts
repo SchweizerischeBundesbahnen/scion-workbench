@@ -18,6 +18,8 @@ import { PLATFORM_SYMBOLIC_NAME } from './platform.constants';
  *
  * This app is used by the platform in the host to connect to the message broker and to provide platform specific capabilities,
  * or to issue intents in the name of the platform.
+ *
+ * @ignore
  */
 export class HostPlatformAppProvider implements PreDestroy {
 
@@ -45,6 +47,8 @@ export class HostPlatformAppProvider implements PreDestroy {
 
 /**
  * If the 'Activator API' is enabled, authorize the host platform app to read activators from the manifest registry.
+ *
+ * @ignore
  */
 function provideActivatorApiIntentions(): Intention[] {
   return Beans.get(PlatformRestrictions).activatorApiDisabled ? [] : [{type: PlatformCapabilityTypes.Activator, qualifier: AnyQualifier}];

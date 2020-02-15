@@ -8,12 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 // tslint:disable:unified-signatures
-import { MessageClient } from '../client/message-client';
+import { MessageClient } from '../client/messaging/message-client';
 
 /**
  * Message client used by the platform to send and receive messages.
  *
  * Messages are sent and received on behalf of the platform app {@link PLATFORM_SYMBOLIC_NAME}.
+ *
+ * @category Platform
  */
 export abstract class PlatformMessageClient extends MessageClient {
 }

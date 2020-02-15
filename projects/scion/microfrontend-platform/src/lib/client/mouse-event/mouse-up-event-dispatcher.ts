@@ -10,7 +10,7 @@
 import { fromEvent, Subject } from 'rxjs';
 import { Beans, PreDestroy } from '../../bean-manager';
 import { filter, takeUntil } from 'rxjs/operators';
-import { mapToBody, MessageClient } from '../message-client';
+import { mapToBody, MessageClient } from '../messaging/message-client';
 import { UUID } from '@scion/toolkit/util';
 
 /**
@@ -19,6 +19,8 @@ import { UUID } from '@scion/toolkit/util';
  * Mouse event dispatching is important when using custom scrollbars which are positioned at the iframe border. It allows the user
  * to scroll seamlessly even when the mouse cursor leaves the iframe, which is because by default, mouse events are only received
  * by the currently hovering document.
+ *
+ * @ignore
  */
 export class MouseUpEventDispatcher implements PreDestroy {
 
@@ -65,9 +67,13 @@ export class MouseUpEventDispatcher implements PreDestroy {
 
 /**
  * Message header to pass the dispatcher's identity.
+ *
+ * @ignore
  */
 const DISPATCHER_ID_HEADER = 'ɵDISPATCHER_ID';
 /**
  * Topic to publish 'mouseup' events so that they can be consumed by dispatchers of other documents.
+ *
+ * @ignore
  */
 const MOUSEUP_EVENT_TOPIC = 'ɵMOUSEUP';

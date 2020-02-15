@@ -13,7 +13,7 @@ import { filterByChannel, filterByTopic, filterByTransport, pluckEnvelope } from
 import { MessageEnvelope, MessagingChannel, MessagingTransport } from '../../ɵmessaging.model';
 import { TopicMatcher } from '../../topic-matcher.util';
 import { MessageHeaders, ResponseStatusCodes, TopicMessage } from '../../messaging.model';
-import { MessageClient, takeUntilUnsubscribe } from '../message-client';
+import { MessageClient, takeUntilUnsubscribe } from '../messaging/message-client';
 import { Beans } from '../../bean-manager';
 import { Contexts } from './context.model';
 import { runSafe } from '../../safe-runner';
@@ -26,6 +26,8 @@ import { IS_PLATFORM_HOST } from '../../platform.model';
  * A context is a hierarchical key-value map which are linked together to form a tree structure. When a key is not found
  * in a context, the lookup is retried on the parent, repeating until either a value is found or the root of the tree has
  * been reached.
+ *
+ * @ignore
  */
 export class RouterOutletContextProvider {
 
@@ -50,10 +52,8 @@ export class RouterOutletContextProvider {
   /**
    * Sets a value to be associated with a given name in this context.
    *
-   * @param name
-   *        Specifies the name to store a value for.
-   * @param value
-   *        Specifies the value to be stored. It can be any object which
+   * @param name - Specifies the name to store a value for.
+   * @param value - Specifies the value to be stored. It can be any object which
    *        is serializable with the structured clone algorithm.
    */
   public set(name: string, value: any): void {
@@ -67,8 +67,7 @@ export class RouterOutletContextProvider {
    * Removal does not affect parent contexts, so it is possible that a subsequent call to {@link ContextService#observe$} with the same name
    * will return a non-null result, due to a value being stored in a parent context.
    *
-   * @param  name
-   *         Specifies the name to remove.
+   * @param  name - Specifies the name to remove.
    * @return `true` if the value in the outlet context has been removed successfully; otherwise `false`.
    */
   public remove(name: string): boolean {

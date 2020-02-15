@@ -10,6 +10,8 @@
 
 /**
  * Configures the platform and defines the applications running in the platform.
+ *
+ * @category Platform
  */
 export interface PlatformConfig {
   /**
@@ -29,13 +31,14 @@ export interface PlatformConfig {
 }
 
 /**
- * Describes an application to register in the platform.
+ * Describes how to register an application in the platform.
+ *
+ * @category Platform
  */
 export interface ApplicationConfig {
   /**
    * Unique symbolic name of the application.
    *
-   * The symbolic name is used to create child routes to the application.
    * Choose a short, lowercase name which contains alphanumeric characters and optionally dash characters.
    */
   symbolicName: string;
@@ -48,31 +51,30 @@ export interface ApplicationConfig {
    */
   exclude?: boolean;
   /**
-   * Sets whether or not capability scope check is disabled for this application.
+   * Sets whether or not this application can issue intents to private capabilities of other apps.
    *
-   * With scope check disabled (discouraged), the application can invoke private capabilities of other applications.
-   *
-   * By default, scope check is enabled.
+   * By default, scope check is enabled. Disabling scope check is discouraged.
    */
   scopeCheckDisabled?: boolean;
   /**
    * Sets whether or not the API to manage intentions is disabled for this application.
    *
-   * With the API enabled (discouraged), the application can register and unregister intentions dynamically at runtime.
-   *
-   * By default, this API is disabled.
+   * By default, this API is disabled. With the API enabled (discouraged), the application can register and
+   * unregister intentions dynamically at runtime.
    */
   intentionRegisterApiDisabled?: boolean;
   /**
    * Sets whether or not this application can issue intents for which it has not declared a respective intention.
    *
-   * By default, intention registered check is enabled. Disabling intention registered check is discouraged.
+   * By default, `IntentionRegisteredCheck` is enabled. Disabling `IntentionRegisteredCheck` is discouraged.
    */
   intentionRegisteredCheckDisabled?: boolean;
 }
 
 /**
  * Configures restricted platform functionality.
+ *
+ * @category Platform
  */
 export abstract class PlatformRestrictions {
   /**
@@ -80,7 +82,7 @@ export abstract class PlatformRestrictions {
    *
    * By default, this API is enabled.
    *
-   * @see ActivatorProvider
+   * @see {@link ActivatorProvider}
    */
   activatorApiDisabled?: boolean;
 }

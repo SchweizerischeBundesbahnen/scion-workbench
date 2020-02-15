@@ -156,10 +156,8 @@ export class SciViewportComponent {
   /**
    * Checks if the specified element is scrolled into the viewport.
    *
-   * @param element
-   *        the element to be checked
-   * @param fit
-   *        control if the element must fully or partially fit into the viewport
+   * @param element - the element to be checked
+   * @param fit - control if the element must fully or partially fit into the viewport
    */
   public isElementInView(element: HTMLElement, fit: 'full' | 'partial'): boolean {
     const elLeft = this.computeOffset(element, 'left');
@@ -185,10 +183,8 @@ export class SciViewportComponent {
   /**
    * Scrolls the specified element into the viewport.
    *
-   * @param element
-   *        the element to scroll into the viewport
-   * @param offset
-   *        the gap between the element and the viewport
+   * @param element - the element to scroll into the viewport
+   * @param offset - the gap between the element and the viewport
    */
   public scrollIntoView(element: HTMLElement, offset: number = 50): void {
     this._viewport.scrollTop = this.computeOffset(element, 'top') - offset;

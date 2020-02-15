@@ -2,12 +2,14 @@ import { Qualifier } from './platform.model';
 
 /**
  * Represents a message with headers to transport additional information with a message.
+ *
+ * @category Messaging
  */
 export interface Message {
   /**
    * Additional information attached to this message.
    *
-   * Header values must be JSON serializable. If no headers are set, the {@link Map} is empty.
+   * Header values must be JSON serializable. If no headers are set, the `Map` is empty.
    */
   headers: Map<string, any>;
 }
@@ -16,6 +18,8 @@ export interface Message {
  * Represents an intent issued by an application.
  *
  * The intent is transported to all clients that provide a satisfying capability visible to the issuing application.
+ *
+ * @category Messaging
  */
 export interface IntentMessage<BODY = any> extends Message {
   /**
@@ -23,7 +27,7 @@ export interface IntentMessage<BODY = any> extends Message {
    */
   intent: Intent;
   /**
-   * Optional JSON serializable data to pass with the intent.
+   * Optional data to pass with the intent.
    */
   body?: BODY;
 }
@@ -33,8 +37,10 @@ export interface IntentMessage<BODY = any> extends Message {
  * declare all its intents in the application manifest in the form of intentions. Otherwise, intents are rejected when
  * issued. The enforced declaration allows to analyze which components depend on which functionality in the system.
  *
- * An intention or intent is formulated in an abstract way and consists of a type and an optional qualifier. When a
- * component intends to use some functionality, it issues a respective intent.
+ * An intention or intent is formulated in an abstract way and consists of a type and an optional qualifier. When an
+ * app intends to use some functionality, it issues a respective intent.
+ *
+ * @category Messaging
  */
 export interface Intent {
   /**
@@ -53,6 +59,8 @@ export interface Intent {
  * Represents a message published to a topic.
  *
  * The message is transported to all consumers subscribed to the topic.
+ *
+ * @category Messaging
  */
 export interface TopicMessage<BODY = any> extends Message {
   /**
@@ -60,19 +68,18 @@ export interface TopicMessage<BODY = any> extends Message {
    */
   topic: string;
   /**
-   * Optional JSON serializable data.
+   * Optional message.
    */
   body?: BODY;
   /**
    * Instructs the broker to store this message as retained message for the topic. With the retained flag set to `true`,
    * a client receives this message immediately upon subscription. The broker stores only one retained message per topic.
-   * To delete the retained message, send a retained message without a body to the topic.
    */
   retain?: boolean;
   /**
    * Contains the resolved values of the wildcard segments as specified in the topic.
-   * For example: If subscribed to the topic 'person/:id' and a message is published to the topic 'person/5',
-   * the resolved id with the value '5' is contained in the params map.
+   * For example: If subscribed to the topic `person/:id` and a message is published to the topic `person/5`,
+   * the resolved id with the value `5` is contained in the params map.
    */
   params?: Map<string, string>;
 }
@@ -80,7 +87,9 @@ export interface TopicMessage<BODY = any> extends Message {
 /**
  * Declares headers set by the platform when sending a message.
  *
- * Clients are allowed to read platform defined headers from a message.
+ * Clients are allowed to read platform-defined headers from a message.
+ *
+ * @category Messaging
  */
 export enum MessageHeaders {
   /**
@@ -128,6 +137,8 @@ export enum MessageHeaders {
 
 /**
  * Defines a set of request methods to indicate the desired action to be performed for a given resource.
+ *
+ * @category Messaging
  */
 export enum RequestMethods {
   /**
@@ -154,6 +165,8 @@ export enum RequestMethods {
 
 /**
  * Defines a set of response status codes to indicate whether a request has been successfully completed.
+ *
+ * @category Messaging
  */
 export enum ResponseStatusCodes {
   /**

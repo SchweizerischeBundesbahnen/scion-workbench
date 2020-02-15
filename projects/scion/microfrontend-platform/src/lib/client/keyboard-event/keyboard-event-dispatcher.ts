@@ -10,10 +10,10 @@
 import { fromEvent, merge, noop, Subject } from 'rxjs';
 import { Beans, PreDestroy } from '../../bean-manager';
 import { filter, take, takeUntil } from 'rxjs/operators';
-import { MessageClient } from '../message-client';
+import { MessageClient } from '../messaging/message-client';
 import { ContextService } from '../context/context-service';
-import { KEYSTROKE_CONTEXT_NAME_PREFIX, OutletContext, RouterOutlets } from '../router-outlet/router-outlet.element';
-import { Keystroke } from '../router-outlet/keystroke';
+import { KEYSTROKE_CONTEXT_NAME_PREFIX, OUTLET_CONTEXT, OutletContext, RouterOutlets } from '../router-outlet/router-outlet.element';
+import { Keystroke } from './keystroke';
 import { Maps } from '@scion/toolkit/util';
 import { runSafe } from '../../safe-runner';
 
@@ -22,6 +22,8 @@ import { runSafe } from '../../safe-runner';
  *
  * This dispatcher listens to keyboard events for keystrokes registered in parent contexts and publishes
  * them as {@link KeyboardEventInit} events to the topic {@link RouterOutlets.keyboardEventTopic}.
+ *
+ * @ignore
  */
 export class KeyboardEventDispatcher implements PreDestroy {
 
@@ -84,7 +86,7 @@ export class KeyboardEventDispatcher implements PreDestroy {
    * Looks up the identity of the outlet containing this microfrontend. If not running in the context of an outlet, the Promise returned never resolves.
    */
   private lookupOutletIdentity(): Promise<string> {
-    return Beans.get(ContextService).observe$<OutletContext>(RouterOutlets.OUTLET_CONTEXT)
+    return Beans.get(ContextService).observe$<OutletContext>(OUTLET_CONTEXT)
       .pipe(take(1), takeUntil(this._destroy$))
       .toPromise()
       .then(outletContext => outletContext ? Promise.resolve(outletContext.uid) : new Promise<never>(noop));

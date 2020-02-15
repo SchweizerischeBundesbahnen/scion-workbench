@@ -15,6 +15,8 @@ import { Qualifier } from '../../platform.model';
 
 /**
  * Provides an in-memory store for provided capabilities and registered intentions.
+ *
+ * @ignore
  */
 export class ManifestObjectStore<T extends ManifestObject> {
 
@@ -36,8 +38,7 @@ export class ManifestObjectStore<T extends ManifestObject> {
   /**
    * Removes manifest objects from this store that match the given filter.
    *
-   * @param filter
-   *        Control which manifest objects to remove by specifying filter criteria which are "AND"ed together.
+   * @param filter - Control which manifest objects to remove by specifying filter criteria which are "AND"ed together.
    *        Wildcards in the qualifier criterion, if any, are not interpreted as wildcards, but as exact values instead.
    */
   public remove(filter: ManifestObjectFilter): void {
@@ -48,11 +49,9 @@ export class ManifestObjectStore<T extends ManifestObject> {
   /**
    * Finds manifest objects that match the given filter.
    *
-   * @param filter
-   *        Control which manifest objects to return.
+   * @param filter - Control which manifest objects to return.
    *        Specified filter criteria are "AND"ed together. If no filter criterion is specified, no filtering takes place.
-   * @param qualifierMatcher
-   *        Control how to match qualifiers if specified in the filter. If not specified, {@link matchesWildcardQualifier} is used.
+   * @param qualifierMatcher - Control how to match qualifiers if specified in the filter. If not specified, {@link matchesWildcardQualifier} is used.
    */
   public find(filter: ManifestObjectFilter, qualifierMatcher: QualifierMatcher = matchesWildcardQualifier): T[] {
     const filterById = filter.id !== undefined;
@@ -94,6 +93,8 @@ export class ManifestObjectStore<T extends ManifestObject> {
 
 /**
  * Represents an object in the manifest registry like a capability or an intention.
+ *
+ * @ignore
  */
 export interface ManifestObject {
   type: string;
@@ -108,6 +109,8 @@ export interface ManifestObject {
  * Allows filtering manifest objects like capabilities or intentions.
  *
  * All specified filter criteria are "AND"ed together. If no filter criterion is specified, no filtering takes place.
+ *
+ * @category Manifest
  */
 export interface ManifestObjectFilter {
   /**

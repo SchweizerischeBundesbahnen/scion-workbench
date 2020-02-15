@@ -10,6 +10,8 @@
 
 /**
  * Describes a user interaction with the keyboard.
+ *
+ * @ignore
  */
 export class Keystroke {
 
@@ -82,6 +84,7 @@ export class Keystroke {
   }
 }
 
+/** @ignore **/
 function escapeKeyboardEventKey(key: string): string {
   switch (key) {
     case '.':

@@ -1,0 +1,5 @@
+{
+  "version": 2,
+  "name": "scion-microfrontend-platform-api-v{version}",
+  "alias": "scion-microfrontend-platform-api-v{version}"
+}

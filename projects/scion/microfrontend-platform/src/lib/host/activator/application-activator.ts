@@ -9,7 +9,7 @@
  */
 import { Beans, PreDestroy } from '../../bean-manager';
 import { ActivatorProvider, PlatformCapabilityTypes } from '../../platform.model';
-import { PlatformManifestService } from '../../client/platform-manifest-service';
+import { PlatformManifestService } from '../../client/manifest-registry/platform-manifest-service';
 import { of, Subject } from 'rxjs';
 import { first, mergeMap, reduce, take } from 'rxjs/operators';
 import { ApplicationRegistry } from '../application-registry';
@@ -24,6 +24,8 @@ import { Logger } from '../../logger';
  * Activators are loaded on platform startup so that applications can interact with the system
  * even when no microfrontend of that app is currently displayed. For example, it allows an
  * application to handle intents, or to flexibly provide capabilities.
+ *
+ * @ignore
  */
 export class ApplicationActivator implements PreDestroy {
 
@@ -84,6 +86,8 @@ export class ApplicationActivator implements PreDestroy {
 
 /**
  * Removes leading and trailing slashes from the path, if any.
+ *
+ * @ignore
  */
 function trimPath(path: string): string {
   let trimmedPath = path;
@@ -99,12 +103,31 @@ function trimPath(path: string): string {
 /**
  * Key for obtaining the current activation context using {@link ContextService}.
  *
- * The activation context is only available if the application is loaded by an activator.
+ * The activation context is only available to microfrontends loaded by an activator.
+ *
+ * @see {@link ActivationContext}
+ * @see {@link ContextService}
+ * @category Platform
  */
 export const ACTIVATION_CONTEXT = 'ɵACTIVATION_CONTEXT';
 
 /**
- * Contains information about the activation context if loaded by an activator.
+ * Information about the activator that loaded a microfrontend.
+ *
+ * This context is available to a microfrontend if loaded by an application activator.
+ * This object can be obtained from the {@link ContextService} using the name {@link ACTIVATION_CONTEXT}.
+ *
+ * ```ts
+ * Beans.get(ContextService).observe$(ACTIVATION_CONTEXT).subscribe((activationContext: ActivationContext) => {
+ *   if (activationContext.primary) {
+ *     ...
+ *   }
+ * });
+ * ```
+ *
+ * @see {@link ACTIVATION_CONTEXT}
+ * @see {@link ContextService}
+ * @category Platform
  */
 export interface ActivationContext {
   /**
@@ -113,7 +136,7 @@ export interface ActivationContext {
    */
   primary: boolean;
   /**
-   * Metadata of the provided activator.
+   * Metadata about the activator that activated the microfrontend.
    */
   activator: ActivatorProvider;
 }

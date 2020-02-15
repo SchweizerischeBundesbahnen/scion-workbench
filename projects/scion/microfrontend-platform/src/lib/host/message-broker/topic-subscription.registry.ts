@@ -16,6 +16,8 @@ import { Client } from './client.registry';
 
 /**
  * Central point for managing topic subscriptions.
+ *
+ * @ignore
  */
 export class TopicSubscriptionRegistry {
 
@@ -28,12 +30,9 @@ export class TopicSubscriptionRegistry {
    * After calling this method, messages that are published on that topic are transported to the
    * given client until {@link unsubscribe} or {@link unsubscribeClient} is called.
    *
-   * @param topic
-   *        The topic which to observe; it allows using wildcard segments, e.g., 'person/:id'.
-   * @param client
-   *        The client which subscribes to the topic.
-   * @param subscriberId
-   *        Unique id which identifies the subscriber.
+   * @param topic - The topic which to observe; it allows using wildcard segments, e.g., `person/:id`.
+   * @param client - The client which subscribes to the topic.
+   * @param subscriberId - Unique id which identifies the subscriber.
    */
   public subscribe(topic: string, client: Client, subscriberId: string): void {
     Defined.orElseThrow(subscriberId, () => Error('[SubscribeError] SubscriberId required'));
@@ -48,10 +47,8 @@ export class TopicSubscriptionRegistry {
    * Unregisters a subscription; has no effect if not registered.
    * If the client has multiple subscriptions on the topic, only one subscription is removed.
    *
-   * @param topic
-   *        The topic from which to unsubscribe from.
-   * @param clientId
-   *        Identifies the client which should be unsubscribed from the topic.
+   * @param topic - The topic from which to unsubscribe from.
+   * @param clientId - Identifies the client which should be unsubscribed from the topic.
    */
   public unsubscribe(topic: string, clientId: string): void {
     Arrays.remove(this._topicSubscriptions, it => it.client.id === clientId && it.topic === topic, {firstOnly: true})
@@ -62,21 +59,19 @@ export class TopicSubscriptionRegistry {
   /**
    * Unregisters all subscriptions of a client.
    *
-   * @param clientId
-   *        Identifies the client which should be unsubscribed from all its topics.
+   * @param clientId - Identifies the client which should be unsubscribed from all its topics.
    */
   public unsubscribeClient(clientId: string): void {
     Arrays.remove(this._topicSubscriptions, it => it.client.id === clientId, {firstOnly: false})
       .map(removedSubscription => removedSubscription.topic)
-      .reduce((set, removedSubscription) => set.add(removedSubscription), new Set()) // distinct
+      .reduce((set, removedSubscription) => set.add(removedSubscription), new Set<string>()) // distinct
       .forEach(it => this._subscriptionChange$.next({topic: it}));
   }
 
   /**
    * Allows observing the number of subscriptions on a topic. It is not allowed to use wildcards in the topic to observe.
    *
-   * @param  topic
-   *         Specifies the topic to observe.
+   * @param  topic - Specifies the topic to observe.
    * @return An Observable that, when subscribed, emits the current number of subscribers on it. It never completes and
    *         emits continuously when the number of subscribers changes.
    */
@@ -112,6 +107,7 @@ export class TopicSubscriptionRegistry {
 
 /**
  * Represents a subscription on a topic. The topic may contain wildcard segments.
+ * @ignore
  */
 export interface TopicSubscription {
   /**
@@ -131,6 +127,7 @@ export interface TopicSubscription {
 
 /**
  * Represents the actual destination to which to transport a topic message.
+ * @ignore
  */
 export interface ResolvedTopicDestination {
   /**
@@ -139,8 +136,8 @@ export interface ResolvedTopicDestination {
   topic: string;
   /**
    * Contains the resolved values of the wildcard segments as specified in the subscription topic.
-   * For example: If subscribed to the topic 'person/:id' and a message is published to the topic 'person/5',
-   * the resolved id with the value '5' is contained in the params map.
+   * For example: If subscribed to the topic `person/:id` and a message is published to the topic `person/5`,
+   * the resolved id with the value `5` is contained in the params map.
    */
   params: Map<string, string>;
   /**
@@ -151,6 +148,7 @@ export interface ResolvedTopicDestination {
 
 /**
  * Event emitted when some subscriber subscribes or unsubscribes on a topic.
+ * @ignore
  */
 interface SubscriptionChangeEvent {
   topic: string;

@@ -10,6 +10,8 @@
 
 /**
  * Configures a client application of the microfrontend platform.
+ *
+ * @category Platform
  */
 export abstract class ClientConfig {
   /**

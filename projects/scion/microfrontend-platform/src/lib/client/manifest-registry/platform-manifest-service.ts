@@ -8,13 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { ManifestService } from './manifest-service';
-import { PlatformMessageClient } from '../host/platform-message-client';
-import { Beans } from '../bean-manager';
+import { PlatformMessageClient } from '../../host/platform-message-client';
+import { Beans } from '../../bean-manager';
 
 /**
  * Manifest service used by the platform to interact with the manifest registry.
  *
  * The interaction is on behalf of the platform app {@link PLATFORM_SYMBOLIC_NAME}.
+ *
+ * @ignore
  */
 export class PlatformManifestService extends ManifestService {
 

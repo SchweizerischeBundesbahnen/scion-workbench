@@ -1,7 +1,7 @@
 {
   "name": "@scion/microfrontend-platform",
   "version": "0.0.0-beta.4",
-  "description": "SCION Microfrontend Platform provides the building blocks for integrating microfrontends based on iframes. It is a pure TypeScript framework allowing to integrate any web content. It comes with a powerful messaging facility for cross-origin intent- or topic-based communication supporting wildcard addressing, request-response message exchange pattern, retained messaging and more. Web content is embedded using a responsive web component which encapsulates the iframe. The component solves many of the cumbersome quirks of iframes and sets up a context in which data can be made available to the embedded content.",
+  "description": "SCION Microfrontend Platform provides the building blocks for integrating microfrontends based on iframes. SCION Microfrontend Platform is a vanilla TypeScript framework allowing us to integrate any web content. It comes with a robust messaging facility for cross-origin intent- or topic-based communication supporting wildcard addressing, request-response message exchange pattern, retained messaging, and more. Web content is embedded using a web component outlet that solves many of the cumbersome quirks of iframes.",
   "license": "EPL-2.0",
   "private": false,
   "publishConfig": {
@@ -25,12 +25,15 @@
   "keywords": [
     "scion",
     "microfrontend",
-    "micro frontend",
+    "micro-frontend",
     "iframe",
-    "web component",
     "webcomponent",
+    "web-component",
     "typescript",
     "javascript",
+    "framework-agnostic",
+    "intent",
+    "intention",
     "messaging",
     "cross-origin"
   ],

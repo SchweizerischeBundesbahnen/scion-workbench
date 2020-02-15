@@ -7,21 +7,21 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { Beans } from '../bean-manager';
-import { PlatformMessageClient } from '../host/platform-message-client';
+import { Beans } from '../../bean-manager';
+import { PlatformMessageClient } from '../../host/platform-message-client';
 import { first, publishReplay, timeoutWith } from 'rxjs/operators';
 import { ConnectableObservable, Observable, Subject, throwError } from 'rxjs';
-import { IntentMessage, MessageHeaders, TopicMessage } from '../messaging.model';
+import { IntentMessage, MessageHeaders, TopicMessage } from '../../messaging.model';
 import { MessageClient, takeUntilUnsubscribe } from './message-client';
-import { Logger } from '../logger';
-import { ManifestRegistry } from '../host/manifest-registry/manifest-registry';
-import { ApplicationConfig } from '../host/platform-config';
-import { PLATFORM_SYMBOLIC_NAME } from '../host/platform.constants';
-import { collectToPromise, expectMap, expectToBeRejectedWithError, serveManifest, waitFor, waitForCondition } from '../spec.util.spec';
-import { MicrofrontendPlatform } from '../microfrontend-platform';
+import { Logger } from '../../logger';
+import { ManifestRegistry } from '../../host/manifest-registry/manifest-registry';
+import { ApplicationConfig } from '../../host/platform-config';
+import { PLATFORM_SYMBOLIC_NAME } from '../../host/platform.constants';
+import { collectToPromise, expectMap, expectToBeRejectedWithError, serveManifest, waitFor, waitForCondition } from '../../spec.util.spec';
+import { MicrofrontendPlatform } from '../../microfrontend-platform';
 import { Defined, Objects } from '@scion/toolkit/util';
-import { ClientRegistry } from '../host/message-broker/client.registry';
-import { MessageEnvelope } from '../ɵmessaging.model';
+import { ClientRegistry } from '../../host/message-broker/client.registry';
+import { MessageEnvelope } from '../../ɵmessaging.model';
 import Spy = jasmine.Spy;
 
 const bodyExtractFn = <T>(msg: TopicMessage<T> | IntentMessage<T>): T => msg.body;

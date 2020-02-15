@@ -16,11 +16,9 @@ import { Observable, Observer, TeardownLogic } from 'rxjs';
  * Wraps a {MutationObserver} in an Observable to watch for changes being made to the DOM tree.
  * See https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver for more information.
  *
- * @param target
- *        HTMLElement to observe.
- * @param options
- *        describes the configuration of a mutation observer
- *        @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserverInit
+ * @param target - HTMLElement to observe.
+ * @param options - describes the configuration of a mutation observer
+ *        See https://developer.mozilla.org/en-US/docs/Web/API/MutationObserverInit
  */
 export function fromMutation$(target: Node, options?: MutationObserverInit): Observable<MutationRecord[]> {
   return new Observable((observer: Observer<MutationRecord[]>): TeardownLogic => {

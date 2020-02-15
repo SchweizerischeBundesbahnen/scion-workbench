@@ -12,6 +12,7 @@
  * Uses the native Web Fetch API to fetch a resource from the network.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+ * @ignore
  */
 export class HttpClient {
 
@@ -22,10 +23,8 @@ export class HttpClient {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
    *
-   * @param  input
-   *         Defines the resource that you wish to fetch.
-   * @param  init
-   *         Options object containing any custom settings that you want to apply to the request.
+   * @param  input - Defines the resource that you wish to fetch.
+   * @param  init - Options object containing any custom settings that you want to apply to the request.
    * @return A Promise that resolves to a Response object.
    */
   public fetch(input: RequestInfo, init?: RequestInit): Promise<Response> {

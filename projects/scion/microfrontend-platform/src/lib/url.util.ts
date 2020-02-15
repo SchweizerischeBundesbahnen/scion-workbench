@@ -8,8 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
+/** @ignore **/
 const ABSOLUTE_URL_REGEX = new RegExp('^http[s]?:\/\/');
 
+/**
+ * @ignore
+ */
 export class Urls {
 
   private constructor() {

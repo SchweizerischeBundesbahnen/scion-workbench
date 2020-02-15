@@ -60,12 +60,9 @@ export class Arrays {
    * Removes the specified element from an array, or the elements which satisfy the provided predicate function.
    * The original array will be changed.
    *
-   * @param  array
-   *         The array from which elements should be removed.
-   * @param  element
-   *         The element to be removed, or a predicate function to resolve elements which to be removed.
-   * @param  options
-   *         Control if to remove all occurrences of the element.
+   * @param  array - The array from which elements should be removed.
+   * @param  element - The element to be removed, or a predicate function to resolve elements which to be removed.
+   * @param  options - Control if to remove all occurrences of the element.
    * @return the elements removed from the array.
    */
   public static remove<T>(array: T[], element: any | ((element: T) => boolean), options: { firstOnly: boolean }): T[] {

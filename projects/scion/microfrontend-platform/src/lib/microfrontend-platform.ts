@@ -7,11 +7,11 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { MessageClient } from './client/message-client';
+import { MessageClient } from './client/messaging/message-client';
 import { ManifestRegistry } from './host/manifest-registry/manifest-registry';
 import { ApplicationRegistry } from './host/application-registry';
 import { BeanInstanceConstructInstructions, Beans, InstanceConstructInstructions, Type } from './bean-manager';
-import { ɵMessageClient } from './client/ɵmessage-client';
+import { ɵMessageClient } from './client/messaging/ɵmessage-client';
 import { PlatformState, PlatformStates } from './platform-state';
 import { PlatformConfigLoader } from './host/platform-config-loader';
 import { from, Observable, of } from 'rxjs';
@@ -43,87 +43,76 @@ import { MouseMoveEventDispatcher } from './client/mouse-event/mouse-move-event-
 import { MouseUpEventDispatcher } from './client/mouse-event/mouse-up-event-dispatcher';
 import { HostPlatformAppProvider } from './host/host-platform-app-provider';
 import { KeyboardEventDispatcher } from './client/keyboard-event/keyboard-event-dispatcher';
-import { ManifestService } from './client/manifest-service';
+import { ManifestService } from './client/manifest-registry/manifest-service';
 import { ɵManifestRegistry } from './host/manifest-registry/ɵmanifest-registry';
 import { ApplicationActivator } from './host/activator/application-activator';
-import { PlatformManifestService } from './client/platform-manifest-service';
+import { PlatformManifestService } from './client/manifest-registry/platform-manifest-service';
+
+window.addEventListener('beforeunload', () => MicrofrontendPlatform.destroy(), {once: true});
 
 /**
- * SCION Microfrontend Platform provides the building blocks for integrating microfrontends based on iframes.
+ * **SCION Microfrontend Platform provides the building blocks for integrating microfrontends based on iframes.**
  *
- * It is a pure TypeScript framework allowing to integrate any web content. It comes with a powerful messaging facility for
- * cross-origin intent- or topic-based communication supporting wildcard addressing, request-response message exchange pattern,
- * retained messaging and more. Web content is embedded using a responsive web component which encapsulates the iframe.
- * The component solves many of the cumbersome quirks of iframes and sets up a context in which data can be made available
- * to the embedded content.
+ * SCION Microfrontend Platform is a vanilla TypeScript framework allowing us to integrate any web content on client side. It comes with a robust
+ * messaging facility for cross-origin intent- and topic-based communication supporting wildcard addressing, request-response message exchange pattern,
+ * retained messaging, and more. Web content is embedded using a web component outlet that solves many of the cumbersome quirks of iframes.
  *
- * @see MessageClient
- * @see SciRouterOutletElement
- * @see OutletRouter
- * @see ContextService
- * @see PreferredSizeService
- * @see ManifestService
- * @see FocusMonitor
+ * The platform is UI framework agnostic and does not include or impose a UI. The platform integrates microfrontends by using iframes to provide the highest
+ * possible isolation between the microfrontends. Iframes, however, require microfrontends to have a fast startup time and impose some restrictions.
+ * For example, sharing state is more difficult because each microfrontend is mounted in a separate iframe. As for UI, microfrontends are trapped
+ * in their iframe boundary, which can be a strong limitation, particularly for overlays.
+ *
+ * The platform aims to remove iframe restrictions where appropriate. For example, the platform bubbles selected keyboard events across iframe
+ * boundaries, lets you determine if the focus is within a microfrontend, or changes the iframe size to the preferred size of embedded content.
+ * You can further associate contextual data with an iframe that is then available in embedded content.
+ *
+ * The platform supports the concept of intent-based communication, also known from the Android platform.
+ * To interact with functionality available in the system, apps declare a respective intention in a manifest and are then qualified to issue an intent to
+ * interact. Apps can also provide capabilities. Capabilities are the counterpart to intentions and allow an app to provide functionality that qualified apps
+ * can call via intent. A capability can either be application-private or available to all apps in the system.
+ *
+ * Intentions or capabilities are formulated in an abstract way, consist of a type and qualifier, and should include enough information to describe it.
+ * The enforced declaration allows analyzing which app depends on each other and to look up capabilities for a flexible composition of web content.
+ *
+ * @see {@link MessageClient}
+ * @see {@link SciRouterOutletElement}
+ * @see {@link OutletRouter}
+ * @see {@link ContextService}
+ * @see {@link PreferredSizeService}
+ * @see {@link ManifestService}
+ * @see {@link FocusMonitor}
+ * @see {@link Intention}
+ * @see {@link CapabilityProvider}
+ * @see {@link ActivatorProvider}
+ * @see {@link Beans}
+ *
+ * @category Platform
  */
-export const MicrofrontendPlatform = new class {
-
-  constructor() {
-    window.addEventListener('beforeunload', () => this.destroy(), {once: true});
-  }
+// @dynamic `ng-packagr` does not support lamdas in statics if `strictMetaDataEmit` is enabled. `ng-packagr` is used to build this library. See https://github.com/ng-packagr/ng-packagr/issues/696#issuecomment-373487183.
+export class MicrofrontendPlatform {
 
   /**
-   * Invoke from a microfrontend application to connect to the platform.
+   * Starts the platform in *host-mode* in the host app.
    *
-   * Note: This application must be a direct or indirect subframe of the host-app; in other words, the window of the host-app must be contained somewhere in the window parent hierarchy.
+   * The host app is the web application which the user loads into his browser. It serves as container application for all microfrontends,
+   * provides the main layout of the app and defines areas in which to host microfrontends.
    *
-   * @param  config
-   *         Configures this application as microfrontend platform client.
+   * In the host app, the platform is started in host-mode, thus acting as mediator for inter-microfrontend interaction. It must be started only once.
+   *
+   * The platform allows registering a client in the host app. This client can, for example, look up capabilities to display a portal, a top-level navigation,
+   * or something alike. This client has no extra privileges, thus must also register a manifest in order to interact with the platform.
+   * However, the host app client does not need an activator because it is always running.
+   *
+   * Typically, the platform is started during bootstrapping or initialization, that is, before displaying content to the user.
+   * In Angular, for example, the platform should be started in an app initializer.
+   *
+   * @param  platformConfig - Platform config declaring the apps allowed to interact with the platform. The config can be a static app list, or
+   *         provided via {@link PlatformConfigLoader} allowing a flexible setup, e.g. to load the config from a backend.
+   * @param  clientConfig - Client config of the app running in the host app; only required if running a client app in the host app.
    * @return A Promise that resolves when the platform started successfully, or that rejects if startup fails.
    */
-  public forClient(config: ClientConfig): Promise<void> {
-    return this.startPlatform(() => {
-        Beans.registerInitializer(() => SciRouterOutletElement.define());
-        // Obtain all platform properties before signalling the platform as started to allow synchronous retrieval of platform properties.
-        Beans.registerInitializer(async () => {
-          if (!await MicrofrontendPlatform.isRunningStandalone()) {
-            await Beans.get(PlatformPropertyService).whenPropertiesLoaded;
-          }
-        });
-
-        Beans.register(IS_PLATFORM_HOST, {useValue: false});
-        Beans.register(ClientConfig, {useValue: config});
-        Beans.register(PlatformPropertyService, {eager: true});
-        Beans.registerIfAbsent(Logger);
-        Beans.registerIfAbsent(HttpClient);
-        Beans.registerIfAbsent(MessageClient, provideMessageClient(config.symbolicName, config.messaging));
-        Beans.register(HostPlatformState);
-        Beans.registerIfAbsent(OutletRouter);
-        Beans.registerIfAbsent(RelativePathResolver);
-        Beans.registerIfAbsent(RouterOutletUrlAssigner);
-        Beans.register(FocusInEventDispatcher, {eager: true});
-        Beans.register(FocusMonitor);
-        Beans.register(MouseMoveEventDispatcher, {eager: true});
-        Beans.register(MouseUpEventDispatcher, {eager: true});
-        Beans.register(PreferredSizeService);
-        Beans.register(ContextService);
-        Beans.register(ManifestService);
-        Beans.register(KeyboardEventDispatcher, {eager: true});
-      },
-    );
-  }
-
-  /**
-   * Invoke from the host application to start the platform.
-   *
-   * @param  platformConfig
-   *         Defines the applications running in the platform. You can provide a static configuration or a loader to load the configuration from remote.
-   *         If using a static config, provide it either as an array of {@link ApplicationConfig}s or as a {@link PlatformConfig} object.
-   * @param  clientConfig
-   *         Provide a client configuration if the host app also acts as a client app. If set, the host app can interact with other clients.
-   * @return A Promise that resolves when the platform started successfully, or that rejects if startup fails.
-   */
-  public forHost(platformConfig: ApplicationConfig[] | PlatformConfig | Type<PlatformConfigLoader>, clientConfig?: ClientConfig): Promise<void> {
-    return this.startPlatform(() => {
+  public static forHost(platformConfig: ApplicationConfig[] | PlatformConfig | Type<PlatformConfigLoader>, clientConfig?: ClientConfig): Promise<void> {
+    return MicrofrontendPlatform.startPlatform(() => {
         Beans.registerInitializer({useClass: ManifestCollector});
 
         Beans.register(IS_PLATFORM_HOST, {useValue: true});
@@ -176,24 +165,76 @@ export const MicrofrontendPlatform = new class {
   }
 
   /**
+   * Starts the platform in *client-mode*. Invoke this method from inside a microfrontend to connect to the host platform.
+   * When connected, the microfrontend can interact with the platform, i.e. sending and receiving messages, issuing and handling intents,
+   * looking up capabilities, and more.
+   *
+   * As a prerequisite, the client app must be a registered app in the host app. Otherwise, the app cannot connect to the platform. Also, the `Window`
+   * of the host app must be contained somewhere in the window parent hierarchy of the microfrontend.
+   *
+   * Typically, a microfrontend connects to the platform during bootstrapping or initialization, that is, before displaying content to the user.
+   * In Angular, for example, the platform should be started in an app initializer.
+   *
+   * The platform must also be started for activator entry points, if any. An activator is a microfrontend without a user interface to perform operations
+   * in the background. Activators are loaded on platform startup to interact with the system even when no microfrontend of that app is displaying, e.g, to
+   * handle intents, or to flexibly provide capabilities.
+   *
+   * @param  config - Identity and config of this app.
+   * @return A Promise that resolves when the platform started successfully, or that rejects if startup fails.
+   */
+  public static forClient(config: ClientConfig): Promise<void> {
+    return MicrofrontendPlatform.startPlatform(() => {
+        Beans.registerInitializer(() => SciRouterOutletElement.define());
+        // Obtain all platform properties before signalling the platform as started to allow synchronous retrieval of platform properties.
+        Beans.registerInitializer(async () => {
+          if (!await MicrofrontendPlatform.isRunningStandalone()) {
+            await Beans.get(PlatformPropertyService).whenPropertiesLoaded;
+          }
+        });
+
+        Beans.register(IS_PLATFORM_HOST, {useValue: false});
+        Beans.register(ClientConfig, {useValue: config});
+        Beans.register(PlatformPropertyService, {eager: true});
+        Beans.registerIfAbsent(Logger);
+        Beans.registerIfAbsent(HttpClient);
+        Beans.registerIfAbsent(MessageClient, provideMessageClient(config.symbolicName, config.messaging));
+        Beans.register(HostPlatformState);
+        Beans.registerIfAbsent(OutletRouter);
+        Beans.registerIfAbsent(RelativePathResolver);
+        Beans.registerIfAbsent(RouterOutletUrlAssigner);
+        Beans.register(FocusInEventDispatcher, {eager: true});
+        Beans.register(FocusMonitor);
+        Beans.register(MouseMoveEventDispatcher, {eager: true});
+        Beans.register(MouseUpEventDispatcher, {eager: true});
+        Beans.register(PreferredSizeService);
+        Beans.register(ContextService);
+        Beans.register(ManifestService);
+        Beans.register(KeyboardEventDispatcher, {eager: true});
+      },
+    );
+  }
+
+  /**
    * Checks if this microfrontend is connected to the platform host. If not, the client platform may not be started,
    * or the microfrontend is running as a top-level app in the browser.
    */
-  public async isRunningStandalone(): Promise<boolean> {
+  public static async isRunningStandalone(): Promise<boolean> {
     return Beans.get(PlatformState).state === PlatformStates.Stopped || !(await Beans.get(MessageClient).isConnected());
   }
 
   /**
    * Destroys this platform and releases resources allocated.
+   *
+   * @return a Promise that resolves once the platformed stopped.
    */
-  public async destroy(): Promise<void> {
+  public static async destroy(): Promise<void> {
     await Beans.get(PlatformState).enterState(PlatformStates.Stopping);
     Beans.destroy();
     await Beans.get(PlatformState).enterState(PlatformStates.Stopped);
   }
 
   /** @internal **/
-  public async startPlatform(startupFn: () => void): Promise<void> {
+  public static async startPlatform(startupFn: () => void): Promise<void> {
     await Beans.get(PlatformState).enterState(PlatformStates.Starting);
     try {
       startupFn();
@@ -210,10 +251,11 @@ export const MicrofrontendPlatform = new class {
       return Promise.reject(`[PlatformStartupError] Microfrontend platform failed to start: ${error}`);
     }
   }
-};
+}
 
 /**
  * Creates a {@link PlatformConfigLoader} from the given config.
+ * @ignore
  */
 function createConfigLoaderBeanDescriptor(config: ApplicationConfig[] | PlatformConfig | Type<PlatformConfigLoader>): InstanceConstructInstructions {
   if (typeof config === 'function') {
@@ -227,6 +269,7 @@ function createConfigLoaderBeanDescriptor(config: ApplicationConfig[] | Platform
   }
 }
 
+/** @ignore */
 function provideMessageClient(clientAppName: string, config?: { brokerDiscoverTimeout?: number, deliveryTimeout?: number }): BeanInstanceConstructInstructions {
   return {
     useFactory: (): MessageClient => {
@@ -239,6 +282,7 @@ function provideMessageClient(clientAppName: string, config?: { brokerDiscoverTi
   };
 }
 
+/** @ignore */
 class StaticPlatformConfigLoader implements PlatformConfigLoader {
 
   constructor(private _config: PlatformConfig) {

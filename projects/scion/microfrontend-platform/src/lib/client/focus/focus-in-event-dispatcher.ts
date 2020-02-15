@@ -10,13 +10,14 @@
 import { fromEvent, Subject } from 'rxjs';
 import { Beans, PreDestroy } from '../../bean-manager';
 import { takeUntil } from 'rxjs/operators';
-import { MessageClient } from '../message-client';
+import { MessageClient } from '../messaging/message-client';
 import { PlatformTopics } from '../../ɵmessaging.model';
 
 /**
  * Sends a 'focusin' event to the topic {@link PlatformTopics.FocusIn} when this document gains focus.
  *
  * @see FocusTracker
+ * @ignore
  */
 export class FocusInEventDispatcher implements PreDestroy {
 

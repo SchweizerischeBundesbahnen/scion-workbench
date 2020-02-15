@@ -12,11 +12,15 @@ import { NilQualifier, Qualifier } from './platform.model';
 
 /**
  * Matcher function to test if two qualifiers matches.
+ *
+ * @ignore
  */
 export type QualifierMatcher = (qualifier1: Qualifier, qualifier2: Qualifier) => boolean;
 
 /**
  * Tests if the given qualifiers are equal.
+ *
+ * @ignore
  */
 export function isEqualQualifier(qualifier1: Qualifier, qualifier2: Qualifier): boolean {
   qualifier1 = qualifier1 || NilQualifier;
@@ -42,12 +46,12 @@ export function isEqualQualifier(qualifier1: Qualifier, qualifier2: Qualifier): 
  * The intent qualifier must be exact, i.e. not contain wildcards. This in contrast to the intention qualifier
  * where wildcards are allowed.
  *
- * @param intentionQualifier
- *        qualifier as specified in the manifest, may contain wildcards (*) as qualifier key and wildcards (* or ?) as qualifier value;
- *        if `null`, {NilQualifier} is used.
- * @param intentQualifier
- *        the qualifier to test against the intent qualifier; must not contain wildcards, or if it does, they are interpreted as values;
- *        if `null`, {NilQualifier} is used.
+ * @param intentionQualifier - qualifier as specified in the manifest, may contain wildcards (*) as qualifier key and wildcards (* or ?)
+ *        as qualifier value; if `null`, {NilQualifier} is used.
+ * @param intentQualifier - the qualifier to test against the intent qualifier; must not contain wildcards, or if it does, they are interpreted
+ *        as values; if `null`, {NilQualifier} is used.
+ *
+ * @ignore
  */
 export function matchesIntentQualifier(intentionQualifier: Qualifier, intentQualifier: Qualifier): boolean {
   intentionQualifier = intentionQualifier || NilQualifier;
@@ -79,12 +83,12 @@ export function matchesIntentQualifier(intentionQualifier: Qualifier, intentQual
 /**
  * Tests if the given qualifiers match, allowing wildcards (* and ?) in both of them.
  *
- * @param qualifier
- *        qualifier as specified in the manifest, may contain wildcards (*) as qualifier key and wildcards (* or ?) as qualifier value;
- *        if `null`, {NilQualifier} is used.
- * @param testee
- *        the qualifier to test against the above qualifier; may contain wildcards (*) as qualifier key and wildcards (* or ?) as qualifier value;
- *        if `null`, {NilQualifier} is used.
+ * @param qualifier - qualifier as specified in the manifest, may contain wildcards (*) as qualifier key and wildcards (* or ?)
+ *        as qualifier value; if `null`, {NilQualifier} is used.
+ * @param testee - the qualifier to test against the above qualifier; may contain wildcards (*) as qualifier key and wildcards (* or ?)
+ *        as qualifier value; if `null`, {NilQualifier} is used.
+ *
+ * @ignore
  */
 export function matchesWildcardQualifier(qualifier: Qualifier, testee: Qualifier): boolean {
   qualifier = qualifier || NilQualifier;

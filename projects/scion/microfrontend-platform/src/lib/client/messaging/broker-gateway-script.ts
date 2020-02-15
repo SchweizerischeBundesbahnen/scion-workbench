@@ -7,11 +7,13 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { ConnackMessage, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../ɵmessaging.model';
-import { MessageHeaders, TopicMessage } from '../messaging.model';
+import { ConnackMessage, MessageEnvelope, MessagingChannel, MessagingTransport, PlatformTopics } from '../../ɵmessaging.model';
+import { MessageHeaders, TopicMessage } from '../../messaging.model';
 
 /**
  * Returns the JavaScript for the gateway to connect to the message broker.
+ *
+ * @ignore
  */
 export function getGatewayJavaScript(config: GatewayConfig): string {
   // Create an IIFE (Immediately Invoked Function Expression) which invokes the transpiled 'initGateway' function.
@@ -54,6 +56,7 @@ export function getGatewayJavaScript(config: GatewayConfig): string {
  * Note: DO NOT USE CODE FROM OTHER MODULES BECAUSE SOLELY THE 'TO-STRING' REPRESENTATION OF FOLLOWING FUNCTION
  *       IS LOADED INTO THE IFRAME. THE ONLY EXCEPTION ARE REFERENCES TO INTERFACE TYPES AS NOT TRANSPILED INTO
  *       JAVASCRIPT.
+ * @ignore
  */
 function initGateway(config: GatewayConfig, constants: Constants): void {
   const noop = (): void => {
@@ -263,6 +266,8 @@ function initGateway(config: GatewayConfig, constants: Constants): void {
 
 /**
  * Instruments the broker gateway.
+ *
+ * @ignore
  */
 export interface GatewayConfig {
   clientAppName: string;
@@ -272,6 +277,8 @@ export interface GatewayConfig {
 
 /**
  * Response to a gateway info request.
+ *
+ * @ignore
  */
 export interface GatewayInfoResponse {
   ok: boolean;
@@ -282,6 +289,8 @@ export interface GatewayInfoResponse {
 
 /**
  * Information about the broker.
+ *
+ * @ignore
  */
 interface BrokerInfo {
   clientId: string;
@@ -291,6 +300,8 @@ interface BrokerInfo {
 
 /**
  * Defines constants available in the gateway script.
+ *
+ * @ignore
  */
 interface Constants {
   transports: {

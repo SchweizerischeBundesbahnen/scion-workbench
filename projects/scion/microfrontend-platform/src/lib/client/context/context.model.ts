@@ -13,6 +13,8 @@ import { MessageHeaders, TopicMessage } from '../../messaging.model';
 
 /**
  * Provides the API to lookup context related information.
+ *
+ * @ignore
  */
 export namespace Contexts {
 
@@ -40,10 +42,8 @@ export namespace Contexts {
   /**
    * Creates a message envelope to request the context value associated with the given name.
    *
-   * @param name
-   *        The name of the value to lookup.
-   * @param replyTo
-   *        The 'replyTo' topic where to send the reply.
+   * @param name - The name of the value to lookup.
+   * @param replyTo - The 'replyTo' topic where to send the reply.
    */
   export function newContextValueLookupRequest(name: string, replyTo: string): MessageEnvelope<TopicMessage<void>> {
     return {
@@ -61,10 +61,8 @@ export namespace Contexts {
   /**
    * Creates a message envelope to lookup the names of associated context values in the context tree.
    *
-   * @param replyTo
-   *        The 'replyTo' topic where to send the reply.
-   * @param names
-   *        The names of the current context to be combined with the names of the parent contexts.
+   * @param replyTo - The 'replyTo' topic where to send the reply.
+   * @param names - The names of the current context to be combined with the names of the parent contexts.
    */
   export function newContextTreeNamesLookupRequest(replyTo: string, names?: Set<string>): MessageEnvelope<TopicMessage<Set<string>>> {
     return {
@@ -83,8 +81,7 @@ export namespace Contexts {
   /**
    * Creates a message envelope to get notified when some context changes at any level in the context tree.
    *
-   * @param replyTo
-   *        The 'replyTo' topic where to send the reply.
+   * @param replyTo - The 'replyTo' topic where to send the reply.
    */
   export function newContextTreeObserveRequest(replyTo: string): MessageEnvelope<TopicMessage<void>> {
     return {

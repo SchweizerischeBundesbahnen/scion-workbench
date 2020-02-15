@@ -11,17 +11,30 @@ import { concat, EMPTY, NEVER, Observable, Observer, of, Subject, TeardownLogic 
 import { expand, filter, map, mergeMapTo, share, take, takeUntil } from 'rxjs/operators';
 import { UUID } from '@scion/toolkit/util';
 import { Beans } from '../../bean-manager';
-import { MessageClient } from '../message-client';
+import { MessageClient } from '../messaging/message-client';
 import { MessageHeaders, ResponseStatusCodes } from '../../messaging.model';
 import { Contexts } from './context.model';
 import { IS_PLATFORM_HOST } from '../../platform.model';
 
 /**
- * Allows looking up values which are set on the current or a parent context.
+ * Allows looking up contextual data set on a {@link SciRouterOutletElement `<sci-router-outlet>`} at any parent level.
  *
- * A context is a hierarchical key-value map which are linked together to form a tree structure.
- * When a key is not found in a context, the lookup is retried on the parent, repeating until either a
- * value is found or the root of the tree has been reached.
+ * The platform allows associating contextual data with an outlet, which then is available in embedded content using {@link ContextService}.
+ * Contextual data must be serializable with the structured clone algorithm.
+ *
+ * Each outlet spans a new context. A context is similar to a `Map`, but is linked to its parent outlet context, if any, thus forming a hierarchical tree structure.
+ * When looking up a value and if the value is not found in the outlet context, the lookup is retried on the parent context, repeating until either a value
+ * is found or the root of the context tree has been reached.
+ *
+ * The platform sets the following context values by default:
+ *
+ * | Key | Value type | Description |
+ * |-----|------------|-------------|
+ * | {@link OUTLET_CONTEXT ɵOUTLET} | {@link OutletContext} | Information about the outlet which embeds the microfrontend. |
+ * | {@link ACTIVATION_CONTEXT ɵACTIVATION_CONTEXT} | {@link ActivationContext} | Information about the activation context if loaded by an activator. See {@link ActivatorProvider} for more information about activators. |
+ *
+ *
+ * @category Context
  */
 export class ContextService {
 
@@ -34,15 +47,14 @@ export class ContextService {
   /**
    * Observes the context value associated with the given name.
    *
-   * When the key is not found in a context, the lookup is retried on the parent context, repeating until either a value is found
-   * or the root of the tree has been reached.
+   * When the name is not found in a context, the lookup is retried on the parent context, repeating until either a value is found
+   * or the root of the context tree has been reached.
    *
-   * @param  name
-   *         The name of the value to return.
-   * @return An Observable that emits the context value associated with the given key.
+   * @param  name - The name of the context value to observe.
+   * @return An Observable that emits the context value associated with the given name.
    *         Upon subscription, the tree of contexts is looked up for a value registered under the given name.
    *         If not found, the Observable emits `null`. The Observable never completes. It emits every time
-   *         a value for the specified name is set or removed, and this at all levels of the tree.
+   *         a value for the specified name is set or removed, and this at all levels of the context tree.
    */
   public observe$<T>(name: string): Observable<T | null> {
     if (Beans.get(IS_PLATFORM_HOST)) {
@@ -72,8 +84,7 @@ export class ContextService {
   /**
    * Looks up the context tree for a value associated with the given name.
    *
-   * @param  name
-   *         The name of the value to return.
+   * @param  name - The name of the value to return.
    * @return An Observable that emits the context value associated with the given key and then completes.
    *         When the requested value is not found in a context, the Observable emits `null` and then completes.
    */
@@ -152,6 +163,8 @@ export class ContextService {
 
 /**
  * Resolves when subscribed to the given reply topic.
+ *
+ * @ignore
  */
 function whenSubscribedToReplyTopic(topic: string): Promise<void> {
   return Beans.get(MessageClient).subscriberCount$(topic)
