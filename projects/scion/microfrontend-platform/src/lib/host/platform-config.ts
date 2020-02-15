@@ -57,18 +57,18 @@ export interface ApplicationConfig {
    */
   scopeCheckDisabled?: boolean;
   /**
+   * Sets whether or not this application can issue intents for which it has not declared a respective intention.
+   *
+   * By default, intention check is enabled. Disabling intention check is discouraged.
+   */
+  intentionCheckDisabled?: boolean;
+  /**
    * Sets whether or not the API to manage intentions is disabled for this application.
    *
    * By default, this API is disabled. With the API enabled (discouraged), the application can register and
    * unregister intentions dynamically at runtime.
    */
   intentionRegisterApiDisabled?: boolean;
-  /**
-   * Sets whether or not this application can issue intents for which it has not declared a respective intention.
-   *
-   * By default, `IntentionRegisteredCheck` is enabled. Disabling `IntentionRegisteredCheck` is discouraged.
-   */
-  intentionRegisteredCheckDisabled?: boolean;
 }
 
 /**

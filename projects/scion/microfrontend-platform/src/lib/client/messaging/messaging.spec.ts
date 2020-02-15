@@ -65,16 +65,16 @@ describe('Messaging', () => {
     await expectAsync(actual).toBeResolvedTo(['payload']);
   });
 
-  it('should allow issuing an intent for which the app has not declared a respective intention, but only if \'intention registered check\' is disabled for that app', async () => {
+  it('should allow issuing an intent for which the app has not declared a respective intention, but only if \'intention check\' is disabled for that app', async () => {
     const manifestUrl = serveManifest({name: 'Host Application'});
     const clientManifestUrl = serveManifest({name: 'Client Application', capabilities: [{type: 'some-type', private: false}]});
-    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl, intentionRegisteredCheckDisabled: true}, {symbolicName: 'client-app', manifestUrl: clientManifestUrl}];
+    const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl, intentionCheckDisabled: true}, {symbolicName: 'client-app', manifestUrl: clientManifestUrl}];
     await MicrofrontendPlatform.forHost(registeredApps, {symbolicName: 'host-app'});
 
     await expectAsync(Beans.get(MessageClient).issueIntent$({type: 'some-type'}).toPromise()).toBeResolved();
   });
 
-  it('should not allow issuing an intent for which the app has not declared a respective intention, if \'intention registered check\' is enabled or not specified for that app', async () => {
+  it('should not allow issuing an intent for which the app has not declared a respective intention, if \'intention check\' is enabled or not specified for that app', async () => {
     const manifestUrl = serveManifest({name: 'Host Application'});
     const clientManifestUrl = serveManifest({name: 'Client Application', capabilities: [{type: 'some-type', private: false}]});
     const registeredApps: ApplicationConfig[] = [{symbolicName: 'host-app', manifestUrl: manifestUrl}, {symbolicName: 'client-app', manifestUrl: clientManifestUrl}];

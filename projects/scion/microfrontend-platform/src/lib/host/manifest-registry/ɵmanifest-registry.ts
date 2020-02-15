@@ -60,7 +60,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
   public hasIntention(intent: Intent, appSymbolicName: string): boolean {
     const filter: ManifestObjectFilter = {appSymbolicName, type: intent.type, qualifier: intent.qualifier || {}};
     return (
-      Beans.get(ApplicationRegistry).isIntentionRegisteredCheckDisabled(appSymbolicName) ||
+      Beans.get(ApplicationRegistry).isIntentionCheckDisabled(appSymbolicName) ||
       this._intentionStore.find(filter, matchesIntentQualifier).length > 0 ||
       this._providerStore.find(filter, matchesIntentQualifier).length > 0
     );
@@ -72,7 +72,7 @@ export class ɵManifestRegistry implements ManifestRegistry, PreDestroy { // tsl
    */
   private hasIntentionForProvider(appSymbolicName: string, provider: CapabilityProvider): boolean {
     return (
-      Beans.get(ApplicationRegistry).isIntentionRegisteredCheckDisabled(appSymbolicName) ||
+      Beans.get(ApplicationRegistry).isIntentionCheckDisabled(appSymbolicName) ||
       provider.metadata.appSymbolicName === appSymbolicName ||
       this._intentionStore.find({appSymbolicName, type: provider.type, qualifier: provider.qualifier}, matchesWildcardQualifier).length > 0
     );
