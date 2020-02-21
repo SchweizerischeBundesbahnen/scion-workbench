@@ -5,6 +5,9 @@
   <sci-form-field label="URL">
     <input [formControlName]="URL" class="e2e-url">
   </sci-form-field>
+  <sci-form-field label="Params">
+    <sci-params-enter [paramsFormArray]="form.get(PARAMS)" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+  </sci-form-field>
 
   <button type="sumit" class="e2e-navigate" (click)="onNavigateClick()">Navigate</button>
 </form>

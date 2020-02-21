@@ -21,26 +21,27 @@ export class RelativePathResolver {
   /**
    * Converts the given relative path into a navigable URL with relative symbols like `/`, `./`, or `../` resolved.
    *
-   * @param  relativePath - Specifies the relative path to be converted into an absolute path.
-   * @param  params - Specifies the path which the given `relativePath` is relative to.
-   * @return converted absolute path.
+   * @param  path - Specifies the path which to convert into an absolute path.
+   * @param  options - Specifies to which path the given path is relative to.
+   * @return the absolute path.
    */
-  public resolve(relativePath: string, params: { relativeTo: string }): string {
-    const relativeToLocation = new URL(params.relativeTo);
-    const hashBasedRouting = relativeToLocation.hash && relativeToLocation.hash.startsWith('#/');
+  public resolve(path: string, options: { relativeTo: string }): string {
+    const relativeToUrl = new URL(options.relativeTo);
+    const isHashBasedRouting = relativeToUrl.hash && relativeToUrl.hash.startsWith('#/');
 
-    const url = new URL(relativePath, relativeToLocation.origin);
-    if (hashBasedRouting) {
-      const truncatedRelativeToPath = this.truncateQueryParamsAndFragment(relativeToLocation.hash.substring(1));
-      url.pathname = relativeToLocation.pathname;
-      url.search = '';
-      url.hash = this.computeNavigationPath(relativePath, {relativeTo: truncatedRelativeToPath});
+    const absolutePath = new URL(path, relativeToUrl.origin);
+    if (isHashBasedRouting) {
+      const relativeToPath = this.truncateQueryParamsAndFragment(relativeToUrl.hash.substring(1));
+      absolutePath.pathname = relativeToUrl.pathname;
+      absolutePath.search = '';
+      absolutePath.hash = this.computeNavigationPath(path, {relativeTo: relativeToPath});
     }
     else {
-      const truncatedPath = this.truncateQueryParamsAndFragment(relativePath); // truncate the path as query params and fragment are already contained in the URL
-      url.pathname = this.computeNavigationPath(truncatedPath, {relativeTo: relativeToLocation.pathname});
+      const pathname = this.truncateQueryParamsAndFragment(path); // truncate the path as query params and fragment are already contained in the URL
+      absolutePath.pathname = this.computeNavigationPath(pathname, {relativeTo: relativeToUrl.pathname});
     }
-    return url.toString();
+
+    return absolutePath.toString();
   }
 
   /**
@@ -60,11 +61,11 @@ export class RelativePathResolver {
   }
 
   /**
-   * Computes the absolute path for the given relative path, with all navigational symbols, if any,
-   * resolved. Supported navigational symbols are  `/`, `../` and `./`.
+   * Computes the absolute path for the given path, with all navigational symbols, if any, resolved.
+   * Supported navigational symbols are  `/`, `../` and `./`.
    */
-  protected computeNavigationPath(relativePath: string, params: { relativeTo: string }): string {
-    const segments = relativePath
+  protected computeNavigationPath(path: string, options: { relativeTo: string }): string {
+    const segments = path
       .split('/')
       .reduce((location, segment, index) => {
         switch (segment) {
@@ -81,8 +82,9 @@ export class RelativePathResolver {
             return location.concat(segment);
           }
         }
-      }, params.relativeTo.split('/').filter(Boolean));
+      }, options.relativeTo.split('/').filter(Boolean));
 
     return `/${segments.join('/')}`;
   }
 }
+

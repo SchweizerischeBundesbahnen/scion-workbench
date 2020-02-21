@@ -46,5 +46,11 @@ describe('Dictionaries', () => {
     it('should return `null` for an `undefined` dictionary', () => {
       expect(Dictionaries.toMap(undefined)).toBeUndefined();
     });
+
+    it('should return the map if given a map', () => {
+      const map = new Map().set('firstname', 'John').set('lastname', 'Smith');
+      expect(Dictionaries.toMap(map)).toBe(map);
+      expect(Dictionaries.toMap(new Map(map))).toEqual(map);
+    });
   });
 });

@@ -17,7 +17,7 @@ export class Dictionaries {
   }
 
   /**
-   * Creates a {@link Dictionary} from the given map.
+   * Creates a {@link Dictionary} from the given map. If `null` is given, `null` is returned.
    */
   public static toDictionary<T = any>(map: Map<string, T>): Dictionary<T> | null {
     if (map === null) {
@@ -36,11 +36,15 @@ export class Dictionaries {
   }
 
   /**
-   * Creates a {@link Map} from the given dictionary.
+   * Creates a {@link Map} from the given dictionary. If given a {@link Map}, the map is returned.
+   * If `null` is given, `null` is returned.
    */
-  public static toMap<T = any>(dictionary: Dictionary<T>): Map<string, T> | null {
+  public static toMap<T = any>(dictionary: Dictionary<T> | Map<string, T>): Map<string, T> | null {
     if (dictionary === null) {
       return null;
+    }
+    if (dictionary instanceof Map) {
+      return dictionary;
     }
     if (dictionary === undefined) {
       return undefined;
