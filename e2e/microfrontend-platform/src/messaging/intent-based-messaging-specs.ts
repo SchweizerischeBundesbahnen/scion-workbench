@@ -678,16 +678,105 @@ export namespace IntendBasedMessagingSpecs {
   }
 
   /**
+   * Tests that the platform resolves to the satisfying capability.
+   */
+  export async function resolveCapabilitySpec(): Promise<void> {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      managerOutlet: 'about:blank',
+      publisher_app: PublishMessagePagePO,
+      receiver1_app2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver2_app2: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_2},
+      receiver1_app3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
+      receiver2_app3: {useClass: ReceiveMessagePagePO, origin: TestingAppOrigins.APP_3},
+    });
+
+    const managerOutlet = await pagePOs.get<BrowserOutletPO>('managerOutlet');
+
+    // Register intention for app-1
+    const intentionManager_app1 = await managerOutlet.enterUrl<RegisterIntentionsPagePO>({useClass: RegisterIntentionsPagePO, origin: TestingAppOrigins.APP_1});
+    await intentionManager_app1.registerIntention({type: 'testing', qualifier: {key: 'value'}});
+
+    // Provide capability in app-2
+    const capabilityManager_app2 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_2});
+    const capabilityId_app2 = await capabilityManager_app2.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
+
+    // Provide capability in app-3
+    const capabilityManager_app3 = await managerOutlet.enterUrl<RegisterCapabilityProvidersPagePO>({useClass: RegisterCapabilityProvidersPagePO, origin: TestingAppOrigins.APP_3});
+    const capabilityId_app3 = await capabilityManager_app3.registerProvider({type: 'testing', qualifier: {key: 'value'}, private: false});
+
+    // Receive intents in app-2 (client-1)
+    const receiver1_app2 = await pagePOs.get<ReceiveMessagePagePO>('receiver1_app2');
+    await receiver1_app2.selectMessagingModel(MessagingModel.Intent);
+    await receiver1_app2.clickSubscribe();
+
+    // Receive intents in app-2 (client-2)
+    const receiver2_app2 = await pagePOs.get<ReceiveMessagePagePO>('receiver2_app2');
+    await receiver2_app2.selectMessagingModel(MessagingModel.Intent);
+    await receiver2_app2.clickSubscribe();
+
+    // Receive intents in app-3 (client-1)
+    const receiver1_app3 = await pagePOs.get<ReceiveMessagePagePO>('receiver1_app3');
+    await receiver1_app3.selectMessagingModel(MessagingModel.Intent);
+    await receiver1_app3.clickSubscribe();
+
+    // Receive intents in app-3 (client-2)
+    const receiver2_app3 = await pagePOs.get<ReceiveMessagePagePO>('receiver2_app3');
+    await receiver2_app3.selectMessagingModel(MessagingModel.Intent);
+    await receiver2_app3.clickSubscribe();
+
+    // issue the intent
+    const publisherPO = pagePOs.get<PublishMessagePagePO>('publisher_app');
+    await publisherPO.selectMessagingModel(MessagingModel.Intent);
+    await publisherPO.enterIntent('testing', {key: 'value'});
+    await publisherPO.clickPublish();
+
+    // verify different capabilities
+    await expect(capabilityId_app2).not.toEqual(capabilityId_app3);
+
+    // verify intent received in app-2 with resolved capability `capabilityId_app2` (client-1)
+    await expectIntent(receiver1_app2.getFirstMessageOrElseReject()).toEqual({
+      intent: {type: 'testing', qualifier: {key: 'value'}},
+      headers: new Map(),
+      capabilityId: capabilityId_app2,
+    });
+
+    // verify intent received in app-2 with resolved capability `capabilityId_app2` (client-2)
+    await expectIntent(receiver2_app2.getFirstMessageOrElseReject()).toEqual({
+      intent: {type: 'testing', qualifier: {key: 'value'}},
+      headers: new Map(),
+      capabilityId: capabilityId_app2,
+    });
+
+    // verify intent received in app-3 with resolved capability `capabilityId_app3` (client-1)
+    await expectIntent(receiver1_app3.getFirstMessageOrElseReject()).toEqual({
+      intent: {type: 'testing', qualifier: {key: 'value'}},
+      headers: new Map(),
+      capabilityId: capabilityId_app3,
+    });
+
+    // verify intent received in app-3 with resolved capability `capabilityId_app3` (client-2)
+    await expectIntent(receiver2_app3.getFirstMessageOrElseReject()).toEqual({
+      intent: {type: 'testing', qualifier: {key: 'value'}},
+      headers: new Map(),
+      capabilityId: capabilityId_app3,
+    });
+  }
+
+  /**
    * Expects the intent to equal the expected intent with its headers to contain at minimum the given map entries.
    */
-  function expectIntent(actual: Promise<MessageListItemPO>): { toEqual: (expected: IntentMessage) => void } {
+  function expectIntent(actual: Promise<MessageListItemPO>): { toEqual: (expected: IntentMessage & { capabilityId?: string }) => void } {
     return {
-      toEqual: async (expected: IntentMessage): Promise<void> => {
+      toEqual: async (expected: IntentMessage & { capabilityId?: string }): Promise<void> => {
         const actualMessage = await actual;
         await expect(actualMessage.getIntentType()).toEqual(expected.intent.type);
         await expect(actualMessage.getIntentQualifier()).toEqual(expected.intent.qualifier);
         if (expected.body !== undefined) {
           await expect(actualMessage.getBody()).toEqual(expected.body);
+        }
+        if (expected.capabilityId !== undefined) {
+          await expect(actualMessage.getCapabilityId()).toEqual(expected.capabilityId);
         }
         // Jasmine 3.5 provides 'mapContaining' matcher; when updated, this custom matcher can be removed.
         await expect([...await actualMessage.getHeaders()]).toEqual(jasmine.arrayContaining([...expected.headers]));

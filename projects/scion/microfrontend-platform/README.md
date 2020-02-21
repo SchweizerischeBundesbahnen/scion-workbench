@@ -3,7 +3,7 @@ SCION Microfrontend Platform
 
 **SCION Microfrontend Platform provides the building blocks for integrating microfrontends based on iframes.**
 
-SCION Microfrontend Platform is a vanilla TypeScript framework allowing us to integrate any web content on client side. It comes with a robust 
+SCION Microfrontend Platform is a TypeScript framework allowing us to integrate any web content on the client-side. It comes with a robust 
 messaging facility for cross-origin intent- and topic-based communication supporting wildcard addressing, request-response message exchange pattern,
 retained messaging, and more. Web content is embedded using a web component outlet that solves many of the cumbersome quirks of iframes.
 

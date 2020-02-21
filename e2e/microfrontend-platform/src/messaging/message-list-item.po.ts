@@ -57,6 +57,11 @@ export class MessageListItemPO {
     return new SciPropertyPO(this._contentFinder.$('sci-property.e2e-intent-qualifier')).readAsDictionary();
   }
 
+  public async getCapabilityId(): Promise<string> {
+    await this._switchToIframeFn();
+    return this._contentFinder.$('span.e2e-capability-id').getText();
+  }
+
   public async clickReply(): Promise<void> {
     await this._switchToIframeFn();
     await this._listItemPO.clickAction('e2e-reply');
