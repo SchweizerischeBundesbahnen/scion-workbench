@@ -555,6 +555,118 @@ describe('RouterOutlet', () => {
     await expect(routerOutletPO.getRouterOutletUrl()).toEqual(getPageUrl({path: OutletRouterPagePO.pageUrl, origin: TestingAppOrigins.APP_1}));
   });
 
+  it('should substitute matrix params when navigating', async () => {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      router: OutletRouterPagePO,
+      testee: RouterOutletPagePO,
+    });
+
+    // Page Object of the loaded microfrontend
+    const microfrontendPO = new Microfrontend1PagePO((): Promise<void> => routerOutletPO.switchToRouterOutletIframe());
+
+    // Name the router outlet under test
+    const routerOutletPO = pagePOs.get<RouterOutletPagePO>('testee');
+    await routerOutletPO.enterOutletName('microfrontend-outlet');
+    await routerOutletPO.clickApply();
+
+    // Navigate
+    const routerPO = pagePOs.get<OutletRouterPagePO>('router');
+    await routerPO.enterOutletName('microfrontend-outlet');
+    await routerPO.enterUrl(`../${Microfrontend2PagePO.pageUrl};product=:product;brand=:brand`);
+    await routerPO.enterParams(new Map().set('product', 'shampoo').set('brand', 'greenline'));
+    await routerPO.clickNavigate();
+
+    // Verify params and fragment and that the app did not reload
+    await expect(microfrontendPO.getQueryParams()).toEqual(new Map());
+    await expect(microfrontendPO.getMatrixParams()).toEqual(new Map().set('product', 'shampoo').set('brand', 'greenline'));
+    await expect(microfrontendPO.getFragment()).toEqual('');
+  });
+
+  it('should substitute query params when navigating', async () => {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      router: OutletRouterPagePO,
+      testee: RouterOutletPagePO,
+    });
+
+    // Page Object of the loaded microfrontend
+    const microfrontendPO = new Microfrontend2PagePO((): Promise<void> => routerOutletPO.switchToRouterOutletIframe());
+
+    // Name the router outlet under test
+    const routerOutletPO = pagePOs.get<RouterOutletPagePO>('testee');
+    await routerOutletPO.enterOutletName('microfrontend-outlet');
+    await routerOutletPO.clickApply();
+
+    // Navigate
+    const routerPO = pagePOs.get<OutletRouterPagePO>('router');
+    await routerPO.enterOutletName('microfrontend-outlet');
+    await routerPO.enterUrl(`../${Microfrontend2PagePO.pageUrl}?product=:product&brand=:brand`);
+    await routerPO.enterParams(new Map().set('product', 'shampoo').set('brand', 'greenline'));
+    await routerPO.clickNavigate();
+
+    // Verify params and fragment and that the app did not reload
+    await expect(microfrontendPO.getQueryParams()).toEqual(new Map().set('product', 'shampoo').set('brand', 'greenline'));
+    await expect(microfrontendPO.getMatrixParams()).toEqual(new Map());
+    await expect(microfrontendPO.getFragment()).toEqual('');
+  });
+
+  it('should substitute path params when navigating', async () => {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      router: OutletRouterPagePO,
+      testee: RouterOutletPagePO,
+    });
+
+    // Page Object of the loaded microfrontend
+    const microfrontendPO = new Microfrontend2PagePO((): Promise<void> => routerOutletPO.switchToRouterOutletIframe());
+
+    // Name the router outlet under test
+    const routerOutletPO = pagePOs.get<RouterOutletPagePO>('testee');
+    await routerOutletPO.enterOutletName('microfrontend-outlet');
+    await routerOutletPO.clickApply();
+
+    // Navigate
+    const routerPO = pagePOs.get<OutletRouterPagePO>('router');
+    await routerPO.enterOutletName('microfrontend-outlet');
+    await routerPO.enterUrl(`../${Microfrontend2PagePO.pageUrl}/:product/:brand`);
+    await routerPO.enterParams(new Map().set('product', 'shampoo').set('brand', 'greenline'));
+    await routerPO.clickNavigate();
+
+    // Verify params and fragment and that the app did not reload
+    await expect(microfrontendPO.getMatrixParams()).toEqual(new Map().set('param1', 'shampoo').set('param2', 'greenline'));
+    await expect(microfrontendPO.getQueryParams()).toEqual(new Map());
+    await expect(microfrontendPO.getFragment()).toEqual('');
+  });
+
+  it('should substitute the fragment when navigating', async () => {
+    const testingAppPO = new TestingAppPO();
+    const pagePOs = await testingAppPO.navigateTo({
+      router: OutletRouterPagePO,
+      testee: RouterOutletPagePO,
+    });
+
+    // Page Object of the loaded microfrontend
+    const microfrontendPO = new Microfrontend2PagePO((): Promise<void> => routerOutletPO.switchToRouterOutletIframe());
+
+    // Name the router outlet under test
+    const routerOutletPO = pagePOs.get<RouterOutletPagePO>('testee');
+    await routerOutletPO.enterOutletName('microfrontend-outlet');
+    await routerOutletPO.clickApply();
+
+    // Navigate
+    const routerPO = pagePOs.get<OutletRouterPagePO>('router');
+    await routerPO.enterOutletName('microfrontend-outlet');
+    await routerPO.enterUrl(`../${Microfrontend2PagePO.pageUrl}#:product`);
+    await routerPO.enterParams(new Map().set('product', 'shampoo'));
+    await routerPO.clickNavigate();
+
+    // Verify params and fragment and that the app did not reload
+    await expect(microfrontendPO.getMatrixParams()).toEqual(new Map());
+    await expect(microfrontendPO.getQueryParams()).toEqual(new Map());
+    await expect(microfrontendPO.getFragment()).toEqual('shampoo');
+  });
+
   it('should emit outlet activate and deactivate events on navigation', async () => {
     const testingAppPO = new TestingAppPO();
     const pagePOs = await testingAppPO.navigateTo({

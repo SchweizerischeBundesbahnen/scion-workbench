@@ -77,7 +77,7 @@ describe('RelativePathResolver', () => {
 
         expect(Beans.get(RelativePathResolver).resolve('microfrontends/microfrontend-2', {relativeTo: 'http://localhost:4200/#/app/microfrontend-1#fragment'}))
           .toEqual('http://localhost:4200/#/app/microfrontend-1/microfrontends/microfrontend-2');
-        //
+
         expect(Beans.get(RelativePathResolver).resolve('microfrontend-1', {relativeTo: 'http://localhost:4200/base/#/#fragment'}))
           .toEqual('http://localhost:4200/base/#/microfrontend-1');
 

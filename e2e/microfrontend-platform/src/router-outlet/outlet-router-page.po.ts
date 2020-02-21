@@ -10,6 +10,7 @@
 import { $ } from 'protractor';
 import { enterText } from '../spec.util';
 import { SwitchToIframeFn } from '../browser-outlet/browser-outlet.po';
+import { SciParamsEnterPO } from '@scion/ɵtoolkit/widgets.po';
 
 export class OutletRouterPagePO {
 
@@ -30,6 +31,12 @@ export class OutletRouterPagePO {
     await enterText(url, this._pageFinder.$('input.e2e-url'));
   }
 
+  public async enterParams(params: Map<string, string>): Promise<void> {
+    await this._switchToIframeFn();
+    const headersEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-params'));
+    await headersEnterPO.clear();
+    await headersEnterPO.enterParams(params);
+  }
   public async clickNavigate(): Promise<void> {
     await this._switchToIframeFn();
     await this._pageFinder.$('button.e2e-navigate').click();

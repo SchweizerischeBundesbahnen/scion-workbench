@@ -66,7 +66,7 @@ const HTML_TEMPLATE = `
  *
  * #### Navigation
  * Using the {@link OutletRouter}, you can control which site to display in the outlet. Any site can be displayed unless having set the HTTP header `X-Frame-Options`.
- * By giving the outlet a name, you can reference the outlet when navigating. The name is optional; if not set, it defaults to {@link RouterOutlets.PRIMARY_OUTLET primary},
+ * By giving the outlet a name, you can reference the outlet when navigating. The name is optional; if not set, it defaults to {@link PRIMARY_OUTLET primary},
  * which is also the name used if not specifying an outlet for the navigation.
  *
  * Multiple outlets can co-exist, and outlets can be nested. If multiple outlets have the same name, then they all show the same content.
@@ -158,7 +158,7 @@ export class SciRouterOutletElement extends HTMLElement {
 
   constructor() {
     super();
-    this._outletName$ = new BehaviorSubject<string>(RouterOutlets.PRIMARY_OUTLET);
+    this._outletName$ = new BehaviorSubject<string>(PRIMARY_OUTLET);
     this._shadowRoot = this.attachShadow({mode: 'closed'});
     this._shadowRoot.innerHTML = HTML_TEMPLATE.trim();
     this._iframe = this._shadowRoot.querySelector('iframe');
@@ -169,7 +169,7 @@ export class SciRouterOutletElement extends HTMLElement {
    * Sets the name of this outlet.
    *
    * By giving the outlet a name, you can reference the outlet when navigating. The name is optional;
-   * if not set, it defaults to {@link RouterOutlets.PRIMARY_OUTLET primary}
+   * if not set, it defaults to {@link PRIMARY_OUTLET primary}
    */
   public set name(name: string) {
     if (name) {
@@ -402,7 +402,7 @@ export class SciRouterOutletElement extends HTMLElement {
   public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
     switch (name) {
       case ATTR_NAME: {
-        this._outletName$.next(newValue || RouterOutlets.PRIMARY_OUTLET);
+        this._outletName$.next(newValue || PRIMARY_OUTLET);
         break;
       }
       case ATTR_SCROLLABLE: {
@@ -472,6 +472,11 @@ function coerceBooleanProperty(value: any): boolean {
 export const OUTLET_CONTEXT = 'ɵOUTLET';
 
 /**
+ * Default name for an outlet if no explicit name is specified.
+ */
+export const PRIMARY_OUTLET = 'primary';
+
+/**
  * Defines constants for {@link SciRouterOutletElement} and {@link OutletRouter}.
  *
  * @category Routing
@@ -504,11 +509,6 @@ export namespace RouterOutlets {
   export function preferredSizeTopic(outletUid: string): string {
     return `sci-router-outlets/${outletUid}/preferred-size`;
   }
-
-  /**
-   * Default name for an outlet if no explicit name is specified.
-   */
-  export const PRIMARY_OUTLET = 'primary';
 }
 
 /**
