@@ -150,6 +150,9 @@ describe('Messaging', () => {
       await IntendBasedMessagingSpecs.passHeadersSpec();
     });
 
+    it('resolves to the satisfying capability', async () => {
+      await IntendBasedMessagingSpecs.resolveCapabilitySpec();
+    });
 
     describe('intent-interception', () => {
 

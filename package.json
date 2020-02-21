@@ -43,9 +43,9 @@
     "microfrontend-platform:await-then-protractor": "run-s microfrontend-apps:await:* microfrontend-platform:run-protractor",
     "microfrontend-platform:run-protractor": "ng e2e e2e-microfrontend-platform",
     "microfrontend-platform:run-protractor-headless": "cross-env HEADLESS=true ng e2e e2e-microfrontend-platform",
-
     "microfrontend-platform:typedoc": "typedoc --tsconfig projects/scion/microfrontend-platform/tsconfig.lib.json",
     "postmicrofrontend-platform:typedoc": "bash ./travis-scripts/copy-versioned.sh projects/scion/microfrontend-platform/package.json projects/scion/microfrontend-platform/now.typedoc.json dist/typedoc/microfrontend-platform/now.json",
+
     "microfrontend-apps:serve": "run-p -r microfrontend-apps:serve:*",
     "microfrontend-apps:serve:4201": "ng serve microfrontend-apps --aot --port 4201",
     "microfrontend-apps:serve:4202": "ng serve microfrontend-apps --aot --port 4202",

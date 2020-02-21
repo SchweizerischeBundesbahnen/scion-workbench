@@ -1,4 +1,4 @@
-import { Qualifier } from './platform.model';
+import { CapabilityProvider, Qualifier } from './platform.model';
 
 /**
  * Represents a message with headers to transport additional information with a message.
@@ -30,6 +30,10 @@ export interface IntentMessage<BODY = any> extends Message {
    * Optional data to pass with the intent.
    */
   body?: BODY;
+  /**
+   * Reference to the resolved capability as specified in the manifest.
+   */
+  capability?: CapabilityProvider;
 }
 
 /**

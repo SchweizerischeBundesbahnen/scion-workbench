@@ -53,7 +53,7 @@ window.addEventListener('beforeunload', () => MicrofrontendPlatform.destroy(), {
 /**
  * **SCION Microfrontend Platform provides the building blocks for integrating microfrontends based on iframes.**
  *
- * SCION Microfrontend Platform is a vanilla TypeScript framework allowing us to integrate any web content on client side. It comes with a robust
+ * SCION Microfrontend Platform is a TypeScript framework allowing us to integrate any web content on the client-side. It comes with a robust
  * messaging facility for cross-origin intent- and topic-based communication supporting wildcard addressing, request-response message exchange pattern,
  * retained messaging, and more. Web content is embedded using a web component outlet that solves many of the cumbersome quirks of iframes.
  *
@@ -97,7 +97,7 @@ export class MicrofrontendPlatform {
    * The host app is the web application which the user loads into his browser. It serves as container application for all microfrontends,
    * provides the main layout of the app and defines areas in which to host microfrontends.
    *
-   * In the host app, the platform is started in host-mode, thus acting as mediator for inter-microfrontend interaction. It must be started only once.
+   * In the host app, the platform is started in host-mode, thus acting as router and mediator for inter-microfrontend interaction. It must be started only once.
    *
    * The platform allows registering a client in the host app. This client can, for example, look up capabilities to display a portal, a top-level navigation,
    * or something alike. This client has no extra privileges, thus must also register a manifest in order to interact with the platform.

@@ -14,7 +14,7 @@ import { ConnackMessage, MessageDeliveryStatus, MessageEnvelope, MessagingChanne
 import { Beans, PreDestroy } from '../../bean-manager';
 import { ApplicationRegistry } from '../application-registry';
 import { ManifestRegistry } from '../manifest-registry/manifest-registry';
-import { UUID } from '@scion/toolkit/util';
+import { Maps, UUID } from '@scion/toolkit/util';
 import { PlatformState, PlatformStates } from '../../platform-state';
 import { Logger } from '../../logger';
 import { runSafe } from '../../safe-runner';
@@ -25,6 +25,7 @@ import { RetainedMessageStore } from './retained-message-store';
 import { TopicMatcher } from '../../topic-matcher.util';
 import { bufferUntil } from '../../operators';
 import { chainInterceptors, IntentInterceptor, MessageInterceptor, PublishInterceptorChain } from './message-interception';
+import { CapabilityProvider } from '../../platform.model';
 
 /**
  * The broker is responsible for receiving all messages, filtering the messages, determining who is
@@ -357,23 +358,35 @@ export class MessageBroker implements PreDestroy {
         throw Error(`[NullProviderError] No application found to provide a capability of the type '${message.intent.type}' and qualifiers '${JSON.stringify(message.intent.qualifier || {})}'. Maybe, the capability is not public API or the providing application not available.`);
       }
 
-      // Find respective clients.
-      const clients: Set<Client> = capabilityProviders
-        .map(capabilityProvider => this._clientRegistry.getByApplication(capabilityProvider.metadata.appSymbolicName))
-        .reduce((combined, list) => new Set([...combined, ...list]), new Set<Client>());
+      // Resolve clients of the found providers.
+      const capabilityProvidersByClientMap = new Map<Client, Set<CapabilityProvider>>();
+      capabilityProviders.forEach(capabilityProvider => {
+        const clients = this._clientRegistry.getByApplication(capabilityProvider.metadata.appSymbolicName);
+        clients.forEach(client => Maps.addSetValue(capabilityProvidersByClientMap, client, capabilityProvider));
+      });
 
       // If request-reply communication, send an error if no replier is found to reply to the intent.
-      if (clients.size === 0 && message.headers.has(MessageHeaders.ReplyTo)) {
+      if (capabilityProvidersByClientMap.size === 0 && message.headers.has(MessageHeaders.ReplyTo)) {
         throw Error(`[RequestReplyError] No client is currently running which could answer the intent '{type=${message.intent.type}, qualifier=${JSON.stringify(message.intent.qualifier)}}'.`);
       }
 
       // Dispatch the intent.
-      const envelope: MessageEnvelope<IntentMessage> = {
-        transport: MessagingTransport.BrokerToClient,
-        channel: MessagingChannel.Intent,
-        message: message,
-      };
-      clients.forEach(client => client.gatewayWindow.postMessage(envelope, client.application.origin));
+      capabilityProvidersByClientMap.forEach((capabilities, client) => {
+        if (capabilities.size > 1) {
+          Beans.get(Logger).warn(`Intent cannot be uniquely resolved to a capability. The application '${client.application.symbolicName}' provides multiple matching capabilities. Most likely this is not intended and may indicate an incorrect manifest configuration.`, capabilities);
+        }
+        capabilities.forEach(capability => {
+          const envelope: MessageEnvelope<IntentMessage> = {
+            transport: MessagingTransport.BrokerToClient,
+            channel: MessagingChannel.Intent,
+            message: {
+              ...message,
+              capability,
+            },
+          };
+          client.gatewayWindow.postMessage(envelope, client.application.origin);
+        });
+      });
     });
   }
 
