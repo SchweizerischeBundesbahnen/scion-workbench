@@ -228,7 +228,7 @@ We use NPM distribution tags to differentiate between pre-releases (x.0.0-beta.0
 ## Release guidelines
 Whenever you publish a new version to NPM (pre-release, major, minor, patch), please follow the instructions below:
 
-- update all `package.json` files with the new version, e.g. `0.0.0-beta.32` (search and replace "0.0.0-beta.32" -> "0.0.0-beta.33")
+- update all `package.json` files with the new version, e.g. `0.0.0-beta.33` (search and replace "0.0.0-beta.33" -> "0.0.0-beta.34")
 - run `npm i` to update the version in `package-lock.json`
 - generate the new `changelog.md` ([see below](#generating-change-logs))
 - correct the generated `changelog.md`: move the header to the top
