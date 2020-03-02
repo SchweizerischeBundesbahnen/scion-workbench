@@ -51,7 +51,11 @@ As for now, the SCION Workbench and the SCION Workbench Application Platform are
 
 SCION Workbench `v0.0.0-beta.23` to `v0.0.0-beta.32` is only compatible with Angular version 8.x.
 
-SCION Workbench `v0.0.0-beta.33` and newer is only compatible with Angular version 9.x. and published as Ivy library.
+SCION Workbench `v0.0.0-beta.33` and newer are only compatible with Angular version 9.x. As recommended by Angular, the libraries are compiled using the View Engine compiler instead of the Ivy compiler to maintain compatibility with projects opting out of Ivy. Applications can still use the Ivy compiler as Angular compatibility compiler (ngcc) compiles View Engine compiled libraries during the application build.
+
+- See https://angular.io/guide/ivy#ivy-and-libraries
+- See https://angular.io/guide/ivy#maintaining-library-compatibility
+
 
 [menu-download]: https://www.npmjs.com/package/@scion/workbench
 
