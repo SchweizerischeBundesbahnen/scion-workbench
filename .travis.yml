@@ -33,6 +33,7 @@ jobs:
     - npm run app:workbench:e2e-headless
     - npm run app:workbench-application-platform:e2e-headless
     - npm run app:workbench-application-platform:build-now
+    - npm run build # Build the libs (which to publish to NPM) again because NGCC converted them to Ivy libs during building the Ivy-enabled apps (devtools, testing-app, demo-app).
     deploy:
       - provider: script
         script: bash ./travis-scripts/now-deploy.sh $TRAVIS_BUILD_DIR dist/app/workbench-application-platform/host-app $NOW_TOKEN
