@@ -16,8 +16,6 @@ export { HostPlatformState } from './host-platform-state';
 export * from './router-outlet/public_api';
 export * from './context/public_api';
 export * from './focus/public_api';
-export * from './keyboard-event/public_api';
-export * from './mouse-event/public_api';
 export * from './preferred-size/public_api';
 export * from './manifest-registry/public_api';
 export * from './messaging/public_api';
