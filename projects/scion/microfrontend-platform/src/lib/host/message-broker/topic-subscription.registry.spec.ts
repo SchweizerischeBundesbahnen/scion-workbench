@@ -26,22 +26,22 @@ describe('TopicSubscriptionRegistry', () => {
 
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client1, 'subscription#1');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client1, 'subscriber#1');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(1);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client2, 'subscription#2');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client2, 'subscriber#2');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(2);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client3, 'subscription#3');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client3, 'subscriber#3');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(3);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/temperature', client1.id);
+    subscriptionRegistry.unsubscribe('subscriber#1');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(2);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/temperature', client2.id);
+    subscriptionRegistry.unsubscribe('subscriber#2');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(1);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/temperature', client3.id);
+    subscriptionRegistry.unsubscribe('subscriber#3');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
 
     await expectAsync(subscriptionCountCollector).toBeResolvedTo([0, 1, 2, 3, 2, 1, 0]);
@@ -53,31 +53,29 @@ describe('TopicSubscriptionRegistry', () => {
 
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client, 'subscription#1');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client, 'subscriber#1');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(1);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client, 'subscription#2');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client, 'subscriber#2');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(2);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client, 'subscription#3');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client, 'subscriber#3');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(3);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/temperature', client.id);
+    subscriptionRegistry.unsubscribe('subscriber#1');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(2);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/temperature', client.id);
+    subscriptionRegistry.unsubscribe('subscriber#2');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(1);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/temperature', client.id);
+    subscriptionRegistry.unsubscribe('subscriber#3');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
 
     await expectAsync(subscriptionCountCollector).toBeResolvedTo([0, 1, 2, 3, 2, 1, 0]);
   });
 
   it('should ignore an unsubscribe attempt if there is no subscription for it', async () => {
-    const client = newClient('client');
-
-    subscriptionRegistry.unsubscribe('myhome/livingroom/temperature', client.id);
+    subscriptionRegistry.unsubscribe('does-not-exist');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
   });
 
@@ -93,27 +91,27 @@ describe('TopicSubscriptionRegistry', () => {
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/humidity').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client, 'subscription#1');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client, 'subscriber#1');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(1);
     await expectSubscriptionCount('myhome/livingroom/humidity').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/:measurement', client, 'subscription#2');
+    subscriptionRegistry.subscribe('myhome/livingroom/:measurement', client, 'subscriber#2');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(2);
     await expectSubscriptionCount('myhome/livingroom/humidity').toBe(1);
 
-    subscriptionRegistry.subscribe('myhome/livingroom/humidity', client, 'subscription#3');
+    subscriptionRegistry.subscribe('myhome/livingroom/humidity', client, 'subscriber#3');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(2);
     await expectSubscriptionCount('myhome/livingroom/humidity').toBe(2);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/temperature', client.id);
+    subscriptionRegistry.unsubscribe('subscriber#2');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(1);
-    await expectSubscriptionCount('myhome/livingroom/humidity').toBe(2);
+    await expectSubscriptionCount('myhome/livingroom/humidity').toBe(1);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/:measurement', client.id);
+    subscriptionRegistry.unsubscribe('subscriber#1');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/humidity').toBe(1);
 
-    subscriptionRegistry.unsubscribe('myhome/livingroom/humidity', client.id);
+    subscriptionRegistry.unsubscribe('subscriber#3');
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/humidity').toBe(0);
 
@@ -125,7 +123,7 @@ describe('TopicSubscriptionRegistry', () => {
     const client1 = newClient('client#1');
     const client2 = newClient('client#2');
 
-    subscriptionRegistry.subscribe('myhome/:room/temperature', client1, 'subscription#1');
+    subscriptionRegistry.subscribe('myhome/:room/temperature', client1, 'subscriber#1');
     await expectSubscriptionCount('myhome/livingroom').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(1);
     await expectSubscriptionCount('myhome/livingroom/temperature/celcius').toBe(0);
@@ -133,7 +131,7 @@ describe('TopicSubscriptionRegistry', () => {
     await expectSubscriptionCount('myhome/kitchen/temperature').toBe(1);
     await expectSubscriptionCount('myhome/kitchen/temperature/celcius').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/:room/temperature', client1, 'subscription#2');
+    subscriptionRegistry.subscribe('myhome/:room/temperature', client1, 'subscriber#2');
     await expectSubscriptionCount('myhome/livingroom').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(2);
     await expectSubscriptionCount('myhome/livingroom/temperature/celcius').toBe(0);
@@ -141,7 +139,7 @@ describe('TopicSubscriptionRegistry', () => {
     await expectSubscriptionCount('myhome/kitchen/temperature').toBe(2);
     await expectSubscriptionCount('myhome/kitchen/temperature/celcius').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/:room/temperature', client2, 'subscription#3');
+    subscriptionRegistry.subscribe('myhome/:room/temperature', client2, 'subscriber#3');
     await expectSubscriptionCount('myhome/livingroom').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(3);
     await expectSubscriptionCount('myhome/livingroom/temperature/celcius').toBe(0);
@@ -149,7 +147,7 @@ describe('TopicSubscriptionRegistry', () => {
     await expectSubscriptionCount('myhome/kitchen/temperature').toBe(3);
     await expectSubscriptionCount('myhome/kitchen/temperature/celcius').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/:room/temperature', client2, 'subscription#4');
+    subscriptionRegistry.subscribe('myhome/:room/temperature', client2, 'subscriber#4');
     await expectSubscriptionCount('myhome/livingroom').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(4);
     await expectSubscriptionCount('myhome/livingroom/temperature/celcius').toBe(0);
@@ -157,7 +155,7 @@ describe('TopicSubscriptionRegistry', () => {
     await expectSubscriptionCount('myhome/kitchen/temperature').toBe(4);
     await expectSubscriptionCount('myhome/kitchen/temperature/celcius').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/:room/:measurement', client1, 'subscription#5');
+    subscriptionRegistry.subscribe('myhome/:room/:measurement', client1, 'subscriber#5');
     await expectSubscriptionCount('myhome/livingroom').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(5);
     await expectSubscriptionCount('myhome/livingroom/temperature/celcius').toBe(0);
@@ -165,7 +163,7 @@ describe('TopicSubscriptionRegistry', () => {
     await expectSubscriptionCount('myhome/kitchen/temperature').toBe(5);
     await expectSubscriptionCount('myhome/kitchen/temperature/celcius').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/:room/:measurement', client2, 'subscription#6');
+    subscriptionRegistry.subscribe('myhome/:room/:measurement', client2, 'subscriber#6');
     await expectSubscriptionCount('myhome/livingroom').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(6);
     await expectSubscriptionCount('myhome/livingroom/temperature/celcius').toBe(0);
@@ -173,7 +171,7 @@ describe('TopicSubscriptionRegistry', () => {
     await expectSubscriptionCount('myhome/kitchen/temperature').toBe(6);
     await expectSubscriptionCount('myhome/kitchen/temperature/celcius').toBe(0);
 
-    subscriptionRegistry.subscribe('myhome/:room/:measurement/:unit', client1, 'subscription#7');
+    subscriptionRegistry.subscribe('myhome/:room/:measurement/:unit', client1, 'subscriber#7');
     await expectSubscriptionCount('myhome/livingroom').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(6);
     await expectSubscriptionCount('myhome/livingroom/temperature/celcius').toBe(1);
@@ -181,7 +179,7 @@ describe('TopicSubscriptionRegistry', () => {
     await expectSubscriptionCount('myhome/kitchen/temperature').toBe(6);
     await expectSubscriptionCount('myhome/kitchen/temperature/celcius').toBe(1);
 
-    subscriptionRegistry.subscribe('myhome/:room/:measurement/:unit', client2, 'subscription#8');
+    subscriptionRegistry.subscribe('myhome/:room/:measurement/:unit', client2, 'subscriber#8');
     await expectSubscriptionCount('myhome/livingroom').toBe(0);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(6);
     await expectSubscriptionCount('myhome/livingroom/temperature/celcius').toBe(2);
@@ -193,16 +191,17 @@ describe('TopicSubscriptionRegistry', () => {
   it('should remove all subscriptions of a client', async () => {
     const client1 = newClient('client#1');
     const client2 = newClient('client#2');
+    const subscriptionCountCollector = collectToPromise(subscriptionRegistry.subscriptionCount$('myhome/livingroom/temperature'), {take: 11, timeout: 500});
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client1, 'subscription#1');
-    subscriptionRegistry.subscribe('myhome/livingroom/:measurement', client1, 'subscription#2');
-    subscriptionRegistry.subscribe('myhome/:livingroom/:measurement', client1, 'subscription#3');
-    subscriptionRegistry.subscribe(':building/:livingroom/:measurement', client1, 'subscription#4');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client1, 'subscriber#1');
+    subscriptionRegistry.subscribe('myhome/livingroom/:measurement', client1, 'subscriber#2');
+    subscriptionRegistry.subscribe('myhome/:livingroom/:measurement', client1, 'subscriber#3');
+    subscriptionRegistry.subscribe(':building/:livingroom/:measurement', client1, 'subscriber#4');
 
-    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client2, 'subscription#5');
-    subscriptionRegistry.subscribe('myhome/livingroom/:measurement', client2, 'subscription#6');
-    subscriptionRegistry.subscribe('myhome/:livingroom/:measurement', client2, 'subscription#7');
-    subscriptionRegistry.subscribe(':building/:livingroom/:measurement', client2, 'subscription#8');
+    subscriptionRegistry.subscribe('myhome/livingroom/temperature', client2, 'subscriber#5');
+    subscriptionRegistry.subscribe('myhome/livingroom/:measurement', client2, 'subscriber#6');
+    subscriptionRegistry.subscribe('myhome/:livingroom/:measurement', client2, 'subscriber#7');
+    subscriptionRegistry.subscribe(':building/:livingroom/:measurement', client2, 'subscriber#8');
 
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(8);
 
@@ -211,6 +210,8 @@ describe('TopicSubscriptionRegistry', () => {
 
     subscriptionRegistry.unsubscribeClient(client2.id);
     await expectSubscriptionCount('myhome/livingroom/temperature').toBe(0);
+
+    await expectAsync(subscriptionCountCollector).toBeResolvedTo([0, 1, 2, 3, 4, 5, 6, 7, 8, 4, 0]);
   });
 
   it('should resolve subscribers which observe the topic \'myhome/livingroom/temperature\'', async () => {
@@ -234,7 +235,7 @@ describe('TopicSubscriptionRegistry', () => {
     // Resolve the subscribers which observe the topic 'myhome/livingroom/temperature'.
     const destinations = subscriptionRegistry.resolveTopicDestinations('myhome/livingroom/temperature');
 
-    expect(destinations.map(destination => destination.subscription.id)).toEqual([
+    expect(destinations.map(destination => destination.subscription.subscriberId)).toEqual([
       'client#1;sub#1',
       'client#1;sub#2',
       'client#1;sub#4',
@@ -249,7 +250,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/livingroom/temperature',
       params: new Map(),
       subscription: {
-        id: 'client#1;sub#1',
+        subscriberId: 'client#1;sub#1',
         topic: 'myhome/livingroom/temperature',
         client: client1,
       },
@@ -258,7 +259,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/livingroom/temperature',
       params: new Map().set('measurement', 'temperature'),
       subscription: {
-        id: 'client#1;sub#2',
+        subscriberId: 'client#1;sub#2',
         topic: 'myhome/livingroom/:measurement',
         client: client1,
       },
@@ -267,7 +268,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/livingroom/temperature',
       params: new Map().set('room', 'livingroom'),
       subscription: {
-        id: 'client#1;sub#4',
+        subscriberId: 'client#1;sub#4',
         topic: 'myhome/:room/temperature',
         client: client1,
       },
@@ -276,7 +277,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/livingroom/temperature',
       params: new Map().set('room', 'livingroom').set('measurement', 'temperature'),
       subscription: {
-        id: 'client#1;sub#5',
+        subscriberId: 'client#1;sub#5',
         topic: 'myhome/:room/:measurement',
         client: client1,
       },
@@ -285,7 +286,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/livingroom/temperature',
       params: new Map(),
       subscription: {
-        id: 'client#2;sub#1',
+        subscriberId: 'client#2;sub#1',
         topic: 'myhome/livingroom/temperature',
         client: client2,
       },
@@ -294,7 +295,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/livingroom/temperature',
       params: new Map().set('measurement', 'temperature'),
       subscription: {
-        id: 'client#2;sub#2',
+        subscriberId: 'client#2;sub#2',
         topic: 'myhome/livingroom/:measurement',
         client: client2,
       },
@@ -303,7 +304,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/livingroom/temperature',
       params: new Map().set('room', 'livingroom'),
       subscription: {
-        id: 'client#2;sub#4',
+        subscriberId: 'client#2;sub#4',
         topic: 'myhome/:room/temperature',
         client: client2,
       },
@@ -312,7 +313,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/livingroom/temperature',
       params: new Map().set('room', 'livingroom').set('measurement', 'temperature'),
       subscription: {
-        id: 'client#2;sub#5',
+        subscriberId: 'client#2;sub#5',
         topic: 'myhome/:room/:measurement',
         client: client2,
       },
@@ -342,7 +343,7 @@ describe('TopicSubscriptionRegistry', () => {
     // Resolve the subscribers which observe the topic 'myhome/kitchen/temperature'.
     const destinations = subscriptionRegistry.resolveTopicDestinations('myhome/kitchen/temperature');
 
-    expect(destinations.map(destination => destination.subscription.id)).toEqual([
+    expect(destinations.map(destination => destination.subscription.subscriberId)).toEqual([
       'client#1;sub#3',
       'client#1;sub#4',
       'client#1;sub#5',
@@ -359,7 +360,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('measurement', 'temperature'),
       subscription: {
-        id: 'client#1;sub#3',
+        subscriberId: 'client#1;sub#3',
         topic: 'myhome/kitchen/:measurement',
         client: client1,
       },
@@ -368,7 +369,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('room', 'kitchen'),
       subscription: {
-        id: 'client#1;sub#4',
+        subscriberId: 'client#1;sub#4',
         topic: 'myhome/:room/temperature',
         client: client1,
       },
@@ -377,7 +378,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('room', 'kitchen').set('measurement', 'temperature'),
       subscription: {
-        id: 'client#1;sub#5',
+        subscriberId: 'client#1;sub#5',
         topic: 'myhome/:room/:measurement',
         client: client1,
       },
@@ -386,7 +387,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('building', 'myhome').set('measurement', 'temperature'),
       subscription: {
-        id: 'client#1;sub#6',
+        subscriberId: 'client#1;sub#6',
         topic: ':building/kitchen/:measurement',
         client: client1,
       },
@@ -395,7 +396,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('building', 'myhome').set('room', 'kitchen').set('measurement', 'temperature'),
       subscription: {
-        id: 'client#1;sub#7',
+        subscriberId: 'client#1;sub#7',
         topic: ':building/:room/:measurement',
         client: client1,
       },
@@ -404,7 +405,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('measurement', 'temperature'),
       subscription: {
-        id: 'client#2;sub#3',
+        subscriberId: 'client#2;sub#3',
         topic: 'myhome/kitchen/:measurement',
         client: client2,
       },
@@ -413,7 +414,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('room', 'kitchen'),
       subscription: {
-        id: 'client#2;sub#4',
+        subscriberId: 'client#2;sub#4',
         topic: 'myhome/:room/temperature',
         client: client2,
       },
@@ -422,7 +423,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('room', 'kitchen').set('measurement', 'temperature'),
       subscription: {
-        id: 'client#2;sub#5',
+        subscriberId: 'client#2;sub#5',
         topic: 'myhome/:room/:measurement',
         client: client2,
       },
@@ -431,7 +432,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('building', 'myhome').set('measurement', 'temperature'),
       subscription: {
-        id: 'client#2;sub#6',
+        subscriberId: 'client#2;sub#6',
         topic: ':building/kitchen/:measurement',
         client: client2,
       },
@@ -440,7 +441,7 @@ describe('TopicSubscriptionRegistry', () => {
       topic: 'myhome/kitchen/temperature',
       params: new Map().set('building', 'myhome').set('room', 'kitchen').set('measurement', 'temperature'),
       subscription: {
-        id: 'client#2;sub#7',
+        subscriberId: 'client#2;sub#7',
         topic: ':building/:room/:measurement',
         client: client2,
       },

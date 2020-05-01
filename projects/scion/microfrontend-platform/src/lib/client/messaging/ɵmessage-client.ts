@@ -124,7 +124,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
           map(message => ({...message, headers: copyMap(message.headers), params: copyMap(message.params)})),
           takeUntil(merge(this._destroy$, unsubscribe$)),
           finalize(() => {
-            const command: TopicUnsubscribeCommand = {topic: topic, headers: new Map()};
+            const command: TopicUnsubscribeCommand = {subscriberId, headers: new Map()};
             this.postMessageToBroker$(MessagingChannel.TopicUnsubscribe, command)
               .pipe(catchError(() => EMPTY)) // do not propagate unsubscribe errors
               .subscribe();
@@ -133,7 +133,7 @@ export class ɵMessageClient implements MessageClient, PreDestroy { // tslint:di
         .subscribe(observer);
 
       // Subscribe for the messages sent to the given topic.
-      const topicSubscribeMessage: TopicSubscribeCommand = {subscriberId: subscriberId, topic: topic, headers: new Map()};
+      const topicSubscribeMessage: TopicSubscribeCommand = {subscriberId, topic, headers: new Map()};
       this.postMessageToBroker$(MessagingChannel.TopicSubscribe, topicSubscribeMessage)
         .pipe(takeUntil(merge(this._destroy$, unsubscribe$)))
         .subscribe(topicSubscribeError$);

@@ -118,7 +118,7 @@ export interface ConnackMessage {
 
 export interface TopicSubscribeCommand extends Message {
   /**
-   * Unique identifier to identify the subscriber.
+   * Unique identify of the subscriber.
    */
   subscriberId: string;
   /**
@@ -128,7 +128,10 @@ export interface TopicSubscribeCommand extends Message {
 }
 
 export interface TopicUnsubscribeCommand extends Message {
-  topic: string;
+  /**
+   * Unique identify of the subscriber.
+   */
+  subscriberId: string;
 }
 
 export interface MessageDeliveryStatus {
