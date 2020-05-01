@@ -396,35 +396,35 @@ describe('Messaging', () => {
     await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 2b'})).toBeResolved();
     await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 2b'})).toBeResolved();
 
-    // unsubscribe observable 2
-    subscription2.unsubscribe();
+    // unsubscribe observable 3
+    subscription3.unsubscribe();
 
     // publish 'message 3a'
     await Beans.get(MessageClient).publish$('topic', 'message 3a', {retain: true}).toPromise();
     await expectAsync(waitUntilMessageReceived(receiver1$, {body: 'message 1b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 2b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 3a'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 3a'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 2b'})).toBeResolved();
 
     // publish 'message 3b'
     await Beans.get(MessageClient).publish$('topic', 'message 3b', {retain: true}).toPromise();
     await expectAsync(waitUntilMessageReceived(receiver1$, {body: 'message 1b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 2b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 2b'})).toBeResolved();
 
-    // unsubscribe observable 3
-    subscription3.unsubscribe();
+    // unsubscribe observable 2
+    subscription2.unsubscribe();
 
     // publish 'message 4a'
     await Beans.get(MessageClient).publish$('topic', 'message 4a', {retain: true}).toPromise();
     await expectAsync(waitUntilMessageReceived(receiver1$, {body: 'message 1b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 2b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 2b'})).toBeResolved();
 
     // publish 'message 4b'
     await Beans.get(MessageClient).publish$('topic', 'message 4b', {retain: true}).toPromise();
     await expectAsync(waitUntilMessageReceived(receiver1$, {body: 'message 1b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 2b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'message 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'message 2b'})).toBeResolved();
   });
 
   it('should allow multiple subscriptions to the same intent in the same client', async () => {
@@ -467,35 +467,35 @@ describe('Messaging', () => {
     await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 2b'})).toBeResolved();
     await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 2b'})).toBeResolved();
 
-    // unsubscribe observable 2
-    subscription2.unsubscribe();
+    // unsubscribe observable 3
+    subscription3.unsubscribe();
 
     // issue 'intent 3a'
     await Beans.get(MessageClient).issueIntent$({type: 'xyz'}, 'intent 3a').toPromise();
     await expectAsync(waitUntilMessageReceived(receiver1$, {body: 'intent 1b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 2b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 3a'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 3a'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 2b'})).toBeResolved();
 
     // issue 'intent 3b'
     await Beans.get(MessageClient).issueIntent$({type: 'xyz'}, 'intent 3b').toPromise();
     await expectAsync(waitUntilMessageReceived(receiver1$, {body: 'intent 1b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 2b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 2b'})).toBeResolved();
 
-    // unsubscribe observable 3
-    subscription3.unsubscribe();
+    // unsubscribe observable 2
+    subscription2.unsubscribe();
 
     // issue 'intent 4a'
     await Beans.get(MessageClient).issueIntent$({type: 'xyz'}, 'intent 4a').toPromise();
     await expectAsync(waitUntilMessageReceived(receiver1$, {body: 'intent 1b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 2b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 2b'})).toBeResolved();
 
     // issue 'intent 4b'
     await Beans.get(MessageClient).issueIntent$({type: 'xyz'}, 'intent 4b').toPromise();
     await expectAsync(waitUntilMessageReceived(receiver1$, {body: 'intent 1b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 2b'})).toBeResolved();
-    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver2$, {body: 'intent 3b'})).toBeResolved();
+    await expectAsync(waitUntilMessageReceived(receiver3$, {body: 'intent 2b'})).toBeResolved();
   });
 
   it('should warn if an intent cannot be uniquely resolved to a capability of an application', async () => {

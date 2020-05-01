@@ -169,7 +169,7 @@ export class MessageBroker implements PreDestroy {
   }
 
   /**
-   * Listens for topic subscribe requests.
+   * Listens for topic subscribe commands.
    */
   private installTopicSubscribeListener(): void {
     this._clientRequests$
@@ -185,7 +185,11 @@ export class MessageBroker implements PreDestroy {
         const messageId = envelope.message.headers.get(MessageHeaders.MessageId);
 
         if (!topic) {
-          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, '[TopicSubscribeError] Topic required');
+          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, '[TopicSubscribeError] Missing required property on message: topic');
+          return;
+        }
+        if (!subscriberId) {
+          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, '[TopicSubscribeError] Missing required property on message: subscriberId');
           return;
         }
 
@@ -206,7 +210,7 @@ export class MessageBroker implements PreDestroy {
   }
 
   /**
-   * Listens for topic unsubscribe requests.
+   * Listens for topic unsubscribe commands.
    */
   private installTopicUnsubscribeListener(): void {
     this._clientRequests$
@@ -217,15 +221,15 @@ export class MessageBroker implements PreDestroy {
       .subscribe((clientMessage: ClientMessage<TopicUnsubscribeCommand>) => runSafe(() => {
         const client = clientMessage.client;
         const envelope = clientMessage.envelope;
-        const topic = envelope.message.topic;
+        const subscriberId = envelope.message.subscriberId;
         const messageId = envelope.message.headers.get(MessageHeaders.MessageId);
 
-        if (!topic) {
-          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, '[TopicUnsubscribeError] Topic required');
+        if (!subscriberId) {
+          sendDeliveryStatusError(client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, '[TopicUnsubscribeError] Missing required property on message: subscriberId');
           return;
         }
 
-        this._topicSubscriptionRegistry.unsubscribe(topic, client.id);
+        this._topicSubscriptionRegistry.unsubscribe(subscriberId);
         sendDeliveryStatusSuccess(client, {transport: MessagingTransport.BrokerToClient, topic: messageId});
       }));
   }
@@ -300,13 +304,13 @@ export class MessageBroker implements PreDestroy {
         const messageId = intentMessage.headers.get(MessageHeaders.MessageId);
 
         if (!intentMessage.intent) {
-          const error = '[IntentDispatchError] Intent required';
+          const error = '[IntentDispatchError] Missing required property on message: intent';
           sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
           return;
         }
 
         if (!intentMessage.intent.type) {
-          const error = '[IntentDispatchError] Intent type required';
+          const error = '[IntentDispatchError] Missing required property on intent: type';
           sendDeliveryStatusError(clientMessage.client, {transport: MessagingTransport.BrokerToClient, topic: messageId}, error);
           return;
         }
@@ -409,7 +413,7 @@ export class MessageBroker implements PreDestroy {
           ...topicMessage,
           topic: resolvedTopicDestination.topic,
           params: resolvedTopicDestination.params,
-          headers: new Map(topicMessage.headers).set(MessageHeaders.ɵTopicSubscriberId, resolvedTopicDestination.subscription.id),
+          headers: new Map(topicMessage.headers).set(MessageHeaders.ɵTopicSubscriberId, resolvedTopicDestination.subscription.subscriberId),
         },
       };
       const client: Client = resolvedTopicDestination.subscription.client;
