@@ -4,26 +4,31 @@ about: Create a report to help us improve
 
 ---
 
-## Current behavior
-<!-- Describe how the issue manifests. -->
+## Describe the bug
+A clear and concise description of what the bug is.
 
-## Expected behavior
-<!-- Describe what the desired behavior would be. -->
+## To Reproduce
+Steps to reproduce the behavior:
 
-## Minimal reproduction of the problem with instructions
-<!-- Before fixing a bug we need to reproduce and confirm it. -->
-
-<!-- Please provide the *STEPS TO REPRODUCE* and if possible a *MINIMAL DEMO* of the problem via https://stackblitz.com or similar. -->
-
-<!-- *STEPS TO REPRODUCE* -->
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
-## Environment
-- SCION Workbench version: X.Y.Z
-- Angular version: X.Y.Z
+## Expected behavior
+A clear and concise description of what you expected to happen.
 
-**Additional context**
+## Screenshots
+If applicable, add screenshots to help explain your problem.
+
+## Environment
+Please complete the following information:
+
+ - SCION Workbench version: [e.g. 1.0.0-beta.3]
+ - Angular version: [e.g. 9.0.0]
+ - Browser: [e.g. Chrome 83, Firefox 77, Edge 83, Safari 10]
+ - OS: [e.g. Windows 10, iOS 13.5.1]
+ - Device: [e.g. Desktop, Smartphone] 
+
+## Additional context
 Add any other context about the problem here.

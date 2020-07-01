@@ -1,7 +1,8 @@
-![SCION Workbench](/resources/site/logo/scion-workbench-banner.png)
+<a href="/README.md"><img src="/docs/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
-[Overview][menu-overview] | [Workbench][menu-workbench] | [Workbench&nbsp;Application&nbsp;Platform][menu-workbench-application-platform] | [Contributing][menu-contributing] | [Changelog][menu-changelog] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
-|---|---|---|---|---|---|---|
+| [SCION Workbench][menu-home] | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | Contributing | [Sponsoring][menu-sponsoring] |  
+| --- | --- | --- | --- | --- |
+
 
 # Contributing
 
@@ -250,10 +251,8 @@ conventional-changelog -p angular -i resources/site/changelog.md -s
 
 [link-travis-ci]: https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench
 
-[menu-overview]: /README.md
-[menu-workbench]: /resources/site/workbench.md
-[menu-workbench-application-platform]: /resources/site/workbench-application-platform.md
+[menu-home]: /README.md
+[menu-projects-overview]: /docs/site/projects-overview.md
+[menu-changelog]: /docs/site/changelog/changelog.md
 [menu-contributing]: /CONTRIBUTING.md
-[menu-changelog]: /resources/site/changelog.md
-[menu-sponsoring]: /resources/site/sponsors.md
-[menu-links]: /resources/site/links.md
+[menu-sponsoring]: /docs/site/sponsoring.md

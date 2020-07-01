@@ -1,68 +1,61 @@
-![SCION Workbench](/resources/site/logo/scion-workbench-banner.png)
+<a href="/README.md"><img src="/docs/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
-[Overview][menu-overview] | [Workbench][menu-workbench] | [Workbench&nbsp;Application&nbsp;Platform][menu-workbench-application-platform] | [Contributing][menu-contributing] | [Changelog][menu-changelog] | [Sponsoring][menu-sponsoring] | [Links][menu-links]
-|---|---|---|---|---|---|---|
+| SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
+| --- | --- | --- | --- | --- |
 
-# Overview
+<p align="center">
+  <a href="https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md">
+      <img src="/docs/site/images/microfrontend-platform-promotion.svg" alt="Microfrontend Platform Promotion" height="250">
+  </a>
+</p>
 
-SCION Workbench helps to build multi-view web applications and integrates separate micro frontends into a consistent rich web application. Views are shown within tabs which can be flexibly arranged and dragged around by the user.
+## SCION Workbench
 
-<a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/site/pics/workbench-large.png">![SCION Workbench](/resources/site/pics/workbench-small.png)</a>
+**The SCION Workbench provides a workbench layout for Angular applications.**
 
-The Workbench provides core features of a modern rich web application.
--	tabbed, movable and stackable views
--	activity panel as application entry point
-- popups
--	global notifications 
--	global or view-local message boxes
-- global or view-local viewpart actions
--	URL encoded navigational state
+Workbench layouts are useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel. Examples include specialized business applications, scientific or development tools, as well as command & control interfaces.
 
-<a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/site/pics/workbench-sketch-large.png">![SCION Workbench Features](/resources/site/pics/workbench-sketch-small.png)</a>
-
-## Background
-Web frontends are becoming more and more common even for complex business applications. To tackle complexity and lifecycle of enterprise application landscapes there is a strong trend towards micro-service based backends and so called micro frontends. Micro frontends break-up hard to handle monoliths into parts by allowing different lifecycle, hosting on different backend systems and usage of completely different web development stacks. The latter is particularly important nowadays as we see a huge dynamic in Web frameworks: they evolve and may also disappear quickly.
-
-While micro frontends offer several benefits from the development and deployment point of view end users still need an integrated and consistent interface which offers a similar performance as every single micro frontend.
-
-Software developers need a simple and lightweight mechanism for common tasks like opening an activity or a view for e.g. a business object’s details.
-
-## Solution and Technology
-SCION Workbench builds on top of Angular but it does not impose a dependency on Angular or any other framework for micro frontends hosted in workbench views.
-
-The workbench is a lightweight application frame which depends on Angular only. The navigation is fully based on Angular routing with every view having its separate router outlet. That allows routing on a per-view basis, with all the benefits like lazy component loading, route guards and the application URL to reflect navigational state. As many views may be opened at the same time, views not presented to the user are removed from Angular change detection tree to not compromise application performance.
-
-As a first level Angular citizen and with routing at its heart, it is like to develop a regular Angular application which you feel familiar with instantly. Integration into SCION Workbench is as lean as possible. Any vanilla Angular component can act as workbench view and obtain data via route parameters. 
-
-Our vision is to provide you with a ready to go workbench frame for production use. We believe in first class code quality and a profound understanding of the things we do.
-
-## Project Status
-Development is still at a very early stage mainly driven by requirements of the project. Many other use cases are imaginable. Hence, we encourage other developers to join the project and contribute to make SCION Workbench constantly better and more stable.
-
-Further development will mainly focus on stability and performance, micro frontend integration points and features like theming, multi-window and responsive design.
-
-We would like to thank SBB which supports open source software and made SCION Workbench possible in the first place.
-
-### Disclaimer
-As for now, the SCION Workbench and the SCION Workbench Application Platform are exclusively optimized and tested on the latest Google Chrome Release. Nevertheless, most things should work fine on other modern browsers like Firefox or Microsoft Edge. We are planning to support and test more browsers in the future.
-
-## Current Version
-[![Project version](https://img.shields.io/npm/v/@scion/workbench.svg)][menu-download] [![Project version](https://img.shields.io/npm/v/@scion/workbench/next.svg)][menu-download]
-
-SCION Workbench `v0.0.0-beta.23` to `v0.0.0-beta.32` is only compatible with Angular version 8.x.
-
-SCION Workbench `v0.0.0-beta.33` and newer are only compatible with Angular version 9.x. As recommended by Angular, the libraries are compiled using the View Engine compiler instead of the Ivy compiler to maintain compatibility with projects opting out of Ivy. Applications can still use the Ivy compiler as Angular compatibility compiler (ngcc) compiles View Engine compiled libraries during the application build.
-
-- See https://angular.io/guide/ivy#ivy-and-libraries
-- See https://angular.io/guide/ivy#maintaining-library-compatibility
+The SCION Workbench supports tabbed views that enable users to arrange content to fit their individual needs. Fixed areas can be declared to display additional information or context-sensitive assistance. In addition, typical workbench controls such as overlays, message boxes, and notification ribbons are available.
 
 
-[menu-download]: https://www.npmjs.com/package/@scion/workbench
+[<img src="/docs/site/images/workbench-layout.svg">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout.svg)
 
-[menu-overview]: /README.md
-[menu-workbench]: /resources/site/workbench.md
-[menu-workbench-application-platform]: /resources/site/workbench-application-platform.md
+While the SCION Workbench can be used in regular Angular applications, it is particularly useful in host applications for the [SCION Microfrontend Platform][link-scion-microfrontend-platform].
+
+***
+
+- [**SCION Workbench Demo**][link-demo]\
+  See a live demo of the SCION Workbench.
+
+- [**Installation and Getting Started**][link-getting-started]\
+  Follow these steps to install the SCION Workbench in your project and start with a gentle introduction to the essentials of the SCION Workbench.
+  
+- [**How To Guides**][link-howto]\
+  Get answers to the most common questions when developing an application with SCION Workbench.
+
+***
+
+### Versions
+- `v0.0.0-beta.33` and newer are only compatible with Angular version 9.x.
+- `v0.0.0-beta.23` to `v0.0.0-beta.32` is only compatible with Angular version 8.x.
+
+[![Project version](https://img.shields.io/npm/v/@scion/workbench.svg)][link-download]
+[![Project version](https://img.shields.io/npm/v/@scion/workbench/next.svg)][link-download]
+[![Continuous Integration and Delivery][link-github-actions-workflow:status]][link-github-actions-workflow]
+
+
+[link-download]: https://www.npmjs.com/package/@scion/workbench
+[link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions
+[link-github-actions-workflow:status]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/workflows/Continuous%20Integration%20and%20Delivery/badge.svg?branch=master&event=push
+
+[link-scion-microfrontend-platform]: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md
+[link-getting-started]: /docs/site/getting-started.md
+[link-howto]: /docs/site/howto/how-to.md
+[link-demo]: https://schweizerischebundesbahnen.github.io/scion-workbench-demo/#/(view.24:person/64//view.22:person/32//view.5:person/79//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuMjQiLCJ2aWV3LjI0Il0sInNhc2gyIjpbInZpZXdwYXJ0LjMiLCJ2aWV3LjIyIiwidmlldy41Iiwidmlldy4yMiJdLCJzcGxpdHRlciI6MC41MTk0Mzg0NDQ5MjQ0MDY2LCJoc3BsaXQiOmZhbHNlfSwic3BsaXR0ZXIiOjAuNTU5NDI0MzI2ODMzNzk3NSwiaHNwbGl0Ijp0cnVlfSwic3BsaXR0ZXIiOjAuMzIyNjI3NzM3MjI2Mjc3MywiaHNwbGl0IjpmYWxzZX0%3D
+
+[menu-home]: /README.md
+[menu-projects-overview]: /docs/site/projects-overview.md
+[menu-changelog]: /docs/site/changelog/changelog.md
 [menu-contributing]: /CONTRIBUTING.md
-[menu-changelog]: /resources/site/changelog.md
-[menu-sponsoring]: /resources/site/sponsors.md
-[menu-links]: /resources/site/links.md
+[menu-sponsoring]: /docs/site/sponsoring.md
+

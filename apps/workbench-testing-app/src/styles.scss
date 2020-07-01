@@ -1,0 +1,5 @@
+@import 'projects/scion/workbench/src/theme/theming';
+@import 'common';
+
+@include wb-theme();
+@include app-theme();

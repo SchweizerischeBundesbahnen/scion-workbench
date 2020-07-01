@@ -1,7 +1,7 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../../out-tsc/spec",
+    "outDir": "../../../out-tsc/workbench-application.core.spec",
     "types": [
       "jasmine",
       "node"

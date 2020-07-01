@@ -1,0 +1,47 @@
+$green: #78c868;
+$dark-green: #3e7f62;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2em;
+
+  > img.banner {
+    height: 35px;
+  }
+
+  > h1 {
+    color: $dark-green;
+    margin-top: 2em;
+    margin-bottom: 1.5em;
+  }
+
+  > nav {
+    display: flex;
+    flex-flow: row wrap;
+
+    > a {
+      width: 200px;
+      height: 200px;
+      background-color: $green;
+      border: 1px solid $dark-green;
+      border-radius: 2px;
+      margin: 1em;
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+
+      > small {
+        margin-top: 1em;
+        font-size: 16px;
+      }
+    }
+  }
+}
