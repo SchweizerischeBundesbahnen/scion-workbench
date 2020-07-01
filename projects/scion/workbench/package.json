@@ -1,7 +1,7 @@
 {
   "name": "@scion/workbench",
   "version": "0.0.0-beta.33",
-  "description": "SCION Workbench provides a lightweight application frame and helps to build multi-view web applications. Views are shown within tabs which can be flexibly arranged and dragged around by the user.",
+  "description": "SCION Workbench provides a workbench layout for Angular applications useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel.",
   "license": "EPL-2.0",
   "private": false,
   "publishConfig": {
@@ -12,8 +12,7 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
   },
   "author": {
-    "name": "SCION Workbench contributors",
-    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
+    "name": "SCION contributors"
   },
   "dependencies": {
     "@scion/mouse-dispatcher": "0.0.0-beta.33"
@@ -32,14 +31,12 @@
   "keywords": [
     "scion",
     "workbench",
-    "multi-view web application",
-    "application shell",
-    "application frame",
-    "micro frontend",
-    "angular"
+    "workbench layout",
+    "view grid",
+    "non-linear workflow"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
   }
 }

@@ -1,15 +1,14 @@
 {
   "name": "scion-workbench",
   "version": "0.0.0-beta.33",
-  "description": "SCION Workbench facilitates the development of Angular web applications that require a complex workbench layout of multiple views and windows.",
+  "description": "SCION Workbench provides a workbench layout for Angular applications useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel.",
   "license": "EPL-2.0",
   "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
   "bugs": {
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
   },
   "author": {
-    "name": "SCION contributors",
-    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
+    "name": "SCION contributors"
   },
   "scripts": {
     "before-push": "run-s build lint test:headless e2e:headless",
@@ -164,6 +163,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
   }
 }
