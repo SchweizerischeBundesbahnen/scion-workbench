@@ -68,22 +68,22 @@
       "@scion/viewport/*": [
         "dist/scion/viewport/*"
       ],
-      "@scion/app/common": [
-        "dist/scion/app/common"
+      "app-common": [
+        "dist/app-common"
       ],
-      "@scion/app/common/*": [
-        "dist/scion/app/common/*"
+      "app-common/*": [
+        "dist/app-common/*"
       ]
     }
-    //    /*
-    //     * ======================================+
-    //     * | PATH-OVERRIDE-FOR-LOCAL-DEVELOPMENT |
-    //     * |                                     |
-    //     * |   DO NOT ACTIVATE FOR PRODUCTION!   |
-    //     * +=====================================+
-    //     *
-    //     * Note: DO NOT ACTIVATE FOR PRODUCTION!
-    //     */
+    /*
+     * ======================================+
+     * |    PATH-OVERRIDE-FOR-DEVELOPMENT    |
+     * |                                     |
+     * |   DO NOT ACTIVATE FOR PRODUCTION!   |
+     * +=====================================+
+     *
+     * Note: DO NOT ACTIVATE FOR PRODUCTION!
+     */
     //    "paths": {
     //      "@scion/workbench": [
     //        "projects/scion/workbench/src/public_api"
@@ -133,12 +133,13 @@
     //      "@scion/viewport/*": [
     //        "projects/scion/viewport/src/*"
     //      ],
-    //      "@scion/app/common": [
-    //        "projects/app/common/src/public_api"
+    //      "app-common": [
+    //        "projects/app-common/src/public_api"
     //      ],
-    //      "@scion/app/common/*": [
-    //        "projects/app/common/src/*"
+    //      "app-common/*": [
+    //        "projects/app-common/src/*"
     //      ]
     //    }
   }
 }
+

@@ -3,253 +3,305 @@
 | [SCION Workbench][menu-home] | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | Contributing | [Sponsoring][menu-sponsoring] |  
 | --- | --- | --- | --- | --- |
 
+## Contributing
+We encourage other developers to join the project and contribute to making SCION products constantly better and more stable. If you are missing a feature, please create a feature request so we can discuss it and coordinate further development. To report a bug, please check existing issues first, and if found, leave a comment on the issue. Otherwise, file a bug or create a pull request with a proposed fix.
 
-# Contributing
+<details>
+  <summary><strong>Submitting a Pull Request</strong></summary>
+  <br>
+  
+This section explains how to submit a pull request.
 
-[Contribution](#contribution)\
-[Build, Test, Lint and Serve](#build-test-lint-and-serve)\
-[Coding guidelines](#coding-guidelines)\
-[Commit guidelines](#commit-guidelines)\
-[Line endings](#line-endings)\
-[NPM versioning guidelines](#npm-versioning-guidelines)\
-[Release guidelines](#release-guidelines)
+1. Login to your GitHub account and fork the `SchweizerischeBundesbahnen/scion-workbench` repo.
+1. Make your changes in a new Git branch. Name your branch in the form `issue/123` with `123` as the related GitHub issue number. Before submitting the pull request, please make sure that you comply with our coding and commit guidelines.
+1. Run the command `npm run before-push` to make sure that the project builds, passes all tests, and has no lint violations. Alternatively, you can also run the commands one by one, as following:
+   - `npm run lint`\
+      Lints all project files.
+   - `npm run build`\
+      Builds the project and related artifacts.
+   - `npm run test:headless`\
+      Runs all unit tests.
+   - `npm run e2e:headless`\
+      Runs all end-to-end tests.
+1. Commit your changes using a descriptive commit message that follows our commit guidelines.
+1. Before submitting the pull request, ensure to have rebased your branch based on the master branch as we stick to the rebase policy to keep the repository history linear. 
+1. Push your branch to your fork on GitHub. In GitHub, send a pull request to `scion-workbench:master`.
+1. If we suggest changes, please amend your commit and force push it to your GitHub repository.
 
-***
+> When we receive a pull request, we will carefully review it and suggest changes if necessary. This may require triage and several iterations. Therefore, we kindly ask you to discuss proposed changes with us in advance via the GitHub issue.
 
-## Contribution
-We encourage other developers to join the project and contribute to make SCION Workbench constantly better and more stable. If you are missing a feature, please create a feature request so we can discuss it and coordinate further development. To report a bug, please check existing issues first, and if found, leave a comment on the issue. Otherwise, file a bug or, even better, create a pull request (PR) with a fix.
+</details>
 
-### Submitting a Pull Request (PR)
-Please follow the guidelines below:
+<details>
+  <summary><strong>Development</strong></summary>
+  <br>
+  
+For development, you can uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json`. This allows running tests or serving applications without having to build dependent modules first.
 
-1. Search GitHub for an open or closed PR that relates to your submission.
-2. Login to your GitHub account and fork the `SchweizerischeBundesbahnen/scion-workbench` repo.
-3. Make your changes in a new Git branch. Name your branch in the form 'issue/123' with '123' as the relevant GitHub issue number.
-4. Create your patch and stick to our [Coding guidelines](#coding-guidelines). 
-5. Run all specs using `ng test` command.
-6. Lint source using `ng lint` command.
-7. Commit your changes using a descriptive commit message that follows our [commit message conventions](#commit-guidelines). 
-8. Push your branch to your fork on GitHub
-9. In GitHub, send a pull request to `scion-workbench:master`.
-10. If we suggest changes, please rebase your branch and force push to your GitHub repository.
+The following is a summary of commands useful for development of `scion-workbench`. See file `package.json` for a complete list of available NPM scripts.
 
-> Please be in mind that large pull requests take a lot of time to review.
+> Before you start development, we recommend that you build all projects using the `npm run build` command. Please make sure that path overrides are disabled in `tsconfig.json`. 
+ 
+### Commands for working on the workbench
+ 
+- `npm run workbench:lint`\
+  Lints the workbench source.
 
-## Build, Test, Lint and Serve
-The project is built with [Travis CI][link-travis-ci]. When pushing to GitHub, the project is built, its tests executed and linted. When merging a PR to the master branch, the demo application is deployed to https://scion-workbench-application-platform.now.sh. When a release tag is added to the master branch, SCION modules are deployed to NPM.
+- `npm run workbench:build`\
+  Builds the workbench source.
 
-[![Build Status](https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench.svg?token=sT5ouhFsqwt9RmkLsQb8&branch=master)](https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench)
+- `npm run workbench:test`\
+  Runs unit tests of the workbench.
+  
+- `npm run workbench:e2e`\
+  Runs end-to-end tests of the workbench. Prior to test execution, the testing app is started using the Angular CLI.
+  
+### Commands for working on the workbench testing application
+  
+- `npm run workbench-testing-app:serve`\
+  Serves the testing app on http://localhost:4200 using the Angular CLI.\
+  Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support. 
+  
+- `npm run workbench-testing-app-localhost:build`\
+  Builds the testing app into `dist` folder using the productive config.
 
-For local development, you can uncomment the section `PATH-OVERRIDE-FOR-LOCAL-DEVELOPMENT` in `tsconfig.json`. This allows running tests or serving the demo application without having to build dependent modules first.
+- `npm run workbench-testing-app:lint`\
+  Lints the testing app.
 
-Use following commands to build, lint and test the project.
+### Commands for generating the project documentation
 
-```
-npm run build-all
-npm run lint-all
-npm run test
-```
-You can serve SCION Workbench test application as follows:
-```
-npm run build ➀
-npm run app:common:build ➀
-npm run app:workbench:serve
-```
-Then, open your browser at following URL: http://localhost:4200.
+- `npm run changelog`\
+  Use to generate the changelog based on the commit history. The output is written to `CHANGELOG.md`, which will be included in `docs/site/changelog/changelog.md` using the template `docs/site/changelog/changelog.template.md`. 
 
-You can serve SCION Workbench Application Platform test application as follows:
-```
-npm run build ➀
-npm run app:common:build ➀
-npm run app:workbench-application-platform:serve ➀
-```
-Then, open your browser at following URL: http://localhost:5000.
+</details>
 
-You can run e2e-tests for SCION Workbench as follows:
-```
-npm run build ➀
-npm run app:common:build ➀
-npm run app:workbench:e2e
-```
+<details>
+  <summary><strong>Code Formatting</strong></summary>
+  <br>
 
-You can run e2e-tests for SCION Workbench Application Platform as follows:
-```
-npm run build ➀
-npm run app:common:build ➀
-npm run app:workbench-application-platform:e2e
-```
+To ensure consistency within our code base, please use the following formatting settings.  
+  
+- **For IntelliJ IDEA**\
+  Import the code style settings of `.editorconfig.intellij.xml` located in the project root.
 
-|#|Explanation|
-|-|-|
-|➀|If not using path overrides in `tsconfig.json`, the project and common lib must first be built.|
+- **For other IDEs**\
+  Import the code style settings of `.editorconfig` located in the project root.
+  
+</details>
 
-## Coding guidelines
-Besides linting rules, the following rules apply:
+<details>
+  <summary><strong>Coding Guidelines</strong></summary>
+  <br>
+  
+In additional to the linting rules, we have the following conventions:
 
-We believe in the [Best practices for a clean and performant Angular application](https://medium.freecodecamp.org/best-practices-for-a-clean-and-performant-angular-application-288e7b39eb6f) and the [Angular Style Guide](https://angular.io/guide/styleguide).
-
-Furthermore, we have the following rules:
-
-- We expect line endings of textual files to be Unix style (LF) only.
-- Observable names are suffixed with the dollar sign $ to indicate that it represents a stream which must be subscribed to and unsubscribed from.
-- We use explicit public or private visibility modifiers (except for constructors) to make the code more explicit.
+- We believe in the [Best practices for a clean and performant Angular application](https://medium.freecodecamp.org/best-practices-for-a-clean-and-performant-angular-application-288e7b39eb6f) and the [Angular Style Guide](https://angular.io/guide/styleguide).
+- We expect line endings to be Unix style (LF) only. Please check your Git settings to not convert line endings to CRLF. You can run the following command to find files with `windows-style` line endings: `find . -type f | xargs file | grep CRLF`.
+- Observable names are suffixed with the dollar sign (`$`) to indicate that it is an `Observable` which we must subscribe to and unsubscribe from.
+- We use explicit public and private visibility modifiers (except for constructors) to make the code more explicit.
 - We prefix private members with an underscore.
-- We use single quotes for string literals or import statements.
-- We use two spaces per indentation.
-- All features or bug fixes related to `routing` or `view grid` must be tested by one or more specs.
-- We write each RxJS operator on a new line, except when piping a single RxJS operator. Then, we write it on the same line as the pipe method.
-```javascript
-// single operator
-observable$
-    .pipe(map(it => ...))
-    .subscribe(...);
-
-// multiple operators
-observable$
-    .pipe(
-      map(it => ...),
-      takeUntil(...),
-    )
-    .subscribe(...);
-```
-- We subscribe via Angular `async` pipe whenever possible, unless not practical.
-- We use the `takeUntil` unsubscribe pattern whenever possible, unless not practical.
+- We write each RxJS operator on a separate line, except when piping a single RxJS operator. Then, we write it on the same line as the pipe method.
 - We avoid nested RxJS subscriptions.
 - We document all public API methods, constants, functions, classes or interfaces.
-- We format our code with the code style settings from `.editorconfig.intellij.xml`.
-- We prefer `const` vs `let` variables.
-- We avoid using the `any` type.
-- If a component is configured with the default change detection strategy, we avoid binding its template values to expensive methods or getter calls.
-- We structure the CSS selectors in CSS files similar to the structure of the companion HTML file, except if there are good reasons not to do it. This gives us a visual by only reading the CSS file.
-- When referencing CSS classes from within E2E tests, we prefix them with `e2e-`. If there is already a CSS class present on an element, we still add such a prefixed CSS class. This underlines that its purpose is not for styling but testing reason instead.
-- Tests have their dedicated test resources (unless not practical) to simplify identifying its resources and not having eagerly coupled tests. Therefore, we name the test resources with the first 8 digits from a UUID, e.g., generated with [Online UUID Generator](https://www.uuidgenerator.net/).
+- We structure the CSS selectors in CSS files similar to the structure of the companion HTML file and favor the direct descendant selector (`>`) over the non-restrictive descendant selector (` `), except if there are good reasons not to do it. This gives us a visual by only reading the CSS file. 
+- When referencing CSS classes from within E2E tests, we always prefix them with `e2e-`. We never reference e2e prefixed CSS classes in stylesheets.
 
-## Commit guidelines
-We believe in a compact and well written Git commit history. Every commit should be a logically separate changeset.
-As a general rule, your messages should start with a single line in imperative present tense and refer a GitHub issue.
+</details>
 
-### Commit message format
-Each commit message consists of a **header**, a **body** and a **footer**.  The header has a special format that includes a **type** and a **subject**:
+<details>
+  <summary><strong>Commit Guidelines</strong></summary>
+  <br>
+  
+We believe in a compact and well written Git commit history. Every commit should be a logically separated changeset. We use the commit messages to generate the changelog.
+ 
+Each commit message consists of a **header**, a **summary** and a **footer**.  The header has a special format that includes a **type**, an optional **scope**, and a **subject**, as following:
 
 ```
-<type>: <subject>
-<BLANK LINE>
-<body>
-<BLANK LINE>
-<footer>
+<type>(<scope>): <subject>
+
+[optional summary]
+
+[optional footer]
 ```
 
-The **header** is mandatory.
+<details>
+  <summary><strong>Type</strong></summary>
+  
+- `feat`: new feature
+- `fix`: bug fix
+- `docs`: changes to the documentation
+- `refactor`: changes that neither fixes a bug nor adds a feature
+- `perf`: changes that improve performance
+- `test`: adding missing tests, refactoring tests; no production code change
+- `chore`: other changes like formatting, updating the license, updating dependencies, removal of deprecations, etc
+- `ci`: changes to our CI configuration files and scripts
+- `revert`: revert of a previous commit
+- `release`: publish a new release
+</details>
 
-Any line of the commit message cannot be longer 100 characters! This allows the message to be easier to read on GitHub as well as in various git tools.
+<details>
+  <summary><strong>Scope</strong></summary>
+  
+The scope should be the name of the NPM package or application affected by the change.
 
-The footer should contain a [closing reference to an issue](https://help.github.com/articles/closing-issues-via-commit-messages/) if any.
-
-Samples:
-
-```
-docs: update changelog to beta.5
-```
-```
-fix: need to depend on latest rxjs and zone.js
-
-The version in our package.json gets copied to the one we publish, and users need the latest of these.
-
-Fixes #xx
-```
-
-### Type
-Must be one of the following:
-
-* **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
-* **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
-* **docs**: Documentation only changes
-* **feat**: A new feature
-* **fix**: A bug fix
-* **perf**: A code change that improves performance
-* **refactor**: A code change that neither fixes a bug nor adds a feature
-* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-* **test**: Adding missing tests or correcting existing tests
-* **release**: A new release
-
-### Subject
-The subject contains a succinct description of the change:
-
-* use the imperative, present tense: "change" not "changed" nor "changes"
-* don't capitalize the first letter
-* no dot (.) at the end
-
-### Body
-Just as in the **subject**, use the imperative, present tense: "change" not "changed" nor "changes". The body should include the motivation for the change and contrast this with previous behavior.
-
-### Footer
-The footer should contain any information about **Breaking Changes** and is also the place to reference GitHub issues that this commit **Closes**.
-
-**Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
+The following scopes are allowed:
+  
+- `workbench`: If the change affects the `@scion/workbench` NPM package.
+- `application-platform`: If the change affects the `@scion/workbench-application-platform` NPM package.
+- `demo`: If the change affects the `SCION Workbench Demo Application`.
+</details>
 
 
-## Line endings
-This project expects line endings of textual files to be Unix style (LF) only, and which is in the responsibility of the committer. There is no automatic line ending conversation done by Git on checkout nor when indexing files. Instead, configure your editor to use unix-style delimiter for new files and disable auto conversion in Git. However, the linting rule `linebreak-style` enforces a unix-style linebreak style for TypeScript files.
+<details>
+  <summary><strong>Subject</strong></summary>
+  
+The subject contains a succinct description of the change and follows the following rules:
+- written in the imperative, present tense ("change" not "changed" nor "changes")
+- starts with a lowercase letter
+- has no punctuation at the end
+</details>
 
-Global Git settings: `core.autocrlf=false`
+<details>
+  <summary><strong>Summary</strong></summary>
+  
+The summary describes the change. You can include the motivation for the change and contrast this with previous behavior.  
+</details>
 
-Run the following command to find files with 'windows-style' line ending:
+<details>
+  <summary><strong>Footer</strong></summary>
+  
+In the footer, reference the GitHub issue and optionally close it with the `Closes` keyword, as following:
 
 ```
-find . -type f | xargs file | grep CRLF
+closes #123
 ```
 
-## NPM versioning guidelines
-For SCION Workbench versioning, we stick to the versioning practices of the Angular project.
-
-### NPM Pre-Releases
-Pre-Releases are early versions of the next major release. They are are named in the form `x.0.0-beta.0`, where `x` is the major release number. When publishing a pre-release to NPM, its version number is increment like `x.0.0-beta.1`,  `x.0.0-beta.2`, ..., `x.0.0-beta.n`. Before the official stable release is published, one or more release candidates (RC0, RC1, etc.) are published: `x.0.0-rc.0`, `x.0.0-rc.1`, ..., `x.0.0-rc.n`. Then, if no critical problems are found, the stable major release is finally published at version `x.0.0`.
-
-> Minor and patch releases do not require to publish pre-releases up front.
-
-### NPM distribution tags:
-We use NPM distribution tags to differentiate between pre-releases (x.0.0-beta.0, x.0.0-beta.1, x.0.0-rc.0, x.0.0-rc.0, etc) and stable releases (x.x.x). Pre-releases are tagged with the distribution tag `next`, and stable releases with `latest`. The latest tag is automatically updated by NPM whenever you publish without setting a distribution tag.
-
-### Example for releasing 2.x.x
-
+And finally, add notes about breaking changes, if there are any. Breaking changes start with the keyword `BREAKING CHANGE: `. The rest of the commit message is then used to describe the breaking change and should contain information about the migration.
+  
 ```
-2.0.0-beta.0 with "next" distribution tag
-2.0.0-beta.1 with "next" distribution tag
-2.0.0-beta.x with "next" distribution tag
+BREAKING CHANGE: Removed deprecated API for xy.
 
-2.0.0-rc.0 with "next" distribution tag
-2.0.0-rc.1 with "next" distribution tag
-2.0.0-rc.x with "next" distribution tag
+To migrate:
+- do xy
+- do xy
+  ```
+</details>
 
-2.0.0 with "latest" distribution tag
-2.0.1 with "latest" distribution tag
-2.1.0 with "latest" distribution tag
-```
+</details>
 
-## Release guidelines
-Whenever you publish a new version to NPM (pre-release, major, minor, patch), please follow the instructions below:
 
-- update all `package.json` files with the new version, e.g. `0.0.0-beta.33` (search and replace "0.0.0-beta.33" -> "0.0.0-beta.34")
-- run `npm i` to update the version in `package-lock.json`
-- generate the new `changelog.md` ([see below](#generating-change-logs))
-- correct the generated `changelog.md`: move the header to the top
-- create a release commit that consists of the changed files and a commit message like 'release: version 0.0.0-beta.33'
-- push the changes to a new branch e.g. `release/0.0.0-beta.33` and create a pull request (no comments needed)
-- once merged to the master, tag your release commit with the exact version as tag name (e.g. `0.0.0-beta.33`).
-- based on the release tag, travis will automatically build & publish the necessary npm packages
+<details>
+  <summary><strong>Deprecation Policy</strong></summary>
+  <br>
 
-SCION workbench packages are published under `@scion` scope. To get access to SCION organization, please file an issue in the project issue tracker.
+You can deprecate API in any version. However, it will still be present in the next major release. Removal of deprecated API will occur only in a major release.
 
-### Generating change logs
-```bash
-# Install the cli
-npm install -g conventional-changelog-cli
+When deprecating API, mark it with the `@deprecated` JSDoc comment tag and include the current library version. Optionally, you can also specify which API to use instead, as following: 
 
-# Generate the changelog since last release
-conventional-changelog -p angular -i resources/site/changelog.md -s
-```
+```ts
+/**
+ * @deprecated since version 2.0. Use {@link otherMethod} instead.
+ */
+function someMethod(): void {
+}
 
-[link-travis-ci]: https://travis-ci.com/SchweizerischeBundesbahnen/scion-workbench
+```  
+
+</details>
+
+<details>
+  <summary><strong>Deployments</strong></summary>
+  <br>
+  
+We deploy our documentations and applications to [Vercel](https://vercel.com/docs). Vercel is a cloud platform for static sites and serverless functions. Applications are deployed using the SCION collaborator account (scion.collaborator@gmail.com) under the [SCION organization](https://vercel.com/scion).
+
+We have the following workbench and application platform related projects:
+- https://vercel.com/scion/scion-workbench-application-platform
+- https://vercel.com/scion/scion-workbench-application-platform-contact
+- https://vercel.com/scion/scion-workbench-application-platform-communication
+- https://vercel.com/scion/scion-workbench-application-platform-devtools
+
+</details>
+
+<details>
+  <summary><strong>NPM Packages</strong></summary>
+  <br>
+  
+We publish our packages to the [NPM registry](https://www.npmjs.com/). Packages are published using the SCION collaborator account (scion.collaborator) under the [SCION organization](https://www.npmjs.com/org/scion).
+
+We have the following workbench and application platform related packages:
+- https://www.npmjs.com/package/@scion/workbench
+- https://www.npmjs.com/package/@scion/workbench-application-platform
+- https://www.npmjs.com/package/@scion/workbench-application-platform.api
+- https://www.npmjs.com/package/@scion/workbench-application.core
+- https://www.npmjs.com/package/@scion/workbench-application.angular
+- https://www.npmjs.com/package/@scion/dimension
+- https://www.npmjs.com/package/@scion/viewport
+- https://www.npmjs.com/package/@scion/mouse-dispatcher
+
+</details>
+
+<details>
+  <summary><strong>Releasing Policy</strong></summary>
+  <br>
+  
+SCION follows the semantic versioning scheme (SemVer) for its releases. In this scheme, a release is represented by three numbers: `MAJOR.MINOR.PATCH`. For example, version `1.5.3` indicates major version `1`, minor version `5`, and patch level `3`.
+
+**Major Version:**\
+The major version number is incremented when introducing any backwards incompatible changes to the API.
+
+**Minor Version**\
+The minor version number is incremented when introducting some new, backwards compatible functionality.
+
+**Patch Level**\
+The patch or maintenance level is incremented when fixing bugs.
+
+In the development of a new major release, we usually release pre-releases and tag them with the beta tag (`-beta.x`). A beta pre-release is a snapshot of current development, so it is potentially unstable and incomplete. Before releasing the major version, we start releasing one or more release candidates, which we tag with the rc tag (`-rc.x`). We will publish the official and stable major release if the platform is working as expected and we do not find any critical problems.  
+  
+</details>
+
+<details>
+  <summary><strong>Release Checklist</strong></summary>
+  <br>
+
+This chapter describes the tasks to publish a new release to NPM.
+
+1. Update the following `package.json` files with the new version:
+    - `/package.json`
+    - `/projects/scion/workbench/package.json`
+    - `/projects/scion/workbench-application-platform/package.json`
+    - `/projects/scion/workbench-application-platform.api/package.json`
+    - `/projects/scion/workbench-application.core/package.json`
+    - `/projects/scion/workbench-application.angular/package.json`
+    - `/projects/scion/viewport/package.json`
+    - `/projects/scion/mouse-dispatcher/package.json`
+    - `/projects/scion/dimension/package.json`
+    - `/projects/app-common/package.json`
+1. Update inter-project dependencies.
+1. Run `npm install` to update the version in `package-lock.json`.
+1. Run `npm run changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
+1. Commit the changed files using the following commit message: `release: vX.X.X`. Replace `X.X.X` with the current version. Later, when merging the branch into the master branch, a commit message of this format triggers the release action in our [GitHub Actions workflow][link-github-actions-workflow].
+1. Push the commit to the branch `release/X.X.X` and submit a pull request to the master branch. Replace `X.X.X` with the current version.
+1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
+1. Verify that: 
+   - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
+   - **@scion/workbench-application-platform** is published to: https://www.npmjs.com/package/@scion/workbench-application-platform.
+   - **@scion/workbench-application-platform.api** is published to: https://www.npmjs.com/package/@scion/workbench-application-platform.api.
+   - **@scion/workbench-application.core** is published to: https://www.npmjs.com/package/@scion/workbench-application.core.
+   - **@scion/workbench-application.angular** is published to: https://www.npmjs.com/package/@scion/workbench-application.angular.
+   - **@scion/dimension** is published to: https://www.npmjs.com/package/@scion/dimension.
+   - **@scion/viewport** is published to: https://www.npmjs.com/package/@scion/viewport.
+   - **@scion/mouse-dispatcher** is published to: https://www.npmjs.com/package/@scion/mouse-dispatcher.
+   - **Workbench Application Platform Demo App** is deployed to:
+      - https://vercel.com/scion/scion-workbench-application-platform
+      - https://vercel.com/scion/scion-workbench-application-platform-contact
+      - https://vercel.com/scion/scion-workbench-application-platform-communication
+   - **DevTools for the Workbench Application Platform** is deployed to:
+      - https://vercel.com/scion/scion-workbench-application-platform-devtools
+
+</details>
+
+[link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
