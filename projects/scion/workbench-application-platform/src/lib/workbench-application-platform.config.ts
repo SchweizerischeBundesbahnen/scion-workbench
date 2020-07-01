@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Type } from '@angular/core/core';
-import { ApplicationConfig, PlatformConfigLoader, ErrorHandler } from './core/metadata';
+import { Type } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, PlatformConfigLoader } from './core/metadata';
 
 /**
  * Configuration for the Workbench Application Platform.
