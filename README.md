@@ -24,16 +24,27 @@ While the SCION Workbench can be used in regular Angular applications, it is par
 
 ***
 
+#### Quickstart
+
 - [**How SCION Workbench can help you**][link-about]\
   Get an overview of the SCION Workbench.
-- [**SCION Workbench Demo**][link-demo]\
-  See a live demo of the SCION Workbench.
 
+- [**Features**][link-features]\
+  Get an overview of existing and planned features of the SCION Workbench.
+ 
 - [**Installation and Getting Started**][link-getting-started]\
   Follow these steps to install the SCION Workbench in your project and start with a gentle introduction to the essentials of the SCION Workbench.
+
+#### Miscellaneous  
+
+- [**SCION Workbench Demo**][link-demo]\
+  See a live demo of the SCION Workbench.
   
 - [**How To Guides**][link-howto]\
   Get answers to the most common questions when developing an application with SCION Workbench.
+  
+- [**Announcements**][link-announcements]\
+  Get the latest news about the further development of the SCION Workbench.
 
 ***
 
@@ -55,6 +66,8 @@ While the SCION Workbench can be used in regular Angular applications, it is par
 [link-getting-started]: /docs/site/getting-started.md
 [link-howto]: /docs/site/howto/how-to.md
 [link-demo]: https://schweizerischebundesbahnen.github.io/scion-workbench-demo/#/(view.24:person/64//view.22:person/32//view.5:person/79//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuMjQiLCJ2aWV3LjI0Il0sInNhc2gyIjpbInZpZXdwYXJ0LjMiLCJ2aWV3LjIyIiwidmlldy41Iiwidmlldy4yMiJdLCJzcGxpdHRlciI6MC41MTk0Mzg0NDQ5MjQ0MDY2LCJoc3BsaXQiOmZhbHNlfSwic3BsaXR0ZXIiOjAuNTU5NDI0MzI2ODMzNzk3NSwiaHNwbGl0Ijp0cnVlfSwic3BsaXR0ZXIiOjAuMzIyNjI3NzM3MjI2Mjc3MywiaHNwbGl0IjpmYWxzZX0%3D
+[link-features]: /docs/site/features.md
+[link-announcements]: /docs/site/announcements.md
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
