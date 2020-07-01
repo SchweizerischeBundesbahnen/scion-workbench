@@ -1,13 +1,11 @@
 {
+  "extends": [
+    "rxjs-tslint-rules"
+  ],
   "rulesDirectory": [
-    "node_modules/codelyzer",
-    "node_modules/rxjs-tslint"
+    "node_modules/codelyzer"
   ],
   "rules": {
-    "rxjs-collapse-imports": true,
-    "rxjs-pipeable-operators-only": true,
-    "rxjs-no-static-observable-methods": true,
-    "rxjs-proper-imports": true,
     "arrow-return-shorthand": true,
     "callable-types": true,
     "class-name": true,
@@ -141,7 +139,6 @@
     "typedef": [
       true,
       "call-signature",
-      "arrow-call-signature",
       "parameter",
       "property-declaration"
     ]
