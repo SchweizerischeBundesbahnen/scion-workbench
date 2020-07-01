@@ -1,7 +1,7 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../../out-tsc/lib",
+    "outDir": "../../../out-tsc/workbench-application.core",
     "declaration": true,
     "inlineSources": true,
     "types": []
