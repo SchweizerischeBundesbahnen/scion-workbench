@@ -2,11 +2,10 @@
 <ul class="activity-bar e2e-activity-bar">
   <li *ngFor="let activity of activities">
     <a href=""
-       class="e2e-activity-item"
        (click)="onActivate(activity)"
        [class.active]="activity.active"
        [class.e2e-active]="activity.active"
-       [ngClass]="getCssClassesForActivityItem(activity)"
+       [ngClass]="['e2e-activity-item'] | wbConcatArray:(activity.itemCssClass | wbCoerceArray):(activity.cssClass | wbCoerceArray)"
        [attr.title]="activity.title">
       {{activity.itemText || ''}}
     </a>

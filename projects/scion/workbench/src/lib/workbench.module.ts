@@ -76,6 +76,8 @@ import { WbFormatAcceleratorPipe } from './view-part/view-context-menu/accelerat
 import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
 import { TextComponent } from './view-part/view-context-menu/text.component';
 import { ViewMenuService } from './view-part/view-context-menu/view-menu.service';
+import { ArrayCoercePipe } from './array-coerce.pipe';
+import { ArrayConcatPipe } from './array-concat.pipe';
 
 @NgModule({
   imports: [
@@ -123,6 +125,8 @@ import { ViewMenuService } from './view-part/view-context-menu/view-menu.service
     ViewMenuItemDirective,
     WbFormatAcceleratorPipe,
     TextComponent,
+    ArrayCoercePipe,
+    ArrayConcatPipe,
   ],
   exports: [
     WorkbenchComponent,
