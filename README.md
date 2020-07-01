@@ -24,6 +24,8 @@ While the SCION Workbench can be used in regular Angular applications, it is par
 
 ***
 
+- [**How SCION Workbench can help you**][link-about]\
+  Get an overview of the SCION Workbench.
 - [**SCION Workbench Demo**][link-demo]\
   See a live demo of the SCION Workbench.
 
@@ -49,6 +51,7 @@ While the SCION Workbench can be used in regular Angular applications, it is par
 [link-github-actions-workflow:status]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/workflows/Continuous%20Integration%20and%20Delivery/badge.svg?branch=master&event=push
 
 [link-scion-microfrontend-platform]: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md
+[link-about]: /docs/site/about.md
 [link-getting-started]: /docs/site/getting-started.md
 [link-howto]: /docs/site/howto/how-to.md
 [link-demo]: https://schweizerischebundesbahnen.github.io/scion-workbench-demo/#/(view.24:person/64//view.22:person/32//view.5:person/79//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuMjQiLCJ2aWV3LjI0Il0sInNhc2gyIjpbInZpZXdwYXJ0LjMiLCJ2aWV3LjIyIiwidmlldy41Iiwidmlldy4yMiJdLCJzcGxpdHRlciI6MC41MTk0Mzg0NDQ5MjQ0MDY2LCJoc3BsaXQiOmZhbHNlfSwic3BsaXR0ZXIiOjAuNTU5NDI0MzI2ODMzNzk3NSwiaHNwbGl0Ijp0cnVlfSwic3BsaXR0ZXIiOjAuMzIyNjI3NzM3MjI2Mjc3MywiaHNwbGl0IjpmYWxzZX0%3D
