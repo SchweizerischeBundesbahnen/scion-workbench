@@ -415,7 +415,7 @@
               "apps/workbench-application-platform/host-app/src/assets",
               {
                 "glob": "favicon.ico",
-                "input": "docs/branding",
+                "input": "resources/branding",
                 "output": "/"
               }
             ],
@@ -508,7 +508,7 @@
               "apps/workbench-application-platform/contact-app/src/assets",
               {
                 "glob": "favicon.ico",
-                "input": "docs/branding",
+                "input": "resources/branding",
                 "output": "/"
               }
             ],
@@ -601,7 +601,7 @@
               "apps/workbench-application-platform/communication-app/src/assets",
               {
                 "glob": "favicon.ico",
-                "input": "docs/branding",
+                "input": "resources/branding",
                 "output": "/"
               }
             ],
@@ -694,7 +694,7 @@
               "apps/workbench-application-platform/devtools-app/src/assets",
               {
                 "glob": "favicon.ico",
-                "input": "docs/branding",
+                "input": "resources/branding",
                 "output": "/"
               }
             ],
@@ -787,7 +787,7 @@
               "apps/workbench-application-platform/testing-app/src/assets",
               {
                 "glob": "favicon.ico",
-                "input": "docs/branding",
+                "input": "resources/branding",
                 "output": "/"
               }
             ],
@@ -880,12 +880,12 @@
               "apps/workbench-testing-app/src/assets",
               {
                 "glob": "favicon.ico",
-                "input": "docs/branding",
+                "input": "resources/branding",
                 "output": "/"
               },
               {
                 "glob": "scion-workbench-banner.svg",
-                "input": "docs/branding",
+                "input": "resources/branding",
                 "output": "/assets"
               }
             ],
