@@ -5,6 +5,16 @@
 
 ## Changelog
 
+# [0.0.0-beta.34](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.33...0.0.0-beta.34) (2020-07-02)
+
+
+### Bug Fixes
+
+* remove deep imports to `@angular/core` ([0a3f4d0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0a3f4d0bf9ac7ceda3979444554c86efe6854a08))
+* set CSS classes to `ngClass` directive without function call ([64e3dde](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/64e3dde297d1bf9465c920fe1e444903bc508028))
+
+
+
 # [0.0.0-beta.33](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.32...0.0.0-beta.33) (2020-02-21)
 
 ### Features
