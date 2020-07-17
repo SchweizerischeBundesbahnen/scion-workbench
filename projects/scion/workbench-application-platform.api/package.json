@@ -16,6 +16,7 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "dependencies": {
+    "tslib": "^2.0.0"
   },
   "peerDependencies": {
   },
@@ -30,6 +31,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
   }
 }

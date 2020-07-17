@@ -15,7 +15,7 @@ import { Capability, ManifestRegistryService, NotificationService, PlatformCapab
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FocusTrapFactory } from '@angular/cdk/a11y';
+import { ConfigurableFocusTrapFactory } from '@angular/cdk/a11y';
 import { PARAM_NAME, PARAM_VALUE, SciParamsEnterComponent } from 'app-common';
 
 const QUALIFIER = 'qualifier';
@@ -47,7 +47,7 @@ export class OutletCapabilityExecPopupComponent implements OnDestroy {
               notificationService: NotificationService,
               formBuilder: FormBuilder,
               private _popup: WorkbenchPopup,
-              private _focusTrapFactory: FocusTrapFactory,
+              private _focusTrapFactory: ConfigurableFocusTrapFactory,
               private _workbenchRouter: WorkbenchRouter,
               private _popupService: PopupService) {
     this.form = formBuilder.group({

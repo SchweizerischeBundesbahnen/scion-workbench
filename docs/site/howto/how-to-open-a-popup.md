@@ -6,7 +6,7 @@
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Miscellaneous
 
 #### How to open a popup
-To open a popup, inject `PopupService` and invoke `open` method. Provide a `PopupConfig` options object to control the appearance of the popup, like which component to show or the anchor where to attach the popup. When the popup is closed, the `Promise` emits the popup result (if any). Do not forget to register the component as `entryComponents` in your application module, so it is available at runtime.
+To open a popup, inject `PopupService` and invoke `open` method. Provide a `PopupConfig` options object to control the appearance of the popup, like which component to show or the anchor where to attach the popup. When the popup is closed, the `Promise` emits the popup result (if any).
 
 ```typescript
 @Component({...})

@@ -77,9 +77,6 @@ The custom message box is implemented in the host application. Hereto, register 
  declarations: [
     ListMessageboxComponent ➀
   ],
-  entryComponents: [
-    ListMessageboxComponent ➀
-  ],
   providers: [
     {
       provide: INTENT_HANDLER, ➁
@@ -98,7 +95,7 @@ export function provideListMessageBoxIntentHandler(): MessageBoxIntentHandler { 
 ```
 |#|Explanation|
 |-|-|
-|➀|Registers the component to be rendered in the message box as an entry component.|
+|➀|Registers the component to be rendered in the message box.|
 |➁|Registers the handler as multi provider under DI injection `INTENT_HANDLER`.|
 |➂|Delegates instantiation of the handler to a factory method (required by AOT).|
 |➃|Instantiates the handler to handle `messagebox` intents of given qualifier. When an application issues a respective intent, a messagebox with given component is opened.|

@@ -35,9 +35,6 @@ import { MessageEnvelope, Notification, NotificationIntentMessage, PlatformCapab
  *       multi: true,
  *     }
  *   ],
- *   entryComponents: [
- *     CustomNotificationComponent,
- *   ],
  *   ...
  * })
  * export class AppModule { }

@@ -31,9 +31,6 @@ import { PopupIntentDispatcher } from './popup-intent-dispatcher.service';
     {provide: APP_INITIALIZER, useFactory: provideModuleInitializerFn, multi: true, deps: [Injector]},
     PopupIntentDispatcher,
   ],
-  entryComponents: [
-    PopupOutletComponent,
-  ],
 })
 export class PopupCapabilityModule {
 }

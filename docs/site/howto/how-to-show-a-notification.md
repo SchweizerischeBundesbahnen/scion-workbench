@@ -8,7 +8,7 @@
 #### How to show a notification
 To show a notification, inject `NotificationService` and invoke `notify` method. Provide a `Notification` options object to control the appearance of the notification, like its severity, its content and show duration.
 
-The content can be as simple as some text, or a component to be displayed. When specifying a component, do not forget to register it as `entryComponents` in your application module, so it is available at runtime.
+The content can be as simple as some text, or a component to be displayed.
 
 ```typescript
 @Component({...})

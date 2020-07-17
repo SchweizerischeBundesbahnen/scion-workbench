@@ -12,7 +12,7 @@ import { Inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 import { ActivityService, MessageBus, Platform, PlatformActivator, ViewService } from '@scion/workbench-application.core';
 import { DOCUMENT } from '@angular/common';
 import { fromEvent, merge, Subject } from 'rxjs';
-import { FocusTrapFactory } from '@angular/cdk/a11y';
+import { ConfigurableFocusTrapFactory } from '@angular/cdk/a11y';
 import { WorkbenchApplicationConfig } from './workbench-application.config';
 import { debounceTime, distinctUntilChanged, filter, take, takeUntil } from 'rxjs/operators';
 import { Defined } from './defined.util';
@@ -27,7 +27,7 @@ export class ActivatorService implements OnDestroy {
 
   constructor(@Inject(DOCUMENT) private _document: any,
               private _messageBus: MessageBus,
-              private _focusTrapFactory: FocusTrapFactory,
+              private _focusTrapFactory: ConfigurableFocusTrapFactory,
               private _zone: NgZone,
               private _config: WorkbenchApplicationConfig) {
   }

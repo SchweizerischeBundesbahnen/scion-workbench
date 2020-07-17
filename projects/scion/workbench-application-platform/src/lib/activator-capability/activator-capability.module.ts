@@ -30,11 +30,9 @@ import { PortalModule } from '@angular/cdk/portal';
     {provide: APP_INITIALIZER, useFactory: provideModuleInitializerFn, multi: true, deps: [Injector]},
     MicrofrontendActivatorService,
   ],
-  entryComponents: [
-    ActivatorOutletComponent,
-  ],
 })
-export class ActivatorCapabilityModule { }
+export class ActivatorCapabilityModule {
+}
 
 export function provideModuleInitializerFn(injector: Injector): () => void {
   // use injector because MicrofrontendActivatorService cannot be injected in `APP_INITIALIZER` function
