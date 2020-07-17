@@ -1,6 +1,6 @@
 {
   "name": "app-common",
-  "version": "0.0.0-beta.34",
+  "version": "0.0.0-beta.35",
   "description": "Contains a collection of UI components, styles and services used by E2E application.",
   "license": "EPL-2.0",
   "private": true,
@@ -22,9 +22,9 @@
     "@angular/common": "^10.0.0-rc.0 || ^10.0.0",
     "@angular/core": "^10.0.0-rc.0 || ^10.0.0",
     "@angular/cdk": "^10.0.0-rc.0 || ^10.0.0",
-    "@scion/viewport": "0.0.0-beta.34",
-    "@scion/dimension": "0.0.0-beta.34",
-    "@scion/workbench-application-platform.api": "0.0.0-beta.34",
+    "@scion/viewport": "0.0.0-beta.35",
+    "@scion/dimension": "0.0.0-beta.35",
+    "@scion/workbench-application-platform.api": "0.0.0-beta.35",
     "rxjs": "^6.0.0"
   },
   "keywords": [

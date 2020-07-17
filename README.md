@@ -49,6 +49,7 @@ While the SCION Workbench can be used in regular Angular applications, it is par
 ***
 
 ### Versions
+- `v0.0.0-beta.35` and newer are only compatible with Angular version 10.x.
 - `v0.0.0-beta.33` and newer are only compatible with Angular version 9.x.
 - `v0.0.0-beta.23` to `v0.0.0-beta.32` is only compatible with Angular version 8.x.
 

@@ -5,6 +5,23 @@
 
 ## Changelog
 
+# [0.0.0-beta.35](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.34...0.0.0-beta.35) (2020-07-17)
+
+
+### chore
+
+* update workbench to Angular 10 ([726e5b3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/726e5b357fff1cbf294aba14faa9a7b0d29ce3ad)), closes [#224](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/224)
+
+
+### BREAKING CHANGES
+
+* Added support for Angular 10.
+
+To migrate:
+- run `ng update @angular/cli @angular/core @angular/cdk` to migrate your app to Angular 10. For more information, see https://angular.io/guide/updating-to-version-10.
+
+
+
 # [0.0.0-beta.34](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.33...0.0.0-beta.34) (2020-07-02)
 
 
