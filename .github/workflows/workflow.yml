@@ -153,11 +153,13 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - uses: actions/download-artifact@v2
+      - name: 'Downloading workbench (dist)'
+        uses: actions/download-artifact@v2
         with:
           name: dist
           path: dist
-      - run: ${{ matrix.app.cmd }}
+      - name: 'Building ${{ matrix.app.name }}'
+        run: ${{ matrix.app.cmd }}
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.app.name }}
@@ -168,7 +170,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - name: 'Downloading workbench (dist)'
+        uses: actions/download-artifact@v2
         with:
           name: dist
           path: dist
@@ -215,36 +218,37 @@ jobs:
             project: application-platform
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - name: 'Downloading workbench (dist)'
+        uses: actions/download-artifact@v2
         with:
           name: dist
           path: dist
-      - name: 'Downloading app: workbench-testing-app-localhost'
+      - name: 'Downloading app: workbench-testing-app-localhost (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-testing-app-localhost
           path: dist/workbench-testing-app-localhost
-      - name: 'Downloading app: workbench-application-platform-host-app-localhost'
+      - name: 'Downloading app: workbench-application-platform-host-app-localhost (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-host-app-localhost
           path: dist/workbench-application-platform-host-app-localhost
-      - name: 'Downloading app: workbench-application-platform-contact-app-localhost'
+      - name: 'Downloading app: workbench-application-platform-contact-app-localhost (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-contact-app-localhost
           path: dist/workbench-application-platform-contact-app-localhost
-      - name: 'Downloading app: workbench-application-platform-communication-app-localhost'
+      - name: 'Downloading app: workbench-application-platform-communication-app-localhost (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-communication-app-localhost
           path: dist/workbench-application-platform-communication-app-localhost
-      - name: 'Downloading app: workbench-application-platform-devtools-app-localhost'
+      - name: 'Downloading app: workbench-application-platform-devtools-app-localhost (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-devtools-app-localhost
           path: dist/workbench-application-platform-devtools-app-localhost
-      - name: 'Downloading app: workbench-application-platform-testing-app-localhost'
+      - name: 'Downloading app: workbench-application-platform-testing-app-localhost (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-testing-app-localhost
@@ -282,27 +286,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: 'Downloading built libs'
+      - name: 'Downloading workbench (dist)'
         uses: actions/download-artifact@v2
         with:
           name: dist
           path: dist
-      - name: 'Downloading built app: workbench-application-platform-host-app-vercel'
+      - name: 'Downloading app: workbench-application-platform-host-app-vercel (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-host-app-vercel
           path: dist/workbench-application-platform-host-app-vercel
-      - name: 'Downloading built app: workbench-application-platform-contact-app-vercel'
+      - name: 'Downloading app: workbench-application-platform-contact-app-vercel (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-contact-app-vercel
           path: dist/workbench-application-platform-contact-app-vercel
-      - name: 'Downloading built app: workbench-application-platform-communication-app-vercel'
+      - name: 'Downloading app: workbench-application-platform-communication-app-vercel (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-communication-app-vercel
           path: dist/workbench-application-platform-communication-app-vercel
-      - name: 'Downloading built app: workbench-application-platform-devtools-app-vercel'
+      - name: 'Downloading app: workbench-application-platform-devtools-app-vercel (dist)'
         uses: actions/download-artifact@v2
         with:
           name: workbench-application-platform-devtools-app-vercel
