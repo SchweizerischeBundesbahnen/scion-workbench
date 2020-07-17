@@ -26,11 +26,6 @@ import { PingIntentHandler } from './ping-intent/ping-intent-handler.service';
   imports: [
     CommonModule,
   ],
-  entryComponents: [
-    ListMessageboxComponent,
-    ListNotificationComponent,
-    CustomNotifyActivityActionComponent,
-  ],
   providers: [
     {
       provide: INTENT_HANDLER,

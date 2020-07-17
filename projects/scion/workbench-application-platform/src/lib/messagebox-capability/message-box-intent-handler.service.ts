@@ -36,9 +36,6 @@ import { MessageBox, MessageBoxIntentMessage, MessageEnvelope, PlatformCapabilit
  *       multi: true,
  *     }
  *   ],
- *   entryComponents: [
- *     CustomMessageBoxComponent,
- *   ],
  *   ...
  * })
  * export class AppModule { }

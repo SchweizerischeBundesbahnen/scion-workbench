@@ -76,9 +76,6 @@ The custom notification is implemented in the host application. Hereto, register
  declarations: [
     ListNotificationComponent ➀
   ],
-  entryComponents: [
-    ListNotificationComponent ➀
-  ],
   providers: [
     {
       provide: INTENT_HANDLER, ➁
@@ -96,7 +93,7 @@ export function provideListNotificationIntentHandler(): NotificationIntentHandle
 ```
 |#|Explanation|
 |-|-|
-|➀|Registers the component to be rendered in the notification as an entry component.|
+|➀|Registers the component to be rendered in the notification.|
 |➁|Registers the handler as multi provider under DI injection `INTENT_HANDLER`.|
 |➂|Delegates instantiation of the handler to a factory method (required by AOT).|
 |➃|Instantiates the handler to handle `notification` intents of given qualifier. When an application issues a respective intent, a notification with given component is shown.|

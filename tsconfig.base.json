@@ -1,0 +1,145 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "module": "es2020",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "noUnusedLocals": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "paths": {
+      "@scion/workbench": [
+        "dist/scion/workbench"
+      ],
+      "@scion/workbench/*": [
+        "dist/scion/workbench/*"
+      ],
+      "@scion/workbench-application-platform.api": [
+        "dist/scion/workbench-application-platform.api"
+      ],
+      "@scion/workbench-application-platform.api/*": [
+        "dist/scion/workbench-application-platform.api/*"
+      ],
+      "@scion/workbench-application-platform": [
+        "dist/scion/workbench-application-platform"
+      ],
+      "@scion/workbench-application-platform/*": [
+        "dist/scion/workbench-application-platform/*"
+      ],
+      "@scion/workbench-application.core": [
+        "dist/scion/workbench-application.core"
+      ],
+      "@scion/workbench-application.core/*": [
+        "dist/scion/workbench-application.core/*"
+      ],
+      "@scion/workbench-application.angular": [
+        "dist/scion/workbench-application.angular"
+      ],
+      "@scion/workbench-application.angular/*": [
+        "dist/scion/workbench-application.angular/*"
+      ],
+      "@scion/mouse-dispatcher": [
+        "dist/scion/mouse-dispatcher"
+      ],
+      "@scion/mouse-dispatcher/*": [
+        "dist/scion/mouse-dispatcher/*"
+      ],
+      "@scion/dimension": [
+        "dist/scion/dimension"
+      ],
+      "@scion/dimension/*": [
+        "dist/scion/dimension/*"
+      ],
+      "@scion/viewport": [
+        "dist/scion/viewport"
+      ],
+      "@scion/viewport/*": [
+        "dist/scion/viewport/*"
+      ],
+      "app-common": [
+        "dist/app-common"
+      ],
+      "app-common/*": [
+        "dist/app-common/*"
+      ]
+    }
+    /*
+     * ======================================+
+     * |    PATH-OVERRIDE-FOR-DEVELOPMENT    |
+     * |                                     |
+     * |   DO NOT ACTIVATE FOR PRODUCTION!   |
+     * +=====================================+
+     *
+     * Note: DO NOT ACTIVATE FOR PRODUCTION!
+     */
+    //    "paths": {
+    //      "@scion/workbench": [
+    //        "projects/scion/workbench/src/public_api"
+    //      ],
+    //      "@scion/workbench/*": [
+    //        "projects/scion/workbench/src/*"
+    //      ],
+    //      "@scion/workbench-application-platform.api": [
+    //        "projects/scion/workbench-application-platform.api/src/public_api"
+    //      ],
+    //      "@scion/workbench-application-platform.api/*": [
+    //        "projects/scion/workbench-application-platform.api/src/*"
+    //      ],
+    //      "@scion/workbench-application-platform": [
+    //        "projects/scion/workbench-application-platform/src/public_api"
+    //      ],
+    //      "@scion/workbench-application-platform/*": [
+    //        "projects/scion/workbench-application-platform/src/*"
+    //      ],
+    //      "@scion/workbench-application.core": [
+    //        "projects/scion/workbench-application.core/src/public_api"
+    //      ],
+    //      "@scion/workbench-application.core/*": [
+    //        "projects/scion/workbench-application.core/src/*"
+    //      ],
+    //      "@scion/workbench-application.angular": [
+    //        "projects/scion/workbench-application.angular/src/public_api"
+    //      ],
+    //      "@scion/workbench-application.angular/*": [
+    //        "projects/scion/workbench-application.angular/src/*"
+    //      ],
+    //      "@scion/mouse-dispatcher": [
+    //        "projects/scion/mouse-dispatcher/src/public_api"
+    //      ],
+    //      "@scion/mouse-dispatcher/*": [
+    //        "projects/scion/mouse-dispatcher/src/*"
+    //      ],
+    //      "@scion/dimension": [
+    //        "projects/scion/dimension/src/public_api"
+    //      ],
+    //      "@scion/dimension/*": [
+    //        "projects/scion/dimension/src/*"
+    //      ],
+    //      "@scion/viewport": [
+    //        "projects/scion/viewport/src/public_api"
+    //      ],
+    //      "@scion/viewport/*": [
+    //        "projects/scion/viewport/src/*"
+    //      ],
+    //      "app-common": [
+    //        "projects/app-common/src/public_api"
+    //      ],
+    //      "app-common/*": [
+    //        "projects/app-common/src/*"
+    //      ]
+    //    }
+  }
+}
+

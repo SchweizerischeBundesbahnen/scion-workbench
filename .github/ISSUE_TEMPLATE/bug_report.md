@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 Please complete the following information:
 
  - SCION Workbench version: [e.g. 1.0.0-beta.3]
- - Angular version: [e.g. 9.0.0]
+ - Angular version: [e.g. 10.0.0]
  - Browser: [e.g. Chrome 83, Firefox 77, Edge 83, Safari 10]
  - OS: [e.g. Windows 10, iOS 13.5.1]
  - Device: [e.g. Desktop, Smartphone] 

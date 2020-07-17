@@ -13,7 +13,7 @@
  */
 @mixin wb-font-theme($theme) {
   $font-path: map-get($theme, font-path);
-  $font-path: 'assets/fonts/' !default;
+  $font-path: '/assets/fonts/' !default;
 
   @font-face {
     font-family: 'wb-icon';

@@ -46,12 +46,6 @@ import { PopupOpenActivityActionComponent } from './popup-open-action/popup-open
     {provide: APP_INITIALIZER, useFactory: provideModuleInitializerFn, multi: true, deps: [Injector]},
     ActivityRegistrator,
   ],
-  entryComponents: [
-    ActivityOutletComponent,
-    ViewOpenActivityActionComponent,
-    PopupOpenActivityActionComponent,
-    UrlOpenActivityActionComponent,
-  ],
 })
 export class ActivityCapabilityModule {
 }

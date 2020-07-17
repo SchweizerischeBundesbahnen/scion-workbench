@@ -33,9 +33,6 @@ import { ViewOutletComponent } from './view-outlet.component';
     {provide: APP_INITIALIZER, useFactory: provideModuleInitializerFn, multi: true, deps: [Injector]},
     ViewIntentDispatcher,
   ],
-  entryComponents: [
-    ViewOutletComponent,
-  ],
 })
 export class ViewCapabilityModule {
 }

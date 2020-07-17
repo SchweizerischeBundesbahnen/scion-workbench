@@ -16,11 +16,12 @@
     "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench"
   },
   "dependencies": {
+    "tslib": "^2.0.0"
   },
   "peerDependencies": {
-    "@angular/common": "^9.0.0-rc.0 || ^9.0.0",
-    "@angular/core": "^9.0.0-rc.0 || ^9.0.0",
-    "@angular/cdk": "^9.0.0-rc.0 || ^9.0.0",
+    "@angular/common": "^10.0.0-rc.0 || ^10.0.0",
+    "@angular/core": "^10.0.0-rc.0 || ^10.0.0",
+    "@angular/cdk": "^10.0.0-rc.0 || ^10.0.0",
     "@scion/dimension": "0.0.0-beta.34",
     "rxjs": "^6.0.0"
   },
@@ -28,6 +29,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
   }
 }

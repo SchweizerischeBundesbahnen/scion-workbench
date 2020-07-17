@@ -18,12 +18,9 @@ In the host application, create an `ActivityActionProvider` and register it unde
   declarations: [
     CustomActivityActionComponent, ➀
   ],
-  entryComponents: [
-    CustomActivityActionComponent, ➁
-  ],
   providers: [
     {
-      provide: ACTIVITY_ACTION_PROVIDER, ➂
+      provide: ACTIVITY_ACTION_PROVIDER, ➁
       useClass: CustomActivityActionProvider,
       multi: true
     }
@@ -35,8 +32,7 @@ export class HostAppModule {
 |#|Explanation|
 |-|-|
 |➀|Registers the component which renders the activity action.|
-|➁|Registers the component as an entry component because loaded dynamically.|
-|➂|Registers the action provider as a multi provider.|
+|➁|Registers the action provider as a multi provider.|
 
 
 The providers looks as follows:

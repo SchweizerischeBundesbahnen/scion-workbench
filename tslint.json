@@ -79,7 +79,6 @@
       true,
       "allow-fast-null-checks"
     ],
-    "no-use-before-declare": false,
     "no-var-keyword": true,
     "object-literal-sort-keys": false,
     "one-line": [

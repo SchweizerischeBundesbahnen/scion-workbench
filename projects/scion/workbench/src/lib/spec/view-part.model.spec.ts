@@ -13,6 +13,7 @@ import { WbBeforeDestroy, WorkbenchView } from '../workbench.model';
 import { Component, OnDestroy } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
 
+@Component({})
 export abstract class AbstractSpecViewComponent implements OnDestroy, WbBeforeDestroy {
 
   private _destroy$ = new Subject<void>();
