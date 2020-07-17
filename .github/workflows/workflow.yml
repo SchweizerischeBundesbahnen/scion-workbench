@@ -1,5 +1,5 @@
 name: Continuous Integration and Delivery
-on: push
+on: [push, pull_request]
 jobs:
   install:
     name: 'Installing NPM modules'
