@@ -41,6 +41,7 @@
     "workbench:test": "ng test @scion/workbench",
     "workbench:e2e": "ng e2e @scion/workbench.e2e",
     "workbench:build": "ng build --prod @scion/workbench",
+    "preworkbench:e2e": "npx webdriver-manager update --versions.chrome=84.0.4147.0",
     "postworkbench:build": "scss-bundle -p . -e projects/scion/workbench/src/theme/_theming.scss -o dist/scion/workbench/theming.scss",
 
     "application-platform.api:lint": "ng lint @scion/workbench-application-platform.api",
@@ -54,6 +55,7 @@
     "application-platform:e2e:serve": "run-p -r application-platform-apps:serve \"application-platform:await-then-protractor -- {@}\" --",
     "application-platform:await-then-protractor": "run-s application-platform-apps:*:await \"application-platform:run-protractor -- {@}\" --",
     "application-platform:run-protractor": "ng e2e @scion/workbench-application-platform.e2e",
+    "preapplication-platform:run-protractor": "npx webdriver-manager update --versions.chrome=84.0.4147.0",
 
     "application-platform.application-core:lint": "ng lint @scion/workbench-application.core",
     "application-platform.application-core:test": "ng test @scion/workbench-application.core",

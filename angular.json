@@ -51,7 +51,8 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "projects/scion/workbench.e2e/protractor.conf.js",
-            "devServerTarget": "workbench-testing-app:serve"
+            "devServerTarget": "workbench-testing-app:serve",
+            "webdriverUpdate": false
           },
           "configurations": {
             "production": {
@@ -118,7 +119,8 @@
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "projects/scion/workbench-application-platform.e2e/protractor.conf.js"
+            "protractorConfig": "projects/scion/workbench-application-platform.e2e/protractor.conf.js",
+            "webdriverUpdate": false
           },
           "configurations": {
           }
