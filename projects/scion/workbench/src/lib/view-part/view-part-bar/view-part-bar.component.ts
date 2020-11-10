@@ -242,7 +242,13 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
         viewPartRef: this._viewPart.viewPartRef,
       },
     });
-    this.unsetDragState({unsetDragSource: true});
+
+    // Wait undoing the drag state until flushed tab changes to the DOM, i.e., after the layout routing cycle completes.
+    // If we were to undo the drag state immediately during the course of the drop event, the tab layout would temporarily
+    // revert to the state before the drag operation, resulting in an ugly flicker.
+    this._workbenchLayout.whenLayoutChange().then(() => {
+      this.unsetDragState({unsetDragSource: !!this.dragSourceViewTab});
+    });
   }
 
   private unsetDragState(options: { unsetDragSource: boolean }): void {
