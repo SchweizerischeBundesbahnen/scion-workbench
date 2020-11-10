@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ApplicationRef, ComponentFactoryResolver, Injectable, Injector, OnDestroy } from '@angular/core';
+import { ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone, OnDestroy } from '@angular/core';
 import { EMPTY, of, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { createElement, setStyle } from '../dom.util';
 import { ViewDragData, ViewDragService } from './view-drag.service';
 import { ComponentPortal, DomPortalOutlet, PortalInjector } from '@angular/cdk/portal';
@@ -41,7 +41,8 @@ export class ViewTabDragImageRenderer implements OnDestroy {
               private _config: WorkbenchConfig,
               private _componentFactoryResolver: ComponentFactoryResolver,
               private _applicationRef: ApplicationRef,
-              private _injector: Injector) {
+              private _injector: Injector,
+              private _zone: NgZone) {
     this.installWindowViewDragListener();
   }
 
@@ -101,11 +102,27 @@ export class ViewTabDragImageRenderer implements OnDestroy {
   }
 
   /**
-   * Method invoked when the drag operation ends for the current window, which is when the user drops the view,
-   * or cancels the drag operation (e.g., by pressing escape key), or if the user drags the view tab outside of
-   * the current window.
+   * Method invoked when the drag operation ends for the current window, which is when the user drags the view tab outside of
+   * the current window or when the user cancels the drag operation (e.g., by pressing the escape key).
    */
   private onWindowDragLeave(): void {
+    this.disposeDragImage();
+  }
+
+  /**
+   * Method invoked when the drag operation ends for the current window which is when the user drops the view.
+   */
+  private onWindowDrop(): void {
+    // Wait for the zone to stabilize before disposing the tab drag image. Otherwise, the tabbar would flicker
+    // because the tab has not yet been rendered at its new position.
+    this._zone.onStable
+      .pipe(take(1))
+      .subscribe(() => {
+        this.disposeDragImage();
+      });
+  }
+
+  private disposeDragImage(): void {
     this._viewDragImagePortalOutlet.dispose();
     this._viewDragImagePortalOutlet = null;
     this._dragData = null;
@@ -136,8 +153,10 @@ export class ViewTabDragImageRenderer implements OnDestroy {
             this.onWindowDragOver(event);
             break;
           case 'dragleave':
-          case 'drop':
             this.onWindowDragLeave();
+            break;
+          case 'drop':
+            this.onWindowDrop();
             break;
         }
       });
