@@ -15,7 +15,7 @@ import { TestingRoutingModule } from './testing-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SciAccordionModule, SciParamsEnterModule, SciPopupShellModule, SciPropertyModule } from 'app-common';
 import { View0c4fe9e3Component } from './view-0c4fe9e3/view-0c4fe9e3.component';
-import { ViewInterationPanelComponent } from './view-interaction-panel/view-interation-panel.component';
+import { ViewInteractionPanelComponent } from './view-interaction-panel/view-interaction-panel.component';
 import { ViewNavigationPanelComponent } from './view-navigation-panel/view-navigation-panel.component';
 import { MessageBoxPanelComponent } from './message-box-panel/message-box-panel.component';
 import { WorkbenchApplicationModule } from '@scion/workbench-application.angular';
@@ -23,7 +23,7 @@ import { NotificationPanelComponent } from './notification-panel/notification-pa
 import { PopupPanelComponent } from './popup-panel/popup-panel.component';
 import { TestingPopupComponent } from './testing-popup/testing-popup.component';
 import { TestingActivityComponent } from './testing-activity/testing-activity.component';
-import { ActivityInterationPanelComponent } from './activity-interaction-panel/activity-interation-panel.component';
+import { ActivityInteractionPanelComponent } from './activity-interaction-panel/activity-interaction-panel.component';
 import { ActivityActionsPanelComponent } from './activity-actions-panel/activity-actions-panel.component';
 import { CustomNotifyActivityActionDirective } from './activity-actions-panel/custom-notify-activity-action.directive';
 import { View354aa6daComponent } from './view-354aa6da/view-354aa6da.component';
@@ -67,14 +67,14 @@ import { ViewB8bbbb11Component } from './view-b8bbbb11/view-b8bbbb11.component';
   declarations: [
     TestingViewComponent,
     ViewNavigationPanelComponent,
-    ViewInterationPanelComponent,
+    ViewInteractionPanelComponent,
     MessageBoxPanelComponent,
     PingIntentPanelComponent,
     NotificationPanelComponent,
     PopupPanelComponent,
     TestingPopupComponent,
     TestingActivityComponent,
-    ActivityInterationPanelComponent,
+    ActivityInteractionPanelComponent,
     ActivityActionsPanelComponent,
     CustomNotifyActivityActionDirective,
     ViewOpenActivityActionPanelComponent,

@@ -1,11 +1,15 @@
-@import 'common';
+@use 'sci-toolkit-styles' as sci-toolkit-styles;
 
 :host {
-  padding: app-padding();
   display: grid;
   grid-auto-rows: min-content;
   grid-row-gap: .5em;
   font-size: .9em;
+  padding: 1em;
+
+  > input {
+    @include sci-toolkit-styles.input-field();
+  }
 
   > sci-params-enter {
     background-color: #FFFFFF;
@@ -16,10 +20,10 @@
     grid-template-columns: 100px minmax(75px, 300px);
     grid-column-gap: 1em;
     grid-row-gap: .5em;
-    @include grid-container-align-items(center);
+    align-items: center;
     background-color: #FFFFFF;
 
-    border: 1px solid accentColor(.25);
+    border: 1px solid var(--sci-color-P400);
     border-radius: 5px;
     padding: 1em;
   }

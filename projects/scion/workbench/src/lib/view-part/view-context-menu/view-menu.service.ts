@@ -13,15 +13,15 @@ import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/
 import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { ViewMenuComponent } from './view-menu.component';
 import { InternalWorkbenchView, WorkbenchMenuItem, WorkbenchView } from '../../workbench.model';
-import { WorkbenchViewRegistry } from '../../workbench-view-registry.service';
+import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
 import { filter, mapTo, switchMap, take, takeUntil, tap } from 'rxjs/operators';
-import { filterArray } from '../../operators';
 import { fromEvent, merge, Observable, Subject, TeardownLogic } from 'rxjs';
-import { Arrays } from '../../array.util';
 import { coerceElement } from '@angular/cdk/coercion';
 import { TEXT, TextComponent } from '../view-context-menu/text.component';
 import { WorkbenchConfig } from '../../workbench.config';
 import { WorkbenchService } from '../../workbench.service';
+import { Arrays } from '@scion/toolkit/util';
+import { filterArray } from '@scion/toolkit/operators';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -46,8 +46,8 @@ export class ViewMenuService {
    *
    * @see {@link WorkbenchView.registerViewMenuItem}
    */
-  public async showMenu(location: Point, viewRef: string): Promise<boolean> {
-    const view = this._viewRegistry.getElseThrow(viewRef);
+  public async showMenu(location: Point, viewId: string): Promise<boolean> {
+    const view = this._viewRegistry.getElseThrow(viewId);
     const menuItems = await view.menuItems$.pipe(take(1)).toPromise();
 
     // Do not show the menu if there are no menu items registered.
@@ -97,7 +97,7 @@ export class ViewMenuService {
               return fromEvent<KeyboardEvent>(coerceElement(target), 'keydown')
                 .pipe(
                   filter(event => event.key.toLowerCase() === key.toLowerCase()), // ignore the shift modifier when comparing the pressed key
-                  filter(event => Arrays.equal(modifierKeys, getModifierState(event), false)), // check the modifier state of the pressed key
+                  filter(event => Arrays.isEqual(modifierKeys, getModifierState(event), {exactOrder: false})), // check the modifier state of the pressed key
                   tap(event => {
                     event.preventDefault();
                     event.stopPropagation();

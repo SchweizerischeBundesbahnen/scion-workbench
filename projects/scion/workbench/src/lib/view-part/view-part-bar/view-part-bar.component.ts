@@ -9,20 +9,19 @@
  */
 
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { ViewTabComponent } from '../view-tab/view-tab.component';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 import { EMPTY, Observable, Subject, timer } from 'rxjs';
-import { SciViewportComponent } from '@scion/viewport';
-import { SciDimension } from '@scion/dimension';
+import { SciViewportComponent } from '@scion/toolkit/viewport';
+import { SciDimension } from '@scion/toolkit/dimension';
 import { ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer } from '../../view-dnd/view-tab-drag-image-renderer.service';
-import { setCssVariable, unsetCssVariable } from '../../dom.util';
 import { WorkbenchService } from '../../workbench.service';
-import { Arrays } from '../../array.util';
 import { ViewListButtonComponent } from '../view-list-button/view-list-button.component';
-import { WorkbenchViewPart } from '../../workbench.model';
+import { InternalWorkbenchViewPart } from '../../workbench.model';
 import { ViewDragData, ViewDragService } from '../../view-dnd/view-drag.service';
+import { Arrays } from '@scion/toolkit/util';
+import { setCssVariable, unsetCssVariable } from '../../dom.util';
 
 /**
  * Renders the view tabbar and viewpart actions, if any.
@@ -105,14 +104,13 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
               private _workbench: WorkbenchService,
               private _workbenchLayout: WorkbenchLayoutService,
               private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
-              private _viewPart: WorkbenchViewPart,
-              private _viewPartService: WorkbenchViewPartService,
+              private _viewPart: InternalWorkbenchViewPart,
               private _viewDragService: ViewDragService) {
     this._host = host.nativeElement;
   }
 
   public ngOnInit(): void {
-    this.installGridChangeListener();
+    this.installLayoutChangeListener();
     this.installViewDragListener();
     this.installAutoScroller();
   }
@@ -123,8 +121,8 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
-  public get viewRefs$(): Observable<string[]> {
-    return this._viewPart.viewRefs$;
+  public get viewIds$(): Observable<string[]> {
+    return this._viewPart.viewIds$;
   }
 
   public onTabbarViewportDimensionChange(): void {
@@ -149,13 +147,14 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
    * Computes tabs which are not visible in the viewtabs viewport.
    */
   private computeHiddenViewTabs(): void {
-    this._viewTabs && this._viewPartService.setHiddenViewTabs(this._viewTabs
+    this._viewTabs && this._viewPart.setHiddenViewTabs(this._viewTabs
       .filter(viewTab => !viewTab.isVisibleInViewport())
-      .map(viewTab => viewTab.viewRef));
+      .map(viewTab => viewTab.viewId));
   }
 
   private scrollActiveViewTabIntoViewport(): void {
-    this._viewTabs.length && this._viewTabs.find(viewTab => viewTab.active).scrollIntoViewport();
+    // There may be no active view in the tabbar, e.g., when dragging the last view out of the tabbar.
+    this._viewTabs.find(viewTab => viewTab.active)?.scrollIntoViewport();
   }
 
   /**
@@ -164,7 +163,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   @HostListener('dragstart')
   public onViewDragStart(): void {
     this.dragData = this._viewDragService.getViewDragData();
-    this.dragSourceViewTab = this.dropTargetViewTab = this._viewTabs.find(viewTab => viewTab.viewRef === this.dragData.viewRef);
+    this.dragSourceViewTab = this.dropTargetViewTab = this._viewTabs.find(viewTab => viewTab.viewId === this.dragData.viewId);
   }
 
   /**
@@ -202,7 +201,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
 
     // Compute if the user is dragging over a viewtab drop slot. A drop slot is some valid drop target within the tabbar,
     // which is either when dragging over a viewtab or the tabbar tail.
-    const lastViewTab = Arrays.last(this._viewTabs, viewTab => viewTab !== this.dragSourceViewTab);
+    const lastViewTab = Arrays.last(this._viewTabs.toArray(), viewTab => viewTab !== this.dragSourceViewTab);
     const viewTabsWidth = lastViewTab ? (lastViewTab.host.offsetLeft + lastViewTab.host.offsetWidth) : 0;
     this.isTabDropSlotDragOver = pointerOffsetX <= viewTabsWidth + this.dragData.viewTabWidth;
   }
@@ -215,7 +214,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
 
     // Activate the view next to the view being dragged out of this tabbar.
     if (this.dragSourceViewTab && this.dragSourceViewTab.active) {
-      this._viewPartService.activateSiblingView().then();
+      this._viewPart.activateSiblingView().then();
     }
   }
 
@@ -223,6 +222,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
    * Method invoked when the user drops a view into this viewpart.
    */
   private onTabbarDrop(): void {
+    // Do nothing when the user drops the tab on the tab where the drag operation started.
     if (this.isDragSourceDragOver) {
       this.unsetDragState({unsetDragSource: true});
       return;
@@ -232,14 +232,14 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: this.dragData.appInstanceId,
-        viewPartRef: this.dragData.viewPartRef,
-        viewRef: this.dragData.viewRef,
+        partId: this.dragData.partId,
+        viewId: this.dragData.viewId,
         viewUrlSegments: this.dragData.viewUrlSegments,
       },
       target: {
         appInstanceId: this._workbench.appInstanceId,
         insertionIndex: dropIndex !== -1 ? dropIndex : undefined,
-        viewPartRef: this._viewPart.viewPartRef,
+        partId: this._viewPart.partId,
       },
     });
 
@@ -262,8 +262,8 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     unsetCssVariable(this._host, '--drag-source-width');
   }
 
-  private installGridChangeListener(): void {
-    this._workbenchLayout.afterGridChange$
+  private installLayoutChangeListener(): void {
+    this._workbenchLayout.afterLayoutChange$
       .pipe(takeUntil(this._destroy$))
       .subscribe(() => this.scrollActiveViewTabIntoViewport());
   }

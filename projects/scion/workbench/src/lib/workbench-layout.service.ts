@@ -8,16 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { mapTo } from 'rxjs/operators';
+import { asyncScheduler, BehaviorSubject, merge, Observable, Subject } from 'rxjs';
+import { Injectable, NgZone } from '@angular/core';
+import { debounce, filter, map, mapTo, observeOn, startWith, take } from 'rxjs/operators';
 import { ViewDragService } from './view-dnd/view-drag.service';
+import { PartsLayout } from './layout/parts-layout';
 
 /**
- * Allows rearrange the layout of Workbench window.
+ * Provides access to the current parts layout.
  */
 @Injectable()
 export class WorkbenchLayoutService {
+
+  private _layout: PartsLayout;
+  private readonly _layoutChange$ = new Subject<void>();
 
   private _maximized$ = new BehaviorSubject<boolean>(false);
 
@@ -38,15 +42,53 @@ export class WorkbenchLayoutService {
   public readonly messageBoxMove$ = new Subject<'start' | 'end'>();
 
   /**
-   * Notifies upon workbench layout change.
+   * Notifies upon a workbench layout change. When this Observable emits, the layout is already flushed to the DOM.
    */
-  public readonly afterGridChange$ = new Subject<void>();
+  public readonly afterLayoutChange$: Observable<void> = this._layoutChange$
+    .pipe(debounce(() => this._zone.onStable), observeOn(asyncScheduler));
 
-  constructor(viewDragService: ViewDragService) {
+  /**
+   * Emits the current {@link PartsLayout}.
+   *
+   * Upon subscription, the current layout is emitted, if any, and then emits continuously when the layout changes. It never completes.
+   */
+  public readonly layout$: Observable<PartsLayout> = this._layoutChange$
+    .pipe(
+      startWith(undefined as void),
+      map(() => this.layout),
+      filter<PartsLayout>(Boolean),
+    );
+
+  constructor(viewDragService: ViewDragService, private _zone: NgZone) {
     this.viewDrag$ = merge<'start' | 'end'>(
       viewDragService.viewDragStart$.pipe(mapTo('start')),
       viewDragService.viewDragEnd$.pipe(mapTo('end')),
     );
+  }
+
+  /**
+   * Returns a Promise that resolves on the next layout change. When this Promise resolves,
+   * the layout is already flushed to the DOM.
+   */
+  public async whenLayoutChange(): Promise<void> {
+    return this.afterLayoutChange$
+      .pipe(take(1))
+      .toPromise();
+  }
+
+  /**
+   * Sets the given {@link PartsLayout}.
+   */
+  public setLayout(layout: PartsLayout): void {
+    this._layout = layout;
+    this._layoutChange$.next();
+  }
+
+  /**
+   * Returns a reference to current {@link PartsLayout}, if any. Is `null` until the initial navigation is performed.
+   */
+  public get layout(): PartsLayout {
+    return this._layout;
   }
 
   /**

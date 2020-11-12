@@ -1,0 +1,22 @@
+@import '../workbench.constants';
+
+:host {
+  display: block;
+  position: relative; // positioning context for <sci-sashbox>
+
+  > sci-sashbox {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    --sci-sashbox-gap: 0;
+    --sci-sashbox-splitter-touch-target-size: 5px;
+    --sci-sashbox-splitter-size_hover: 9px;
+    --sci-sashbox-splitter-size: 1px;
+    --sci-sashbox-splitter-bgcolor: #{$viewpart_sash-bgcolor};
+    --sci-sashbox-splitter-opacity_active: .25;
+    --sci-sashbox-splitter-opacity_hover: .125;
+  }
+}

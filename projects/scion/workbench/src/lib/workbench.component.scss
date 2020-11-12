@@ -24,12 +24,12 @@
     flex: none;
   }
 
-  > wb-activity-part + wb-view-part-grid {
+  > wb-activity-part + wb-parts-layout {
     position: relative; // forms a stacking context to show 'box-shadow'
     box-shadow: -1px 0 2px 0 rgba(0, 0, 0, .4);
   }
 
-  > wb-view-part-grid {
+  > wb-parts-layout {
     @include preventPointerEvents;
     flex: auto;
   }

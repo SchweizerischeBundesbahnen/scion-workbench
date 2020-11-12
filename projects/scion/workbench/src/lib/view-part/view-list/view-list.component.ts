@@ -9,12 +9,12 @@
  */
 
 import { Component, ElementRef, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { animate, AnimationBuilder, style } from '@angular/animations';
 import { fromEvent, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { SciDimension } from '@scion/dimension';
+import { SciDimension } from '@scion/toolkit/dimension';
+import { InternalWorkbenchViewPart } from '../../workbench.model';
 
 @Component({
   selector: 'wb-view-list',
@@ -33,7 +33,7 @@ export class ViewListComponent implements OnInit, OnDestroy {
   public hiddenViewTabs: string[] = [];
 
   constructor(private _host: ElementRef<HTMLElement>,
-              private _viewPartService: WorkbenchViewPartService,
+              private _viewPart: InternalWorkbenchViewPart,
               private _overlayRef: OverlayRef,
               private _animationBuilder: AnimationBuilder) {
     this.installHiddenViewTabsListener();
@@ -70,7 +70,7 @@ export class ViewListComponent implements OnInit, OnDestroy {
   }
 
   private installHiddenViewTabsListener(): void {
-    this._viewPartService.hiddenViewTabs$
+    this._viewPart.hiddenViewTabs$
       .pipe(takeUntil(this._destroy$))
       .subscribe((hiddenViewTabs: string[]) => {
         this.hiddenViewTabs = hiddenViewTabs;

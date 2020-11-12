@@ -12,7 +12,7 @@ This short manual helps to install the SCION Workbench and describes how to open
     <br>
 
 ```console
-npm install @scion/workbench @scion/dimension @scion/viewport @angular/cdk --save
+npm install @scion/workbench @scion/toolkit @angular/cdk --save
 ```
 
 > SCION Workbench requires some peer dependencies to be installed. By using the above commands, those are installed as well.

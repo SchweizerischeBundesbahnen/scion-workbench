@@ -9,7 +9,7 @@
  */
 
 /**
- * Pointer events are ignored in 'activity part' and 'viewpart-grid' to allow interaction with projected content.
+ * Pointer events are ignored in 'activity part' and 'view-part' to allow interaction with projected content.
  * Projected content is out of the element flow and added to a top-level workbench DOM element. It is projected
  * into respective view or activity bounding box.
  *

@@ -1,5 +1,6 @@
-import { coerceArray, coerceElement } from '@angular/cdk/coercion';
+import { coerceElement } from '@angular/cdk/coercion';
 import { ElementRef } from '@angular/core';
+import { Arrays } from '@scion/toolkit/util';
 
 /**
  * Creates a HTML element and optionally adds it to the DOM.
@@ -7,7 +8,7 @@ import { ElementRef } from '@angular/core';
 export function createElement(tag: string, options: ElementCreateOptions): HTMLElement {
   const element = document.createElement(tag);
   options.style && setStyle(element, options.style);
-  options.cssClass && element.classList.add(...coerceArray(options.cssClass));
+  options.cssClass && element.classList.add(...Arrays.coerce(options.cssClass));
   options.text && (element.innerText = options.text);
   options.parent && options.parent.appendChild(element);
   return element;
@@ -40,7 +41,7 @@ export function setCssVariable(element: HTMLElement | ElementRef<HTMLElement>, k
 /**
  * Removes the CSS variable of the given key.
  */
-export function unsetCssVariable(element: HTMLElement | ElementRef<HTMLElement>, key: string, value?: any): void {
+export function unsetCssVariable(element: HTMLElement | ElementRef<HTMLElement>, key: string): void {
   coerceElement(element).style.removeProperty(key);
 }
 

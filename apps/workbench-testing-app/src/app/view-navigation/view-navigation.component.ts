@@ -10,10 +10,10 @@
 
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { SciParamsEnterComponent } from 'app-common';
 import { WbNavigationExtras, WorkbenchRouter, WorkbenchView } from '@scion/workbench';
 import { Params } from '@angular/router';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
+import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
 
 const PATH = 'path';
 const QUERY_PARAMS = 'queryParams';
@@ -56,13 +56,13 @@ export class ViewNavigationComponent {
   }
 
   public onNavigate(): void {
-    const matrixParams: Params = SciParamsEnterComponent.toParams(this.form.get(MATRIX_PARAMS) as FormArray);
+    const matrixParams: Params = SciParamsEnterComponent.toParamsDictionary(this.form.get(MATRIX_PARAMS) as FormArray);
     const extras: WbNavigationExtras = {
-      queryParams: SciParamsEnterComponent.toParams(this.form.get(QUERY_PARAMS) as FormArray),
+      queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUERY_PARAMS) as FormArray),
       activateIfPresent: this.form.get(ACTIVATE_IF_PRESENT).value,
       closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
       target: this.form.get(TARGET).value,
-      selfViewRef: this._view.viewRef,
+      selfViewId: this._view.viewId,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
     };
 

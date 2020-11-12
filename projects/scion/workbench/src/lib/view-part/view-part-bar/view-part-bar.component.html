@@ -4,9 +4,9 @@
               (scroll)="onScroll()">
   <div class="viewport-client" [class.drag-over]="isDragOver"
        sciDimension (sciDimensionChange)="onTabbarViewportClientDimensionChange($event)">
-    <wb-view-tab *ngFor="let viewRef of viewRefs$ | async"
+    <wb-view-tab *ngFor="let viewId of viewIds$ | async"
                  #viewtab
-                 [viewRef]="viewRef"
+                 [viewId]="viewId"
                  context="tabbar"
                  [class.drop-target]="viewtab === dropTargetViewTab"
                  [class.drag-source]="viewtab === dragSourceViewTab">

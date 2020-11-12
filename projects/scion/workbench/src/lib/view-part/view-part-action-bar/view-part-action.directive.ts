@@ -55,7 +55,7 @@ export class ViewPartActionDirective implements OnInit, OnDestroy {
       this._action = (this._viewPart || this._workbench).registerViewPartAction({
         templateOrComponent: this._template,
         align: this.align,
-        viewRef: this._view && this._view.viewRef,
+        viewId: this._view?.viewId,
       });
     });
   }

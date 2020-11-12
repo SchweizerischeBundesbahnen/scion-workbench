@@ -9,21 +9,23 @@
  */
 
 import { Component } from '@angular/core';
-import { WorkbenchActivity } from '@scion/workbench-application.angular';
+import { WorkbenchView } from '@scion/workbench';
 import { Observable } from 'rxjs';
 import { map, scan } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-activity-interaction-panel',
-  templateUrl: './activity-interation-panel.component.html',
-  styleUrls: ['./activity-interation-panel.component.scss'],
+  selector: 'app-view-interaction',
+  templateUrl: './view-interaction.component.html',
+  styleUrls: ['./view-interaction.component.scss'],
 })
-export class ActivityInterationPanelComponent {
+export class ViewInteractionComponent {
 
   public activeLog$: Observable<string>;
 
-  constructor(public activity: WorkbenchActivity) {
-    this.activeLog$ = activity.active$
+  constructor(public view: WorkbenchView) {
+    this.view.title = 'View Interaction';
+    this.view.heading = 'Interact with the view';
+    this.activeLog$ = view.active$
       .pipe(
         scan((acc: boolean[], active: boolean) => [...acc, active], [] as boolean[]),
         map(activeLog => activeLog.join('\n')),

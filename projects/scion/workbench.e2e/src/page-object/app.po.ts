@@ -10,18 +10,27 @@
 
 import { $, $$, browser, ElementFinder, Key, protractor } from 'protractor';
 import { getCssClasses } from '../util/testing.util';
-import { Duration, Severity } from '@scion/workbench-application-platform.api';
 import { ISize } from 'selenium-webdriver';
 import { WelcomePagePO } from './welcome-page.po';
+
+declare type Duration = 'short' | 'medium' | 'long' | 'infinite';
+declare type Severity = 'info' | 'warn' | 'error';
 
 export class AppPO {
 
   /**
-   * Returns a handle representing the view tab of given `viewRef` or which has given CSS class set.
+   * Returns a handle representing the view tab of given `viewId`, or which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
+   *
+   * @param findBy - Specifies how to find the view tab. Either `viewId` or `cssClass` must be set.
+   *        <ul>
+   *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
+   *          <li>viewId?: Identifies the view by its id/li>
+   *          <li>cssClass?: Identifies the view by its CSS class</li>
+   *        </ul>
    */
-  public findViewTab(viewPartRef: string, findBy: { viewRef?: string, cssClass?: string }): ViewTabPO {
-    const viewTabFinder = createViewTabFinder(viewPartRef, findBy);
+  public findViewTab(findBy: { partId?: string, viewId?: string, cssClass?: string }): ViewTabPO {
+    const viewTabFinder = createViewTabFinder(findBy);
 
     return new class implements ViewTabPO {
       async isPresent(): Promise<boolean> {
@@ -64,24 +73,27 @@ export class AppPO {
   }
 
   /**
-   * Returns the number of view tabs in the specified viewpart.
+   * Returns the number of view tabs in the specified viewpart, or in the active viewpart if not specifying a part.
    *
    * Optionally, provide a CSS class to only count view tabs of given view.
    */
-  public async getViewTabCount(viewPartRef: string, viewCssClass?: string): Promise<number> {
-    if (viewCssClass) {
-      return createViewPartBarFinder(viewPartRef).$$(`wb-view-tab.${viewCssClass}`).count();
+  public async getViewTabCount(findBy?: { partId?: string, viewCssClass?: string }): Promise<number> {
+    const {partId, viewCssClass} = findBy || {};
+
+    const viewpartFinder = createViewPartBarFinder(partId);
+    if (!viewCssClass) {
+      return viewpartFinder.$$('wb-view-tab').count();
     }
-    return createViewPartBarFinder(viewPartRef).$$('wb-view-tab').count();
+    return viewpartFinder.$$(`wb-view-tab.${viewCssClass}`).count();
   }
 
   /**
    * Returns the view tab view references in the order as displayed in the view tab bar.
    */
-  public async getViewTabs(viewPartRef: string): Promise<string[]> {
-    const viewTabsFinder = createViewPartBarFinder(viewPartRef).$$('wb-view-tab');
+  public async getViewTabs(partId?: string): Promise<string[]> {
+    const viewTabsFinder = createViewPartBarFinder(partId).$$('wb-view-tab');
     return viewTabsFinder.reduce((acc: string[], viewTabFinder: ElementFinder) => {
-      return viewTabFinder.getAttribute('viewref').then(viewRef => acc.concat(viewRef));
+      return viewTabFinder.getAttribute('data-viewid').then(viewId => acc.concat(viewId));
     }, []);
   }
 
@@ -100,7 +112,7 @@ export class AppPO {
   }
 
   /**
-   * Returns `true` if the default page is showing, or `false` otherwise.
+   * Returns `true` if the entry point page is showing, or `false` otherwise.
    */
   public async isDefaultPageShowing(componentSelector: string): Promise<boolean> {
     return $('wb-workbench').$('main').$(componentSelector).isPresent();
@@ -266,8 +278,8 @@ export class AppPO {
   /**
    * Closes all views of all viewparts.
    */
-  public async closeAllViewTabs(viewPartRef: string): Promise<void> {
-    const viewPartBarFinder = createViewPartBarFinder(viewPartRef);
+  public async closeAllViewTabs(partId?: string): Promise<void> {
+    const viewPartBarFinder = createViewPartBarFinder(partId);
     return viewPartBarFinder.$('wb-view-tab').sendKeys(Key.chord(Key.CONTROL, Key.ALT, Key.SHIFT, 'k'));
   }
 
@@ -489,18 +501,34 @@ export interface ViewPartActionPO {
   click(): Promise<void>;
 }
 
-function createViewPartBarFinder(viewPartRef: string): ElementFinder {
-  return $(`wb-view-part[viewpartref="${viewPartRef}"] wb-view-part-bar`);
+/**
+ * Allows finding the tabbar in the given part, or in the active part if not specifying a part.
+ */
+function createViewPartBarFinder(partId?: string): ElementFinder {
+  if (partId) {
+    return $(`wb-view-part[data-partid="${partId}"]`).$('wb-view-part-bar');
+  }
+  return $('wb-view-part.active').$('wb-view-part-bar');
 }
 
-function createViewTabFinder(viewPartRef: string, findBy: { viewRef?: string, cssClass?: string }): ElementFinder {
-  const viewPartBarFinder = createViewPartBarFinder(viewPartRef);
+/**
+ * Allows finding a view tab.
+ *
+ * @param findBy - Specifies how to find the view tab. Either `viewId` or `cssClass` must be set.
+ *        <ul>
+ *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
+ *          <li>viewId?: Identifies the view by its id/li>
+ *          <li>cssClass?: Identifies the view by its CSS class</li>
+ *        </ul>
+ */
+function createViewTabFinder(findBy: { partId?: string, viewId?: string, cssClass?: string }): ElementFinder {
+  const viewPartBarFinder = createViewPartBarFinder(findBy.partId);
 
-  if (findBy.viewRef !== undefined) {
-    return viewPartBarFinder.$(`wb-view-tab[viewref="${findBy.viewRef}"]`);
+  if (findBy.viewId !== undefined) {
+    return viewPartBarFinder.$(`wb-view-tab[data-viewid="${findBy.viewId}"]`);
   }
   else if (findBy.cssClass !== undefined) {
     return viewPartBarFinder.$(`wb-view-tab.${findBy.cssClass}`);
   }
-  throw Error('[IllegalArgumentError] \'viewRef\' or \'cssClass\' required to find a view tab');
+  throw Error('[IllegalArgumentError] \'viewId\' or \'cssClass\' required to find a view tab');
 }

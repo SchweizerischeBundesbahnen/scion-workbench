@@ -10,10 +10,9 @@
 
 import { Injectable, NgZone } from '@angular/core';
 import { EMPTY, fromEvent, merge, Observable, Observer, of, Subject, TeardownLogic } from 'rxjs';
-import { coerceArray } from '@angular/cdk/coercion';
 import { filter, take, takeUntil } from 'rxjs/operators';
 import { BroadcastChannelService } from '../broadcast-channel.service';
-import { Defined } from '../defined.util';
+import { Arrays, Defined } from '@scion/toolkit/util';
 import { UrlSegment } from '@angular/router';
 
 /**
@@ -84,7 +83,7 @@ export class ViewDragService {
     const emitOutsideAngular = Defined.orElse(options && options.emitOutsideAngular, false);
 
     const fromEvent$ = (eventName: ViewDragEventType): Observable<DragEvent> => {
-      if (!options || !options.eventType || coerceArray(options.eventType).includes(eventName)) {
+      if (!options || !options.eventType || Arrays.coerce(options.eventType).includes(eventName)) {
         return fromEvent<DragEvent>(target, eventName, options);
       }
       return EMPTY;
@@ -210,13 +209,13 @@ export interface ViewDragData {
    * Y-coordinate of the mouse pointer, relative to the view tab drag image.
    */
   viewTabPointerOffsetY: number;
-  viewRef: string;
+  viewId: string;
   viewTitle: string;
   viewUrlSegments: UrlSegment[];
   viewHeading: string;
   viewClosable: boolean;
   viewDirty: boolean;
-  viewPartRef: string;
+  partId: string;
   viewTabWidth: number;
   viewTabHeight: number;
   appInstanceId: string;
@@ -227,15 +226,32 @@ export interface ViewDragData {
  */
 export interface ViewMoveEvent {
   source: {
-    viewRef: string;
-    viewPartRef: string;
+    viewId: string;
+    partId: string;
     viewUrlSegments: UrlSegment[],
     appInstanceId: string;
   };
   target: {
-    viewPartRef: string;
-    viewPartRegion?: 'north' | 'east' | 'south' | 'west' | 'center';
+    /**
+     * Part to which to add the view. If using a {@link region} other than 'center', that part is used as a reference for creating a new part.
+     */
+    partId: string;
+    /**
+     * Identity of the new part to be created, if the region is either 'north', 'east', 'south', or 'west'.
+     * If not set, a UUID is generated.
+     */
+    newPartId?: string;
+    /**
+     * Region of the {@link partId part} where to add the view. If using a region other than 'center', creates a new part in that region.
+     */
+    region?: 'north' | 'east' | 'south' | 'west' | 'center';
+    /**
+     * Tab index in the tabbar where to add the view tab. If not set, then the view tab is added as last view tab.
+     */
     insertionIndex?: number;
+    /**
+     * Identity of the window where to move the view to.
+     */
     appInstanceId: string | 'new';
   };
 }

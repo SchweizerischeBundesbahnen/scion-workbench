@@ -138,6 +138,21 @@
     //      ],
     //      "app-common/*": [
     //        "projects/app-common/src/*"
+    //      ],
+    //      "@scion/toolkit/util": [
+    //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
+    //      ],
+    //      "@scion/toolkit/operators": [
+    //        "../scion-toolkit/projects/scion/toolkit/operators/src/public_api"
+    //      ],
+    //      "@scion/toolkit/dimension": [
+    //        "../scion-toolkit/projects/scion/toolkit/dimension/src/public_api"
+    //      ],
+    //      "@scion/toolkit/observable": [
+    //        "../scion-toolkit/projects/scion/toolkit/observable/src/public_api"
+    //      ],
+    //      "@scion/toolkit/sashbox": [
+    //        "../scion-toolkit/projects/scion/toolkit/sashbox/src/public_api"
     //      ]
     //    }
   }

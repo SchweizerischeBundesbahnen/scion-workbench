@@ -15,10 +15,10 @@ import { map, scan } from 'rxjs/operators';
 
 @Component({
   selector: 'app-view-interaction-panel',
-  templateUrl: './view-interation-panel.component.html',
-  styleUrls: ['./view-interation-panel.component.scss'],
+  templateUrl: './view-interaction-panel.component.html',
+  styleUrls: ['./view-interaction-panel.component.scss'],
 })
-export class ViewInterationPanelComponent {
+export class ViewInteractionPanelComponent {
 
   public activeLog$: Observable<string>;
 

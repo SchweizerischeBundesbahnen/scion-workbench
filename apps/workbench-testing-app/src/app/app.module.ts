@@ -12,9 +12,9 @@ import { ViewComponent } from './view/view.component';
 import { View4a3a8932Component } from './view-4a3a8932/view-4a3a8932.component';
 import { ViewNavigationComponent } from './view-navigation/view-navigation.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SciParamsEnterModule, SciPropertyModule } from 'app-common';
 import { ViewBb9700a6Component } from './view-bb9700a6/view-bb9700a6.component';
-import { ViewInterationComponent } from './view-interaction/view-interation.component';
+import { ViewInteractionComponent } from './view-interaction/view-interaction.component';
+import { SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule, SciPropertyModule } from '@scion/toolkit.internal/widgets';
 
 @NgModule({
   declarations: [
@@ -26,7 +26,7 @@ import { ViewInterationComponent } from './view-interaction/view-interation.comp
     View4a3a8932Component,
     ViewBb9700a6Component,
     ViewNavigationComponent,
-    ViewInterationComponent,
+    ViewInteractionComponent,
   ],
   imports: [
     BrowserModule,
@@ -37,6 +37,8 @@ import { ViewInterationComponent } from './view-interaction/view-interation.comp
     ReactiveFormsModule,
     SciParamsEnterModule,
     SciPropertyModule,
+    SciFormFieldModule,
+    SciCheckboxModule,
   ],
   providers: [],
   bootstrap: [

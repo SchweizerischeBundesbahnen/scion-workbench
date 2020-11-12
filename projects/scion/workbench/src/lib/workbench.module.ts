@@ -10,7 +10,6 @@
 
 import { Inject, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { WorkbenchComponent } from './workbench.component';
 import { ActivityPartComponent } from './activity-part/activity-part.component';
 import { SashDirective } from './sash.directive';
@@ -24,19 +23,17 @@ import { ViewListButtonComponent } from './view-part/view-list-button/view-list-
 import { ViewPartBarComponent } from './view-part/view-part-bar/view-part-bar.component';
 import { InternalWorkbenchService, WorkbenchService } from './workbench.service';
 import { ViewDropZoneDirective } from './view-dnd/view-drop-zone.directive';
-import { ViewPartGridComponent } from './view-part-grid/view-part-grid.component';
+import { PartsLayoutComponent } from './layout/parts-layout.component';
 import { RemoteSiteComponent } from './remote-site/remote-site.component';
 import { WorkbenchLayoutService } from './workbench-layout.service';
 import { ViewComponent } from './view/view.component';
 import { WbRouterOutletDirective } from './routing/wb-router-outlet.directive';
-import { ViewPartSashBoxComponent } from './view-part-sash-box/view-part-sash-box.component';
-import { ViewPartGridSerializerService } from './view-part-grid/view-part-grid-serializer.service';
+import { TreeNodeComponent } from './layout/tree-node.component';
 import { WbPortalOutletComponent } from './portal/wb-portal-outlet.component';
-import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
 import { WorkbenchRouter } from './routing/workbench-router.service';
 import { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './routing/wb-router-link.directive';
-import { WorkbenchViewRegistry } from './workbench-view-registry.service';
+import { WorkbenchViewRegistry } from './view/workbench-view.registry';
 import { OverlayHostRef } from './overlay-host-ref.service';
 import { WorkbenchUrlObserver } from './workbench-url-observer.service';
 import { WbActivityActionDirective } from './activity-part/wb-activity-action.directive';
@@ -55,8 +52,9 @@ import { APP_MESSAGE_BOX_SERVICE, MessageBoxService } from './message-box/messag
 import { EmptyOutletComponent } from './routing/empty-outlet.component';
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
-import { SciViewportModule } from '@scion/viewport';
-import { SciDimensionModule } from '@scion/dimension';
+import { SciViewportModule } from '@scion/toolkit/viewport';
+import { SciDimensionModule } from '@scion/toolkit/dimension';
+import { SciSashboxModule } from '@scion/toolkit/sashbox';
 import { ActivityResolver } from './routing/activity.resolver';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
@@ -66,18 +64,20 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { ViewPartActionDirective } from './view-part/view-part-action-bar/view-part-action.directive';
 import { ViewPartActionBarComponent } from './view-part/view-part-action-bar/view-part-action-bar.component';
 import { TaskScheduler } from './task-scheduler.service';
-import { WorkbenchViewPartRegistry } from './view-part-grid/workbench-view-part-registry.service';
+import { WorkbenchViewPartRegistry } from './view-part/workbench-view-part.registry';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 import { ViewTabContentComponent } from './view-part/view-tab-content/view-tab-content.component';
 import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
 import { ViewMenuComponent } from './view-part/view-context-menu/view-menu.component';
 import { ViewMenuItemDirective } from './view-part/view-context-menu/view-menu.directive';
 import { WbFormatAcceleratorPipe } from './view-part/view-context-menu/accelerator-format.pipe';
-import { ViewPartGridProvider } from './view-part-grid/view-part-grid-provider.service';
 import { TextComponent } from './view-part/view-context-menu/text.component';
 import { ViewMenuService } from './view-part/view-context-menu/view-menu.service';
 import { ArrayCoercePipe } from './array-coerce.pipe';
 import { ArrayConcatPipe } from './array-concat.pipe';
+import { ViewPortalPipe } from './view/view-portal.pipe';
+import { PartsLayoutFactory } from './layout/parts-layout.factory';
+import { ViewDropHandler } from './layout/view-drop-handler.service';
 
 @NgModule({
   imports: [
@@ -87,6 +87,7 @@ import { ArrayConcatPipe } from './array-concat.pipe';
     ReactiveFormsModule,
     SciViewportModule,
     SciDimensionModule,
+    SciSashboxModule,
     OverlayModule,
     A11yModule,
   ],
@@ -102,9 +103,9 @@ import { ArrayConcatPipe } from './array-concat.pipe';
     ViewTabContentComponent,
     ViewListButtonComponent,
     ViewListComponent,
-    ViewPartGridComponent,
+    PartsLayoutComponent,
     SashDirective,
-    ViewPartSashBoxComponent,
+    TreeNodeComponent,
     ViewDropZoneDirective,
     WbPortalOutletComponent,
     RemoteSiteComponent,
@@ -127,6 +128,7 @@ import { ArrayConcatPipe } from './array-concat.pipe';
     TextComponent,
     ArrayCoercePipe,
     ArrayConcatPipe,
+    ViewPortalPipe,
   ],
   exports: [
     WorkbenchComponent,
@@ -146,7 +148,8 @@ export class WorkbenchModule {
   constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any,
               auxiliaryRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
               workbenchUrlObserver: WorkbenchUrlObserver,
-              viewMenuService: ViewMenuService) {
+              viewMenuService: ViewMenuService,
+              viewDropService: ViewDropHandler) {
     auxiliaryRoutesRegistrator.registerActivityAuxiliaryRoutes();
     viewMenuService.registerBuiltInMenuItems();
   }
@@ -190,16 +193,13 @@ export class WorkbenchModule {
         {
           provide: VIEW_COMPONENT_TYPE, useValue: ViewComponent,
         },
-
         WorkbenchLayoutService,
         WorkbenchActivityPartService,
         WorkbenchAuxiliaryRoutesRegistrator,
         ActivityResolver,
         NotificationService,
         MessageBoxService,
-        ViewPartGridSerializerService,
         WorkbenchUrlObserver,
-        WbBeforeDestroyGuard,
         WorkbenchViewRegistry,
         WorkbenchViewPartRegistry,
         OverlayHostRef,
@@ -209,7 +209,7 @@ export class WorkbenchModule {
         PopupService,
         TaskScheduler,
         ViewActivationInstantProvider,
-        ViewPartGridProvider,
+        PartsLayoutFactory,
         {
           provide: APP_MESSAGE_BOX_SERVICE,
           useExisting: MessageBoxService,

@@ -16,7 +16,7 @@ import { WbBeforeDestroy } from '../workbench.model';
 /**
  * Invokes 'wbBeforeDestroy' lifecycle hook, if applicable.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WbBeforeDestroyGuard implements CanDeactivate<any> {
 
   public canDeactivate(component: any,

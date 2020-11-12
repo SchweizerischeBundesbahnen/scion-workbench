@@ -1,7 +1,7 @@
 :host {
   display: flex;
 
-  > wb-view-part-sash-box, > wb-portal-outlet {
+  > wb-tree-node, > wb-portal-outlet {
     flex: auto;
   }
 }

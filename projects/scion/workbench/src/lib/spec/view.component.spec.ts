@@ -9,8 +9,8 @@
  */
 
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
-import { NgModule, Type } from '@angular/core';
-import { ViewPartGridComponent } from '../view-part-grid/view-part-grid.component';
+import { NgModule } from '@angular/core';
+import { PartsLayoutComponent } from '../layout/parts-layout.component';
 import { WorkbenchService } from '../workbench.service';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { By } from '@angular/platform-browser';
@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
 import { SpecView1Component, SpecView2Component } from './view-part.model.spec';
 import { ViewComponent } from '../view/view.component';
 import { WorkbenchView } from '../workbench.model';
-import { WorkbenchViewRegistry } from '../workbench-view-registry.service';
+import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
 import { WorkbenchTestingModule } from './workbench-testing.module';
@@ -37,12 +37,12 @@ describe('ViewComponent', () => {
   }));
 
   it('should render dirty state', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set dirty flag
@@ -63,12 +63,12 @@ describe('ViewComponent', () => {
   })));
 
   it('should render heading text', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set heading
@@ -86,12 +86,12 @@ describe('ViewComponent', () => {
   })));
 
   it('should render title', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set heading
@@ -109,12 +109,12 @@ describe('ViewComponent', () => {
   })));
 
   it('should detach inactive views from Angular component tree and DOM', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     const component1: SpecView1Component = view1DebugElement.component;
@@ -125,7 +125,7 @@ describe('ViewComponent', () => {
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(B)');
 
     // Add View 2
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView2Component>('view.2');
     const component2: SpecView2Component = view2DebugElement.component;
@@ -143,7 +143,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).toBeFalsy('(H)');
 
     // Switch to View 1
-    getWorkbenchService().activateView('view.1').then();
+    TestBed.inject(WorkbenchService).activateView('view.1').then();
     advance(fixture);
 
     view1DebugElement.component.checked = false;
@@ -159,7 +159,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.2').component.destroyed).toBeFalsy('(N)');
 
     // Switch to View 2
-    getWorkbenchService().activateView('view.2').then();
+    TestBed.inject(WorkbenchService).activateView('view.2').then();
     advance(fixture);
 
     view1DebugElement.component.checked = false;
@@ -178,19 +178,19 @@ describe('ViewComponent', () => {
   })));
 
   it('invokes activate and deactivate lifecycle hooks', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     expect(view1DebugElement.view.active).toBeTruthy('(A)');
     expect(view1DebugElement.component.activated).toBeTruthy('(B)');
 
     // Add View 2
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView1Component>('view.2');
     expect(view1DebugElement.view.active).toBeFalsy('(C)');
@@ -199,7 +199,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.activated).toBeTruthy('(F)');
 
     // Switch to View 1
-    getWorkbenchService().activateView('view.1').then();
+    TestBed.inject(WorkbenchService).activateView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.active).toBeTruthy('(G)');
@@ -208,7 +208,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.activated).toBeFalsy('(J)');
 
     // Switch to View 2
-    getWorkbenchService().activateView('view.2').then();
+    TestBed.inject(WorkbenchService).activateView('view.2').then();
     advance(fixture);
 
     expect(view1DebugElement.view.active).toBeFalsy('(K)');
@@ -220,19 +220,19 @@ describe('ViewComponent', () => {
   })));
 
   it('invokes destroy lifecycle hook', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     expect(view1DebugElement.view.destroyed).toBeFalsy('(A)');
     expect(view1DebugElement.component.destroyed).toBeFalsy('(B)');
 
     // Add View 2
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView1Component>('view.2');
     expect(view1DebugElement.view.destroyed).toBeFalsy('(C)');
@@ -241,7 +241,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.destroyed).toBeFalsy('(F)');
 
     // Destroy to View 2
-    getWorkbenchService().destroyView('view.2').then();
+    TestBed.inject(WorkbenchService).destroyView('view.2').then();
     advance(fixture);
     expect(view1DebugElement.view.destroyed).toBeFalsy('(G)');
     expect(view1DebugElement.component.destroyed).toBeFalsy('(H)');
@@ -249,7 +249,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.destroyed).toBeTruthy('(J)');
 
     // Destroy to View 1
-    getWorkbenchService().destroyView('view.1').then();
+    TestBed.inject(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
     expect(view1DebugElement.view.destroyed).toBeTruthy('(K)');
     expect(view1DebugElement.component.destroyed).toBeTruthy('(L)');
@@ -263,18 +263,18 @@ describe('ViewComponent', () => {
   })));
 
   it('prevents the view from being destroyed', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
 
     // Try destroy to View 1 (prevent)
     view1DebugElement.component.preventDestroy = true;
-    getWorkbenchService().destroyView('view.1').then();
+    TestBed.inject(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.destroyed).toBeFalsy('(A)');
@@ -283,7 +283,7 @@ describe('ViewComponent', () => {
 
     // Try destroy to View 1 (accept)
     view1DebugElement.component.preventDestroy = false;
-    getWorkbenchService().destroyView('view.1').then();
+    TestBed.inject(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
 
     expect(view1DebugElement.view.destroyed).toBeTruthy('(D)');
@@ -294,12 +294,12 @@ describe('ViewComponent', () => {
   })));
 
   it('allows component routing', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement1.component.destroyed).toBeFalsy('(A)');
@@ -307,7 +307,7 @@ describe('ViewComponent', () => {
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(C)');
 
     // Route to View 2
-    wbRouter.navigate(['view-2'], {blankViewPartRef: 'viewpart.1', target: 'self', selfViewRef: 'view.1'}).then();
+    wbRouter.navigate(['view-2'], {target: 'self', selfViewId: 'view.1'}).then();
     advance(fixture);
 
     const viewDebugElement2 = getViewDebugElement<SpecView2Component>('view.1');
@@ -325,12 +325,12 @@ describe('ViewComponent', () => {
   })));
 
   it('allows a view to be added, removed and to be added again', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
-    const fixture = TestBed.createComponent(ViewPartGridComponent);
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement1.component.destroyed).toBeFalsy('(A)');
@@ -345,7 +345,7 @@ describe('ViewComponent', () => {
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(F)');
 
     // Remove View 1 again
-    wbRouter.navigate(['view-1'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement2 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement2.component.destroyed).toBeFalsy('(G)');
@@ -362,8 +362,8 @@ describe('ViewComponent', () => {
     tick();
   })));
 
-  function getViewDebugElement<T>(viewRef: string): ViewDebugElement<T> {
-    const view = TestBed.inject(WorkbenchViewRegistry).getElseThrow(viewRef);
+  function getViewDebugElement<T>(viewId: string): ViewDebugElement<T> {
+    const view = TestBed.inject(WorkbenchViewRegistry).getElseThrow(viewId);
     const viewComponent = view.portal.componentRef.instance as ViewComponent;
     const component = viewComponent.routerOutlet.component as T;
 
@@ -394,7 +394,3 @@ describe('ViewComponent', () => {
 class AppTestModule {
 }
 
-function getWorkbenchService(): WorkbenchService {
-  // TODO [Angular 9]: remove type cast for abstract symbols once 'angular/issues/29905' and 'angular/issues/23611' are fixed
-  return TestBed.inject(WorkbenchService as Type<WorkbenchService>);
-}

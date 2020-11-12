@@ -14,7 +14,7 @@
 export { WorkbenchModule } from './lib/workbench.module';
 export { WorkbenchTestingModule } from './lib/spec/workbench-testing.module';
 export { WorkbenchService } from './lib/workbench.service';
-export { WorkbenchView, WorkbenchViewPart, WbBeforeDestroy } from './lib/workbench.model';
+export { WorkbenchViewPart, WorkbenchView, WbBeforeDestroy, WorkbenchViewPartAction } from './lib/workbench.model';
 export { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './lib/routing/wb-router-link.directive';
 export { WorkbenchRouter, WbNavigationExtras } from './lib/routing/workbench-router.service';
 export { WorkbenchAuxiliaryRoutesRegistrator } from './lib/routing/workbench-auxiliary-routes-registrator.service';
