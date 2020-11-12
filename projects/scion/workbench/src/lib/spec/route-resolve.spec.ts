@@ -16,9 +16,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
-import { WorkbenchView } from '../workbench.model';
 import { WorkbenchTestingModule } from './workbench-testing.module';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
+import { WorkbenchView } from '../view/workbench-view.model';
 
 describe('ViewOutletNavigator', () => {
 

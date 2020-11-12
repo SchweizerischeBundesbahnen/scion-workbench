@@ -9,12 +9,12 @@
  */
 
 import { Directive, HostBinding, HostListener, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
-import { WorkbenchView } from '../workbench.model';
 import { WbNavigationExtras, WorkbenchRouter } from './workbench-router.service';
 import { noop } from 'rxjs';
 import { LocationStrategy } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WorkbenchService } from '../workbench.service';
+import { WorkbenchView } from '../view/workbench-view.model';
 
 /**
  * Like 'RouterLink' but with functionality to target a view outlet.

@@ -12,7 +12,7 @@ import { Component, ElementRef, HostBinding, HostListener, Injector } from '@ang
 import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { ViewListComponent } from '../view-list/view-list.component';
-import { InternalWorkbenchViewPart } from '../../workbench.model';
+import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
 
 @Component({
   selector: 'wb-view-list-button',
@@ -29,7 +29,7 @@ export class ViewListButtonComponent {
     return this._viewPart.hiddenViewTabCount > 0;
   }
 
-  constructor(private _viewPart: InternalWorkbenchViewPart,
+  constructor(private _viewPart: ɵWorkbenchViewPart,
               private _host: ElementRef,
               private _overlay: Overlay,
               private _injector: Injector) {

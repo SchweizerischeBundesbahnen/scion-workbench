@@ -10,10 +10,11 @@
 
 import { ComponentFactoryResolver, Injectable, Injector, IterableDiffers } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
-import { InternalWorkbenchViewPart, WorkbenchViewPart } from '../workbench.model';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { VIEW_PART_COMPONENT_TYPE } from '../workbench.constants';
 import { PartsLayout } from '../layout/parts-layout';
+import { ɵWorkbenchViewPart } from './ɵworkbench-view-part';
+import { WorkbenchViewPart } from './workbench-view-part';
 
 /**
  * Registry for {WorkbenchViewPart} objects.
@@ -21,7 +22,7 @@ import { PartsLayout } from '../layout/parts-layout';
 @Injectable()
 export class WorkbenchViewPartRegistry {
 
-  private readonly _viewPartRegistry = new Map<string, InternalWorkbenchViewPart>();
+  private readonly _viewPartRegistry = new Map<string, ɵWorkbenchViewPart>();
 
   constructor(private _differs: IterableDiffers,
               private _injector: Injector,
@@ -66,14 +67,14 @@ export class WorkbenchViewPartRegistry {
     });
   }
 
-  private createWorkbenchViewPart(partId: string): InternalWorkbenchViewPart {
+  private createWorkbenchViewPart(partId: string): ɵWorkbenchViewPart {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_PART_COMPONENT_TYPE));
-    const viewPart = new InternalWorkbenchViewPart(partId, portal, this._injector);
+    const viewPart = new ɵWorkbenchViewPart(partId, portal, this._injector);
 
     portal.init({
       injectorTokens: new WeakMap()
         .set(WorkbenchViewPart, viewPart)
-        .set(InternalWorkbenchViewPart, viewPart),
+        .set(ɵWorkbenchViewPart, viewPart),
     });
 
     return viewPart;
@@ -82,7 +83,7 @@ export class WorkbenchViewPartRegistry {
   /**
    * Returns the {@link WorkbenchViewPart} of the given identity, or throws an Error if not found.
    */
-  public getElseThrow(partId: string): InternalWorkbenchViewPart {
+  public getElseThrow(partId: string): ɵWorkbenchViewPart {
     const viewPart = this._viewPartRegistry.get(partId);
     if (!viewPart) {
       throw Error(`[NullPartError] Part '${partId}' not found in the registry.`);

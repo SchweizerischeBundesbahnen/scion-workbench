@@ -18,10 +18,10 @@ import { SciDimension } from '@scion/toolkit/dimension';
 import { ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer } from '../../view-dnd/view-tab-drag-image-renderer.service';
 import { WorkbenchService } from '../../workbench.service';
 import { ViewListButtonComponent } from '../view-list-button/view-list-button.component';
-import { InternalWorkbenchViewPart } from '../../workbench.model';
 import { ViewDragData, ViewDragService } from '../../view-dnd/view-drag.service';
 import { Arrays } from '@scion/toolkit/util';
 import { setCssVariable, unsetCssVariable } from '../../dom.util';
+import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
 
 /**
  * Renders the view tabbar and viewpart actions, if any.
@@ -104,7 +104,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
               private _workbench: WorkbenchService,
               private _workbenchLayout: WorkbenchLayoutService,
               private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
-              private _viewPart: InternalWorkbenchViewPart,
+              private _viewPart: ɵWorkbenchViewPart,
               private _viewDragService: ViewDragService) {
     this._host = host.nativeElement;
   }

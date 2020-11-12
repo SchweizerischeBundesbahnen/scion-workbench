@@ -10,7 +10,6 @@
 
 import { ComponentFactoryResolver, Injectable, Injector, OnDestroy } from '@angular/core';
 import { ROUTER_OUTLET_NAME, VIEW_COMPONENT_TYPE, VIEW_REF_PREFIX, WORKBENCH } from '../workbench.constants';
-import { InternalWorkbenchView, WorkbenchView } from '../workbench.model';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { asapScheduler, AsyncSubject, merge, Observable, Subject } from 'rxjs';
 import { delay, filter, map, take, takeUntil } from 'rxjs/operators';
@@ -19,15 +18,16 @@ import { ViewActivationInstantProvider } from '../view-activation-instant-provid
 import { ViewDragService } from '../view-dnd/view-drag.service';
 import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { ɵWorkbenchView } from './ɵworkbench-view.model';
 
 /**
- * Registry for {WorkbenchView} objects.
+ * Registry for {@link WorkbenchView} model objects.
  */
 @Injectable()
 export class WorkbenchViewRegistry implements OnDestroy {
 
   private readonly _destroy$ = new Subject<void>();
-  private readonly _viewRegistry = new Map<string, InternalWorkbenchView>();
+  private readonly _viewRegistry = new Map<string, ɵWorkbenchView>();
   private readonly _viewRegistryChange$ = new Subject<void>();
 
   constructor(private _componentFactoryResolver: ComponentFactoryResolver,
@@ -68,7 +68,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
   /**
    * Returns the {@link WorkbenchView} of the given identity, or throws an Error if not found.
    */
-  public getElseThrow(viewId: string): InternalWorkbenchView {
+  public getElseThrow(viewId: string): ɵWorkbenchView {
     const view = this._viewRegistry.get(viewId);
     if (!view) {
       throw Error(`[NullViewError] View '${viewId}' not found in the registry.`);
@@ -79,7 +79,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
   /**
    * Returns the {@link WorkbenchView} of the given identity, or returns `null` if not found.
    */
-  public getElseNull(viewId: string): InternalWorkbenchView | null {
+  public getElseNull(viewId: string): ɵWorkbenchView | null {
     return this._viewRegistry.get(viewId) || null;
   }
 
@@ -101,15 +101,15 @@ export class WorkbenchViewRegistry implements OnDestroy {
     this._destroy$.next();
   }
 
-  private createWorkbenchView(viewId: string, active: boolean): InternalWorkbenchView {
+  private createWorkbenchView(viewId: string, active: boolean): ɵWorkbenchView {
     const portal = new WbComponentPortal(this._componentFactoryResolver, this._injector.get(VIEW_COMPONENT_TYPE));
-    const view = new InternalWorkbenchView(viewId, active, portal, this._injector.get(WORKBENCH), this._viewActivationInstantProvider, this._router, this._viewDragService, this._injector.get(WorkbenchViewPartRegistry), this._layoutService);
+    const view = new ɵWorkbenchView(viewId, active, portal, this._injector.get(WORKBENCH), this._viewActivationInstantProvider, this._router, this._viewDragService, this._injector.get(WorkbenchViewPartRegistry), this._layoutService);
 
     portal.init({
       injectorTokens: new WeakMap()
         .set(ROUTER_OUTLET_NAME, viewId)
         .set(WorkbenchView, view)
-        .set(InternalWorkbenchView, view),
+        .set(ɵWorkbenchView, view),
       onAttach: (): void => view.activate(true),
       onDetach: (): void => view.activate(false),
     });

@@ -9,7 +9,6 @@
  */
 
 import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, ViewChild } from '@angular/core';
-import { InternalWorkbenchView } from '../workbench.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -20,6 +19,7 @@ import { MessageBoxService } from '../message-box/message-box.service';
 import { OverlayHostRef } from '../overlay-host-ref.service';
 import { ContentProjectionContext } from '../content-projection/content-projection-context.service';
 import { ViewMenuService } from '../view-part/view-context-menu/view-menu.service';
+import { ɵWorkbenchView } from './ɵworkbench-view.model';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -62,7 +62,7 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
   }
 
   constructor(host: ElementRef<HTMLElement>,
-              private _view: InternalWorkbenchView,
+              private _view: ɵWorkbenchView,
               private _contentProjectionContext: ContentProjectionContext,
               public messageBoxOverlayHostRef: OverlayHostRef,
               messageBoxService: MessageBoxService,

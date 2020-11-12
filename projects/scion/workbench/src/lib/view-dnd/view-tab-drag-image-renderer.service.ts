@@ -15,11 +15,12 @@ import { createElement, setStyle } from '../dom.util';
 import { ViewDragData, ViewDragService } from './view-drag.service';
 import { ComponentPortal, DomPortalOutlet, PortalInjector } from '@angular/cdk/portal';
 import { ViewTabContentComponent } from '../view-part/view-tab-content/view-tab-content.component';
-import { WorkbenchMenuItem, WorkbenchView } from '../workbench.model';
+import { WorkbenchMenuItem} from '../workbench.model';
 import { WorkbenchConfig } from '../workbench.config';
 import { VIEW_TAB_CONTEXT } from '../workbench.constants';
 import { UrlSegment } from '@angular/router';
 import { Disposable } from '../disposable';
+import { WorkbenchView } from '../view/workbench-view.model';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 

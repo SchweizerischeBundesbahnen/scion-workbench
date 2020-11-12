@@ -11,9 +11,10 @@
 import { ChangeDetectionStrategy, Component, Injector, TemplateRef } from '@angular/core';
 import { combineLatest, Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { WorkbenchViewPart, WorkbenchViewPartAction } from '../../workbench.model';
-import { InternalWorkbenchService } from '../../workbench.service';
+import { WorkbenchViewPartAction } from '../../workbench.model';
 import { PortalInjector } from '@angular/cdk/portal';
+import { WorkbenchViewPart } from '../workbench-view-part.model';
+import { ɵWorkbenchService } from '../../ɵworkbench.service';
 
 @Component({
   selector: 'wb-view-part-action-bar',
@@ -26,7 +27,7 @@ export class ViewPartActionBarComponent {
   public startActions$: Observable<WorkbenchViewPartAction[]>;
   public endActions$: Observable<WorkbenchViewPartAction[]>;
 
-  constructor(private _viewPart: WorkbenchViewPart, workbenchService: InternalWorkbenchService) {
+  constructor(private _viewPart: WorkbenchViewPart, workbenchService: ɵWorkbenchService) {
     this.startActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, this._viewPart.activeViewId$]).pipe(combineAndFilterViewPartActions('start'));
     this.endActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, this._viewPart.activeViewId$]).pipe(combineAndFilterViewPartActions('end'));
   }

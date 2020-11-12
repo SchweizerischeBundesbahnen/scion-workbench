@@ -8,16 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { WorkbenchViewRegistry } from './view/workbench-view.registry';
+import { Observable } from 'rxjs';
 import { Disposable } from './disposable';
-import { InternalWorkbenchViewPart, WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench.model';
-import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
-import { Arrays } from '@scion/toolkit/util';
-import { UUID } from '@scion/toolkit/uuid';
-import { WorkbenchLayoutService } from './workbench-layout.service';
-import { WorkbenchViewPartRegistry } from './view-part/workbench-view-part.registry';
+import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench.model';
 
 /**
  * Root object for the SCION Workbench.
@@ -45,6 +38,14 @@ export abstract class WorkbenchService {
   public readonly appInstanceId: string;
 
   /**
+   * Emits the views opened in the workbench.
+   *
+   * Upon subscription, the currently opened views are emitted, and then emits continuously
+   * when new views are opened or existing views closed. It never completes.
+   */
+  public readonly views$: Observable<string[]>;
+
+  /**
    * Destroys the specified workbench view(s) and associated routed component.
    * If it is the last view in the viewpart, the viewpart is removed as well.
    *
@@ -67,14 +68,6 @@ export abstract class WorkbenchService {
   public abstract resolveViewPart(viewId: string): string;
 
   /**
-   * Emits the views opened in the workbench.
-   *
-   * Upon subscription, the currently opened views are emitted, and then emits continuously
-   * when new views are opened or existing views closed. It never completes.
-   */
-  public abstract get views$(): Observable<string[]>;
-
-  /**
    * Registers an action which is added to every viewpart.
    *
    * Viewpart actions are displayed next to the opened view tabs.
@@ -91,66 +84,4 @@ export abstract class WorkbenchService {
    * @return {@link Disposable} to unregister the menu item.
    */
   public abstract registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable;
-}
-
-@Injectable()
-export class InternalWorkbenchService implements WorkbenchService {
-
-  public readonly viewPartActions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
-  public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
-  public readonly appInstanceId = UUID.randomUUID();
-
-  constructor(private _viewOutletNavigator: ViewOutletNavigator,
-              private _layoutService: WorkbenchLayoutService,
-              private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _viewRegistry: WorkbenchViewRegistry) {
-  }
-
-  public destroyView(...viewIds: string[]): Promise<boolean> {
-    const destroyViewFn = (viewId: string): Promise<boolean> => {
-      return this._viewOutletNavigator.navigate({
-        viewOutlet: {name: viewId, commands: null},
-        partsLayout: this._layoutService.layout
-          .removeView(viewId)
-          .serialize(),
-      });
-    };
-
-    // Use a separate navigate command to remove each view separately. Otherwise, if a view would reject destruction,
-    // no view would be removed at all. Also, removal must be done sequentially to have a proper grid snapshot.
-    return viewIds.reduce((prevDestroyPromise, viewId) => {
-      return prevDestroyPromise.then(() => destroyViewFn(viewId));
-    }, Promise.resolve(true));
-  }
-
-  public activateView(viewId: string): Promise<boolean> {
-    return this.resolveViewPartElseThrow(viewId).activateView(viewId);
-  }
-
-  public resolveViewPart(viewId: string): string {
-    return this.resolveViewPartElseThrow(viewId).partId;
-  }
-
-  private resolveViewPartElseThrow(viewId: string): InternalWorkbenchViewPart | null {
-    const part = this._layoutService.layout.findPartByViewId(viewId, {orElseThrow: true});
-    return this._viewPartRegistry.getElseThrow(part.partId);
-  }
-
-  public get views$(): Observable<string[]> {
-    return this._viewRegistry.viewIds$;
-  }
-
-  public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
-    this.viewPartActions$.next([...this.viewPartActions$.value, action]);
-    return {
-      dispose: (): void => this.viewPartActions$.next(this.viewPartActions$.value.filter(it => it !== action)),
-    };
-  }
-
-  public registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable {
-    this.viewMenuItemProviders$.next([...this.viewMenuItemProviders$.value, factoryFn]);
-    return {
-      dispose: (): void => this.viewMenuItemProviders$.next(Arrays.remove(this.viewMenuItemProviders$.value, factoryFn, {firstOnly: false})),
-    };
-  }
 }

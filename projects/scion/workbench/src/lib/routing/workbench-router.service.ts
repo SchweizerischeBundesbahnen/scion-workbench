@@ -9,7 +9,6 @@
  */
 
 import { NavigationExtras, Router } from '@angular/router';
-import { InternalWorkbenchService } from '../workbench.service';
 import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
 import { Defined } from '@scion/toolkit/util';
 import { ViewOutletNavigator } from './view-outlet-navigator.service';
@@ -32,6 +31,7 @@ export interface ViewNavigation {
    */
   viewIndex?: number | 'start' | 'end';
 }
+import { ɵWorkbenchService } from '../ɵworkbench.service';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -41,7 +41,7 @@ export class WorkbenchRouter {
 
   constructor(private _router: Router,
               private _viewOutletNavigator: ViewOutletNavigator,
-              private _workbench: InternalWorkbenchService,
+              private _workbench: ɵWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
               private _layoutService: WorkbenchLayoutService) {
   }

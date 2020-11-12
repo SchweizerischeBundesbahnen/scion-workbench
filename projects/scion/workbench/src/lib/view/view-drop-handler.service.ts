@@ -3,13 +3,13 @@ import { takeUntil } from 'rxjs/operators';
 import { ViewDragService, ViewMoveEvent } from '../view-dnd/view-drag.service';
 import { UUID } from '@scion/toolkit/uuid';
 import { Router, UrlSegment } from '@angular/router';
-import { InternalWorkbenchService } from '../workbench.service';
 import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
-import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
+import { WorkbenchViewRegistry } from './workbench-view.registry';
 import { LocationStrategy } from '@angular/common';
-import { PartsLayoutFactory } from './parts-layout.factory';
+import { PartsLayoutFactory } from '../layout/parts-layout.factory';
 import { Subject } from 'rxjs';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { ɵWorkbenchService } from '../ɵworkbench.service';
 
 /**
  * Subscribes to view move requests for moving views in the {@link PartsLayout} when the user arranges views via drag and drop.
@@ -19,7 +19,7 @@ export class ViewDropHandler implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  constructor(private _workbench: InternalWorkbenchService,
+  constructor(private _workbench: ɵWorkbenchService,
               private _viewOutletNavigator: ViewOutletNavigator,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewDragService: ViewDragService,

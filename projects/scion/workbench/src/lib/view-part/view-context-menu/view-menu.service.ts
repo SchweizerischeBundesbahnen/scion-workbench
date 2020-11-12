@@ -12,7 +12,7 @@ import { ElementRef, Injectable, Injector } from '@angular/core';
 import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { ViewMenuComponent } from './view-menu.component';
-import { InternalWorkbenchView, WorkbenchMenuItem, WorkbenchView } from '../../workbench.model';
+import { WorkbenchMenuItem} from '../../workbench.model';
 import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
 import { filter, mapTo, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { fromEvent, merge, Observable, Subject, TeardownLogic } from 'rxjs';
@@ -22,6 +22,8 @@ import { WorkbenchConfig } from '../../workbench.config';
 import { WorkbenchService } from '../../workbench.service';
 import { Arrays } from '@scion/toolkit/util';
 import { filterArray } from '@scion/toolkit/operators';
+import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
+import { WorkbenchView } from '../../view/workbench-view.model';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -71,7 +73,7 @@ export class ViewMenuService {
     const injector = new PortalInjector(this._injector, new WeakMap()
       .set(OverlayRef, overlayRef)
       .set(WorkbenchView, view)
-      .set(InternalWorkbenchView, view),
+      .set(ɵWorkbenchView, view),
     );
     overlayRef.attach(new ComponentPortal(ViewMenuComponent, null, injector));
     return true;
@@ -80,7 +82,7 @@ export class ViewMenuService {
   /**
    * Upon subscription, installs keyboard accelerators of the menu items registered in {@link WorkbenchView}.
    */
-  public installMenuItemAccelerators$(target: ElementRef<HTMLElement> | HTMLElement, view: InternalWorkbenchView): Observable<void> {
+  public installMenuItemAccelerators$(target: ElementRef<HTMLElement> | HTMLElement, view: ɵWorkbenchView): Observable<void> {
     return new Observable((): TeardownLogic => {
       const unsubscribe$ = new Subject<void>();
 

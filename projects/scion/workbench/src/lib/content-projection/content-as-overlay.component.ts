@@ -11,11 +11,11 @@
 import { Component, OnDestroy, Optional, ViewContainerRef } from '@angular/core';
 import { ContentHostRef } from './content-host-ref.service';
 import { ContentProjectionContext } from './content-projection-context.service';
-import { WorkbenchView } from '../workbench.model';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { WorkbenchActivityPartService } from '../activity-part/workbench-activity-part.service';
 import { ActivatedRoute } from '@angular/router';
+import { WorkbenchView } from '../view/workbench-view.model';
 
 /**
  * Structural component which adds its `ng-content` to a top-level workbench DOM element and projects it into this component's bounding box.
