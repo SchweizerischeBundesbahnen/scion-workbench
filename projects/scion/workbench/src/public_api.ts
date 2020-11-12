@@ -14,7 +14,7 @@
 export { WorkbenchModule } from './lib/workbench.module';
 export { WorkbenchTestingModule } from './lib/spec/workbench-testing.module';
 export { WorkbenchService } from './lib/workbench.service';
-export { WorkbenchViewPart, WorkbenchView, WbBeforeDestroy, WorkbenchViewPartAction } from './lib/workbench.model';
+export { WbBeforeDestroy, WorkbenchViewPartAction } from './lib/workbench.model';
 export { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './lib/routing/wb-router-link.directive';
 export { WorkbenchRouter, WbNavigationExtras } from './lib/routing/workbench-router.service';
 export { WorkbenchAuxiliaryRoutesRegistrator } from './lib/routing/workbench-auxiliary-routes-registrator.service';
@@ -39,3 +39,5 @@ export { PopupService } from './lib/popup/popup.service';
 export { Popup, PopupConfig, Position, CloseStrategy } from './lib/popup/metadata';
 export { ViewMenuItemDirective } from './lib/view-part/view-context-menu/view-menu.directive';
 export { ViewPartActionDirective } from './lib/view-part/view-part-action-bar/view-part-action.directive';
+export { WorkbenchView } from './lib/view/workbench-view.model';
+export { WorkbenchViewPart } from './lib/view-part/workbench-view-part.model';

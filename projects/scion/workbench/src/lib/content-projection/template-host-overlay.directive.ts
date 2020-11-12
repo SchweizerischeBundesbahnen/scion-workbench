@@ -9,12 +9,12 @@
  */
 
 import { AfterViewInit, Directive, DoCheck, ElementRef, EmbeddedViewRef, EventEmitter, Input, KeyValueDiffer, KeyValueDiffers, OnDestroy, OnInit, Optional, Output, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
-import { WorkbenchView } from '../workbench.model';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { WorkbenchActivityPartService } from '../activity-part/workbench-activity-part.service';
 import { combineLatest, Subject } from 'rxjs';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchView } from '../view/workbench-view.model';
 
 /**
  * Instantiates an Embedded View based on the {@link TemplateRef `templateRef`}, appends it

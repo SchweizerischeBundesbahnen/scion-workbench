@@ -9,10 +9,8 @@
  */
 
 import { Attribute, Component, ElementRef, HostBinding, HostListener, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnDestroy } from '@angular/core';
-import { InternalWorkbenchView, InternalWorkbenchViewPart, WorkbenchView } from '../../workbench.model';
 import { SciViewportComponent } from '@scion/toolkit/viewport';
 import { fromEvent, merge, Subject } from 'rxjs';
-import { InternalWorkbenchService } from '../../workbench.service';
 import { WorkbenchLayoutService } from '../../workbench-layout.service';
 import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
 import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -23,6 +21,10 @@ import { VIEW_TAB_CONTEXT } from '../../workbench.constants';
 import { WorkbenchConfig } from '../../workbench.config';
 import { ViewTabContentComponent } from '../view-tab-content/view-tab-content.component';
 import { ViewMenuService } from '../view-context-menu/view-menu.service';
+import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
+import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
+import { WorkbenchView } from '../../view/workbench-view.model';
+import { ɵWorkbenchService } from '../../ɵworkbench.service';
 
 /**
  * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
@@ -41,7 +43,7 @@ export class ViewTabComponent implements OnDestroy {
   private _context: 'tabbar' | 'tabbar-dropdown';
 
   public host: HTMLElement;
-  public view: InternalWorkbenchView;
+  public view: ɵWorkbenchView;
   public viewTabContentPortal: ComponentPortal<any>;
 
   @Input()
@@ -56,12 +58,12 @@ export class ViewTabComponent implements OnDestroy {
               // The context must be available during construction to create the portal for the view tab content.
               // The param is weak typed as a string (instead as a string literal) due to Angular restrictions when building prod.
               @Attribute('context') context: string,
-              private _workbench: InternalWorkbenchService,
+              private _workbench: ɵWorkbenchService,
               private _config: WorkbenchConfig,
               private _viewRegistry: WorkbenchViewRegistry,
               private _workbenchLayout: WorkbenchLayoutService,
               private _viewport: SciViewportComponent,
-              private _viewPart: InternalWorkbenchViewPart,
+              private _viewPart: ɵWorkbenchViewPart,
               private _viewDragService: ViewDragService,
               private _differs: IterableDiffers,
               private _viewContextMenuService: ViewMenuService,

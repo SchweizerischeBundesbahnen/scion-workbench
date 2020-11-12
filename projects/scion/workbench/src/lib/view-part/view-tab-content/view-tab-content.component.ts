@@ -9,8 +9,8 @@
  */
 
 import { Component, HostBinding, Inject } from '@angular/core';
-import { WorkbenchView } from '../../workbench.model';
 import { VIEW_TAB_CONTEXT, ViewTabContext } from '../../workbench.constants';
+import { WorkbenchView } from '../../view/workbench-view.model';
 
 @Component({
   selector: 'wb-view-tab-content',

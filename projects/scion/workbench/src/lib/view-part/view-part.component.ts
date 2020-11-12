@@ -11,10 +11,10 @@
 import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { WbViewDropEvent } from '../view-dnd/view-drop-zone.directive';
-import { InternalWorkbenchService } from '../workbench.service';
-import { InternalWorkbenchViewPart } from '../workbench.model';
 import { takeUntil } from 'rxjs/operators';
 import { ViewDragService } from '../view-dnd/view-drag.service';
+import { ɵWorkbenchViewPart } from './ɵworkbench-view-part.model';
+import { ɵWorkbenchService } from '../ɵworkbench.service';
 
 @Component({
   selector: 'wb-view-part',
@@ -44,9 +44,9 @@ export class ViewPartComponent implements OnInit, OnDestroy {
     return this._part.isActive();
   }
 
-  constructor(private _workbench: InternalWorkbenchService,
+  constructor(private _workbench: ɵWorkbenchService,
               private _viewDragService: ViewDragService,
-              private _part: InternalWorkbenchViewPart) {
+              private _part: ɵWorkbenchViewPart) {
     combineLatest([this._workbench.viewPartActions$, this._part.actions$, this._part.viewIds$])
       .pipe(takeUntil(this._destroy$))
       .subscribe(([globalActions, localActions, viewIds]) => {

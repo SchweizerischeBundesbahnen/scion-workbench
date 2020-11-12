@@ -12,7 +12,8 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { fromEvent, Observable, OperatorFunction, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import { InternalWorkbenchView, WorkbenchMenuItem } from '../../workbench.model';
+import { WorkbenchMenuItem } from '../../workbench.model';
+import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
 
 declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
 
@@ -29,7 +30,7 @@ export class ViewMenuComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
   public menuItemGroups$: Observable<MenuItemGroups>;
 
-  constructor(private _overlayRef: OverlayRef, private _view: InternalWorkbenchView) {
+  constructor(private _overlayRef: OverlayRef, private _view: ɵWorkbenchView) {
     this.menuItemGroups$ = this._view.menuItems$.pipe(groupMenuItems());
   }
 

@@ -1,8 +1,9 @@
 import { Directive, EventEmitter, Input, OnDestroy, Optional, Output, TemplateRef } from '@angular/core';
 import { Disposable } from './../../disposable';
-import { WorkbenchMenuItem, WorkbenchView } from '../../workbench.model';
+import { WorkbenchMenuItem} from '../../workbench.model';
 import { WorkbenchService } from '../../workbench.service';
 import { TemplatePortal } from '@angular/cdk/portal';
+import { WorkbenchView } from '../../view/workbench-view.model';
 
 /**
  * Use this directive to model a menu item added to the context menu of a view.

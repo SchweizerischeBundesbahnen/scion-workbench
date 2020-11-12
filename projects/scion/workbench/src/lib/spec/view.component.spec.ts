@@ -18,11 +18,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { SpecView1Component, SpecView2Component } from './view-part.model.spec';
 import { ViewComponent } from '../view/view.component';
-import { WorkbenchView } from '../workbench.model';
 import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
 import { WorkbenchTestingModule } from './workbench-testing.module';
+import { WorkbenchView } from '../view/workbench-view.model';
 
 describe('ViewComponent', () => {
 

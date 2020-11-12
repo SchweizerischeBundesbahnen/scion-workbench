@@ -21,7 +21,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ViewListComponent } from './view-part/view-list/view-list.component';
 import { ViewListButtonComponent } from './view-part/view-list-button/view-list-button.component';
 import { ViewPartBarComponent } from './view-part/view-part-bar/view-part-bar.component';
-import { InternalWorkbenchService, WorkbenchService } from './workbench.service';
+import { WorkbenchService } from './workbench.service';
 import { ViewDropZoneDirective } from './view-dnd/view-drop-zone.directive';
 import { PartsLayoutComponent } from './layout/parts-layout.component';
 import { RemoteSiteComponent } from './remote-site/remote-site.component';
@@ -42,7 +42,7 @@ import { MoveDirective } from './move.directive';
 import { WorkbenchConfig } from './workbench.config';
 import { TemplateHostOverlayDirective } from './content-projection/template-host-overlay.directive';
 import { ContentAsOverlayComponent } from './content-projection/content-as-overlay.component';
-import { ROUTE_REUSE_PROVIDER, VIEW_COMPONENT_TYPE, VIEW_PART_COMPONENT_TYPE, WORKBENCH, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
+import { ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
 import { NotificationService } from './notification/notification.service';
 import { NotificationListComponent } from './notification/notification-list.component';
 import { NotificationComponent } from './notification/notification.component';
@@ -77,7 +77,8 @@ import { ArrayCoercePipe } from './array-coerce.pipe';
 import { ArrayConcatPipe } from './array-concat.pipe';
 import { ViewPortalPipe } from './view/view-portal.pipe';
 import { PartsLayoutFactory } from './layout/parts-layout.factory';
-import { ViewDropHandler } from './layout/view-drop-handler.service';
+import { ViewDropHandler } from './view/view-drop-handler.service';
+import { ɵWorkbenchService } from './ɵworkbench.service';
 
 @NgModule({
   imports: [
@@ -180,18 +181,9 @@ export class WorkbenchModule {
     return {
       ngModule: WorkbenchModule,
       providers: [
-        InternalWorkbenchService,
+        ɵWorkbenchService,
         {
-          provide: WorkbenchService, useExisting: InternalWorkbenchService,
-        },
-        {
-          provide: WORKBENCH, useExisting: InternalWorkbenchService,
-        },
-        {
-          provide: VIEW_PART_COMPONENT_TYPE, useValue: ViewPartComponent,
-        },
-        {
-          provide: VIEW_COMPONENT_TYPE, useValue: ViewComponent,
+          provide: WorkbenchService, useExisting: ɵWorkbenchService,
         },
         WorkbenchLayoutService,
         WorkbenchActivityPartService,

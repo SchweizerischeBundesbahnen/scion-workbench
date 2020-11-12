@@ -11,8 +11,9 @@
 import { Directive, Input, OnDestroy, OnInit, Optional, TemplateRef } from '@angular/core';
 import { Disposable } from '../../disposable';
 import { TaskScheduler } from '../../task-scheduler.service';
-import { WorkbenchView, WorkbenchViewPart } from '../../workbench.model';
 import { WorkbenchService } from '../../workbench.service';
+import { WorkbenchView } from '../../view/workbench-view.model';
+import { WorkbenchViewPart } from '../workbench-view-part.model';
 
 /**
  * Use this directive to model an action contributed to the viewpart action bar located to the right of the view tabs.
