@@ -81,7 +81,7 @@ describe('Router', () => {
     advance(fixture);
 
     // Navigate to entry component of feature module A
-    wbRouter.navigate(['feature-a'], {blankViewPartRef: 'viewpart.1'}).then();
+    wbRouter.navigate(['feature-a']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureA_EntryComponent, '(1)');
 

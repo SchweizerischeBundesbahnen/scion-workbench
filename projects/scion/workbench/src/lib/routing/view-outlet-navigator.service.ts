@@ -8,10 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
-import { ACTIVITY_OUTLET_NAME, VIEW_GRID_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
+import { ACTIVITY_OUTLET_NAME, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX } from '../workbench.constants';
 import { Injectable } from '@angular/core';
-import { Arrays } from '../array.util';
-import { coerceArray } from '@angular/cdk/coercion';
+import { Arrays } from '@scion/toolkit/util';
 
 /**
  * Allows navigating to auxiliary routes in view outlets.
@@ -23,23 +22,23 @@ export class ViewOutletNavigator {
   }
 
   /**
-   * Navigates based on the provided array of commands, if any, and updates the URL with the given view grid.
+   * Navigates based on the provided array of commands, if any, and updates the URL with the given parts layout.
    */
-  public navigate(params: { viewOutlet?: { name: string, commands: any[] }, viewGrid: string, extras?: NavigationExtras }): Promise<boolean> {
+  public navigate(params: { viewOutlet?: { name: string, commands: any[] }, partsLayout: string, extras?: NavigationExtras }): Promise<boolean> {
     const urlTree = this.createUrlTree(params);
-    return this._router.navigateByUrl(urlTree);
+    return this._router.navigateByUrl(urlTree, params.extras);
   }
 
   /**
-   * Applies the provided commands and viewgrid to the current URL tree and creates a new URL tree.
+   * Applies the provided commands and parts layout to the current URL tree and creates a new URL tree.
    */
-  public createUrlTree(params: { viewOutlet?: Outlet | Outlet[], viewGrid: string, extras?: NavigationExtras }): UrlTree {
-    const {viewOutlet, viewGrid, extras = {}} = params;
+  public createUrlTree(params: { viewOutlet?: Outlet | Outlet[], partsLayout: string, extras?: NavigationExtras }): UrlTree {
+    const {viewOutlet, partsLayout, extras = {}} = params;
     const commands: any[] = this.createOutletCommands(viewOutlet);
 
     return this._router.createUrlTree(commands, {
       ...extras,
-      queryParams: {...extras.queryParams, [VIEW_GRID_QUERY_PARAM]: viewGrid},
+      queryParams: {...extras.queryParams, [PARTS_LAYOUT_QUERY_PARAM]: partsLayout},
       queryParamsHandling: 'merge',
     });
   }
@@ -79,14 +78,14 @@ export class ViewOutletNavigator {
   /**
    * Resolves present views which match the given commands.
    */
-  public resolvePresentViewRefs(commands: any[]): string[] {
+  public resolvePresentViewIds(commands: any[]): string[] {
     const serializeCommands = this.serializeCommands(commands);
     const urlTree = this._router.parseUrl(this._router.url);
     const urlSegmentGroups = urlTree.root.children;
 
     return Object.keys(urlSegmentGroups)
       .filter(outletName => outletName.startsWith(VIEW_REF_PREFIX))
-      .filter(outletName => Arrays.equal(serializeCommands, urlSegmentGroups[outletName].segments.map((segment: UrlSegment) => segment.toString())));
+      .filter(outletName => Arrays.isEqual(serializeCommands, urlSegmentGroups[outletName].segments.map((segment: UrlSegment) => segment.toString())));
   }
 
   /**
@@ -112,7 +111,7 @@ export class ViewOutletNavigator {
     if (!viewOutlets) {
       return [];
     }
-    const outletsObject = coerceArray(viewOutlets).reduce((acc, viewOutlet) => ({...acc, [viewOutlet.name]: viewOutlet.commands}), {});
+    const outletsObject = Arrays.coerce(viewOutlets).reduce((acc, viewOutlet) => ({...acc, [viewOutlet.name]: viewOutlet.commands}), {});
     return [{outlets: outletsObject}];
   }
 }

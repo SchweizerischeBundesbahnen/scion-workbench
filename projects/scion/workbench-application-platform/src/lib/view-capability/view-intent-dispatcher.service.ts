@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, OnDestroy, Type } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { VIEW_CAPABILITY_ID_PARAM, VIEW_PATH_PARAM } from './metadata';
 import { Router } from '@angular/router';
 import { ViewOutletComponent } from './view-outlet.component';
@@ -61,7 +61,7 @@ export class ViewIntentDispatcher implements OnDestroy {
       .filter(capability => this._manifestRegistry.isVisibleForApplication(capability, envelope.sender))
       .forEach((viewCapability: ViewCapability) => {
         const intentMessage: ViewIntentMessage = envelope.message;
-        const view = envelope._injector.get(WorkbenchView as Type<WorkbenchView>, null); // TODO [Angular 9]: remove type cast for abstract symbols once 'angular/issues/29905' and 'angular/issues/23611' are fixed
+        const view = envelope._injector.get(WorkbenchView, null);
 
         const matrixParamObject = Url.writeMatrixParamObject({
           matrixParams: Url.substituteParamVariables({...viewCapability.properties.matrixParams, ...intentMessage.payload.matrixParams}, envelope.message.qualifier),
@@ -71,8 +71,8 @@ export class ViewIntentDispatcher implements OnDestroy {
         const extras: WbNavigationExtras = {
           activateIfPresent: intentMessage.payload.activateIfPresent,
           closeIfPresent: intentMessage.payload.closeIfPresent,
-          selfViewRef: view && view.viewRef,
-          blankViewPartRef: view && this._workbench.resolveViewPart(view.viewRef),
+          selfViewId: view && view.viewId,
+          blankPartId: view && this._workbench.resolveViewPart(view.viewId),
           blankInsertionIndex: intentMessage.payload.blankInsertionIndex,
         };
 
@@ -83,7 +83,7 @@ export class ViewIntentDispatcher implements OnDestroy {
         }
         else {
           extras.target = 'self';
-          extras.selfViewRef = target;
+          extras.selfViewId = target;
         }
 
         const commands = this.createNavigateCommands(viewCapability, matrixParamObject, envelope.message.qualifier);

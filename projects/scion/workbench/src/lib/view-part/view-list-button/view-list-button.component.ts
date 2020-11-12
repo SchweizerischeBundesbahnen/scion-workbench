@@ -9,10 +9,10 @@
  */
 
 import { Component, ElementRef, HostBinding, HostListener, Injector } from '@angular/core';
-import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { ViewListComponent } from '../view-list/view-list.component';
+import { InternalWorkbenchViewPart } from '../../workbench.model';
 
 @Component({
   selector: 'wb-view-list-button',
@@ -26,17 +26,17 @@ export class ViewListButtonComponent {
 
   @HostBinding('class.visible')
   public get visible(): boolean {
-    return this._viewPartService.hiddenViewTabCount > 0;
+    return this._viewPart.hiddenViewTabCount > 0;
   }
 
-  constructor(private _viewPartService: WorkbenchViewPartService,
+  constructor(private _viewPart: InternalWorkbenchViewPart,
               private _host: ElementRef,
               private _overlay: Overlay,
               private _injector: Injector) {
   }
 
   public get hiddenViewTabCount(): number {
-    return this._viewPartService.hiddenViewTabCount;
+    return this._viewPart.hiddenViewTabCount;
   }
 
   @HostListener('click')

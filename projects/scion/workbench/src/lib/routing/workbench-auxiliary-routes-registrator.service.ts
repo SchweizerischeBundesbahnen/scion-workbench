@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Data, PRIMARY_OUTLET, ResolveData, Router, Routes } from '@angular/router';
+import { Injectable, Type } from '@angular/core';
+import { CanActivate, CanDeactivate, Data, PRIMARY_OUTLET, ResolveData, Router, Routes } from '@angular/router';
 import { ActivityResolver } from './activity.resolver';
 import { ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME } from '../workbench.constants';
 import { EmptyOutletComponent } from './empty-outlet.component';
 import { WbBeforeDestroyGuard } from '../view/wb-before-destroy.guard';
+import { WbAddViewToPartGuard } from './add-view-to-part.guard';
 
 /**
  * Registers auxiliary routes for views and activities.
@@ -24,10 +25,13 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
   /**
    * Registers a named view auxiliary route for every primary route found in the router config.
    */
-  public registerViewAuxiliaryRoutes(...viewRefs: string[]): Routes {
+  public registerViewAuxiliaryRoutes(...viewIds: string[]): Routes {
     const auxRoutes: Routes = [];
-    viewRefs.forEach(viewRef => {
-      auxRoutes.push(...this.registerAuxiliaryRoutesFor(viewRef, {canDeactivate: [WbBeforeDestroyGuard]}));
+    viewIds.forEach(viewId => {
+      auxRoutes.push(...this.registerAuxiliaryRoutesFor(viewId, {
+        canActivate: [WbAddViewToPartGuard],
+        canDeactivate: [WbBeforeDestroyGuard],
+      }));
     });
     return auxRoutes;
   }
@@ -49,7 +53,8 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
           ...it,
           outlet: outlet,
           component: it.component || EmptyOutletComponent, // used for lazy loading of aux routes; see Angular PR #23459
-          canDeactivate: [...(it.canDeactivate || []), ...(params.canDeactivate || [])],
+          canActivate: [...(params.canActivate || []), ...(it.canActivate || [])],
+          canDeactivate: [...(params.canDeactivate || []), ...(it.canDeactivate || [])],
           data: {...it.data, ...params.data},
           resolve: {...it.resolve, ...params.resolve},
         };
@@ -80,7 +85,8 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
  * Controls creation of auxiliary routes for named router outlets.
  */
 interface AuxiliaryRouteParams {
-  canDeactivate?: any[];
+  canDeactivate?: Type<CanDeactivate<any>>[];
+  canActivate?: Type<CanActivate>[];
   data?: Data;
   resolve?: ResolveData;
 }

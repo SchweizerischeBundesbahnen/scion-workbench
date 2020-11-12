@@ -896,7 +896,7 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "projects/app-common/src/lib"
+                "node_modules/@scion/toolkit.internal/widgets"
               ]
             },
             "scripts": []

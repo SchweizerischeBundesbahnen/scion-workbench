@@ -15,8 +15,8 @@ import { MoveDelta } from '../move.directive';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
-import { Arrays } from '../array.util';
 import { TaskScheduler } from '../task-scheduler.service';
+import { Arrays } from '@scion/toolkit/util';
 
 @Component({
   selector: 'wb-message-box',
@@ -44,7 +44,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   @HostBinding('attr.class')
   public get cssClass(): string {
     return [
-      ...Arrays.from(this._messageBox.cssClass),
+      ...Arrays.coerce(this._messageBox.cssClass),
       this._messageBox.severity,
       `e2e-severity-${this._messageBox.severity}`,
     ].join(' ');

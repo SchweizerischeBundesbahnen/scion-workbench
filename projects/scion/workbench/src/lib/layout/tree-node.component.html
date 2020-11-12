@@ -1,0 +1,32 @@
+<sci-sashbox [direction]="direction" (sashStart)="onSashStart()" (sashEnd)="onSashEnd($event)">
+  <!-- left or top sash -->
+  <ng-template sciSash [size]="sash1.proportion">
+    <wb-tree-node *ngIf="sash1.treeNode"
+                  [treeNode]="sash1.treeNode"
+                  [attr.data-parentnodeid]="nodeId"
+                  [attr.data-nodeid]="sash1.treeNode.nodeId"
+                  class="sash-1">
+    </wb-tree-node>
+    <wb-portal-outlet *ngIf="sash1.portal"
+                      [wbPortal]="sash1.portal"
+                      [attr.data-parentnodeid]="nodeId"
+                      class="sash-1">
+    </wb-portal-outlet>
+  </ng-template>
+
+  <!-- right or bottom sash -->
+  <ng-template sciSash [size]="sash2.proportion">
+    <wb-tree-node *ngIf="sash2.treeNode"
+                  [treeNode]="sash2.treeNode"
+                  [attr.data-parentnodeid]="nodeId"
+                  [attr.data-nodeid]="sash2.treeNode.nodeId"
+                  class="sash-2">
+
+    </wb-tree-node>
+    <wb-portal-outlet *ngIf="sash2.portal"
+                      [wbPortal]="sash2.portal"
+                      [attr.data-parentnodeid]="nodeId"
+                      class="sash-2">
+    </wb-portal-outlet>
+  </ng-template>
+</sci-sashbox>

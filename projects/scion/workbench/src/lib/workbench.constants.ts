@@ -70,14 +70,19 @@ export const ACTIVITY_DATA_KEY = 'wb.activity';
 export const VIEW_PART_REF_PREFIX = 'viewpart.';
 
 /**
- * Specifies the prefix used to name viewreferences.
+ * Specifies the prefix used to name views.
  */
 export const VIEW_REF_PREFIX = 'view.';
 
 /**
- * Specifies the HTTP query parameter name to set the viewpart grid in the URI.
+ * Name of the query parameter that contains the parts layout in the URL.
  */
-export const VIEW_GRID_QUERY_PARAM = 'viewgrid';
+export const PARTS_LAYOUT_QUERY_PARAM = 'parts';
+
+/**
+ * Property name of the view navigation state.
+ */
+export const VIEW_NAV_STATE = 'scion.workbench.viewNavigation';
 
 /**
  * Defines the contexts in which a viewtab is rendered.

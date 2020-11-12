@@ -13,8 +13,8 @@ import { Notification, WbNotification } from './notification';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PortalInjector } from '@angular/cdk/portal';
-import { Arrays } from '../array.util';
 import { TaskScheduler } from '../task-scheduler.service';
+import { Arrays } from '@scion/toolkit/util';
 
 @Component({
   selector: 'wb-notification',
@@ -58,7 +58,7 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
   @HostBinding('attr.class')
   public get cssClass(): string {
     return [
-      ...Arrays.from(this._notification.cssClass),
+      ...Arrays.coerce(this._notification.cssClass),
       this._notification.severity,
       `e2e-severity-${this._notification.severity}`,
       `e2e-duration-${this._notification.duration}`,

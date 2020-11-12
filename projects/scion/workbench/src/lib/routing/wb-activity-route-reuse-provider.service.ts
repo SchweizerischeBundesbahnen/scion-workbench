@@ -14,7 +14,7 @@ import { ACTIVITY_OUTLET_NAME } from '../workbench.constants';
 import { WbRouteReuseProvider } from './wb-route-reuse-strategy.service';
 import { Injectable } from '@angular/core';
 import { WorkbenchConfig } from '../workbench.config';
-import { Defined } from '../defined.util';
+import { Defined } from '@scion/toolkit/util';
 
 /**
  * Provides reuse keys for activity routes to not destroy associated activity component

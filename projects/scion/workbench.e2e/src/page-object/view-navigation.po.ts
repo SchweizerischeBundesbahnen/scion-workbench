@@ -25,11 +25,11 @@ export class ViewNavigationPO {
   }
 
   public async activateViewTab(): Promise<void> {
-    await new AppPO().findViewTab('viewpart.1', {cssClass: 'e2e-view-navigation'}).click();
+    await new AppPO().findViewTab({cssClass: 'e2e-view-navigation'}).click();
   }
 
   public async isActiveViewTab(): Promise<boolean> {
-    return new AppPO().findViewTab('viewpart.1', {cssClass: 'e2e-view-navigation'}).isActive();
+    return new AppPO().findViewTab({cssClass: 'e2e-view-navigation'}).isActive();
   }
 
   public async enterPath(path: string): Promise<void> {

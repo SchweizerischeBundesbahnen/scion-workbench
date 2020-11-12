@@ -33,21 +33,21 @@ describe('RouterLink', () => {
 
   it('should open testing view in current view [testcase: b8bbbb11-view]', async () => {
     await viewPO.clickLink();
-    await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(1);
+    await expect(hostAppPO.getViewTabCount()).toBe(1);
   });
 
   it('should open testing view in new view tab when CTRL + click [testcase: b8bbbb11-view]', async () => {
     await viewPO.clickLink(Key.CONTROL);
-    await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
+    await expect(hostAppPO.getViewTabCount()).toBe(2);
   });
 
   it('should open testing view in new view tab when COMMAND + click [testcase: b8bbbb11-view]', async () => {
     await viewPO.clickLink(Key.COMMAND);
-    await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
+    await expect(hostAppPO.getViewTabCount()).toBe(2);
   });
 
   it('should open testing view in new view tab when META + click [testcase: b8bbbb11-view]', async () => {
     await viewPO.clickLink(Key.META);
-    await expect(hostAppPO.getViewTabCount('viewpart.1')).toBe(2);
+    await expect(hostAppPO.getViewTabCount()).toBe(2);
   });
 });

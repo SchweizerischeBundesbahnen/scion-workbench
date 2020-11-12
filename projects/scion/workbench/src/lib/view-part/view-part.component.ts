@@ -8,12 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
-import { WorkbenchViewPartService } from './workbench-view-part.service';
-import { combineLatest, Subject } from 'rxjs';
+import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import { WbViewDropEvent } from '../view-dnd/view-drop-zone.directive';
 import { InternalWorkbenchService } from '../workbench.service';
-import { WorkbenchViewPart } from '../workbench.model';
+import { InternalWorkbenchViewPart } from '../workbench.model';
 import { takeUntil } from 'rxjs/operators';
 import { ViewDragService } from '../view-dnd/view-drag.service';
 
@@ -21,9 +20,8 @@ import { ViewDragService } from '../view-dnd/view-drag.service';
   selector: 'wb-view-part',
   templateUrl: './view-part.component.html',
   styleUrls: ['./view-part.component.scss'],
-  providers: [WorkbenchViewPartService],
 })
-export class ViewPartComponent implements OnDestroy {
+export class ViewPartComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
@@ -36,26 +34,34 @@ export class ViewPartComponent implements OnDestroy {
   @HostBinding('class.suspend-pointer-events')
   public suspendPointerEvents = false;
 
-  @HostBinding('attr.viewpartref')
-  public get viewPartRef(): string {
-    return this.viewPartService.viewPartRef;
+  @HostBinding('attr.data-partid')
+  public get partId(): string {
+    return this._part.partId;
+  }
+
+  @HostBinding('class.active')
+  public get isActive(): boolean {
+    return this._part.isActive();
   }
 
   constructor(private _workbench: InternalWorkbenchService,
               private _viewDragService: ViewDragService,
-              private _viewPart: WorkbenchViewPart,
-              public viewPartService: WorkbenchViewPartService) {
-    combineLatest([this._workbench.viewPartActions$, this._viewPart.actions$, this._viewPart.viewRefs$])
+              private _part: InternalWorkbenchViewPart) {
+    combineLatest([this._workbench.viewPartActions$, this._part.actions$, this._part.viewIds$])
       .pipe(takeUntil(this._destroy$))
-      .subscribe(([globalActions, localActions, viewRefs]) => {
-        this.hasViews = viewRefs.length > 0;
+      .subscribe(([globalActions, localActions, viewIds]) => {
+        this.hasViews = viewIds.length > 0;
         this.hasActions = globalActions.length > 0 || localActions.length > 0;
       });
   }
 
+  public ngOnInit(): void {
+    this._part.activate().then();
+  }
+
   @HostListener('focusin')
   public onFocusIn(): void {
-    this.viewPartService.activate();
+    this._part.activate().then();
   }
 
   /**
@@ -65,16 +71,20 @@ export class ViewPartComponent implements OnDestroy {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: event.dragData.appInstanceId,
-        viewPartRef: event.dragData.viewPartRef,
-        viewRef: event.dragData.viewRef,
+        partId: event.dragData.partId,
+        viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
       },
       target: {
         appInstanceId: this._workbench.appInstanceId,
-        viewPartRef: this._viewPart.viewPartRef,
-        viewPartRegion: event.dropRegion,
+        partId: this._part.partId,
+        region: event.dropRegion,
       },
     });
+  }
+
+  public get activeViewId$(): Observable<string> {
+    return this._part.activeViewId$;
   }
 
   public ngOnDestroy(): void {

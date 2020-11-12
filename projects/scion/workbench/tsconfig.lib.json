@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "../../../out-tsc/workbench",
     "declaration": true,
+    "stripInternal": true,
     "inlineSources": true,
     "types": []
   },

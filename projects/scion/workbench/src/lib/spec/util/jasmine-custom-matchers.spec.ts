@@ -12,12 +12,12 @@ import CustomMatcher = jasmine.CustomMatcher;
 import MatchersUtil = jasmine.MatchersUtil;
 import CustomEqualityTester = jasmine.CustomEqualityTester;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
+import ObjectContaining = jasmine.ObjectContaining;
 import { ComponentFixture } from '@angular/core/testing';
-import { ViewPartGridComponent } from '../../view-part-grid/view-part-grid.component';
+import { PartsLayoutComponent } from '../../layout/parts-layout.component';
 import { DebugElement, Type } from '@angular/core';
 import { By } from '@angular/platform-browser';
-import { AssertException } from './assert-exception.spec';
-import { ACTIVE_VIEW_REF_INDEX, VIEW_PART_REF_INDEX, ViewPartInfoArray, ViewPartSashBox } from '../../view-part-grid/view-part-grid-serializer.service';
+import { MPart, MTreeNode } from '../../layout/parts-layout.model';
 
 /**
  * Extends the Jasmine expect API to support chaining with project specific custom matchers.
@@ -35,12 +35,16 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
   not: CustomMatchers<T>;
 
   /**
-   * Expect the given view part grid rendered in the DOM.
+   * Expects the given parts layout. Tests only properties contained in the expected layout, i.e., if not including {@link MPart#parent}
+   * in the expectation, that property is ignored in the assertion.
+   *
+   * The actual value can be of the type {@link MTreeNode}, {@link MPart} or {@link ComponentFixture<PartsLayoutComponent>}.
+   * In the latter case, the DOM structure is also tested.
    */
-  toBeViewPartGrid(expected: ViewPartSashBox | ViewPartInfoArray, expectationFailOutput?: any): boolean;
+  toEqualPartsLayout(expected: MTreeNode | MPart, expectationFailOutput?: any): boolean;
 
   /**
-   * Expect a component of the given type to show.
+   * Expects a component of the given type to show.
    */
   toShow(expectedComponentType: Type<any>, expectationFailOutput?: any): boolean;
 }
@@ -49,11 +53,11 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
  * Provides the implementation of project specific custom matchers.
  */
 export const jasmineCustomMatchers: jasmine.CustomMatcherFactories = {
-  toBeViewPartGrid: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToBeViewPartGridMatcher(util, customEqualityTesters),
-  toShow: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToDisplayMatcher(util, customEqualityTesters),
+  toEqualPartsLayout: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToEqualPartsLayoutMatcher(util, customEqualityTesters),
+  toShow: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToShowMatcher(util, customEqualityTesters),
 };
 
-function createToDisplayMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
+function createToShowMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
   return {
     compare(actualFixture: any, expectedComponentType: Type<any>): CustomMatcherResult {
       const failOutput = arguments[2];
@@ -75,66 +79,78 @@ function createToDisplayMatcher(util: MatchersUtil, customEqualityTesters: Custo
   };
 }
 
-function createToBeViewPartGridMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
+function createToEqualPartsLayoutMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
   return {
-    compare(actualViewPartGridFixture: any, expectedViewPartGrid: ViewPartSashBox | ViewPartInfoArray): CustomMatcherResult {
-      const failOutput = arguments[2];
-      const msgFn = (msg: string): string => [msg, failOutput].filter(Boolean).join(', ');
-
-      // verify correct actual type
-      if (!(actualViewPartGridFixture instanceof ComponentFixture)) {
-        return {
-          pass: false,
-          message: msgFn(`Expected actual to be of type \'ComponentFixture\' [actual=${Object.getOwnPropertyNames(actualViewPartGridFixture)}]`),
-        };
-      }
-
-      const actualGridFixture: ComponentFixture<ViewPartGridComponent> = actualViewPartGridFixture;
+    compare(actual: MTreeNode | MPart | ComponentFixture<PartsLayoutComponent>, expectedLayout: MTreeNode | MPart): CustomMatcherResult {
       try {
-        // Verify grid object
-        const result = toEqual(actualGridFixture.componentInstance.root, expectedViewPartGrid, util, customEqualityTesters);
-        if (!result.pass) {
-          return result;
-        }
-
-        // Verify DOM representation
-        assertRenderedGridInDom(expectedViewPartGrid, actualGridFixture.debugElement.query(By.css('wb-view-part-sash-box')) || actualGridFixture.debugElement);
-      } catch (error) {
-        if (error instanceof AssertException) {
-          return {pass: false, message: msgFn(error.message)};
-        }
-        else {
-          throw error;
-        }
+        assertPartsLayout(expectedLayout, actual);
+        return {pass: true};
       }
-
-      return {pass: true};
+      catch (error) {
+        if (error instanceof PartsLayoutAssertError) {
+          const failOutput = arguments[2];
+          return {pass: false, message: [error.message, failOutput].filter(Boolean).join(', ')};
+        }
+        throw error;
+      }
     },
   };
 
-  /**
-   * Asserts the rendered grid in the DOM against the expected modelled grid.
-   */
-  function assertRenderedGridInDom(expectedGridElement: ViewPartSashBox | ViewPartInfoArray, actualDom: DebugElement): void {
-    if (!Array.isArray(expectedGridElement)) {
-      // ViewPartSashBox
-      assertRenderedGridInDom(expectedGridElement.sash1, actualDom.children.find(child => ['wb-view-part-sash-box', 'wb-portal-outlet'].includes(child.name) && child.nativeElement.classList.contains('sash-1')));
-      assertRenderedGridInDom(expectedGridElement.sash2, actualDom.children.find(child => ['wb-view-part-sash-box', 'wb-portal-outlet'].includes(child.name) && child.nativeElement.classList.contains('sash-2')));
+  function assertPartsLayout(expectedLayout: MTreeNode | MPart, actual: MTreeNode | MPart | ComponentFixture<PartsLayoutComponent>): void {
+    if (actual instanceof MTreeNode || actual instanceof MPart) {
+      assertPartsLayoutModel(expectedLayout, actual);
+    }
+    else if (actual instanceof ComponentFixture && actual.componentInstance instanceof PartsLayoutComponent) {
+      assertPartsLayoutModel(expectedLayout, actual.componentInstance.root);
+      assertPartsLayoutDOM(expectedLayout, actual.debugElement.query(By.css('wb-tree-node')) || actual.debugElement);
     }
     else {
-      // ViewPartInfoArray
-      const expectedViewPartRef = expectedGridElement[VIEW_PART_REF_INDEX];
-      const expectedActiveViewRef = expectedGridElement[ACTIVE_VIEW_REF_INDEX];
+      throw new PartsLayoutAssertError(`Expected testee to be of type \'MTreeNode\', \'MPart\' or \'ComponentFixture&lt;PartsLayoutComponent&gt;\' [actual=${actual.constructor.name}]`);
+    }
+  }
 
-      const actualViewPartElement = actualDom.query(By.css(`wb-view-part[viewpartref="${expectedViewPartRef}"]`));
-      if (!actualViewPartElement) {
-        throw new AssertException(`DOM: Expected element <wb-view-part viewpartref="${expectedViewPartRef}"> not found for view '${expectedActiveViewRef}'`);
+  /**
+   * Asserts the actual model to equal the expected model. Only properties declared on the expected object are compared ().
+   */
+  function assertPartsLayoutModel(expectedLayout: MTreeNode | MPart, actualLayout: MTreeNode | MPart): void {
+    const result = toEqual(actualLayout, objectContainingRecursive(expectedLayout), util, customEqualityTesters);
+    if (!result.pass) {
+      throw new PartsLayoutAssertError(result.message);
+    }
+  }
+
+  /**
+   * Asserts the rendered parts layout in the DOM against the expected modelled parts layout.
+   */
+  function assertPartsLayoutDOM(expectedLayout: MTreeNode | MPart, actualDom: DebugElement): void {
+    if (expectedLayout instanceof MTreeNode) {
+      const treeNode = expectedLayout as MTreeNode;
+
+      const nodeid = actualDom.attributes['data-nodeid'];
+      if (!nodeid) {
+        throw Error(`[AttributeNotFoundError] Attribute \'data-nodeid\' not found on element ${actualDom.name}`);
       }
 
-      const actualActiveViewDebugElement = actualViewPartElement.query(By.css(`wb-view[viewref="${expectedActiveViewRef}"]`));
+      const sash1DomElement = actualDom.query(By.css(`wb-tree-node[data-parentnodeid="${nodeid}"].sash-1, wb-portal-outlet[data-parentnodeid="${nodeid}"].sash-1`));
+      assertPartsLayoutDOM(treeNode.child1, sash1DomElement);
+
+      const sash2DomElement = actualDom.query(By.css(`wb-tree-node[data-parentnodeid="${nodeid}"].sash-2, wb-portal-outlet[data-parentnodeid="${nodeid}"].sash-2`));
+      assertPartsLayoutDOM(treeNode.child2, sash2DomElement);
+    }
+    else if (expectedLayout instanceof MPart) {
+      const expectedPart = expectedLayout as MPart;
+      const actualPartElement = actualDom.query(By.css(`wb-view-part[data-partid="${expectedPart.partId}"]`));
+      if (!actualPartElement) {
+        throw new PartsLayoutAssertError(`DOM: Expected element <wb-view-part data-partid="${expectedPart.partId}"> not found for view '${expectedPart.activeViewId}'`);
+      }
+
+      const actualActiveViewDebugElement = actualPartElement.query(By.css(`wb-view[data-viewid="${expectedPart.activeViewId}"]`));
       if (!actualActiveViewDebugElement) {
-        throw new AssertException(`DOM: Expected element <wb-view viewref="${expectedActiveViewRef}"> not found for view '${expectedActiveViewRef}'`);
+        throw new PartsLayoutAssertError(`DOM: Expected element <wb-view data-viewid="${expectedPart.activeViewId}"> not found for view '${expectedPart.activeViewId}'`);
       }
+    }
+    else {
+      throw Error('[IllegalArgumentError] Layout must be of type \'TreeNode\' or \'Part\'');
     }
   }
 }
@@ -148,4 +164,23 @@ function toEqual(actual: any, expected: any, util: MatchersUtil, customEqualityT
   }
 
   return result;
+}
+
+/**
+ * Creates a {@link ObjectContaining} instance of the given partial {@link MTreeNode} or {@link MPart},
+ * which then can be used by jasmine equals matcher to only compare defined properties.
+ */
+function objectContainingRecursive(node: Partial<MTreeNode | MPart>): ObjectContaining<MTreeNode | MPart> {
+  if (node instanceof MTreeNode) {
+    const copy = new MTreeNode(node);
+    copy.child1 = objectContainingRecursive(node.child1) as any;
+    copy.child2 = objectContainingRecursive(node.child2) as any;
+    return jasmine.objectContaining(copy);
+  }
+  return jasmine.objectContaining(node);
+}
+
+class PartsLayoutAssertError {
+  constructor(public readonly message: string) {
+  }
 }

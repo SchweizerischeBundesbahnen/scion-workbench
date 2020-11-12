@@ -25,9 +25,8 @@
     "@angular/animations": "^10.0.0-rc.0 || ^10.0.0",
     "@angular/forms": "^10.0.0-rc.0 || ^10.0.0",
     "@angular/router": "^10.0.0-rc.0 || ^10.0.0",
-    "@scion/dimension": "0.0.0-beta.35",
-    "@scion/viewport": "0.0.0-beta.35",
-    "rxjs": "^6.0.0"
+    "@scion/toolkit": "^10.0.0-beta.3 || ^10.0.0-rc.0 || ^10.0.0",
+   "rxjs": "^6.0.0"
   },
   "keywords": [
     "scion",

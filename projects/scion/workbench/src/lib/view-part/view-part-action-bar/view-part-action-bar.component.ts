@@ -9,7 +9,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Injector, TemplateRef } from '@angular/core';
-import { WorkbenchViewPartService } from '../workbench-view-part.service';
 import { combineLatest, Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { WorkbenchViewPart, WorkbenchViewPartAction } from '../../workbench.model';
@@ -27,9 +26,9 @@ export class ViewPartActionBarComponent {
   public startActions$: Observable<WorkbenchViewPartAction[]>;
   public endActions$: Observable<WorkbenchViewPartAction[]>;
 
-  constructor(private _viewPart: WorkbenchViewPart, workbenchService: InternalWorkbenchService, viewPartService: WorkbenchViewPartService) {
-    this.startActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewRef$]).pipe(combineAndFilterViewPartActions('start'));
-    this.endActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, viewPartService.activeViewRef$]).pipe(combineAndFilterViewPartActions('end'));
+  constructor(private _viewPart: WorkbenchViewPart, workbenchService: InternalWorkbenchService) {
+    this.startActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, this._viewPart.activeViewId$]).pipe(combineAndFilterViewPartActions('start'));
+    this.endActions$ = combineLatest([this._viewPart.actions$, workbenchService.viewPartActions$, this._viewPart.activeViewId$]).pipe(combineAndFilterViewPartActions('end'));
   }
 
   public isTemplate(action: WorkbenchViewPartAction): boolean {
@@ -44,10 +43,10 @@ export class ViewPartActionBarComponent {
 }
 
 function combineAndFilterViewPartActions(align: 'start' | 'end'): OperatorFunction<[WorkbenchViewPartAction[], WorkbenchViewPartAction[], string], WorkbenchViewPartAction[]> {
-  return map(([localActions, globalActions, activeViewRef]: [WorkbenchViewPartAction[], WorkbenchViewPartAction[], string]): WorkbenchViewPartAction[] => {
+  return map(([localActions, globalActions, activeViewId]: [WorkbenchViewPartAction[], WorkbenchViewPartAction[], string]): WorkbenchViewPartAction[] => {
       return [...localActions, ...globalActions]
         .filter(action => (action.align || 'start') === align)
-        .filter(action => !action.viewRef || action.viewRef === activeViewRef);
+        .filter(action => !action.viewId || action.viewId === activeViewId);
     },
   );
 }

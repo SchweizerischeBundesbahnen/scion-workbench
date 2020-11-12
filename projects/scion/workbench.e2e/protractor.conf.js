@@ -16,7 +16,7 @@ const {SpecReporter, StacktraceOption} = require('jasmine-spec-reporter');
 const puppeteer = require('puppeteer');
 const chromeArgs = ['--window-size=1920,1080'];
 
-// Allow resolving modules specified by paths in 'tsconfig', e.g., to resolve '@scion/microfrontend-platform' module. This is required when working with secondary entry point.
+// Allow resolving modules specified by paths in 'tsconfig', e.g., to resolve '@scion/workbench' module. This is required when working with secondary entry point.
 // By default, 'ts-node' only looks in the 'node_modules' folder for modules and not in paths specified in 'tsconfig'.
 // See https://www.npmjs.com/package/tsconfig-paths
 require('tsconfig-paths/register');

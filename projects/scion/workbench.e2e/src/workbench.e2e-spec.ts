@@ -23,13 +23,13 @@ describe('Workbench', () => {
   it('should allow to always have an entry view open', async () => {
     await browser.get('/#/?ensure-welcome-view=true');
 
-    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
+    await expect(appPO.getViewTabCount()).toEqual(1);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
     await expectViewToShow({viewCssClass: 'e2e-welcome-page', componentSelector: 'app-welcome-page'});
 
     // close the view
-    await appPO.findViewTab('viewpart.1', {cssClass: 'e2e-welcome-page'}).close();
-    await expect(appPO.getViewTabCount('viewpart.1')).toEqual(1);
+    await appPO.findViewTab({cssClass: 'e2e-welcome-page'}).close();
+    await expect(appPO.getViewTabCount()).toEqual(1);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();
     await expectViewToShow({viewCssClass: 'e2e-welcome-page', componentSelector: 'app-welcome-page'});
   });

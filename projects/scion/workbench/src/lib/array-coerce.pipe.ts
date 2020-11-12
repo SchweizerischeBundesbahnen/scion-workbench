@@ -11,7 +11,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 /**
- * Creates an array from the given value, or returns the value if already an array. If `null` or `undefined` is given, returns an empty array.
+ * Returns the value, if an array, or adds it to an array. If `null` or `undefined` is given, returns an empty array.
  */
 @Pipe({name: 'wbCoerceArray', pure: true})
 export class ArrayCoercePipe implements PipeTransform {

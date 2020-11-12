@@ -16,11 +16,11 @@ import { ISize } from 'selenium-webdriver';
 export class HostAppPO {
 
   /**
-   * Returns a handle representing the view tab of given `viewRef` or which has given CSS class set.
+   * Returns a handle representing the view tab of given `viewId` or which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public findViewTab(viewPartRef: string, findBy: { viewRef?: string, cssClass?: string }): ViewTabPO {
-    const viewTabFinder = createViewTabFinder(viewPartRef, findBy);
+  public findViewTab(findBy: { partId?: string, viewId?: string, cssClass?: string }): ViewTabPO {
+    const viewTabFinder = createViewTabFinder(findBy);
 
     return new class implements ViewTabPO {
       async isPresent(): Promise<boolean> {
@@ -68,9 +68,9 @@ export class HostAppPO {
   /**
    * Returns the number of view tabs.
    */
-  public async getViewTabCount(viewPartRef: string): Promise<number> {
+  public async getViewTabCount(partId?: string): Promise<number> {
     await switchToMainContext();
-    return createViewPartBarFinder(viewPartRef).$$('wb-view-tab').count();
+    return createViewPartBarFinder(partId).$$('wb-view-tab').count();
   }
 
   /**
@@ -457,18 +457,21 @@ export interface ActivityActionPO {
   click(): Promise<void>;
 }
 
-function createViewPartBarFinder(viewPartRef: string): ElementFinder {
-  return $(`wb-view-part[viewpartref="${viewPartRef}"] wb-view-part-bar`);
+function createViewPartBarFinder(partId?: string): ElementFinder {
+  if (partId) {
+    return $(`wb-view-part[data-partid="${partId}"]`).$('wb-view-part-bar');
+  }
+  return $('wb-view-part.active').$('wb-view-part-bar');
 }
 
-function createViewTabFinder(viewPartRef: string, findBy: { viewRef?: string, cssClass?: string }): ElementFinder {
-  const viewPartBarFinder = createViewPartBarFinder(viewPartRef);
+function createViewTabFinder(findBy: { partId?: string, viewId?: string, cssClass?: string }): ElementFinder {
+  const viewPartBarFinder = createViewPartBarFinder(findBy.partId);
 
-  if (findBy.viewRef !== undefined) {
-    return viewPartBarFinder.$(`wb-view-tab[viewref="${findBy.viewRef}"]`);
+  if (findBy.viewId !== undefined) {
+    return viewPartBarFinder.$(`wb-view-tab[data-viewid="${findBy.viewId}"]`);
   }
   else if (findBy.cssClass !== undefined) {
     return viewPartBarFinder.$(`wb-view-tab.${findBy.cssClass}`);
   }
-  throw Error('[IllegalArgumentError] \'viewRef\' or \'cssClass\' required to find a view tab');
+  throw Error('[IllegalArgumentError] \'viewId\' or \'cssClass\' required to find a view tab');
 }
