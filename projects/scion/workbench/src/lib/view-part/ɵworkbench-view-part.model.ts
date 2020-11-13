@@ -26,6 +26,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
   private _hiddenViewTabs$ = new BehaviorSubject<string[]>([]);
   private _layoutService: WorkbenchLayoutService;
   private _viewOutletNavigator: ViewOutletNavigator;
+  private _markedForDestruction = false;
 
   public readonly viewIds$ = new BehaviorSubject<string[]>([]);
   public readonly actions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
@@ -67,9 +68,13 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public activate(): Promise<boolean> {
+  public async activate(): Promise<boolean> {
+    if (this._markedForDestruction) {
+      return false;
+    }
+
     if (this.isActive()) {
-      return Promise.resolve(true);
+      return true;
     }
 
     const serializedLayout = this._layoutService.layout
@@ -88,9 +93,13 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public activateView(viewId: string): Promise<boolean> {
+  public async activateView(viewId: string): Promise<boolean> {
+    if (this._markedForDestruction) {
+      return false;
+    }
+
     if (this.activeViewId === viewId) {
-      return Promise.resolve(true);
+      return true;
     }
 
     const serializedLayout = this._layoutService.layout
@@ -105,10 +114,12 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public activateSiblingView(): Promise<boolean> {
-    const layout = this._layoutService.layout;
+  public async activateSiblingView(): Promise<boolean> {
+    if (this._markedForDestruction) {
+      return false;
+    }
 
-    const serializedLayout = layout
+    const serializedLayout = this._layoutService.layout
       .activateAdjacentView(this.activeViewId)
       .serialize();
 
@@ -131,6 +142,10 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
 
   public get hiddenViewTabs$(): Observable<string[]> {
     return this._hiddenViewTabs$;
+  }
+
+  public preDestroy(): void {
+    this._markedForDestruction = true;
   }
 
   public destroy(): void {

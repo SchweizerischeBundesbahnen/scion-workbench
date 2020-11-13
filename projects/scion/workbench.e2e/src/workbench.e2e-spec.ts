@@ -21,7 +21,7 @@ describe('Workbench', () => {
   });
 
   it('should allow to always have an entry view open', async () => {
-    await browser.get('/#/?ensure-welcome-view=true');
+    await browser.get('/#/?home-tab-enabled=true');
 
     await expect(appPO.getViewTabCount()).toEqual(1);
     await expect(appPO.isViewTabBarShowing()).toBeTruthy();

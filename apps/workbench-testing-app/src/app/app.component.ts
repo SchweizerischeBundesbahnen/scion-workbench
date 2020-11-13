@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { combineLatest, Subject } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { WorkbenchRouter, WorkbenchService } from '@scion/workbench';
 
@@ -16,7 +16,6 @@ export class AppComponent implements OnDestroy {
 
   public showActivities = true;
   public showOpenNewViewTabAction = true;
-  public ensureWelcomeView = false;
 
   constructor(route: ActivatedRoute, workbench: WorkbenchService, wbRouter: WorkbenchRouter) {
     route.queryParamMap
@@ -24,13 +23,14 @@ export class AppComponent implements OnDestroy {
       .subscribe(queryParams => {
         this.showActivities = coerceBooleanProperty(queryParams.get('show-activities') || true);
         this.showOpenNewViewTabAction = coerceBooleanProperty(queryParams.get('show-open-new-view-tab-action') || true);
-        this.ensureWelcomeView = coerceBooleanProperty(queryParams.get('ensure-welcome-view') || false);
       });
 
-    workbench.views$
+    const homeTabEnabled$ = route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get('home-tab-enabled') || false)));
+    const views$ = workbench.views$;
+    combineLatest([homeTabEnabled$, views$])
       .pipe(takeUntil(this._destroy$))
-      .subscribe(views => {
-        if (this.ensureWelcomeView && views.length === 0) {
+      .subscribe(([homeTabEnabled, views]) => {
+        if (homeTabEnabled && views.length === 0) {
           wbRouter.navigate(['/welcome']).then();
         }
       });

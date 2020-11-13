@@ -467,7 +467,7 @@ describe('PartsLayout', () => {
     const partsLayout = createSimplePartsLayout();
     const serializedPartsLayout = partsLayout.serialize();
 
-    // change the layout
+    // modify the layout; should not modify `partsLayout` instance
     partsLayout
       .addPart('X', {relativeTo: 'main', align: 'right'})
       .addPart('Y', {relativeTo: 'X', align: 'bottom'})
