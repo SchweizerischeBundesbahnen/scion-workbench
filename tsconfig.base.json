@@ -31,12 +31,6 @@
       ],
       "@scion/dimension/*": [
         "dist/scion/dimension/*"
-      ],
-      "@scion/viewport": [
-        "dist/scion/viewport"
-      ],
-      "@scion/viewport/*": [
-        "dist/scion/viewport/*"
       ]
     }
     /*
@@ -61,12 +55,6 @@
     //      "@scion/dimension/*": [
     //        "projects/scion/dimension/src/*"
     //      ],
-    //      "@scion/viewport": [
-    //        "projects/scion/viewport/src/public_api"
-    //      ],
-    //      "@scion/viewport/*": [
-    //        "projects/scion/viewport/src/*"
-    //      ],
     //      "@scion/toolkit/util": [
     //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
     //      ],
@@ -75,6 +63,9 @@
     //      ],
     //      "@scion/toolkit/dimension": [
     //        "../scion-toolkit/projects/scion/toolkit/dimension/src/public_api"
+    //      ],
+    //      "@scion/toolkit/viewport": [
+    //        "../scion-toolkit/projects/scion/toolkit/viewport/src/public_api"
     //      ],
     //      "@scion/toolkit/observable": [
     //        "../scion-toolkit/projects/scion/toolkit/observable/src/public_api"

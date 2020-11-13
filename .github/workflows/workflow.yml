@@ -49,19 +49,13 @@ jobs:
         id: dimension-package-json
         with:
           path: projects/scion/dimension/package.json
-      - name: 'Reading package.json version of scion/viewport'
-        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/package-json@master
-        id: viewport-package-json
-        with:
-          path: projects/scion/viewport/package.json
       - name: 'Asserting package.json versions to be equal'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/equality-checker@master
         with:
           values: |
             ${{ steps.root-package-json.outputs.version }},
             ${{ steps.workbench-package-json.outputs.version }},
-            ${{ steps.dimension-package-json.outputs.version }},
-            ${{ steps.viewport-package-json.outputs.version }}
+            ${{ steps.dimension-package-json.outputs.version }}
       - name: 'Restoring NPM modules from cache'
         uses: actions/cache@v2
         with:
@@ -69,8 +63,6 @@ jobs:
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: 'Building @scion/dimension'
         run: npm run dimension:build
-      - name: 'Building @scion/viewport'
-        run: npm run viewport:build
       - name: 'Building @scion/workbench'
         run: npm run workbench:build
       - uses: actions/upload-artifact@v2
@@ -207,11 +199,5 @@ jobs:
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/npm-publish@master
         with:
           dist-folder: dist/scion/dimension
-          npm-token: ${{ secrets.NPM_TOKEN }}
-          dry-run: false
-      - name: 'Publishing @scion/viewport to NPM'
-        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/npm-publish@master
-        with:
-          dist-folder: dist/scion/viewport
           npm-token: ${{ secrets.NPM_TOKEN }}
           dry-run: false

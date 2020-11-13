@@ -229,7 +229,6 @@ We publish our packages to the [NPM registry](https://www.npmjs.com/). Packages 
 We have the following workbench related packages:
 - https://www.npmjs.com/package/@scion/workbench
 - https://www.npmjs.com/package/@scion/dimension
-- https://www.npmjs.com/package/@scion/viewport
 
 </details>
 
@@ -261,7 +260,6 @@ This chapter describes the tasks to publish a new release to NPM.
 1. Update the following `package.json` files with the new version:
     - `/package.json`
     - `/projects/scion/workbench/package.json`
-    - `/projects/scion/viewport/package.json`
     - `/projects/scion/dimension/package.json`
 1. Update inter-project dependencies.
 1. Run `npm install` to update the version in `package-lock.json`.
@@ -272,7 +270,6 @@ This chapter describes the tasks to publish a new release to NPM.
 1. Verify that: 
    - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
    - **@scion/dimension** is published to: https://www.npmjs.com/package/@scion/dimension.
-   - **@scion/viewport** is published to: https://www.npmjs.com/package/@scion/viewport.
 
 </details>
 

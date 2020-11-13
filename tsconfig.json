@@ -23,12 +23,6 @@
       "path": "./projects/scion/dimension/tsconfig.spec.json"
     },
     {
-      "path": "./projects/scion/viewport/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/scion/viewport/tsconfig.spec.json"
-    },
-    {
       "path": "./apps/workbench-testing-app/tsconfig.app.json"
     }
   ]
