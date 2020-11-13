@@ -25,12 +25,6 @@
       ],
       "@scion/workbench/*": [
         "dist/scion/workbench/*"
-      ],
-      "@scion/dimension": [
-        "dist/scion/dimension"
-      ],
-      "@scion/dimension/*": [
-        "dist/scion/dimension/*"
       ]
     }
     /*
@@ -48,12 +42,6 @@
     //      ],
     //      "@scion/workbench/*": [
     //        "projects/scion/workbench/src/*"
-    //      ],
-    //      "@scion/dimension": [
-    //        "projects/scion/dimension/src/public_api"
-    //      ],
-    //      "@scion/dimension/*": [
-    //        "projects/scion/dimension/src/*"
     //      ],
     //      "@scion/toolkit/util": [
     //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
