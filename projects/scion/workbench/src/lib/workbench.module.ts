@@ -24,7 +24,6 @@ import { ViewPartBarComponent } from './view-part/view-part-bar/view-part-bar.co
 import { WorkbenchService } from './workbench.service';
 import { ViewDropZoneDirective } from './view-dnd/view-drop-zone.directive';
 import { PartsLayoutComponent } from './layout/parts-layout.component';
-import { RemoteSiteComponent } from './remote-site/remote-site.component';
 import { WorkbenchLayoutService } from './layout/workbench-layout.service';
 import { ViewComponent } from './view/view.component';
 import { WbRouterOutletDirective } from './routing/wb-router-outlet.directive';
@@ -108,7 +107,6 @@ import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
     TreeNodeComponent,
     ViewDropZoneDirective,
     WbPortalOutletComponent,
-    RemoteSiteComponent,
     WbRouterOutletDirective,
     WbRouterLinkDirective,
     WbRouterLinkWithHrefDirective,
@@ -136,7 +134,6 @@ import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
     WbActivityActionDirective,
     WbRouterLinkDirective,
     WbRouterLinkWithHrefDirective,
-    RemoteSiteComponent,
     ContentAsOverlayComponent,
     ViewPartActionDirective,
     ViewMenuItemDirective,

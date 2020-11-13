@@ -147,7 +147,6 @@ The scope should be the name of the NPM package or application affected by the c
 The following scopes are allowed:
   
 - `workbench`: If the change affects the `@scion/workbench` NPM package.
-- `application-platform`: If the change affects the `@scion/workbench-application-platform` NPM package.
 - `demo`: If the change affects the `SCION Workbench Demo Application`.
 </details>
 
@@ -209,19 +208,17 @@ function someMethod(): void {
 
 </details>
 
+<!---
 <details>
   <summary><strong>Deployments</strong></summary>
   <br>
   
 We deploy our documentations and applications to [Vercel](https://vercel.com/docs). Vercel is a cloud platform for static sites and serverless functions. Applications are deployed using the SCION collaborator account (scion.collaborator@gmail.com) under the [SCION organization](https://vercel.com/scion).
 
-We have the following workbench and application platform related projects:
-- https://vercel.com/scion/scion-workbench-application-platform
-- https://vercel.com/scion/scion-workbench-application-platform-contact
-- https://vercel.com/scion/scion-workbench-application-platform-communication
-- https://vercel.com/scion/scion-workbench-application-platform-devtools
+We have the following workbench related projects:
 
 </details>
+-->
 
 <details>
   <summary><strong>NPM Packages</strong></summary>
@@ -229,15 +226,10 @@ We have the following workbench and application platform related projects:
   
 We publish our packages to the [NPM registry](https://www.npmjs.com/). Packages are published using the SCION collaborator account (scion.collaborator) under the [SCION organization](https://www.npmjs.com/org/scion).
 
-We have the following workbench and application platform related packages:
+We have the following workbench related packages:
 - https://www.npmjs.com/package/@scion/workbench
-- https://www.npmjs.com/package/@scion/workbench-application-platform
-- https://www.npmjs.com/package/@scion/workbench-application-platform.api
-- https://www.npmjs.com/package/@scion/workbench-application.core
-- https://www.npmjs.com/package/@scion/workbench-application.angular
 - https://www.npmjs.com/package/@scion/dimension
 - https://www.npmjs.com/package/@scion/viewport
-- https://www.npmjs.com/package/@scion/mouse-dispatcher
 
 </details>
 
@@ -269,14 +261,8 @@ This chapter describes the tasks to publish a new release to NPM.
 1. Update the following `package.json` files with the new version:
     - `/package.json`
     - `/projects/scion/workbench/package.json`
-    - `/projects/scion/workbench-application-platform/package.json`
-    - `/projects/scion/workbench-application-platform.api/package.json`
-    - `/projects/scion/workbench-application.core/package.json`
-    - `/projects/scion/workbench-application.angular/package.json`
     - `/projects/scion/viewport/package.json`
-    - `/projects/scion/mouse-dispatcher/package.json`
     - `/projects/scion/dimension/package.json`
-    - `/projects/app-common/package.json`
 1. Update inter-project dependencies.
 1. Run `npm install` to update the version in `package-lock.json`.
 1. Run `npm run changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
@@ -285,19 +271,8 @@ This chapter describes the tasks to publish a new release to NPM.
 1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
 1. Verify that: 
    - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
-   - **@scion/workbench-application-platform** is published to: https://www.npmjs.com/package/@scion/workbench-application-platform.
-   - **@scion/workbench-application-platform.api** is published to: https://www.npmjs.com/package/@scion/workbench-application-platform.api.
-   - **@scion/workbench-application.core** is published to: https://www.npmjs.com/package/@scion/workbench-application.core.
-   - **@scion/workbench-application.angular** is published to: https://www.npmjs.com/package/@scion/workbench-application.angular.
    - **@scion/dimension** is published to: https://www.npmjs.com/package/@scion/dimension.
    - **@scion/viewport** is published to: https://www.npmjs.com/package/@scion/viewport.
-   - **@scion/mouse-dispatcher** is published to: https://www.npmjs.com/package/@scion/mouse-dispatcher.
-   - **Workbench Application Platform Demo App** is deployed to:
-      - https://vercel.com/scion/scion-workbench-application-platform
-      - https://vercel.com/scion/scion-workbench-application-platform-contact
-      - https://vercel.com/scion/scion-workbench-application-platform-communication
-   - **DevTools for the Workbench Application Platform** is deployed to:
-      - https://vercel.com/scion/scion-workbench-application-platform-devtools
 
 </details>
 

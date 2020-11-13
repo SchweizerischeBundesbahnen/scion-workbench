@@ -17,36 +17,6 @@
       "path": "./projects/scion/workbench.e2e/tsconfig.json"
     },
     {
-      "path": "./projects/scion/workbench-application-platform/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/scion/workbench-application-platform/tsconfig.spec.json"
-    },
-    {
-      "path": "./projects/scion/workbench-application-platform.e2e/tsconfig.json"
-    },
-    {
-      "path": "./projects/scion/workbench-application-platform.api/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/scion/workbench-application.core/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/scion/workbench-application.core/tsconfig.spec.json"
-    },
-    {
-      "path": "./projects/scion/workbench-application.angular/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/scion/workbench-application.angular/tsconfig.spec.json"
-    },
-    {
-      "path": "./projects/scion/mouse-dispatcher/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/scion/mouse-dispatcher/tsconfig.spec.json"
-    },
-    {
       "path": "./projects/scion/dimension/tsconfig.lib.json"
     },
     {
@@ -57,24 +27,6 @@
     },
     {
       "path": "./projects/scion/viewport/tsconfig.spec.json"
-    },
-    {
-      "path": "./projects/app-common/tsconfig.lib.json"
-    },
-    {
-      "path": "./apps/workbench-application-platform/host-app/tsconfig.app.json"
-    },
-    {
-      "path": "./apps/workbench-application-platform/contact-app/tsconfig.app.json"
-    },
-    {
-      "path": "./apps/workbench-application-platform/communication-app/tsconfig.app.json"
-    },
-    {
-      "path": "./apps/workbench-application-platform/devtools-app/tsconfig.app.json"
-    },
-    {
-      "path": "./apps/workbench-application-platform/testing-app/tsconfig.app.json"
     },
     {
       "path": "./apps/workbench-testing-app/tsconfig.app.json"
