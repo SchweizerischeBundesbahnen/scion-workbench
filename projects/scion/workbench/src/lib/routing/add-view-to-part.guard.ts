@@ -13,8 +13,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PARTS_LAYOUT_QUERY_PARAM, VIEW_NAV_STATE } from '../workbench.constants';
 import { PartsLayout } from '../layout/parts-layout';
-import { ViewNavigation } from '../routing/workbench-router.service';
-import { PartsLayoutFactory } from '../layout/parts-layout.factory';
+import { ViewNavigation, WorkbenchRouter } from '../routing/workbench-router.service';
 
 /**
  * Guard for adding a view to a part.
@@ -30,7 +29,7 @@ import { PartsLayoutFactory } from '../layout/parts-layout.factory';
 @Injectable({providedIn: 'root'})
 export class WbAddViewToPartGuard implements CanActivate {
 
-  constructor(private _router: Router, private _partsLayoutFactory: PartsLayoutFactory) {
+  constructor(private _router: Router, private _workbenchRouter: WorkbenchRouter) {
   }
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
@@ -38,7 +37,7 @@ export class WbAddViewToPartGuard implements CanActivate {
     const viewId = route.outlet;
 
     // Read the layout from the URL.
-    const partsLayout = this._partsLayoutFactory.create(route.queryParams[PARTS_LAYOUT_QUERY_PARAM]);
+    const partsLayout = this._workbenchRouter.getCurrentNavigationContext().partsLayout;
 
     // Return if the view is already added to the layout.
     if (partsLayout.findPartByViewId(viewId, {orElseThrow: false})) {

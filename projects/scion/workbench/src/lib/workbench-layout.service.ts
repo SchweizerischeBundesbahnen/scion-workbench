@@ -50,7 +50,9 @@ export class WorkbenchLayoutService {
   /**
    * Emits the current {@link PartsLayout}.
    *
-   * Upon subscription, the current layout is emitted, if any, and then emits continuously when the layout changes. It never completes.
+   * Upon subscription, the current layout is emitted, and then emits continuously when the layout changes.
+   * If Angular's initial navigation is not performed yet, blocks until the initial navigation is complete. It never
+   * emits `null` and never completes.
    */
   public readonly layout$: Observable<PartsLayout> = this._layoutChange$
     .pipe(
@@ -87,8 +89,8 @@ export class WorkbenchLayoutService {
   /**
    * Returns a reference to current {@link PartsLayout}, if any. Is `null` until the initial navigation is performed.
    */
-  public get layout(): PartsLayout {
-    return this._layout;
+  public get layout(): PartsLayout | null {
+    return this._layout || null;
   }
 
   /**

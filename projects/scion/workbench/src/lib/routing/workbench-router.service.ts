@@ -12,32 +12,21 @@ import { NavigationExtras, Router } from '@angular/router';
 import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
 import { Defined } from '@scion/toolkit/util';
 import { ViewOutletNavigator } from './view-outlet-navigator.service';
-import { Injectable } from '@angular/core';
+import { Injectable, IterableChanges } from '@angular/core';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { VIEW_NAV_STATE } from '../workbench.constants';
-
-/**
- * Contains information about the view navigation.
- *
- * @internal
- */
-export interface ViewNavigation {
-  /**
-   * Specifies the part where to add a view. If not set, adds it to its preferred part, if defined on its route, or to the currently active part.
-   */
-  partId?: string;
-  /**
-   * Specifies the position where to add the view tab into the tabbar.
-   */
-  viewIndex?: number | 'start' | 'end';
-}
 import { ɵWorkbenchService } from '../ɵworkbench.service';
+import { PartsLayout } from '../layout/parts-layout';
+import { filter, take } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
  */
 @Injectable()
 export class WorkbenchRouter {
+
+  private _currentNavigationContext$ = new BehaviorSubject<WorkbenchNavigationContext>(null);
 
   constructor(private _router: Router,
               private _viewOutletNavigator: ViewOutletNavigator,
@@ -69,8 +58,17 @@ export class WorkbenchRouter {
    *
    * @see WbRouterLinkDirective
    */
-  public navigate(commandList: any[], extras: WbNavigationExtras = {}): Promise<boolean> {
+  public async navigate(commandList: any[], extras: WbNavigationExtras = {}): Promise<boolean> {
     const commands = this._viewOutletNavigator.normalizeCommands(commandList, extras.relativeTo);
+
+    // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
+    // Otherwise, would override the initial layout as given in the URL.
+    await this.waitForInitialLayout();
+
+    // Do not interfere with a potentially running navigation. For example, if observing the view registry,
+    // you would get events during navigation. If you would then start an extra navigation, e.g., when the
+    // view count drops to zero, this could end up in an invalid routing state.
+    await this.waitForNavigationToComplete();
 
     if (extras.closeIfPresent) {
       return this._workbench.destroyView(...this._viewOutletNavigator.resolvePresentViewIds(commands));
@@ -87,7 +85,6 @@ export class WorkbenchRouter {
 
     switch (extras.target || 'blank') {
       case 'blank': {
-        const partsLayout = this._layoutService.layout;
         const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
         const viewNavigation: ViewNavigation = {
           partId: extras.blankPartId,
@@ -96,7 +93,7 @@ export class WorkbenchRouter {
 
         return this._viewOutletNavigator.navigate({
           viewOutlet: {name: newViewId, commands},
-          partsLayout: partsLayout.serialize(),
+          partsLayout: this._layoutService.layout.serialize(),
           extras: {
             ...extras,
             relativeTo: null, // commands are absolute because normalized
@@ -131,6 +128,49 @@ export class WorkbenchRouter {
         throw Error(`[WorkbenchRouterError] Invalid routing target. Expected 'self' or 'blank', but received ${extras.target}'.`);
       }
     }
+  }
+
+  /**
+   * Returns the context of the current workbench navigation, when being invoked during navigation, or throws an error otherwise.
+   *
+   * @internal
+   */
+  public getCurrentNavigationContext(): WorkbenchNavigationContext {
+    const context = this._currentNavigationContext$.value;
+    if (!context) {
+      throw Error('[WorkbenchRouterError] Navigation context not available as no navigation is in progress.');
+    }
+    return context;
+  }
+
+  /**
+   * Sets navigational contextual data.
+   *
+   * @internal
+   */
+  public setCurrentNavigationContext(context: WorkbenchNavigationContext): void {
+    this._currentNavigationContext$.next(context);
+  }
+
+  /**
+   * Waits for a potentially running navigation to complete. Resolves immediately if there is no navigation in progress.
+   */
+  private async waitForNavigationToComplete(): Promise<void> {
+    await this._currentNavigationContext$
+      .pipe(
+        filter(context => context === null),
+        take(1),
+      )
+      .toPromise();
+  }
+
+  /**
+   * Blocks until the initial layout is available, i.e. after completion of Angular's initial navigation.
+   */
+  private async waitForInitialLayout(): Promise<void> {
+    await this._layoutService.layout$
+      .pipe(take(1))
+      .toPromise();
   }
 }
 
@@ -170,4 +210,40 @@ export interface WbNavigationExtras extends NavigationExtras {
    * the view at the beginning or at the end.
    */
   blankInsertionIndex?: number | 'start' | 'end';
+}
+
+/**
+ * Contains information about the view navigation.
+ *
+ * @internal
+ */
+export interface ViewNavigation {
+  /**
+   * Specifies the part where to add a view. If not set, adds it to its preferred part, if defined on its route, or to the currently active part.
+   */
+  partId?: string;
+  /**
+   * Specifies the position where to add the view tab into the tabbar.
+   */
+  viewIndex?: number | 'start' | 'end';
+}
+
+/**
+ * Contextual data of a workbench navigation.
+ *
+ * @internal
+ */
+export interface WorkbenchNavigationContext {
+  /**
+   * Layout to be applied after successful navigation.
+   */
+  partsLayout: PartsLayout;
+  /**
+   * Parts that are added or removed by this navigation.
+   */
+  partChanges: IterableChanges<string> | null;
+  /**
+   * Views outlets that are added or removed by this navigation.
+   */
+  viewOutletChanges: IterableChanges<string> | null;
 }

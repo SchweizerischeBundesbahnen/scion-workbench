@@ -36,9 +36,10 @@ export class PartsLayout {
     this._root = layout.root;
     this._activePartId = layout.activePartId;
 
+    assertType(this._root, {toBeOneOf: [MTreeNode, MPart]});
     assertNotNullish(this._root, {orElseThrow: () => Error(`[PartsLayoutError] Expected a root part/node to be set.`)});
     assertNotNullish(this._activePartId, {orElseThrow: () => Error(`[PartsLayoutError] Expected an active part to be set.`)});
-    assertType(this._root, {toBeOneOf: [MTreeNode, MPart]});
+    assertNotNullish(this.findPart(this._activePartId, {orElseThrow: false}), {orElseThrow: () => Error(`[PartsLayoutError] Expected active part to be contained in the layout, but was not found [partId=${this._activePartId}].`)});
   }
 
   /**
@@ -346,6 +347,7 @@ export class PartsLayout {
    */
   private _activatePart(partId: string): this {
     assertNotNullish(partId, {orElseThrow: () => Error(`[PartsLayoutError] PartId must not be 'null' or 'undefined'.`)});
+    assertNotNullish(this.findPart(partId, {orElseThrow: false}), {orElseThrow: () => Error(`[PartsLayoutError] Part to activate expected to be contained in the layout, but was not found [partId=${partId}].`)});
     this._activePartId = partId;
     return this;
   }

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { WbViewDropEvent } from '../view-dnd/view-drop-zone.directive';
 import { takeUntil } from 'rxjs/operators';
@@ -21,7 +21,7 @@ import { ɵWorkbenchService } from '../ɵworkbench.service';
   templateUrl: './view-part.component.html',
   styleUrls: ['./view-part.component.scss'],
 })
-export class ViewPartComponent implements OnInit, OnDestroy {
+export class ViewPartComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
@@ -53,10 +53,6 @@ export class ViewPartComponent implements OnInit, OnDestroy {
         this.hasViews = viewIds.length > 0;
         this.hasActions = globalActions.length > 0 || localActions.length > 0;
       });
-  }
-
-  public ngOnInit(): void {
-    this._part.activate().then();
   }
 
   @HostListener('focusin')

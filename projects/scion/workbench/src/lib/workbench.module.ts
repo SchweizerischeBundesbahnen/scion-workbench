@@ -79,6 +79,7 @@ import { ViewPortalPipe } from './view/view-portal.pipe';
 import { PartsLayoutFactory } from './layout/parts-layout.factory';
 import { ViewDropHandler } from './view/view-drop-handler.service';
 import { ɵWorkbenchService } from './ɵworkbench.service';
+import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
 
 @NgModule({
   imports: [
@@ -186,6 +187,7 @@ export class WorkbenchModule {
           provide: WorkbenchService, useExisting: ɵWorkbenchService,
         },
         WorkbenchLayoutService,
+        WorkbenchLayoutDiffer,
         WorkbenchActivityPartService,
         WorkbenchAuxiliaryRoutesRegistrator,
         ActivityResolver,
