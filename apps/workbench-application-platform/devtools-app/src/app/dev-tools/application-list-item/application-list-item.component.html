@@ -1,8 +1,0 @@
-<a class="app-name" [wbRouterLink]="{entity: 'application', symbolicName: manifest.symbolicName}">{{manifest.name}}</a>
-<span class="app-symbolic-name" title="symbolic name">{{manifest.symbolicName}}</span>
-<a class="url" [href]="manifest.baseUrl" target="_blank">{{manifest.baseUrl}}</a>
-
-<div class="chips">
-  <span class="chip" *ngIf="intentCount">{{intentCount}} {{intentCount === 1 ? 'intent' : 'intents'}}</span>
-  <span class="chip" *ngIf="capabilityCount">{{capabilityCount}} {{capabilityCount === 1 ? 'capability' : 'capabilities'}}</span>
-</div>

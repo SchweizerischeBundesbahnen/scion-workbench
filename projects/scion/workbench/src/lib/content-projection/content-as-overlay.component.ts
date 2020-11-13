@@ -33,7 +33,7 @@ import { WorkbenchView } from '../view/workbench-view.model';
  * Example HTML template:
  *
  * <wb-content-as-overlay>
- *   <wb-remote-site [url]="..."></wb-remote-site>
+ *   <iframe [src]="..."></iframe>
  * </wb-content-as-overlay>
  *
  *
@@ -46,7 +46,7 @@ import { WorkbenchView } from '../view/workbench-view.model';
  *   }
  * }
  *
- * wb-remote-site {
+ * iframe {
  *   flex: auto;
  * }
  */

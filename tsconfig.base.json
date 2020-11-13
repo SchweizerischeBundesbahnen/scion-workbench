@@ -26,36 +26,6 @@
       "@scion/workbench/*": [
         "dist/scion/workbench/*"
       ],
-      "@scion/workbench-application-platform.api": [
-        "dist/scion/workbench-application-platform.api"
-      ],
-      "@scion/workbench-application-platform.api/*": [
-        "dist/scion/workbench-application-platform.api/*"
-      ],
-      "@scion/workbench-application-platform": [
-        "dist/scion/workbench-application-platform"
-      ],
-      "@scion/workbench-application-platform/*": [
-        "dist/scion/workbench-application-platform/*"
-      ],
-      "@scion/workbench-application.core": [
-        "dist/scion/workbench-application.core"
-      ],
-      "@scion/workbench-application.core/*": [
-        "dist/scion/workbench-application.core/*"
-      ],
-      "@scion/workbench-application.angular": [
-        "dist/scion/workbench-application.angular"
-      ],
-      "@scion/workbench-application.angular/*": [
-        "dist/scion/workbench-application.angular/*"
-      ],
-      "@scion/mouse-dispatcher": [
-        "dist/scion/mouse-dispatcher"
-      ],
-      "@scion/mouse-dispatcher/*": [
-        "dist/scion/mouse-dispatcher/*"
-      ],
       "@scion/dimension": [
         "dist/scion/dimension"
       ],
@@ -67,12 +37,6 @@
       ],
       "@scion/viewport/*": [
         "dist/scion/viewport/*"
-      ],
-      "app-common": [
-        "dist/app-common"
-      ],
-      "app-common/*": [
-        "dist/app-common/*"
       ]
     }
     /*
@@ -91,36 +55,6 @@
     //      "@scion/workbench/*": [
     //        "projects/scion/workbench/src/*"
     //      ],
-    //      "@scion/workbench-application-platform.api": [
-    //        "projects/scion/workbench-application-platform.api/src/public_api"
-    //      ],
-    //      "@scion/workbench-application-platform.api/*": [
-    //        "projects/scion/workbench-application-platform.api/src/*"
-    //      ],
-    //      "@scion/workbench-application-platform": [
-    //        "projects/scion/workbench-application-platform/src/public_api"
-    //      ],
-    //      "@scion/workbench-application-platform/*": [
-    //        "projects/scion/workbench-application-platform/src/*"
-    //      ],
-    //      "@scion/workbench-application.core": [
-    //        "projects/scion/workbench-application.core/src/public_api"
-    //      ],
-    //      "@scion/workbench-application.core/*": [
-    //        "projects/scion/workbench-application.core/src/*"
-    //      ],
-    //      "@scion/workbench-application.angular": [
-    //        "projects/scion/workbench-application.angular/src/public_api"
-    //      ],
-    //      "@scion/workbench-application.angular/*": [
-    //        "projects/scion/workbench-application.angular/src/*"
-    //      ],
-    //      "@scion/mouse-dispatcher": [
-    //        "projects/scion/mouse-dispatcher/src/public_api"
-    //      ],
-    //      "@scion/mouse-dispatcher/*": [
-    //        "projects/scion/mouse-dispatcher/src/*"
-    //      ],
     //      "@scion/dimension": [
     //        "projects/scion/dimension/src/public_api"
     //      ],
@@ -132,12 +66,6 @@
     //      ],
     //      "@scion/viewport/*": [
     //        "projects/scion/viewport/src/*"
-    //      ],
-    //      "app-common": [
-    //        "projects/app-common/src/public_api"
-    //      ],
-    //      "app-common/*": [
-    //        "projects/app-common/src/*"
     //      ],
     //      "@scion/toolkit/util": [
     //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"

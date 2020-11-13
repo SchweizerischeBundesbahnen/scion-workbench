@@ -7,6 +7,11 @@
 
 On this page you will find the latest news about the development of the SCION Workbench.
 
+- **2020-11: Deletion of the SCION Application Platform**\
+We have deleted the SCION application platform from our Git repository and deprecated respective NPM modules. This project is discontinued and will no longer be maintained. Its documentation is still online. The following NPM modules are deprecated: `@scion/workbench-application-platform`, `@scion/workbench-application-platform.api`, `@scion/workbench-application.core`, `@scion/workbench-application.angular`, `@scion/mouse-dispatcher`, `@scion/dimension` (moved to `@scion/toolkit`), `@scion/viewport` (moved to `@scion/toolkit`). 
+
+  If you still need updates for new Angular versions, please let us know and submit a GitHub issue. Alternatively, micro applications can use the TypeScript module `@scion/workbench-application.core` instead of `@scion/workbench-application.angular`. We plan to release the new microfrontend support for the SCION Workbench by the end of 2020 so that you can migrate to Angular 11. Detailed migration instructions for upgrading to the new workbench microfrontend support will follow after its release.
+
 - **2020-06: Integration of the SCION Microfrontend Platform**\
 We are working on the integration of the new [SCION Microfrontend Platform][link-scion-microfrontend-platform] into the workbench to enable a seamless integration of microfrontends as workbench views. Embedded microfrontends will be able to interact with the workbench via a framework-agnostic workbench API and benefit from the full functionality of the SCION Microfrontend Platform.
 
