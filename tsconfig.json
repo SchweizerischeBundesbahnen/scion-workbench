@@ -17,12 +17,6 @@
       "path": "./projects/scion/workbench.e2e/tsconfig.json"
     },
     {
-      "path": "./projects/scion/dimension/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/scion/dimension/tsconfig.spec.json"
-    },
-    {
       "path": "./apps/workbench-testing-app/tsconfig.app.json"
     }
   ]

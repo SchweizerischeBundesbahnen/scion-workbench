@@ -22,10 +22,6 @@
     "e2e:workbench:headless": "cross-env HEADLESS=HEADLESS run-s \"workbench:e2e -- {@}\" --",
     "postinstall": "ngcc --tsconfig \"tsconfig.base.json\"",
 
-    "dimension:lint": "ng lint @scion/dimension",
-    "dimension:test": "ng test @scion/dimension",
-    "dimension:build": "ng build --prod @scion/dimension",
-
     "workbench:lint": "ng lint @scion/workbench",
     "workbench.e2e:lint": "ng lint @scion/workbench.e2e",
     "workbench:test": "ng test @scion/workbench",
