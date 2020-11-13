@@ -111,46 +111,6 @@
         }
       }
     },
-    "@scion/viewport": {
-      "projectType": "library",
-      "root": "projects/scion/viewport",
-      "sourceRoot": "projects/scion/viewport/src",
-      "prefix": "sci",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/scion/viewport/tsconfig.lib.json",
-            "project": "projects/scion/viewport/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/scion/viewport/tsconfig.lib.prod.json"
-            }
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/scion/viewport/src/test.ts",
-            "tsConfig": "projects/scion/viewport/tsconfig.spec.json",
-            "karmaConfig": "projects/scion/viewport/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/scion/viewport/tsconfig.lib.json",
-              "projects/scion/viewport/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
     "workbench-testing-app": {
       "projectType": "application",
       "root": "apps/workbench-testing-app",

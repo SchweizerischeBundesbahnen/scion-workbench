@@ -26,11 +26,6 @@
     "dimension:test": "ng test @scion/dimension",
     "dimension:build": "ng build --prod @scion/dimension",
 
-    "viewport:lint": "ng lint @scion/viewport",
-    "viewport:test": "ng test @scion/viewport",
-    "viewport:build": "ng build --prod @scion/viewport",
-    "postviewport:build": "scss-bundle -p . -e projects/scion/viewport/src/theme/_scrollbar.scss -o dist/scion/viewport/scrollbar.scss",
-
     "workbench:lint": "ng lint @scion/workbench",
     "workbench.e2e:lint": "ng lint @scion/workbench.e2e",
     "workbench:test": "ng test @scion/workbench",
