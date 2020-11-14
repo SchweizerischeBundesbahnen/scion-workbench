@@ -10,10 +10,10 @@
 
 import { Directive, Input, OnDestroy, OnInit, Optional, TemplateRef } from '@angular/core';
 import { Disposable } from '../../disposable';
-import { TaskScheduler } from '../../task-scheduler.service';
 import { WorkbenchService } from '../../workbench.service';
 import { WorkbenchView } from '../../view/workbench-view.model';
 import { WorkbenchViewPart } from '../workbench-view-part.model';
+import { asapScheduler } from 'rxjs';
 
 /**
  * Use this directive to model an action contributed to the viewpart action bar located to the right of the view tabs.
@@ -46,13 +46,12 @@ export class ViewPartActionDirective implements OnInit, OnDestroy {
   constructor(private _template: TemplateRef<void>,
               @Optional() private _viewPart: WorkbenchViewPart,
               @Optional() private _view: WorkbenchView,
-              private _workbench: WorkbenchService,
-              private _taskScheduler: TaskScheduler) {
+              private _workbench: WorkbenchService) {
   }
 
   public ngOnInit(): void {
     // Add the action inside a microtask because the action may be added to a parent component which already was change detected by Angular.
-    this._taskScheduler.scheduleMicrotask(() => {
+    asapScheduler.schedule(() => {
       this._action = (this._viewPart || this._workbench).registerViewPartAction({
         templateOrComponent: this._template,
         align: this.align,

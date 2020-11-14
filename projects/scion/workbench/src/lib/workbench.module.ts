@@ -63,7 +63,6 @@ import { PopupService } from './popup/popup.service';
 import { A11yModule } from '@angular/cdk/a11y';
 import { ViewPartActionDirective } from './view-part/view-part-action-bar/view-part-action.directive';
 import { ViewPartActionBarComponent } from './view-part/view-part-action-bar/view-part-action-bar.component';
-import { TaskScheduler } from './task-scheduler.service';
 import { WorkbenchViewPartRegistry } from './view-part/workbench-view-part.registry';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 import { ViewTabContentComponent } from './view-part/view-tab-content/view-tab-content.component';
@@ -199,7 +198,6 @@ export class WorkbenchModule {
         ContentHostRef,
         WorkbenchRouter,
         PopupService,
-        TaskScheduler,
         ViewActivationInstantProvider,
         PartsLayoutFactory,
         {

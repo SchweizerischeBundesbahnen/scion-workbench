@@ -10,10 +10,9 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Injector, Input, NgZone, OnDestroy, Output } from '@angular/core';
 import { Notification, WbNotification } from './notification';
-import { Subject, timer } from 'rxjs';
+import { asyncScheduler, Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PortalInjector } from '@angular/cdk/portal';
-import { TaskScheduler } from '../task-scheduler.service';
 import { Arrays } from '@scion/toolkit/util';
 
 @Component({
@@ -65,13 +64,13 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
     ].join(' ');
   }
 
-  constructor(private _injector: Injector, private _cd: ChangeDetectorRef, private _zone: NgZone, private _taskScheduler: TaskScheduler) {
+  constructor(private _injector: Injector, private _cd: ChangeDetectorRef, private _zone: NgZone) {
   }
 
   public ngAfterViewInit(): void {
     // Initiate manual change detection cycle because property may change during custom component construction.
     if (this._notification.content) {
-      this._taskScheduler.scheduleMacrotask(() => this._cd.markForCheck());
+      asyncScheduler.schedule(() => this._cd.markForCheck());
     }
   }
 
