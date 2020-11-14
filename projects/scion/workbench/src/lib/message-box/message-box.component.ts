@@ -12,10 +12,9 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { Action, Actions, MessageBox, WbMessageBox } from './message-box';
 import { PortalInjector } from '@angular/cdk/portal';
 import { MoveDelta } from '../move.directive';
-import { Subject, timer } from 'rxjs';
+import { asyncScheduler, Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
-import { TaskScheduler } from '../task-scheduler.service';
 import { Arrays } from '@scion/toolkit/util';
 
 @Component({
@@ -98,14 +97,13 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
 
   constructor(private _injector: Injector,
               private _cd: ChangeDetectorRef,
-              private _workbenchLayout: WorkbenchLayoutService,
-              private _taskScheduler: TaskScheduler) {
+              private _workbenchLayout: WorkbenchLayoutService) {
   }
 
   public ngAfterViewInit(): void {
     // Initiate manual change detection cycle because property may change during custom component construction.
     if (this._messageBox.content) {
-      this._taskScheduler.scheduleMacrotask(() => this._cd.markForCheck());
+      asyncScheduler.schedule(() => this._cd.markForCheck());
     }
   }
 
