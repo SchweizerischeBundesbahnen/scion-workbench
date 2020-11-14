@@ -60,7 +60,7 @@ The application manifest is a JSON file which contains metadata about the applic
 [menu-how-to]: /docs/site/application-platform/howto/how-to.md
 
 [menu-home]: /docs/site/application-platform/README.md
-[menu-projects-overview]: /docs/site/projects-overview.md
-[menu-changelog]: /docs/site/changelog/changelog.md
-[menu-contributing]: /CONTRIBUTING.md
-[menu-sponsoring]: /docs/site/sponsoring.md
+[menu-projects-overview]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/docs/site/projects-overview.md
+[menu-changelog]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/docs/site/changelog/changelog.md
+[menu-contributing]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/CONTRIBUTING.md
+[menu-sponsoring]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/docs/site/sponsoring.md
