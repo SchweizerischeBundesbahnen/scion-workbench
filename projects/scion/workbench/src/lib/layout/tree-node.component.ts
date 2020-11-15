@@ -13,8 +13,8 @@ import { WbComponentPortal } from '../portal/wb-component-portal';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { ViewPartComponent } from '../view-part/view-part.component';
 import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
-import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 import { MPart, MTreeNode } from './parts-layout.model';
+import { WorkbenchRouter } from '../routing/workbench-router.service';
 
 /**
  * Visual representation of a {@link MTreeNode} in {@link PartsLayout}.
@@ -40,9 +40,8 @@ export class TreeNodeComponent {
     this.sash2 = this.createSash(treeNode.child2, size2);
   }
 
-  constructor(private _viewOutletNavigator: ViewOutletNavigator,
+  constructor(private _wbRouter: WorkbenchRouter,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _layoutService: WorkbenchLayoutService,
               private _workbenchLayout: WorkbenchLayoutService) {
   }
 
@@ -61,11 +60,7 @@ export class TreeNodeComponent {
   public onSashEnd([sashSize1, sashSize2]: [number, number]): void {
     const ratio = sashSize1 / (sashSize1 + sashSize2);
     this._workbenchLayout.viewSashDrag$.next('end');
-
-    const serializedLayout = this._layoutService.layout
-      .setSplitRatio(this._treeNode.nodeId, ratio)
-      .serialize();
-    this._viewOutletNavigator.navigate({partsLayout: serializedLayout}).then();
+    this._wbRouter.ɵnavigate(layout => layout.setSplitRatio(this._treeNode.nodeId, ratio)).then();
   }
 
   private createSash(content: MTreeNode | MPart, proportion: string): Sash {

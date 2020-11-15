@@ -67,7 +67,6 @@ import { TaskScheduler } from './task-scheduler.service';
 import { WorkbenchViewPartRegistry } from './view-part/workbench-view-part.registry';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 import { ViewTabContentComponent } from './view-part/view-tab-content/view-tab-content.component';
-import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
 import { ViewMenuComponent } from './view-part/view-context-menu/view-menu.component';
 import { ViewMenuItemDirective } from './view-part/view-context-menu/view-menu.directive';
 import { WbFormatAcceleratorPipe } from './view-part/view-context-menu/accelerator-format.pipe';
@@ -199,7 +198,6 @@ export class WorkbenchModule {
         OverlayHostRef,
         ContentHostRef,
         WorkbenchRouter,
-        ViewOutletNavigator,
         PopupService,
         TaskScheduler,
         ViewActivationInstantProvider,

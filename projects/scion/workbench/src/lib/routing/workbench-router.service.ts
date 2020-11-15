@@ -8,14 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NavigationExtras, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
-import { Defined } from '@scion/toolkit/util';
-import { ViewOutletNavigator } from './view-outlet-navigator.service';
+import { Arrays, Defined } from '@scion/toolkit/util';
 import { Injectable, IterableChanges } from '@angular/core';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
-import { VIEW_NAV_STATE } from '../workbench.constants';
-import { ɵWorkbenchService } from '../ɵworkbench.service';
+import { ACTIVITY_OUTLET_NAME, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX, VIEW_TARGET } from '../workbench.constants';
 import { PartsLayout } from '../layout/parts-layout';
 import { filter, take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
@@ -29,8 +27,6 @@ export class WorkbenchRouter {
   private _currentNavigationContext$ = new BehaviorSubject<WorkbenchNavigationContext>(null);
 
   constructor(private _router: Router,
-              private _viewOutletNavigator: ViewOutletNavigator,
-              private _workbench: ɵWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
               private _layoutService: WorkbenchLayoutService) {
   }
@@ -59,50 +55,39 @@ export class WorkbenchRouter {
    * @see WbRouterLinkDirective
    */
   public async navigate(commandList: any[], extras: WbNavigationExtras = {}): Promise<boolean> {
-    const commands = this._viewOutletNavigator.normalizeCommands(commandList, extras.relativeTo);
-
-    // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
-    // Otherwise, would override the initial layout as given in the URL.
-    await this.waitForInitialLayout();
-
-    // Do not interfere with a potentially running navigation. For example, if observing the view registry,
-    // you would get events during navigation. If you would then start an extra navigation, e.g., when the
-    // view count drops to zero, this could end up in an invalid routing state.
-    await this.waitForNavigationToComplete();
+    const commands = this.normalizeCommands(commandList, extras.relativeTo);
 
     if (extras.closeIfPresent) {
-      return this._workbench.destroyView(...this._viewOutletNavigator.resolvePresentViewIds(commands));
+      return this.closeViews(...this.resolvePresentViewIds(commands));
     }
 
     const activateIfPresent = Defined.orElse(extras.activateIfPresent, !commands.includes('new') && !commands.includes('create') /* coerce activation based on command segment names */);
     // If the view is present, activate it.
     if (activateIfPresent) {
-      const presentViewId = this._viewOutletNavigator.resolvePresentViewIds(commands)[0];
+      const presentViewId = this.resolvePresentViewIds(commands)[0];
       if (presentViewId) {
-        return this._workbench.activateView(presentViewId);
+        return this.ɵnavigate(layout => layout.activateView(presentViewId));
       }
     }
 
     switch (extras.target || 'blank') {
       case 'blank': {
         const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
-        const viewNavigation: ViewNavigation = {
-          partId: extras.blankPartId,
-          viewIndex: extras.blankInsertionIndex,
+        const viewTarget: { [outlet: string]: ViewTarget } = {
+          [newViewId]: {
+            partId: extras.blankPartId,
+            viewIndex: extras.blankInsertionIndex,
+          },
+        };
+        const navigationExtras: NavigationExtras = {
+          ...extras,
+          state: {
+            ...extras.state,
+            [VIEW_TARGET]: viewTarget,
+          },
         };
 
-        return this._viewOutletNavigator.navigate({
-          viewOutlet: {name: newViewId, commands},
-          partsLayout: this._layoutService.layout.serialize(),
-          extras: {
-            ...extras,
-            relativeTo: null, // commands are absolute because normalized
-            state: {
-              ...extras.state,
-              [VIEW_NAV_STATE]: viewNavigation,
-            },
-          },
-        });
+        return this.ɵnavigate(layout => ({layout, viewOutlets: {[newViewId]: commands}}), navigationExtras); // The view is added in {WbAddViewToPartGuard} to the layout in order to resolve its part
       }
       case 'self': {
         if (!extras.selfViewId) {
@@ -115,19 +100,121 @@ export class WorkbenchRouter {
           throw Error(`[WorkbenchRouterError] Target view outlet not found: ${extras.selfViewId}'`);
         }
 
-        return this._viewOutletNavigator.navigate({
-          viewOutlet: {name: extras.selfViewId, commands},
-          partsLayout: this._layoutService.layout.serialize(),
-          extras: {
-            ...extras,
-            relativeTo: null, // commands are absolute because normalized
-          },
-        });
+        return this.ɵnavigate(layout => ({layout, viewOutlets: {[extras.selfViewId]: commands}}), extras);
       }
       default: {
         throw Error(`[WorkbenchRouterError] Invalid routing target. Expected 'self' or 'blank', but received ${extras.target}'.`);
       }
     }
+  }
+
+  /**
+   * Experimental API to replace {@link WorkbenchRouter#navigate} for navigating views and modifying the layout.
+   * @internal
+   */
+  public async ɵnavigate(computeNavigationFn: (layout: PartsLayout) => PartsLayout | WorkbenchNavigation, extras?: NavigationExtras): Promise<boolean> {
+    const urlTree = await this.createUrlTree(computeNavigationFn, extras);
+    return this._router.navigateByUrl(urlTree, extras);
+  }
+
+  /**
+   * Experimental API to replace {@link WorkbenchRouter#navigate} for navigating views and modifying the layout.
+   * @internal
+   */
+  public async createUrlTree(computeNavigationFn: (layout: PartsLayout) => PartsLayout | WorkbenchNavigation, extras?: NavigationExtras): Promise<UrlTree> {
+    // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
+    // Otherwise, would override the initial layout as given in the URL.
+    await this.waitForInitialLayout();
+
+    // Do not interfere with a potentially running navigation. For example, if observing the view registry,
+    // you would get events during navigation. If you would then start an extra navigation, e.g., when the
+    // view count drops to zero, this could end up in an invalid routing state.
+    await this.waitForNavigationToComplete();
+
+    // Let the caller modify the layout.
+    const result = computeNavigationFn(this._layoutService.layout);
+
+    // Coerce the result to a {WorkbenchNavigation} object.
+    const navigation: WorkbenchNavigation = result instanceof PartsLayout ? ({layout: result}) : result;
+
+    // Normalize commands of the outlets to their absolute form and resolve relative navigational symbols.
+    const viewOutlets = this.normalizeOutletCommands(navigation.viewOutlets);
+
+    // Add view outlets as 'outlets' fragment to be interpreted by Angular.
+    const commands: Commands = viewOutlets ? [{outlets: viewOutlets}] : [];
+
+    // Let Angular Router construct the URL tree.
+    return this._router.createUrlTree(commands, {
+      ...extras,
+      queryParams: {...extras?.queryParams, [PARTS_LAYOUT_QUERY_PARAM]: navigation.layout.serialize()},
+      queryParamsHandling: 'merge',
+      relativeTo: null, // commands are normalized to their absolute form
+    });
+  }
+
+  /**
+   * @see normalizeCommands
+   */
+  private normalizeOutletCommands(outlets?: { [outlet: string]: any[]; }, relativeTo?: ActivatedRoute | null): { [outlet: string]: any[]; } | null {
+    if (!outlets || !Object.keys(outlets).length) {
+      return null;
+    }
+
+    return Object.entries(outlets).reduce((acc, [outletName, commands]) => {
+      return {
+        ...acc,
+        [outletName]: commands ? this.normalizeCommands(commands, relativeTo) : null, // `null` to remove an outlet
+      };
+    }, {});
+  }
+
+  /**
+   * Normalizes commands to their absolute form.
+   *
+   * ---
+   * As of Angular 6.x, commands which target a named outlet (auxiliary route) are not normalized, meaning that
+   * relative navigational symbols like `/`, `./`, or `../` are not resolved (see `create_url_tree.ts` method: `computeNavigation`).
+   *
+   * Example: router.navigate([{outlets: {[outlet]: commands}}])
+   *
+   * To bypass that restriction, we first create an URL tree without specifying the target outlet. As expected, this translates into an
+   * URL with all navigational symbols resolved. Then, we extract the URL segments of the resolved route and convert it back into commands.
+   * The resulting commands are in their absolute form and may be used for the effective navigation to target a named router outlet.
+   *
+   * @internal
+   */
+  public normalizeCommands(commands: any[], relativeTo?: ActivatedRoute | null): any[] {
+    const normalizeFn = (outlet: string, extras?: NavigationExtras): any[] => {
+      return this._router.createUrlTree(commands, extras)
+        .root.children[outlet].segments
+        .reduce((acc, p) => [...acc, p.path, ...(Object.keys(p.parameters).length ? [p.parameters] : [])], []);
+    };
+
+    if (!relativeTo) {
+      return normalizeFn(PRIMARY_OUTLET);
+    }
+
+    const targetOutlet = relativeTo.pathFromRoot[1]?.outlet;
+    if (!targetOutlet || (!targetOutlet.startsWith(VIEW_REF_PREFIX) && !targetOutlet.startsWith(ACTIVITY_OUTLET_NAME))) {
+      return normalizeFn(PRIMARY_OUTLET);
+    }
+
+    return normalizeFn(targetOutlet, {relativeTo});
+  }
+
+  /**
+   * Resolves present views which match the given commands.
+   *
+   * @internal
+   */
+  public resolvePresentViewIds(commands: any[]): string[] {
+    const serializeCommands = this.serializeCommands(commands);
+    const urlTree = this._router.parseUrl(this._router.url);
+    const urlSegmentGroups = urlTree.root.children;
+
+    return Object.keys(urlSegmentGroups)
+      .filter(outletName => outletName.startsWith(VIEW_REF_PREFIX))
+      .filter(outletName => Arrays.isEqual(serializeCommands, urlSegmentGroups[outletName].segments.map((segment: UrlSegment) => segment.toString())));
   }
 
   /**
@@ -153,12 +240,12 @@ export class WorkbenchRouter {
   }
 
   /**
-   * Waits for a potentially running navigation to complete. Resolves immediately if there is no navigation in progress.
+   * Waits for a potentially running navigations to complete. Resolves immediately if there is no navigation in progress.
    */
   private async waitForNavigationToComplete(): Promise<void> {
     await this._currentNavigationContext$
       .pipe(
-        filter(context => context === null),
+        filter(() => !this.hasCurrentNavigation()),
         take(1),
       )
       .toPromise();
@@ -171,6 +258,49 @@ export class WorkbenchRouter {
     await this._layoutService.layout$
       .pipe(take(1))
       .toPromise();
+  }
+
+  /**
+   * Tests if there is a current navigation in progress.
+   */
+  private hasCurrentNavigation(): boolean {
+    return this._currentNavigationContext$.value !== null;
+  }
+
+  /**
+   * Serializes given commands into valid URL segments.
+   */
+  private serializeCommands(commands: any[]): string[] {
+    const serializedCommands: string[] = [];
+
+    commands.forEach(cmd => {
+      // if matrix param, append it to the last segment
+      if (typeof cmd === 'object') {
+        serializedCommands.push(new UrlSegment(serializedCommands.pop(), cmd).toString());
+      }
+      else {
+        serializedCommands.push(encodeURIComponent(cmd));
+      }
+    });
+
+    return serializedCommands;
+  }
+
+  /**
+   * Instructs the routing to close given views.
+   *
+   * @internal
+   */
+  public closeViews(...viewIds: string[]): Promise<boolean> {
+    // Use a separate navigate command to remove each view separately. Otherwise, if a view would reject destruction,
+    // no view would be removed at all.
+    return viewIds.reduce((prevNavigation, viewId) => {
+      const closeViewFn = () => this.ɵnavigate(layout => ({
+        layout: layout.removeView(viewId),
+        viewOutlets: {[viewId]: null},
+      }));
+      return prevNavigation.then(() => closeViewFn());
+    }, Promise.resolve(true));
   }
 }
 
@@ -213,11 +343,12 @@ export interface WbNavigationExtras extends NavigationExtras {
 }
 
 /**
- * Contains information about the view navigation.
+ * Specifies the target of a view in the layout tree.
  *
  * @internal
+ * @see WbAddViewToPartGuard
  */
-export interface ViewNavigation {
+export interface ViewTarget {
   /**
    * Specifies the part where to add a view. If not set, adds it to its preferred part, if defined on its route, or to the currently active part.
    */
@@ -229,9 +360,10 @@ export interface ViewNavigation {
 }
 
 /**
- * Contextual data of a workbench navigation.
+ * Contextual data of a workbench navigation available on the router during navigation.
  *
  * @internal
+ * @see WorkbenchUrlObserver
  */
 export interface WorkbenchNavigationContext {
   /**
@@ -246,4 +378,38 @@ export interface WorkbenchNavigationContext {
    * Views outlets that are added or removed by this navigation.
    */
   viewOutletChanges: IterableChanges<string> | null;
+}
+
+/**
+ * An array of URL fragments with which to construct the target URL.
+ *
+ * If the path is static, can be the literal URL string. For a dynamic path, pass an array of path segments,
+ * followed by the parameters for each segment.
+ *
+ * The last segment allows adding matrix parameters in the form of a dictionary to provide additional data along
+ * with the URL. Matrix parameters do not affect route resolution. In the routed component, matrix parameters are
+ * available in {@link ActivatedRoute#params}.
+ *
+ * Example command array with 'details' as matrix parameter: `['user', userName, {details: true}]`,
+ *
+ * @internal
+ */
+export type Commands = any[];
+
+/**
+ * Information about a workbench navigation operation.
+ *
+ * @internal
+ */
+export interface WorkbenchNavigation {
+  /**
+   * The target layout to apply.
+   */
+  layout: PartsLayout;
+  /**
+   * View outlet delta to apply to the current URL. For each outlet to add, remove, or change,
+   * add a property to this dictionary and set the commands to construct the outlet URL.
+   * To remove an outlet from the URL, set its commands to `null`.
+   */
+  viewOutlets?: { [outlet: string]: Commands; };
 }

@@ -58,7 +58,7 @@ export const PARTS_LAYOUT_QUERY_PARAM = 'parts';
 /**
  * Property name of the view navigation state.
  */
-export const VIEW_NAV_STATE = 'scion.workbench.viewNavigation';
+export const VIEW_TARGET = 'scion.workbench.routing.viewTarget';
 
 /**
  * Defines the contexts in which a viewtab is rendered.

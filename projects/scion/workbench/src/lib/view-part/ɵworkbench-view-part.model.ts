@@ -10,7 +10,6 @@
 import { MPart } from '../layout/parts-layout.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WorkbenchLayoutService } from '../workbench-layout.service';
-import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { ViewPartComponent } from './view-part.component';
 import { Injector } from '@angular/core';
@@ -18,6 +17,7 @@ import { Arrays } from '@scion/toolkit/util';
 import { Disposable } from '../disposable';
 import { WorkbenchViewPartAction } from '../workbench.model';
 import { WorkbenchViewPart } from './workbench-view-part.model';
+import { WorkbenchRouter } from '../routing/workbench-router.service';
 
 export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disable-line:class-name
 
@@ -25,7 +25,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
   private _hiddenViewTabs = new Set<string>();
   private _hiddenViewTabs$ = new BehaviorSubject<string[]>([]);
   private _layoutService: WorkbenchLayoutService;
-  private _viewOutletNavigator: ViewOutletNavigator;
+  private _wbRouter: WorkbenchRouter;
   private _markedForDestruction = false;
 
   public readonly viewIds$ = new BehaviorSubject<string[]>([]);
@@ -36,7 +36,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
               public readonly portal: WbComponentPortal<ViewPartComponent>,
               injector: Injector) {
     this._layoutService = injector.get(WorkbenchLayoutService);
-    this._viewOutletNavigator = injector.get(ViewOutletNavigator);
+    this._wbRouter = injector.get(WorkbenchRouter);
   }
 
   public setPart(part: MPart): void {
@@ -77,11 +77,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
       return true;
     }
 
-    const serializedLayout = this._layoutService.layout
-      .activatePart(this.partId)
-      .serialize();
-
-    return this._viewOutletNavigator.navigate({partsLayout: serializedLayout});
+    return this._wbRouter.ɵnavigate(layout => layout.activatePart(this.partId));
   }
 
   public containsView(viewId: string): boolean {
@@ -102,11 +98,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
       return true;
     }
 
-    const serializedLayout = this._layoutService.layout
-      .activateView(viewId)
-      .serialize();
-
-    return this._viewOutletNavigator.navigate({partsLayout: serializedLayout});
+    return this._wbRouter.ɵnavigate(layout => layout.activateView(viewId));
   }
 
   /**
@@ -119,11 +111,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
       return false;
     }
 
-    const serializedLayout = this._layoutService.layout
-      .activateAdjacentView(this.activeViewId)
-      .serialize();
-
-    return this._viewOutletNavigator.navigate({partsLayout: serializedLayout});
+    return this._wbRouter.ɵnavigate(layout => layout.activateAdjacentView(this.activeViewId));
   }
 
   public isActive(): boolean {

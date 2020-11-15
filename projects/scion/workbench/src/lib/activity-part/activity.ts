@@ -2,7 +2,7 @@ import { Injector, TemplateRef } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ComponentType, PortalInjector } from '@angular/cdk/portal';
 import { Disposable } from '../disposable';
-import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
+import { WorkbenchRouter } from '../routing/workbench-router.service';
 
 /**
  * Represents an activity in the activity panel.
@@ -109,11 +109,11 @@ export class InternalActivity implements Activity {
   public visible = true;
   public position: number;
 
-  constructor(private _viewOutletNavigator: ViewOutletNavigator, private _injector: Injector) {
+  constructor(private _wbRouter: WorkbenchRouter, private _injector: Injector) {
   }
 
   public set routerLink(routerLink: any[] | string) {
-    this._commands = this._viewOutletNavigator.normalizeCommands(routerLink ? (Array.isArray(routerLink) ? routerLink : [routerLink]) : []);
+    this._commands = this._wbRouter.normalizeCommands(routerLink ? (Array.isArray(routerLink) ? routerLink : [routerLink]) : []);
     this._path = this.commands.filter(it => typeof it === 'string').join('/');
   }
 

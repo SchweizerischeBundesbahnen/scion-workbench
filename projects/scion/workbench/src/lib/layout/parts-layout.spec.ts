@@ -12,6 +12,7 @@ import { async } from '@angular/core/testing';
 import { MPart, MTreeNode } from './parts-layout.model';
 import { expect, jasmineCustomMatchers } from '../spec/util/jasmine-custom-matchers.spec';
 import { PartsLayout, PartsLayoutWorkbenchAccessor } from './parts-layout';
+import SpyObj = jasmine.SpyObj;
 
 describe('PartsLayout', () => {
 
@@ -808,6 +809,26 @@ describe('PartsLayout', () => {
     // move view from the 'bottom-left' part to the 'top-left' part
     partsLayout = partsLayout.moveView('view.1', 'main');
     expect(partsLayout.activePart.partId).toEqual('main');
+  });
+
+  /**
+   * Creates the following parts layout:
+   *
+   * +-------------+------+
+   * | topLeft     | main |
+   * +-------------+      |
+   * | bottomLeft  |      |
+   * +-------------+------+
+   */
+  it('should allow clearing the layout', () => {
+    // create new root parts with 'root' as its identity
+    const workbenchAccessor: SpyObj<PartsLayoutWorkbenchAccessor> = jasmine.createSpyObj('PartsLayoutWorkbenchAccessor', ['provideRootPartIdentity']);
+    workbenchAccessor.provideRootPartIdentity.and.returnValue('root');
+
+    const partsLayout = createSimplePartsLayout(workbenchAccessor).clear();
+
+    expect(partsLayout.root).toEqualPartsLayout(new MPart({partId: 'root'}));
+    expect(partsLayout.activePart.partId).toEqual('root');
   });
 });
 

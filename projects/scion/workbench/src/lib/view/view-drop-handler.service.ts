@@ -3,13 +3,11 @@ import { takeUntil } from 'rxjs/operators';
 import { ViewDragService, ViewMoveEvent } from '../view-dnd/view-drag.service';
 import { UUID } from '@scion/toolkit/uuid';
 import { Router, UrlSegment } from '@angular/router';
-import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 import { WorkbenchViewRegistry } from './workbench-view.registry';
 import { LocationStrategy } from '@angular/common';
-import { PartsLayoutFactory } from '../layout/parts-layout.factory';
 import { Subject } from 'rxjs';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
 import { ɵWorkbenchService } from '../ɵworkbench.service';
+import { WorkbenchRouter } from '../routing/workbench-router.service';
 
 /**
  * Subscribes to view move requests for moving views in the {@link PartsLayout} when the user arranges views via drag and drop.
@@ -20,13 +18,11 @@ export class ViewDropHandler implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   constructor(private _workbench: ɵWorkbenchService,
-              private _viewOutletNavigator: ViewOutletNavigator,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewDragService: ViewDragService,
               private _locationStrategy: LocationStrategy,
               private _router: Router,
-              private _layoutService: WorkbenchLayoutService,
-              private _partsLayoutFactory: PartsLayoutFactory) {
+              private _wbRouter: WorkbenchRouter) {
     this.installViewMoveListener();
   }
 
@@ -51,10 +47,12 @@ export class ViewDropHandler implements OnDestroy {
 
         // Check if to remove the view from this app instance if being moved to another app instance.
         if (crossAppInstanceViewDrag && event.source.appInstanceId === appInstanceId) {
-          this.removeView(event);
           // Check if to add the view to a new browser window.
           if (event.target.appInstanceId === 'new') {
-            this.addViewToNewWindow(event);
+            this.moveViewToNewWindow(event);
+          }
+          else {
+            this.removeView(event);
           }
         }
         // Check if to add the view to this app instance if being moved from another app instance to this app instance.
@@ -69,11 +67,7 @@ export class ViewDropHandler implements OnDestroy {
   }
 
   private activateView(viewId: string): void {
-    this._viewOutletNavigator.navigate({
-      partsLayout: this._layoutService.layout
-        .activateView(viewId)
-        .serialize(),
-    }).then();
+    this._wbRouter.ɵnavigate(layout => layout.activateView(viewId)).then();
   }
 
   private addView(event: ViewMoveEvent): void {
@@ -83,36 +77,33 @@ export class ViewDropHandler implements OnDestroy {
     if (addToNewViewPart) {
       const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
       const newPartId = event.target.newPartId || UUID.randomUUID();
-      this._viewOutletNavigator.navigate({
-        viewOutlet: {name: newViewId, commands},
-        partsLayout: this._layoutService.layout
+      this._wbRouter.ɵnavigate(layout => ({
+        layout: layout
           .addPart(newPartId, {relativeTo: event.target.partId, align: coerceLayoutAlignment(event.target.region)})
-          .addView(newPartId, newViewId)
-          .serialize(),
-      }).then();
+          .addView(newPartId, newViewId),
+        viewOutlets: {[newViewId]: commands},
+      })).then();
     }
     else {
       const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
-      this._viewOutletNavigator.navigate({
-        viewOutlet: {name: newViewId, commands},
-        partsLayout: this._layoutService.layout
-          .addView(event.target.partId, newViewId, event.target.insertionIndex)
-          .serialize(),
-      }).then();
+      this._wbRouter.ɵnavigate(layout => ({
+        layout: layout.addView(event.target.partId, newViewId, event.target.insertionIndex),
+        viewOutlets: {[newViewId]: commands},
+      })).then();
     }
   }
 
-  private addViewToNewWindow(event: ViewMoveEvent): void {
-    const emptyLayout = this._partsLayoutFactory.create();
-    const urlTree = this._viewOutletNavigator.createUrlTree({
-      viewOutlet: this._viewRegistry.viewIds
-        .filter(viewId => viewId !== event.source.viewId) // continue with all other outlets in order to remove them from the URL tree
-        .map(viewId => ({name: viewId, commands: null})),
-      partsLayout: emptyLayout
-        .addView(emptyLayout.activePart.partId, event.source.viewId)
-        .serialize(),
-    });
-    window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree)));
+  private async moveViewToNewWindow(event: ViewMoveEvent): Promise<void> {
+    const urlTree = await this._wbRouter.createUrlTree(layout => ({
+      layout: layout.clear(),
+      viewOutlets: layout.parts
+        .reduce((viewIds, part) => viewIds.concat(part.viewIds), [])
+        .filter(viewId => viewId !== event.source.viewId)
+        .reduce((acc, viewId) => ({...acc, [viewId]: null}), {}),
+    }));
+    if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree)))) {
+      this.removeView(event);
+    }
   }
 
   private removeView(event: ViewMoveEvent): void {
@@ -123,19 +114,13 @@ export class ViewDropHandler implements OnDestroy {
     const addToNewPart = (event.target.region || 'center') !== 'center';
     if (addToNewPart) {
       const newPartId = event.target.newPartId || UUID.randomUUID();
-      this._viewOutletNavigator.navigate({
-        partsLayout: this._layoutService.layout
-          .addPart(newPartId, {relativeTo: event.target.partId, align: coerceLayoutAlignment(event.target.region)})
-          .moveView(event.source.viewId, newPartId)
-          .serialize(),
-      }).then();
+      this._wbRouter.ɵnavigate(layout => layout
+        .addPart(newPartId, {relativeTo: event.target.partId, align: coerceLayoutAlignment(event.target.region)})
+        .moveView(event.source.viewId, newPartId),
+      ).then();
     }
     else {
-      this._viewOutletNavigator.navigate({
-        partsLayout: this._layoutService.layout
-          .moveView(event.source.viewId, event.target.partId, event.target.insertionIndex)
-          .serialize(),
-      }).then();
+      this._wbRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, event.target.partId, event.target.insertionIndex)).then();
     }
   }
 
