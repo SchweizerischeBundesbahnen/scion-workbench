@@ -133,7 +133,7 @@ export class ViewMenuService {
     this.registerMoveLeftMenuItem();
     this.registerMoveUpMenuItem();
     this.registerMoveDownMenuItem();
-    this.registerOpenInNewWindowMenuItem();
+    this.registerMoveToNewWindowMenuItem();
   }
 
   private registerCloseViewMenuItem(): void {
@@ -260,8 +260,8 @@ export class ViewMenuService {
     }));
   }
 
-  private registerOpenInNewWindowMenuItem(): void {
-    const defaults = {visible: true, text: 'Open in new window', group: 'open'};
+  private registerMoveToNewWindowMenuItem(): void {
+    const defaults = {visible: true, text: 'Move to new window', group: 'open'};
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.moveBlank;
     const config = {...defaults, ...appConfig};
 

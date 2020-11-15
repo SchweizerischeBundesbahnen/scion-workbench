@@ -17,10 +17,9 @@ import { Router } from '@angular/router';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 import { advance } from './util/util.spec';
 import { WorkbenchTestingModule } from './workbench-testing.module';
-import { ViewOutletNavigator } from '../routing/view-outlet-navigator.service';
 import { WorkbenchView } from '../view/workbench-view.model';
 
-describe('ViewOutletNavigator', () => {
+describe('WorkbenchRouter', () => {
 
   beforeEach(async(() => {
     jasmine.addMatchers(jasmineCustomMatchers);
@@ -32,7 +31,7 @@ describe('ViewOutletNavigator', () => {
     TestBed.inject(Router).initialNavigation();
   }));
 
-  it('resolves present views by path', fakeAsync(inject([WorkbenchRouter, ViewOutletNavigator], (wbRouter: WorkbenchRouter, viewOutletNavigator: ViewOutletNavigator) => {
+  it('resolves present views by path', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
@@ -57,14 +56,14 @@ describe('ViewOutletNavigator', () => {
     wbRouter.navigate(['path', 'to', 'view-3'], {activateIfPresent: true}).then();
     advance(fixture);
 
-    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view-1']).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view-2'])).toEqual(['view.3']);
-    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view-3'])).toEqual(['view.4']);
+    expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view-1']).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view-2'])).toEqual(['view.3']);
+    expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view-3'])).toEqual(['view.4']);
 
     tick();
   })));
 
-  it('resolves present views by path and matrix params', fakeAsync(inject([WorkbenchRouter, ViewOutletNavigator], (wbRouter: WorkbenchRouter, viewOutletNavigator: ViewOutletNavigator) => {
+  it('resolves present views by path and matrix params', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
@@ -89,10 +88,10 @@ describe('ViewOutletNavigator', () => {
     wbRouter.navigate(['path', 'to', 'view', {'matrixParam': 'C'}], {activateIfPresent: true}).then();
     advance(fixture);
 
-    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view'])).toEqual([]);
-    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'A'}]).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(['view.3'].sort());
-    expect(viewOutletNavigator.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(['view.4'].sort());
+    expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view'])).toEqual([]);
+    expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'A'}]).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(['view.3'].sort());
+    expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(['view.4'].sort());
 
     tick();
   })));

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { asyncScheduler, BehaviorSubject, merge, Observable, Subject } from 'rxjs';
+import { asapScheduler, BehaviorSubject, merge, Observable, Subject } from 'rxjs';
 import { Injectable, NgZone } from '@angular/core';
 import { debounce, filter, map, mapTo, observeOn, startWith, take } from 'rxjs/operators';
 import { ViewDragService } from './view-dnd/view-drag.service';
@@ -45,7 +45,7 @@ export class WorkbenchLayoutService {
    * Notifies upon a workbench layout change. When this Observable emits, the layout is already flushed to the DOM.
    */
   public readonly afterLayoutChange$: Observable<void> = this._layoutChange$
-    .pipe(debounce(() => this._zone.onStable), observeOn(asyncScheduler));
+    .pipe(debounce(() => this._zone.onStable), observeOn(asapScheduler));
 
   /**
    * Emits the current {@link PartsLayout}.

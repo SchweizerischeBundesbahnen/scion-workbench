@@ -11,9 +11,9 @@
 import { ActivatedRouteSnapshot, CanActivate, Params, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PARTS_LAYOUT_QUERY_PARAM, VIEW_NAV_STATE } from '../workbench.constants';
+import { PARTS_LAYOUT_QUERY_PARAM, VIEW_TARGET } from '../workbench.constants';
 import { PartsLayout } from '../layout/parts-layout';
-import { ViewNavigation, WorkbenchRouter } from '../routing/workbench-router.service';
+import { ViewTarget, WorkbenchRouter } from '../routing/workbench-router.service';
 
 /**
  * Guard for adding a view to a part.
@@ -33,8 +33,8 @@ export class WbAddViewToPartGuard implements CanActivate {
   }
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    const viewNavigation: ViewNavigation = (this._router.getCurrentNavigation().extras.state || {})[VIEW_NAV_STATE] || {};
-    const viewId = route.outlet;
+    const viewId: string = route.outlet;
+    const viewTarget: ViewTarget = ((this._router.getCurrentNavigation().extras.state || {})[VIEW_TARGET] || {})[viewId] || {};
 
     // Read the layout from the URL.
     const partsLayout = this._workbenchRouter.getCurrentNavigationContext().partsLayout;
@@ -45,8 +45,8 @@ export class WbAddViewToPartGuard implements CanActivate {
     }
 
     // Add the view to the part specified in the navigation state, or its preferred part, or to the currently active part.
-    const partId = viewNavigation.partId || this.getPreferredPartId(route, partsLayout) || partsLayout.activePart.partId;
-    const viewInsertionIndex = this.coerceViewInsertionIndex(viewNavigation.viewIndex, partId, partsLayout);
+    const partId = viewTarget.partId || this.getPreferredPartId(route, partsLayout) || partsLayout.activePart.partId;
+    const viewInsertionIndex = this.coerceViewInsertionIndex(viewTarget.viewIndex, partId, partsLayout);
     const partsLayoutSerialized = partsLayout
       .addView(partId, viewId, viewInsertionIndex)
       .serialize();

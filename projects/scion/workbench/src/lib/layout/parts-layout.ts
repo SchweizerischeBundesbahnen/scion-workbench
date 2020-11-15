@@ -162,6 +162,13 @@ export class PartsLayout {
   }
 
   /**
+   * Removes all parts and views, returning a layout with a single {@link MPart}.
+   */
+  public clear(): PartsLayout {
+    return this._workingCopy()._clear();
+  }
+
+  /**
    * Returns all parts of the layout.
    */
   public get parts(): Readonly<MPart>[] {
@@ -255,12 +262,6 @@ export class PartsLayout {
 
     // The last part is never removed.
     if (this.parts.length === 1) {
-      return this;
-    }
-
-    // Create a new root part if removing the root part.
-    if (!part.parent) {
-      this._root = createRootLayout(this.workbenchAccessor).root;
       return this;
     }
 
@@ -386,6 +387,14 @@ export class PartsLayout {
   private _setSplitRatio(nodeId: string, ratio: number): this {
     const treeNode = this._findTreeNode(nodeId, {orElseThrow: true});
     treeNode.ratio = ratio;
+    return this;
+  }
+
+  /**
+   * Note: This method name begins with an underscore, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private _clear(): this {
+    ({root: this._root, activePartId: this._activePartId} = createRootLayout(this.workbenchAccessor));
     return this;
   }
 

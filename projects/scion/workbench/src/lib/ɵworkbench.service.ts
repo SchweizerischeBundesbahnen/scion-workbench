@@ -12,14 +12,12 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench.model';
 import { UUID } from '@scion/toolkit/uuid';
-import { ViewOutletNavigator } from './routing/view-outlet-navigator.service';
 import { WorkbenchLayoutService } from './workbench-layout.service';
-import { WorkbenchViewPartRegistry } from './view-part/workbench-view-part.registry';
-import { WorkbenchViewRegistry } from './view/workbench-view.registry';
-import { ɵWorkbenchViewPart } from './view-part/ɵworkbench-view-part.model';
 import { Disposable } from './disposable';
 import { Arrays } from '@scion/toolkit/util';
 import { WorkbenchService } from './workbench.service';
+import { WorkbenchRouter } from './routing/workbench-router.service';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-line:class-name
@@ -28,44 +26,23 @@ export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   public readonly appInstanceId = UUID.randomUUID();
 
-  constructor(private _viewOutletNavigator: ViewOutletNavigator,
-              private _layoutService: WorkbenchLayoutService,
-              private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _viewRegistry: WorkbenchViewRegistry) {
+  constructor(private _wbRouter: WorkbenchRouter, private _layoutService: WorkbenchLayoutService) {
   }
 
   public destroyView(...viewIds: string[]): Promise<boolean> {
-    const destroyViewFn = (viewId: string): Promise<boolean> => {
-      return this._viewOutletNavigator.navigate({
-        viewOutlet: {name: viewId, commands: null},
-        partsLayout: this._layoutService.layout
-          .removeView(viewId)
-          .serialize(),
-      });
-    };
-
-    // Use a separate navigate command to remove each view separately. Otherwise, if a view would reject destruction,
-    // no view would be removed at all. Also, removal must be done sequentially to have a proper grid snapshot.
-    return viewIds.reduce((prevDestroyPromise, viewId) => {
-      return prevDestroyPromise.then(() => destroyViewFn(viewId));
-    }, Promise.resolve(true));
+    return this._wbRouter.closeViews(...viewIds);
   }
 
   public activateView(viewId: string): Promise<boolean> {
-    return this.resolveViewPartElseThrow(viewId).activateView(viewId);
+    return this._wbRouter.ɵnavigate(layout => layout.activateView(viewId));
   }
 
   public resolveViewPart(viewId: string): string {
-    return this.resolveViewPartElseThrow(viewId).partId;
-  }
-
-  private resolveViewPartElseThrow(viewId: string): ɵWorkbenchViewPart | null {
-    const part = this._layoutService.layout.findPartByViewId(viewId, {orElseThrow: true});
-    return this._viewPartRegistry.getElseThrow(part.partId);
+    return this._layoutService.layout.findPartByViewId(viewId, {orElseThrow: true}).partId;
   }
 
   public get views$(): Observable<string[]> {
-    return this._viewRegistry.viewIds$;
+    return this._layoutService.layout$.pipe(map(layout => layout.parts.reduce((viewIds, part) => viewIds.concat(part.viewIds), [])));
   }
 
   public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
