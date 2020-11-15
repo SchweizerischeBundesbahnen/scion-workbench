@@ -14,7 +14,7 @@ import { DOCUMENT } from '@angular/common';
 import { first, takeUntil } from 'rxjs/operators';
 
 /**
- * Provides functionality to move the host element.
+ * Allows moving the host element while holding down the primary mouse button, e.g. to move a message box.
  */
 @Directive({
   selector: '[wbMove]',

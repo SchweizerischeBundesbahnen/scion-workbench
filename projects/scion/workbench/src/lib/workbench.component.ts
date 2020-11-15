@@ -9,7 +9,7 @@
  */
 
 import { Component, HostBinding, ViewChild, ViewContainerRef } from '@angular/core';
-import { WorkbenchLayoutService } from './workbench-layout.service';
+import { WorkbenchLayoutService } from './layout/workbench-layout.service';
 import { OverlayHostRef } from './overlay-host-ref.service';
 import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { map } from 'rxjs/operators';

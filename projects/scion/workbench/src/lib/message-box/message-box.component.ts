@@ -14,7 +14,7 @@ import { PortalInjector } from '@angular/cdk/portal';
 import { MoveDelta } from '../move.directive';
 import { asyncScheduler, Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { Arrays } from '@scion/toolkit/util';
 
 @Component({

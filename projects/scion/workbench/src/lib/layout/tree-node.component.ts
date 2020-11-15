@@ -10,7 +10,7 @@
 
 import { Component, Input } from '@angular/core';
 import { WbComponentPortal } from '../portal/wb-component-portal';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from './workbench-layout.service';
 import { ViewPartComponent } from '../view-part/view-part.component';
 import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
 import { MPart, MTreeNode } from './parts-layout.model';

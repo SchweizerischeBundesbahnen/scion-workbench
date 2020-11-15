@@ -25,7 +25,7 @@ import { WorkbenchService } from './workbench.service';
 import { ViewDropZoneDirective } from './view-dnd/view-drop-zone.directive';
 import { PartsLayoutComponent } from './layout/parts-layout.component';
 import { RemoteSiteComponent } from './remote-site/remote-site.component';
-import { WorkbenchLayoutService } from './workbench-layout.service';
+import { WorkbenchLayoutService } from './layout/workbench-layout.service';
 import { ViewComponent } from './view/view.component';
 import { WbRouterOutletDirective } from './routing/wb-router-outlet.directive';
 import { TreeNodeComponent } from './layout/tree-node.component';
@@ -35,7 +35,7 @@ import { WorkbenchRouter } from './routing/workbench-router.service';
 import { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './routing/wb-router-link.directive';
 import { WorkbenchViewRegistry } from './view/workbench-view.registry';
 import { OverlayHostRef } from './overlay-host-ref.service';
-import { WorkbenchUrlObserver } from './workbench-url-observer.service';
+import { WorkbenchUrlObserver } from './routing/workbench-url-observer.service';
 import { WbActivityActionDirective } from './activity-part/wb-activity-action.directive';
 import { WbActivityDirective } from './activity-part/wb-activity.directive';
 import { MoveDirective } from './move.directive';
@@ -64,7 +64,7 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { ViewPartActionDirective } from './view-part/view-part-action-bar/view-part-action.directive';
 import { ViewPartActionBarComponent } from './view-part/view-part-action-bar/view-part-action-bar.component';
 import { WorkbenchViewPartRegistry } from './view-part/workbench-view-part.registry';
-import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
+import { ViewActivationInstantProvider } from './view/view-activation-instant-provider.service';
 import { ViewTabContentComponent } from './view-part/view-tab-content/view-tab-content.component';
 import { ViewMenuComponent } from './view-part/view-context-menu/view-menu.component';
 import { ViewMenuItemDirective } from './view-part/view-context-menu/view-menu.directive';
@@ -75,7 +75,7 @@ import { ArrayCoercePipe } from './array-coerce.pipe';
 import { ArrayConcatPipe } from './array-concat.pipe';
 import { ViewPortalPipe } from './view/view-portal.pipe';
 import { PartsLayoutFactory } from './layout/parts-layout.factory';
-import { ViewDropHandler } from './view/view-drop-handler.service';
+import { ViewMoveHandler } from './view/view-move-handler.service';
 import { ɵWorkbenchService } from './ɵworkbench.service';
 import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
 
@@ -149,7 +149,7 @@ export class WorkbenchModule {
               auxiliaryRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
               workbenchUrlObserver: WorkbenchUrlObserver,
               viewMenuService: ViewMenuService,
-              viewDropService: ViewDropHandler) {
+              viewMoveHandler: ViewMoveHandler) {
     auxiliaryRoutesRegistrator.registerActivityAuxiliaryRoutes();
     viewMenuService.registerBuiltInMenuItems();
   }

@@ -12,21 +12,21 @@ import { GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, Navig
 import { takeUntil } from 'rxjs/operators';
 import { ComponentFactoryResolver, Injectable, Injector, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
-import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
-import { PARTS_LAYOUT_QUERY_PARAM, ROUTER_OUTLET_NAME } from './workbench.constants';
-import { WorkbenchViewRegistry } from './view/workbench-view.registry';
-import { WorkbenchViewPartRegistry } from './view-part/workbench-view-part.registry';
-import { WorkbenchLayoutService } from './workbench-layout.service';
-import { ɵWorkbenchViewPart } from './view-part/ɵworkbench-view-part.model';
-import { WbComponentPortal } from './portal/wb-component-portal';
-import { ViewPartComponent } from './view-part/view-part.component';
-import { WorkbenchViewPart } from './view-part/workbench-view-part.model';
-import { ɵWorkbenchView } from './view/ɵworkbench-view.model';
-import { ViewComponent } from './view/view.component';
-import { WorkbenchView } from './view/workbench-view.model';
-import { WorkbenchNavigationContext, WorkbenchRouter } from './routing/workbench-router.service';
-import { PartsLayoutFactory } from './layout/parts-layout.factory';
-import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
+import { WorkbenchAuxiliaryRoutesRegistrator } from './workbench-auxiliary-routes-registrator.service';
+import { PARTS_LAYOUT_QUERY_PARAM, ROUTER_OUTLET_NAME } from '../workbench.constants';
+import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
+import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
+import { ɵWorkbenchViewPart } from '../view-part/ɵworkbench-view-part.model';
+import { WbComponentPortal } from '../portal/wb-component-portal';
+import { ViewPartComponent } from '../view-part/view-part.component';
+import { WorkbenchViewPart } from '../view-part/workbench-view-part.model';
+import { ɵWorkbenchView } from '../view/ɵworkbench-view.model';
+import { ViewComponent } from '../view/view.component';
+import { WorkbenchView } from '../view/workbench-view.model';
+import { WorkbenchNavigationContext, WorkbenchRouter } from './workbench-router.service';
+import { PartsLayoutFactory } from '../layout/parts-layout.factory';
+import { WorkbenchLayoutDiffer } from './workbench-layout-differ';
 
 /**
  * Enable this option when debugging the workbench navigation for detailed logging.

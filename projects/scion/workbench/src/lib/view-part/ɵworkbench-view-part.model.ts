@@ -9,7 +9,7 @@
  */
 import { MPart } from '../layout/parts-layout.model';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { ViewPartComponent } from './view-part.component';
 import { Injector } from '@angular/core';

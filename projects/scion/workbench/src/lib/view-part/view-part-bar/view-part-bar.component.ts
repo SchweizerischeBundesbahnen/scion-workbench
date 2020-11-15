@@ -10,7 +10,7 @@
 
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ViewTabComponent } from '../view-tab/view-tab.component';
-import { WorkbenchLayoutService } from '../../workbench-layout.service';
+import { WorkbenchLayoutService } from '../../layout/workbench-layout.service';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 import { EMPTY, Observable, Subject, timer } from 'rxjs';
 import { SciViewportComponent } from '@scion/toolkit/viewport';
