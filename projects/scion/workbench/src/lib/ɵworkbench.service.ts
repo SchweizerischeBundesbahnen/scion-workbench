@@ -12,7 +12,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench.model';
 import { UUID } from '@scion/toolkit/uuid';
-import { WorkbenchLayoutService } from './workbench-layout.service';
+import { WorkbenchLayoutService } from './layout/workbench-layout.service';
 import { Disposable } from './disposable';
 import { Arrays } from '@scion/toolkit/util';
 import { WorkbenchService } from './workbench.service';

@@ -1,5 +1,5 @@
 import { Injectable, ModuleWithProviders, NgModule } from '@angular/core';
-import { ViewActivationInstantProvider } from '../view-activation-instant-provider.service';
+import { ViewActivationInstantProvider } from '../view/view-activation-instant-provider.service';
 import { WorkbenchModule } from '../workbench.module';
 import { WorkbenchConfig } from '../workbench.config';
 import { FromDimension } from '@scion/toolkit/observable';

@@ -11,8 +11,8 @@
 import { asapScheduler, BehaviorSubject, merge, Observable, Subject } from 'rxjs';
 import { Injectable, NgZone } from '@angular/core';
 import { debounce, filter, map, mapTo, observeOn, startWith, take } from 'rxjs/operators';
-import { ViewDragService } from './view-dnd/view-drag.service';
-import { PartsLayout } from './layout/parts-layout';
+import { ViewDragService } from '../view-dnd/view-drag.service';
+import { PartsLayout } from './parts-layout';
 
 /**
  * Provides access to the current parts layout.

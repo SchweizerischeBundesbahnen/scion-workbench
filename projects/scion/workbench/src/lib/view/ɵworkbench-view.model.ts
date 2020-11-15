@@ -11,11 +11,11 @@
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { WbComponentPortal } from '../portal/wb-component-portal';
 import { ViewComponent } from './view.component';
-import { ViewActivationInstantProvider } from '../view-activation-instant-provider.service';
+import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 import { Router, UrlSegment } from '@angular/router';
 import { ViewDragService } from '../view-dnd/view-drag.service';
 import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { map } from 'rxjs/operators';
 import { filterArray, mapArray } from '@scion/toolkit/operators';
 import { Arrays } from '@scion/toolkit/util';

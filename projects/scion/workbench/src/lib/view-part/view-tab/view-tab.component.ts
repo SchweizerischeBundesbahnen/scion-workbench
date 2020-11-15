@@ -11,7 +11,7 @@
 import { Attribute, Component, ElementRef, HostBinding, HostListener, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnDestroy } from '@angular/core';
 import { SciViewportComponent } from '@scion/toolkit/viewport';
 import { fromEvent, merge, Subject } from 'rxjs';
-import { WorkbenchLayoutService } from '../../workbench-layout.service';
+import { WorkbenchLayoutService } from '../../layout/workbench-layout.service';
 import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
 import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
 import { VIEW_DRAG_TRANSFER_TYPE, ViewDragService } from '../../view-dnd/view-drag.service';

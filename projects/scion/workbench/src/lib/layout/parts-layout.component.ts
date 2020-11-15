@@ -17,7 +17,7 @@ import { pairwise, startWith, takeUntil } from 'rxjs/operators';
 import { PartsLayout } from './parts-layout';
 import { MPart, MTreeNode } from './parts-layout.model';
 import { Arrays } from '@scion/toolkit/util';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from './workbench-layout.service';
 
 /**
  * Represents the arrangement of parts. Each part contains one or more views.

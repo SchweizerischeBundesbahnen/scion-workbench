@@ -15,7 +15,7 @@ import { filter, takeUntil } from 'rxjs/operators';
 import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { Popup, PopupConfig } from './metadata';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { Arrays, Defined } from '@scion/toolkit/util';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};

@@ -11,7 +11,7 @@
 import { ChangeDetectorRef, Component, ElementRef, HostBinding, ViewChild } from '@angular/core';
 import { animate, AnimationBuilder, AnimationPlayer, style, transition, trigger } from '@angular/animations';
 import { WorkbenchActivityPartService } from './workbench-activity-part.service';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { noop, Observable, Subject } from 'rxjs';
 import { ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME } from '../workbench.constants';
 import { Activity } from './activity';

@@ -12,7 +12,7 @@ import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, U
 import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
 import { Arrays, Defined } from '@scion/toolkit/util';
 import { Injectable, IterableChanges } from '@angular/core';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { ACTIVITY_OUTLET_NAME, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX, VIEW_TARGET } from '../workbench.constants';
 import { PartsLayout } from '../layout/parts-layout';
 import { filter, take } from 'rxjs/operators';

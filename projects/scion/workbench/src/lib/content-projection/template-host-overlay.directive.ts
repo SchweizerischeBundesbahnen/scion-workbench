@@ -13,7 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { WorkbenchActivityPartService } from '../activity-part/workbench-activity-part.service';
 import { combineLatest, Subject } from 'rxjs';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { WorkbenchView } from '../view/workbench-view.model';
 
 /**

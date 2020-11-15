@@ -11,7 +11,7 @@
 import { Component, ElementRef, EventEmitter, Input, isDevMode, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
 import { combineLatest, from, fromEvent, merge, Observable, of, OperatorFunction, Subject } from 'rxjs';
 import { mergeMap, takeUntil } from 'rxjs/operators';
-import { WorkbenchLayoutService } from '../workbench-layout.service';
+import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { installMouseDispatcher, SciMouseDispatcher } from '@scion/mouse-dispatcher';
 import { setStyle } from '../dom.util';
 
