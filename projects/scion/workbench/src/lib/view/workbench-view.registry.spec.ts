@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { WorkbenchViewRegistry } from './workbench-view.registry';
 import { ɵWorkbenchView } from './ɵworkbench-view.model';
 import createSpyObj = jasmine.createSpyObj;
 
 describe('WorkbenchViewRegistry', () => {
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [WorkbenchViewRegistry],
     });

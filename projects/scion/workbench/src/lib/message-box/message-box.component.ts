@@ -10,7 +10,6 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, HostListener, Injector, Input, OnDestroy, Output, QueryList, ViewChildren } from '@angular/core';
 import { Action, Actions, MessageBox, WbMessageBox } from './message-box';
-import { PortalInjector } from '@angular/cdk/portal';
 import { MoveDelta } from '../move.directive';
 import { asyncScheduler, Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -80,9 +79,11 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
       this.text = messageBox.content as string;
     }
     else {
-      const injectionTokens = new WeakMap();
-      injectionTokens.set(MessageBox, messageBox);
-      this.injector = new PortalInjector(this._injector, injectionTokens);
+      this.injector = Injector.create({
+        parent: this._injector,
+        providers: [{provide: MessageBox, useValue: messageBox}],
+      });
+
       this.componentType = messageBox.content;
     }
   }
@@ -92,7 +93,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
     this.onMove({deltaX: delta, deltaY: delta});
   }
 
-  @Output()
+  @Output() // tslint:disable-line:no-output-native
   public close = new EventEmitter<Action>();
 
   constructor(private _injector: Injector,

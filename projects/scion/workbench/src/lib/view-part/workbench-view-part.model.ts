@@ -45,7 +45,7 @@ export abstract class WorkbenchViewPart {
    *
    * Viewpart actions are displayed next to the opened view tabs.
    *
-   * @return {@link Disposable} to unregister the action.
+   * @return handle to unregister the action.
    */
   public abstract registerViewPartAction(action: WorkbenchViewPartAction): Disposable;
 }

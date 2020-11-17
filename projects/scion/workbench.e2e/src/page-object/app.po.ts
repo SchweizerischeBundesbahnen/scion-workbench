@@ -33,39 +33,39 @@ export class AppPO {
     const viewTabFinder = createViewTabFinder(findBy);
 
     return new class implements ViewTabPO {
-      async isPresent(): Promise<boolean> {
+      public async isPresent(): Promise<boolean> {
         return viewTabFinder.isPresent();
       }
 
-      async click(): Promise<void> {
+      public async click(): Promise<void> {
         await viewTabFinder.click();
       }
 
-      async close(): Promise<void> {
+      public async close(): Promise<void> {
         // hover the view-tab to make the close button visible
         await browser.actions().mouseMove(viewTabFinder).perform();
         await viewTabFinder.$('.e2e-close').click();
       }
 
-      async getTitle(): Promise<string> {
+      public async getTitle(): Promise<string> {
         return viewTabFinder.$('.e2e-title').getText();
       }
 
-      async getHeading(): Promise<string> {
+      public async getHeading(): Promise<string> {
         return viewTabFinder.$('.e2e-heading').getText();
       }
 
-      async isDirty(): Promise<boolean> {
+      public async isDirty(): Promise<boolean> {
         const cssClasses = await getCssClasses(viewTabFinder);
         return cssClasses.includes('e2e-dirty');
       }
 
-      async isClosable(): Promise<boolean> {
+      public async isClosable(): Promise<boolean> {
         const element = viewTabFinder.$('.e2e-close');
         return await element.isPresent() && await element.isDisplayed();
       }
 
-      async isActive(): Promise<boolean> {
+      public async isActive(): Promise<boolean> {
         const cssClasses = await getCssClasses(viewTabFinder);
         return cssClasses.includes('e2e-active');
       }
@@ -133,19 +133,19 @@ export class AppPO {
     const notificationFinder = $(`wb-notification.${cssClass}`);
 
     return new class implements NotificationPO {
-      async isPresent(): Promise<boolean> {
+      public async isPresent(): Promise<boolean> {
         return notificationFinder.isPresent();
       }
 
-      async getTitle(): Promise<string> {
+      public async getTitle(): Promise<string> {
         return notificationFinder.$('.e2e-title').getText();
       }
 
-      async getText(): Promise<string> {
+      public async getText(): Promise<string> {
         return notificationFinder.$('.e2e-text').getText();
       }
 
-      async getSeverity(): Promise<Severity> {
+      public async getSeverity(): Promise<Severity> {
         const cssClasses = await getCssClasses(notificationFinder);
         if (cssClasses.includes('e2e-severity-info')) {
           return 'info';
@@ -159,7 +159,7 @@ export class AppPO {
         return null;
       }
 
-      async getDuration(): Promise<Duration> {
+      public async getDuration(): Promise<Duration> {
         const cssClasses = await getCssClasses(notificationFinder);
         if (cssClasses.includes('e2e-duration-short')) {
           return 'short';
@@ -176,7 +176,7 @@ export class AppPO {
         return null;
       }
 
-      async close(): Promise<void> {
+      public async close(): Promise<void> {
         await notificationFinder.$('.e2e-close').click();
         // wait until the animation completes
         await browser.wait(protractor.ExpectedConditions.stalenessOf(notificationFinder), 5000);
@@ -192,19 +192,19 @@ export class AppPO {
     const msgboxFinder = $(`wb-message-box.${cssClass}`);
 
     return new class implements MessageBoxPO {
-      async isPresent(): Promise<boolean> {
+      public async isPresent(): Promise<boolean> {
         return msgboxFinder.isPresent();
       }
 
-      async getTitle(): Promise<string> {
+      public async getTitle(): Promise<string> {
         return msgboxFinder.$('.e2e-title').getText();
       }
 
-      async getText(): Promise<string> {
+      public async getText(): Promise<string> {
         return msgboxFinder.$('.e2e-text').getText();
       }
 
-      async getSeverity(): Promise<Severity | null> {
+      public async getSeverity(): Promise<Severity | null> {
         const cssClasses = await getCssClasses(msgboxFinder);
         if (cssClasses.includes('e2e-severity-info')) {
           return 'info';
@@ -218,7 +218,7 @@ export class AppPO {
         return null;
       }
 
-      async getModality(): Promise<'application' | 'view' | null> {
+      public async getModality(): Promise<'application' | 'view' | null> {
         const cssClasses = await getCssClasses(msgboxFinder);
         if (cssClasses.includes('e2e-modality-application')) {
           return 'application';
@@ -229,7 +229,7 @@ export class AppPO {
         return null;
       }
 
-      async isContentSelectable(): Promise<boolean> {
+      public async isContentSelectable(): Promise<boolean> {
         const text = await msgboxFinder.$('.e2e-text').getText();
 
         await browser.actions().mouseMove(msgboxFinder.$('.e2e-text')).perform();
@@ -239,7 +239,7 @@ export class AppPO {
         return selection && selection.length && text.includes(selection);
       }
 
-      async getActions(): Promise<{ [key: string]: string }> {
+      public async getActions(): Promise<{ [key: string]: string }> {
         const actions: { [key: string]: string } = {};
 
         const actionsFinder = msgboxFinder.$$('button.e2e-action');
@@ -254,13 +254,13 @@ export class AppPO {
         return actions;
       }
 
-      async close(action: string): Promise<void> {
+      public async close(action: string): Promise<void> {
         await msgboxFinder.$(`button.e2e-action.e2e-action-key-${action}`).click();
         // wait until the animation completes
         await browser.wait(protractor.ExpectedConditions.stalenessOf(msgboxFinder), 5000);
       }
 
-      async isDisplayed(): Promise<boolean> {
+      public async isDisplayed(): Promise<boolean> {
         return msgboxFinder.isDisplayed();
       }
     };
@@ -291,7 +291,7 @@ export class AppPO {
     const actionFinder = $(`wb-workbench wb-view-part wb-view-part-action-bar button.${buttonCssClass}`);
 
     return new class implements ViewPartActionPO {
-      async isPresent(): Promise<boolean> {
+      public async isPresent(): Promise<boolean> {
         return actionFinder.isPresent();
       }
 
@@ -323,23 +323,23 @@ export class AppPO {
     const activityPanelFinder = $(`wb-activity-part .e2e-activity-panel.${cssClass}`);
 
     return new class implements ActivityItemPO {
-      async isPresent(): Promise<boolean> {
+      public async isPresent(): Promise<boolean> {
         return activityItemFinder.isPresent();
       }
 
-      async getTitle(): Promise<string> {
+      public async getTitle(): Promise<string> {
         return await activityItemFinder.getAttribute('title');
       }
 
-      async getText(): Promise<string> {
+      public async getText(): Promise<string> {
         return await activityItemFinder.getText();
       }
 
-      async getCssClasses(): Promise<string[]> {
+      public async getCssClasses(): Promise<string[]> {
         return await getCssClasses(activityItemFinder);
       }
 
-      async click(): Promise<void> {
+      public async click(): Promise<void> {
         const cssClasses = await this.getCssClasses();
         const closePanel = cssClasses.includes('e2e-active');
         await activityItemFinder.click();
@@ -357,19 +357,19 @@ export class AppPO {
     const activityPanelFinder = $(`wb-activity-part .e2e-activity-panel.${cssClass}`);
 
     return new class implements ActivityPanelPO {
-      async isPresent(): Promise<boolean> {
+      public async isPresent(): Promise<boolean> {
         return activityPanelFinder.isPresent();
       }
 
-      async getTitle(): Promise<string> {
+      public async getTitle(): Promise<string> {
         return activityPanelFinder.$('.e2e-activity-title').getText();
       }
 
-      async getSize(): Promise<ISize> {
+      public async getSize(): Promise<ISize> {
         return activityPanelFinder.getSize();
       }
 
-      async getCssClasses(): Promise<string[]> {
+      public async getCssClasses(): Promise<string[]> {
         return getCssClasses(activityPanelFinder);
       }
     };
@@ -395,11 +395,11 @@ export class AppPO {
     const actionFinder = $(`wb-activity-part .e2e-activity-actions .${cssClass}`);
 
     return new class implements ActivityActionPO {
-      async isPresent(): Promise<boolean> {
+      public async isPresent(): Promise<boolean> {
         return actionFinder.isPresent();
       }
 
-      async click(): Promise<void> {
+      public async click(): Promise<void> {
         await actionFinder.click();
       }
     };

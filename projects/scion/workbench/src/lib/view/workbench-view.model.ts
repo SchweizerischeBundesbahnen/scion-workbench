@@ -121,7 +121,7 @@ export abstract class WorkbenchView {
   /**
    * Registers a menu item which is added to the context menu of the view tab.
    *
-   * @return {@link Disposable} to unregister the menu item.
+   * @return handle to unregister the menu item.
    */
   public abstract registerMenuItem(menuItem: WorkbenchMenuItem): Disposable;
 }

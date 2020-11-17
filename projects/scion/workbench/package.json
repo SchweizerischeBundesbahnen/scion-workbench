@@ -18,13 +18,13 @@
     "tslib": "^2.0.0"
   },
   "peerDependencies": {
-    "@angular/common": "^10.0.0-rc.0 || ^10.0.0",
-    "@angular/core": "^10.0.0-rc.0 || ^10.0.0",
-    "@angular/cdk": "^10.0.0-rc.0 || ^10.0.0",
-    "@angular/animations": "^10.0.0-rc.0 || ^10.0.0",
-    "@angular/forms": "^10.0.0-rc.0 || ^10.0.0",
-    "@angular/router": "^10.0.0-rc.0 || ^10.0.0",
-    "@scion/toolkit": "^10.0.0-beta.3 || ^10.0.0-rc.0 || ^10.0.0",
+    "@angular/common": "^11.0.0-rc.0 || ^11.0.0",
+    "@angular/core": "^11.0.0-rc.0 || ^11.0.0",
+    "@angular/cdk": "^11.0.0-rc.0 || ^11.0.0",
+    "@angular/animations": "^11.0.0-rc.0 || ^11.0.0",
+    "@angular/forms": "^11.0.0-rc.0 || ^11.0.0",
+    "@angular/router": "^11.0.0-rc.0 || ^11.0.0",
+    "@scion/toolkit": "^11.0.0-beta.1 || ^11.0.0-rc.0 || ^11.0.0",
    "rxjs": "^6.0.0"
   },
   "keywords": [

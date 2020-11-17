@@ -72,7 +72,7 @@ export abstract class WorkbenchService {
    *
    * Viewpart actions are displayed next to the opened view tabs.
    *
-   * @return {@link Disposable} to unregister the action.
+   * @return handle to unregister the action.
    */
   public abstract registerViewPartAction(action: WorkbenchViewPartAction): Disposable;
 
@@ -81,7 +81,7 @@ export abstract class WorkbenchService {
    *
    * The factory function is invoked with the view as its argument when the menu is about to show.
    *
-   * @return {@link Disposable} to unregister the menu item.
+   * @return handle to unregister the menu item.
    */
   public abstract registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable;
 }

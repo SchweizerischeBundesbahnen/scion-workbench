@@ -10,9 +10,9 @@
 
 import { ElementRef, Injectable, Injector } from '@angular/core';
 import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal } from '@angular/cdk/portal';
 import { ViewMenuComponent } from './view-menu.component';
-import { WorkbenchMenuItem} from '../../workbench.model';
+import { WorkbenchMenuItem } from '../../workbench.model';
 import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
 import { filter, mapTo, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { fromEvent, merge, Observable, Subject, TeardownLogic } from 'rxjs';
@@ -70,11 +70,14 @@ export class ViewMenuService {
     });
 
     const overlayRef = this._overlay.create(config);
-    const injector = new PortalInjector(this._injector, new WeakMap()
-      .set(OverlayRef, overlayRef)
-      .set(WorkbenchView, view)
-      .set(ɵWorkbenchView, view),
-    );
+    const injector = Injector.create({
+      parent: this._injector,
+      providers: [
+        {provide: OverlayRef, useValue: overlayRef},
+        {provide: WorkbenchView, useValue: view},
+        {provide: ɵWorkbenchView, useValue: view},
+      ],
+    });
     overlayRef.attach(new ComponentPortal(ViewMenuComponent, null, injector));
     return true;
   }
@@ -141,12 +144,18 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.close;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      onAction: (): void => void view.close('self').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return ({
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        onAction: (): void => void view.close('self').then(),
+      });
+    });
   }
 
   private registerCloseOtherViewsMenuItem(): void {
@@ -154,13 +163,19 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.closeOthers;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      isDisabled: (): boolean => view.first && view.last,
-      onAction: (): void => void view.close('other-views').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return ({
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        isDisabled: (): boolean => view.first && view.last,
+        onAction: (): void => void view.close('other-views').then(),
+      });
+    });
   }
 
   private registerCloseAllViewsMenuItem(): void {
@@ -168,12 +183,18 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.closeAll;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      onAction: (): void => void view.close('all-views').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return ({
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        onAction: (): void => void view.close('all-views').then(),
+      });
+    });
   }
 
   private registerCloseViewsToTheRightMenuItem(): void {
@@ -181,13 +202,19 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.closeToTheRight;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      isDisabled: (): boolean => view.last,
-      onAction: (): void => void view.close('views-to-the-right').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return {
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        isDisabled: (): boolean => view.last,
+        onAction: (): void => void view.close('views-to-the-right').then(),
+      };
+    });
   }
 
   private registerCloseViewsToTheLeftMenuItem(): void {
@@ -195,13 +222,19 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.closeToTheLeft;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      isDisabled: (): boolean => view.first,
-      onAction: (): void => void view.close('views-to-the-left').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return {
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        isDisabled: (): boolean => view.first,
+        onAction: (): void => void view.close('views-to-the-left').then(),
+      };
+    });
   }
 
   private registerMoveRightMenuItem(): void {
@@ -209,13 +242,19 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.moveRight;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      isDisabled: (): boolean => view.first && view.last,
-      onAction: (): void => void view.move('east').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return {
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        isDisabled: (): boolean => view.first && view.last,
+        onAction: (): void => void view.move('east').then(),
+      };
+    });
   }
 
   private registerMoveLeftMenuItem(): void {
@@ -223,13 +262,19 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.moveLeft;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      isDisabled: (): boolean => view.first && view.last,
-      onAction: (): void => void view.move('west').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return {
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        isDisabled: (): boolean => view.first && view.last,
+        onAction: (): void => void view.move('west').then(),
+      };
+    });
   }
 
   private registerMoveUpMenuItem(): void {
@@ -237,13 +282,19 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.moveUp;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      isDisabled: (): boolean => view.first && view.last,
-      onAction: (): void => void view.move('north').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return {
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        isDisabled: (): boolean => view.first && view.last,
+        onAction: (): void => void view.move('north').then(),
+      };
+    });
   }
 
   private registerMoveDownMenuItem(): void {
@@ -251,13 +302,19 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.moveDown;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      isDisabled: (): boolean => view.first && view.last,
-      onAction: (): void => void view.move('south').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return {
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        isDisabled: (): boolean => view.first && view.last,
+        onAction: (): void => void view.move('south').then(),
+      };
+    });
   }
 
   private registerMoveToNewWindowMenuItem(): void {
@@ -265,12 +322,18 @@ export class ViewMenuService {
     const appConfig = this._config.viewMenuItems && this._config.viewMenuItems.moveBlank;
     const config = {...defaults, ...appConfig};
 
-    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => ({
-      portal: new ComponentPortal(TextComponent, null, new PortalInjector(Injector.NULL, new WeakMap().set(TEXT, config.text))),
-      accelerator: config.accelerator,
-      group: config.group,
-      onAction: (): void => void view.move('blank-window').then(),
-    }));
+    config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
+      const injector = Injector.create({
+        parent: Injector.NULL,
+        providers: [{provide: TEXT, useValue: config.text}],
+      });
+      return {
+        portal: new ComponentPortal(TextComponent, null, injector),
+        accelerator: config.accelerator,
+        group: config.group,
+        onAction: (): void => void view.move('blank-window').then(),
+      };
+    });
   }
 }
 

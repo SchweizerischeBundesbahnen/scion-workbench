@@ -10,7 +10,7 @@
 
 import { Component, ElementRef, HostBinding, HostListener, Injector } from '@angular/core';
 import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal } from '@angular/cdk/portal';
 import { ViewListComponent } from '../view-list/view-list.component';
 import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
 
@@ -53,7 +53,10 @@ export class ViewListButtonComponent {
     });
 
     const overlayRef = this._overlay.create(config);
-    const injector = new PortalInjector(this._injector, new WeakMap().set(OverlayRef, overlayRef));
+    const injector = Injector.create({
+      parent: this._injector,
+      providers: [{provide: OverlayRef, useValue: overlayRef}],
+    });
 
     overlayRef.attach(new ComponentPortal(ViewListComponent, null, injector));
   }

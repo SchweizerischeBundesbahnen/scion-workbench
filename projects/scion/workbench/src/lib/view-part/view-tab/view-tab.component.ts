@@ -16,7 +16,7 @@ import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
 import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
 import { VIEW_DRAG_TRANSFER_TYPE, ViewDragService } from '../../view-dnd/view-drag.service';
 import { createElement } from '../../dom.util';
-import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal } from '@angular/cdk/portal';
 import { VIEW_TAB_CONTEXT } from '../../workbench.constants';
 import { WorkbenchConfig } from '../../workbench.config';
 import { ViewTabContentComponent } from '../view-tab-content/view-tab-content.component';
@@ -231,12 +231,13 @@ export class ViewTabComponent implements OnDestroy {
   }
 
   private createViewTabContentPortal(): ComponentPortal<any> {
-    const injector = new PortalInjector(
-      this._injector,
-      new WeakMap()
-        .set(WorkbenchView, this.view)
-        .set(VIEW_TAB_CONTEXT, this._context),
-    );
+    const injector = Injector.create({
+      parent: this._injector,
+      providers: [
+        {provide: WorkbenchView, useValue: this.view},
+        {provide: VIEW_TAB_CONTEXT, useValue: this._context},
+      ],
+    });
     return new ComponentPortal(this._config.viewTabComponent || ViewTabContentComponent, null, injector);
   }
 

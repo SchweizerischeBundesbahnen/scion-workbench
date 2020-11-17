@@ -30,18 +30,18 @@ export async function expectViewToShow(expected: { viewCssClass?: string; compon
   const ctx = `viewCssClass=${expected.viewCssClass}, component=${expected.componentSelector}`;
 
   if (expected.viewCssClass) {
-    await expect($(`wb-view-tab.${expected.viewCssClass}`).isDisplayed()).toBeTruthy(`Expected <wb-view-tab> to show [${ctx}]`);
-    await expect($(`wb-view.${expected.viewCssClass}`).isDisplayed()).toBeTruthy(`Expected <wb-view> to show [${ctx}]`);
+    await expect(await $(`wb-view-tab.${expected.viewCssClass}`).isDisplayed()).toBe(true, `Expected <wb-view-tab> to show [${ctx}]`);
+    await expect(await $(`wb-view.${expected.viewCssClass}`).isDisplayed()).toBe(true, `Expected <wb-view> to show [${ctx}]`);
   }
-  await expect($(`wb-view ${expected.componentSelector}`).isDisplayed()).toBeTruthy(`Expected component <${expected.componentSelector}> to show [${ctx}]`);
+  await expect(await $(`wb-view ${expected.componentSelector}`).isDisplayed()).toBe(true, `Expected component <${expected.componentSelector}> to show [${ctx}]`);
 }
 
 /**
  * Expects the view tab and view for given identity to not be present in the DOM.
  */
 export async function expectViewToNotExist(expected: { viewCssClass: string; }): Promise<void> {
-  await expect($(`wb-view-tab.${expected.viewCssClass}`).isPresent()).toBeFalsy('Expected <wb-view-tab> not to be present in the DOM');
-  await expect($(`wb-view.${expected.viewCssClass}`).isPresent()).toBeFalsy('Expected <wb-view> not to be present in the DOM');
+  await expect(await $(`wb-view-tab.${expected.viewCssClass}`).isPresent()).toBe(false, 'Expected <wb-view-tab> not to be present in the DOM');
+  await expect(await $(`wb-view.${expected.viewCssClass}`).isPresent()).toBe(false, 'Expected <wb-view> not to be present in the DOM');
 }
 
 /**
@@ -50,8 +50,8 @@ export async function expectViewToNotExist(expected: { viewCssClass: string; }):
 export async function expectPopupToShow(expected: { popupCssClass: string; componentSelector: string; }): Promise<any> {
   const ctx = `popupCssClass=${expected.popupCssClass}, component=${expected.componentSelector}`;
 
-  await expect($(`.wb-popup.${expected.popupCssClass}`).isDisplayed()).toBeTruthy(`Expected 'wb-popup' to show [${ctx}]`);
-  await expect($(expected.componentSelector).isDisplayed()).toBeTruthy(`Expected component <${expected.componentSelector}> to show [${ctx}]`);
+  await expect(await $(`.wb-popup.${expected.popupCssClass}`).isDisplayed()).toBe(true, `Expected 'wb-popup' to show [${ctx}]`);
+  await expect(await $(expected.componentSelector).isDisplayed()).toBe(true, `Expected component <${expected.componentSelector}> to show [${ctx}]`);
 }
 
 /**
@@ -60,7 +60,7 @@ export async function expectPopupToShow(expected: { popupCssClass: string; compo
 export async function expectPopupToNotExist(expected: { popupCssClass: string; }): Promise<void> {
   const ctx = `popupCssClass=${expected.popupCssClass}`;
 
-  await expect($(`.wb-popup.${expected.popupCssClass}`).isPresent()).toBeFalsy(`Expected 'wb-popup' not to be present in the DOM [${ctx}]`);
+  await expect(await $(`.wb-popup.${expected.popupCssClass}`).isPresent()).toBe(false, `Expected 'wb-popup' not to be present in the DOM [${ctx}]`);
 }
 
 /**
@@ -69,8 +69,8 @@ export async function expectPopupToNotExist(expected: { popupCssClass: string; }
 export async function expectActivityToShow(expected: { activityCssClass: string; componentSelector: string; }): Promise<any> {
   const ctx = `activityCssClass=${expected.activityCssClass}, component=${expected.componentSelector}`;
 
-  await expect($(`wb-activity-part .e2e-activity-panel.${expected.activityCssClass}`).isDisplayed()).toBeTruthy(`Expected 'e2e-activity-panel' to show [${ctx}]`);
-  await expect($(expected.componentSelector).isDisplayed()).toBeTruthy(`Expected component <${expected.componentSelector}> to show [${ctx}]`);
+  await expect(await $(`wb-activity-part .e2e-activity-panel.${expected.activityCssClass}`).isDisplayed()).toBe(true, `Expected 'e2e-activity-panel' to show [${ctx}]`);
+  await expect(await $(expected.componentSelector).isDisplayed()).toBe(true, `Expected component <${expected.componentSelector}> to show [${ctx}]`);
 }
 
 /**

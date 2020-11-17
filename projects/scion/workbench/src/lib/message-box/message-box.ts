@@ -20,45 +20,45 @@ export abstract class MessageBox {
   /**
    * Specifies the optional title.
    */
-  title?: string;
+  public title?: string;
 
   /**
    * Specifies the message box text, or the component to be displayed as content.
    * @see input
    */
-  content: string | Type<any>;
+  public content: string | Type<any>;
 
   /**
    * Specifies the optional input to be given to the component as specified in `content`.
    * @see content
    */
-  input?: any;
+  public input?: any;
 
   /**
    * Specifies which buttons to display on the message box.
    */
-  actions?: Actions;
+  public actions?: Actions;
 
   /**
    * Specifies the optional severity.
    */
-  severity?: Severity | null = 'info';
+  public severity?: Severity | null = 'info';
 
   /**
    * Specifies the modality context created by the message box.
    *
    * By default, and if in view context, view modality is used.
    */
-  modality?: 'application' | 'view' = 'view';
+  public modality?: 'application' | 'view' = 'view';
 
   /**
    * Specifies if the user can select the message box text.
    */
-  contentSelectable?: boolean = false; // tslint:disable-line:no-inferrable-types
+  public contentSelectable?: boolean = false; // tslint:disable-line:no-inferrable-types
   /**
    * Specifies CSS class(es) added to the <wb-message-box> element, e.g. used for e2e testing.
    */
-  cssClass?: string | string[];
+  public cssClass?: string | string[];
 }
 
 export class WbMessageBox extends MessageBox {

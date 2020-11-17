@@ -19,13 +19,13 @@ describe('Activity', () => {
 
     it('should not show if no activities are registered [testcase: 1a90c8d3]', async () => {
       await browser.get('/');
-      await expect(appPO.isActivityBarShowing()).toBeTruthy();
+      await expect(await appPO.isActivityBarShowing()).toBe(true);
 
       await browser.get('/#/?show-activities=false');
-      await expect(appPO.isActivityBarShowing()).toBeFalsy();
+      await expect(await appPO.isActivityBarShowing()).toBe(false);
 
       await browser.get('/#/?show-activities=true');
-      await expect(appPO.isActivityBarShowing()).toBeTruthy();
+      await expect(await appPO.isActivityBarShowing()).toBe(true);
     });
   });
 });

@@ -19,7 +19,7 @@ export abstract class WorkbenchConfig {
    * Specifies whether to reuse routes of activities.
    * If set to 'true', which is by default, activity components are not destroyed when toggling the activity.
    */
-  abstract reuseActivityRoutes?: boolean;
+  public abstract reuseActivityRoutes?: boolean;
 
   /**
    * Allows customizing the appearance of a view tab by providing a custom view tab component.
@@ -35,12 +35,12 @@ export abstract class WorkbenchConfig {
    *   constructor(view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {}
    * }
    */
-  abstract viewTabComponent?: ComponentType<any>;
+  public abstract viewTabComponent?: ComponentType<any>;
 
   /**
    * Controls which built-in menu items to display in the view context menu.
    */
-  abstract viewMenuItems?: ViewMenuItemsConfig;
+  public abstract viewMenuItems?: ViewMenuItemsConfig;
 }
 
 /**

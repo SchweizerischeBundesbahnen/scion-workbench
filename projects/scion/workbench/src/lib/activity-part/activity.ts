@@ -1,6 +1,6 @@
 import { Injector, TemplateRef } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ComponentType, PortalInjector } from '@angular/cdk/portal';
+import { ComponentType } from '@angular/cdk/portal';
 import { Disposable } from '../disposable';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
 
@@ -147,9 +147,10 @@ export class InternalActivity implements Activity {
         return {template: templateOrComponent, injector: injector};
       }
       else {
-        const injectionTokens = new WeakMap();
-        injectionTokens.set(Activity, this);
-        const portalInjector = new PortalInjector(injector || this._injector, injectionTokens);
+        const portalInjector = Injector.create({
+          parent: injector || this._injector,
+          providers: [{provide: Activity, useValue: this}],
+        });
         return {component: templateOrComponent, injector: portalInjector};
       }
     })();

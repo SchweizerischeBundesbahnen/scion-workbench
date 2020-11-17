@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { Component, NgModule } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router, RouteReuseStrategy } from '@angular/router';
@@ -37,7 +37,7 @@ import { WorkbenchTestingModule } from './workbench-testing.module';
  */
 describe('Activity part', () => {
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
