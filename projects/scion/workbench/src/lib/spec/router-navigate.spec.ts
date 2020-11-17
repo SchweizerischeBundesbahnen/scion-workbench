@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
 import { Router, RouterModule } from '@angular/router';
@@ -57,7 +57,7 @@ import { WorkbenchTestingModule } from './workbench-testing.module';
 // tslint:disable class-name
 describe('Router', () => {
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({
@@ -122,7 +122,7 @@ describe('Router', () => {
     expect(fixture).toShow(FeatureB_EntryComponent, '(10b)');
 
     // Go back one level to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../.."]', '(11a)');
+    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink=".."]', '(11a)');
     expect(fixture).toShow(FeatureA_EntryComponent, '(11b)');
 
     // Open '/feature-a/feature-b/view-1' (relative navigation)
@@ -146,7 +146,7 @@ describe('Router', () => {
     expect(fixture).toShow(FeatureB_EntryComponent, '(16b)');
 
     // Go back one level to '/feature-a' (relative navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../.."]', '(17a)');
+    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink=".."]', '(17a)');
     expect(fixture).toShow(FeatureA_EntryComponent, '(17b)');
 
     // Open '/feature-a/feature-b/view-1' (absolute navigation)
@@ -182,7 +182,7 @@ describe('Router', () => {
     expect(fixture).toShow(FeatureB_EntryComponent, '(24b)');
 
     // Open '/feature-a/view-1' (relative navigation)
-    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../../view-1"]', '(25a)');
+    clickElement(fixture, FeatureB_EntryComponent, 'a[wbRouterLink="../view-1"]', '(25a)');
     expect(fixture).toShow(FeatureA_View1Component, '(25b)');
 
     // Open '/feature-a/feature-b/view-1' (relative navigation)
@@ -347,7 +347,7 @@ class FeatureA_EntryComponent {
   template: `
     <h1>Feature Module A - View 1</h1>
     <ul>
-      <li><a wbRouterLink="..">go 1 level back</a></li>
+      <li><a wbRouterLink="..">go back 1 level</a></li>
       <li><a wbRouterLink="../view-2">view-2</a></li>
 
       <li><a wbRouterLink="../feature-b">feature-b</a></li>
@@ -365,7 +365,7 @@ class FeatureA_View1Component {
   template: `
     <h1>Feature Module A - View 2</h1>
     <ul>
-      <li><a wbRouterLink="..">go 1 level back</a></li>
+      <li><a wbRouterLink="..">go back 1 level</a></li>
       <li><a wbRouterLink="../view-1">view-1</a></li>
     </ul>
   `,
@@ -396,9 +396,9 @@ export class FeatureAModule {
   template: `
     <h1>Feature Module B - Entry</h1>
     <ul>
-      <li><a wbRouterLink="..">go 1 level back</a></li>
-      <li><a wbRouterLink="../..">go 2 levels back</a></li>
-      <li><a wbRouterLink="../../view-1">../../view-1</a></li>
+      <li><a wbRouterLink="..">go back 1 level</a></li>
+      <li><a wbRouterLink="../..">go back 2 levels</a></li>
+      <li><a wbRouterLink="../view-1">../view-1</a></li>
 
       <li><a wbRouterLink="view-1">view-1</a></li>
       <li><a wbRouterLink="./view-2">./view-2</a></li>
@@ -417,8 +417,8 @@ class FeatureB_EntryComponent {
   template: `
     <h1>Feature Module B - View 1</h1>
     <ul>
-      <li><a wbRouterLink="..">go 1 level back</a></li>
-      <li><a wbRouterLink="../..">go 2 levels back</a></li>
+      <li><a wbRouterLink="..">go back 1 level</a></li>
+      <li><a wbRouterLink="../..">go back 2 levels</a></li>
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
   `,
@@ -430,8 +430,8 @@ class FeatureB_View1Component {
   template: `
     <h1>Feature Module B - View 2</h1>
     <ul>
-      <li><a wbRouterLink="..">go 1 level back</a></li>
-      <li><a wbRouterLink="../..">go 2 levels back</a></li>
+      <li><a wbRouterLink="..">go back 1 level</a></li>
+      <li><a wbRouterLink="../..">go back 2 levels</a></li>
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
   `,

@@ -23,16 +23,16 @@ describe('ViewPartAction', () => {
   it('should be added to all viewparts', async () => {
     const openNewTabActionButtonPO = appPO.findViewPartAction('e2e-open-new-tab');
 
-    await expect(appPO.isViewTabBarShowing()).toBeTruthy();
-    await expect(openNewTabActionButtonPO.isPresent()).toBeTruthy();
+    await expect(await appPO.isViewTabBarShowing()).toBe(true);
+    await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
 
     await browser.get('/#/?show-open-new-view-tab-action=false');
-    await expect(appPO.isViewTabBarShowing()).toBeFalsy();
-    await expect(openNewTabActionButtonPO.isPresent()).toBeFalsy();
+    await expect(await appPO.isViewTabBarShowing()).toBe(false);
+    await expect(await openNewTabActionButtonPO.isPresent()).toBe(false);
 
     await browser.get('/#/?show-open-new-view-tab-action=true');
-    await expect(appPO.isViewTabBarShowing()).toBeTruthy();
-    await expect(openNewTabActionButtonPO.isPresent()).toBeTruthy();
+    await expect(await appPO.isViewTabBarShowing()).toBe(true);
+    await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
   });
 
   it('should stick to a view if registered in the context of a view [testcase: 4a3a8932]', async () => {
@@ -43,20 +43,20 @@ describe('ViewPartAction', () => {
     await welcomePagePO.clickTile('e2e-tile-4a3a8932');
 
     // Open a view which contributes a view-local action
-    await expect(viewTabPO.isActive()).toBeTruthy();
-    await expect(viewLocalActionButtonPO.isPresent()).toBeTruthy();
+    await expect(await viewTabPO.isActive()).toBe(true);
+    await expect(await viewLocalActionButtonPO.isPresent()).toBe(true);
 
     // Open a new view tab
     await appPO.openNewViewTab();
-    await expect(viewLocalActionButtonPO.isPresent()).toBeFalsy();
+    await expect(await viewLocalActionButtonPO.isPresent()).toBe(false);
 
     // Activate previous view
     await viewTabPO.click();
-    await expect(viewLocalActionButtonPO.isPresent()).toBeTruthy();
+    await expect(await viewLocalActionButtonPO.isPresent()).toBe(true);
 
     // Close the view
     await viewTabPO.close();
-    await expect(viewTabPO.isPresent()).toBeFalsy();
-    await expect(viewLocalActionButtonPO.isPresent()).toBeFalsy();
+    await expect(await viewTabPO.isPresent()).toBe(false);
+    await expect(await viewLocalActionButtonPO.isPresent()).toBe(false);
   });
 });

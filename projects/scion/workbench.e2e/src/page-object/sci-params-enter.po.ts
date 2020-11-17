@@ -9,6 +9,7 @@
  */
 
 import { ElementFinder } from 'protractor';
+import { Params } from '@angular/router';
 
 export class SciParamsEnterPanelPO {
 
@@ -25,7 +26,7 @@ export class SciParamsEnterPanelPO {
   /**
    * Allows to enter parameters into '<sci-params-enter>' panel.
    */
-  public async enterParams(params: Object): Promise<void> {
+  public async enterParams(params: Params): Promise<void> {
     const addButton = this._sciParamsEnterPanel.$('button.e2e-add');
     const lastKeyInput = this._sciParamsEnterPanel.$$('input.e2e-key').last();
     const lastValueInput = this._sciParamsEnterPanel.$$('input.e2e-value').last();

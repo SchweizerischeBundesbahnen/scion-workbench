@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { async, fakeAsync, inject, TestBed } from '@angular/core/testing';
+import { fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { Component, Inject, Injectable, InjectionToken, NgModule, NgModuleFactoryLoader, Optional } from '@angular/core';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
@@ -45,7 +45,7 @@ import { WorkbenchTestingModule } from './workbench-testing.module';
 // tslint:disable class-name
 describe('Lazily loaded view', () => {
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({

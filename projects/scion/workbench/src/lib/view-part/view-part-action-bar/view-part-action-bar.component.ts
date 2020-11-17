@@ -12,7 +12,6 @@ import { ChangeDetectionStrategy, Component, Injector, TemplateRef } from '@angu
 import { combineLatest, Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { WorkbenchViewPartAction } from '../../workbench.model';
-import { PortalInjector } from '@angular/cdk/portal';
 import { WorkbenchViewPart } from '../workbench-view-part.model';
 import { ɵWorkbenchService } from '../../ɵworkbench.service';
 
@@ -37,9 +36,10 @@ export class ViewPartActionBarComponent {
   }
 
   public addViewPartToInjector(injector: Injector): Injector {
-    const injectionTokens = new WeakMap();
-    injectionTokens.set(WorkbenchViewPart, this._viewPart);
-    return new PortalInjector(injector, injectionTokens);
+    return Injector.create({
+      parent: injector,
+      providers: [{provide: WorkbenchViewPart, useValue: this._viewPart}],
+    });
   }
 }
 

@@ -23,21 +23,21 @@ describe('Default view', () => {
   });
 
   it('should be displayed if there is no view opened', async () => {
-    await expect(appPO.isDefaultPageShowing('app-welcome-page')).toBeTruthy();
-    await expect(welcomePagePO.isPresent()).toBeTruthy();
-    await expect(appPO.isViewTabBarShowing()).toBeFalsy();
+    await expect(await appPO.isDefaultPageShowing('app-welcome-page')).toBe(true);
+    await expect(await welcomePagePO.isPresent()).toBe(true);
+    await expect(await appPO.isViewTabBarShowing()).toBe(false);
 
     // Open a view
     await welcomePagePO.clickTile('e2e-tile-view-1');
-    await expect(appPO.isDefaultPageShowing('app-welcome-page')).toBeFalsy();
-    await expect(appPO.isViewTabBarShowing()).toBeTruthy();
-    await expect(welcomePagePO.isPresent()).toBeFalsy();
-    await expect(appPO.findViewTab({cssClass: 'e2e-tile-view-1'}).isPresent).toBeTruthy();
+    await expect(await appPO.isDefaultPageShowing('app-welcome-page')).toBe(false);
+    await expect(await appPO.isViewTabBarShowing()).toBe(true);
+    await expect(await welcomePagePO.isPresent()).toBe(false);
+    await expect(await appPO.findViewTab({cssClass: 'e2e-tile-view-1'}).isPresent()).toBe(true);
 
     // Close the view
     await appPO.findViewTab({cssClass: 'e2e-tile-view-1'}).close();
-    await expect(appPO.isDefaultPageShowing('app-welcome-page')).toBeTruthy();
-    await expect(welcomePagePO.isPresent()).toBeTruthy();
-    await expect(appPO.isViewTabBarShowing()).toBeFalsy();
+    await expect(await appPO.isDefaultPageShowing('app-welcome-page')).toBe(true);
+    await expect(await welcomePagePO.isPresent()).toBe(true);
+    await expect(await appPO.isViewTabBarShowing()).toBe(false);
   });
 });

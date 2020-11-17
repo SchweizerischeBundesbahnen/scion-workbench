@@ -13,9 +13,9 @@ import { EMPTY, of, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { createElement, setStyle } from '../dom.util';
 import { ViewDragData, ViewDragService } from './view-drag.service';
-import { ComponentPortal, DomPortalOutlet, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal, DomPortalOutlet } from '@angular/cdk/portal';
 import { ViewTabContentComponent } from '../view-part/view-tab-content/view-tab-content.component';
-import { WorkbenchMenuItem} from '../workbench.model';
+import { WorkbenchMenuItem } from '../workbench.model';
 import { WorkbenchConfig } from '../workbench.config';
 import { VIEW_TAB_CONTEXT } from '../workbench.constants';
 import { UrlSegment } from '@angular/router';
@@ -164,12 +164,14 @@ export class ViewTabDragImageRenderer implements OnDestroy {
   }
 
   private createViewTabContentPortal(): ComponentPortal<any> {
-    const injector = new PortalInjector(
-      this._injector,
-      new WeakMap()
-        .set(WorkbenchView, new DragImageWorkbenchView(this._dragData))
-        .set(VIEW_TAB_CONTEXT, 'drag-image'),
-    );
+    const injector = Injector.create({
+      parent: this._injector,
+      providers: [
+        {provide: WorkbenchView, useValue: new DragImageWorkbenchView(this._dragData)},
+        {provide: VIEW_TAB_CONTEXT, useValue: 'drag-image'},
+      ],
+    });
+
     return new ComponentPortal(this._config.viewTabComponent || ViewTabContentComponent, null, injector);
   }
 

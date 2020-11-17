@@ -21,6 +21,9 @@ const chromeArgs = ['--window-size=1920,1080'];
 // See https://www.npmjs.com/package/tsconfig-paths
 require('tsconfig-paths/register');
 
+/**
+ * @type { import("protractor").Config }
+ */
 exports.config = {
   allScriptsTimeout: 11000,
   specs: [
@@ -50,7 +53,7 @@ exports.config = {
     ],
   },
   capabilities: {
-    'browserName': 'chrome',
+    browserName: 'chrome',
     chromeOptions: {
       args: process.env.HEADLESS ? ['--headless', ...chromeArgs] : chromeArgs,
       binary: puppeteer.executablePath(),

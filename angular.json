@@ -10,7 +10,7 @@
       "prefix": "wb",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "tsConfig": "projects/scion/workbench/tsconfig.lib.json",
             "project": "projects/scion/workbench/ng-package.json"
@@ -114,7 +114,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,

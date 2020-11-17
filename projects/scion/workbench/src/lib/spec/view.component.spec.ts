@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgModule } from '@angular/core';
 import { PartsLayoutComponent } from '../layout/parts-layout.component';
 import { WorkbenchService } from '../workbench.service';
@@ -26,7 +26,7 @@ import { WorkbenchView } from '../view/workbench-view.model';
 
 describe('ViewComponent', () => {
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     jasmine.addMatchers(jasmineCustomMatchers);
 
     TestBed.configureTestingModule({

@@ -12,7 +12,7 @@ import { Injectable, Injector, OnDestroy } from '@angular/core';
 import { ConnectedOverlayPositionChange, ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { from, fromEvent, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
-import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal } from '@angular/cdk/portal';
 import { Popup, PopupConfig } from './metadata';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
 import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
@@ -87,9 +87,10 @@ export class PopupService implements OnDestroy {
     const popup = new InternalPopup(input);
 
     // Prepare component injector
-    const injectionTokens = new WeakMap();
-    injectionTokens.set(Popup, popup);
-    const injector = new PortalInjector(this._injector, injectionTokens);
+    const injector = Injector.create({
+      parent: this._injector,
+      providers: [{provide: Popup, useValue: popup}],
+    });
 
     // Instantiate popup component and attach it to the DOM
     const portal = new ComponentPortal(config.component, null, injector);

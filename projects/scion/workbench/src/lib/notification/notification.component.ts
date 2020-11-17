@@ -12,7 +12,6 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { Notification, WbNotification } from './notification';
 import { asyncScheduler, Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { PortalInjector } from '@angular/cdk/portal';
 import { Arrays } from '@scion/toolkit/util';
 
 @Component({
@@ -44,14 +43,15 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
       this.text = notification.content as string;
     }
     else {
-      const injectionTokens = new WeakMap();
-      injectionTokens.set(Notification, notification);
-      this.injector = new PortalInjector(this._injector, injectionTokens);
+      this.injector = Injector.create({
+        parent: this._injector,
+        providers: [{provide: Notification, useValue: notification}],
+      });
       this.componentType = notification.content;
     }
   }
 
-  @Output()
+  @Output() // tslint:disable-line:no-output-native
   public close = new EventEmitter<void>();
 
   @HostBinding('attr.class')
