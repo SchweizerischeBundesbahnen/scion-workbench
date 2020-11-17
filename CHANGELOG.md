@@ -1,3 +1,91 @@
+# [11.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.35...11.0.0-beta.1) (2020-11-17)
+
+
+### Bug Fixes
+
+* **workbench:** remove flickering when dropping views ([46a9c4d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/46a9c4dee209c3466d973b7590a009c5273b4561))
+* **workbench:** wait to navigate until other navigations complete ([5448260](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/54482602078506d05163536378f4c47859656bdc))
+
+
+### chore
+
+* **application-platform:** delete SCION Workbench Application Platform ([3468a43](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3468a434e7748084070511e68c010ca44f03aee5)), closes [#232](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/232)
+* **dimension:** delete `@scion/dimension` module ([7c73203](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7c73203b3312508f3618a7b118386e74eb989317))
+* **viewport:** delete `@scion/viewport` module ([809b028](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/809b0284b4cd053a1fa934f61fcb4cb9efd35338))
+* **workbench:** update @scion/workbench to Angular 11 ([5d45ce3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5d45ce3aefb8c4d8faf8396c8271a5c0a255ff96)), closes [#234](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/234)
+
+
+### Code Refactoring
+
+* **workbench:** refactor the workbench layout as prerequisite for complex layouts with fixed parts ([84b764c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/84b764cb872a5378e908b9a6279d64356c271aba))
+
+
+### BREAKING CHANGES
+
+* **workbench:** Added support for Angular 11.
+
+    To migrate:
+    Migrate your app to Angular 11 as following:
+    - Run `ng update @angular/cli @angular/core @angular/cdk`.
+    - Refer to the Angular Update Guide for detailed instructions on how to update Angular: https://update.angular.io/
+
+* **dimension:** The dimension was moved from `@scion/dimension` to `@scion/toolkit` NPM module.
+
+    SCION Toolkit is a collection of UI components and utilities. The toolkit is published as single NPM library with a separate entry point per tool, allowing for tree shaking away not used tools.
+    Refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/docs/site/tools/dimension.md for more information about dimension directive.
+    Refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/docs/site/tools/observable.md for more information about replacement of `DimensionService`.
+    
+    To migrate:
+    - Uninstall NPM module `@scion/dimension`
+    - Install NPM module `@scion/toolkit`
+    - Replace ES2015 imports `@scion/dimension` with `@scion/toolkit/dimension`
+    - Replace usage of `DimensionService` with `fromDimension$ ` Observable for observing the dimension of a DOM element.
+
+* **viewport:** The viewport was moved from `@scion/viewport` to `@scion/toolkit` NPM module.
+
+    SCION Toolkit is a collection of UI components and utilities. The toolkit is published as single NPM library with a separate entry point per tool, allowing for tree shaking away not used tools.
+    Refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/docs/site/tools/viewport.md for more information.
+    
+    To migrate:
+    - Uninstall NPM module `@scion/viewport`
+    - Install NPM module `@scion/toolkit`
+    - Replace ES2015 imports `@scion/viewport` with `@scion/toolkit/viewport`
+
+* **application-platform:** The development of the SCION Application Platform was discontinued in favor of the new SCION Microfrontend Platform. SCION Microfrontend Platform is extremely lightweight and does not depend on SCION Workbench and Angular. Microfrontend support for the SCION Workbench will be back soon. We are working on the integration of the new SCION Microfrontend Platform into the workbench to enable a seamless integration of microfrontends as workbench views.
+
+    We have deleted the SCION application platform from our Git repository and deprecated respective NPM modules. This project is discontinued and will no longer be maintained. Its documentation is still online. The following NPM modules are deprecated: `@scion/workbench-application-platform`, `@scion/workbench-application-platform.api`, `@scion/workbench-application.core`, `@scion/workbench-application. angular`, `@scion/mouse-dispatcher`, `@scion/dimension` (moved to `@scion/toolkit`), `@scion/viewport` (moved to `@scion/toolkit`).
+    
+    If you still need updates for new Angular versions, please let us know and submit a GitHub issue. Alternatively, micro applications can use the TypeScript module `@scion/workbench-application.core` instead of `@scion/workbench-application.angular`. We plan to release the new microfrontend support for the SCION Workbench by the end of 2020 so that you can migrate to Angular 11. Detailed migration instructions for upgrading to the new workbench microfrontend support will follow after its release.
+    
+    Refer to https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform for more information about SCION Microfrontend Platform.
+
+* **workbench:** The refactoring of the workbench layout introduced a breaking change as properties were renamed, dependencies added or removed, and the internal DOM structure changed.
+
+    To migrate:
+    - Update the usage of following properties:
+      - Property `selfViewRef` of `WbNavigationExtras` was renamed to `selfViewId`
+      - Property `blankViewPartRef` of `WbNavigationExtras` was renamed to `blankPartId`
+      - Property `viewRef` of `WorkbenchView` was renamed to `viewId`
+      - Property `viewPart` of `WorkbenchView` was renamed to `part`
+      - Property `viewPartRef` of `WorkbenchViewPart` was renamed to `partId`
+      - Property `activeViewRef$ ` of `WorkbenchViewPart` was renamed to `activeViewId$ `
+      - Property `activeViewRef` of `WorkbenchViewPart` was renamed to `activeViewId`
+      - Property `viewRefs$ ` of `WorkbenchViewPart` was renamed to `viewIds$ `
+      - Property `viewRefs` of `WorkbenchViewPart` was renamed to `viewIds`
+      - Property `viewRef` of `WorkbenchViewPartAction` was renamed to `viewId`
+    - Add the dependency `@scion/toolkit@10.0.0-beta.3` as required by the workbench
+    - Remove the dependencies `@scion/dimension` and `@scion/viewport` as tools are now used from `@scion/toolkit`.
+       Refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit for more information about its installation and usage.
+    - If you rely on the workbench-internal DOM structure to style your app, change CSS selectors as following:
+      - Attribute `viewpartref` of `<wb-view-part>` was changed to `data-partid`
+      - Attribute `viewref` of `<wb-view>` was changed to `data-viewid`
+      - Attribute `viewref` of `<wb-view-tab>` was changed to `data-viewid`
+      - DOM element `<wb-view-part-grid>` was renamed to `<wb-parts-layout>`
+      - DOM element `<wb-view-part-sash-box>` was renamed to `<wb-tree-node>`
+      - Added `<sci-sashbox>` as child to `<wb-tree-node>` element
+    - The serialized representation of the layout in the URL changed. For that reason, we renamed the query parameter `viewgrid` to `parts` so  that the app does not error when loading it from a bookmark into the browser.
+
+
 # [0.0.0-beta.35](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/0.0.0-beta.34...0.0.0-beta.35) (2020-07-17)
 
 
