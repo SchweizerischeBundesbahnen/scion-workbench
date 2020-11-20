@@ -1,0 +1,34 @@
+@use 'sci-toolkit-theme' with (
+    $theme: (
+      accent: (
+        50: #E8F5E9,
+        100: #C8E6C9,
+        200: #A5D6A7,
+        300: #81C784,
+        400: #66BB6A,
+        500: #4CAF50,
+        600: #43A047,
+        700: #388E3C,
+        800: #2E7D32,
+        900: #1B5E20,
+        default: 800,
+        lighter: #60bf4cff,
+        darker: #327f1fff,
+      ),
+   )
+ );
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px; // defines 1rem as 14px
+}
+
+body {
+  font-family: Roboto, Arial, sans-serif;
+  color: var(--sci-color-foreground);
+  background-color: var(--sci-color-background);
+  margin: 0;
+}

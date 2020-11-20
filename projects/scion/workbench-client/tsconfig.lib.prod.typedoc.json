@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.lib.prod.json",
+  "typedocOptions": {
+    "mode": "file",
+    "out": "dist/workbench-client-api",
+    "includeVersion": true,
+    "listInvalidSymbolLinks": true,
+    "excludeNotExported": true,
+    "excludeProtected": false,
+    "excludePrivate": true,
+    "excludeExternals": true,
+    "exclude": "**/ɵ*.ts",
+    "toc": [
+      "WorkbenchClient",
+      "WorkbenchRouter"
+    ],
+    "categorizeByGroup": true
+  }
+}

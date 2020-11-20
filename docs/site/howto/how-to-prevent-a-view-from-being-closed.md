@@ -49,6 +49,6 @@ export class PersonComponent implements WbBeforeDestroy {
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
-[menu-changelog]: /docs/site/changelog/changelog.md
+[menu-changelog]: /docs/site/changelog.md
 [menu-contributing]: /CONTRIBUTING.md
 [menu-sponsoring]: /docs/site/sponsoring.md

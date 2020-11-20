@@ -42,7 +42,7 @@ The following is a summary of commands useful for development of `scion-workbenc
 
 > Before you start development, we recommend that you build all projects using the `npm run build` command. Please make sure that path overrides are disabled in `tsconfig.json`. 
  
-### Commands for working on the workbench
+### Commands for working on the @scion/workbench library
  
 - `npm run workbench:lint`\
   Lints the workbench source.
@@ -54,24 +54,54 @@ The following is a summary of commands useful for development of `scion-workbenc
   Runs unit tests of the workbench.
   
 - `npm run workbench:e2e`\
-  Runs end-to-end tests of the workbench. Prior to test execution, the testing app is started using the Angular CLI.
+  Runs end-to-end tests of the workbench. Prior to test execution, starts the testing app `workbench-testing-app` using the Angular CLI.
+  
+### Commands for working on the @scion/workbench-client library
+ 
+- `npm run workbench-client:lint`\
+  Lints the workbench-client source.
+
+- `npm run workbench-client:build`\
+  Builds the workbench-client source.
+
+- `npm run workbench-client:test`\
+  Runs unit tests of the workbench-client.
+  
+- `npm run workbench-client:e2e`\
+  Runs end-to-end tests of the workbench-client. Prior to test execution, starts the testing app `workbench-testing-app` and two instances of the `workbench-client-testing-app` using the Angular CLI.
   
 ### Commands for working on the workbench testing application
   
 - `npm run workbench-testing-app:serve`\
-  Serves the testing app on http://localhost:4200 using the Angular CLI.\
+  Serves the `workbench-testing-app` on http://localhost:4200 using the Angular CLI.\
   Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support. 
   
-- `npm run workbench-testing-app-localhost:build`\
-  Builds the testing app into `dist` folder using the productive config.
+- `npm run workbench-testing-app:ci:build`\
+  Builds the `workbench-testing-app` into `dist` folder using the productive config.
 
 - `npm run workbench-testing-app:lint`\
-  Lints the testing app.
+  Lints the `workbench-testing-app`.
+  
+### Commands for working on the workbench-client testing application
+  
+- `npm run workbench-client-fixture:serve`\
+  Serves the `workbench-testing-app` and two instances of the `workbench-client-testing-app` using the Angular CLI. Open the page http://localhost:4200 to load the workbench host app into your browser.\
+  Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support. 
+  
+- `npm run workbench-client-testing-app:ci:build`\
+  Builds the `workbench-client-testing-app` into `dist` folder using the productive config.
+
+- `npm run workbench-client-testing-app:lint`\
+  Lints the `workbench-client-testing-app`.
 
 ### Commands for generating the project documentation
 
-- `npm run changelog`\
-  Use to generate the changelog based on the commit history. The output is written to `CHANGELOG.md`, which will be included in `docs/site/changelog/changelog.md` using the template `docs/site/changelog/changelog.template.md`. 
+We generate separate changelogs for the packages `@scion/workbench` and `@scion/workbench-client` because of their independent release cycles.
+
+- `npm run changelog-workbench`\
+  Use to generate the changelog for `@scion/workbench` based on the commit history. Only commits that involve files under `projects/scion/workbench` are included in the changelog. The output is written to `CHANGELOG_WORKBENCH.md`, which will be included in `docs/site/changelog-workbench/changelog.md` using the template `docs/site/changelog-workbench/changelog.template.md`. 
+- `npm run changelog-workbench-client`\
+  Use to generate the changelog for `@scion/workbench-client` based on the commit history. Only commits that involve files under `projects/scion/workbench-client` are included in the changelog. The output is written to `CHANGELOG_WORKBENCH_CLIENT.md`, which will be included in `docs/site/changelog-workbench-client/changelog.md` using the template `docs/site/changelog-workbench-client/changelog.template.md`. 
 
 </details>
 
@@ -147,7 +177,9 @@ The scope should be the name of the NPM package or application affected by the c
 The following scopes are allowed:
   
 - `workbench`: If the change affects the `@scion/workbench` NPM package.
-- `demo`: If the change affects the `SCION Workbench Demo Application`.
+- `workbench-client`: If the change affects the `@scion/workbench-client` NPM package.
+- `workbench-testing-app`: If the change affects the internal testing app for the workbench.
+- `workbench-client-testing-app`: If the change affects the internal testing app for the workbench client.
 </details>
 
 
@@ -228,6 +260,7 @@ We publish our packages to the [NPM registry](https://www.npmjs.com/). Packages 
 
 We have the following workbench related packages:
 - https://www.npmjs.com/package/@scion/workbench
+- https://www.npmjs.com/package/@scion/workbench-client
 
 </details>
 
@@ -251,29 +284,48 @@ In the development of a new major release, we usually release pre-releases and t
 </details>
 
 <details>
-  <summary><strong>Release Checklist</strong></summary>
+  <summary><strong>Release Checklist for @scion/workbench and related artifacts</strong></summary>
   <br>
 
-This chapter describes the tasks to publish a new release to NPM.
+This chapter describes the tasks to publish a new release for `@scion/workbench` to NPM.
 
-1. Update the following `package.json` files with the new version:
-    - `/package.json`
-    - `/projects/scion/workbench/package.json`
-1. Update inter-project dependencies.
+1. Update `/projects/scion/workbench/package.json` with the new version.
 1. Run `npm install` to update the version in `package-lock.json`.
-1. Run `npm run changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
-1. Commit the changed files using the following commit message: `release: vX.X.X`. Replace `X.X.X` with the current version. Later, when merging the branch into the master branch, a commit message of this format triggers the release action in our [GitHub Actions workflow][link-github-actions-workflow].
+1. Run `npm run workbench:changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
+1. Commit the changed files using the following commit message: `release(workbench): vX.X.X`. Replace `X.X.X` with the current version. Later, when merging the branch into the master branch, a commit message of this format triggers the release action in our [GitHub Actions workflow][link-github-actions-workflow].
 1. Push the commit to the branch `release/X.X.X` and submit a pull request to the master branch. Replace `X.X.X` with the current version.
 1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
 1. Verify that: 
    - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
+   - **Testing App** is deployed to https://scion-workbench-testing-app.now.sh and https://scion-workbench-testing-app-vX-X-X.now.sh.
 
+</details>
+
+<details>
+  <summary><strong>Release Checklist for @scion/workbench-client and related artifacts</strong></summary>
+  <br>
+
+This chapter describes the tasks to publish a new release for `@scion/workbench-client` to NPM.
+
+1. Update `/projects/scion/workbench-client/package.json` with the new version.
+1. Run `npm install` to update the version in `package-lock.json`.
+1. Run `npm run workbench-client:changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
+1. Commit the changed files using the following commit message: `release(workbench-client): vX.X.X`. Replace `X.X.X` with the current version. Later, when merging the branch into the master branch, a commit message of this format triggers the release action in our [GitHub Actions workflow][link-github-actions-workflow].
+1. Push the commit to the branch `release/workbench-client-X.X.X` and submit a pull request to the master branch. Replace `X.X.X` with the current version.
+1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
+1. Verify that: 
+   - **@scion/workbench-client** is published to: https://www.npmjs.com/package/@scion/workbench-client.
+   - **Testing App** is deployed to https://scion-workbench-client-testing-app1.now.sh and https://scion-workbench-client-testing-app1-vX-X-X.now.sh.
+   - **Testing App** is deployed to https://scion-workbench-client-testing-app2.now.sh and https://scion-workbench-client-testing-app2-vX-X-X.now.sh.
+   - **API Documentation (TypeDoc)** is deployed to: 
+      - https://scion-workbench-client-api.now.sh.
+      - https://scion-workbench-client-api-vX-X-X.now.sh.
 </details>
 
 [link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
-[menu-changelog]: /docs/site/changelog/changelog.md
+[menu-changelog]: /docs/site/changelog.md
 [menu-contributing]: /CONTRIBUTING.md
 [menu-sponsoring]: /docs/site/sponsoring.md

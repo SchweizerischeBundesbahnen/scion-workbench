@@ -123,6 +123,6 @@ To open another view from within a view of the feature module, go back one level
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
-[menu-changelog]: /docs/site/changelog/changelog.md
+[menu-changelog]: /docs/site/changelog.md
 [menu-contributing]: /CONTRIBUTING.md
 [menu-sponsoring]: /docs/site/sponsoring.md

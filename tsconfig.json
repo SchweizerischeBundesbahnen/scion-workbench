@@ -22,8 +22,8 @@
       "@scion/workbench": [
         "dist/scion/workbench"
       ],
-      "@scion/workbench/*": [
-        "dist/scion/workbench/*"
+      "@scion/workbench-client": [
+        "dist/scion/workbench-client"
       ]
     }
     /*
@@ -39,8 +39,8 @@
     //      "@scion/workbench": [
     //        "projects/scion/workbench/src/public_api"
     //      ],
-    //      "@scion/workbench/*": [
-    //        "projects/scion/workbench/src/*"
+    //      "@scion/workbench-client": [
+    //        "projects/scion/workbench-client/src/public_api"
     //      ],
     //      "@scion/toolkit/util": [
     //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"

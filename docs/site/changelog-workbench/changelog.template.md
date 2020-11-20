@@ -3,12 +3,13 @@
 | [SCION Workbench][menu-home] | [Projects Overview][menu-projects-overview] | Changelog | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
 | --- | --- | --- | --- | --- |
 
-## Changelog
+## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
-#include "CHANGELOG.md"
+
+#include "CHANGELOG_WORKBENCH.md"
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
-[menu-changelog]: /docs/site/changelog/changelog.md
+[menu-changelog]: /docs/site/changelog.md
 [menu-contributing]: /CONTRIBUTING.md
 [menu-sponsoring]: /docs/site/sponsoring.md

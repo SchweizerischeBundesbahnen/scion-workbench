@@ -51,13 +51,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "projects/scion/workbench.e2e/protractor.conf.js",
-            "devServerTarget": "workbench-testing-app:serve",
             "webdriverUpdate": false
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "workbench-testing-app:serve:production"
-            }
           }
         },
         "lint": {
@@ -110,7 +104,13 @@
             "scripts": []
           },
           "configurations": {
-            "production-localhost": {
+            "production-vercel": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/workbench-testing-app/src/environments/environment.ts",
+                  "with": "apps/workbench-testing-app/src/environments/environment.vercel.ts"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -118,7 +118,23 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "outputPath": "dist/workbench-testing-app-localhost"
+              "outputPath": "dist/workbench-testing-app-vercel"
+            },
+            "production-ci": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/workbench-testing-app/src/environments/environment.ts",
+                  "with": "apps/workbench-testing-app/src/environments/environment.ci.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "outputPath": "dist/workbench-testing-app-ci"
             }
           }
         },
@@ -126,11 +142,6 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "workbench-testing-app:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "workbench-testing-app:build:production-localhost"
-            }
           }
         },
         "lint": {
@@ -138,6 +149,165 @@
           "options": {
             "tsConfig": [
               "apps/workbench-testing-app/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "@scion/workbench-client": {
+      "projectType": "library",
+      "root": "projects/scion/workbench-client",
+      "sourceRoot": "projects/scion/workbench-client/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/scion/workbench-client/tsconfig.lib.json",
+            "project": "projects/scion/workbench-client/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/scion/workbench-client/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/workbench-client/src/test.ts",
+            "tsConfig": "projects/scion/workbench-client/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench-client/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/scion/workbench-client/tsconfig.lib.json",
+              "projects/scion/workbench-client/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "@scion/workbench-client.e2e": {
+      "projectType": "application",
+      "root": "projects/scion/workbench-client.e2e",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/scion/workbench-client.e2e/protractor.conf.js",
+            "webdriverUpdate": false
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "projects/scion/workbench-client.e2e/tsconfig.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "workbench-client-testing-app": {
+      "projectType": "application",
+      "root": "apps/workbench-client-testing-app",
+      "sourceRoot": "apps/workbench-client-testing-app/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/workbench-client-testing-app",
+            "index": "apps/workbench-client-testing-app/src/index.html",
+            "main": "apps/workbench-client-testing-app/src/main.ts",
+            "polyfills": "apps/workbench-client-testing-app/src/polyfills.ts",
+            "tsConfig": "apps/workbench-client-testing-app/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "apps/workbench-client-testing-app/src/assets",
+              {
+                "glob": "favicon.ico",
+                "input": "resources/branding",
+                "output": "/"
+              },
+              {
+                "glob": "scion-workbench-banner.svg",
+                "input": "resources/branding",
+                "output": "/assets"
+              }
+            ],
+            "styles": [
+              "apps/workbench-client-testing-app/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "node_modules/@scion/toolkit.internal/widgets"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "production-vercel": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/workbench-client-testing-app/src/environments/environment.ts",
+                  "with": "apps/workbench-client-testing-app/src/environments/environment.vercel.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "outputPath": "dist/workbench-client-testing-app-vercel"
+            },
+            "production-ci": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/workbench-client-testing-app/src/environments/environment.ts",
+                  "with": "apps/workbench-client-testing-app/src/environments/environment.ci.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "outputPath": "dist/workbench-client-testing-app-ci"
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "workbench-client-testing-app:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/workbench-client-testing-app/tsconfig.app.json"
             ],
             "exclude": [
               "**/node_modules/**"
