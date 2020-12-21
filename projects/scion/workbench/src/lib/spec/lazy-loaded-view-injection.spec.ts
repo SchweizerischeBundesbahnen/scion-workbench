@@ -144,7 +144,7 @@ export class FeatureService {
 
 @NgModule({
   imports: [
-    WorkbenchTestingModule.forRoot(),
+    WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
       {path: 'feature', loadChildren: './feature/feature.module'}

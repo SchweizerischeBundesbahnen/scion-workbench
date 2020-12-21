@@ -1,47 +1,22 @@
-import { $, browser, ElementFinder, logging } from 'protractor';
+/*
+ * Copyright (c) 2018-2019 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
+
+import { $, browser, ElementFinder, Key, logging } from 'protractor';
 import Level = logging.Level;
 import Entry = logging.Entry;
 
 /**
- * Allows to check or uncheck a checkbox.
- */
-export async function checkCheckbox(check: boolean, checkboxField: ElementFinder): Promise<void> {
-  const isChecked = await checkboxField.isSelected();
-
-  if (check && !isChecked) {
-    await checkboxField.click();
-  }
-  else if (!check && isChecked) {
-    await checkboxField.click();
-  }
-}
-
-/**
- * Allows to select an option from a select dropdown.
+ * Selects an option of a select dropdown.
  */
 export async function selectOption(value: string, selectField: ElementFinder): Promise<void> {
-  return selectField.$$(`option[value="${value}"`).click();
-}
-
-/**
- * Expects the view tab and view for given identity to show.
- */
-export async function expectViewToShow(expected: { viewCssClass?: string; componentSelector: string; }): Promise<any> {
-  const ctx = `viewCssClass=${expected.viewCssClass}, component=${expected.componentSelector}`;
-
-  if (expected.viewCssClass) {
-    await expect(await $(`wb-view-tab.${expected.viewCssClass}`).isDisplayed()).toBe(true, `Expected <wb-view-tab> to show [${ctx}]`);
-    await expect(await $(`wb-view.${expected.viewCssClass}`).isDisplayed()).toBe(true, `Expected <wb-view> to show [${ctx}]`);
-  }
-  await expect(await $(`wb-view ${expected.componentSelector}`).isDisplayed()).toBe(true, `Expected component <${expected.componentSelector}> to show [${ctx}]`);
-}
-
-/**
- * Expects the view tab and view for given identity to not be present in the DOM.
- */
-export async function expectViewToNotExist(expected: { viewCssClass: string; }): Promise<void> {
-  await expect(await $(`wb-view-tab.${expected.viewCssClass}`).isPresent()).toBe(false, 'Expected <wb-view-tab> not to be present in the DOM');
-  await expect(await $(`wb-view.${expected.viewCssClass}`).isPresent()).toBe(false, 'Expected <wb-view> not to be present in the DOM');
+  await selectField.$(`option[value="${value}"`).click();
 }
 
 /**
@@ -64,13 +39,11 @@ export async function expectPopupToNotExist(expected: { popupCssClass: string; }
 }
 
 /**
- * Expects the activity for given identity to show.
+ * Returns if given CSS class is present on given element.
  */
-export async function expectActivityToShow(expected: { activityCssClass: string; componentSelector: string; }): Promise<any> {
-  const ctx = `activityCssClass=${expected.activityCssClass}, component=${expected.componentSelector}`;
-
-  await expect(await $(`wb-activity-part .e2e-activity-panel.${expected.activityCssClass}`).isDisplayed()).toBe(true, `Expected 'e2e-activity-panel' to show [${ctx}]`);
-  await expect(await $(expected.componentSelector).isDisplayed()).toBe(true, `Expected component <${expected.componentSelector}> to show [${ctx}]`);
+export async function isCssClassPresent(elementFinder: ElementFinder, cssClass: string): Promise<boolean> {
+  const classes: string[] = await getCssClasses(elementFinder);
+  return classes.includes(cssClass);
 }
 
 /**
@@ -79,6 +52,57 @@ export async function expectActivityToShow(expected: { activityCssClass: string;
 export async function getCssClasses(elementFinder: ElementFinder): Promise<string[]> {
   const classAttr: string = await elementFinder.getAttribute('class');
   return classAttr.split(/\s+/);
+}
+
+/**
+ * Sends the given keys to the currently focused element.
+ */
+export async function sendKeys(...keys: string[]): Promise<void> {
+  return browser.actions().sendKeys(...keys).perform();
+}
+
+/**
+ * Enters the given text into the given input field.
+ *
+ * By default, the text is set directly as input to the field, because 'sendKeys' is very slow.
+ */
+export async function enterText(text: string, elementFinder: ElementFinder, inputStrategy: 'sendKeys' | 'setValue' = 'setValue'): Promise<void> {
+  switch (inputStrategy) {
+    case 'sendKeys': { // send keys is slow for long texts
+      await elementFinder.clear();
+      await elementFinder.click();
+      await sendKeys(text);
+      break;
+    }
+    case 'setValue': {
+      // fire the 'input' event manually because not fired when setting the value with javascript
+      await elementFinder.click();
+      await browser.executeScript('arguments[0].value=arguments[1]; arguments[0].dispatchEvent(new Event(\'input\'));', elementFinder.getWebElement(), text);
+      await sendKeys(Key.TAB);
+      break;
+    }
+    default: {
+      throw Error('[UnsupportedStrategyError] Input strategy not supported.');
+    }
+  }
+}
+
+/**
+ * Reads the element value of the given element.
+ */
+export function getInputValue(elementFinder: ElementFinder): Promise<any> {
+  return browser.executeScript('return arguments[0].value', elementFinder.getWebElement()) as Promise<any>;
+}
+
+/**
+ * Clicks the given element while pressing the specified modifier key.
+ * The modifier key must be one of {ALT, CONTROL, SHIFT, COMMAND, META}.
+ */
+export async function pressModifierThenClick(elementFinder: ElementFinder, modifierKey: string): Promise<void> {
+  await browser.actions().mouseMove(elementFinder).perform();
+
+  // It is important to release the pressed key by {@link #keyUp} in order to avoid side effects in other tests.
+  await browser.actions().keyDown(modifierKey).click().keyUp(modifierKey).perform();
 }
 
 /**
@@ -91,20 +115,31 @@ export async function browserErrors(): Promise<Entry[]> {
 }
 
 /**
- * Checks if the following error was logged on the browser console.
- * Note that log buffers are reset after this call.
+ * Instructs Protractor to disable Angular synchronization while running the given function.
  */
-export async function hasBrowserError(error: string): Promise<boolean> {
-  const logs = await this.browserErrors();
-  return logs.some(log => log.message.includes(error));
+export async function runOutsideAngularSynchronization<T = void>(fn: () => Promise<T>): Promise<T> {
+  const waitForAngularEnabled = await browser.waitForAngularEnabled();
+  await browser.waitForAngularEnabled(false);
+  try {
+    return await fn();
+  }
+  finally {
+    await browser.waitForAngularEnabled(waitForAngularEnabled);
+  }
 }
 
 /**
- * Clicks the given element while pressing the specified key.
+ * Confirms an alert dialog. Throws if there is no alert dialog showing.
  */
-export async function clickElement(elementFinder: ElementFinder, pressKey: string): Promise<void> {
-  await browser.actions().mouseMove(elementFinder).perform();
-
-  // It is important to release the pressed key by {@link #keyUp} in order to avoid side effects in other tests.
-  await browser.actions().keyDown(pressKey).click().keyUp(pressKey).perform();
+export async function confirmAlert(options?: { confirmDelay?: number }): Promise<void> {
+  const alert = await browser.switchTo().alert();
+  try {
+    if (options?.confirmDelay !== undefined) {
+      await browser.sleep(options.confirmDelay);
+    }
+    await alert.accept();
+  }
+  finally {
+    await browser.switchTo().defaultContent();
+  }
 }

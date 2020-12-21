@@ -12,6 +12,7 @@
  * Entry point for all public APIs of this package.
  */
 export { WorkbenchModule } from './lib/workbench.module';
+export * from './lib/workbench-module-config';
 export { WorkbenchTestingModule } from './lib/spec/workbench-testing.module';
 export { WorkbenchService } from './lib/workbench.service';
 export { WbBeforeDestroy, WorkbenchViewPartAction } from './lib/workbench.model';
@@ -19,7 +20,6 @@ export { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './lib/rout
 export { WorkbenchRouter, WbNavigationExtras } from './lib/routing/workbench-router.service';
 export { WorkbenchAuxiliaryRoutesRegistrator } from './lib/routing/workbench-auxiliary-routes-registrator.service';
 export { WorkbenchComponent } from './lib/workbench.component';
-export { OverlayHostRef } from './lib/overlay-host-ref.service';
 export { WbActivityDirective } from './lib/activity-part/wb-activity.directive';
 export { Activity } from './lib/activity-part/activity';
 export { ActivityPartComponent } from './lib/activity-part/activity-part.component';
@@ -31,6 +31,8 @@ export { MessageBox, Action, Actions } from './lib/message-box/message-box';
 export { MessageBoxService } from './lib/message-box/message-box.service';
 export { WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM } from './lib/routing/routing-params.constants';
 export { Severity, ROUTE_REUSE_PROVIDER, VIEW_TAB_CONTEXT, ViewTabContext } from './lib/workbench.constants';
+export { WorkbenchLauncher, WorkbenchStartup } from './lib/startup/workbench-launcher.service';
+export { WorkbenchInitializer } from './lib/startup/workbench-initializer';
 export { WbRouteReuseProvider, WbRouteReuseStrategy } from './lib/routing/wb-route-reuse-strategy.service';
 export { Disposable } from './lib/disposable';
 export { ContentAsOverlayComponent } from './lib/content-projection/content-as-overlay.component';
@@ -40,3 +42,5 @@ export { ViewMenuItemDirective } from './lib/view-part/view-context-menu/view-me
 export { ViewPartActionDirective } from './lib/view-part/view-part-action-bar/view-part-action.directive';
 export { WorkbenchView } from './lib/view/workbench-view.model';
 export { WorkbenchViewPart } from './lib/view-part/workbench-view-part.model';
+export { MicrofrontendPlatformConfigLoader } from './lib/microfrontend-platform/microfrontend-platform-config-loader';
+export { LogAppender, LogEvent, LogLevel, LoggerName, Logger, ConsoleAppender } from './lib/logging';

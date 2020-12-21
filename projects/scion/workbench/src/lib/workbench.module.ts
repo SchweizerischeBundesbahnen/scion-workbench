@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Inject, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
+import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, Inject, Injector, ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkbenchComponent } from './workbench.component';
 import { ActivityPartComponent } from './activity-part/activity-part.component';
@@ -33,13 +33,12 @@ import { RouteReuseStrategy, RouterModule } from '@angular/router';
 import { WorkbenchRouter } from './routing/workbench-router.service';
 import { WbRouterLinkDirective, WbRouterLinkWithHrefDirective } from './routing/wb-router-link.directive';
 import { WorkbenchViewRegistry } from './view/workbench-view.registry';
-import { OverlayHostRef } from './overlay-host-ref.service';
 import { WorkbenchUrlObserver } from './routing/workbench-url-observer.service';
 import { WbActivityActionDirective } from './activity-part/wb-activity-action.directive';
 import { WbActivityDirective } from './activity-part/wb-activity.directive';
 import { MoveDirective } from './move.directive';
-import { WorkbenchConfig } from './workbench.config';
-import { TemplateHostOverlayDirective } from './content-projection/template-host-overlay.directive';
+import { WorkbenchModuleConfig } from './workbench-module-config';
+import { ContentProjectionDirective } from './content-projection/content-projection.directive';
 import { ContentAsOverlayComponent } from './content-projection/content-as-overlay.component';
 import { ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
 import { NotificationService } from './notification/notification.service';
@@ -54,8 +53,8 @@ import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service'
 import { SciViewportModule } from '@scion/toolkit/viewport';
 import { SciDimensionModule } from '@scion/toolkit/dimension';
 import { SciSashboxModule } from '@scion/toolkit/sashbox';
+import { SciThrobberModule } from '@scion/toolkit/throbber';
 import { ActivityResolver } from './routing/activity.resolver';
-import { ContentHostRef } from './content-projection/content-host-ref.service';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './routing/workbench-auxiliary-routes-registrator.service';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { PopupService } from './popup/popup.service';
@@ -77,16 +76,33 @@ import { PartsLayoutFactory } from './layout/parts-layout.factory';
 import { ViewMoveHandler } from './view/view-move-handler.service';
 import { ɵWorkbenchService } from './ɵworkbench.service';
 import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
+import { provideWorkbenchMicrofrontendSupport } from './microfrontend-platform/workbench-microfrontend-support';
+import { provideWorkbenchLauncher, WORKBENCH_POST_STARTUP } from './startup/workbench-launcher.service';
+import { MicrofrontendViewComponent } from './microfrontend-platform/microfrontend-view/microfrontend-view.component';
+import { SplashComponent } from './startup/splash/splash.component';
+import { provideLogging } from './logging';
+import { WorkbenchInitializer } from './startup/workbench-initializer';
+import { IFRAME_HOST, VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference } from './content-projection/view-container.reference';
+import { MicrofrontendViewRoutes } from './microfrontend-platform/routing/microfrontend-routes';
+import { SafeRunner } from './safe-runner';
+import { BroadcastChannelService } from './broadcast-channel.service';
+import { WbAddViewToPartGuard } from './routing/add-view-to-part.guard';
+import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
+import { ViewDragService } from './view-dnd/view-drag.service';
+import { ViewTabDragImageRenderer } from './view-dnd/view-tab-drag-image-renderer.service';
 
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forChild([]),
+    RouterModule.forChild([
+      ...MicrofrontendViewRoutes.config,
+    ]),
     PortalModule,
     ReactiveFormsModule,
     SciViewportModule,
     SciDimensionModule,
     SciSashboxModule,
+    SciThrobberModule,
     OverlayModule,
     A11yModule,
   ],
@@ -115,7 +131,7 @@ import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
     MessageBoxStackComponent,
     MessageBoxComponent,
     MoveDirective,
-    TemplateHostOverlayDirective,
+    ContentProjectionDirective,
     EmptyOutletComponent,
     ContentAsOverlayComponent,
     ViewPartActionDirective,
@@ -127,6 +143,8 @@ import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
     ArrayCoercePipe,
     ArrayConcatPipe,
     ViewPortalPipe,
+    MicrofrontendViewComponent,
+    SplashComponent,
   ],
   exports: [
     WorkbenchComponent,
@@ -138,17 +156,11 @@ import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
     ViewPartActionDirective,
     ViewMenuItemDirective,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a web component
 })
 export class WorkbenchModule {
 
-  // Note: Inject services which should be created eagerly.
-  constructor(@Optional() @Inject(WORKBENCH_FORROOT_GUARD) guard: any,
-              auxiliaryRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
-              workbenchUrlObserver: WorkbenchUrlObserver,
-              viewMenuService: ViewMenuService,
-              viewMoveHandler: ViewMoveHandler) {
-    auxiliaryRoutesRegistrator.registerActivityAuxiliaryRoutes();
-    viewMenuService.registerBuiltInMenuItems();
+  constructor(@Inject(WORKBENCH_FORROOT_GUARD) guard: any) {
   }
 
   /**
@@ -173,10 +185,11 @@ export class WorkbenchModule {
    * export class AppModule { }
    * ```
    */
-  public static forRoot(config: WorkbenchConfig = {}): ModuleWithProviders<WorkbenchModule> {
+  public static forRoot(config: WorkbenchModuleConfig = {}): ModuleWithProviders<WorkbenchModule> {
     return {
       ngModule: WorkbenchModule,
       providers: [
+        {provide: WorkbenchModuleConfig, useValue: config},
         ɵWorkbenchService,
         {
           provide: WorkbenchService, useExisting: ɵWorkbenchService,
@@ -191,17 +204,23 @@ export class WorkbenchModule {
         WorkbenchUrlObserver,
         WorkbenchViewRegistry,
         WorkbenchViewPartRegistry,
-        OverlayHostRef,
-        ContentHostRef,
         WorkbenchRouter,
         PopupService,
         ViewActivationInstantProvider,
         PartsLayoutFactory,
+        ViewMenuService,
+        ViewContainerReference,
+        ViewMoveHandler,
+        SafeRunner,
+        BroadcastChannelService,
+        WbAddViewToPartGuard,
+        WbBeforeDestroyGuard,
+        ViewDragService,
+        ViewTabDragImageRenderer,
         {
           provide: APP_MESSAGE_BOX_SERVICE,
           useExisting: MessageBoxService,
         },
-        {provide: WorkbenchConfig, useValue: config},
         {
           provide: ROUTE_REUSE_PROVIDER,
           multi: true,
@@ -216,6 +235,33 @@ export class WorkbenchModule {
           useFactory: provideForRootGuard,
           deps: [[WorkbenchService, new Optional(), new SkipSelf()]],
         },
+        {
+          provide: WorkbenchInitializer,
+          useExisting: ViewMenuService,
+          multi: true,
+        },
+        {
+          provide: IFRAME_HOST,
+          useClass: ViewContainerReference,
+        },
+        {
+          provide: VIEW_LOCAL_MESSAGE_BOX_HOST,
+          useClass: ViewContainerReference,
+        },
+        {
+          provide: APP_INITIALIZER,
+          useFactory: installWorkbenchRouting,
+          multi: true,
+          deps: [Injector],
+        },
+        {
+          provide: WORKBENCH_POST_STARTUP,
+          useExisting: ViewMoveHandler,
+          multi: true,
+        },
+        provideWorkbenchLauncher(config),
+        provideWorkbenchMicrofrontendSupport(config),
+        provideLogging(config),
       ],
     };
   }
@@ -231,6 +277,9 @@ export class WorkbenchModule {
   }
 }
 
+/**
+ * @docs-private Not public API, intended for internal use only.
+ */
 export function provideForRootGuard(workbench: WorkbenchService): any {
   if (workbench) {
     throw new Error('[ModuleForRootError] WorkbenchModule.forRoot() called twice. Lazy loaded modules should use WorkbenchModule.forChild() instead.');
@@ -238,3 +287,17 @@ export function provideForRootGuard(workbench: WorkbenchService): any {
   return 'guarded';
 }
 
+/**
+ * Workbench routing needs to be installed before Angular performs the initial navigation.
+ *
+ * @docs-private Not public API, intended for internal use only.
+ */
+export function installWorkbenchRouting(injector: Injector): () => void {
+  // Angular is very strict when compiling module definitions ahead-of-time.
+  // We cannot return the lamda directly as this would break the AOT build. Instead, we add a redundant assignment.
+  const fn = () => {
+    injector.get(WorkbenchUrlObserver);
+    injector.get(WorkbenchAuxiliaryRoutesRegistrator).registerActivityAuxiliaryRoutes();
+  };
+  return fn;
+}

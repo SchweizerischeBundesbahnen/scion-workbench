@@ -11,7 +11,7 @@
 
     // Set the viewport client width to its ideal content width, so it occupies only as much space as its content requires.
     // This allows view actions to stick to the right of the viewport, even if closing view tabs.
-    --grid-template-columns: max-content; // DO NOT USE `min-content` to preserve white space of text content.
+    --sci-viewport-content-grid-template-columns: max-content; // DO NOT USE `min-content` to preserve white space of text content.
 
     div.viewport-client {
       display: flex;

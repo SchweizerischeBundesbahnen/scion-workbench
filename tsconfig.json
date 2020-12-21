@@ -27,13 +27,15 @@
       ]
     }
     /*
-     * ======================================+
-     * |    PATH-OVERRIDE-FOR-DEVELOPMENT    |
-     * |                                     |
-     * |   DO NOT ACTIVATE FOR PRODUCTION!   |
-     * +=====================================+
-     *
-     * Note: DO NOT ACTIVATE FOR PRODUCTION!
+     * =======================================+
+     * |    PATH-OVERRIDE-FOR-DEVELOPMENT     |
+     * |   DO NOT ACTIVATE FOR PRODUCTION!    |
+     * |                                      |
+     * | To debug dependent modules, please   |
+     * | uncomment lines accordingly.         |
+     * | The most specific paths win, or the  |
+     * | latter with equal specificity.       |
+     * +======================================+
      */
     //    "paths": {
     //      "@scion/workbench": [
@@ -42,23 +44,56 @@
     //      "@scion/workbench-client": [
     //        "projects/scion/workbench-client/src/public_api"
     //      ],
-    //      "@scion/toolkit/util": [
-    //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
+    //      "@scion/microfrontend-platform": [
+    //        "./node_modules/@scion/microfrontend-platform"
     //      ],
-    //      "@scion/toolkit/operators": [
-    //        "../scion-toolkit/projects/scion/toolkit/operators/src/public_api"
+    //      "@scion/toolkit/*": [
+    //        "./node_modules/@scion/toolkit/*"
     //      ],
-    //      "@scion/toolkit/dimension": [
-    //        "../scion-toolkit/projects/scion/toolkit/dimension/src/public_api"
+    //      "@scion/toolkit.internal/*": [
+    //        "./node_modules/@scion/toolkit.internal/*"
     //      ],
-    //      "@scion/toolkit/viewport": [
-    //        "../scion-toolkit/projects/scion/toolkit/viewport/src/public_api"
+    //      "@scion/microfrontend-platform": [
+    //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public_api"
     //      ],
-    //      "@scion/toolkit/observable": [
-    //        "../scion-toolkit/projects/scion/toolkit/observable/src/public_api"
+    //      //      "@scion/toolkit/util": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/operators": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/operators/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/dimension": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/dimension/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/viewport": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/viewport/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/observable": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/observable/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/sashbox": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/sashbox/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/throbber": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/throbber/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/bean-manager": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/bean-manager/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit.internal/widgets": [
+    //      //        "../scion-toolkit/projects/scion/toolkit.internal/widgets/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit.internal/widgets.po": [
+    //      //        "../scion-toolkit/projects/scion/toolkit.internal/widgets.po/src/public_api"
+    //      //      ],
+    //      "@angular/*": [
+    //        "./node_modules/@angular/*"
     //      ],
-    //      "@scion/toolkit/sashbox": [
-    //        "../scion-toolkit/projects/scion/toolkit/sashbox/src/public_api"
+    //      "rxjs": [
+    //        "./node_modules/rxjs"
+    //      ],
+    //      "rxjs/*": [
+    //        "./node_modules/rxjs/*"
     //      ]
     //    }
   },

@@ -38,7 +38,7 @@ describe('PartsLayoutComponent', () => {
     TestBed.configureTestingModule({
       declarations: [View1Component, View2Component, View3Component],
       imports: [
-        WorkbenchTestingModule.forRoot(),
+        WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
           {path: 'view-1', component: View1Component},
           {path: 'view-2', component: View2Component},

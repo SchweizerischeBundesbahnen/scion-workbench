@@ -1,0 +1,21 @@
+{
+  "name": "SCION Microfrontend Platform DevTools",
+  "baseUrl": "https://scion-microfrontend-platform-devtools.now.sh",
+  "capabilities": [
+    {
+      "type": "view",
+      "qualifier": {
+        "component": "devtools"
+      },
+      "description": "Allows inspecting integrated micro applications, browsing available capabilities, analyzing dependencies between micro applications, and more.",
+      "private": false,
+      "properties": {
+        "path": "",
+        "pinToStartPage": true,
+        "title": "DevTools"
+      }
+    }
+  ],
+  "intentions": [
+  ]
+}

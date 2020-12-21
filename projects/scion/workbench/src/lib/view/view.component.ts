@@ -8,18 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, ViewChild } from '@angular/core';
-import { Subject } from 'rxjs';
+import { ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild, ViewContainerRef } from '@angular/core';
+import { AsyncSubject, combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { SciViewportComponent } from '@scion/toolkit/viewport';
 import { WbRouterOutletDirective } from '../routing/wb-router-outlet.directive';
 import { WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
 import { MessageBoxService } from '../message-box/message-box.service';
-import { OverlayHostRef } from '../overlay-host-ref.service';
-import { ContentProjectionContext } from '../content-projection/content-projection-context.service';
 import { ViewMenuService } from '../view-part/view-context-menu/view-menu.service';
 import { ɵWorkbenchView } from './ɵworkbench-view.model';
+import { WorkbenchStartup } from '../startup/workbench-launcher.service';
+import { Logger, LoggerNames } from '../logging';
+import { VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference } from '../content-projection/view-container.reference';
+import { PopupService } from '../popup/popup.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -34,16 +36,23 @@ import { ɵWorkbenchView } from './ɵworkbench-view.model';
   selector: 'wb-view',
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
-  providers: [MessageBoxService, ContentProjectionContext],
+  providers: [MessageBoxService, PopupService],
 })
-export class ViewComponent implements AfterViewInit, OnDestroy {
+export class ViewComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
+  private _viewport$ = new AsyncSubject<SciViewportComponent>();
+  public viewLocalMessageBoxHost: Promise<ViewContainerRef>;
 
-  @ViewChild(SciViewportComponent, {static: true})
-  private _viewport: SciViewportComponent;
+  @ViewChild(SciViewportComponent)
+  public set setViewport(viewport: SciViewportComponent) {
+    if (viewport) {
+      this._viewport$.next(viewport);
+      this._viewport$.complete();
+    }
+  }
 
-  @ViewChild('router_outlet', {static: true})
+  @ViewChild('router_outlet')
   public routerOutlet: WbRouterOutletDirective; // specs
 
   @HostBinding('attr.data-viewid')
@@ -51,45 +60,71 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
     return this._view.viewId;
   }
 
-  @HostBinding('attr.content-projection')
-  public get contentProjectionActive(): boolean {
-    return this._contentProjectionContext.isActive();
-  }
-
   @HostBinding('attr.class')
   public get cssClasses(): string {
     return this._view.cssClasses.join(' ');
   }
 
-  constructor(host: ElementRef<HTMLElement>,
-              private _view: ɵWorkbenchView,
-              private _contentProjectionContext: ContentProjectionContext,
-              public messageBoxOverlayHostRef: OverlayHostRef,
+  constructor(private _view: ɵWorkbenchView,
+              private _logger: Logger,
+              public workbenchStartup: WorkbenchStartup,
+              host: ElementRef<HTMLElement>,
               messageBoxService: MessageBoxService,
-              viewContextMenuService: ViewMenuService) {
+              viewContextMenuService: ViewMenuService,
+              cd: ChangeDetectorRef,
+              @Inject(VIEW_LOCAL_MESSAGE_BOX_HOST) viewLocalMessageBoxHost: ViewContainerReference) {
+
+    // IMPORTANT:
+    // Wait mounting this view's named router outlet until the workbench startup has completed.
+    //
+    // This component is constructed when the workbench detects view outlets in the browser URL, e.g., when workbench navigation
+    // occurs or when Angular triggers the initial navigation for an URL that contains view outlets. See {WorkbenchUrlObserver}.
+    // Depending on the used workbench launcher, this may happen before starting the workbench or before it completed the startup.
+    // In any case, we must not mount the view's named router outlet until the workbench startup is completed. Otherwise, the
+    // outlet's routed component would be constructed as well, leading to unexpected or wrong behavior, e.g., because the
+    // Microfrontend Platform may not be fully initialized yet, or because the workbench should not be started since the user is
+    // not authorized.
+    //
+    // It would be simplest to install a route guard to protect routed components from being loaded before workbench startup completed.
+    // However, this does not work in a situation where the `<wb-workbench>` component is displayed in a router outlet. Then, we
+    // would end up in a deadlock, as the view outlet guard would wait until the workbench startup completes, but the workbench component
+    // never gets mounted because the navigation never ends, thus cannot initiate the workbench startup.
+
+    this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
+    this.viewLocalMessageBoxHost = viewLocalMessageBoxHost.get();
+
+    // Trigger a manual change detection cycle if this view is not the active view in the tabbar. Otherwise, since inactive views are not added
+    // to the Angular component tree, their routed component would not be activated until activating the view. But, view components typically
+    // initialize their view in the constructor, setting a title, for example. This requires eagerly activating the routed components of inactive views
+    // by triggering a manual change detection cycle, but only after workbench startup completed.
+    if (!this._view.active) {
+      workbenchStartup.whenStarted.then(() => {
+        this._logger.debug(() => `Activating view router outlet after initial navigation. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
+        cd.detectChanges();
+      });
+    }
+
     messageBoxService.count$
       .pipe(takeUntil(this._destroy$))
       .subscribe(count => this._view.blocked = count > 0);
     viewContextMenuService.installMenuItemAccelerators$(host, this._view)
       .pipe(takeUntil(this._destroy$))
       .subscribe();
-  }
 
-  public ngAfterViewInit(): void {
-    this._view.active$
+    combineLatest([this._view.active$, this._viewport$])
       .pipe(takeUntil(this._destroy$))
-      .subscribe(active => active ? this.onActivateView() : this.onDeactivateView());
+      .subscribe(([active, viewport]) => active ? this.onActivateView(viewport) : this.onDeactivateView(viewport));
   }
 
-  private onActivateView(): void {
-    this._viewport.focus();
-    this._viewport.scrollTop = this._view.scrollTop;
-    this._viewport.scrollLeft = this._view.scrollLeft;
+  private onActivateView(viewport: SciViewportComponent): void {
+    viewport.focus();
+    viewport.scrollTop = this._view.scrollTop;
+    viewport.scrollLeft = this._view.scrollLeft;
   }
 
-  private onDeactivateView(): void {
-    this._view.scrollTop = this._viewport.scrollTop;
-    this._view.scrollLeft = this._viewport.scrollLeft;
+  private onDeactivateView(viewport: SciViewportComponent): void {
+    this._view.scrollTop = viewport.scrollTop;
+    this._view.scrollLeft = viewport.scrollLeft;
   }
 
   public onActivateRoute(route: ActivatedRoute): void {
@@ -111,6 +146,7 @@ export class ViewComponent implements AfterViewInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this._logger.debug(() => `Destroying ViewComponent [viewId=${this.viewId}]'`, LoggerNames.LIFECYCLE);
     this._destroy$.next();
   }
 }

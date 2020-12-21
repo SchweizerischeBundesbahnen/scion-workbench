@@ -9,12 +9,25 @@
  */
 
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+const routes: Routes = [
+  {
+    path: 'activator',
+    loadChildren: (): any => import('./activator/activator.module').then(m => m.ActivatorModule),
+  },
+  {
+    path: 'test-router',
+    loadChildren: (): any => import('./router-page/router-page.module').then(m => m.RouterPageModule),
+  },
+  {
+    path: 'test-view',
+    loadChildren: (): any => import('./view-page/view-page.module').then(m => m.ViewPageModule),
+  },
+];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {useHash: true})],
   exports: [RouterModule],
 })
 export class AppRoutingModule {

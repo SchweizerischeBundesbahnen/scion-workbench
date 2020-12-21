@@ -10,7 +10,7 @@
 
 import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { Notification, WbNotification } from './notification';
+import { Notification, ɵNotification } from './notification';
 
 /**
  * Displays notifications to the user.
@@ -18,7 +18,7 @@ import { Notification, WbNotification } from './notification';
 @Injectable()
 export class NotificationService {
 
-  private _notify$ = new Subject<WbNotification>();
+  private _notify$ = new Subject<ɵNotification>();
 
   constructor(private _zone: NgZone) {
   }
@@ -31,13 +31,13 @@ export class NotificationService {
     this._zone.run(() => this.notifyInternal(notification));
   }
 
-  public notifyInternal(notification: Notification | string): void {
-    const note = ((): WbNotification => {
+  private notifyInternal(notification: Notification | string): void {
+    const note = ((): ɵNotification => {
       if (typeof notification === 'string') {
-        return new WbNotification({content: notification});
+        return new ɵNotification({content: notification});
       }
       else {
-        return new WbNotification(notification);
+        return new ɵNotification(notification);
       }
     })();
 
@@ -46,8 +46,9 @@ export class NotificationService {
 
   /**
    * Allows to subscribe for notifications.
+   * @internal
    */
-  public get notify$(): Observable<WbNotification> {
-    return this._notify$.asObservable();
+  public get notify$(): Observable<ɵNotification> {
+    return this._notify$;
   }
 }

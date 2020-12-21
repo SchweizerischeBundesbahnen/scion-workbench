@@ -1,0 +1,8 @@
+// Like the inset CSS property as a shorthand to set the top, right, bottom, and left properties.
+// See https://developer.mozilla.org/en-US/docs/Web/CSS/inset for browser support.
+@mixin inset($top, $right, $bottom, $left) {
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}

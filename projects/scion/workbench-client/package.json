@@ -1,15 +1,15 @@
 {
   "name": "@scion/workbench-client",
   "version": "1.0.0-beta.1",
-  "description": "Allows integrating a web app into the SCION Workbench as a microfrontend, providing API for interacting with the workbench and other microfrontends. It is a pure TypeScript library based on the framework-agnostic SCION Microfrontend Platform library and can be used with any web stack.",
+  "description": "SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends. It is a pure TypeScript library based on the framework-agnostic `@scion/microfrontend-platform` library and can be used with any web stack.",
   "license": "EPL-2.0",
   "private": false,
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform",
+  "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
   "bugs": {
-    "url": "https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/issues"
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues"
   },
   "author": {
     "name": "SCION contributors"
@@ -19,21 +19,23 @@
   },
   "peerDependencies": {
     "rxjs": "^6.0.0",
-    "@scion/toolkit": ">=11.0.0-beta.0"
+    "@scion/toolkit": ">=11.0.0-beta.4",
+    "@scion/microfrontend-platform": ">= 1.0.0-beta.8"
   },
   "keywords": [
-    "workbench microfrontend integration",
     "scion",
+    "workbench microfrontend integration",
     "workbench",
     "workbench client",
     "microfrontend",
-    "microfrontend platform",
+    "micro frontend",
     "typescript",
     "javascript",
-    "framework-agnostic"
+    "framework-agnostic",
+    "webstack-agnostic"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform.git"
+    "url": "https://github.com/SchweizerischeBundesbahnen/scion-workbench.git"
   }
 }

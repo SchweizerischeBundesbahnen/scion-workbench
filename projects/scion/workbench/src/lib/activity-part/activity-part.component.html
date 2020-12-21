@@ -4,7 +4,6 @@
     <a href=""
        (click)="onActivate(activity)"
        [class.active]="activity.active"
-       [class.e2e-active]="activity.active"
        [ngClass]="['e2e-activity-item'] | wbConcatArray:(activity.itemCssClass | wbCoerceArray):(activity.cssClass | wbCoerceArray)"
        [attr.title]="activity.title">
       {{activity.itemText || ''}}

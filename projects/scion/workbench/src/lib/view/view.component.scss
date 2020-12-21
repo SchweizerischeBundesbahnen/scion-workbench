@@ -1,5 +1,3 @@
-@import '../content-projection/mixins';
-
 :host {
   position: absolute;
   top: 0;
@@ -16,8 +14,3 @@
     }
   }
 }
-
-:host-context([content-projection="false"]) sci-viewport {
-  @include allowPointerEvents;
-}
-

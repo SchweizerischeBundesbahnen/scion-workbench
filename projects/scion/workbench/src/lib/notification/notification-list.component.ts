@@ -11,7 +11,7 @@
 import { animate, AnimationMetadata, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, TrackByFunction } from '@angular/core';
 
-import { Notification, WbNotification } from './notification';
+import { ɵNotification } from './notification';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { NotificationService } from './notification.service';
@@ -27,7 +27,7 @@ export class NotificationListComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  public notifications: WbNotification[] = [];
+  public notifications: ɵNotification[] = [];
 
   constructor(notificationService: NotificationService, private _cd: ChangeDetectorRef) {
     notificationService.notify$
@@ -44,7 +44,7 @@ export class NotificationListComponent implements OnDestroy {
   /**
    * Invoked upon the receipt of a new notification.
    */
-  private onNotification(notification: WbNotification): void {
+  private onNotification(notification: ɵNotification): void {
     // Find potential notification which belongs to the same group.
     const index = notification.group && this.notifications.findIndex(it => it.group === notification.group);
     if (notification.group && index >= 0) {
@@ -62,7 +62,7 @@ export class NotificationListComponent implements OnDestroy {
     this._cd.markForCheck();
   }
 
-  public trackByFn: TrackByFunction<Notification> = (index: number, notification: WbNotification): any => {
+  public trackByFn: TrackByFunction<ɵNotification> = (index: number, notification: ɵNotification): any => {
     return notification.group || notification;
   };
 

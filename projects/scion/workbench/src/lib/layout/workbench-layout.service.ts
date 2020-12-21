@@ -21,25 +21,16 @@ import { PartsLayout } from './parts-layout';
 export class WorkbenchLayoutService {
 
   private _layout: PartsLayout;
-  private readonly _layoutChange$ = new Subject<void>();
-
+  private _layoutChange$ = new Subject<void>();
   private _maximized$ = new BehaviorSubject<boolean>(false);
+  private _dragStart$ = new Subject<void>();
+  private _dragEnd$ = new Subject<void>();
 
   /**
-   * Notifies upon resizing a view by dragging the sashes which separate them.
+   * Notifies when the user starts or ends modifying the parts layout using drag and drop, e.g., moving the splitter between parts,
+   * moving a message box, or moving a view.
    */
-  public readonly viewSashDrag$ = new Subject<'start' | 'end'>();
-
-  /**
-   * Notifies upon dragging a view to different positions within the Workbench.
-   * The event is received across app instances of the same origin.
-   */
-  public readonly viewDrag$: Observable<'start' | 'end'>;
-
-  /**
-   * Notifies upon moving a message box to different positions within the Workbench.
-   */
-  public readonly messageBoxMove$ = new Subject<'start' | 'end'>();
+  public readonly dragging$: Observable<'start' | 'end'>;
 
   /**
    * Notifies upon a workbench layout change. When this Observable emits, the layout is already flushed to the DOM.
@@ -62,10 +53,24 @@ export class WorkbenchLayoutService {
     );
 
   constructor(viewDragService: ViewDragService, private _zone: NgZone) {
-    this.viewDrag$ = merge<'start' | 'end'>(
-      viewDragService.viewDragStart$.pipe(mapTo('start')),
-      viewDragService.viewDragEnd$.pipe(mapTo('end')),
+    this.dragging$ = merge<'start' | 'end'>(
+      merge(this._dragStart$, viewDragService.viewDragStart$).pipe(mapTo('start')),
+      merge(this._dragEnd$, viewDragService.viewDragEnd$).pipe(mapTo('end')),
     );
+  }
+
+  /**
+   * Invoke to inform the layout when about to start a drag operation, like when start moving the splitter between parts.
+   */
+  public notifyDragStarting(): void {
+    this._dragStart$.next();
+  }
+
+  /**
+   * Invoke to inform the layout when about to end a drag operation, like when end moving the splitter between parts.
+   */
+  public notifyDragEnding(): void {
+    this._dragEnd$.next();
   }
 
   /**
@@ -119,6 +124,6 @@ export class WorkbenchLayoutService {
    * Emits upon change of main content full viewport mode.
    */
   public get maximized$(): Observable<boolean> {
-    return this._maximized$.asObservable();
+    return this._maximized$;
   }
 }

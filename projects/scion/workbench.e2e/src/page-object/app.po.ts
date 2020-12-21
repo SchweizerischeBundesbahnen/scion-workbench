@@ -8,24 +8,87 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { $, $$, browser, ElementFinder, Key, protractor } from 'protractor';
-import { getCssClasses } from '../util/testing.util';
-import { ISize } from 'selenium-webdriver';
-import { WelcomePagePO } from './welcome-page.po';
+import { $, browser, ElementFinder, Key, protractor } from 'protractor';
+import { getCssClasses, runOutsideAngularSynchronization } from '../util/testing.util';
+import { StartPagePO } from './start-page.po';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 declare type Duration = 'short' | 'medium' | 'long' | 'infinite';
 declare type Severity = 'info' | 'warn' | 'error';
 
 export class AppPO {
 
+  private _workbenchStartupQueryParams: URLSearchParams;
+
+  /**
+   * Navigates to the testing app.
+   *
+   * By passing a features object, you can control how to start the workbench and which app features to enable.
+   */
+  public async navigateTo(features?: Features): Promise<void> {
+    this._workbenchStartupQueryParams = new URLSearchParams();
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, features?.launcher ?? 'LAZY');
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(features?.microfrontendSupport ?? true) === false}`);
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${features?.confirmStartup ?? false}`);
+
+    const featureQueryParams = new URLSearchParams();
+    if (features?.stickyStartViewTab !== undefined) {
+      featureQueryParams.append('stickyStartViewTab', `${features.stickyStartViewTab}`);
+    }
+
+    if (features?.showNewTabAction !== undefined) {
+      featureQueryParams.append('showNewTabAction', `${features.showNewTabAction}`);
+    }
+
+    const browserNavigateFn = async () => {
+      await browser.get(`/?${this._workbenchStartupQueryParams.toString()}#/${featureQueryParams.toString() ? `?${featureQueryParams.toString()}` : ''}`);
+    };
+
+    // We need to navigate outside of Protractor's Angular sync if displaying an alert dialog to pause the workbench startup.
+    const confirmStartup = coerceBooleanProperty(this._workbenchStartupQueryParams.get(WorkenchStartupQueryParams.CONFIRM_STARTUP));
+    if (confirmStartup) {
+      await runOutsideAngularSynchronization(browserNavigateFn);
+    }
+    else {
+      await browserNavigateFn();
+      // Wait until the workbench completed startup.
+      await this.waitUntilWorkbenchStarted();
+    }
+  }
+
+  /**
+   * Reloads the app with current features preserved.
+   */
+  public async reload(): Promise<void> {
+    // We cannot call `browser.refresh()` because workbench startup options are not part of the hash-based URL
+    // and would therefore be lost on a reload.
+    const reloadUrl = new URL(await browser.getCurrentUrl());
+    this._workbenchStartupQueryParams.forEach((value, key) => reloadUrl.searchParams.append(key, value));
+
+    const browserNavigateFn = async () => {
+      await browser.get(reloadUrl.toString());
+    };
+
+    // We need to navigate outside of Protractor's Angular sync if displaying an alert dialog to pause the workbench startup.
+    const confirmStartup = coerceBooleanProperty(this._workbenchStartupQueryParams.get(WorkenchStartupQueryParams.CONFIRM_STARTUP));
+    if (confirmStartup) {
+      await runOutsideAngularSynchronization(browserNavigateFn);
+    }
+    else {
+      await browserNavigateFn();
+      // Wait until the workbench completed startup.
+      await this.waitUntilWorkbenchStarted();
+    }
+  }
+
   /**
    * Returns a handle representing the view tab of given `viewId`, or which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    *
-   * @param findBy - Specifies how to find the view tab. Either `viewId` or `cssClass` must be set.
+   * @param findBy - Specifies how to find the view tab. If both `viewId` and `cssClass` are not set, then the finder refers to the active view tab.
    *        <ul>
    *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
-   *          <li>viewId?: Identifies the view by its id/li>
+   *          <li>viewId?: Identifies the view by its id</li>
    *          <li>cssClass?: Identifies the view by its CSS class</li>
    *        </ul>
    */
@@ -37,7 +100,11 @@ export class AppPO {
         return viewTabFinder.isPresent();
       }
 
-      public async click(): Promise<void> {
+      public async getViewId(): Promise<string> {
+        return viewTabFinder.getAttribute('data-viewid');
+      }
+
+      public async activate(): Promise<void> {
         await viewTabFinder.click();
       }
 
@@ -57,7 +124,7 @@ export class AppPO {
 
       public async isDirty(): Promise<boolean> {
         const cssClasses = await getCssClasses(viewTabFinder);
-        return cssClasses.includes('e2e-dirty');
+        return cssClasses.includes('dirty');
       }
 
       public async isClosable(): Promise<boolean> {
@@ -67,7 +134,75 @@ export class AppPO {
 
       public async isActive(): Promise<boolean> {
         const cssClasses = await getCssClasses(viewTabFinder);
-        return cssClasses.includes('e2e-active');
+        return cssClasses.includes('active');
+      }
+    };
+  }
+
+  /**
+   * Returns a handle representing the active view tab.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
+   */
+  public findActiveViewTab(partId?: string): ViewTabPO {
+    return this.findViewTab({partId});
+  }
+
+  /**
+   * Returns a handle representing the view tab of given `viewId`, or which has given CSS class set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
+   *
+   * @param findBy - Specifies how to find the view. If both `viewId` and `cssClass` are not set, then the finder refers to the active view.
+   *        <ul>
+   *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
+   *          <li>viewId?: Identifies the view by its id</li>
+   *          <li>cssClass?: Identifies the view by its CSS class</li>
+   *        </ul>
+   */
+  public findView(findBy: { partId?: string, viewId?: string, cssClass?: string }): ViewPO {
+    const viewFinder = createViewFinder(findBy);
+    const viewTabPO = this.findViewTab(findBy);
+
+    return new class implements ViewPO {
+
+      public viewTabPO = viewTabPO;
+
+      public async isPresent(): Promise<boolean> {
+        return viewFinder.isPresent();
+      }
+
+      public async getViewId(): Promise<string> {
+        return viewFinder.getAttribute('data-viewid');
+      }
+
+      public $(selector: string): ElementFinder {
+        return viewFinder.$(selector);
+      }
+    };
+  }
+
+  /**
+   * Returns a handle representing the active view.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
+   */
+  public findActiveView(partId?: string): ViewPO {
+    return this.findView({partId});
+  }
+
+  public findActivePart(): PartPO {
+    const partFinder = createViewPartFinder();
+
+    return new class implements PartPO {
+
+      public async isPresent(): Promise<boolean> {
+        return partFinder.isPresent();
+      }
+
+      public $(selector: string): ElementFinder {
+        return partFinder.$(selector);
+      }
+
+      public async getPartId(): Promise<string> {
+        return partFinder.getAttribute('data-partid');
       }
     };
   }
@@ -101,28 +236,24 @@ export class AppPO {
    * Returns the number of notifications.
    */
   public async getNotificationCount(): Promise<number> {
-    return $$('wb-notification').count();
+    return $('wb-workbench').$$('wb-notification').count();
   }
 
   /**
-   * Returns `true` if the activity bar is showing, or `false` otherwise.
-   */
-  public async isActivityBarShowing(): Promise<boolean> {
-    return $('wb-workbench').$('wb-activity-part').isPresent();
-  }
-
-  /**
-   * Returns `true` if the entry point page is showing, or `false` otherwise.
+   * Returns whether the default page is displayed in the active part.
+   * The default page is displayed if there are no open tabs in the part.
    */
   public async isDefaultPageShowing(componentSelector: string): Promise<boolean> {
-    return $('wb-workbench').$('main').$(componentSelector).isPresent();
+    const activePart = createViewPartFinder();
+    return activePart.$('sci-viewport.views-absent-outlet').$(componentSelector).isPresent();
   }
 
   /**
-   * Returns `true` if the view tab bar is showing, or `false` otherwise.
+   * Returns whether the tabbar is displayed in the active part.
+   * The tab bar is displayed when at least one view is open or part actions are displayed.
    */
   public async isViewTabBarShowing(): Promise<boolean> {
-    return $('wb-workbench').$('wb-view-part-bar').isPresent();
+    return createViewPartBarFinder().isPresent();
   }
 
   /**
@@ -130,7 +261,7 @@ export class AppPO {
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
   public findNotification(cssClass: string): NotificationPO {
-    const notificationFinder = $(`wb-notification.${cssClass}`);
+    const notificationFinder = $('wb-workbench').$(`wb-notification.${cssClass}`);
 
     return new class implements NotificationPO {
       public async isPresent(): Promise<boolean> {
@@ -189,7 +320,7 @@ export class AppPO {
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
   public findMessageBox(cssClass: string): MessageBoxPO {
-    const msgboxFinder = $(`wb-message-box.${cssClass}`);
+    const msgboxFinder = $('wb-workbench').$(`wb-message-box.${cssClass}`);
 
     return new class implements MessageBoxPO {
       public async isPresent(): Promise<boolean> {
@@ -269,10 +400,14 @@ export class AppPO {
   /**
    * Opens a new view tab.
    */
-  public async openNewViewTab(): Promise<WelcomePagePO> {
-    const viewPartActionPO = this.findViewPartAction('e2e-open-new-tab');
-    await viewPartActionPO.click();
-    return new WelcomePagePO();
+  public async openNewViewTab(): Promise<StartPagePO> {
+    const newTabViewPartActionPO = this.findViewPartAction({buttonCssClass: 'e2e-open-new-tab'});
+    if (!await newTabViewPartActionPO.isPresent()) {
+      throw Error('Opening a new view tab requires the part action \'e2e-open-new-tab\' to be present, but it could not be found. Have you disabled the \'showNewTabAction\' feature?');
+    }
+    await newTabViewPartActionPO.click();
+    const viewId = await this.findActiveView().getViewId();
+    return new StartPagePO(viewId);
   }
 
   /**
@@ -287,8 +422,8 @@ export class AppPO {
    * Returns a handle representing the viewpart action which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public findViewPartAction(buttonCssClass: string): ViewPartActionPO {
-    const actionFinder = $(`wb-workbench wb-view-part wb-view-part-action-bar button.${buttonCssClass}`);
+  public findViewPartAction(findBy: { partId?: string, buttonCssClass: string }): ViewPartActionPO {
+    const actionFinder = createViewPartActionBarFinder(findBy.partId).$(`button.${findBy.buttonCssClass}`);
 
     return new class implements ViewPartActionPO {
       public async isPresent(): Promise<boolean> {
@@ -302,112 +437,36 @@ export class AppPO {
   }
 
   /**
-   * Clicks the activity item which has given CSS class set.
-   *
-   * The promise returned is rejected if not found.
+   * Waits until the workbench finished startup.
    */
-  public async clickActivityItem(cssClass: string): Promise<void> {
-    const activityItemPO = this.findActivityItem(cssClass);
-    if (!await activityItemPO.isPresent()) {
-      return Promise.reject(`Activity item not found [cssClass=${cssClass}]`);
-    }
-    await activityItemPO.click();
+  public async waitUntilWorkbenchStarted(): Promise<void> {
+    await browser.wait(protractor.ExpectedConditions.presenceOf($('wb-workbench:not(.starting)')));
   }
+}
 
-  /**
-   * Returns a handle representing the activity item which has given CSS class set.
-   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
-   */
-  public findActivityItem(cssClass: string): ActivityItemPO {
-    const activityItemFinder = $(`wb-activity-part .e2e-activity-bar a.e2e-activity-item.${cssClass}`);
-    const activityPanelFinder = $(`wb-activity-part .e2e-activity-panel.${cssClass}`);
+export interface PartPO {
 
-    return new class implements ActivityItemPO {
-      public async isPresent(): Promise<boolean> {
-        return activityItemFinder.isPresent();
-      }
+  getPartId(): Promise<string>;
 
-      public async getTitle(): Promise<string> {
-        return await activityItemFinder.getAttribute('title');
-      }
+  isPresent(): Promise<boolean>;
 
-      public async getText(): Promise<string> {
-        return await activityItemFinder.getText();
-      }
+  $(selector: string): ElementFinder;
+}
 
-      public async getCssClasses(): Promise<string[]> {
-        return await getCssClasses(activityItemFinder);
-      }
+export interface ViewPO {
+  readonly viewTabPO: ViewTabPO;
 
-      public async click(): Promise<void> {
-        const cssClasses = await this.getCssClasses();
-        const closePanel = cssClasses.includes('e2e-active');
-        await activityItemFinder.click();
-        // wait until the animation completes
-        closePanel && await browser.wait(protractor.ExpectedConditions.stalenessOf(activityPanelFinder), 5000);
-      }
-    };
-  }
+  getViewId(): Promise<string>;
 
-  /**
-   * Returns a handle representing the activity panel which has given CSS class set.
-   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
-   */
-  public findActivityPanel(cssClass: string): ActivityPanelPO {
-    const activityPanelFinder = $(`wb-activity-part .e2e-activity-panel.${cssClass}`);
+  isPresent(): Promise<boolean>;
 
-    return new class implements ActivityPanelPO {
-      public async isPresent(): Promise<boolean> {
-        return activityPanelFinder.isPresent();
-      }
-
-      public async getTitle(): Promise<string> {
-        return activityPanelFinder.$('.e2e-activity-title').getText();
-      }
-
-      public async getSize(): Promise<ISize> {
-        return activityPanelFinder.getSize();
-      }
-
-      public async getCssClasses(): Promise<string[]> {
-        return getCssClasses(activityPanelFinder);
-      }
-    };
-  }
-
-  /**
-   * Enlarges or shrinks the activity panel.
-   */
-  public async moveActivitySash(delta: number): Promise<void> {
-    await browser.actions().mouseMove($('div.e2e-activity-sash'), {x: 0, y: 0}).perform();
-    await browser.actions()
-      .mouseDown()
-      .mouseMove({x: delta, y: 0})
-      .mouseUp()
-      .perform();
-  }
-
-  /**
-   * Returns a handle representing the activity action which has given CSS class set.
-   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
-   */
-  public findActivityAction(cssClass: string): ActivityActionPO {
-    const actionFinder = $(`wb-activity-part .e2e-activity-actions .${cssClass}`);
-
-    return new class implements ActivityActionPO {
-      public async isPresent(): Promise<boolean> {
-        return actionFinder.isPresent();
-      }
-
-      public async click(): Promise<void> {
-        await actionFinder.click();
-      }
-    };
-  }
+  $(selector: string): ElementFinder;
 }
 
 export interface ViewTabPO {
   isPresent(): Promise<boolean>;
+
+  getViewId(): Promise<string>;
 
   getTitle(): Promise<string>;
 
@@ -419,7 +478,7 @@ export interface ViewTabPO {
 
   close(): Promise<void>;
 
-  click(): Promise<void>;
+  activate(): Promise<void>;
 
   isActive(): Promise<boolean>;
 }
@@ -458,43 +517,6 @@ export interface MessageBoxPO {
   isDisplayed(): Promise<boolean>;
 }
 
-/**
- * Represents an activity item in the activity bar.
- */
-export interface ActivityItemPO {
-  isPresent(): Promise<boolean>;
-
-  getTitle(): Promise<string>;
-
-  getText(): Promise<string>;
-
-  getCssClasses(): Promise<string[]>;
-
-  click(): Promise<void>;
-}
-
-/**
- * Represents an activity panel in the activity part.
- */
-export interface ActivityPanelPO {
-  isPresent(): Promise<boolean>;
-
-  getTitle(): Promise<string>;
-
-  getSize(): Promise<ISize>;
-
-  getCssClasses(): Promise<string[]>;
-}
-
-/*
-* Represents a clickable activity action
-*/
-export interface ActivityActionPO {
-  isPresent(): Promise<boolean>;
-
-  click(): Promise<void>;
-}
-
 export interface ViewPartActionPO {
   isPresent(): Promise<boolean>;
 
@@ -502,22 +524,38 @@ export interface ViewPartActionPO {
 }
 
 /**
+ * Allows finding the given part, or the active part if not specifying a part.
+ */
+function createViewPartFinder(partId?: string): ElementFinder {
+  if (partId) {
+    return $('wb-workbench').$(`wb-view-part[data-partid="${partId}"]`);
+  }
+  else {
+    return $('wb-workbench').$('wb-view-part.active');
+  }
+}
+
+/**
  * Allows finding the tabbar in the given part, or in the active part if not specifying a part.
  */
 function createViewPartBarFinder(partId?: string): ElementFinder {
-  if (partId) {
-    return $(`wb-view-part[data-partid="${partId}"]`).$('wb-view-part-bar');
-  }
-  return $('wb-view-part.active').$('wb-view-part-bar');
+  return createViewPartFinder(partId).$('wb-view-part-bar');
+}
+
+/**
+ * Allows finding the action bar in the given part, or in the active part if not specifying a part.
+ */
+function createViewPartActionBarFinder(partId?: string): ElementFinder {
+  return createViewPartBarFinder(partId).$('wb-view-part-action-bar');
 }
 
 /**
  * Allows finding a view tab.
  *
- * @param findBy - Specifies how to find the view tab. Either `viewId` or `cssClass` must be set.
+ * @param findBy - Specifies how to find the view tab. If both `viewId` and `cssClass` are not set, then the finder refers to the active view tab.
  *        <ul>
  *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
- *          <li>viewId?: Identifies the view by its id/li>
+ *          <li>viewId?: Identifies the view by its id</li>
  *          <li>cssClass?: Identifies the view by its CSS class</li>
  *        </ul>
  */
@@ -530,5 +568,79 @@ function createViewTabFinder(findBy: { partId?: string, viewId?: string, cssClas
   else if (findBy.cssClass !== undefined) {
     return viewPartBarFinder.$(`wb-view-tab.${findBy.cssClass}`);
   }
-  throw Error('[IllegalArgumentError] \'viewId\' or \'cssClass\' required to find a view tab');
+  else {
+    return viewPartBarFinder.$(`wb-view-tab.active`);
+  }
+}
+
+/**
+ * Allows finding a view.
+ *
+ * @param findBy - Specifies how to find the view. If both `viewId` and `cssClass` are not set, then the finder refers to the active view.
+ *        <ul>
+ *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
+ *          <li>viewId?: Identifies the view by its id</li>
+ *          <li>cssClass?: Identifies the view by its CSS class</li>
+ *        </ul>
+ */
+function createViewFinder(findBy: { partId?: string, viewId?: string, cssClass?: string }): ElementFinder {
+  const viewPartFinder = createViewPartFinder(findBy.partId);
+
+  if (findBy.viewId !== undefined) {
+    return viewPartFinder.$(`wb-view[data-viewid="${findBy.viewId}"]`);
+  }
+  else if (findBy.cssClass !== undefined) {
+    return viewPartFinder.$(`wb-view.${findBy.cssClass}`);
+  }
+  else {
+    return viewPartFinder.$(`wb-view`);
+  }
+}
+
+/**
+ * Configures features of the testing app.
+ */
+export interface Features {
+  /**
+   * Controls launching of the testing app. By default, if not specified, starts the workbench lazy.
+   */
+  launcher?: 'APP_INITIALIZER' | 'LAZY';
+  /**
+   * Controls if to enable microfrontend support. By default, if not specified, microfrontend support is enabled.
+   */
+  microfrontendSupport?: boolean;
+  /**
+   * Controls whether the start view tab should always be opened when no other tabs are open, e.g., on startup, or when closing all views.
+   * By default, if not specified, this feature is turned off.
+   */
+  stickyStartViewTab?: boolean;
+  /**
+   * Controls whether to display the part action for opening a new tab.
+   * By default, if not specified, this feature is turned on.
+   */
+  showNewTabAction?: boolean;
+  /**
+   * Allows pausing the workbench startup by displaying an alert dialog that the user must confirm in order to continue the workbench startup.
+   */
+  confirmStartup?: boolean;
+}
+
+/**
+ * Query params to instrument the workbench startup.
+ */
+enum WorkenchStartupQueryParams {
+  /**
+   * Query param to set the workbench launch strategy.
+   */
+  LAUNCHER = 'launcher',
+
+  /**
+   * Query param to set if to run the workbench standalone, or to start it with microfrontend support.
+   */
+  STANDALONE = 'standalone',
+
+  /**
+   * Query param if to display an alert dialog during workbench startup to pause the workbench startup until the user confirms the alert.
+   */
+  CONFIRM_STARTUP = 'confirmStartup',
 }

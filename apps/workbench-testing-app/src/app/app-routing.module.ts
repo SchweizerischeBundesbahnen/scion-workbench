@@ -1,24 +1,50 @@
+/*
+ * Copyright (c) 2018-2019 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
+
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { Activity1a90c8d31Component } from './activity-1a90c8d3/activity-1a90c8d3-1.component';
-import { Activity1a90c8d32Component } from './activity-1a90c8d3/activity-1a90c8d3-2.component';
-import { WelcomePageComponent } from './welcome-page/welcome-page.component';
-import { ViewComponent } from './view/view.component';
-import { View4a3a8932Component } from './view-4a3a8932/view-4a3a8932.component';
-import { ViewNavigationComponent } from './view-navigation/view-navigation.component';
-import { ViewBb9700a6Component } from './view-bb9700a6/view-bb9700a6.component';
-import { ViewInteractionComponent } from './view-interaction/view-interaction.component';
+import { StartPageComponent } from './start-page/start-page.component';
+import { WorkbenchComponent } from './workbench/workbench.component';
 
 const routes: Routes = [
-  {path: '', component: WelcomePageComponent},
-  {path: 'welcome', component: WelcomePageComponent},
-  {path: 'activity-1a90c8d31-1', component: Activity1a90c8d31Component},
-  {path: 'activity-1a90c8d31-2', component: Activity1a90c8d32Component},
-  {path: 'view', component: ViewComponent},
-  {path: 'view-4a3a8932', component: View4a3a8932Component},
-  {path: 'view-bb9700a6', component: ViewBb9700a6Component},
-  {path: 'view-navigation', component: ViewNavigationComponent},
-  {path: 'view-interaction', component: ViewInteractionComponent},
+  {
+    path: '', component: WorkbenchComponent, children: [
+      {path: '', component: StartPageComponent}, // default page displayed when all views are closed
+    ],
+  },
+  {path: 'start-page', component: StartPageComponent, data: {title: 'New Tab', cssClass: 'e2e-start-page'}},
+  {
+    path: 'test-router',
+    loadChildren: (): any => import('./router-page/router-page.module').then(m => m.RouterPageModule),
+    data: {title: 'Workbench Router', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-router', pinToStartPage: true},
+  },
+  {
+    path: 'test-view',
+    loadChildren: (): any => import('./view-page/view-page.module').then(m => m.ViewPageModule),
+    data: {title: 'Workbench View', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-view', pinToStartPage: true},
+  },
+  {
+    path: 'test-messagebox',
+    loadChildren: (): any => import('./messagebox-page/messagebox-page.module').then(m => m.MessageboxPageModule),
+    data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', cssClass: 'e2e-messagebox-view', pinToStartPage: true},
+  },
+  {
+    path: 'test-notification',
+    loadChildren: (): any => import('./notification-page/notification-page.module').then(m => m.NotificationPageModule),
+    data: {title: 'Workbench Notification', heading: 'Workbench E2E Testpage', cssClass: 'e2e-notification-view', pinToStartPage: true},
+  },
+  {
+    path: 'test-popup',
+    loadChildren: (): any => import('./popup-page/popup-page.module').then(m => m.PopupPageModule),
+    data: {title: 'Workbench Popup', heading: 'Workbench E2E Testpage', cssClass: 'e2e-popup-view', pinToStartPage: true},
+  },
 ];
 
 @NgModule({

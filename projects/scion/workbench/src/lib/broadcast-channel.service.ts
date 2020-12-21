@@ -19,7 +19,7 @@ const BROADCAST_CHANNEL_ITEM_KEY = 'workbench/broadcast-channel';
  *
  * Like the native `BroadcastChannel` but based on `LocalStorage` for wider browser support.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class BroadcastChannelService {
 
   // Subject to dispatch local messages because a storage event is only dispatched between different browsing contexts.

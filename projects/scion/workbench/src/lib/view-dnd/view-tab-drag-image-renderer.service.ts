@@ -16,7 +16,7 @@ import { ViewDragData, ViewDragService } from './view-drag.service';
 import { ComponentPortal, DomPortalOutlet } from '@angular/cdk/portal';
 import { ViewTabContentComponent } from '../view-part/view-tab-content/view-tab-content.component';
 import { WorkbenchMenuItem } from '../workbench.model';
-import { WorkbenchConfig } from '../workbench.config';
+import { WorkbenchModuleConfig } from '../workbench-module-config';
 import { VIEW_TAB_CONTEXT } from '../workbench.constants';
 import { UrlSegment } from '@angular/router';
 import { Disposable } from '../disposable';
@@ -30,7 +30,7 @@ export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
  * Unlike when using the native drag image support, it allows controlling the drag image position and its size during the drag operation.
  * For instance, allows snapping the view tab into the view tab bar (drop zone) when being dragged over.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class ViewTabDragImageRenderer implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
@@ -39,7 +39,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
   private _dragData: ViewDragData;
 
   constructor(private _viewDragService: ViewDragService,
-              private _config: WorkbenchConfig,
+              private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _componentFactoryResolver: ComponentFactoryResolver,
               private _applicationRef: ApplicationRef,
               private _injector: Injector,
@@ -172,7 +172,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
       ],
     });
 
-    return new ComponentPortal(this._config.viewTabComponent || ViewTabContentComponent, null, injector);
+    return new ComponentPortal(this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent, null, injector);
   }
 
   public ngOnDestroy(): void {

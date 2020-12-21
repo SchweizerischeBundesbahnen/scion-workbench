@@ -14,7 +14,6 @@ import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench
 import { UUID } from '@scion/toolkit/uuid';
 import { WorkbenchLayoutService } from './layout/workbench-layout.service';
 import { Disposable } from './disposable';
-import { Arrays } from '@scion/toolkit/util';
 import { WorkbenchService } from './workbench.service';
 import { WorkbenchRouter } from './routing/workbench-router.service';
 import { map } from 'rxjs/operators';
@@ -53,9 +52,11 @@ export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-
   }
 
   public registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable {
-    this.viewMenuItemProviders$.next([...this.viewMenuItemProviders$.value, factoryFn]);
+    this.viewMenuItemProviders$.next(this.viewMenuItemProviders$.value.concat(factoryFn));
     return {
-      dispose: (): void => this.viewMenuItemProviders$.next(Arrays.remove(this.viewMenuItemProviders$.value, factoryFn, {firstOnly: false})),
+      dispose: (): void => {
+        this.viewMenuItemProviders$.next(this.viewMenuItemProviders$.value.filter(it => it !== factoryFn));
+      },
     };
   }
 }

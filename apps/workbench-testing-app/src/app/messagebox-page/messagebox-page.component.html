@@ -1,0 +1,48 @@
+<form autocomplete="off" [formGroup]="form">
+  <header>Messagebox</header>
+
+  <sci-form-field label="Title">
+    <input [formControlName]="TITLE" class="e2e-title">
+  </sci-form-field>
+
+  <sci-form-field label="Content">
+    <input [formControlName]="CONTENT" class="e2e-content">
+  </sci-form-field>
+
+  <sci-form-field label="Severity">
+    <select [formControlName]="SEVERITY" class="e2e-severity">
+      <option value="info">info</option>
+      <option value="warn">warn</option>
+      <option value="error">error</option>
+      <option value="">&lt;default&gt;</option>
+    </select>
+  </sci-form-field>
+
+  <sci-form-field label="Modality">
+    <select [formControlName]="MODALITY" class="e2e-modality">
+      <option value="application">application</option>
+      <option value="view">view</option>
+      <option value="">&lt;default&gt;</option>
+    </select>
+  </sci-form-field>
+
+  <sci-form-field label="Content Selectable">
+    <sci-checkbox [formControlName]="CONTENT_SELECTABLE" class="e2e-content-selectable"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="CSS Class(es)">
+    <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+  </sci-form-field>
+
+  <sci-form-field label="Actions">
+    <sci-params-enter [paramsFormArray]="$any(form.get(ACTIONS))" [addable]="true" [removable]="true" class="e2e-actions"></sci-params-enter>
+  </sci-form-field>
+</form>
+
+<button (click)="onOpen()" class="e2e-open">
+  Display message box
+</button>
+
+<output class="action" *ngIf="action">
+  {{action}}
+</output>

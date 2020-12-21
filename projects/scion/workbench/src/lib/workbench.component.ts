@@ -8,31 +8,39 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, HostBinding, Inject, Injector, OnDestroy, ViewChild, ViewContainerRef } from '@angular/core';
 import { WorkbenchLayoutService } from './layout/workbench-layout.service';
-import { OverlayHostRef } from './overlay-host-ref.service';
-import { ContentHostRef } from './content-projection/content-host-ref.service';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { IFRAME_HOST, VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference } from './content-projection/view-container.reference';
+import { map, takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 import { WorkbenchActivityPartService } from './activity-part/workbench-activity-part.service';
+import { WorkbenchLauncher } from './startup/workbench-launcher.service';
+import { WorkbenchModuleConfig } from './workbench-module-config';
+import { ComponentType } from '@angular/cdk/portal';
+import { SplashComponent } from './startup/splash/splash.component';
+import { Logger, LoggerNames } from './logging';
 
 @Component({
   selector: 'wb-workbench',
   templateUrl: './workbench.component.html',
   styleUrls: ['./workbench.component.scss'],
 })
-export class WorkbenchComponent {
+export class WorkbenchComponent implements OnDestroy {
 
+  private _destroy$ = new Subject<void>();
+
+  @HostBinding('class.starting')
+  public workbenchStarting = true;
   public activitiesVisible$: Observable<boolean>;
 
-  @ViewChild('overlay_host', {read: ViewContainerRef, static: true})
-  public set overlayHost(overlayHost: ViewContainerRef) {
-    this._overlayHostRef.set(overlayHost);
+  @ViewChild('iframe_host', {read: ViewContainerRef})
+  public set injectIframeHost(host: ViewContainerRef) {
+    host && this._iframeHost.set(host);
   }
 
-  @ViewChild('content_host', {read: ViewContainerRef, static: true})
-  public set contentHost(contentHost: ViewContainerRef) {
-    this._contentHostRef.set(contentHost);
+  @ViewChild('view_local_message_box_host', {read: ViewContainerRef})
+  public set injectLocalMessageBoxHost(host: ViewContainerRef) {
+    host && this._viewLocalMessageBoxHost.set(host);
   }
 
   @HostBinding('class.maximized')
@@ -40,14 +48,38 @@ export class WorkbenchComponent {
     return this._workbenchLayout.maximized;
   }
 
+  @HostBinding('class.dragging')
+  public dragging = false;
+
+  public splash: ComponentType<any>;
+
   constructor(private _workbenchLayout: WorkbenchLayoutService,
-              private _activityPartService: WorkbenchActivityPartService,
-              private _overlayHostRef: OverlayHostRef,
-              private _contentHostRef: ContentHostRef) {
-    this.activitiesVisible$ = this._activityPartService.activities$
+              @Inject(IFRAME_HOST) private _iframeHost: ViewContainerReference,
+              @Inject(VIEW_LOCAL_MESSAGE_BOX_HOST) private _viewLocalMessageBoxHost: ViewContainerReference,
+              public injector: Injector,
+              workbenchModuleConfig: WorkbenchModuleConfig,
+              workbenchLauncher: WorkbenchLauncher,
+              layoutService: WorkbenchLayoutService,
+              activityPartService: WorkbenchActivityPartService,
+              logger: Logger) {
+    logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
+    // Start the workbench. Has no effect if already started, e.g., in an app initializer or route guard.
+    workbenchLauncher.launch().then(() => this.workbenchStarting = false);
+    this.splash = workbenchModuleConfig?.startup?.splash || SplashComponent;
+    this.activitiesVisible$ = activityPartService.activities$
       .pipe(
         map(activities => activities.filter(activity => activity.visible)),
         map(activities => activities.length > 0),
       );
+
+    layoutService.dragging$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(event => {
+        this.dragging = (event === 'start');
+      });
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }

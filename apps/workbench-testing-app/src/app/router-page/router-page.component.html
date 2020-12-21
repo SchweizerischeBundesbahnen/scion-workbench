@@ -1,0 +1,61 @@
+<form autocomplete="off" [formGroup]="form">
+  <header>Routing Command</header>
+
+  <sci-form-field label="Path">
+    <input [formControlName]="PATH" class="e2e-path">
+  </sci-form-field>
+
+  <sci-form-field label="Matrix parameters">
+    <sci-params-enter [paramsFormArray]="$any(form.get(MATRIX_PARAMS))" [addable]="true" [removable]="true" class="e2e-matrix-params"></sci-params-enter>
+  </sci-form-field>
+</form>
+
+<form autocomplete="off" [formGroup]="form">
+  <header>Navigation Extras</header>
+
+  <sci-form-field label="Target">
+    <select [formControlName]="TARGET" class="e2e-target">
+      <option value="self">self</option>
+      <option value="blank">blank</option>
+      <option value="">&lt;default&gt;</option>
+    </select>
+  </sci-form-field>
+
+  <sci-form-field label="SelfViewId">
+    <input [formControlName]="SELF_VIEW_ID" class="e2e-self-view-id">
+  </sci-form-field>
+
+  <sci-form-field label="InsertionIndex">
+    <input [formControlName]="INSERTION_INDEX" list="insertionIndexHints" class="e2e-insertion-index">
+    <datalist id="insertionIndexHints">
+      <option value="start">
+      <option value="end">
+    </datalist>
+  </sci-form-field>
+
+  <sci-form-field label="Query parameters">
+    <sci-params-enter [paramsFormArray]="$any(form.get(QUERY_PARAMS))" [addable]="true" [removable]="true" class="e2e-query-params"></sci-params-enter>
+  </sci-form-field>
+
+  <sci-form-field label="ActivateIfPresent">
+    <sci-checkbox [formControlName]="ACTIVATE_IF_PRESENT" class="e2e-activate-if-present"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="CloseIfPresent">
+    <sci-checkbox [formControlName]="CLOSE_IF_PRESENT" class="e2e-close-if-present"></sci-checkbox>
+  </sci-form-field>
+</form>
+
+<button (click)="onRouterNavigate()" class="e2e-router-navigate">
+  Navigate via Router
+</button>
+
+<a [wbRouterLink]="routerLinkCommands$ | async"
+   [wbRouterLinkExtras]="navigationExtras$ | async"
+   class="e2e-router-link-navigate">
+  Navigate via Router Link
+</a>
+
+<output class="navigate-error" *ngIf="navigateError">
+  {{navigateError}}
+</output>

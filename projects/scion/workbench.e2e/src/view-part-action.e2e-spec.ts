@@ -9,54 +9,73 @@
  */
 
 import { AppPO } from './page-object/app.po';
-import { browser } from 'protractor';
-import { WelcomePagePO } from './page-object/welcome-page.po';
+import { ViewPagePO } from './page-object/view-page.po';
 
-describe('ViewPartAction', () => {
+describe('Viewpart Action', () => {
 
   const appPO = new AppPO();
 
-  beforeEach(async () => {
-    await browser.get('/');
-  });
+  it('should be added to all viewparts (global action)', async () => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.findViewPartAction({buttonCssClass: 'e2e-open-new-tab'});
 
-  it('should be added to all viewparts', async () => {
-    const openNewTabActionButtonPO = appPO.findViewPartAction('e2e-open-new-tab');
+    // Global action should show if no view is opened
+    await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
+    await expect(await appPO.getViewTabCount()).toEqual(0);
 
-    await expect(await appPO.isViewTabBarShowing()).toBe(true);
+    // Global action should show in the context of view-1
+    const viewPagePO1 = await ViewPagePO.openInNewTab();
+    await expect(await viewPagePO1.viewTabPO.isActive()).toBe(true);
+    await expect(await viewPagePO1.viewPO.isPresent()).toBe(true);
+    await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
 
-    await browser.get('/#/?show-open-new-view-tab-action=false');
-    await expect(await appPO.isViewTabBarShowing()).toBe(false);
-    await expect(await openNewTabActionButtonPO.isPresent()).toBe(false);
+    // Global action should show in the context of view-2
+    const viewPagePO2 = await ViewPagePO.openInNewTab();
+    await expect(await viewPagePO2.viewTabPO.isActive()).toBe(true);
+    await expect(await viewPagePO2.viewPO.isPresent()).toBe(true);
+    await expect(await appPO.getViewTabCount()).toEqual(2);
+    await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
 
-    await browser.get('/#/?show-open-new-view-tab-action=true');
-    await expect(await appPO.isViewTabBarShowing()).toBe(true);
+    // Global action should show in the context of view-1
+    await viewPagePO2.viewTabPO.close();
+    await expect(await viewPagePO1.viewTabPO.isActive()).toBe(true);
+    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
+
+    // Global action should show if no view is opened
+    await viewPagePO1.viewTabPO.close();
+    await expect(await appPO.getViewTabCount()).toEqual(0);
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
   });
 
-  it('should stick to a view if registered in the context of a view [testcase: 4a3a8932]', async () => {
-    const welcomePagePO = new WelcomePagePO();
-    const viewTabPO = appPO.findViewTab({cssClass: 'e2e-view-4a3a8932'});
-    const viewLocalActionButtonPO = appPO.findViewPartAction('e2e-button-4a3a8932');
+  it('should stick to a view if registered in the context of a view (view-local action)', async () => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const testeeActionButtonPO = appPO.findViewPartAction({buttonCssClass: 'e2e-testee'});
 
-    await welcomePagePO.clickTile('e2e-tile-4a3a8932');
+    // Open view-1 and register a view-local viewpart action
+    const viewPagePO1 = await ViewPagePO.openInNewTab();
+    await viewPagePO1.addViewAction({icon: 'open_in_new', cssClass: 'e2e-testee'});
+    await expect(await testeeActionButtonPO.isPresent()).toBe(true);
 
-    // Open a view which contributes a view-local action
-    await expect(await viewTabPO.isActive()).toBe(true);
-    await expect(await viewLocalActionButtonPO.isPresent()).toBe(true);
+    // Open view-2, expect the action not to show
+    const viewPagePO2 = await ViewPagePO.openInNewTab();
+    await expect(await testeeActionButtonPO.isPresent()).toBe(false);
 
-    // Open a new view tab
-    await appPO.openNewViewTab();
-    await expect(await viewLocalActionButtonPO.isPresent()).toBe(false);
+    // Activate view-1, expect the action to show
+    await viewPagePO1.viewTabPO.activate();
+    await expect(await testeeActionButtonPO.isPresent()).toBe(true);
 
-    // Activate previous view
-    await viewTabPO.click();
-    await expect(await viewLocalActionButtonPO.isPresent()).toBe(true);
+    // Activate view-2, expect the action not to show
+    await viewPagePO2.viewTabPO.activate();
+    await expect(await testeeActionButtonPO.isPresent()).toBe(false);
 
-    // Close the view
-    await viewTabPO.close();
-    await expect(await viewTabPO.isPresent()).toBe(false);
-    await expect(await viewLocalActionButtonPO.isPresent()).toBe(false);
+    // Close view-2, expect the action to show because view-1 gets activated
+    await viewPagePO2.viewTabPO.close();
+    await expect(await testeeActionButtonPO.isPresent()).toBe(true);
+
+    // Close view-1, expect the action not to show because view-1 is closed
+    await viewPagePO1.viewTabPO.close();
+    await expect(await testeeActionButtonPO.isPresent()).toBe(false);
   });
 });

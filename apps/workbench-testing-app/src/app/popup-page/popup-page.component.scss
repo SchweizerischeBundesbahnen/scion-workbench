@@ -1,0 +1,38 @@
+@use 'sci-toolkit-styles' as sci-toolkit-styles;
+
+:host {
+  display: grid;
+  grid-auto-rows: max-content;
+  row-gap: 1em;
+  padding: 1em;
+
+  > section, form {
+    display: grid;
+    grid-row-gap: .5em;
+    border: 1px solid var(--sci-color-P400);
+    border-radius: 5px;
+    padding: 1em;
+
+    > header {
+      font-size: 1em;
+      margin-top: 0;
+      margin-bottom: 2em;
+      font-weight: bold;
+    }
+
+    &.input input {
+      @include sci-toolkit-styles.input-field();
+    }
+  }
+
+  > output.return-value {
+    border: 1px solid var(--sci-color-accent);
+    background-color: var(--sci-color-A100);
+    border-radius: 3px;
+    padding: 1em;
+  }
+
+  > button.open {
+    justify-self: center;
+  }
+}

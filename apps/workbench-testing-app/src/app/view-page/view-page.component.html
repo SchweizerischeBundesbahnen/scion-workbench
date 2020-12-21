@@ -1,0 +1,75 @@
+<section>
+  <sci-form-field label="View ID">
+    <span class="e2e-view-id">{{view.viewId}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Part ID">
+    <span class="e2e-part-id">{{uuid}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Instance UUID" title="UUID of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
+  </sci-form-field>
+</section>
+
+<section>
+  <header>Route Params</header>
+
+  <sci-property [properties]="route.params | async" class="e2e-route-params"></sci-property>
+</section>
+
+<section>
+  <header>Route Query Params</header>
+
+  <sci-property [properties]="route.queryParams | async" class="e2e-route-query-params"></sci-property>
+</section>
+
+<section>
+  <header>View Properties</header>
+
+  <sci-form-field label="Title">
+    <input [(ngModel)]="view.title" class="e2e-title">
+  </sci-form-field>
+
+  <sci-form-field label="Heading">
+    <input [(ngModel)]="view.heading" class="e2e-heading">
+  </sci-form-field>
+
+  <sci-form-field label="Dirty">
+    <sci-checkbox [(ngModel)]="view.dirty" class="e2e-dirty"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Closable">
+    <sci-checkbox [(ngModel)]="view.closable" class="e2e-closable"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Blocked">
+    <sci-checkbox [(ngModel)]="view.blocked" class="e2e-blocked"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Active log">
+    <textarea [ngModel]="activeLog$ | async" readonly class="e2e-view-active-log"></textarea>
+  </sci-form-field>
+</section>
+
+<section class="actions">
+  <header>View Actions</header>
+
+  <button (click)="view.close()" class="e2e-close">Close</button>
+</section>
+
+<section class="viewpart-actions">
+  <header>Viewpart Actions</header>
+
+  <input class="e2e-viewpart-actions"
+         [formControl]="viewpartActionsFormControl"
+         placeholder='Enter action(s) as JSON array: [{"icon":"open_in_new","align":"end","cssClass":"e2e-open-in-new"}]'>
+</section>
+
+<ng-template wbViewPartAction
+             *ngFor="let action of viewpartActions$ | async"
+             [align]="action.align">
+  <button class="material-icons" [ngClass]="action.cssClass">
+    {{action.icon}}
+  </button>
+</ng-template>

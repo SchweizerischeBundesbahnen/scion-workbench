@@ -1,10 +1,14 @@
-<sci-viewport wbTemplateHostOverlay [wbTemplate]="mbox_stack_template" [wbOverlayHost]="messageBoxOverlayHostRef.get()">
-  <wb-router-outlet #router_outlet="outlet"
-                    (activate)="onActivateRoute(router_outlet.activatedRoute)"
-                    (deactivate)="onDeactivateRoute()">
-  </wb-router-outlet>
-</sci-viewport>
+<ng-container *ngIf="workbenchStartup.isStarted()">
+  <sci-viewport wbContentProjection
+                [wbContentProjectionContent]="message_box_stack_template"
+                [wbContentProjectionOverlayHost]="viewLocalMessageBoxHost">
+    <wb-router-outlet #router_outlet="outlet"
+                      (activate)="onActivateRoute(router_outlet.activatedRoute)"
+                      (deactivate)="onDeactivateRoute()">
+    </wb-router-outlet>
+  </sci-viewport>
 
-<ng-template #mbox_stack_template>
-  <wb-message-box-stack></wb-message-box-stack>
-</ng-template>
+  <ng-template #message_box_stack_template>
+    <wb-message-box-stack></wb-message-box-stack>
+  </ng-template>
+</ng-container>

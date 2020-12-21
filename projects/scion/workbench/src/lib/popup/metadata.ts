@@ -18,15 +18,13 @@ export declare type Position = 'east' | 'west' | 'north' | 'south';
 export interface PopupConfig {
   /**
    * Specifies the component to be displayed in the popup.
-   *
-   * - the component must be registered as entry-component in app module
-   * - the component can inject {Popup} instance to access input or to close the popup
+   * The component can inject {@link Popup} to access input data or to close the popup.
    */
   component: Type<any>;
   /**
    * Specifies the {Element} where to attach the popup.
    */
-  anchor: ElementRef;
+  anchor: ElementRef | Element;
   /**
    * Specifies in which region of the anchor to show the popup (unless not enough space).
    */
@@ -70,7 +68,7 @@ export interface PopupConfig {
  */
 export abstract class Popup {
   /**
-   * Optional input data available in the popup component.
+   * Input data passed when opened this popup.
    */
   public abstract get input(): any | undefined;
 
@@ -95,5 +93,5 @@ export interface CloseStrategy {
   /**
    * Specifies if to close the popup on workbench view grid change, which is `true` by default.
    */
-  onGridLayoutChange?: boolean;
+  onLayoutChange?: boolean;
 }

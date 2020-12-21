@@ -1,7 +1,7 @@
 import { Injectable, ModuleWithProviders, NgModule } from '@angular/core';
 import { ViewActivationInstantProvider } from '../view/view-activation-instant-provider.service';
 import { WorkbenchModule } from '../workbench.module';
-import { WorkbenchConfig } from '../workbench.config';
+import { WorkbenchModuleConfig } from '../workbench-module-config';
 import { FromDimension } from '@scion/toolkit/observable';
 import { PARTS_LAYOUT_ROOT_PART_IDENTITY } from '../layout/parts-layout.factory';
 
@@ -23,12 +23,12 @@ export class ViewActivationTestingInstantProvider implements ViewActivationInsta
 })
 export class WorkbenchTestingModule {
 
-  public static forRoot(config: WorkbenchConfig = {}): ModuleWithProviders<WorkbenchTestingModule> {
+  public static forRoot(workbenchModuleConfig: WorkbenchModuleConfig = {}): ModuleWithProviders<WorkbenchTestingModule> {
     WorkbenchTestingModule.disableNativeResizeObserver();
     return {
       ngModule: WorkbenchTestingModule,
       providers: [
-        WorkbenchModule.forRoot(config).providers,
+        WorkbenchModule.forRoot(workbenchModuleConfig).providers,
         {provide: ViewActivationInstantProvider, useClass: ViewActivationTestingInstantProvider},
         {provide: PARTS_LAYOUT_ROOT_PART_IDENTITY, useValue: 'main'},
       ],
@@ -43,7 +43,7 @@ export class WorkbenchTestingModule {
    * Disable native `ResizeObserver` in tests because it sometimes throws 'loop limit exceeded' error which can safely be ignored.
    *
    * Comment from the specification authors:
-   * ﻿This error means that `ResizeObserver` was not able to deliver all observations within a single animation frame. It is benign and the site will not break.
+   * This error means that `ResizeObserver` was not able to deliver all observations within a single animation frame. It is benign and the site will not break.
    * See https://stackoverflow.com/a/50387233
    */
   private static disableNativeResizeObserver(): void {

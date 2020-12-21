@@ -306,7 +306,7 @@ class AppComponent {
 
 @NgModule({
   imports: [
-    WorkbenchTestingModule.forRoot(),
+    WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
       {path: 'feature-a', loadChildren: './feature-a/feature-a.module'},

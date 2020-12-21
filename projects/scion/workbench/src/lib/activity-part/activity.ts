@@ -130,7 +130,7 @@ export class InternalActivity implements Activity {
   }
 
   public get active$(): Observable<boolean> {
-    return this._active$.asObservable();
+    return this._active$;
   }
 
   public get active(): boolean {

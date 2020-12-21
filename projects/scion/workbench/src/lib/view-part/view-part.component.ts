@@ -15,6 +15,7 @@ import { takeUntil } from 'rxjs/operators';
 import { ViewDragService } from '../view-dnd/view-drag.service';
 import { ɵWorkbenchViewPart } from './ɵworkbench-view-part.model';
 import { ɵWorkbenchService } from '../ɵworkbench.service';
+import { Logger, LoggerNames } from '../logging';
 
 @Component({
   selector: 'wb-view-part',
@@ -31,9 +32,6 @@ export class ViewPartComponent implements OnDestroy {
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
 
-  @HostBinding('class.suspend-pointer-events')
-  public suspendPointerEvents = false;
-
   @HostBinding('attr.data-partid')
   public get partId(): string {
     return this._part.partId;
@@ -46,7 +44,9 @@ export class ViewPartComponent implements OnDestroy {
 
   constructor(private _workbench: ɵWorkbenchService,
               private _viewDragService: ViewDragService,
-              private _part: ɵWorkbenchViewPart) {
+              private _part: ɵWorkbenchViewPart,
+              private _logger: Logger) {
+    this._logger.debug(() => `Constructing ViewPartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
     combineLatest([this._workbench.viewPartActions$, this._part.actions$, this._part.viewIds$])
       .pipe(takeUntil(this._destroy$))
       .subscribe(([globalActions, localActions, viewIds]) => {
@@ -84,6 +84,7 @@ export class ViewPartComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this._logger.debug(() => `Destroying ViewPartComponent [partId=${this.partId}]'`, LoggerNames.LIFECYCLE);
     this._destroy$.next();
   }
 }

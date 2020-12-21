@@ -82,10 +82,10 @@ The following is a summary of commands useful for development of `scion-workbenc
 - `npm run workbench-testing-app:lint`\
   Lints the `workbench-testing-app`.
   
-### Commands for working on the workbench-client testing application
+### Commands for working on the workbench testing application with microfrontend support enabled
   
-- `npm run workbench-client-fixture:serve`\
-  Serves the `workbench-testing-app` and two instances of the `workbench-client-testing-app` using the Angular CLI. Open the page http://localhost:4200 to load the workbench host app into your browser.\
+- `npm run workbench-testing-app-fixture:serve`\
+  Serves the `workbench-testing-app` and an instance of the `workbench-client-testing-app` using the Angular CLI. Open the page http://localhost:4200 to load the workbench host app into your browser.\
   Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support. 
   
 - `npm run workbench-client-testing-app:ci:build`\
@@ -290,14 +290,13 @@ In the development of a new major release, we usually release pre-releases and t
 This chapter describes the tasks to publish a new release for `@scion/workbench` to NPM.
 
 1. Update `/projects/scion/workbench/package.json` with the new version.
-1. Run `npm install` to update the version in `package-lock.json`.
 1. Run `npm run workbench:changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
 1. Commit the changed files using the following commit message: `release(workbench): vX.X.X`. Replace `X.X.X` with the current version. Later, when merging the branch into the master branch, a commit message of this format triggers the release action in our [GitHub Actions workflow][link-github-actions-workflow].
 1. Push the commit to the branch `release/X.X.X` and submit a pull request to the master branch. Replace `X.X.X` with the current version.
 1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
 1. Verify that: 
    - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
-   - **Testing App** is deployed to https://scion-workbench-testing-app.now.sh and https://scion-workbench-testing-app-vX-X-X.now.sh.
+   - **Testing App** is deployed to https://scion-workbench-testing-app.now.sh.
 
 </details>
 
@@ -308,15 +307,13 @@ This chapter describes the tasks to publish a new release for `@scion/workbench`
 This chapter describes the tasks to publish a new release for `@scion/workbench-client` to NPM.
 
 1. Update `/projects/scion/workbench-client/package.json` with the new version.
-1. Run `npm install` to update the version in `package-lock.json`.
 1. Run `npm run workbench-client:changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
 1. Commit the changed files using the following commit message: `release(workbench-client): vX.X.X`. Replace `X.X.X` with the current version. Later, when merging the branch into the master branch, a commit message of this format triggers the release action in our [GitHub Actions workflow][link-github-actions-workflow].
 1. Push the commit to the branch `release/workbench-client-X.X.X` and submit a pull request to the master branch. Replace `X.X.X` with the current version.
 1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
 1. Verify that: 
    - **@scion/workbench-client** is published to: https://www.npmjs.com/package/@scion/workbench-client.
-   - **Testing App** is deployed to https://scion-workbench-client-testing-app1.now.sh and https://scion-workbench-client-testing-app1-vX-X-X.now.sh.
-   - **Testing App** is deployed to https://scion-workbench-client-testing-app2.now.sh and https://scion-workbench-client-testing-app2-vX-X-X.now.sh.
+   - **Testing App** is deployed to https://scion-workbench-client-testing-app.now.sh.
    - **API Documentation (TypeDoc)** is deployed to: 
       - https://scion-workbench-client-api.now.sh.
       - https://scion-workbench-client-api-vX-X-X.now.sh.

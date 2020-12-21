@@ -8,13 +8,21 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
+import { WorkbenchMicrofrontendConfig } from '@scion/workbench';
 
 /**
  * Environment used when packaging the app for Vercel.
  */
+const microfrontendConfig: WorkbenchMicrofrontendConfig = {
+  platform: {
+    apps: [
+      {symbolicName: 'devtools', manifestUrl: '/assets/manifest-devtools.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
+      {symbolicName: 'workbench-client-testing-app', manifestUrl: `https://scion-workbench-client-testing-app.now.sh/assets/manifest.json`},
+    ],
+  },
+};
+
 export const environment = {
   production: true,
+  microfrontendConfig,
 };

@@ -54,12 +54,12 @@ export class TreeNodeComponent {
   }
 
   public onSashStart(): void {
-    this._workbenchLayout.viewSashDrag$.next('start');
+    this._workbenchLayout.notifyDragStarting();
   }
 
-  public onSashEnd([sashSize1, sashSize2]: [number, number]): void {
+  public onSashEnd([sashSize1, sashSize2]: number[]): void {
     const ratio = sashSize1 / (sashSize1 + sashSize2);
-    this._workbenchLayout.viewSashDrag$.next('end');
+    this._workbenchLayout.notifyDragEnding();
     this._wbRouter.ɵnavigate(layout => layout.setSplitRatio(this._treeNode.nodeId, ratio)).then();
   }
 

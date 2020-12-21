@@ -1,0 +1,81 @@
+/*
+ * Copyright (c) 2018-2019 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ *  SPDX-License-Identifier: EPL-2.0
+ */
+
+import { Component } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { WorkbenchNavigationExtras, WorkbenchRouter } from '@scion/workbench-client';
+import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
+import { coerceNumberProperty } from '@angular/cdk/coercion';
+
+const QUALIFIER = 'qualifier';
+const PARAMS = 'params';
+const ACTIVATE_IF_PRESENT = 'activateIfPresent';
+const CLOSE_IF_PRESENT = 'closeIfPresent';
+const TARGET = 'target';
+const SELF_VIEW_ID = 'selfViewId';
+const INSERTION_INDEX = 'insertionIndex';
+
+@Component({
+  selector: 'app-router-page',
+  templateUrl: './router-page.component.html',
+  styleUrls: ['./router-page.component.scss'],
+})
+export class RouterPageComponent {
+
+  public readonly QUALIFIER = QUALIFIER;
+  public readonly PARAMS = PARAMS;
+  public readonly TARGET = TARGET;
+  public readonly SELF_VIEW_ID = SELF_VIEW_ID;
+  public readonly INSERTION_INDEX = INSERTION_INDEX;
+  public readonly ACTIVATE_IF_PRESENT = ACTIVATE_IF_PRESENT;
+  public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
+
+  public form: FormGroup;
+  public navigateError: string;
+
+  constructor(formBuilder: FormBuilder,
+              private _router: WorkbenchRouter) {
+    this.form = formBuilder.group({
+      [QUALIFIER]: formBuilder.array([], Validators.required),
+      [PARAMS]: formBuilder.array([]),
+      [TARGET]: formBuilder.control(''),
+      [SELF_VIEW_ID]: formBuilder.control(''),
+      [INSERTION_INDEX]: formBuilder.control(''),
+      [ACTIVATE_IF_PRESENT]: formBuilder.control(true),
+      [CLOSE_IF_PRESENT]: formBuilder.control(false),
+    });
+  }
+
+  public onNavigate(): void {
+    this.navigateError = null;
+
+    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray);
+    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as FormArray);
+    const extras: WorkbenchNavigationExtras = {
+      activateIfPresent: this.form.get(ACTIVATE_IF_PRESENT).value,
+      closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
+      target: this.form.get(TARGET).value || undefined,
+      selfViewId: this.form.get(SELF_VIEW_ID).value || undefined,
+      blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
+      params: params || undefined,
+    };
+    this._router.navigate(qualifier, extras).catch(error => this.navigateError = error);
+  }
+}
+
+function coerceInsertionIndex(value: any): number | 'start' | 'end' | undefined {
+  if (value === '') {
+    return undefined;
+  }
+  if (value === 'start' || value === 'end' || value === undefined) {
+    return value;
+  }
+  return coerceNumberProperty(value);
+}
