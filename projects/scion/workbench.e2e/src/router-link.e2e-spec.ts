@@ -8,45 +8,83 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { browser, Key } from 'protractor';
-import { TestcaseBb9700a6ViewPO } from './page-object/testcase-bb9700a6-view.po';
+import { Key } from 'protractor';
 import { AppPO } from './page-object/app.po';
-import { ViewNavigationPO } from './page-object/view-navigation.po';
+import { RouterPagePO } from './page-object/router-page.po';
 
-describe('RouterLink', () => {
+describe('Workbench RouterLink', () => {
 
   const appPO = new AppPO();
-  const viewNavigationPO = new ViewNavigationPO();
-  const viewPO = new TestcaseBb9700a6ViewPO();
 
   beforeEach(async () => {
-    await browser.get('/');
-    await viewNavigationPO.navigateTo();
-
-    // open view-bb9700a6
-    await viewNavigationPO.enterPath('view-bb9700a6');
-    await viewNavigationPO.enterMatrixParams({viewCssClass: 'e2e-view-bb9700a6', viewTitle: 'view-bb9700a6'});
-    await viewNavigationPO.selectTarget('self');
-    await viewNavigationPO.navigate();
+    await appPO.navigateTo({microfrontendSupport: false});
   });
 
-  it('should open the testing view in current view [testcase: bb9700a6-view]', async () => {
-    await viewPO.clickLink();
-    await expect(await appPO.getViewTabCount()).toBe(1);
+  it('should open the view in the current view tab (by default)', async () => {
+    const routerPagePO = await RouterPagePO.openInNewTab();
+
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterMatrixParams({cssClass: 'testee', heading: 'testee'});
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await appPO.findActiveViewTab().getHeading()).toEqual('testee');
   });
 
-  it('should open the testing view in new view tab when CTRL + click [testcase: bb9700a6-view]', async () => {
-    await viewPO.clickLink(Key.CONTROL);
-    await expect(await appPO.getViewTabCount()).toBe(2);
+  it('should open the view in the current view tab (target="self")', async () => {
+    const routerPagePO = await RouterPagePO.openInNewTab();
+
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterMatrixParams({cssClass: 'testee', heading: 'testee'});
+    await routerPagePO.selectTarget('self');
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await appPO.findActiveViewTab().getHeading()).toEqual('testee');
   });
 
-  it('should open the testing view in new view tab when COMMAND + click [testcase: bb9700a6-view]', async () => {
-    await viewPO.clickLink(Key.COMMAND);
-    await expect(await appPO.getViewTabCount()).toBe(2);
+  it('should open the view in a new view tab (target="blank")', async () => {
+    const routerPagePO = await RouterPagePO.openInNewTab();
+
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterMatrixParams({cssClass: 'testee', heading: 'testee'});
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    await expect(await appPO.getViewTabCount()).toEqual(2);
+    await expect(await appPO.findActiveViewTab().getHeading()).toEqual('testee');
   });
 
-  it('should open the testing view in new view tab when META + click [testcase: bb9700a6-view]', async () => {
-    await viewPO.clickLink(Key.META);
-    await expect(await appPO.getViewTabCount()).toBe(2);
+  it('should open the view in a new view tab when pressing the CTRL modifier key', async () => {
+    const routerPagePO = await RouterPagePO.openInNewTab();
+
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterMatrixParams({cssClass: 'testee', heading: 'testee'});
+    await routerPagePO.clickNavigateViaRouterLink(Key.CONTROL);
+
+    await expect(await appPO.getViewTabCount()).toEqual(2);
+    await expect(await appPO.findActiveViewTab().getHeading()).toEqual('testee');
+  });
+
+  it('should open the view in a new view tab when pressing the COMMAND modifier key', async () => {
+    const routerPagePO = await RouterPagePO.openInNewTab();
+
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterMatrixParams({cssClass: 'testee', heading: 'testee'});
+    await routerPagePO.clickNavigateViaRouterLink(Key.COMMAND);
+
+    await expect(await appPO.getViewTabCount()).toEqual(2);
+    await expect(await appPO.findActiveViewTab().getHeading()).toEqual('testee');
+  });
+
+  it('should open the view in a new view tab when pressing the META modifier key', async () => {
+    const routerPagePO = await RouterPagePO.openInNewTab();
+
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterMatrixParams({cssClass: 'testee', heading: 'testee'});
+    await routerPagePO.clickNavigateViaRouterLink(Key.META);
+
+    await expect(await appPO.getViewTabCount()).toEqual(2);
+    await expect(await appPO.findActiveViewTab().getHeading()).toEqual('testee');
   });
 });

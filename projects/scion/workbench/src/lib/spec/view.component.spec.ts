@@ -49,16 +49,16 @@ describe('ViewComponent', () => {
     const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'e2e-dirty': true}), '(A)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'dirty': true}), '(A)');
 
     // Clear dirty flag
     viewDebugElement.view.dirty = false;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).not.toEqual(jasmine.objectContaining({'e2e-dirty': true}), '(B)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).not.toEqual(jasmine.objectContaining({'dirty': true}), '(B)');
 
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'e2e-dirty': true}), '(C)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'dirty': true}), '(C)');
     tick();
   })));
 
@@ -384,7 +384,7 @@ describe('ViewComponent', () => {
 @NgModule({
   declarations: [SpecView1Component, SpecView2Component],
   imports: [
-    WorkbenchTestingModule.forRoot(),
+    WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     RouterTestingModule.withRoutes([
       {path: 'view-1', component: SpecView1Component},
       {path: 'view-2', component: SpecView2Component},

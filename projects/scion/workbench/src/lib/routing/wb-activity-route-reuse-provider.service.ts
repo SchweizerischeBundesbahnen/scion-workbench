@@ -13,7 +13,7 @@ import { EmptyOutletComponent } from './empty-outlet.component';
 import { ACTIVITY_OUTLET_NAME } from '../workbench.constants';
 import { WbRouteReuseProvider } from './wb-route-reuse-strategy.service';
 import { Injectable } from '@angular/core';
-import { WorkbenchConfig } from '../workbench.config';
+import { WorkbenchModuleConfig } from '../workbench-module-config';
 import { Defined } from '@scion/toolkit/util';
 
 /**
@@ -25,8 +25,8 @@ export class WbActivityRouteReuseProvider implements WbRouteReuseProvider {
 
   private readonly _active: boolean;
 
-  constructor(config: WorkbenchConfig) {
-    this._active = Defined.orElse(config.reuseActivityRoutes, true);
+  constructor(workbenchModuleConfig: WorkbenchModuleConfig) {
+    this._active = Defined.orElse(workbenchModuleConfig.reuseActivityRoutes, true);
   }
 
   public computeReuseKey(route: ActivatedRouteSnapshot): any {

@@ -1,0 +1,67 @@
+<img src="assets/scion-workbench-banner.svg" alt="SCION Workbench" class="banner">
+
+<span class="about" *ngIf="isWelcomePage()" ngPreserveWhitespaces>
+Welcome to the internal test app of SCION Workbench and SCION Workbench Client.
+We use this app to run our e2e tests and experiment with features.
+</span>
+
+<sci-tabbar>
+  <ng-template sciTab label="Workbench Views" cssClass="e2e-workbench-views">
+    <section class="tiles e2e-workbench-view-tiles">
+      <a *ngFor="let route of workbenchViewRoutes"
+         [wbRouterLink]="route.path"
+         [ngClass]="route.data['cssClass']"
+         [wbRouterLinkExtras]="{relativeTo: null, activateIfPresent: false}">
+        {{route.data['title']}}
+        <span class="description" *ngIf="route.data['heading']">
+          {{route.data['heading']}}
+        </span>
+      </a>
+    </section>
+  </ng-template>
+
+  <ng-template sciTab label="Microfrontend Views" cssClass="e2e-microfrontend-views" *ngIf="this.microfrontendViewCapabilities$">
+    <section class="tiles e2e-microfrontend-view-tiles">
+      <a *ngFor="let viewCapability of microfrontendViewCapabilities$ | async"
+         (click)="onMicrofrontendViewOpen(viewCapability)"
+         [ngClass]="viewCapability.properties.cssClass">
+        {{viewCapability.properties.title}}
+        <span class="description" *ngIf="viewCapability.properties.heading">
+          {{viewCapability.properties.heading}}
+        </span>
+      </a>
+    </section>
+  </ng-template>
+
+  <ng-template sciTab label="Miscellaneous" cssClass="e2e-miscellaneous">
+    <section class="miscellaneous e2e-miscellaneous">
+      <header>Open this app in a new browser tab, as follows:</header>
+      <a [href]="computeAppUrl({launcher: 'LAZY', standalone: true})" target="_blank">
+        Start the workbench lazy with microfrontend support disabled.
+      </a>
+      <a [href]="computeAppUrl({launcher: 'LAZY', standalone: false})" target="_blank">
+        Start the workbench lazy with microfrontend support enabled.
+      </a>
+      <a [href]="computeAppUrl({launcher: 'APP_INITIALIZER', standalone: true})" target="_blank">
+        Start the workbench in an 'APP_INITIALIZER' with microfrontend support disabled.
+      </a>
+      <a [href]="computeAppUrl({launcher: 'APP_INITIALIZER', standalone: false})" target="_blank">
+        Start the workbench in an 'APP_INITIALIZER' with microfrontend support enabled.
+      </a>
+
+      <header>Configure workbench logging:</header>
+      <a [routerLink]="[]" queryParamsHandling="merge" [queryParams]="{loglevel: 'debug'}">
+        Change log level to DEBUG
+      </a>
+      <a [routerLink]="[]" queryParamsHandling="merge" [queryParams]="{loglevel: 'info'}">
+        Change log level to INFO
+      </a>
+      <a [routerLink]="[]" queryParamsHandling="merge" [queryParams]="{loglevel: 'warn'}">
+        Change log level to WARN
+      </a>
+      <a [routerLink]="[]" queryParamsHandling="merge" [queryParams]="{loglevel: 'error'}">
+        Change log level to ERROR
+      </a>
+    </section>
+  </ng-template>
+</sci-tabbar>

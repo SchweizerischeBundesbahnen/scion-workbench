@@ -129,7 +129,7 @@ class Activity3Component {
 
 @NgModule({
   imports: [
-    WorkbenchTestingModule.forRoot(),
+    WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     CommonModule,
     RouterTestingModule.withRoutes([

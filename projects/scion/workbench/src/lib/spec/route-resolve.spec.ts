@@ -110,7 +110,7 @@ class ViewComponent {
 @NgModule({
   declarations: [ViewComponent],
   imports: [
-    WorkbenchTestingModule.forRoot(),
+    WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     RouterTestingModule.withRoutes([
       {path: 'path/to/view', component: ViewComponent},
       {path: 'path/to/view-1', component: ViewComponent},

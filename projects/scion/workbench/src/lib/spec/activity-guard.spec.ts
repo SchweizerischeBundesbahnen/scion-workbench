@@ -126,7 +126,7 @@ class Activity2CanActivate implements CanActivate {
 
 @NgModule({
   imports: [
-    WorkbenchTestingModule.forRoot(),
+    WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     CommonModule,
     RouterTestingModule.withRoutes([

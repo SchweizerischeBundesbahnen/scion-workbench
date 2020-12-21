@@ -12,7 +12,7 @@
     height: 100%;
 
     // Sets the viewport client to its smallest height to shrink the overlay when closing views.
-    --grid-auto-rows: min-content;
+    --sci-viewport-content-grid-auto-rows: min-content;
 
     ul {
       list-style: none;

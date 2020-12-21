@@ -10,7 +10,7 @@
 
 import { Inject, Injectable, InjectionToken, NgZone, Optional, SkipSelf } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, MessageBox, WbMessageBox } from './message-box';
+import { Action, MessageBox, ɵMessageBox } from './message-box';
 
 /**
  * DI injection token to inject the {MessageBoxService} with application modality context.
@@ -25,7 +25,7 @@ export class MessageBoxService {
 
   private _count$ = new BehaviorSubject<number>(0);
 
-  private _open$ = new Subject<WbMessageBox>();
+  private _open$ = new Subject<ɵMessageBox>();
 
   constructor(@Optional() @SkipSelf() @Inject(APP_MESSAGE_BOX_SERVICE) private _globalMessageBoxService: MessageBoxService,
               private _zone: NgZone) {
@@ -57,12 +57,12 @@ export class MessageBoxService {
   }
 
   private openInternal(messageBox: MessageBox | string): Promise<Action> {
-    const msgBox: WbMessageBox = ((): WbMessageBox => {
+    const msgBox: ɵMessageBox = ((): ɵMessageBox => {
       if (typeof messageBox === 'string') {
-        return new WbMessageBox({content: messageBox});
+        return new ɵMessageBox({content: messageBox});
       }
       else {
-        return new WbMessageBox(messageBox);
+        return new ɵMessageBox(messageBox);
       }
     })();
 
@@ -81,13 +81,17 @@ export class MessageBoxService {
 
   /**
    * Allows to subscribe for message boxes.
+   *
+   * @internal
    */
-  public get open$(): Observable<WbMessageBox> {
-    return this._open$.asObservable();
+  public get open$(): Observable<ɵMessageBox> {
+    return this._open$;
   }
 
   /**
    * Returns the number of displayed message boxes.
+   *
+   * @internal
    */
   public get count(): number {
     return this._count$.getValue();
@@ -98,8 +102,10 @@ export class MessageBoxService {
    *
    * Upon subscription, the current count is emitted, and then emits continuously
    * when a message box is opened or closed. It never completes.
+   *
+   * @internal
    */
   public get count$(): Observable<number> {
-    return this._count$.asObservable();
+    return this._count$;
   }
 }

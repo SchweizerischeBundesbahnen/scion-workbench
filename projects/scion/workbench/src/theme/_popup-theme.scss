@@ -12,6 +12,11 @@ $popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
     border-radius: 2px;
     box-shadow: $popup-box-shadow, 0 0 1px $border-color;
     border: 1px solid $border-color;
+    display: grid;
+
+    > * {
+      outline: none;
+    }
 
     //::before is used as diamond-border
     //::after is used as diamond-content

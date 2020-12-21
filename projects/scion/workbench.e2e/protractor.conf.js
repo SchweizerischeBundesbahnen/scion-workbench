@@ -30,11 +30,11 @@ exports.config = {
     './src/**/*.e2e-spec.ts',
   ],
   suites: {
-    activity: [
-      './src/**/activity.e2e-spec.ts',
+    startup: [
+      './src/**/startup.e2e-spec.ts',
     ],
-    defaultView: [
-      './src/**/entry-point-page.e2e-spec.ts',
+    defaultPage: [
+      './src/**/default-page.e2e-spec.ts',
     ],
     router: [
       './src/**/router.e2e-spec.ts',
@@ -42,14 +42,14 @@ exports.config = {
     routerlink: [
       './src/**/router-link.e2e-spec.ts',
     ],
+    view: [
+      './src/**/view.e2e-spec.ts',
+    ],
     viewpartAction: [
       './src/**/view-part-action.e2e-spec.ts',
     ],
     viewTabbar: [
       './src/**/view-tab-bar.e2e-spec.ts',
-    ],
-    workbench: [
-      './src/**/workbench.e2e-spec.ts',
     ],
   },
   capabilities: {

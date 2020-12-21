@@ -26,7 +26,7 @@ import { ViewTarget, WorkbenchRouter } from '../routing/workbench-router.service
  * 2. Adds the view to its preferred part as specified in its route data, if defined.
  * 3. Adds the views to the currently active part.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class WbAddViewToPartGuard implements CanActivate {
 
   constructor(private _router: Router, private _workbenchRouter: WorkbenchRouter) {

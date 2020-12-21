@@ -50,7 +50,8 @@ export class ViewPartActionDirective implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    // Add the action inside a microtask because the action may be added to a parent component which already was change detected by Angular.
+    // Register this action in a subsequent microtask, as the action may be added to a parent component that has already been checked for changes.
+    // Otherwise, Angular would throw an `ExpressionChangedAfterItHasBeenCheckedError`.
     asapScheduler.schedule(() => {
       this._action = (this._viewPart || this._workbench).registerViewPartAction({
         templateOrComponent: this._template,
@@ -61,6 +62,10 @@ export class ViewPartActionDirective implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._action && this._action.dispose();
+    // Unregister this action in a subsequent microtask, as the action may be removed from a parent component that has already been checked for changes.
+    // Otherwise, Angular would throw an `ExpressionChangedAfterItHasBeenCheckedError`.
+    if (this._action) {
+      asapScheduler.schedule(() => this._action.dispose());
+    }
   }
 }

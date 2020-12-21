@@ -12,3 +12,9 @@
  * Entry point for all public APIs of this package.
  */
 export * from './lib/workbench-client';
+export * from './lib/routing/workbench-router';
+export * from './lib/routing/workbench-router.constants';
+export * from './lib/view/view-capability';
+export { WorkbenchView, ViewClosingListener, ViewClosingEvent, ɵVIEW_ID_CONTEXT_KEY } from './lib/view/workbench-view';
+export * from './lib/workbench-capabilities.enum';
+export { ɵWorkbenchCommands } from './lib/ɵworkbench-commands';

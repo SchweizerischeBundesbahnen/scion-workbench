@@ -63,7 +63,6 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
 
     this.active$ = new BehaviorSubject<boolean>(active);
     this.cssClasses$ = new BehaviorSubject<string[]>([]);
-    this.title = viewId;
     this.closable = true;
 
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbench.viewMenuItemProviders$])
@@ -173,9 +172,11 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
 
   public registerMenuItem(menuItem: WorkbenchMenuItem): Disposable {
     const factoryFn = (): WorkbenchMenuItem => menuItem;
-    this._menuItemProviders$.next([...this._menuItemProviders$.value, factoryFn]);
+    this._menuItemProviders$.next(this._menuItemProviders$.value.concat(factoryFn));
     return {
-      dispose: (): void => this._menuItemProviders$.next(Arrays.remove(this._menuItemProviders$.value, factoryFn, {firstOnly: false})),
+      dispose: (): void => {
+        this._menuItemProviders$.next(this._menuItemProviders$.value.filter(it => it !== factoryFn));
+      },
     };
   }
 

@@ -12,7 +12,8 @@
     "exclude": "**/ɵ*.ts",
     "toc": [
       "WorkbenchClient",
-      "WorkbenchRouter"
+      "WorkbenchRouter",
+      "WorkbenchView"
     ],
     "categorizeByGroup": true
   }

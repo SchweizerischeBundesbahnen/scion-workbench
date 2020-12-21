@@ -14,7 +14,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { MessageBoxService } from './message-box.service';
-import { Action, WbMessageBox } from './message-box';
+import { Action, ɵMessageBox } from './message-box';
 import { MessageBoxComponent } from './message-box.component';
 
 @Component({
@@ -31,7 +31,7 @@ export class MessageBoxStackComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  public messageBoxes: WbMessageBox[] = [];
+  public messageBoxes: ɵMessageBox[] = [];
 
   constructor(messageBoxService: MessageBoxService, private _cd: ChangeDetectorRef) {
     messageBoxService.open$

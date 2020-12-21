@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, Component, Input, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, Input, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { WbComponentPortal } from './wb-component-portal';
 
 @Component({
@@ -16,7 +16,7 @@ import { WbComponentPortal } from './wb-component-portal';
   template: '<ng-template></ng-template>',
   styleUrls: ['./wb-portal-outlet.component.scss'],
 })
-export class WbPortalOutletComponent implements AfterViewInit, OnDestroy {
+export class WbPortalOutletComponent implements OnDestroy {
 
   private _portal: WbComponentPortal<any>;
 
@@ -27,10 +27,6 @@ export class WbPortalOutletComponent implements AfterViewInit, OnDestroy {
   public set portal(portal: WbComponentPortal<any>) {
     this.detachPortal();
     this._portal = portal;
-    this.attachPortal();
-  }
-
-  public ngAfterViewInit(): void {
     this.attachPortal();
   }
 

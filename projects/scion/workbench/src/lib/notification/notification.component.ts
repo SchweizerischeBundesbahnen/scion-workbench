@@ -9,7 +9,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Injector, Input, NgZone, OnDestroy, Output } from '@angular/core';
-import { Notification, WbNotification } from './notification';
+import { Notification, ɵNotification } from './notification';
 import { asyncScheduler, Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Arrays } from '@scion/toolkit/util';
@@ -24,7 +24,7 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
   private _closeTimerChange$ = new Subject<void>();
-  private _notification: WbNotification;
+  private _notification: ɵNotification;
 
   public text: string;
   public textual: boolean;
@@ -33,7 +33,7 @@ export class NotificationComponent implements AfterViewInit, OnDestroy {
   public injector: Injector;
 
   @Input()
-  public set notification(notification: WbNotification) {
+  public set notification(notification: ɵNotification) {
     this._notification = notification;
     this._notification.onPropertyChange = (): void => this._cd.markForCheck();
     this.installAutoCloseTimer();

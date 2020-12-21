@@ -5,6 +5,7 @@ import { ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME } from '../workbench.constants'
 import { EmptyOutletComponent } from './empty-outlet.component';
 import { WbBeforeDestroyGuard } from '../view/wb-before-destroy.guard';
 import { WbAddViewToPartGuard } from './add-view-to-part.guard';
+import { Arrays } from '@scion/toolkit/util';
 
 /**
  * Registers auxiliary routes for views and activities.
@@ -26,46 +27,44 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
    * Registers a named view auxiliary route for every primary route found in the router config.
    */
   public registerViewAuxiliaryRoutes(...viewIds: string[]): Routes {
-    const auxRoutes: Routes = [];
-    viewIds.forEach(viewId => {
-      auxRoutes.push(...this.registerAuxiliaryRoutesFor(viewId, {
-        canActivate: [WbAddViewToPartGuard],
-        canDeactivate: [WbBeforeDestroyGuard],
-      }));
+    return this.registerAuxiliaryRoutesFor(viewIds, {
+      canActivate: [WbAddViewToPartGuard],
+      canDeactivate: [WbBeforeDestroyGuard],
     });
-    return auxRoutes;
   }
 
   /**
    * Registers a named auxiliary route for every primary route found in the router config.
-   * This allows all primary routes to be used in a named router outlet of the given outlet name.
+   * This allows all primary routes to be used in a named router outlet of the given outlet name(s).
    *
-   * @param outlet for which to create named auxiliary routes
+   * @param outletName(s) for which to create named auxiliary routes
    * @param params optional parametrization of the auxilary route
    */
-  private registerAuxiliaryRoutesFor(outlet: string, params: AuxiliaryRouteParams = {}): Routes {
+  private registerAuxiliaryRoutesFor(outletName: string | string[], params: AuxiliaryRouteParams = {}): Routes {
     const primaryRoutes = this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
 
-    const auxRoutes: Routes = primaryRoutes
+    const outletAuxRoutes: Routes = [];
+    const outletNames = new Set<string>(Arrays.coerce(outletName));
+    primaryRoutes
       .filter(primaryRoute => primaryRoute.path !== '') // skip empty path routes because not supported in named outlets
-      .map(it => {
-        return {
-          ...it,
+      .forEach(primaryRoute => outletNames.forEach(outlet => {
+        outletAuxRoutes.push({
+          ...primaryRoute,
           outlet: outlet,
-          component: it.component || EmptyOutletComponent, // used for lazy loading of aux routes; see Angular PR #23459
-          canActivate: [...(params.canActivate || []), ...(it.canActivate || [])],
-          canDeactivate: [...(params.canDeactivate || []), ...(it.canDeactivate || [])],
-          data: {...it.data, ...params.data},
-          resolve: {...it.resolve, ...params.resolve},
-        };
-      });
+          component: primaryRoute.component || EmptyOutletComponent, // used for lazy loading of aux routes; see Angular PR #23459
+          canActivate: [...(params.canActivate || []), ...(primaryRoute.canActivate || [])],
+          canDeactivate: [...(params.canDeactivate || []), ...(primaryRoute.canDeactivate || [])],
+          data: {...primaryRoute.data, ...params.data},
+          resolve: {...primaryRoute.resolve, ...params.resolve},
+        });
+      }));
 
     this.replaceRouterConfig([
-      ...this._router.config.filter(route => route.outlet !== outlet), // all registered routes, except auxiliary routes of the outlet
-      ...auxRoutes,
+      ...this._router.config.filter(route => !outletNames.has(route.outlet)), // all registered routes, except auxiliary routes for any of the given outlets
+      ...outletAuxRoutes,
     ]);
 
-    return auxRoutes;
+    return outletAuxRoutes;
   }
 
   /**

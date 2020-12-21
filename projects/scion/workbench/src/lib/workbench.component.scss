@@ -1,50 +1,71 @@
-@import './workbench.constants';
-@import 'content-projection/mixins';
-
-@mixin position($position, $top, $right, $bottom, $left) {
-  position: $position;
-  top: $top;
-  right: $right;
-  bottom: $bottom;
-  left: $left;
-}
+@use './workbench.constants' as constants;
+@use './mixin';
 
 :host {
-  display: flex;
-  @include position(absolute, 0, 0, 0, 0);
+  display: grid;
+  position: relative; // positioning context
   overflow: hidden;
-  background-color: $background-color;
+  background-color: constants.$background-color;
 
-  > wb-notification-list {
-    @include position(absolute, 0, 0, 0, 0);
-  }
+  > div.stacking-context-barrier {
+    display: flex;
 
-  > wb-activity-part {
-    @include preventPointerEvents;
-    flex: none;
-  }
+    // Form a stacking context barrier (z-index=0) to clear nested stacking contexts so that
+    // subsequent DOM elements are rendered above elements contained in the barrier element,
+    // regardless of whether they form a stacking context. In other words, that elements
+    // overlay elements according to their DOM element ordering.
+    // Following elements form a stacking context:
+    // - splitter of `<sci-sashbox>`
+    // - `wb-parts-layout` during drag & drop
+    z-index: 0;
 
-  > wb-activity-part + wb-parts-layout {
-    position: relative; // forms a stacking context to show 'box-shadow'
-    box-shadow: -1px 0 2px 0 rgba(0, 0, 0, .4);
-  }
+    > wb-activity-part {
+      flex: none;
+    }
 
-  > wb-parts-layout {
-    @include preventPointerEvents;
-    flex: auto;
+    > wb-activity-part + wb-parts-layout {
+      position: relative; // forms a stacking context to show 'box-shadow'
+      box-shadow: -1px 0 2px 0 rgba(0, 0, 0, .4);
+    }
+
+    > wb-parts-layout {
+      flex: auto;
+    }
   }
 
   > wb-message-box-stack {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    @include mixin.inset(0, 0, 0, 0);
   }
-}
 
-:host-context(.maximized) {
-  wb-activity-part {
+  > wb-notification-list {
+    position: absolute;
+    @include mixin.inset(0, 0, 0, 0);
+  }
+
+  // For iframe-based microfrontend integration, `<wb-parts-layout>` forms a new stacking context during a workbench drag & drop operation such
+  // as dragging a view tab, moving a part splitter, or moving a message box. The stacking context, however, is local to the workbench component.
+  //
+  // Rationale:
+  // Since we cannot add iframes directly to the view component (an iframe would reload its content if it is reparented in the DOM), we
+  // add iframes after the `<wb-parts-layout>` element and project each iframe to its view boundaries. Alternatively, if we were to add
+  // iframes before the workbench layout, we would have to disable pointer events on the layout in order to interact with iframe content.
+  //
+  // As a consequence, the iframes now cover the view drop zones, stopping us from arranging views via drag & drop. For that reason, during drag & drop,
+  // we form a new stacking context on the `<wb-parts-layout>` element by setting its `z-index` to `1`. In turn, during drag & drop, the layout
+  // will overlap the iframes, making drop zones functional and preventing iframes from consuming pointer events. However, the new stacking context
+  // needs to be local to the workbench component, as `<wb-parts-layout>` would otherwise overlap subsequent DOM elements, causing, for example,
+  // drag images or message boxes to be rendered under the layout. Therefore, we add it to an element that acts as a stacking context barrier, i.e.,
+  // an element with a z-index of `0`. A `z-index` of `0` is similar to the value `auto`, which means that the element is rendered in the same layer as
+  // elements without an explicit z-index, while, in contrast to the value `auto`, still forming a stacking context.
+  //
+  // For more information about stacking contexts, refer to
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context.
+  &.dragging > div.stacking-context-barrier > wb-parts-layout {
+    z-index: 1;
+  }
+
+  &.maximized > div.stacking-context-barrier > wb-activity-part {
     display: none;
   }
 }

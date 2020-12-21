@@ -12,7 +12,7 @@ import { WorkbenchRouter } from '../routing/workbench-router.service';
 /**
  * Subscribes to view move requests for moving views in the {@link PartsLayout} when the user arranges views via drag and drop or view context menu.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class ViewMoveHandler implements OnDestroy {
 
   private _destroy$ = new Subject<void>();

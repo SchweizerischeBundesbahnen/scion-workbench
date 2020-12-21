@@ -60,7 +60,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
   public getElseThrow(viewId: string): ɵWorkbenchView {
     const view = this._viewRegistry.get(viewId);
     if (!view) {
-      throw Error(`[NullViewError] View '${viewId}' not found in the registry.`);
+      throw Error(`[NullViewError] No view for '${viewId}' found.`);
     }
     return view;
   }

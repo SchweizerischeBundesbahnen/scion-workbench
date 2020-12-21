@@ -50,10 +50,10 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - name: 'Building @scion/workbench'
-        run: npm run workbench:build
       - name: 'Building @scion/workbench-client'
         run: npm run workbench-client:build
+      - name: 'Building @scion/workbench'
+        run: npm run workbench:build
       - name: 'Building TypeDoc for @scion/workbench-client'
         run: npm run workbench-client:typedoc
       - uses: actions/upload-artifact@v2
@@ -117,19 +117,19 @@ jobs:
     strategy:
       matrix:
         suite:
-          - name: workbench
+          - name: startup
             project: workbench
           - name: router
             project: workbench
           - name: routerlink
             project: workbench
-          - name: activity
-            project: workbench
-          - name: defaultView
+          - name: defaultPage
             project: workbench
           - name: viewpartAction
             project: workbench
           - name: viewTabbar
+            project: workbench
+          - name: view
             project: workbench
           - name: router
             project: workbench-client
@@ -197,10 +197,43 @@ jobs:
           release-commit-message-pattern: 'release\(workbench-client\): v(.*)'
           expected-version: ${{ needs.build-libs.outputs.workbench-client-version }}
           git-tag: workbench-client-%v
+  release-testing-app:
+    name: 'Releasing testing app'
+    if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' || needs.workbench-client-release-guard.outputs.should-release == 'true' }}
+    needs: [workbench-release-guard, workbench-client-release-guard]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Downloading app: workbench-testing-app-vercel (dist)'
+        uses: actions/download-artifact@v2
+        with:
+          name: workbench-testing-app-vercel
+          path: dist/workbench-testing-app-vercel
+      - name: 'Downloading app: workbench-client-testing-app-vercel (dist)'
+        uses: actions/download-artifact@v2
+        with:
+          name: workbench-client-testing-app-vercel
+          path: dist/workbench-client-testing-app-vercel
+      - name: 'Deploying workbench-testing-app to Vercel'
+        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
+        with:
+          dist-folder: dist/workbench-testing-app-vercel
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          org-id: ${{ secrets.VERCEL_ORG_ID }}
+          project-id: ${{ secrets.VERCEL_WORKBENCH_TESTING_APP_PROJECT_ID }}
+          aliases: scion-workbench-testing-app.now.sh
+      - name: 'Deploying workbench-client-testing-app to Vercel'
+        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
+        with:
+          dist-folder: dist/workbench-client-testing-app-vercel
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          org-id: ${{ secrets.VERCEL_ORG_ID }}
+          project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_TESTING_APP_PROJECT_ID }}
+          aliases: scion-workbench-client-testing-app.now.sh
   release-workbench:
     name: 'Releasing @scion/workbench'
     if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' }}
-    needs: [workbench-release-guard, build-libs]
+    needs: [workbench-release-guard, build-libs, release-testing-app]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -209,22 +242,6 @@ jobs:
         with:
           name: dist
           path: dist
-      - name: 'Downloading app: workbench-testing-app-vercel (dist)'
-        uses: actions/download-artifact@v2
-        with:
-          name: workbench-testing-app-vercel
-          path: dist/workbench-testing-app-vercel
-      - name: 'Deploying workbench-testing-app to Vercel'
-        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
-        with:
-          dist-folder: dist/workbench-testing-app-vercel
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          org-id: ${{ secrets.VERCEL_ORG_ID }}
-          project-id: ${{ secrets.VERCEL_WORKBENCH_TESTING_APP_PROJECT_ID }}
-          version: ${{ needs.build-libs.outputs.workbench-version }}
-          aliases: |
-            scion-workbench-testing-app.now.sh,
-            scion-workbench-testing-app-v%v.now.sh,
       - name: 'Publishing @scion/workbench to NPM'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/npm-publish@master
         with:
@@ -234,7 +251,7 @@ jobs:
   release-workbench-client:
     name: 'Releasing @scion/workbench-client'
     if: ${{ needs.workbench-client-release-guard.outputs.should-release == 'true' }}
-    needs: [workbench-client-release-guard, build-libs]
+    needs: [workbench-client-release-guard, build-libs, release-testing-app]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -243,11 +260,6 @@ jobs:
         with:
           name: dist
           path: dist
-      - name: 'Downloading app: workbench-client-testing-app-vercel (dist)'
-        uses: actions/download-artifact@v2
-        with:
-          name: workbench-client-testing-app-vercel
-          path: dist/workbench-client-testing-app-vercel
       - name: 'Deploying API Documentation (TypeDoc) to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
@@ -259,22 +271,10 @@ jobs:
           aliases: |
             scion-workbench-client-api.now.sh,
             scion-workbench-client-api-v%v.now.sh
-      - name: 'Deploying workbench-client-testing-app to Vercel'
-        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
-        with:
-          dist-folder: dist/workbench-client-testing-app-vercel
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          org-id: ${{ secrets.VERCEL_ORG_ID }}
-          project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_TESTING_APP_PROJECT_ID }}
-          version: ${{ needs.build-libs.outputs.workbench-client-version }}
-          aliases: |
-            scion-workbench-client-testing-app1.now.sh,
-            scion-workbench-client-testing-app1-v%v.now.sh,
-            scion-workbench-client-testing-app2.now.sh,
-            scion-workbench-client-testing-app2-v%v.now.sh,
       - name: 'Publishing @scion/workbench-client to NPM'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/npm-publish@master
         with:
           dist-folder: dist/scion/workbench-client
           npm-token: ${{ secrets.NPM_TOKEN }}
           dry-run: false
+

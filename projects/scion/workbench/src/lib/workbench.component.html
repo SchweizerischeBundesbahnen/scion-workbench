@@ -1,6 +1,23 @@
-<ng-container #content_host></ng-container> <!-- placed upfront to not cover other elements, e.g. sashes or popus -->
-<wb-activity-part *ngIf="activitiesVisible$ | async"></wb-activity-part>
-<wb-parts-layout></wb-parts-layout>
-<ng-container #overlay_host></ng-container>
-<wb-message-box-stack></wb-message-box-stack>
-<wb-notification-list></wb-notification-list>
+<ng-container *ngIf="workbenchStarting; then splash_template; else workbench_template;"></ng-container>
+
+<!-- splash that is rendered during workbench startup -->
+<ng-template #splash_template>
+  <ng-container *ngComponentOutlet="splash; injector: injector"></ng-container>
+</ng-template>
+
+<!-- workbench that is rendered after workbench startup completed -->
+<ng-template #workbench_template>
+  <div class="stacking-context-barrier">
+    <wb-activity-part *ngIf="activitiesVisible$ | async"></wb-activity-part>
+    <wb-parts-layout></wb-parts-layout>
+    <!-- iframes -->
+    <ng-container #iframe_host></ng-container>
+  </div>
+
+  <!-- notifications -->
+  <wb-notification-list></wb-notification-list>
+
+  <!-- message boxes -->
+  <ng-container #view_local_message_box_host></ng-container>
+  <wb-message-box-stack></wb-message-box-stack>
+</ng-template>

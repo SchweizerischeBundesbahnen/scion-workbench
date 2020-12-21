@@ -70,7 +70,7 @@ export class WorkbenchRouter {
       }
     }
 
-    switch (extras.target || 'blank') {
+    switch (extras.target || (extras.selfViewId ? 'self' : 'blank')) {
       case 'blank': {
         const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
         const viewTarget: { [outlet: string]: ViewTarget } = {

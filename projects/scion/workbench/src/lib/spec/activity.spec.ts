@@ -146,7 +146,7 @@ class Activity2Component {
 
 @NgModule({
   imports: [
-    WorkbenchTestingModule.forRoot(),
+    WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
       {path: 'activity-debug', component: ActivityDebugComponent},

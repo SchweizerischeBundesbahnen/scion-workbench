@@ -43,7 +43,7 @@ const VIEW_DRAG_DATA_STORAGE_KEY = 'workbench/view-drag-data';
 /**
  * Manages the drag & drop behavior when the user drags a view.
  */
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class ViewDragService {
 
   /**

@@ -57,9 +57,11 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
   }
 
   public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
-    this.actions$.next([...this.actions$.value, action]);
+    this.actions$.next(this.actions$.value.concat(action));
     return {
-      dispose: (): void => this.actions$.next(Arrays.remove(this.actions$.value, action, {firstOnly: false})),
+      dispose: (): void => {
+        this.actions$.next(this.actions$.value.filter(it => it !== action));
+      },
     };
   }
 

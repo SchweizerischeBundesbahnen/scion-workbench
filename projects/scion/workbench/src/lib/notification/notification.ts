@@ -14,7 +14,7 @@ import { Severity } from '../workbench.constants';
 /**
  * Represents a notification to be displayed to the user.
  */
-export class Notification {
+export abstract class Notification {
   /**
    * Specifies the optional title.
    */
@@ -25,8 +25,7 @@ export class Notification {
    */
   public content: string | Type<any>;
   /**
-   * Specifies the optional input to be given to the component as specified in `content`.
-   * @see content
+   * Data available in the notification box component if providing a custom notification component via the {@link #content} property.
    */
   public input?: any;
   /**
@@ -53,7 +52,7 @@ export class Notification {
   public groupInputReduceFn?: (prevInput: any, currInput: any) => any = (prevInput, currInput) => currInput;
 }
 
-export class WbNotification extends Notification {
+export class ɵNotification extends Notification { // tslint:disable-line:class-name
 
   /**
    * Allows to register a callback that will be called when a property like 'severity' or 'title' is changed.

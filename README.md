@@ -15,12 +15,12 @@
 
 Workbench layouts are useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel. Examples include specialized business applications, scientific or development tools, as well as command & control interfaces.
 
-The SCION Workbench supports tabbed views that enable users to arrange content to fit their individual needs. Fixed areas can be declared to display additional information or context-sensitive assistance. In addition, typical workbench controls such as overlays, message boxes, and notification ribbons are available.
+The SCION Workbench supports tabbed views that enable users to arrange content to fit their individual needs. Fixed areas can be defined to display additional information or context-sensitive assistance. In addition, typical workbench controls such as overlays, message boxes, and notification ribbons are available.
 
 
 [<img src="/docs/site/images/workbench-layout.svg">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout.svg)
 
-While the SCION Workbench can be used in regular Angular applications, it is particularly useful in host applications for the [SCION Microfrontend Platform][link-scion-microfrontend-platform].
+Although SCION Workbench is designed for use in Angular applications, its workbench layout is particularly well suited for implementing a framework-agnostic microfrontend architecture, as different web applications can contribute views in the form of microfrontends. SCION Workbench has built-in microfrontend support from the [SCION Microfrontend Platform][link-scion-microfrontend-platform], a lightweight library for embedding microfrontends. Microfrontends embedded as views can interact seamlessly with the workbench using the [SCION Workbench Client][link-scion-workbench-client] or communicate with other microfrontends via the SCION Microfrontend Platform. Any web application can be integrated as a workbench view. Likewise, a workbench view can embed further microfrontends, and so on.
 
 ***
 
@@ -49,7 +49,8 @@ While the SCION Workbench can be used in regular Angular applications, it is par
 ***
 
 ### Versions
-- `v11.0.0-beta.1` and newer are only compatible with Angular version 11.x. (no microfrontend support yet)
+- `v11.0.0-beta.2` Limited microfrontend support; more coming soon
+- `v11.0.0-beta.1` and newer are only compatible with Angular version 11.x.
 - `v0.0.0-beta.35` and newer are only compatible with Angular version 10.x.
 - `v0.0.0-beta.33` and newer are only compatible with Angular version 9.x.
 - `v0.0.0-beta.23` to `v0.0.0-beta.32` is only compatible with Angular version 8.x.
@@ -64,6 +65,7 @@ While the SCION Workbench can be used in regular Angular applications, it is par
 [link-github-actions-workflow:status]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/workflows/Continuous%20Integration%20and%20Delivery/badge.svg?branch=master&event=push
 
 [link-scion-microfrontend-platform]: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md
+[link-scion-workbench-client]: https://www.npmjs.com/package/@scion/workbench-client
 [link-about]: /docs/site/about.md
 [link-getting-started]: /docs/site/getting-started.md
 [link-howto]: /docs/site/howto/how-to.md

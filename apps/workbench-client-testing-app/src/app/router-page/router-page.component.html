@@ -1,0 +1,49 @@
+<form autocomplete="off" [formGroup]="form">
+  <header>View Intent</header>
+
+  <sci-form-field label="Qualifier">
+    <sci-params-enter [paramsFormArray]="$any(form.get(QUALIFIER))" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+  </sci-form-field>
+
+  <sci-form-field label="Params">
+    <sci-params-enter [paramsFormArray]="$any(form.get(PARAMS))" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+  </sci-form-field>
+</form>
+
+<form autocomplete="off" [formGroup]="form">
+  <header>Navigation Extras</header>
+
+  <sci-form-field label="Target">
+    <select [formControlName]="TARGET" class="e2e-target">
+      <option value="self">self</option>
+      <option value="blank">blank</option>
+      <option value="">&lt;default&gt;</option>
+    </select>
+  </sci-form-field>
+
+  <sci-form-field label="SelfViewId">
+    <input [formControlName]="SELF_VIEW_ID" class="e2e-self-view-id">
+  </sci-form-field>
+
+  <sci-form-field label="InsertionIndex">
+    <input [formControlName]="INSERTION_INDEX" list="insertionIndexHints" class="e2e-insertion-index">
+    <datalist id="insertionIndexHints">
+      <option value="start">
+      <option value="end">
+    </datalist>
+  </sci-form-field>
+
+  <sci-form-field label="ActivateIfPresent">
+    <sci-checkbox [formControlName]="ACTIVATE_IF_PRESENT" class="e2e-activate-if-present"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="CloseIfPresent">
+    <sci-checkbox [formControlName]="CLOSE_IF_PRESENT" class="e2e-close-if-present"></sci-checkbox>
+  </sci-form-field>
+</form>
+
+<button (click)="onNavigate()" class="e2e-navigate">Navigate</button>
+
+<output class="navigate-error" *ngIf="navigateError">
+  {{navigateError}}
+</output>

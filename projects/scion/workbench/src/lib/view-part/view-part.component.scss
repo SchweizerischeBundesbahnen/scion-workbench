@@ -1,5 +1,4 @@
-@import '../workbench.constants';
-@import '../content-projection/mixins';
+@use '../workbench.constants' as constants;
 
 :host {
   position: absolute; // absolutely positioned anchor so that '<wb-view-part-bar>' does not overflow horizontally
@@ -11,24 +10,18 @@
 
   > wb-view-part-bar {
     flex: none;
-    height: $viewtab-height;
-    @include allowPointerEvents;
+    height: constants.$viewtab-height;
   }
 
   > wb-portal-outlet {
     flex: auto;
   }
 
-  > sci-viewport {
+  > sci-viewport.views-absent-outlet {
     flex: auto;
-    @include allowPointerEvents;
 
-    main {
-      display: grid;
-
-      > router-outlet {
-        position: absolute; // take router outlet out of the document flow
-      }
+    router-outlet {
+      position: absolute; // take router outlet out of the document flow
     }
   }
 }

@@ -174,7 +174,7 @@ class App_Activity2_Component {
 
 @NgModule({
   imports: [
-    WorkbenchTestingModule.forRoot(),
+    WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
       {path: 'app/activity-1', component: App_Activity1_Component},

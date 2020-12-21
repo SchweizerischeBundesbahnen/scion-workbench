@@ -9,20 +9,27 @@
  */
 
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { provideWorkbenchClientInitializer } from './workbench-client/workbench-microfrontend-support';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 
 @NgModule({
   declarations: [
     AppComponent,
   ],
   imports: [
+    CommonModule,
     BrowserModule,
     AppRoutingModule,
+    SciViewportModule,
   ],
-  providers: [],
+  providers: [
+    provideWorkbenchClientInitializer(),
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent],
 })
 export class AppModule {

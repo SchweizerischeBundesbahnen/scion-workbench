@@ -18,7 +18,7 @@ import { VIEW_DRAG_TRANSFER_TYPE, ViewDragService } from '../../view-dnd/view-dr
 import { createElement } from '../../dom.util';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { VIEW_TAB_CONTEXT } from '../../workbench.constants';
-import { WorkbenchConfig } from '../../workbench.config';
+import { WorkbenchModuleConfig } from '../../workbench-module-config';
 import { ViewTabContentComponent } from '../view-tab-content/view-tab-content.component';
 import { ViewMenuService } from '../view-context-menu/view-menu.service';
 import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
@@ -59,7 +59,7 @@ export class ViewTabComponent implements OnDestroy {
               // The param is weak typed as a string (instead as a string literal) due to Angular restrictions when building prod.
               @Attribute('context') context: string,
               private _workbench: ɵWorkbenchService,
-              private _config: WorkbenchConfig,
+              private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _viewRegistry: WorkbenchViewRegistry,
               private _workbenchLayout: WorkbenchLayoutService,
               private _viewport: SciViewportComponent,
@@ -77,12 +77,11 @@ export class ViewTabComponent implements OnDestroy {
   }
 
   @HostBinding('class.active')
-  @HostBinding('class.e2e-active')
   public get active(): boolean {
     return this.view.active;
   }
 
-  @HostBinding('class.e2e-dirty')
+  @HostBinding('class.dirty')
   public get dirty(): boolean {
     return this.view.dirty;
   }
@@ -238,7 +237,7 @@ export class ViewTabComponent implements OnDestroy {
         {provide: VIEW_TAB_CONTEXT, useValue: this._context},
       ],
     });
-    return new ComponentPortal(this._config.viewTabComponent || ViewTabContentComponent, null, injector);
+    return new ComponentPortal(this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent, null, injector);
   }
 
   public ngOnDestroy(): void {

@@ -29,8 +29,7 @@ export abstract class MessageBox {
   public content: string | Type<any>;
 
   /**
-   * Specifies the optional input to be given to the component as specified in `content`.
-   * @see content
+   * Data available in the message box component if providing a custom message box component via the {@link #content} property.
    */
   public input?: any;
 
@@ -47,7 +46,7 @@ export abstract class MessageBox {
   /**
    * Specifies the modality context created by the message box.
    *
-   * By default, and if in view context, view modality is used.
+   * By default, and if in the context of a view, view modality is used.
    */
   public modality?: 'application' | 'view' = 'view';
 
@@ -61,7 +60,7 @@ export abstract class MessageBox {
   public cssClass?: string | string[];
 }
 
-export class WbMessageBox extends MessageBox {
+export class ɵMessageBox extends MessageBox { // tslint:disable-line:class-name
 
   public readonly close$ = new Subject<Action>();
 

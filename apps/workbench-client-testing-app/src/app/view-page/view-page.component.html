@@ -1,0 +1,72 @@
+<section>
+  <sci-form-field label="View ID">
+    <span class="e2e-view-id">{{view.viewId}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Instance UUID" title="UUID of this component instance">
+    <span class="e2e-component-instance-uuid">{{uuid}}</span>
+  </sci-form-field>
+</section>
+
+<section>
+  <header>View Capability</header>
+
+  <sci-property [properties]="view.capability$ | async" class="e2e-view-capability"></sci-property>
+</section>
+
+<section>
+  <header>View Params</header>
+
+  <sci-property [properties]="view.params$ | async" class="e2e-view-params"></sci-property>
+</section>
+
+<section>
+  <header>Route Params</header>
+
+  <sci-property [properties]="route.params | async" class="e2e-route-params"></sci-property>
+</section>
+
+<section>
+  <header>Route Query Params</header>
+
+  <sci-property [properties]="route.queryParams | async" class="e2e-route-query-params"></sci-property>
+</section>
+
+<section>
+  <header>Route Fragment</header>
+
+  <span class="e2e-route-fragment">{{route.fragment | async}}</span>
+</section>
+
+<form autocomplete="off" [formGroup]="form">
+  <header>View Properties</header>
+
+  <sci-form-field label="Title">
+    <input [formControlName]="TITLE" class="e2e-title">
+  </sci-form-field>
+
+  <sci-form-field label="Heading">
+    <input [formControlName]="HEADING" class="e2e-heading">
+  </sci-form-field>
+
+  <sci-form-field label="Dirty">
+    <sci-checkbox [formControlName]="DIRTY" class="e2e-dirty"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Closable">
+    <sci-checkbox [formControlName]="CLOSABLE" class="e2e-closable"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Confirm Closing">
+    <sci-checkbox [formControlName]="CONFIRM_CLOSING" class="e2e-confirm-closing"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Active log">
+    <textarea [value]="activeLog$ | async" readonly class="e2e-view-active-log"></textarea>
+  </sci-form-field>
+</form>
+
+<section class="actions">
+  <header>View Actions</header>
+  <button (click)="view.close()">Close</button>
+</section>

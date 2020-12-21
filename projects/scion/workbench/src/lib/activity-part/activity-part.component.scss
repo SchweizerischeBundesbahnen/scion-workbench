@@ -1,5 +1,4 @@
-@import '../workbench.constants';
-@import '../content-projection/mixins';
+@use '../workbench.constants' as constants;
 
 $diamond-height: 8;
 
@@ -8,11 +7,10 @@ $diamond-height: 8;
 
   > ul.activity-bar {
     flex: none;
-    background-color: $activitypart_toolbar-bgcolor;
+    background-color: constants.$activitypart_toolbar-bgcolor;
     margin: 0;
-    padding: $topbar-height 0 0;
-    width: #{$activitypart_toolbar-width}px;
-    @include allowPointerEvents;
+    padding: constants.$topbar-height 0 0;
+    width: #{constants.$activitypart_toolbar-width}px;
 
     > li {
       position: relative; // positioned anchor for diamond
@@ -25,11 +23,11 @@ $diamond-height: 8;
 
       > a {
         text-decoration: none;
-        color: $activitypart_toolitem-fgcolor;
+        color: constants.$activitypart_toolitem-fgcolor;
         outline: none;
 
         &:hover, &:active, &.active {
-          color: $activitypart_toolitem-active-fgcolor;
+          color: constants.$activitypart_toolitem-active-fgcolor;
         }
       }
 
@@ -39,7 +37,7 @@ $diamond-height: 8;
         top: calc(50% - #{$diamond-height}px);
         border: #{$diamond-height}px solid transparent;
         border-left-width: 0;
-        border-right-color: $background-color;
+        border-right-color: constants.$background-color;
       }
     }
   }
@@ -49,7 +47,7 @@ $diamond-height: 8;
     flex-direction: column;
     display: flex;
     position: relative; // positioned anchor for sash
-    max-width: calc(100vw - #{$activitypart_toolbar-width}px);
+    max-width: calc(100vw - #{constants.$activitypart_toolbar-width}px);
     overflow: hidden;
 
     > header {
@@ -57,12 +55,11 @@ $diamond-height: 8;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: $activitypart_toolitem-active-fgcolor;
-      background-color: $activitypart_panel-title-fgcolor;
-      height: $topbar-height;
-      line-height: $topbar-height;
+      color: constants.$activitypart_toolitem-active-fgcolor;
+      background-color: constants.$activitypart_panel-title-fgcolor;
+      height: constants.$topbar-height;
+      line-height: constants.$topbar-height;
       padding: 0 1em;
-      @include allowPointerEvents;
 
       > h1 {
         font: {
@@ -93,7 +90,6 @@ $diamond-height: 8;
     }
 
     > div.sash {
-      @include allowPointerEvents;
       position: absolute;
       right: 0;
       top: 0;
@@ -103,7 +99,4 @@ $diamond-height: 8;
   }
 }
 
-:host-context([content-projection="false"]) sci-viewport {
-  @include allowPointerEvents;
-}
 

@@ -8,14 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, ElementRef, HostBinding, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { animate, AnimationBuilder, AnimationPlayer, style, transition, trigger } from '@angular/animations';
 import { WorkbenchActivityPartService } from './workbench-activity-part.service';
 import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { noop, Observable, Subject } from 'rxjs';
 import { ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME } from '../workbench.constants';
 import { Activity } from './activity';
-import { ContentProjectionContext } from '../content-projection/content-projection-context.service';
 
 /**
  * Specifies the minimal panel width. If smaller, it is expanded to this value
@@ -46,7 +45,6 @@ const PANEL_INITIAL_WIDTH = 500;
   ],
   viewProviders: [
     {provide: ROUTER_OUTLET_NAME, useValue: ACTIVITY_OUTLET_NAME},
-    ContentProjectionContext,
   ],
 })
 export class ActivityPartComponent {
@@ -60,17 +58,11 @@ export class ActivityPartComponent {
   @ViewChild('panel', {read: ElementRef})
   private _panelElementRef: ElementRef;
 
-  @HostBinding('attr.content-projection')
-  public get contentProjectionActive(): boolean {
-    return this._contentProjectionContext.isActive();
-  }
-
   constructor(public host: ElementRef<HTMLElement>,
               public activityPartService: WorkbenchActivityPartService,
               private _workbenchLayout: WorkbenchLayoutService,
               private _animationBuilder: AnimationBuilder,
-              private _cd: ChangeDetectorRef,
-              private _contentProjectionContext: ContentProjectionContext) {
+              private _cd: ChangeDetectorRef) {
   }
 
   public get activities(): Activity[] {
@@ -92,7 +84,7 @@ export class ActivityPartComponent {
   }
 
   public get panelWidth$(): Observable<number> {
-    return this._panelWidth$.asObservable();
+    return this._panelWidth$;
   }
 
   public onActivate(activity: Activity): false {
@@ -101,7 +93,7 @@ export class ActivityPartComponent {
   }
 
   public onSashStart(): void {
-    this._workbenchLayout.viewSashDrag$.next('start');
+    this._workbenchLayout.notifyDragStarting();
   }
 
   public onSash(deltaX: number): void {
@@ -109,7 +101,7 @@ export class ActivityPartComponent {
   }
 
   public onSashEnd(): void {
-    this._workbenchLayout.viewSashDrag$.next('end');
+    this._workbenchLayout.notifyDragEnding();
     this.ensureMinimalPanelWidth();
   }
 

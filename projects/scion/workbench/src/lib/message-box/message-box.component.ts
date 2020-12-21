@@ -9,7 +9,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, HostListener, Injector, Input, OnDestroy, Output, QueryList, ViewChildren } from '@angular/core';
-import { Action, Actions, MessageBox, WbMessageBox } from './message-box';
+import { Action, Actions, MessageBox, ɵMessageBox } from './message-box';
 import { MoveDelta } from '../move.directive';
 import { asyncScheduler, Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -24,7 +24,7 @@ import { Arrays } from '@scion/toolkit/util';
 })
 export class MessageBoxComponent implements AfterViewInit, OnDestroy {
 
-  private _messageBox: WbMessageBox;
+  private _messageBox: ɵMessageBox;
   private _actions: Actions;
   private _buttons: HTMLButtonElement[];
   private _accDeltaX = 0;
@@ -66,7 +66,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
-  public set messageBox(messageBox: WbMessageBox) {
+  public set messageBox(messageBox: ɵMessageBox) {
     this._messageBox = messageBox;
     this._messageBox.onPropertyChange = (): void => this._cd.markForCheck();
     this._actions = messageBox.actions;
@@ -125,7 +125,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   }
 
   public onMoveStart(): void {
-    this._workbenchLayout.messageBoxMove$.next('start');
+    this._workbenchLayout.notifyDragStarting();
   }
 
   public onMove(delta: MoveDelta): void {
@@ -135,7 +135,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   }
 
   public onMoveEnd(): void {
-    this._workbenchLayout.messageBoxMove$.next('end');
+    this._workbenchLayout.notifyDragEnding();
   }
 
   public onTab(index: number, direction: 'prev' | 'next'): boolean {

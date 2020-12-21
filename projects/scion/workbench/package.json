@@ -24,15 +24,22 @@
     "@angular/animations": "^11.0.0-rc.0 || ^11.0.0",
     "@angular/forms": "^11.0.0-rc.0 || ^11.0.0",
     "@angular/router": "^11.0.0-rc.0 || ^11.0.0",
-    "@scion/toolkit": "^11.0.0-beta.1 || ^11.0.0-rc.0 || ^11.0.0",
-   "rxjs": "^6.0.0"
+    "@scion/toolkit": "^11.0.0-beta.4 || ^11.0.0-rc.0 || ^11.0.0",
+    "@scion/microfrontend-platform": ">= 1.0.0-beta.8",
+    "@scion/workbench-client": ">= 1.0.0-beta.1",
+    "rxjs": "^6.0.0"
   },
   "keywords": [
     "scion",
     "workbench",
     "workbench layout",
-    "view grid",
-    "non-linear workflow"
+    "view layout",
+    "microfrontend architecture",
+    "microfrontend",
+    "micro frontend",
+    "angular",
+    "app shell",
+    "business application"
   ],
   "repository": {
     "type": "git",
