@@ -9,18 +9,18 @@
  */
 
 import { merge, MonoTypeOperatorFunction, Observable, Subject, Subscription } from 'rxjs';
-import { ViewCapability } from './view-capability';
+import { WorkbenchViewCapability } from './workbench-view-capability';
 import { Beans, PreDestroy } from '@scion/toolkit/bean-manager';
 import { ManifestService, mapToBody, MessageClient, MessageHeaders } from '@scion/microfrontend-platform';
 import { distinctUntilChanged, filter, map, mapTo, mergeMap, shareReplay, skip, switchMap, takeUntil } from 'rxjs/operators';
 import { Observables } from '@scion/toolkit/util';
-import { ɵMicrofrontendRouteParams } from '../routing/workbench-router.constants';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
+import { ɵMicrofrontendRouteParams } from '../routing/workbench-router';
 
 /**
  * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.
  *
- * If a microfrontend lives in the context of a workbench view, regardless of its embedding level, you can inject an instance
+ * If a microfrontend lives in the context of a workbench view, regardless of its embedding level, it can inject an instance
  * of this class to interact with the workbench view, such as setting view tab properties or closing the view. It further
  * provides you access to the microfrontend capability and passed parameters.
  *
@@ -28,6 +28,8 @@ import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
  * in your app, no new instance will be constructed when navigating to a different microfrontend of the same application, or when
  * re-routing to the same view capability, e.g., for updating the browser URL to persist navigation. Consequently, do not forget
  * to unsubscribe from Observables of this class before displaying another microfrontend.
+ *
+ * @category View
  */
 export abstract class WorkbenchView {
 
@@ -44,24 +46,24 @@ export abstract class WorkbenchView {
    * or navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before
    * displaying another microfrontend.
    */
-  public readonly capability$: Observable<ViewCapability>;
+  public readonly capability$: Observable<WorkbenchViewCapability>;
 
   /**
    * Observable containing the parameters including the qualifier as passed for navigation in {@link WorkbenchNavigationExtras.params}.
    *
-   * Upon subscription, it emits the current params, and then emits continuously when they change. It does not complete when navigating
-   * to another microfrontend of the same app. It only completes before unloading the web app, e.g., when closing the view or navigating
-   * to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying another
-   * microfrontend.
+   * Upon subscription, it emits the current params, and then emits continuously when they change. The Observable does not complete when
+   * navigating to another microfrontend of the same app. It only completes before unloading the web app, e.g., when closing the view or
+   * navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
+   * another microfrontend.
    */
   public readonly params$: Observable<Map<string, string>>;
 
   /**
    * Indicates whether this is the active view in its view part.
    *
-   * Upon subscription, it emits the current active state of this view, and then emits continuously when it changes. It does not complete
-   * when navigating to another microfrontend of the same app. It only completes before unloading the web app, e.g., when closing the view
-   * or navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
+   * Upon subscription, it emits the current active state of this view, and then emits continuously when it changes. The Observable does not
+   * complete when navigating to another microfrontend of the same app. It only completes before unloading the web app, e.g., when closing
+   * the view or navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
    * another microfrontend.
    */
   public readonly active$: Observable<boolean>;
@@ -138,7 +140,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
   private _closingSubscription: Subscription;
 
   public active$: Observable<boolean>;
-  public capability$: Observable<ViewCapability>;
+  public capability$: Observable<WorkbenchViewCapability>;
   public params$: Observable<Map<string, string>>;
 
   constructor(public viewId: string) {
@@ -157,7 +159,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
       .pipe(
         map(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID)),
         distinctUntilChanged(),
-        switchMap(capabilityId => Beans.get(ManifestService).lookupCapabilities$<ViewCapability>({id: capabilityId})),
+        switchMap(capabilityId => Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({id: capabilityId})),
         map(capabilities => capabilities[0]),
         shareReplay({refCount: true, bufferSize: 1}),
         takeUntil(this._beforeUnload$),
@@ -311,6 +313,8 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
 
 /**
  * Listener to be notified just before closing the workbench view.
+ *
+ * @category View
  */
 export interface ViewClosingListener {
 
@@ -336,6 +340,8 @@ export interface ViewClosingListener {
 
 /**
  * Indicates that the workbench view is about to be closed. This event is cancelable.
+ *
+ * @category View
  */
 export class ViewClosingEvent {
 

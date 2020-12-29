@@ -11,7 +11,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { WorkbenchStartup, WorkbenchView } from '@scion/workbench';
 import { merge, Observable, Subject } from 'rxjs';
-import { filter, map, scan, startWith, takeUntil } from 'rxjs/operators';
+import { filter, map, startWith, takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { UUID } from '@scion/toolkit/uuid';
 import { FormControl } from '@angular/forms';
@@ -27,7 +27,6 @@ export class ViewPageComponent implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   public uuid = UUID.randomUUID();
-  public activeLog$: Observable<string>;
   public viewpartActions$: Observable<ViewpartAction[]>;
   public viewpartActionsFormControl = new FormControl('');
 
@@ -48,11 +47,7 @@ export class ViewPageComponent implements OnDestroy {
         startWith(this.parseViewpartActions()),
       );
 
-    this.activeLog$ = this.view.active$
-      .pipe(
-        scan((acc: boolean[], active: boolean) => acc.concat(active), [] as boolean[]),
-        map(activeLog => activeLog.join('\n')),
-      );
+    this.installViewActiveStateLogger();
   }
 
   /**
@@ -107,6 +102,19 @@ export class ViewPageComponent implements OnDestroy {
     catch {
       return [];
     }
+  }
+
+  private installViewActiveStateLogger(): void {
+    this.view.active$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(active => {
+        if (active) {
+          console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+        }
+        else {
+          console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+        }
+      });
   }
 
   public ngOnDestroy(): void {

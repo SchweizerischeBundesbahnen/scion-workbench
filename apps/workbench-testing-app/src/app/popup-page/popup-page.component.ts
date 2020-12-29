@@ -91,7 +91,7 @@ export class PopupPageComponent {
       component: PopupComponent,
       anchor: this._openButton,
       position: this.form.get(POSITION).value || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split('\s+') || undefined,
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
       closeStrategy: {
         onFocusLost: this.form.get([CLOSE_STRATEGY, ON_FOCUS_LOST]).value,
         onEscape: this.form.get([CLOSE_STRATEGY, ON_ESCAPE]).value,

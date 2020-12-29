@@ -9,7 +9,7 @@
  */
 
 import { APP_INITIALIZER, Provider } from '@angular/core';
-import { ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, OutletRouter, PlatformPropertyService, PreferredSizeService } from '@scion/microfrontend-platform';
+import { ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformPropertyService, PreferredSizeService } from '@scion/microfrontend-platform';
 import { WorkbenchClient, WorkbenchRouter, WorkbenchView } from '@scion/workbench-client';
 import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './ng-zone-decorators';
 import { Beans } from '@scion/toolkit/bean-manager';
@@ -19,6 +19,10 @@ import { environment } from '../../environments/environment';
  * Registers a set of DI providers to set up microfrontend support and connect to the workbench.
  */
 export function provideWorkbenchClientInitializer(): Provider[] {
+  if (window === window.parent) {
+    return [];
+  }
+
   return [
     {
       provide: APP_INITIALIZER,
@@ -28,6 +32,7 @@ export function provideWorkbenchClientInitializer(): Provider[] {
     },
     NgZoneMessageClientDecorator,
     NgZoneIntentClientDecorator,
+    {provide: MicroApplicationConfig, useFactory: () => Beans.get(MicroApplicationConfig)},
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
     {provide: OutletRouter, useFactory: () => Beans.get(OutletRouter)},
@@ -46,12 +51,19 @@ export function provideWorkbenchClientInitializer(): Provider[] {
  */
 export function connectToWorkbenchFn(ngZoneMessageClientDecorator: NgZoneMessageClientDecorator, ngZoneIntentClientDecorator: NgZoneIntentClientDecorator): () => Promise<void> {
   return (): Promise<void> => {
-    if (window === window.parent) {
-      return Promise.resolve(); // not running in the context of the workbench host app
-    }
-
     Beans.registerDecorator(MessageClient, {useValue: ngZoneMessageClientDecorator});
     Beans.registerDecorator(IntentClient, {useValue: ngZoneIntentClientDecorator});
-    return WorkbenchClient.connect({symbolicName: environment.symbolicName});
+    return WorkbenchClient.connect({symbolicName: determineAppSymbolicName()});
   };
+}
+
+/**
+ * Identifies the currently running app based on the configured apps in the environment and the current URL.
+ */
+function determineAppSymbolicName(): string {
+  const application = Object.values(environment.apps).find(app => new URL(app.url).host === window.location.host);
+  if (!application) {
+    throw Error(`[AppError] Application served on wrong URL. Supported URLs are: ${Object.values(environment.apps).map(app => app.url)}`);
+  }
+  return application.symbolicName;
 }

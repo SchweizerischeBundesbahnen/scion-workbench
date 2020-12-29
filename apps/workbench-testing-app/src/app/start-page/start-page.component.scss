@@ -26,17 +26,20 @@
     flex: auto;
 
     section.tiles {
-      display: flex;
-      flex-flow: row wrap;
-      align-content: flex-start;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, 200px);
+      grid-template-rows: max-content;
+      grid-auto-rows: 200px;
+      gap: 1em;
+
+      > sci-filter-field {
+        grid-column: 1/-1;
+      }
 
       > a {
-        width: 200px;
-        height: 200px;
         background-color: var(--sci-color-accent-lighter);
         border: 1px solid var(--sci-color-accent-darker);
         border-radius: 2px;
-        margin: 1em;
         padding: 1em;
         display: flex;
         flex-direction: column;
@@ -52,6 +55,21 @@
         > span.description {
           margin-top: 1.5em;
           font-size: .5em;
+        }
+
+        &.microfrontend {
+          background-color: #484848;
+          border-color: unset;
+        }
+
+        &.microfrontend.workbench-client-testing-app1 {
+          background-color: var(--workbench-client-testing-app1-color);
+          border-color: unset;
+        }
+
+        &.microfrontend.workbench-client-testing-app2 {
+          background-color: var(--workbench-client-testing-app2-color);
+          border-color: unset;
         }
       }
     }

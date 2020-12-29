@@ -15,6 +15,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { provideWorkbenchClientInitializer } from './workbench-client/workbench-microfrontend-support';
 import { SciViewportModule } from '@scion/toolkit/viewport';
+import { provideAppInstanceId } from './app-instance-id';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -23,11 +25,13 @@ import { SciViewportModule } from '@scion/toolkit/viewport';
   imports: [
     CommonModule,
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     SciViewportModule,
   ],
   providers: [
     provideWorkbenchClientInitializer(),
+    provideAppInstanceId(),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent],

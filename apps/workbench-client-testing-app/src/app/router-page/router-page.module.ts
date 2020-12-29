@@ -13,9 +13,9 @@ import { CommonModule } from '@angular/common';
 import { SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule } from '@scion/toolkit.internal/widgets';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterPageComponent } from './router-page.component';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
-const routes = [
+const routes: Routes = [
   {path: '', component: RouterPageComponent},
 ];
 

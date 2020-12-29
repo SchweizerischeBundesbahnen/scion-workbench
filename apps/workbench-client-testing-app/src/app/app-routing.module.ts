@@ -24,6 +24,18 @@ const routes: Routes = [
     path: 'test-view',
     loadChildren: (): any => import('./view-page/view-page.module').then(m => m.ViewPageModule),
   },
+  {
+    path: 'register-workbench-capability',
+    loadChildren: (): any => import('./register-workbench-capability-page/register-workbench-capability-page.module').then(m => m.RegisterWorkbenchCapabilityPageModule),
+  },
+  {
+    path: 'unregister-workbench-capability',
+    loadChildren: (): any => import('./unregister-workbench-capability-page/unregister-workbench-capability-page.module').then(m => m.UnregisterWorkbenchCapabilityPageModule),
+  },
+  {
+    path: 'register-workbench-intention',
+    loadChildren: (): any => import('./register-workbench-intention-page/register-workbench-intention-page.module').then(m => m.RegisterWorkbenchIntentionPageModule),
+  },
 ];
 
 @NgModule({

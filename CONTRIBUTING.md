@@ -240,7 +240,6 @@ function someMethod(): void {
 
 </details>
 
-<!---
 <details>
   <summary><strong>Deployments</strong></summary>
   <br>
@@ -248,9 +247,11 @@ function someMethod(): void {
 We deploy our documentations and applications to [Vercel](https://vercel.com/docs). Vercel is a cloud platform for static sites and serverless functions. Applications are deployed using the SCION collaborator account (scion.collaborator@gmail.com) under the [SCION organization](https://vercel.com/scion).
 
 We have the following workbench related projects:
+- https://vercel.com/scion/scion-workbench-client-api
+- https://vercel.com/scion/scion-workbench-testing-app
+- https://vercel.com/scion/scion-workbench-client-testing-app
 
 </details>
--->
 
 <details>
   <summary><strong>NPM Packages</strong></summary>
@@ -296,7 +297,10 @@ This chapter describes the tasks to publish a new release for `@scion/workbench`
 1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
 1. Verify that: 
    - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
-   - **Testing App** is deployed to https://scion-workbench-testing-app.now.sh.
+   - **Testing Apps** are deployed to:
+      - https://scion-workbench-testing-app.now.sh
+      - https://scion-workbench-client-testing-app1.now.sh (contributes microfrontends)
+      - https://scion-workbench-client-testing-app2.now.sh (contributes microfrontends)
 
 </details>
 
@@ -313,10 +317,13 @@ This chapter describes the tasks to publish a new release for `@scion/workbench-
 1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
 1. Verify that: 
    - **@scion/workbench-client** is published to: https://www.npmjs.com/package/@scion/workbench-client.
-   - **Testing App** is deployed to https://scion-workbench-client-testing-app.now.sh.
+   - **Testing Apps** are deployed to:
+      - https://scion-workbench-testing-app.now.sh
+      - https://scion-workbench-client-testing-app1.now.sh (contributes microfrontends)
+      - https://scion-workbench-client-testing-app2.now.sh (contributes microfrontends)
    - **API Documentation (TypeDoc)** is deployed to: 
-      - https://scion-workbench-client-api.now.sh.
-      - https://scion-workbench-client-api-vX-X-X.now.sh.
+      - https://scion-workbench-client-api.now.sh
+      - https://scion-workbench-client-api-vX-X-X.now.sh
 </details>
 
 [link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions

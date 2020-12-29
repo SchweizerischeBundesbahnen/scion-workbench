@@ -13,10 +13,10 @@ import { CommonModule } from '@angular/common';
 import { SciFormFieldModule } from '@scion/toolkit.internal/widgets';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NotificationPageComponent } from './notification-page.component';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { WorkbenchModule } from '@scion/workbench';
 
-const routes = [
+const routes: Routes = [
   {path: '', component: NotificationPageComponent},
 ];
 

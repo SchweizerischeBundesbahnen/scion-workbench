@@ -33,12 +33,12 @@ const routes: Routes = [
   {
     path: 'test-messagebox',
     loadChildren: (): any => import('./messagebox-page/messagebox-page.module').then(m => m.MessageboxPageModule),
-    data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', cssClass: 'e2e-messagebox-view', pinToStartPage: true},
+    data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-messagebox', pinToStartPage: true},
   },
   {
     path: 'test-notification',
     loadChildren: (): any => import('./notification-page/notification-page.module').then(m => m.NotificationPageModule),
-    data: {title: 'Workbench Notification', heading: 'Workbench E2E Testpage', cssClass: 'e2e-notification-view', pinToStartPage: true},
+    data: {title: 'Workbench Notification', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-notification', pinToStartPage: true},
   },
   {
     path: 'test-popup',

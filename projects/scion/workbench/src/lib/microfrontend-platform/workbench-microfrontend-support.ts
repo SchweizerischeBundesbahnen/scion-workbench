@@ -1,15 +1,15 @@
 import { MicrofrontendPlatformConfigLoader } from './microfrontend-platform-config-loader';
 import { Injectable, Provider } from '@angular/core';
 import { MICROFRONTEND_PLATFORM_PRE_ACTIVATION, MicrofrontendPlatformInitializerService } from './initialization/microfrontend-platform-initializer.service';
-import { IntentClient, ManifestService, MessageClient, OutletRouter, PlatformConfig, PlatformPropertyService } from '@scion/microfrontend-platform';
+import { IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformConfig, PlatformPropertyService } from '@scion/microfrontend-platform';
 import { WorkbenchInitializer } from '../startup/workbench-initializer';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchRouter } from '@scion/workbench-client';
-import { MicrofrontendNavigationHandler } from './routing/microfrontend-navigation-handler.service';
+import { MicrofrontendWorkbenchRouter } from './routing/microfrontend-workbench-router.service';
 import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './initialization/ng-zone-decorators';
 import { WorkbenchModuleConfig } from '../workbench-module-config';
 import { LogDelegate } from './initialization/log-delegate.service';
-import { MicrofrontendCommandHandler } from './microfrontend-view/microfrontend-command-handler.service';
+import { MicrofrontendViewCommandHandler } from './microfrontend-view/microfrontend-view-command-handler.service';
 
 /**
  * Registers a set of DI providers to set up microfrontend support in the workbench.
@@ -28,12 +28,12 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       },
       {
         provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
-        useExisting: MicrofrontendCommandHandler,
+        useExisting: MicrofrontendViewCommandHandler,
         multi: true,
       },
       {
         provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
-        useExisting: MicrofrontendNavigationHandler,
+        useExisting: MicrofrontendWorkbenchRouter,
         multi: true,
       },
       {
@@ -42,8 +42,8 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       },
       LogDelegate,
       WorkbenchRouter,
-      MicrofrontendNavigationHandler,
-      MicrofrontendCommandHandler,
+      MicrofrontendWorkbenchRouter,
+      MicrofrontendViewCommandHandler,
       NgZoneMessageClientDecorator,
       NgZoneIntentClientDecorator,
       provideMicrofrontendPlatformBeans(),
@@ -70,6 +70,7 @@ class MicrofrontendPlatformModuleConfigLoader implements MicrofrontendPlatformCo
  */
 function provideMicrofrontendPlatformBeans(): Provider[] {
   return [
+    {provide: MicroApplicationConfig, useFactory: () => Beans.get(MicroApplicationConfig)},
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
     {provide: OutletRouter, useFactory: () => Beans.get(OutletRouter)},

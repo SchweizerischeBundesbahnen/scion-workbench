@@ -2,7 +2,10 @@
   <header>Routing Command</header>
 
   <sci-form-field label="Path">
-    <input [formControlName]="PATH" class="e2e-path">
+    <input [formControlName]="PATH" class="e2e-path" list="routes">
+    <datalist id="routes">
+      <option *ngFor="let route of routes" [value]="route.path">{{route.path}}</option>
+    </datalist>
   </sci-form-field>
 
   <sci-form-field label="Matrix parameters">

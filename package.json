@@ -12,6 +12,7 @@
   "scripts": {
     "before-push": "run-s build lint test:headless e2e:headless",
     "build": "run-s **:*:build",
+    "start": "run-s testing-apps:serve",
     "lint": "run-p **:*:lint",
     "test": "run-p **:*:test",
     "test:headless": "cross-env HEADLESS=true run-s **:*:test",
@@ -19,35 +20,23 @@
     "e2e:headless": "cross-env HEADLESS=true run-s **:*:e2e",
     "postinstall": "ngcc",
 
-    "start": "run-s workbench-testing-app:serve",
-    "start-fixture": "run-s workbench-testing-app-fixture:serve",
-
     "workbench-client:build": "ng build --prod @scion/workbench-client",
     "workbench-client:lint": "ng lint @scion/workbench-client",
-    "workbench-client.e2e:lint": "ng lint @scion/workbench-client.e2e",
     "workbench-client:test": "ng test @scion/workbench-client",
-    "workbench-client:e2e": "run-p -r workbench-testing-app-fixture:serve  \"workbench-testing-app-fixture:await-then-protractor -- {@}\" --",
-    "workbench-client:e2e-ci": "cross-env HEADLESS=true run-p -r workbench-testing-app-fixture:http-server \"workbench-testing-app-fixture:await-then-protractor -- {@}\" --",
-    "workbench-client:protractor": "npx webdriver-manager update --versions.chrome=86.0.4240.22 && ng e2e @scion/workbench-client.e2e",
     "workbench-client:typedoc": "typedoc --plugin typedoc-plugin-extras --tsconfig projects/scion/workbench-client/tsconfig.lib.prod.typedoc.json --favicon resources/branding/favicon.ico",
     "workbench-client:changelog": "conventional-changelog --commit-path projects/scion/workbench-client -k projects/scion/workbench-client -t workbench-client- -p angular -i CHANGELOG_WORKBENCH_CLIENT.md -s && markdown-include docs/site/changelog-workbench-client/changelog.template.json",
 
     "workbench:build": "ng build --prod @scion/workbench && scss-bundle -p . -e projects/scion/workbench/src/theme/_theming.scss -o dist/scion/workbench/theming.scss",
     "workbench:lint": "ng lint @scion/workbench",
-    "workbench.e2e:lint": "ng lint @scion/workbench.e2e",
     "workbench:test": "ng test @scion/workbench",
-    "workbench:e2e": "run-p -r workbench-testing-app:serve  \"workbench-testing-app:await-then-protractor -- {@}\" --",
-    "workbench:e2e-ci": "cross-env HEADLESS=true run-p -r workbench-testing-app:http-server \"workbench-testing-app:await-then-protractor -- {@}\" --",
-    "workbench:protractor": "npx webdriver-manager update --versions.chrome=86.0.4240.22 && ng e2e @scion/workbench.e2e",
     "workbench:changelog": "conventional-changelog --commit-path projects/scion/workbench -k projects/scion/workbench -p angular -i CHANGELOG_WORKBENCH.md -s && markdown-include docs/site/changelog-workbench/changelog.template.json",
 
-    "workbench-testing-app:ci:build": "ng build workbench-testing-app --configuration=production-ci",
     "workbench-testing-app:vercel:build": "ng build workbench-testing-app --configuration=production-vercel",
+    "workbench-testing-app:ci:build": "ng build workbench-testing-app --configuration=production-ci",
     "workbench-testing-app:lint": "ng lint workbench-testing-app",
     "workbench-testing-app:serve": "ng serve workbench-testing-app --port 4200",
     "workbench-testing-app:http-server": "cd dist/workbench-testing-app-ci && http-server --silent --port 4200",
     "workbench-testing-app:await": "wait-on http-get://localhost:4200",
-    "workbench-testing-app:await-then-protractor": "run-s workbench-testing-app:await \"workbench:protractor -- {@}\" --",
 
     "workbench-client-testing-app:vercel:build": "ng build workbench-client-testing-app --configuration=production-vercel",
     "workbench-client-testing-app:ci:build": "ng build workbench-client-testing-app --configuration=production-ci",
@@ -55,10 +44,18 @@
     "workbench-client-testing-app:4201:serve": "ng serve workbench-client-testing-app --port 4201",
     "workbench-client-testing-app:4201:http-server": "cd dist/workbench-client-testing-app-ci && http-server --cors --silent --port 4201",
     "workbench-client-testing-app:4201:await": "wait-on http-get://localhost:4201",
+    "workbench-client-testing-app:4202:serve": "ng serve workbench-client-testing-app --port 4202",
+    "workbench-client-testing-app:4202:http-server": "cd dist/workbench-client-testing-app-ci && http-server --cors --silent --port 4202",
+    "workbench-client-testing-app:4202:await": "wait-on http-get://localhost:4202",
 
-    "workbench-testing-app-fixture:serve": "run-p -r workbench-testing-app:serve workbench-client-testing-app:*:serve",
-    "workbench-testing-app-fixture:http-server": "run-p -r workbench-testing-app:http-server workbench-client-testing-app:*:http-server",
-    "workbench-testing-app-fixture:await-then-protractor": "run-s workbench-testing-app:await workbench-client-testing-app:*:await \"workbench-client:protractor -- {@}\" --"
+    "testing-apps:serve": "run-p -r workbench-testing-app:serve workbench-client-testing-app:*:serve",
+    "testing-apps:http-server": "run-p -r workbench-testing-app:http-server workbench-client-testing-app:*:http-server",
+    "testing-apps:await-then-protractor": "run-s workbench-testing-app:await workbench-client-testing-app:*:await \"e2e-testing:protractor -- {@}\" --",
+
+    "e2e-testing:e2e": "run-p -r testing-apps:serve  \"testing-apps:await-then-protractor -- {@}\" --",
+    "e2e-testing:e2e-ci": "cross-env HEADLESS=true run-p -r testing-apps:http-server \"testing-apps:await-then-protractor -- {@}\" --",
+    "e2e-testing:protractor": "npx webdriver-manager update --versions.chrome=86.0.4240.22 && ng e2e e2e-testing",
+    "e2e-testing:lint": "ng lint e2e-testing"
   },
   "private": true,
   "dependencies": {
@@ -71,9 +68,9 @@
     "@angular/platform-browser": "11.0.0",
     "@angular/platform-browser-dynamic": "11.0.0",
     "@angular/router": "11.0.0",
-    "@scion/microfrontend-platform": "1.0.0-beta.8",
-    "@scion/toolkit": "11.0.0-beta.4",
-    "@scion/toolkit.internal": "11.0.0-beta.4",
+    "@scion/microfrontend-platform": "1.0.0-beta.9",
+    "@scion/toolkit": "11.0.0-beta.6",
+    "@scion/toolkit.internal": "11.0.0-beta.6",
     "rxjs": "6.6.0",
     "tslib": "2.0.0",
     "zone.js": "0.10.3"

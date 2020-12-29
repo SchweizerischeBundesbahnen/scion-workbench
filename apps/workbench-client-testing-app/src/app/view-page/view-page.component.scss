@@ -12,10 +12,30 @@
     padding: 1em;
 
     > header {
-      font-size: 1em;
       margin-top: 0;
       margin-bottom: 2em;
       font-weight: bold;
+    }
+  }
+
+  > sci-accordion {
+    header {
+      font-weight: bold;
+    }
+
+    &.view-capability {
+      sci-viewport {
+        max-height: 200px;
+
+        div.capability {
+          white-space: pre;
+          font-family: monospace;
+        }
+      }
+    }
+
+    &.update-view-params button.update-view-params {
+      margin-top: .5em;
     }
   }
 }

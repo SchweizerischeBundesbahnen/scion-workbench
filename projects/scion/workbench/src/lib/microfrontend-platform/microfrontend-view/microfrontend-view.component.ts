@@ -11,9 +11,9 @@
 import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
-import { catchError, map, pairwise, startWith, switchMap, take, takeUntil } from 'rxjs/operators';
+import { catchError, first, map, pairwise, startWith, switchMap, take, takeUntil } from 'rxjs/operators';
 import { Application, ManifestService, mapToBody, MessageClient, OutletRouter, SciRouterOutletElement, takeUntilUnsubscribe } from '@scion/microfrontend-platform';
-import { ViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchCommands } from '@scion/workbench-client';
+import { WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchCommands } from '@scion/workbench-client';
 import { Maps } from '@scion/toolkit/util';
 import { Logger, LoggerNames } from '../../logging';
 import { WorkbenchView } from '../../view/workbench-view.model';
@@ -55,7 +55,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     this._route.params
       .pipe(
         switchMap(params => this.observeViewCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID])),
-        startWith(undefined as ViewCapability), // initialize 'pairwise' operator
+        startWith(undefined as WorkbenchViewCapability), // initialize 'pairwise' operator
         pairwise(),
         switchMap(([prev, curr]) => this.onNavigate(this._route.snapshot.params, prev, curr)),
         catchError((error, caught) => {
@@ -67,16 +67,16 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
       .subscribe();
   }
 
-  private async onNavigate(params: Params, prevViewCapability: ViewCapability | undefined, viewCapability: ViewCapability | undefined): Promise<void> {
+  private async onNavigate(params: Params, prevViewCapability: WorkbenchViewCapability | undefined, viewCapability: WorkbenchViewCapability | undefined): Promise<void> {
     if (!viewCapability) {
-      this._logger.warn(() => `[NullViewCapabilityError] No application found to provide a view capability of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the capability is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND);
+      this._logger.warn(() => `[NullViewError] No application found to provide a view of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND);
       await this._view.close();
       return;
     }
 
     const microfrontendPath = viewCapability.properties?.path;
     if (microfrontendPath === undefined || microfrontendPath === null) { // empty path is a valid path
-      this._logger.error(() => `[ViewCapabilityError] View capability expected to declare the path to the microfrontend in its properties.`, LoggerNames.MICROFRONTEND, viewCapability);
+      this._logger.error(() => `[ViewProviderError] Requested view has no path to the microfrontend defined.`, LoggerNames.MICROFRONTEND, viewCapability);
       await this._view.close();
       return;
     }
@@ -88,9 +88,9 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
       return;
     }
 
-    // Update the properties of this view, but only if it is the initial microfrontend displayed in this view, or when navigating to another microfrontend.
+    // Set this view's properties, but only when displaying its initial microfrontend, or when navigating to another microfrontend.
     if (!prevViewCapability || prevViewCapability.metadata.id !== viewCapability.metadata.id) {
-      this.updateViewProperties(viewCapability);
+      this.setViewProperties(viewCapability);
     }
 
     // Signal that the currently loaded microfrontend, if any, is about to be replaced by a microfrontend of another application.
@@ -100,6 +100,15 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
 
     // Provide route parameters including matrix parameters and qualifiers to the microfrontend.
     await this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.viewId), Maps.coerce(params), {retain: true});
+
+    // When navigating to another view capability of the same app, wait until transported the params to consumers before loading the
+    // new microfrontend into the iframe, allowing the currently loaded microfrontend to cleanup subscriptions. Params include the
+    // capability id.
+    if (prevViewCapability
+      && prevViewCapability.metadata.appSymbolicName === viewCapability.metadata.appSymbolicName
+      && prevViewCapability.metadata.id !== viewCapability.metadata.id) {
+      await this.waitForCapabilityParam(viewCapability.metadata.id);
+    }
 
     // Navigate to the microfrontend.
     this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.viewId}, app=${viewCapability.metadata.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND, params, viewCapability);
@@ -114,7 +123,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
   /**
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
-  private updateViewProperties(viewCapability: ViewCapability): void {
+  private setViewProperties(viewCapability: WorkbenchViewCapability): void {
     this._view.title = viewCapability.properties?.title;
     this._view.heading = viewCapability.properties?.heading;
     this._view.cssClass = viewCapability.properties?.cssClass;
@@ -127,8 +136,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * Observes the capability of the given id. If the capability is not found, the returned Observable emits `undefined`.
    * It never completes.
    */
-  private observeViewCapability$(capabilityId: string): Observable<ViewCapability | undefined> {
-    return this._manifestService.lookupCapabilities$<ViewCapability>({id: capabilityId})
+  private observeViewCapability$(capabilityId: string): Observable<WorkbenchViewCapability | undefined> {
+    return this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({id: capabilityId})
       .pipe(map(capabilities => capabilities[0]));
   }
 
@@ -140,10 +149,22 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
   }
 
   /**
-   * Identity of this view.
+   * Unique identity of this view.
    */
   public get viewId(): string {
     return this._view.viewId;
+  }
+
+  /**
+   * Promise that resolves once params contain the given capability id.
+   */
+  private async waitForCapabilityParam(viewCapabilityId: string): Promise<void> {
+    await this._messageClient.observe$<Map<string, string>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
+      .pipe(
+        mapToBody(),
+        first(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) === viewCapabilityId),
+      )
+      .toPromise();
   }
 
   /**

@@ -44,6 +44,7 @@
 
 <button (click)="onNavigate()" class="e2e-navigate">Navigate</button>
 
-<output class="navigate-error" *ngIf="navigateError">
+<output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
   {{navigateError}}
 </output>
+<output class="navigated e2e-navigated" *ngIf="navigated"></output>

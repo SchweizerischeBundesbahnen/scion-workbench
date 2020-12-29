@@ -61,7 +61,7 @@ export class NotificationPageComponent {
       severity: this.form.get(SEVERITY).value || undefined,
       duration: this.form.get(DURATION).value || undefined,
       group: this.form.get(GROUP).value || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split('\s+') || undefined,
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
     });
   }
 }

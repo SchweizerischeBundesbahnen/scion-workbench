@@ -1,0 +1,17 @@
+{
+  "name": "Workbench Client Testing App 2",
+  "baseUrl": "#",
+  "IMPORTANT NOTE:": "CAPABILITIES ARE REGISTERED IN THE ACTIVATOR TO NOT NEED TO DUPLICATE THEM FOR BOTH TESTING APPS.",
+  "capabilities": [
+    {
+      "type": "activator",
+      "private": false,
+      "properties": {
+        "path": "activator",
+        "readinessTopics": "activator-ready"
+      }
+    }
+  ],
+  "intentions": [
+  ]
+}

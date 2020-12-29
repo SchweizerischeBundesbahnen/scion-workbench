@@ -1,7 +1,8 @@
 <ng-container *ngIf="workbenchStartup.isStarted()">
   <sci-viewport wbContentProjection
                 [wbContentProjectionContent]="message_box_stack_template"
-                [wbContentProjectionOverlayHost]="viewLocalMessageBoxHost">
+                [wbContentProjectionOverlayHost]="viewLocalMessageBoxHost"
+                cdkTrapFocus>
     <wb-router-outlet #router_outlet="outlet"
                       (activate)="onActivateRoute(router_outlet.activatedRoute)"
                       (deactivate)="onDeactivateRoute()">

@@ -8,13 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { ViewClosingEvent, ViewClosingListener, WorkbenchView } from '@scion/workbench-client';
+import { Component, Inject, OnDestroy } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { ViewClosingEvent, ViewClosingListener, WorkbenchRouter, WorkbenchView } from '@scion/workbench-client';
 import { ActivatedRoute } from '@angular/router';
 import { UUID } from '@scion/toolkit/uuid';
-import { Observable, Subject } from 'rxjs';
-import { map, scan, startWith, takeUntil } from 'rxjs/operators';
+import { MonoTypeOperatorFunction, Subject } from 'rxjs';
+import { finalize, startWith, take, takeUntil } from 'rxjs/operators';
+import { APP_INSTANCE_ID } from '../app-instance-id';
+import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
 
 const TITLE = 'title';
 const HEADING = 'heading';
@@ -37,13 +39,16 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
 
   public form: FormGroup;
   public uuid = UUID.randomUUID();
-  public activeLog$: Observable<string>;
+
+  public viewParamsControl: FormArray;
 
   private _destroy$ = new Subject<void>();
 
   constructor(formBuilder: FormBuilder,
               public view: WorkbenchView,
-              public route: ActivatedRoute) {
+              public route: ActivatedRoute,
+              @Inject(APP_INSTANCE_ID) public appInstanceId: string,
+              private _router: WorkbenchRouter) {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [HEADING]: formBuilder.control(''),
@@ -51,19 +56,21 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
       [CLOSABLE]: formBuilder.control(true),
       [CONFIRM_CLOSING]: formBuilder.control(false),
     });
+    this.viewParamsControl = formBuilder.array([]);
 
-    this.activeLog$ = view.active$
-      .pipe(
-        scan((acc: boolean[], active: boolean) => acc.concat(active), [] as boolean[]),
-        map(activeLog => activeLog.join('\n')),
-      );
-
-    this.view.title = this.form.get(TITLE).valueChanges;
-    this.view.heading = this.form.get(HEADING).valueChanges;
-    this.view.dirty = this.form.get(DIRTY).valueChanges;
-    this.view.closable = this.form.get(CLOSABLE).valueChanges;
+    this.view.title = this.form.get(TITLE).valueChanges
+      .pipe(this.logCompletion('TitleObservableComplete'));
+    this.view.heading = this.form.get(HEADING).valueChanges
+      .pipe(this.logCompletion('HeadingObservableComplete'));
+    this.view.dirty = this.form.get(DIRTY).valueChanges
+      .pipe(this.logCompletion('DirtyObservableComplete'));
+    this.view.closable = this.form.get(CLOSABLE).valueChanges
+      .pipe(this.logCompletion('ClosableObservableComplete'));
 
     this.installClosingListener();
+    this.installViewActiveStateLogger();
+    this.installObservableCompletionLogger();
+    this.setInitialTitleFromParams();
   }
 
   public async onClosing(event: ViewClosingEvent): Promise<void> {
@@ -74,6 +81,12 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
     if (!confirm('Do you want to close this view?')) {
       event.preventDefault();
     }
+  }
+
+  public onUpdateViewParams(): void {
+    const params = SciParamsEnterComponent.toParamsDictionary(this.viewParamsControl);
+    this.viewParamsControl.clear();
+    this._router.navigate({}, {params}).then();
   }
 
   private installClosingListener(): void {
@@ -90,6 +103,56 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
           this.view.removeClosingListener(this);
         }
       });
+  }
+
+  /**
+   * Sets the view's initial title if contained in its params.
+   */
+  private setInitialTitleFromParams(): void {
+    this.view.params$
+      .pipe(
+        take(1),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(params => {
+        if (params.has('initialTitle')) {
+          this.view.title = params.get('initialTitle');
+          // Restore title observer
+          this.view.title = this.form.get(TITLE).valueChanges;
+        }
+      });
+  }
+
+  private installViewActiveStateLogger(): void {
+    this.view.active$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(active => {
+        if (active) {
+          console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+        }
+        else {
+          console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+        }
+      });
+  }
+
+  private installObservableCompletionLogger(): void {
+    // Do not install `takeUntil` operator as it would complete the Observable as well.
+    this.view.params$
+      .pipe(this.logCompletion('ParamsObservableComplete'))
+      .subscribe();
+    this.view.capability$
+      .pipe(this.logCompletion('CapabilityObservableComplete'))
+      .subscribe();
+    this.view.active$
+      .pipe(this.logCompletion('ActiveObservableComplete'))
+      .subscribe();
+  }
+
+  private logCompletion<T>(logPrefix: string): MonoTypeOperatorFunction<T> {
+    return finalize(() => {
+      console.debug(`[${logPrefix}] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+    });
   }
 
   public ngOnDestroy(): void {

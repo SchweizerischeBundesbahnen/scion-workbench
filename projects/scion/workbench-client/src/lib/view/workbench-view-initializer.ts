@@ -22,7 +22,7 @@ export class WorkbenchViewInitializer implements Initializer {
   public async init(): Promise<void> {
     const viewId = await Beans.get(ContextService).lookup<string>(ɵVIEW_ID_CONTEXT_KEY);
     if (viewId !== null) {
-      Beans.register(WorkbenchView, {useFactory: () => new ɵWorkbenchView(viewId)});
+      Beans.register(WorkbenchView, {useValue: new ɵWorkbenchView(viewId)});
     }
   }
 }
