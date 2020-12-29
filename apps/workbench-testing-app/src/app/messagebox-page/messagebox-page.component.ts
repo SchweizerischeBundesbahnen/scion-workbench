@@ -66,7 +66,7 @@ export class MessageboxPageComponent {
       severity: this.form.get(SEVERITY).value || undefined,
       modality: this.form.get(MODALITY).value || undefined,
       contentSelectable: this.form.get(CONTENT_SELECTABLE).value || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split('\s+') || undefined,
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
       actions: SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as FormArray) || undefined,
     });
   }

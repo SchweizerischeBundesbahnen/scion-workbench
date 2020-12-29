@@ -53,9 +53,9 @@
     //      "@scion/toolkit.internal/*": [
     //        "./node_modules/@scion/toolkit.internal/*"
     //      ],
-    //      "@scion/microfrontend-platform": [
-    //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public_api"
-    //      ],
+    //      //      "@scion/microfrontend-platform": [
+    //      //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public_api"
+    //      //      ],
     //      //      "@scion/toolkit/util": [
     //      //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
     //      //      ],
@@ -73,6 +73,9 @@
     //      //      ],
     //      //      "@scion/toolkit/sashbox": [
     //      //        "../scion-toolkit/projects/scion/toolkit/sashbox/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/uuid": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/uuid/src/public_api"
     //      //      ],
     //      //      "@scion/toolkit/throbber": [
     //      //        "../scion-toolkit/projects/scion/toolkit/throbber/src/public_api"

@@ -3,40 +3,61 @@
     <span class="e2e-view-id">{{view.viewId}}</span>
   </sci-form-field>
 
-  <sci-form-field label="Instance UUID" title="UUID of this component instance">
-    <span class="e2e-component-instance-uuid">{{uuid}}</span>
+  <sci-form-field label="App Instance" title="Unique identifier of this app instance">
+    <span class="e2e-app-instance-id">{{appInstanceId}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Component Instance" title="Unique identifier of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
   </sci-form-field>
 </section>
 
-<section>
-  <header>View Capability</header>
+<sci-accordion class="view-capability e2e-view-capability" variant="solid">
+  <ng-template sciAccordionItem [panel]="panel_capability">
+    <header>View Capability</header>
+  </ng-template>
+  <ng-template #panel_capability>
+    <sci-viewport>
+      <div class="e2e-view-capability capability">{{view.capability$ | async | json}}</div>
+    </sci-viewport>
+  </ng-template>
+</sci-accordion>
 
-  <sci-property [properties]="view.capability$ | async" class="e2e-view-capability"></sci-property>
-</section>
+<sci-accordion class="e2e-view-params" variant="solid" *ngIf="view.params$ | async | wbNullIfEmpty as params">
+  <ng-template sciAccordionItem [panel]="panel_view_params">
+    <header>View Params</header>
+  </ng-template>
+  <ng-template #panel_view_params>
+    <sci-property [properties]="params" class="e2e-view-params"></sci-property>
+  </ng-template>
+</sci-accordion>
 
-<section>
-  <header>View Params</header>
+<sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | wbNullIfEmpty as params">
+  <ng-template sciAccordionItem [panel]="panel_route_params">
+    <header>Route Params</header>
+  </ng-template>
+  <ng-template #panel_route_params>
+    <sci-property [properties]="params" class="e2e-route-params"></sci-property>
+  </ng-template>
+</sci-accordion>
 
-  <sci-property [properties]="view.params$ | async" class="e2e-view-params"></sci-property>
-</section>
+<sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | wbNullIfEmpty as params">
+  <ng-template sciAccordionItem [panel]="panel_query_params">
+    <header>Route Query Params</header>
+  </ng-template>
+  <ng-template #panel_query_params>
+    <sci-property [properties]="params" class="e2e-route-query-params"></sci-property>
+  </ng-template>
+</sci-accordion>
 
-<section>
-  <header>Route Params</header>
-
-  <sci-property [properties]="route.params | async" class="e2e-route-params"></sci-property>
-</section>
-
-<section>
-  <header>Route Query Params</header>
-
-  <sci-property [properties]="route.queryParams | async" class="e2e-route-query-params"></sci-property>
-</section>
-
-<section>
-  <header>Route Fragment</header>
-
-  <span class="e2e-route-fragment">{{route.fragment | async}}</span>
-</section>
+<sci-accordion class="e2e-route-fragment" variant="solid" *ngIf="route.fragment | async | wbNullIfEmpty as fragment">
+  <ng-template sciAccordionItem [panel]="panel_route_fragment">
+    <header>Route Fragment</header>
+  </ng-template>
+  <ng-template #panel_route_fragment>
+    <span class="e2e-route-fragment">{{fragment}}</span>
+  </ng-template>
+</sci-accordion>
 
 <form autocomplete="off" [formGroup]="form">
   <header>View Properties</header>
@@ -60,13 +81,23 @@
   <sci-form-field label="Confirm Closing">
     <sci-checkbox [formControlName]="CONFIRM_CLOSING" class="e2e-confirm-closing"></sci-checkbox>
   </sci-form-field>
-
-  <sci-form-field label="Active log">
-    <textarea [value]="activeLog$ | async" readonly class="e2e-view-active-log"></textarea>
-  </sci-form-field>
 </form>
 
-<section class="actions">
-  <header>View Actions</header>
-  <button (click)="view.close()">Close</button>
-</section>
+<sci-accordion class="e2e-view-actions" variant="solid">
+  <ng-template sciAccordionItem [panel]="panel_view_actions">
+    <header>View Actions</header>
+  </ng-template>
+  <ng-template #panel_view_actions>
+    <button (click)="view.close()" class="e2e-close">Close</button>
+  </ng-template>
+</sci-accordion>
+
+<sci-accordion class="update-view-params e2e-update-view-params" variant="solid">
+  <ng-template sciAccordionItem [panel]="panel_update_view_params">
+    <header>Update View Params</header>
+  </ng-template>
+  <ng-template #panel_update_view_params>
+    <sci-params-enter [paramsFormArray]="viewParamsControl" [addable]="true" [removable]="true" class="e2e-view-params"></sci-params-enter>
+    <button (click)="onUpdateViewParams()" class="update-view-params e2e-update-view-params">Update</button>
+  </ng-template>
+</sci-accordion>

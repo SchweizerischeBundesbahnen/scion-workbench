@@ -1,0 +1,64 @@
+<form autocomplete="off" [formGroup]="form">
+  <section>
+    <sci-form-field label="Type">
+      <select [formControlName]="TYPE" class="e2e-type">
+        <option [value]="WorkbenchCapabilities.View">VIEW</option>
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="Qualifier">
+      <sci-params-enter [paramsFormArray]="$any(form.get(QUALIFIER))" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+    </sci-form-field>
+
+    <sci-form-field label="Required Params">
+      <input [formControlName]="REQUIRED_PARAMS" class="e2e-required-params" placeholder="param1,param2,...">
+    </sci-form-field>
+    <sci-form-field label="Optional Params">
+      <input [formControlName]="OPTIONAL_PARAMS" class="e2e-optional-params" placeholder="param1,param2,...">
+    </sci-form-field>
+
+    <sci-form-field label="Private">
+      <sci-checkbox [formControlName]="PRIVATE" class="e2e-private"></sci-checkbox>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <header>Properties</header>
+
+    <ng-container *ngIf="form.get(TYPE).value === WorkbenchCapabilities.View" [formGroupName]="VIEW_PROPERTIES">
+      <sci-form-field label="Path">
+        <input [formControlName]="PATH" class="e2e-path">
+      </sci-form-field>
+
+      <sci-form-field label="Title">
+        <input [formControlName]="TITLE" class="e2e-title">
+      </sci-form-field>
+
+      <sci-form-field label="Heading">
+        <input [formControlName]="HEADING" class="e2e-heading">
+      </sci-form-field>
+
+      <sci-form-field label="Closable">
+        <sci-checkbox [formControlName]="CLOSABLE" class="e2e-closable"></sci-checkbox>
+      </sci-form-field>
+
+      <sci-form-field label="CSS Class(es)">
+        <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+      </sci-form-field>
+
+      <sci-form-field label="Pin to Startpage">
+        <sci-checkbox [formControlName]="PIN_TO_START_PAGE" class="e2e-pin-to-startpage"></sci-checkbox>
+      </sci-form-field>
+    </ng-container>
+  </section>
+
+  <button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid">Register</button>
+
+  <output class="capability-id e2e-register-response" *ngIf="capabilityId">
+    Capability ID: <span class="e2e-capability-id">{{capabilityId}}</span>
+  </output>
+
+  <output class="register-error e2e-register-error" *ngIf="registerError">
+    {{registerError}}
+  </output>
+</form>

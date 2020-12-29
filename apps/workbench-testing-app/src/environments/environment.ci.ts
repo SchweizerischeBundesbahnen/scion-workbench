@@ -15,8 +15,17 @@ import { WorkbenchMicrofrontendConfig } from '@scion/workbench';
  */
 const microfrontendConfig: WorkbenchMicrofrontendConfig = {
   platform: {
+    properties: {
+      'workbench-client-testing-app1': {
+        color: '#314d8c',
+      },
+      'workbench-client-testing-app2': {
+        color: '#2c78f7',
+      },
+    },
     apps: [
-      {symbolicName: 'workbench-client-testing-app', manifestUrl: 'http://localhost:4201/assets/manifest.json'},
+      {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
+      {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
     ],
   },
 };

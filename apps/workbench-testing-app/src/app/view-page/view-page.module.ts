@@ -10,13 +10,14 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SciCheckboxModule, SciFormFieldModule, SciPropertyModule } from '@scion/toolkit.internal/widgets';
+import { SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciPropertyModule } from '@scion/toolkit.internal/widgets';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { ViewPageComponent } from './view-page.component';
 import { WorkbenchModule } from '@scion/workbench';
+import { UtilModule } from '../../util/util.module';
 
-const routes = [
+const routes: Routes = [
   {path: '', component: ViewPageComponent},
 ];
 
@@ -29,7 +30,9 @@ const routes = [
     SciFormFieldModule,
     SciPropertyModule,
     SciCheckboxModule,
+    SciAccordionModule,
     WorkbenchModule.forChild(),
+    UtilModule,
   ],
   declarations: [
     ViewPageComponent,

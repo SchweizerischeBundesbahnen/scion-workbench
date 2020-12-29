@@ -1,5 +1,5 @@
 name: Continuous Integration and Delivery
-on: [push, pull_request]
+on: [ push, pull_request ]
 jobs:
   install:
     name: 'Installing NPM modules'
@@ -112,7 +112,7 @@ jobs:
       - run: npm run test:headless
   e2e:
     name: 'E2E Testing'
-    needs: [build-libs, build-apps]
+    needs: [ build-libs, build-apps ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -123,15 +123,19 @@ jobs:
             project: workbench
           - name: routerlink
             project: workbench
-          - name: defaultPage
+          - name: default-page
             project: workbench
-          - name: viewpartAction
+          - name: viewpart-action
             project: workbench
-          - name: viewTabbar
+          - name: view-tabbar
             project: workbench
           - name: view
             project: workbench
           - name: router
+            project: workbench-client
+          - name: router-params
+            project: workbench-client
+          - name: view
             project: workbench-client
     steps:
       - uses: actions/checkout@v2
@@ -155,7 +159,7 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - run: npm run ${{ matrix.suite.project }}:e2e-ci -- --suite ${{ matrix.suite.name }}
+      - run: npm run e2e-testing:e2e-ci -- --suite ${{ matrix.suite.project }}::${{ matrix.suite.name }}
   workbench-release-guard:
     name: 'Should release @scion/workbench?'
     if: github.ref == 'refs/heads/master'
@@ -200,7 +204,7 @@ jobs:
   release-testing-app:
     name: 'Releasing testing app'
     if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' || needs.workbench-client-release-guard.outputs.should-release == 'true' }}
-    needs: [workbench-release-guard, workbench-client-release-guard]
+    needs: [ workbench-release-guard, workbench-client-release-guard ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -229,11 +233,13 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_TESTING_APP_PROJECT_ID }}
-          aliases: scion-workbench-client-testing-app.now.sh
+          aliases: |
+            scion-workbench-client-testing-app1.now.sh,
+            scion-workbench-client-testing-app2.now.sh,
   release-workbench:
     name: 'Releasing @scion/workbench'
     if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' }}
-    needs: [workbench-release-guard, build-libs, release-testing-app]
+    needs: [ workbench-release-guard, build-libs, release-testing-app ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -251,7 +257,7 @@ jobs:
   release-workbench-client:
     name: 'Releasing @scion/workbench-client'
     if: ${{ needs.workbench-client-release-guard.outputs.should-release == 'true' }}
-    needs: [workbench-client-release-guard, build-libs, release-testing-app]
+    needs: [ workbench-client-release-guard, build-libs, release-testing-app ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

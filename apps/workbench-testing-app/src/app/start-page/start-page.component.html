@@ -8,7 +8,8 @@ We use this app to run our e2e tests and experiment with features.
 <sci-tabbar>
   <ng-template sciTab label="Workbench Views" cssClass="e2e-workbench-views">
     <section class="tiles e2e-workbench-view-tiles">
-      <a *ngFor="let route of workbenchViewRoutes"
+      <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
+      <a *ngFor="let route of workbenchViewRoutes$ | async"
          [wbRouterLink]="route.path"
          [ngClass]="route.data['cssClass']"
          [wbRouterLinkExtras]="{relativeTo: null, activateIfPresent: false}">
@@ -22,12 +23,14 @@ We use this app to run our e2e tests and experiment with features.
 
   <ng-template sciTab label="Microfrontend Views" cssClass="e2e-microfrontend-views" *ngIf="this.microfrontendViewCapabilities$">
     <section class="tiles e2e-microfrontend-view-tiles">
+      <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
       <a *ngFor="let viewCapability of microfrontendViewCapabilities$ | async"
          (click)="onMicrofrontendViewOpen(viewCapability)"
-         [ngClass]="viewCapability.properties.cssClass">
+         [ngClass]="concat(viewCapability.metadata.appSymbolicName, viewCapability.properties.cssClass)"
+         class="microfrontend">
         {{viewCapability.properties.title}}
-        <span class="description" *ngIf="viewCapability.properties.heading">
-          {{viewCapability.properties.heading}}
+        <span class="description">
+          {{viewCapability.metadata.appSymbolicName}}
         </span>
       </a>
     </section>

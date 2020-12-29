@@ -16,13 +16,14 @@ import { AppComponent } from './app.component';
 import { WorkbenchModule } from '@scion/workbench';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StartPageComponent } from './start-page/start-page.component';
-import { SciTabbarModule } from '@scion/toolkit.internal/widgets';
+import { SciFilterFieldModule, SciTabbarModule } from '@scion/toolkit.internal/widgets';
 import { SciViewportModule } from '@scion/toolkit/viewport';
 import { WorkbenchStartupQueryParams } from './workbench/workbench-startup-query-params';
 import { WorkbenchComponent } from './workbench/workbench.component';
 import { environment } from '../environments/environment';
 import { provideConfirmWorkbenchStartupInitializer } from './workbench/confirm-workbench-startup-initializer.service';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -41,8 +42,10 @@ import { CommonModule } from '@angular/common';
       microfrontends: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendConfig,
     }),
     BrowserAnimationsModule,
+    ReactiveFormsModule,
     SciViewportModule,
     SciTabbarModule,
+    SciFilterFieldModule,
   ],
   bootstrap: [
     AppComponent,

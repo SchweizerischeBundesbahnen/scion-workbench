@@ -16,9 +16,7 @@
 export namespace ɵWorkbenchCommands {
 
   /**
-   * Topic via which to initiate a workbench navigation.
-   *
-   * Include navigation instructions in {@link ɵWorkbenchRouterMessageHeaders} message headers.
+   * Topic to initiate a workbench microfrontend navigation.
    */
   export const navigate = 'ɵworkbench/navigate';
 
@@ -85,7 +83,7 @@ export namespace ɵWorkbenchCommands {
   }
 
   /**
-   * Computes the topic for providing params to a microfrontend.
+   * Computes the topic for providing params to a view microfrontend.
    *
    * Params include the {@link ɵMicrofrontendRouteParams#ɵVIEW_CAPABILITY_ID capability id}, matrix params as passed in {@link WorkbenchNavigationExtras.params}
    * and the view qualifier.

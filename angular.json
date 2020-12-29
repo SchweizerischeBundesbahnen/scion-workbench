@@ -43,28 +43,6 @@
         }
       }
     },
-    "@scion/workbench.e2e": {
-      "projectType": "application",
-      "root": "projects/scion/workbench.e2e",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/scion/workbench.e2e/protractor.conf.js",
-            "webdriverUpdate": false
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "projects/scion/workbench.e2e/tsconfig.json",
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
     "workbench-testing-app": {
       "projectType": "application",
       "root": "apps/workbench-testing-app",
@@ -202,28 +180,6 @@
         }
       }
     },
-    "@scion/workbench-client.e2e": {
-      "projectType": "application",
-      "root": "projects/scion/workbench-client.e2e",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/scion/workbench-client.e2e/protractor.conf.js",
-            "webdriverUpdate": false
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "projects/scion/workbench-client.e2e/tsconfig.json",
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
-    },
     "workbench-client-testing-app": {
       "projectType": "application",
       "root": "apps/workbench-client-testing-app",
@@ -318,6 +274,28 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
+        }
+      }
+    },
+    "e2e-testing": {
+      "projectType": "application",
+      "root": "projects/scion/e2e-testing",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/scion/e2e-testing/protractor.conf.js",
+            "webdriverUpdate": false
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "projects/scion/e2e-testing/tsconfig.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
         }
       }
     }

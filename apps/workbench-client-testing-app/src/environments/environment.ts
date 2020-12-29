@@ -22,6 +22,15 @@
  */
 export const environment = {
   production: false,
-  symbolicName: 'workbench-client-testing-app',
+  apps: {
+    app1: {
+      symbolicName: 'workbench-client-testing-app1',
+      url: 'http://localhost:4201',
+    },
+    app2: {
+      symbolicName: 'workbench-client-testing-app2',
+      url: 'http://localhost:4202',
+    },
+  },
 };
 

@@ -1,0 +1,21 @@
+<section [formGroup]="form">
+  <sci-form-field label="Type">
+    <select [formControlName]="TYPE" class="e2e-type">
+      <option [value]="WorkbenchCapabilities.View">VIEW</option>
+    </select>
+  </sci-form-field>
+
+  <sci-form-field label="Qualifier">
+    <sci-params-enter [paramsFormArray]="$any(form.get(QUALIFIER))" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+  </sci-form-field>
+</section>
+
+<button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid">Register</button>
+
+<output class="intention-id e2e-register-response" *ngIf="intentionId">
+  Intention ID: <span class="e2e-intention-id">{{intentionId}}</span>
+</output>
+
+<output class="register-error e2e-register-error" *ngIf="registerError">
+  {{registerError}}
+</output>

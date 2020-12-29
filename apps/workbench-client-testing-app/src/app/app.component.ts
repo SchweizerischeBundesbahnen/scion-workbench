@@ -8,7 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component } from '@angular/core';
+import { Component, HostBinding, Optional } from '@angular/core';
+import { MicroApplicationConfig, PlatformPropertyService } from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-root',
@@ -16,4 +17,22 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
+
+  public readonly workbenchContextActive: boolean;
+
+  @HostBinding('attr.data-app-symbolic-name')
+  public appSymbolicName: string;
+
+  @HostBinding('style.--app-color')
+  public appColor: string;
+
+  constructor(@Optional() config: MicroApplicationConfig, // not available if not running in the workbench context
+              @Optional() propertyService: PlatformPropertyService) { // not available if not running in the workbench context
+    this.workbenchContextActive = config !== null;
+
+    if (this.workbenchContextActive) {
+      this.appSymbolicName = config.symbolicName;
+      this.appColor = propertyService.get<any>(config.symbolicName).color;
+    }
+  }
 }

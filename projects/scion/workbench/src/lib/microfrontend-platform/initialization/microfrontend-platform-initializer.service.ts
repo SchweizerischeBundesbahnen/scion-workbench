@@ -53,8 +53,10 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
       apps: microfrontendPlatformConfig.apps.concat(this._hostAppConfigIfAbsent || []),
     };
 
-    // Enable the API to register intentions at runtime, allowing the workbench (host app) to register a wildcard `view` intention to read view capabilities during workbench microfrontend routing.
+    // Enable the API to register intentions at runtime, required for microfrontend routing to register the wildcard `view` intention.
     this.enableIntentionRegisterApi(effectiveMicrofrontendPlatformConfig, effectiveHostSymbolicName);
+    // Disable scope check to read private capabilities, required for microfrontend routing.
+    this.disableScopeCheck(effectiveMicrofrontendPlatformConfig, effectiveHostSymbolicName);
 
     // Synchronize emissions of messaging Observables with the Angular zone.
     Beans.registerDecorator(MessageClient, {useValue: this._ngZoneMessageClientDecorator});
@@ -74,7 +76,7 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
     // Start the microfrontend platform host.
     await MicrofrontendPlatform.startHost(effectiveMicrofrontendPlatformConfig, {symbolicName: effectiveHostSymbolicName});
 
-    // Register a wildcard `view` intention required for workbench microfrontend routing.
+    // Register a wildcard `view` intention to read all view capabilities, required for microfrontend routing.
     await this.registerWildcardViewIntention();
 
     this._logger.debug('SCION Microfrontend Platform started.', LoggerNames.LIFECYCLE, effectiveMicrofrontendPlatformConfig);
@@ -103,6 +105,10 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
 
   private enableIntentionRegisterApi(microfrontendPlatformConfig: PlatformConfig, appSymbolicName: string): void {
     microfrontendPlatformConfig.apps.find(app => app.symbolicName === appSymbolicName).intentionRegisterApiDisabled = false;
+  }
+
+  private disableScopeCheck(microfrontendPlatformConfig: PlatformConfig, appSymbolicName: string): void {
+    microfrontendPlatformConfig.apps.find(app => app.symbolicName === appSymbolicName).scopeCheckDisabled = true;
   }
 
   private async registerWildcardViewIntention(): Promise<void> {

@@ -39,6 +39,7 @@ export class RouterPageComponent {
 
   public form: FormGroup;
   public navigateError: string;
+  public navigated: boolean;
 
   constructor(formBuilder: FormBuilder,
               private _router: WorkbenchRouter) {
@@ -48,13 +49,14 @@ export class RouterPageComponent {
       [TARGET]: formBuilder.control(''),
       [SELF_VIEW_ID]: formBuilder.control(''),
       [INSERTION_INDEX]: formBuilder.control(''),
-      [ACTIVATE_IF_PRESENT]: formBuilder.control(true),
-      [CLOSE_IF_PRESENT]: formBuilder.control(false),
+      [ACTIVATE_IF_PRESENT]: formBuilder.control(undefined),
+      [CLOSE_IF_PRESENT]: formBuilder.control(undefined),
     });
   }
 
-  public onNavigate(): void {
-    this.navigateError = null;
+  public async onNavigate(): Promise<void> {
+    this.navigateError = undefined;
+    this.navigated = undefined;
 
     const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray);
     const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as FormArray);
@@ -66,7 +68,9 @@ export class RouterPageComponent {
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
       params: params || undefined,
     };
-    this._router.navigate(qualifier, extras).catch(error => this.navigateError = error);
+    await this._router.navigate(qualifier, extras)
+      .then(() => this.navigated = true)
+      .catch(error => this.navigateError = error);
   }
 }
 

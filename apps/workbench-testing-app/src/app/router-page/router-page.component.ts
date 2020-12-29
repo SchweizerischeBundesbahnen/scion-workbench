@@ -11,7 +11,7 @@
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { WbNavigationExtras, WorkbenchRouter, WorkbenchView } from '@scion/workbench';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, PRIMARY_OUTLET, Router, Routes } from '@angular/router';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
 import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
 import { Observable } from 'rxjs';
@@ -48,11 +48,13 @@ export class RouterPageComponent {
 
   public routerLinkCommands$: Observable<any[]>;
   public navigationExtras$: Observable<WbNavigationExtras>;
+  public routes: Routes;
 
   constructor(formBuilder: FormBuilder,
               route: ActivatedRoute,
               view: WorkbenchView,
-              private _router: WorkbenchRouter) {
+              private _router: Router,
+              private _wbRouter: WorkbenchRouter) {
     view.title = route.snapshot.data['title'];
     view.heading = route.snapshot.data['heading'];
     view.cssClass = route.snapshot.data['cssClass'];
@@ -64,8 +66,8 @@ export class RouterPageComponent {
       [SELF_VIEW_ID]: formBuilder.control(view.viewId),
       [INSERTION_INDEX]: formBuilder.control(''),
       [QUERY_PARAMS]: formBuilder.array([]),
-      [ACTIVATE_IF_PRESENT]: formBuilder.control(true),
-      [CLOSE_IF_PRESENT]: formBuilder.control(false),
+      [ACTIVATE_IF_PRESENT]: formBuilder.control(undefined),
+      [CLOSE_IF_PRESENT]: formBuilder.control(undefined),
     });
 
     this.routerLinkCommands$ = this.form.valueChanges
@@ -79,17 +81,23 @@ export class RouterPageComponent {
         map(() => this.constructNavigationExtras()),
         startWith(this.constructNavigationExtras()),
       );
+
+    this.routes = this._router.config
+      .filter(it => !it.outlet || it.outlet === PRIMARY_OUTLET)
+      .filter(it => !it.path.startsWith('~')); // microfrontend route prefix
   }
 
   public onRouterNavigate(): void {
     this.navigateError = null;
     const commands: any[] = this.constructRouterLinkCommands();
     const extras: WbNavigationExtras = this.constructNavigationExtras();
-    this._router.navigate(commands, extras).catch(error => this.navigateError = error);
+
+    this._wbRouter.navigate(commands, extras)
+      .catch(error => this.navigateError = error);
   }
 
   private constructRouterLinkCommands(): any[] {
-    const matrixParams: Params = this.readMatrixParams();
+    const matrixParams: Params | null = this.readMatrixParams();
     const commands: any[] = this.form.get(PATH).value.split('/');
 
     // Replace the first segment with a slash if empty

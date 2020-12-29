@@ -120,7 +120,7 @@ export class ViewMenuService implements WorkbenchInitializer {
 
               return fromEvent<KeyboardEvent>(coerceElement(target), 'keydown')
                 .pipe(
-                  filter(event => event.key.toLowerCase() === key.toLowerCase()), // ignore the shift modifier when comparing the pressed key
+                  filter(event => event.key?.toLowerCase() === key.toLowerCase()), // ignore the shift modifier when comparing the pressed key
                   filter(event => Arrays.isEqual(modifierKeys, getModifierState(event), {exactOrder: false})), // check the modifier state of the pressed key
                   tap(event => {
                     event.preventDefault();

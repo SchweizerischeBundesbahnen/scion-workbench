@@ -10,13 +10,18 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { SciCheckboxModule, SciFormFieldModule, SciPropertyModule } from '@scion/toolkit.internal/widgets';
+import { RouterModule, Routes } from '@angular/router';
+import { SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule, SciPropertyModule } from '@scion/toolkit.internal/widgets';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ViewPageComponent } from './view-page.component';
+import { UtilModule } from '../util/util.module';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 
-const routes = [
+const routes: Routes = [
   {path: '', component: ViewPageComponent},
+  {path: ':segment1/segment2/:segment3', component: ViewPageComponent},
+  {path: 'view1', component: ViewPageComponent},
+  {path: 'view2', component: ViewPageComponent},
 ];
 
 @NgModule({
@@ -27,6 +32,10 @@ const routes = [
     SciFormFieldModule,
     SciPropertyModule,
     SciCheckboxModule,
+    SciParamsEnterModule,
+    SciAccordionModule,
+    SciViewportModule,
+    UtilModule,
   ],
   declarations: [
     ViewPageComponent,

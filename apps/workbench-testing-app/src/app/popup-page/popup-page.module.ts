@@ -12,14 +12,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SciCheckboxModule, SciFormFieldModule } from '@scion/toolkit.internal/widgets';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { PopupPageComponent } from './popup-page.component';
 import { WorkbenchModule } from '@scion/workbench';
 import { PopupComponent } from './popup/popup.component';
 import { SciViewportModule } from '@scion/toolkit/viewport';
 import { A11yModule } from '@angular/cdk/a11y';
 
-const routes = [
+const routes: Routes = [
   {path: '', component: PopupPageComponent},
 ];
 

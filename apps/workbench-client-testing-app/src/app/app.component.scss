@@ -1,3 +1,5 @@
+@use 'sci-toolkit-styles' as sci-toolkit-styles;
+
 :host {
   display: grid;
   position: absolute;
@@ -8,5 +10,18 @@
 
   router-outlet {
     position: absolute; // take router outlet out of the document flow
+  }
+
+  &::after {
+    content: attr(data-app-symbolic-name);
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    @include sci-toolkit-styles.chip(var(--app-color), var(--app-color), white);
+  }
+
+  > span.workbench-context-note {
+    text-align: center;
+    padding: 2em;
   }
 }
