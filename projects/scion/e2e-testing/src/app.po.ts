@@ -9,10 +9,10 @@
  */
 
 import { $, browser, ElementFinder, Key, protractor } from 'protractor';
-import { getCssClasses, runOutsideAngularSynchronization } from './workbench-client/helper/testing.util';
+import { getCssClasses, isCssClassPresent, runOutsideAngularSynchronization } from './helper/testing.util';
 import { StartPagePO } from './start-page.po';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { WebdriverExecutionContexts } from './workbench-client/helper/webdriver-execution-context';
+import { coerceArray, coerceBooleanProperty } from '@angular/cdk/coercion';
+import { WebdriverExecutionContexts } from './helper/webdriver-execution-context';
 
 declare type Duration = 'short' | 'medium' | 'long' | 'infinite';
 declare type Severity = 'info' | 'warn' | 'error';
@@ -286,7 +286,79 @@ export class AppPO {
   }
 
   /**
-   * Returns a handle representing the notification which has given CSS class set.
+   * Returns a handle representing the popup having given CSS class(es) set.
+   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
+   */
+  public findPopup(findBy: { cssClass: string | string[] }): PopupPO {
+    const popupOverlayFinder = $(`.wb-popup.${coerceArray(findBy.cssClass).join('.')}`);
+    const popupComponentFinder = popupOverlayFinder.$('wb-popup');
+
+    return new class implements PopupPO {
+
+      public async isPresent(): Promise<boolean> {
+        await WebdriverExecutionContexts.switchToDefault();
+        return popupOverlayFinder.isPresent() && popupComponentFinder.isPresent();
+      }
+
+      public async isDisplayed(): Promise<boolean> {
+        await WebdriverExecutionContexts.switchToDefault();
+        if (!await this.isPresent()) {
+          return false;
+        }
+        return popupOverlayFinder.isDisplayed() && popupComponentFinder.isDisplayed();
+      }
+
+      public async getClientRect(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<ClientRect> {
+        await WebdriverExecutionContexts.switchToDefault();
+        const finder = selector === 'cdk-overlay' ? popupOverlayFinder : popupComponentFinder;
+        const {width, height} = await finder.getSize();
+        const {x, y} = await finder.getLocation();
+        return {
+          top: y,
+          left: x,
+          right: x + width,
+          bottom: y + height,
+          width,
+          height,
+        };
+      }
+
+      public async getAlign(): Promise<'east' | 'west' | 'north' | 'south'> {
+        await WebdriverExecutionContexts.switchToDefault();
+        const cssClasses = await getCssClasses(popupOverlayFinder);
+        if (cssClasses.includes('wb-east')) {
+          return 'east';
+        }
+        if (cssClasses.includes('wb-west')) {
+          return 'west';
+        }
+        if (cssClasses.includes('wb-north')) {
+          return 'north';
+        }
+        if (cssClasses.includes('wb-south')) {
+          return 'south';
+        }
+        throw Error('[PopupAlignError] Popup not aligned.');
+      }
+
+      public async hasVerticalOverflow(): Promise<boolean> {
+        await WebdriverExecutionContexts.switchToDefault();
+        return isCssClassPresent(popupComponentFinder.$('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
+      }
+
+      public async hasHorizontalOverflow(): Promise<boolean> {
+        await WebdriverExecutionContexts.switchToDefault();
+        return isCssClassPresent(popupComponentFinder.$('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
+      }
+
+      public $(selector: string): ElementFinder {
+        return popupComponentFinder.$(selector);
+      }
+    };
+  }
+
+  /**
+   * Returns a handle representing the notification having given CSS class(es) set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
   public findNotification(findBy: { cssClass: string | string[] }): NotificationPO {
@@ -656,6 +728,23 @@ export interface ViewTabPO {
   isActive(): Promise<boolean>;
 
   getCssClasses(): Promise<string[]>;
+}
+
+export interface PopupPO {
+
+  isPresent(): Promise<boolean>;
+
+  isDisplayed(): Promise<boolean>;
+
+  getClientRect(selector?: 'cdk-overlay' | 'wb-popup'): Promise<ClientRect>;
+
+  hasVerticalOverflow(): Promise<boolean>;
+
+  hasHorizontalOverflow(): Promise<boolean>;
+
+  getAlign(): Promise<'east' | 'west' | 'north' | 'south'>;
+
+  $(selector: string): ElementFinder;
 }
 
 export interface NotificationPO {

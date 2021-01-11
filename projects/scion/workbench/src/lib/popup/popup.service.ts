@@ -8,16 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, Injector, OnDestroy, Optional } from '@angular/core';
+import { ElementRef, Inject, Injectable, Injector, Optional } from '@angular/core';
 import { ConnectedOverlayPositionChange, ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { from, fromEvent, Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { from, fromEvent, MonoTypeOperatorFunction, Observable } from 'rxjs';
+import { filter, map, shareReplay, take, takeUntil } from 'rxjs/operators';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { Popup, PopupConfig } from './metadata';
+import { Popup, PopupConfig, PopupOrigin, ɵPopup, ɵPopupError } from './popup.config';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
-import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
-import { Arrays, Defined } from '@scion/toolkit/util';
+import { Arrays, Observables } from '@scion/toolkit/util';
 import { WorkbenchView } from '../view/workbench-view.model';
+import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
+import { fromBoundingClientRect$, fromDimension$ } from '@scion/toolkit/observable';
+import { coerceElement } from '@angular/cdk/coercion';
+import { PopupComponent } from './popup.component';
+import { DOCUMENT } from '@angular/common';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top'};
@@ -25,39 +29,56 @@ const WEST: ConnectedPosition = {originX: 'start', originY: 'center', overlayX: 
 const EAST: ConnectedPosition = {originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center'};
 
 /**
- * Provides the mechanism to open a popup relative to an anchor element.
+ * Allows displaying a component in a workbench popup.
+ *
+ * A popup is a visual workbench component for displaying content above other content. It is positioned relative to an anchor,
+ * which can be either a page coordinate (x/y) or an HTML element. When using an element as the popup anchor, the popup also
+ * moves when the anchor element moves.
+ *
+ * Unlike views, popups are not part of the persistent Workbench navigation, meaning that popups do not survive a page reload.
  */
 @Injectable()
-export class PopupService implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class PopupService {
 
   constructor(private _injector: Injector,
               private _overlay: Overlay,
               private _focusManager: FocusMonitor,
-              private _workbenchLayoutService: WorkbenchLayoutService,
+              private _viewRegistry: WorkbenchViewRegistry,
+              @Inject(DOCUMENT) private _document: any,
               @Optional() private _view: WorkbenchView) {
   }
 
   /**
-   * Opens a popup relative to the specified anchor.
+   * Displays the specified component in a popup.
    *
-   * The component can inject {@link Popup} to access input data or to close the popup.
+   * To position the popup, provide either an exact screen coordinate (x/y) or an element to serve as the popup anchor.
+   * If you use an element as the popup anchor, the popup also moves when the anchor element moves. If you position the
+   * popup using screen coordinates, consider passing an Observable to re-position the popup after it is created. If
+   * passing coordinates via an Observable, the popup will not display until the Observable emits the first coordinate.
+   *
+   * By setting the alignment of the popup, you can further control where the popup should open relative to its anchor.
+   *
+   * Optionally, you can pass data to the popup component. The component can inject the popup handle {@link Popup} to
+   * read input data or to close the popup.
+   *
+   * By default, the popup will close on focus loss, or when the user hits the escape key.
    *
    * @param   config - Controls popup behavior
-   * @param   input - Optional data to pass to the popup component
    * @returns a promise that:
    *          - resolves to the result if closed with a result
    *          - resolves to `undefined` if closed without a result
    */
-  public open<T>(config: PopupConfig, input?: any): Promise<T> {
-    const position = config.position || 'north';
+  public async open<R>(config: PopupConfig): Promise<R> {
+    const align = config.align || 'north';
+    const anchor$ = this.observePopupAnchor$(config).pipe(shareReplay({bufferSize: 1, refCount: false}));
 
+    // Set up the popup positioning strategy.
     const overlayPositionStrategy = this._overlay.position()
-      .flexibleConnectedTo(config.anchor)
+      .flexibleConnectedTo(await anchor$.pipe(take(1)).toPromise())
       .withFlexibleDimensions(false)
+      .withLockedPosition(false) // If locked, the popup won't attempt to reposition itself if not enough space available.
       .withPositions(((): ConnectedPosition[] => {
-        switch (position) {
+        switch (align) {
           case 'north':
             return [NORTH, SOUTH, WEST, EAST];
           case 'south':
@@ -70,93 +91,76 @@ export class PopupService implements OnDestroy {
             throw Error('[PopupPositionError] Illegal position; must be north, south, west or east');
         }
       })());
+
+    // Configure the popup overlay.
     const overlayConfig = new OverlayConfig({
       panelClass: [
         'wb-popup',
-        `wb-${position}`,
-        `e2e-position-${position}`,
+        `wb-${align}`,
         ...Arrays.coerce(config.cssClass),
       ],
-      width: config.width,
-      height: config.height,
-      minWidth: config.minWidth,
-      minHeight: config.minHeight,
-      maxWidth: config.maxWidth,
-      maxHeight: config.maxHeight,
       hasBackdrop: false,
       positionStrategy: overlayPositionStrategy,
-      scrollStrategy: this._overlay.scrollStrategies.reposition(),
+      scrollStrategy: this._overlay.scrollStrategies.noop(),
       disposeOnNavigation: true,
     });
 
+    // Construct the popup component and attach it to the DOM.
     const overlayRef = this._overlay.create(overlayConfig);
-    const popup = new ɵPopup(input);
-
-    // Prepare component injector
-    const injector = Injector.create({
-      parent: this._injector,
-      providers: [{provide: Popup, useValue: popup}],
-    });
-
-    // Instantiate popup component and attach it to the DOM
-    const portal = new ComponentPortal(config.component, null, injector);
-    const componentRef = overlayRef.attach(portal);
-
-    // Listen for position changes to set current region CSS class
-    overlayPositionStrategy.positionChanges
-      .pipe(takeUntil(this._destroy$), takeUntil(from(popup.whenClose)))
-      .subscribe(change => this.setPopupPositionCssClass(overlayRef, change));
-
+    const popupHandle = new ɵPopup(config.input, config.size);
+    const popupPortal = new ComponentPortal(PopupComponent, null, Injector.create({
+      parent: config.componentConstructOptions?.injector || this._injector,
+      providers: [
+        {provide: PopupConfig, useValue: config},
+        {provide: Popup, useValue: popupHandle},
+      ],
+    }));
+    const componentRef = overlayRef.attach(popupPortal);
     const popupElement: HTMLElement = componentRef.location.nativeElement;
+    const takeUntilClose = <T>() => takeUntil<T>(from(popupHandle.whenClose));
 
-    // Make the popup focusable and request the focus
+    // Make the popup focusable and request the focus.
     popupElement.setAttribute('tabindex', '-1');
-    this._focusManager.focusVia(popupElement, 'program');
+    this._focusManager.focusVia(popupElement, 'program'); // To not close the popup immediately when it opens, if using the 'onFocusLost' strategy.
 
-    // Close the popup on escape keystroke
-    if (!config.closeStrategy || Defined.orElse(config.closeStrategy.onEscape, true)) {
-      fromEvent(popupElement, 'keydown')
-        .pipe(
-          filter((event: KeyboardEvent) => event.key === 'Escape'),
-          takeUntil(from(popup.whenClose)),
-        )
-        .subscribe(() => popup.close());
-    }
+    // Synchronize the CSS class that indicates where the popup docks to the anchor; is one of 'wb-north', 'wb-south', 'wb-east', or 'wb-west'.
+    overlayPositionStrategy.positionChanges
+      .pipe(takeUntilClose())
+      .subscribe(change => this.setPopupAlignCssClass(overlayRef, change));
 
-    // Close the popup on focus lost
-    if (!config.closeStrategy || Defined.orElse(config.closeStrategy.onFocusLost, true)) {
-      this._focusManager.monitor(popupElement, true)
-        .pipe(
-          filter((focusOrigin: FocusOrigin) => !focusOrigin),
-          takeUntil(from(popup.whenClose)),
-        )
-        .subscribe(() => popup.close());
-    }
-
-    // Close the popup on workbench view grid layout change
-    if (!config.closeStrategy || Defined.orElse(config.closeStrategy.onLayoutChange, true)) {
-      this._workbenchLayoutService.dragging$
-        .pipe(takeUntil(from(popup.whenClose)))
-        .subscribe(() => popup.close());
-    }
-
-    // If in the context of a view, close the popup when closing the view
-    this._view?.active$
-      .pipe(
-        filter(active => !active),
-        takeUntil(from(popup.whenClose)),
-      )
-      .subscribe(() => {
-        popup.close();
+    // Re-position the popup when the anchor moves.
+    anchor$
+      .pipe(takeUntilClose())
+      .subscribe((origin: PopupOrigin) => {
+        overlayPositionStrategy.setOrigin(origin);
+        overlayRef.updatePosition();
       });
 
-    // Dispose the popup if the close notifier fires
-    popup.whenClose.then(() => overlayRef.dispose());
+    // Let the popup reposition itself when the popup size changes.
+    fromDimension$(overlayRef.overlayElement)
+      .pipe(takeUntilClose())
+      .subscribe(() => overlayRef.updatePosition());
 
-    return popup.whenClose;
+    this.installPopupCloser(config, popupElement, overlayRef, popupHandle, takeUntilClose);
+
+    // Dispose the popup when closing it.
+    popupHandle.whenClose.then(() => {
+      overlayRef.dispose();
+    });
+
+    return popupHandle.whenClose.then((result: R | ɵPopupError): R => {
+      if (result instanceof ɵPopupError) {
+        const error = result.error;
+        if (typeof result === 'string') {
+          throw Error(result);
+        }
+        throw error;
+      }
+      return result;
+    });
   }
 
-  private setPopupPositionCssClass(overlayRef: OverlayRef, positionChange: ConnectedOverlayPositionChange): void {
+  private setPopupAlignCssClass(overlayRef: OverlayRef, positionChange: ConnectedOverlayPositionChange): void {
     overlayRef.overlayElement.classList.remove('wb-north', 'wb-south', 'wb-east', 'wb-west');
     switch (positionChange.connectionPair) {
       case NORTH:
@@ -174,27 +178,103 @@ export class PopupService implements OnDestroy {
     }
   }
 
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
-}
+  /**
+   * Closes the popup depending on the configured popup closing strategy.
+   */
+  private installPopupCloser(config: PopupConfig, popupElement: HTMLElement, overlayRef: OverlayRef, popupHandle: Popup, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
+    // Close the popup on escape keystroke.
+    if (config.closeStrategy?.onEscape ?? true) {
+      fromEvent(popupElement, 'keydown')
+        .pipe(
+          filter((event: KeyboardEvent) => event.key === 'Escape'),
+          takeUntilClose(),
+        )
+        .subscribe(() => popupHandle.close());
+    }
 
-class ɵPopup implements Popup { // tslint:disable-line:class-name
+    // Close the popup on focus loss.
+    if (config.closeStrategy?.onFocusLost ?? true) {
+      this._focusManager.monitor(popupElement, true)
+        .pipe(
+          filter((focusOrigin: FocusOrigin) => !focusOrigin),
+          takeUntilClose(),
+        )
+        .subscribe(() => popupHandle.close());
+    }
+    // If in the context of a view, hide the popup when inactivating the view, or close it when closing the view.
+    else if (config.viewRef || (config.viewRef === undefined /* undefined, not null */ && this._view)) {
+      const view = this.resolveViewFromContext(config.viewRef);
+      overlayRef.overlayElement.classList.add('wb-view-context');
 
-  private _closeResolveFn: (result: any | undefined) => void;
-  public _closePromise = new Promise<any | undefined>(resolve => this._closeResolveFn = resolve); // tslint:disable-line:typedef
+      // Hide the popup when inactivating the view.
+      this.bindPopupToViewActiveState(view, overlayRef, takeUntilClose);
 
-  constructor(public input: any | undefined) {
+      // Close the popup when closing the view.
+      this._viewRegistry.viewIds$
+        .pipe(takeUntilClose())
+        .subscribe(viewIds => {
+          if (!viewIds.includes(view.viewId)) {
+            popupHandle.close();
+          }
+        });
+    }
   }
 
   /**
-   * @inheritDoc
+   * Observes the popup anchor to which the popup should dock. The Observable outputs the initial position of the anchor,
+   * and each time its position changes.
    */
-  public close(result?: any): void {
-    this._closeResolveFn(result);
+  private observePopupAnchor$(config: PopupConfig): Observable<PopupOrigin> {
+    if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
+      return fromBoundingClientRect$(coerceElement<HTMLElement>(config.anchor as HTMLElement))
+        .pipe(map<ClientRect, PopupOrigin>(clientRect => ({
+            x: clientRect.left,
+            y: clientRect.top,
+            width: clientRect.width,
+            height: clientRect.height,
+          }),
+        ));
+    }
+    else {
+      return Observables.coerce(config.anchor);
+    }
   }
 
-  public get whenClose(): Promise<any | undefined> {
-    return this._closePromise;
+  private resolveViewFromContext(viewRef: string | undefined): WorkbenchView {
+    if (viewRef) {
+      return this._viewRegistry.getElseThrow(viewRef);
+    }
+
+    if (!this._view) {
+      throw Error('[PopupOpenError] Expected view context to be available, but was not.');
+    }
+
+    return this._view;
+  }
+
+  /**
+   * Hides the popup when its contextual view is deactivated, and then displays the popup again when activating it.
+   * Also restores the focus on re-activation.
+   */
+  private bindPopupToViewActiveState(view: WorkbenchView, overlayRef: OverlayRef, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
+    let activeElement: HTMLElement | undefined;
+
+    view.active$
+      .pipe(takeUntilClose())
+      .subscribe(viewActive => {
+        if (viewActive) {
+          overlayRef.overlayElement.classList.add('wb-view-active');
+          activeElement?.focus();
+        }
+        else {
+          overlayRef.overlayElement.classList.remove('wb-view-active');
+        }
+      });
+
+    fromEvent(overlayRef.overlayElement, 'focusin')
+      .pipe(takeUntilClose())
+      .subscribe(() => {
+        activeElement = this._document.activeElement instanceof HTMLElement ? this._document.activeElement : undefined;
+      });
   }
 }

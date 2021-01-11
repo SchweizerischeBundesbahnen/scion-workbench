@@ -13,6 +13,7 @@
  */
 export const environment = {
   production: true,
+  animationEnabled: true,
   apps: {
     app1: {
       symbolicName: 'workbench-client-testing-app1',
@@ -22,5 +23,5 @@ export const environment = {
       symbolicName: 'workbench-client-testing-app2',
       url: 'http://scion-workbench-client-testing-app2.now.sh',
     },
-  }
+  },
 };

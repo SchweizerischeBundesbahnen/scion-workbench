@@ -37,7 +37,7 @@ export { WbRouteReuseProvider, WbRouteReuseStrategy } from './lib/routing/wb-rou
 export { Disposable } from './lib/disposable';
 export { ContentAsOverlayComponent } from './lib/content-projection/content-as-overlay.component';
 export { PopupService } from './lib/popup/popup.service';
-export { Popup, PopupConfig, Position, CloseStrategy } from './lib/popup/metadata';
+export { Popup, PopupConfig, CloseStrategy, PopupOrigin, PopupSize } from './lib/popup/popup.config';
 export { ViewMenuItemDirective } from './lib/view-part/view-context-menu/view-menu.directive';
 export { ViewPartActionDirective } from './lib/view-part/view-part-action-bar/view-part-action.directive';
 export { WorkbenchView } from './lib/view/workbench-view.model';

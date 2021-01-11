@@ -131,6 +131,10 @@ jobs:
             project: workbench
           - name: view
             project: workbench
+          - name: popup
+            project: workbench
+          - name: popup-size
+            project: workbench
           - name: router
             project: workbench-client
           - name: router-params

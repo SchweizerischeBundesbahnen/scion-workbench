@@ -9,14 +9,16 @@
  */
 
 import { BrowserModule } from '@angular/platform-browser';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule, Type } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { provideWorkbenchClientInitializer } from './workbench-client/workbench-microfrontend-support';
 import { SciViewportModule } from '@scion/toolkit/viewport';
 import { provideAppInstanceId } from './app-instance-id';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { environment } from '../environments/environment';
+import { A11yModule } from '@angular/cdk/a11y';
 
 @NgModule({
   declarations: [
@@ -25,9 +27,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   imports: [
     CommonModule,
     BrowserModule,
-    BrowserAnimationsModule,
+    A11yModule,
     AppRoutingModule,
     SciViewportModule,
+    animationModuleIfEnabled(),
   ],
   providers: [
     provideWorkbenchClientInitializer(),
@@ -37,4 +40,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   bootstrap: [AppComponent],
 })
 export class AppModule {
+}
+
+function animationModuleIfEnabled(): Type<NoopAnimationsModule | BrowserAnimationsModule> {
+  return environment.animationEnabled ? BrowserAnimationsModule : NoopAnimationsModule; // animations should be disabled during e2e test execution
 }

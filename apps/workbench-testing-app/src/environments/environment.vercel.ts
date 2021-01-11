@@ -33,5 +33,6 @@ const microfrontendConfig: WorkbenchMicrofrontendConfig = {
 
 export const environment = {
   production: true,
+  animationEnabled: true,
   microfrontendConfig,
 };

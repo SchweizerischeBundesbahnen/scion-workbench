@@ -42,8 +42,8 @@ const routes: Routes = [
   },
   {
     path: 'test-popup',
-    loadChildren: (): any => import('./popup-page/popup-page.module').then(m => m.PopupPageModule),
-    data: {title: 'Workbench Popup', heading: 'Workbench E2E Testpage', cssClass: 'e2e-popup-view', pinToStartPage: true},
+    loadChildren: (): any => import('./popup-opener-page/popup-opener-page.module').then(m => m.PopupOpenerPageModule),
+    data: {title: 'Workbench Popup', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-popup', pinToStartPage: true},
   },
 ];
 
