@@ -3,7 +3,7 @@
               sciDimension (sciDimensionChange)="onTabbarViewportDimensionChange()"
               (scroll)="onScroll()">
   <div class="viewport-client" [class.drag-over]="isDragOver"
-       sciDimension (sciDimensionChange)="onTabbarViewportClientDimensionChange($event)">
+       sciDimension (sciDimensionChange)="onTabbarViewportClientDimensionChange()">
     <wb-view-tab *ngFor="let viewId of viewIds$ | async"
                  #viewtab
                  [viewId]="viewId"

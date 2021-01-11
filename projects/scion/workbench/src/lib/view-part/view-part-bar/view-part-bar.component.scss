@@ -7,11 +7,9 @@
   --drag-source-width: 0;
 
   > sci-viewport.tabbar {
+    // Use 'flex: initial' instead of 'flex: auto' to not grow to absorb any extra free space in the partbar,
+    // so that left-aligned actions will directly follow the viewtabs.
     flex: initial;
-
-    // Set the viewport client width to its ideal content width, so it occupies only as much space as its content requires.
-    // This allows view actions to stick to the right of the viewport, even if closing view tabs.
-    --sci-viewport-content-grid-template-columns: max-content; // DO NOT USE `min-content` to preserve white space of text content.
 
     div.viewport-client {
       display: flex;

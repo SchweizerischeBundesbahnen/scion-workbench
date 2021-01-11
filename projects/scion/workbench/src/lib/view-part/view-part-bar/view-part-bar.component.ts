@@ -14,7 +14,6 @@ import { WorkbenchLayoutService } from '../../layout/workbench-layout.service';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 import { EMPTY, Observable, Subject, timer } from 'rxjs';
 import { SciViewportComponent } from '@scion/toolkit/viewport';
-import { SciDimension } from '@scion/toolkit/dimension';
 import { ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer } from '../../view-dnd/view-tab-drag-image-renderer.service';
 import { WorkbenchService } from '../../workbench.service';
 import { ViewListButtonComponent } from '../view-list-button/view-list-button.component';
@@ -129,13 +128,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     this.computeHiddenViewTabs();
   }
 
-  public onTabbarViewportClientDimensionChange(dimension: SciDimension): void {
-    // The tabbar viewport is set to 'flex: initial' (and not to 'flex: auto') and its width set equals to the viewport client width.
-    // This allows rendering left-aligned actions right after the viewtabs, and shrinks the viewport if there is not enough space available.
-
-    // The width is set directly to the viewport DOM element not to waste a change detection cycle in order to compute the hidden viewtabs.
-    this._viewport.host.nativeElement.style.width = `${dimension.clientWidth}px`;
-
+  public onTabbarViewportClientDimensionChange(): void {
     this.computeHiddenViewTabs();
   }
 

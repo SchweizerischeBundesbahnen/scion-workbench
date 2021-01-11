@@ -8,65 +8,53 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy } from '@angular/core';
 import { OverlayRef } from '@angular/cdk/overlay';
-import { animate, AnimationBuilder, style } from '@angular/animations';
-import { fromEvent, Subject } from 'rxjs';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { SciDimension } from '@scion/toolkit/dimension';
 import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
 
 @Component({
   selector: 'wb-view-list',
   templateUrl: './view-list.component.html',
   styleUrls: ['./view-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('viewtabLeave', [
+      transition(':leave', [
+        style({height: '*'}),
+        animate('.25s ease-out', style({height: 0})),
+      ]),
+    ]),
+    trigger('showPopup', [
+      transition(':enter', [
+        style({height: 0}),
+        animate('.25s ease-out', style({height: '*'})),
+      ]),
+    ]),
+  ],
 })
-export class ViewListComponent implements OnInit, OnDestroy {
-
-  private static MAX_COMPONENT_HEIGHT_PX = 350;
+export class ViewListComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  @HostBinding('style.height.px')
-  public componentHeight: number;
-
   public hiddenViewTabs: string[] = [];
 
-  constructor(private _host: ElementRef<HTMLElement>,
-              private _viewPart: ɵWorkbenchViewPart,
+  constructor(private _viewPart: ɵWorkbenchViewPart,
               private _overlayRef: OverlayRef,
-              private _animationBuilder: AnimationBuilder) {
+              private _cd: ChangeDetectorRef) {
     this.installHiddenViewTabsListener();
-  }
-
-  public ngOnInit(): void {
     this.installBackdropListener();
   }
 
-  public onViewportClientDimensionChange(dimension: SciDimension): void {
-    this.componentHeight = Math.min(dimension.clientHeight, ViewListComponent.MAX_COMPONENT_HEIGHT_PX);
-    this.animateComponentHeightChange();
-  }
-
-  public onViewTabClick(): void {
+  public onCloseViewTab(): void {
     this._overlayRef.dispose();
   }
 
   @HostListener('document:keydown.escape')
   public onEscape(): void {
     this._overlayRef.dispose();
-  }
-
-  private animateComponentHeightChange(): void {
-    const animation = this._animationBuilder.build([
-      style({height: '*'}),
-      animate('.2s ease-out', style({height: `${this.componentHeight}px`})),
-    ]).create(this._host.nativeElement);
-    animation.onDone(() => {
-      animation.destroy();
-      this._overlayRef.updatePosition();
-    });
-    animation.play();
   }
 
   private installHiddenViewTabsListener(): void {
@@ -77,11 +65,14 @@ export class ViewListComponent implements OnInit, OnDestroy {
         if (hiddenViewTabs.length === 0) {
           this._overlayRef.dispose();
         }
+        else {
+          this._cd.markForCheck();
+        }
       });
   }
 
   private installBackdropListener(): void {
-    fromEvent(this._overlayRef.backdropElement, 'mousedown')
+    this._overlayRef.backdropClick()
       .pipe(takeUntil(this._destroy$))
       .subscribe(() => this._overlayRef.dispose());
   }
