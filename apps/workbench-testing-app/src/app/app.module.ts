@@ -9,12 +9,12 @@
  */
 
 import { BrowserModule } from '@angular/platform-browser';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule, Type } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WorkbenchModule } from '@scion/workbench';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { StartPageComponent } from './start-page/start-page.component';
 import { SciFilterFieldModule, SciTabbarModule } from '@scion/toolkit.internal/widgets';
 import { SciViewportModule } from '@scion/toolkit/viewport';
@@ -41,11 +41,11 @@ import { ReactiveFormsModule } from '@angular/forms';
       },
       microfrontends: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendConfig,
     }),
-    BrowserAnimationsModule,
     ReactiveFormsModule,
     SciViewportModule,
     SciTabbarModule,
     SciFilterFieldModule,
+    animationModuleIfEnabled(),
   ],
   bootstrap: [
     AppComponent,
@@ -57,4 +57,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 })
 
 export class AppModule {
+}
+
+function animationModuleIfEnabled(): Type<NoopAnimationsModule | BrowserAnimationsModule> {
+  return environment.animationEnabled ? BrowserAnimationsModule : NoopAnimationsModule; // animations should be disabled during e2e test execution
 }

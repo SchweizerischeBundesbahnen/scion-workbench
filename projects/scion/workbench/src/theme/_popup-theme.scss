@@ -14,10 +14,6 @@ $popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
     border: 1px solid $border-color;
     display: grid;
 
-    > * {
-      outline: none;
-    }
-
     //::before is used as diamond-border
     //::after is used as diamond-content
 
@@ -98,6 +94,11 @@ $popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
         border-right-width: 0;
         border-left-color: $background-color;
       }
+    }
+
+    // Hide the popup if it is bound to a view but the view is not active.
+    &.wb-view-context:not(.wb-view-active) {
+      display: none;
     }
   }
 }

@@ -10,34 +10,28 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SciCheckboxModule, SciFormFieldModule } from '@scion/toolkit.internal/widgets';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule, Routes } from '@angular/router';
-import { PopupPageComponent } from './popup-page.component';
+import { SciAccordionModule, SciFormFieldModule } from '@scion/toolkit.internal/widgets';
+import { FormsModule } from '@angular/forms';
 import { WorkbenchModule } from '@scion/workbench';
-import { PopupComponent } from './popup/popup.component';
+import { PopupPageComponent } from './popup-page.component';
 import { SciViewportModule } from '@scion/toolkit/viewport';
-import { A11yModule } from '@angular/cdk/a11y';
-
-const routes: Routes = [
-  {path: '', component: PopupPageComponent},
-];
+import { UtilModule } from '../../util/util.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
-    RouterModule.forChild(routes),
     SciFormFieldModule,
-    SciCheckboxModule,
-    WorkbenchModule.forChild(),
     SciViewportModule,
-    A11yModule,
+    SciAccordionModule,
+    WorkbenchModule.forChild(),
+    UtilModule,
   ],
   declarations: [
     PopupPageComponent,
-    PopupComponent,
+  ],
+  exports: [
+    PopupPageComponent,
   ],
 })
 export class PopupPageModule {

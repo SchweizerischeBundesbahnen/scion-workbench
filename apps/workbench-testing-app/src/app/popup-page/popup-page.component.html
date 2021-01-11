@@ -1,77 +1,69 @@
-<ng-container [formGroup]="form">
+<sci-viewport>
   <section>
-    <header>Properties</header>
-
-    <sci-form-field label="Position">
-      <select [formControlName]="POSITION" class="e2e-position">
-        <option value="east">east</option>
-        <option value="west">west</option>
-        <option value="north">north</option>
-        <option value="south">south</option>
-        <option value="">&lt;default&gt;</option>
-      </select>
-    </sci-form-field>
-
-    <sci-form-field label="CSS Class(es)">
-      <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+    <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
+      <span class="e2e-component-instance-id">{{uuid}}</span>
     </sci-form-field>
   </section>
 
-  <section class="input">
+  <section *ngIf="popup.input">
     <header>Input Data</header>
 
-    <input [formControlName]="INPUT" class="e2e-input" placeholder="Optional data to pass to the popup component">
+    <output class="input e2e-input">
+      {{popup.input}}
+    </output>
   </section>
 
-  <section [formGroupName]="CLOSE_STRATEGY">
-    <header>Close Strategy</header>
-
-    <sci-form-field label="onFocusLost">
-      <sci-checkbox [formControlName]="ON_FOCUS_LOST" class="e2e-close-on-focus-lost"></sci-checkbox>
-    </sci-form-field>
-
-    <sci-form-field label="onEscape">
-      <sci-checkbox [formControlName]="ON_ESCAPE" class="e2e-close-on-escape"></sci-checkbox>
-    </sci-form-field>
-
-    <sci-form-field label="onLayoutChange">
-      <sci-checkbox [formControlName]="ON_LAYOUT_CHANGE" class="e2e-close-on-layout-change"></sci-checkbox>
-    </sci-form-field>
-  </section>
-
-  <section [formGroupName]="SIZE">
-    <header>Size</header>
+  <section>
+    <header>Component Size</header>
 
     <sci-form-field label="Min Height">
-      <input [formControlName]="MIN_HEIGHT" class="e2e-min-height">
+      <input [(ngModel)]="minHeight" class="e2e-min-height">
     </sci-form-field>
 
     <sci-form-field label="Height">
-      <input [formControlName]="HEIGHT" class="e2e-height">
+      <input [(ngModel)]="height" class="e2e-height">
     </sci-form-field>
 
     <sci-form-field label="Max Height">
-      <input [formControlName]="MAX_HEIGHT" class="e2e-max-height">
+      <input [(ngModel)]="maxHeight" class="e2e-max-height">
     </sci-form-field>
 
     <sci-form-field label="Min Width">
-      <input [formControlName]="MIN_WIDTH" class="e2e-min-width">
+      <input [(ngModel)]="minWidth" class="e2e-min-width">
     </sci-form-field>
 
     <sci-form-field label="Width">
-      <input [formControlName]="WIDTH" class="e2e-width">
+      <input [(ngModel)]="width" class="e2e-width">
     </sci-form-field>
 
     <sci-form-field label="Max Width">
-      <input [formControlName]="MAX_WIDTH" class="e2e-max-width">
+      <input [(ngModel)]="maxWidth" class="e2e-max-width">
     </sci-form-field>
   </section>
-</ng-container>
 
-<button (click)="onOpen()" class="open e2e-open" #open_button>
-  Open popup
-</button>
+  <sci-accordion *ngIf="popup.size | wbNullIfEmpty as preferredSize"
+                 title="Preferred Overlay Size"
+                 class="preferred-overlay-size e2e-preferred-overlay-size"
+                 variant="solid">
+    <ng-template sciAccordionItem [panel]="panel">
+      <header>Preferred Overlay Size</header>
+    </ng-template>
+    <ng-template #panel>
+      <div class="preferred-overlay-size e2e-preferred-overlay-size">{{preferredSize | json}}</div>
+    </ng-template>
+  </sci-accordion>
 
-<output class="return-value e2e-return-value" *ngIf="returnValue">
-  {{returnValue}}
-</output>
+  <sci-accordion class="return-value e2e-return-value" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_return_value">
+      <header>Return Value</header>
+    </ng-template>
+    <ng-template #panel_return_value>
+      <input class="e2e-return-value" [(ngModel)]="result" placeholder="Optional data to return to the popup opener" #return_value>
+    </ng-template>
+  </sci-accordion>
+</sci-viewport>
+
+<div class="buttons">
+  <button (click)="onClose()" class="e2e-close">Close</button>
+  <button (click)="onCloseWithError()" class="e2e-close-with-error">Close (with error)</button>
+</div>

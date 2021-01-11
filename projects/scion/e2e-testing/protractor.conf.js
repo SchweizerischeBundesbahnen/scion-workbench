@@ -14,7 +14,7 @@
 const {SpecReporter, StacktraceOption} = require('jasmine-spec-reporter');
 
 const puppeteer = require('puppeteer');
-const chromeArgs = ['--window-size=1920,1080'];
+const chromeArgs = ['--window-size=1920,1200'];
 
 // Allow resolving modules specified by paths in 'tsconfig', e.g., to resolve '@scion/workbench' module. This is required when working with secondary entry point.
 // By default, 'ts-node' only looks in the 'node_modules' folder for modules and not in paths specified in 'tsconfig'.
@@ -50,6 +50,12 @@ exports.config = {
     ],
     'workbench::view-tabbar': [
       './src/workbench/**/view-tab-bar.e2e-spec.ts',
+    ],
+    'workbench::popup': [
+      './src/workbench/**/popup.e2e-spec.ts',
+    ],
+    'workbench::popup-size': [
+      './src/workbench/**/popup-size.e2e-spec.ts',
     ],
     'workbench-client::router': [
       './src/workbench-client/**/router.e2e-spec.ts',

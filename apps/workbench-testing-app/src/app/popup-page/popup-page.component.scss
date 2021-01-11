@@ -1,37 +1,50 @@
 @use 'sci-toolkit-styles' as sci-toolkit-styles;
 
 :host {
-  display: grid;
-  grid-auto-rows: max-content;
-  row-gap: 1em;
+  display: flex;
+  flex-direction: column;
   padding: 1em;
 
-  > section, form {
+  > sci-viewport {
+    flex: auto;
+    --sci-viewport-content-grid-gap: 1em;
+    --sci-viewport-content-grid-auto-rows: min-content;
+
+    section, form {
+      display: grid;
+      grid-row-gap: .5em;
+      border: 1px solid var(--sci-color-P400);
+      border-radius: 5px;
+      padding: 1em;
+
+      > header {
+        margin-top: 0;
+        margin-bottom: 2em;
+        font-weight: bold;
+      }
+    }
+
+    sci-accordion {
+      header {
+        font-weight: bold;
+      }
+
+      &.preferred-overlay-size div.preferred-overlay-size {
+        white-space: pre;
+        font-family: monospace;
+      }
+
+      &.return-value input {
+        @include sci-toolkit-styles.input-field();
+      }
+    }
+  }
+
+  > div.buttons {
+    flex: none;
     display: grid;
-    grid-row-gap: .5em;
-    border: 1px solid var(--sci-color-P400);
-    border-radius: 5px;
-    padding: 1em;
-
-    > header {
-      margin-top: 0;
-      margin-bottom: 2em;
-      font-weight: bold;
-    }
-
-    &.input input {
-      @include sci-toolkit-styles.input-field();
-    }
-  }
-
-  > output.return-value {
-    border: 1px solid var(--sci-color-accent);
-    background-color: var(--sci-color-A100);
-    border-radius: 3px;
-    padding: 1em;
-  }
-
-  > button.open {
-    justify-self: center;
+    grid-template-columns: 1fr 1fr;
+    column-gap: .25em;
+    margin-top: 1em;
   }
 }

@@ -90,6 +90,7 @@ import { WbAddViewToPartGuard } from './routing/add-view-to-part.guard';
 import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
 import { ViewDragService } from './view-dnd/view-drag.service';
 import { ViewTabDragImageRenderer } from './view-dnd/view-tab-drag-image-renderer.service';
+import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
   imports: [
@@ -145,6 +146,7 @@ import { ViewTabDragImageRenderer } from './view-dnd/view-tab-drag-image-rendere
     ViewPortalPipe,
     MicrofrontendViewComponent,
     SplashComponent,
+    PopupComponent,
   ],
   exports: [
     WorkbenchComponent,
