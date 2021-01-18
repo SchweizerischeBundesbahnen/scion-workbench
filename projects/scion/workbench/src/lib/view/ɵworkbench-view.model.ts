@@ -183,4 +183,8 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
   public get destroyed(): boolean {
     return this.portal.isDestroyed;
   }
+
+  public destroy(): void {
+    this.portal.destroy();
+  }
 }

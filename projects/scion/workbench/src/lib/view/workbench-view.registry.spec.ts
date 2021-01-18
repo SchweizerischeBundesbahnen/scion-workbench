@@ -11,7 +11,7 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { WorkbenchViewRegistry } from './workbench-view.registry';
 import { ɵWorkbenchView } from './ɵworkbench-view.model';
-import createSpyObj = jasmine.createSpyObj;
+import { noop } from 'rxjs';
 
 describe('WorkbenchViewRegistry', () => {
 
@@ -62,6 +62,6 @@ describe('WorkbenchViewRegistry', () => {
 function createWorkbenchView(id: string): ɵWorkbenchView {
   return {
     viewId: id,
-    portal: createSpyObj('Portal', ['destroy']),
+    destroy: noop,
   } as ɵWorkbenchView;
 }

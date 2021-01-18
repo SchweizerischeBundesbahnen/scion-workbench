@@ -238,7 +238,6 @@ export class WorkbenchUrlObserver implements OnDestroy {
       // would fail because the view would already be destroyed.
       this._layoutService.whenLayoutChange().then(() => partIdsToRemove.forEach(partId => {
         this._logger.debug(() => `Destroying ɵWorkbenchViewPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
-        this._viewPartRegistry.getElseThrow(partId).destroy();
         this._viewPartRegistry.remove(partId);
       }));
     }
