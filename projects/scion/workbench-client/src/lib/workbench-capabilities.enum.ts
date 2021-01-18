@@ -13,7 +13,11 @@
  */
 export enum WorkbenchCapabilities {
   /**
-   * Allows the contribution of microfrontends for display in workbench views.
+   * Allows the contribution of a microfrontend for display in workbench view.
    */
   View = 'view',
+  /**
+   * Allows the contribution of a microfrontend for display in workbench popup.
+   */
+  Popup = 'popup',
 }

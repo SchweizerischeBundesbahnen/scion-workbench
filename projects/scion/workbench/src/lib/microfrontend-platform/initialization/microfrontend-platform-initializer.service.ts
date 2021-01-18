@@ -9,9 +9,8 @@
  */
 
 import { Injectable, InjectFlags, InjectionToken, Injector, OnDestroy } from '@angular/core';
-import { ApplicationConfig } from '@scion/microfrontend-platform/lib/host/platform-config';
+import { ApplicationConfig, ApplicationManifest, IntentClient, Logger as MicrofrontendPlatformLogger, ManifestService, MessageClient, MicrofrontendPlatform, PlatformConfig, Runlevel } from '@scion/microfrontend-platform';
 import { WorkbenchModuleConfig } from '../../workbench-module-config';
-import { ApplicationManifest, IntentClient, Logger as MicrofrontendPlatformLogger, ManifestService, MessageClient, MicrofrontendPlatform, PlatformConfig, Runlevel } from '@scion/microfrontend-platform';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchCapabilities } from '@scion/workbench-client';
 import { Logger, LoggerNames } from '../../logging';
@@ -76,8 +75,8 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
     // Start the microfrontend platform host.
     await MicrofrontendPlatform.startHost(effectiveMicrofrontendPlatformConfig, {symbolicName: effectiveHostSymbolicName});
 
-    // Register a wildcard `view` intention to read all view capabilities, required for microfrontend routing.
-    await this.registerWildcardViewIntention();
+    // Register wildcard intentions to look up view capabilities, required for reading the microfrontend path.
+    await this.registerWildcardIntention(WorkbenchCapabilities.View);
 
     this._logger.debug('SCION Microfrontend Platform started.', LoggerNames.LIFECYCLE, effectiveMicrofrontendPlatformConfig);
   }
@@ -111,8 +110,8 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
     microfrontendPlatformConfig.apps.find(app => app.symbolicName === appSymbolicName).scopeCheckDisabled = true;
   }
 
-  private async registerWildcardViewIntention(): Promise<void> {
-    await Beans.get(ManifestService).registerIntention({type: WorkbenchCapabilities.View, qualifier: {'*': '*'}});
+  private async registerWildcardIntention(type: WorkbenchCapabilities): Promise<void> {
+    await Beans.get(ManifestService).registerIntention({type, qualifier: {'*': '*'}});
   }
 
   public ngOnDestroy(): void {

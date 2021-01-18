@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { $, browser, ElementFinder, Key, protractor } from 'protractor';
+import { $, $$, browser, ElementFinder, Key, protractor } from 'protractor';
 import { getCssClasses, isCssClassPresent, runOutsideAngularSynchronization } from './helper/testing.util';
 import { StartPagePO } from './start-page.po';
 import { coerceArray, coerceBooleanProperty } from '@angular/cdk/coercion';
@@ -297,7 +297,7 @@ export class AppPO {
 
       public async isPresent(): Promise<boolean> {
         await WebdriverExecutionContexts.switchToDefault();
-        return popupOverlayFinder.isPresent() && popupComponentFinder.isPresent();
+        return await popupOverlayFinder.isPresent() && await popupComponentFinder.isPresent();
       }
 
       public async isDisplayed(): Promise<boolean> {
@@ -305,7 +305,7 @@ export class AppPO {
         if (!await this.isPresent()) {
           return false;
         }
-        return popupOverlayFinder.isDisplayed() && popupComponentFinder.isDisplayed();
+        return await popupOverlayFinder.isDisplayed() && await popupComponentFinder.isDisplayed();
       }
 
       public async getClientRect(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<ClientRect> {
@@ -355,6 +355,14 @@ export class AppPO {
         return popupComponentFinder.$(selector);
       }
     };
+  }
+
+  /**
+   * Returns the number of opened popups.
+   */
+  public async getPopupCount(): Promise<number> {
+    await WebdriverExecutionContexts.switchToDefault();
+    return $$('.wb-popup').count();
   }
 
   /**

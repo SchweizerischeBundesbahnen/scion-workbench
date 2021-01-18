@@ -128,5 +128,40 @@ export class ActivatorModule {
         },
       },
     );
+
+    // Register view to open a workbench popup.
+    await this._manifestService.registerCapability(
+      {
+        type: WorkbenchCapabilities.View,
+        qualifier: {
+          component: 'popup',
+          app,
+        },
+        description: '[e2e] Allows opening a microfrontend in a workbench popup',
+        private: false,
+        properties: {
+          path: 'test-popup',
+          pinToStartPage: true,
+          title: 'Workbench Popup',
+          heading,
+          cssClass: 'e2e-test-popup',
+        },
+      });
+
+    // Register the popup microfrontend.
+    await this._manifestService.registerCapability(
+      {
+        type: WorkbenchCapabilities.Popup,
+        qualifier: {
+          component: 'popup',
+          app,
+        },
+        description: '[e2e] Provides access to the workbench popup object',
+        private: false,
+        properties: {
+          path: 'popup',
+          cssClass: 'e2e-test-popup',
+        },
+      });
   }
 }

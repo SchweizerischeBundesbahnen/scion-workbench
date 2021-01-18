@@ -8,10 +8,23 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { $ } from 'protractor';
+import { $, browser, protractor } from 'protractor';
 import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
 
+const EC = protractor.ExpectedConditions;
+
 export class RouterOutletPO {
+
+  /**
+   * Resolves to the name of the <sci-router-outlet> that has given CSS class(es) set.
+   */
+  public async resolveRouterOutletName(...cssClass: string[]): Promise<string> {
+    await WebdriverExecutionContexts.switchToDefault();
+
+    const routerOutletFinder = $(`sci-router-outlet.${cssClass.join('.')}`);
+    await browser.wait(EC.presenceOf(routerOutletFinder), 5000);
+    return routerOutletFinder.getAttribute('name');
+  }
 
   /**
    * Tests if the given router outlet is present in the DOM.

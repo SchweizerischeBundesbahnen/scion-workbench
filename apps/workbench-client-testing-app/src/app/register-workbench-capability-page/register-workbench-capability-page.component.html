@@ -3,6 +3,7 @@
     <sci-form-field label="Type">
       <select [formControlName]="TYPE" class="e2e-type">
         <option [value]="WorkbenchCapabilities.View">VIEW</option>
+        <option [value]="WorkbenchCapabilities.Popup">POPUP</option>
       </select>
     </sci-form-field>
 
@@ -48,6 +49,42 @@
 
       <sci-form-field label="Pin to Startpage">
         <sci-checkbox [formControlName]="PIN_TO_START_PAGE" class="e2e-pin-to-startpage"></sci-checkbox>
+      </sci-form-field>
+    </ng-container>
+
+    <ng-container *ngIf="form.get(TYPE).value === WorkbenchCapabilities.Popup" [formGroupName]="POPUP_PROPERTIES">
+      <sci-form-field label="Path">
+        <input [formControlName]="PATH" class="e2e-path">
+      </sci-form-field>
+
+      <ng-container [formGroupName]="SIZE">
+        <sci-form-field label="Min Height">
+          <input [formControlName]="MIN_HEIGHT" class="e2e-min-height">
+        </sci-form-field>
+
+        <sci-form-field label="Height">
+          <input [formControlName]="HEIGHT" class="e2e-height">
+        </sci-form-field>
+
+        <sci-form-field label="Max Height">
+          <input [formControlName]="MAX_HEIGHT" class="e2e-max-height">
+        </sci-form-field>
+
+        <sci-form-field label="Min Width">
+          <input [formControlName]="MIN_WIDTH" class="e2e-min-width">
+        </sci-form-field>
+
+        <sci-form-field label="Width">
+          <input [formControlName]="WIDTH" class="e2e-width">
+        </sci-form-field>
+
+        <sci-form-field label="Max Width">
+          <input [formControlName]="MAX_WIDTH" class="e2e-max-width">
+        </sci-form-field>
+      </ng-container>
+
+      <sci-form-field label="CSS Class(es)">
+        <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
       </sci-form-field>
     </ng-container>
   </section>

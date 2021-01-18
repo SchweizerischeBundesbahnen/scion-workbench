@@ -12,6 +12,8 @@ import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchViewInitializer } from './view/workbench-view-initializer';
 import { MicroApplicationConfig, MicrofrontendPlatform } from '@scion/microfrontend-platform';
 import { WorkbenchRouter } from './routing/workbench-router';
+import { WorkbenchPopupService } from './popup/workbench-popup-service';
+import { WorkbenchPopupInitializer } from './popup/workbench-popup-initializer';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -97,7 +99,9 @@ export class WorkbenchClient {
    */
   public static async connect(config: MicroApplicationConfig): Promise<void> {
     Beans.register(WorkbenchRouter);
+    Beans.register(WorkbenchPopupService);
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
+    Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
     await MicrofrontendPlatform.connectToHost(config);
   }
 }

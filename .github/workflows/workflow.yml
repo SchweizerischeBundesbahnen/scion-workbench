@@ -141,6 +141,14 @@ jobs:
             project: workbench-client
           - name: view
             project: workbench-client
+          - name: popup
+            project: workbench-client
+          - name: popup-params
+            project: workbench-client
+          - name: popup-router
+            project: workbench-client
+          - name: popup-size
+            project: workbench-client
     steps:
       - uses: actions/checkout@v2
       - name: 'Downloading dist/workbench and dist/workbench-client'

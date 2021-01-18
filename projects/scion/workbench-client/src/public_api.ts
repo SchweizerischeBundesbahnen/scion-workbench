@@ -12,9 +12,14 @@
  * Entry point for all public APIs of this package.
  */
 export { WorkbenchClient } from './lib/workbench-client';
-export { WorkbenchRouter, WorkbenchNavigationExtras } from './lib/routing/workbench-router';
-export { ɵMicrofrontendRouteParams, ɵWorkbenchNavigationMessageHeaders } from './lib/routing/workbench-router.constants';
+export { WorkbenchRouter, WorkbenchNavigationExtras, ɵMicrofrontendRouteParams, ɵWorkbenchNavigationMessageHeaders } from './lib/routing/workbench-router';
 export { WorkbenchViewCapability } from './lib/view/workbench-view-capability';
 export { WorkbenchView, ViewClosingListener, ViewClosingEvent, ɵVIEW_ID_CONTEXT_KEY } from './lib/view/workbench-view';
 export { WorkbenchCapabilities } from './lib/workbench-capabilities.enum';
 export { ɵWorkbenchCommands } from './lib/ɵworkbench-commands';
+export { ɵWorkbenchPopupCommand } from './lib/popup/workbench-popup-open-command';
+export { WorkbenchPopupService } from './lib/popup/workbench-popup-service';
+export { WorkbenchPopup, ɵWorkbenchPopupMessageHeaders } from './lib/popup/workbench-popup';
+export { WorkbenchPopupCapability, PopupSize } from './lib/popup/workbench-popup-capability';
+export { WorkbenchPopupConfig, PopupOrigin, CloseStrategy } from './lib/popup/workbench-popup.config';
+export { ɵPopupContext, ɵPOPUP_CONTEXT } from './lib/popup/workbench-popup-context';
