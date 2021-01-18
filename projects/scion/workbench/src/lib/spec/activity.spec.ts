@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { Component, NgModule, OnDestroy } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute, ParamMap, Router, RouteReuseStrategy } from '@angular/router';
@@ -39,7 +39,7 @@ describe('Activity part', () => {
       advance(fixture);
     }).not.toThrowError();
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('supports initial navigation with an activity registered conditionally based on the value of a query parameter', fakeAsync(inject([Router], (router: Router) => {
@@ -49,7 +49,7 @@ describe('Activity part', () => {
     advance(fixture);
     expect(fixture).toShow(ActivityDebugComponent);
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   /**
@@ -83,7 +83,7 @@ describe('Activity part', () => {
     clickElement(fixture, ActivityPartComponent, 'a.activity-2', '(5a)');
     expect(fixture).toShow(Activity2Component, '(5b)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 });
 

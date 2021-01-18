@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { Component, Injectable, NgModule } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouteReuseStrategy, RouterStateSnapshot } from '@angular/router';
@@ -83,7 +83,7 @@ describe('Activity part', () => {
     expect(fixture).toShow(Activity2Component, '(5b)');
     expect(fixture.debugElement.query(By.css('header>h1')).nativeElement.textContent).toEqual('Activity 2', '(5c)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 });
 
