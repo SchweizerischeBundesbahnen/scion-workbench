@@ -91,6 +91,7 @@ import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
 import { ViewDragService } from './view-dnd/view-drag.service';
 import { ViewTabDragImageRenderer } from './view-dnd/view-tab-drag-image-renderer.service';
 import { PopupComponent } from './popup/popup.component';
+import { MicrofrontendPopupComponent } from './microfrontend-platform/microfrontend-popup/microfrontend-popup.component';
 
 @NgModule({
   imports: [
@@ -145,6 +146,7 @@ import { PopupComponent } from './popup/popup.component';
     ArrayConcatPipe,
     ViewPortalPipe,
     MicrofrontendViewComponent,
+    MicrofrontendPopupComponent,
     SplashComponent,
     PopupComponent,
   ],

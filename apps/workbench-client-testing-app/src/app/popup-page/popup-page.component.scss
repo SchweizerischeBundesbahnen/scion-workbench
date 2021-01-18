@@ -1,0 +1,86 @@
+@use 'sci-toolkit-styles' as sci-toolkit-styles;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+  // Because this component contains expandable panels that can grow and shrink,
+  // we position it out of the document flow to give it infinite space so that it
+  // can always be rendered at its preferred size.
+  position: absolute;
+
+  > sci-viewport {
+    flex: auto;
+    --sci-viewport-content-grid-gap: 1em;
+    --sci-viewport-content-grid-template-columns: 1fr 1fr;
+    --sci-viewport-content-grid-auto-rows: min-content;
+
+    section, form {
+      display: grid;
+      grid-row-gap: .5em;
+      grid-auto-rows: min-content;
+      border: 1px solid var(--sci-color-P400);
+      border-radius: 5px;
+      padding: 1em;
+
+      > header {
+        margin-top: 0;
+        margin-bottom: 2em;
+        font-weight: bold;
+      }
+    }
+
+    section.general {
+      grid-column: 1/-1;
+    }
+
+    section.component-size {
+      grid-row: 2/8;
+    }
+
+    sci-accordion.return-value {
+      grid-column: 1/-1;
+    }
+
+    sci-accordion {
+      header {
+        font-weight: bold;
+      }
+
+      &.popup-capability sci-viewport {
+        max-height: 200px;
+        max-width: 260px;
+
+        div.capability {
+          white-space: pre;
+          font-family: monospace;
+        }
+      }
+
+      &.e2e-popup-params sci-viewport {
+        max-height: 200px;
+      }
+
+      &.preferred-overlay-size sci-viewport {
+        max-height: 200px;
+
+        div.preferred-overlay-size {
+          white-space: pre;
+          font-family: monospace;
+        }
+      }
+
+      &.return-value input {
+        @include sci-toolkit-styles.input-field();
+      }
+    }
+  }
+
+  > div.buttons {
+    flex: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: .25em;
+    margin-top: 1em;
+  }
+}

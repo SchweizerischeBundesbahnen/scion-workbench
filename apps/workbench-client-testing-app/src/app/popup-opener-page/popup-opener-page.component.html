@@ -1,0 +1,76 @@
+<ng-container [formGroup]="form">
+  <section>
+    <sci-form-field label="Qualifier">
+      <sci-params-enter [paramsFormArray]="$any(form.get(QUALIFIER))" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+    </sci-form-field>
+
+    <sci-form-field label="Params">
+      <sci-params-enter [paramsFormArray]="$any(form.get(PARAMS))" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+    </sci-form-field>
+
+    <sci-form-field label="Align">
+      <select [formControlName]="ALIGN" class="e2e-align">
+        <option value="east">east</option>
+        <option value="west">west</option>
+        <option value="north">north</option>
+        <option value="south">south</option>
+        <option value="">&lt;default&gt;</option>
+      </select>
+    </sci-form-field>
+  </section>
+
+  <sci-accordion class="anchor e2e-anchor" variant="solid" [formGroupName]="ANCHOR">
+    <ng-template sciAccordionItem [panel]="panel_anchor">
+      <header>Anchor</header>
+    </ng-template>
+    <ng-template #panel_anchor>
+      <sci-form-field label="Binding">
+        <select [formControlName]="BINDING" class="e2e-anchor">
+          <option value="element">Element</option>
+          <option value="coordinate">Coordinate</option>
+        </select>
+      </sci-form-field>
+      <ng-container *ngIf="form.get([ANCHOR, BINDING]).value === 'coordinate'">
+        <sci-form-field label="X">
+          <input [formControlName]="X" class="e2e-anchor-x">
+        </sci-form-field>
+        <sci-form-field label="Y">
+          <input [formControlName]="Y" class="e2e-anchor-y">
+        </sci-form-field>
+        <sci-form-field label="Width">
+          <input [formControlName]="WIDTH" class="e2e-anchor-width">
+        </sci-form-field>
+        <sci-form-field label="Height">
+          <input [formControlName]="HEIGHT" class="e2e-anchor-height">
+        </sci-form-field>
+      </ng-container>
+    </ng-template>
+  </sci-accordion>
+
+  <sci-accordion [formGroupName]="CLOSE_STRATEGY" variant="solid" class="e2e-close-strategy">
+    <ng-template sciAccordionItem [panel]="panel_close_strategy">
+      <header>Close Strategy</header>
+    </ng-template>
+    <ng-template #panel_close_strategy>
+      <sci-form-field label="onFocusLost">
+        <sci-checkbox [formControlName]="ON_FOCUS_LOST" class="e2e-close-on-focus-lost"></sci-checkbox>
+      </sci-form-field>
+
+      <sci-form-field label="onEscape">
+        <sci-checkbox [formControlName]="ON_ESCAPE" class="e2e-close-on-escape"></sci-checkbox>
+      </sci-form-field>
+    </ng-template>
+  </sci-accordion>
+</ng-container>
+
+<button (click)="onPopupOpen()" class="open e2e-open" [disabled]="form.invalid" #open_button>
+  Open popup
+</button>
+
+<output class="return-value e2e-return-value" *ngIf="returnValue">
+  {{returnValue}}
+</output>
+
+<output class="popup-error e2e-popup-error" *ngIf="popupError">
+  {{popupError}}
+</output>

@@ -21,6 +21,11 @@ export namespace ɵWorkbenchCommands {
   export const navigate = 'ɵworkbench/navigate';
 
   /**
+   * Topic to instruct the workbench to display a microfrontend in a popup.
+   */
+  export const popup = 'ɵworkbench/popup';
+
+  /**
    * Computes the topic via which the title of a workbench view tab can be set.
    */
   export function viewTitleTopic(viewId: string): string {
@@ -92,5 +97,19 @@ export namespace ɵWorkbenchCommands {
    */
   export function viewParamsTopic(viewId: string): string {
     return `ɵworkbench/views/${viewId}/params`;
+  }
+
+  /**
+   * Computes the topic for observing the popup anchor.
+   */
+  export function popupOriginTopic(popupId: string): string {
+    return `ɵworkbench/popups/${popupId}/origin`;
+  }
+
+  /**
+   * Computes the topic via which a popup can be closed.
+   */
+  export function popupCloseTopic(popupId: string): string {
+    return `ɵworkbench/popups/${popupId}/close`;
   }
 }

@@ -15,7 +15,7 @@ import { $, browser, ElementFinder, protractor } from 'protractor';
 import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
 import { coerceArray } from '@angular/cdk/coercion';
 import { RouterOutletPO } from './router-outlet.po';
-import { WorkbenchViewCapability as _WorkbenchViewCapability } from '@scion/workbench-client';
+import { WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability } from '@scion/workbench-client';
 
 const EC = protractor.ExpectedConditions;
 
@@ -29,6 +29,7 @@ const EC = protractor.ExpectedConditions;
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property with a string literal.
  */
 export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & { type: 'view', properties: { pinToStartPage?: boolean } };
+export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & { type: 'popup' };
 
 /**
  * Page object to interact {@link RegisterWorkbenchCapabilityPageComponent}.
@@ -67,7 +68,7 @@ export class RegisterWorkbenchCapabilityPagePO {
    *
    * Returns a Promise that resolves to the capability ID upon successful registration, or that rejects on registration error.
    */
-  public async registerCapability<T extends WorkbenchViewCapability>(capability: T): Promise<string> {
+  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(capability: T): Promise<string> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 
@@ -98,6 +99,9 @@ export class RegisterWorkbenchCapabilityPagePO {
     if (capability.type === 'view') {
       await this.enterViewCapabilityProperties(capability as WorkbenchViewCapability);
     }
+    else if (capability.type === 'popup') {
+      await this.enterPopupCapabilityProperties(capability as WorkbenchPopupCapability);
+    }
 
     await this.clickRegister();
 
@@ -125,6 +129,29 @@ export class RegisterWorkbenchCapabilityPagePO {
     }
     if (capability.properties.pinToStartPage !== undefined) {
       await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
+    }
+  }
+
+  private async enterPopupCapabilityProperties(capability: WorkbenchPopupCapability): Promise<void> {
+    const size = capability.properties.size;
+
+    if (size?.width !== undefined) {
+      await enterText(size.width, this._pageFinder.$('input.e2e-width'));
+    }
+    if (size?.height) {
+      await enterText(size.height, this._pageFinder.$('input.e2e-height'));
+    }
+    if (size?.minWidth) {
+      await enterText(size.minWidth, this._pageFinder.$('input.e2e-min-width'));
+    }
+    if (size?.maxWidth) {
+      await enterText(size.maxWidth, this._pageFinder.$('input.e2e-max-width'));
+    }
+    if (size?.minHeight) {
+      await enterText(size.minHeight, this._pageFinder.$('input.e2e-min-height'));
+    }
+    if (size?.maxHeight) {
+      await enterText(size.maxHeight, this._pageFinder.$('input.e2e-max-height'));
     }
   }
 

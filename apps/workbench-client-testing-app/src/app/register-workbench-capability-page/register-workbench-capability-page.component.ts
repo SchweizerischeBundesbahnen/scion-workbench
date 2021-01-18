@@ -12,13 +12,15 @@ import { Component } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
 import { Capability, ManifestService } from '@scion/microfrontend-platform';
-import { WorkbenchCapabilities, WorkbenchViewCapability } from '@scion/workbench-client';
+import { PopupSize, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability } from '@scion/workbench-client';
+import { undefinedIfEmpty } from '../util/util';
 
 const TYPE = 'type';
 const QUALIFIER = 'qualifier';
 const REQUIRED_PARAMS = 'requiredParams';
 const OPTIONAL_PARAMS = 'optionalParams';
 const VIEW_PROPERTIES = 'viewProperties';
+const POPUP_PROPERTIES = 'popupProperties';
 const PRIVATE = 'private';
 const PATH = 'path';
 const TITLE = 'title';
@@ -26,6 +28,13 @@ const HEADING = 'heading';
 const CLOSABLE = 'closable';
 const CSS_CLASS = 'cssClass';
 const PIN_TO_START_PAGE = 'pinToStartPage';
+const SIZE = 'size';
+const MIN_HEIGHT = 'minHeight';
+const HEIGHT = 'height';
+const MAX_HEIGHT = 'maxHeight';
+const MIN_WIDTH = 'minWidth';
+const WIDTH = 'width';
+const MAX_WIDTH = 'maxWidth';
 
 /**
  * Allows registering workbench capabilities.
@@ -43,12 +52,20 @@ export class RegisterWorkbenchCapabilityPageComponent {
   public readonly OPTIONAL_PARAMS = OPTIONAL_PARAMS;
   public readonly PRIVATE = PRIVATE;
   public readonly VIEW_PROPERTIES = VIEW_PROPERTIES;
+  public readonly POPUP_PROPERTIES = POPUP_PROPERTIES;
   public readonly PATH = PATH;
   public readonly TITLE = TITLE;
   public readonly HEADING = HEADING;
   public readonly CLOSABLE = CLOSABLE;
   public readonly CSS_CLASS = CSS_CLASS;
   public readonly PIN_TO_START_PAGE = PIN_TO_START_PAGE;
+  public readonly SIZE = SIZE;
+  public readonly MIN_HEIGHT = MIN_HEIGHT;
+  public readonly HEIGHT = HEIGHT;
+  public readonly MAX_HEIGHT = MAX_HEIGHT;
+  public readonly MIN_WIDTH = MIN_WIDTH;
+  public readonly WIDTH = WIDTH;
+  public readonly MAX_WIDTH = MAX_WIDTH;
 
   public form: FormGroup;
 
@@ -74,6 +91,18 @@ export class RegisterWorkbenchCapabilityPageComponent {
         [CSS_CLASS]: formBuilder.control(''),
         [PIN_TO_START_PAGE]: formBuilder.control(false),
       }),
+      [POPUP_PROPERTIES]: formBuilder.group({
+        [PATH]: formBuilder.control(''),
+        [SIZE]: formBuilder.group({
+          [MIN_HEIGHT]: formBuilder.control(''),
+          [HEIGHT]: formBuilder.control(''),
+          [MAX_HEIGHT]: formBuilder.control(''),
+          [MIN_WIDTH]: formBuilder.control(''),
+          [WIDTH]: formBuilder.control(''),
+          [MAX_WIDTH]: formBuilder.control(''),
+        }),
+        [CSS_CLASS]: formBuilder.control(''),
+      }),
     });
     this._formInitialValue = this.form.value;
   }
@@ -83,6 +112,8 @@ export class RegisterWorkbenchCapabilityPageComponent {
       switch (this.form.get(TYPE).value) {
         case WorkbenchCapabilities.View:
           return this.readViewCapabilityFromUI();
+        case WorkbenchCapabilities.Popup:
+          return this.readPopupCapabilityFromUI();
         default:
           throw Error('[IllegalArgumentError] Capability expected to be a workbench capability, but was not.');
       }
@@ -115,6 +146,29 @@ export class RegisterWorkbenchCapabilityPageComponent {
         cssClass: propertiesGroup.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
         closable: propertiesGroup.get(CLOSABLE).value ?? undefined,
         pinToStartPage: propertiesGroup.get(PIN_TO_START_PAGE).value,
+      },
+    };
+  }
+
+  private readPopupCapabilityFromUI(): WorkbenchPopupCapability {
+    const propertiesGroup = this.form.get(POPUP_PROPERTIES);
+    return {
+      type: WorkbenchCapabilities.Popup,
+      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray),
+      requiredParams: this.form.get(REQUIRED_PARAMS).value?.split(/,\s*/).filter(Boolean),
+      optionalParams: this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean),
+      private: this.form.get(PRIVATE).value,
+      properties: {
+        path: this.readPathFromUI(propertiesGroup),
+        size: undefinedIfEmpty<PopupSize>({
+          width: propertiesGroup.get([SIZE, WIDTH]).value || undefined,
+          height: propertiesGroup.get([SIZE, HEIGHT]).value || undefined,
+          minWidth: propertiesGroup.get([SIZE, MIN_WIDTH]).value || undefined,
+          maxWidth: propertiesGroup.get([SIZE, MAX_WIDTH]).value || undefined,
+          minHeight: propertiesGroup.get([SIZE, MIN_HEIGHT]).value || undefined,
+          maxHeight: propertiesGroup.get([SIZE, MAX_HEIGHT]).value || undefined,
+        }),
+        cssClass: propertiesGroup.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
       },
     };
   }

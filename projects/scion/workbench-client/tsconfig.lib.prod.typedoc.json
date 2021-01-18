@@ -13,7 +13,11 @@
     "toc": [
       "WorkbenchClient",
       "WorkbenchRouter",
-      "WorkbenchView"
+      "WorkbenchPopupService",
+      "WorkbenchView",
+      "WorkbenchViewCapability",
+      "WorkbenchPopup",
+      "WorkbenchPopupCapability"
     ],
     "categorizeByGroup": true
   }

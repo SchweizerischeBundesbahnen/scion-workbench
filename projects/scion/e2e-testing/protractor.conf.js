@@ -66,6 +66,18 @@ exports.config = {
     'workbench-client::view': [
       './src/workbench-client/**/view.e2e-spec.ts',
     ],
+    'workbench-client::popup': [
+      './src/workbench-client/**/popup.e2e-spec.ts',
+    ],
+    'workbench-client::popup-params': [
+      './src/workbench-client/**/popup-params.e2e-spec.ts',
+    ],
+    'workbench-client::popup-router': [
+      './src/workbench-client/**/popup-router.e2e-spec.ts',
+    ],
+    'workbench-client::popup-size': [
+      './src/workbench-client/**/popup-size.e2e-spec.ts',
+    ],
   },
   capabilities: {
     browserName: 'chrome',
