@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgModule } from '@angular/core';
 import { PartsLayoutComponent } from '../layout/parts-layout.component';
 import { WorkbenchService } from '../workbench.service';
@@ -59,7 +59,8 @@ describe('ViewComponent', () => {
     viewDebugElement.view.dirty = true;
     advance(fixture);
     expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'dirty': true}), '(C)');
-    tick();
+
+    discardPeriodicTasks();
   })));
 
   it('should render heading text', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -82,7 +83,7 @@ describe('ViewComponent', () => {
     advance(fixture);
     expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.heading')).nativeElement.innerText).toEqual('Bar', '(B)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('should render title', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -105,7 +106,7 @@ describe('ViewComponent', () => {
     advance(fixture);
     expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.title')).nativeElement.innerText).toEqual('Bar', '(B)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('should detach inactive views from Angular component tree and DOM', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -174,7 +175,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.1').component).toBe(component1, '(S)');
     expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).toBeFalsy('(T)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('invokes activate and deactivate lifecycle hooks', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -216,7 +217,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.view.active).toBeTruthy('(M)');
     expect(view2DebugElement.component.activated).toBeTruthy('(N)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('invokes destroy lifecycle hook', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -259,7 +260,7 @@ describe('ViewComponent', () => {
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(O)');
     expect(fixture.debugElement.query(By.css('spec-view-2'))).toBeFalsy('(P)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('prevents the view from being destroyed', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -290,7 +291,7 @@ describe('ViewComponent', () => {
     expect(view1DebugElement.component.destroyed).toBeTruthy('(E)');
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(F)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('allows component routing', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -321,7 +322,7 @@ describe('ViewComponent', () => {
     expect(viewDebugElement1.view.destroyed).toBeFalsy('(H)');
     expect(viewDebugElement1.view).toBe(viewDebugElement2.view, '(I)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('allows a view to be added, removed and to be added again', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -359,7 +360,7 @@ describe('ViewComponent', () => {
     expect(viewDebugElement2.view.destroyed).toBeTruthy('(E)');
     expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(F)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   function getViewDebugElement<T>(viewId: string): ViewDebugElement<T> {

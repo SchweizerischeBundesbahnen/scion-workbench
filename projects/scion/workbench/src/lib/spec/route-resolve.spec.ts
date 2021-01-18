@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { Component, NgModule } from '@angular/core';
 import { PartsLayoutComponent } from '../layout/parts-layout.component';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
@@ -60,7 +60,7 @@ describe('WorkbenchRouter', () => {
     expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view-2'])).toEqual(['view.3']);
     expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view-3'])).toEqual(['view.4']);
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   it('resolves present views by path and matrix params', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
@@ -93,7 +93,7 @@ describe('WorkbenchRouter', () => {
     expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(['view.3'].sort());
     expect(wbRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(['view.4'].sort());
 
-    tick();
+    discardPeriodicTasks();
   })));
 });
 

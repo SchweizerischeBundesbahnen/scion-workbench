@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { Component, Inject, Injectable, InjectionToken, NgModule, NgModuleFactoryLoader, Optional } from '@angular/core';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
@@ -83,7 +83,8 @@ describe('Lazily loaded view', () => {
     const viewComponent: Feature_View_Component = fixture.debugElement.query(By.directive(Feature_View_Component)).componentInstance;
     expect(viewComponent.featureService).not.toBeNull('(3)');
     expect(viewComponent.featureService).not.toBeUndefined('(4)');
-    advance(fixture);
+
+    discardPeriodicTasks();
   })));
 
   /**
@@ -116,7 +117,8 @@ describe('Lazily loaded view', () => {
     // Verify injection token
     const viewComponent: Feature_View_Component = fixture.debugElement.query(By.directive(Feature_View_Component)).componentInstance;
     expect(viewComponent.injectedValue).toEqual('child-injector-value', '(2)');
-    advance(fixture);
+
+    discardPeriodicTasks();
   })));
 });
 
@@ -147,7 +149,7 @@ export class FeatureService {
     WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
-      {path: 'feature', loadChildren: './feature/feature.module'}
+      {path: 'feature', loadChildren: './feature/feature.module'},
     ]),
   ],
   declarations: [AppComponent],

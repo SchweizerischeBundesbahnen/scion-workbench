@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
@@ -92,7 +92,7 @@ describe('Activities', () => {
     clickElement(fixture, ActivityPartComponent, 'a.activity-feature_module_a-1', '(5a)');
     expect(fixture).toShow(FeatureA_Activity1_Component, '(5b)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 });
 

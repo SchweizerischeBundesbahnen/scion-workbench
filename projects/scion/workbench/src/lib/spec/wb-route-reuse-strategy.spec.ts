@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
 import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
@@ -137,7 +137,7 @@ describe('WbRouteReuseStrategy', () => {
     expect(fixture).toShow(FeatureB_Activity2_Component, '(12b)');
     expect(fixture.debugElement.query(By.directive(FeatureB_Activity2_Component)).componentInstance).toBe(featureBActivity2, '(12c)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 });
 

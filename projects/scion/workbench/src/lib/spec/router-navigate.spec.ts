@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
 import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
 import { Router, RouterModule } from '@angular/router';
@@ -245,7 +245,7 @@ describe('Router', () => {
     clickElement(fixture, FeatureA_View1Component, 'a[wbRouterLink="../feature-b"]', '(40a)');
     expect(fixture).toShow(FeatureB_EntryComponent, '(40b)');
 
-    tick();
+    discardPeriodicTasks();
   })));
 
   // TODO [Angular 9]:
@@ -293,7 +293,8 @@ describe('Router', () => {
 
     // Close not present view
     wbRouter.navigate(['a/b/c'], {closeIfPresent: true}).then();
-    advance(fixture);
+
+    discardPeriodicTasks();
   })));
 });
 
