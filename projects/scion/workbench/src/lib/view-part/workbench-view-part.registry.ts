@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { ɵWorkbenchViewPart } from './ɵworkbench-view-part.model';
 
 /**
  * Registry for {@link WorkbenchViewPart} model objects.
  */
 @Injectable()
-export class WorkbenchViewPartRegistry {
+export class WorkbenchViewPartRegistry implements OnDestroy {
 
   private readonly _viewPartRegistry = new Map<string, ɵWorkbenchViewPart>();
 
@@ -23,7 +23,11 @@ export class WorkbenchViewPartRegistry {
     this._viewPartRegistry.set(viewPart.partId, viewPart);
   }
 
+  /**
+   * Destroys the viewpart of the given id and removes it from this registry.
+   */
   public remove(partId: string): void {
+    this._viewPartRegistry.get(partId).destroy();
     this._viewPartRegistry.delete(partId);
   }
 
@@ -36,5 +40,10 @@ export class WorkbenchViewPartRegistry {
       throw Error(`[NullPartError] Part '${partId}' not found in the registry.`);
     }
     return viewPart;
+  }
+
+  public ngOnDestroy(): void {
+    this._viewPartRegistry.forEach(viewPart => viewPart.destroy());
+    this._viewPartRegistry.clear();
   }
 }

@@ -20,7 +20,6 @@ import { ɵWorkbenchView } from './ɵworkbench-view.model';
 @Injectable()
 export class WorkbenchViewRegistry implements OnDestroy {
 
-  private readonly _destroy$ = new Subject<void>();
   private readonly _viewRegistry = new Map<string, ɵWorkbenchView>();
   private readonly _viewRegistryChange$ = new Subject<void>();
 
@@ -30,10 +29,10 @@ export class WorkbenchViewRegistry implements OnDestroy {
   }
 
   /**
-   * Destroys the view of the given view reference and removes it from this registry.
+   * Destroys the view of the given id and removes it from this registry.
    */
   public remove(viewId: string): void {
-    this._viewRegistry.get(viewId).portal.destroy();
+    this._viewRegistry.get(viewId).destroy();
     this._viewRegistry.delete(viewId);
     this._viewRegistryChange$.next();
   }
@@ -91,6 +90,8 @@ export class WorkbenchViewRegistry implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._destroy$.next();
+    this._viewRegistry.forEach(view => view.destroy());
+    this._viewRegistry.clear();
+    this._viewRegistryChange$.next();
   }
 }
