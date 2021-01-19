@@ -15,7 +15,7 @@ import { ManifestService, mapToBody, MessageClient, MessageHeaders } from '@scio
 import { distinctUntilChanged, filter, map, mapTo, mergeMap, shareReplay, skip, switchMap, takeUntil } from 'rxjs/operators';
 import { Observables } from '@scion/toolkit/util';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
-import { ɵMicrofrontendRouteParams } from '../routing/workbench-router';
+import { ɵMicrofrontendRouteParams } from '../routing/workbench-router-navigate-command';
 
 /**
  * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.

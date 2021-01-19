@@ -5,7 +5,7 @@ import { IntentClient, ManifestService, MessageClient, MicroApplicationConfig, O
 import { WorkbenchInitializer } from '../startup/workbench-initializer';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchPopupService, WorkbenchRouter } from '@scion/workbench-client';
-import { MicrofrontendWorkbenchRouter } from './routing/microfrontend-workbench-router.service';
+import { MicrofrontendNavigateCommandHandler } from './routing/microfrontend-navigate-command-handler.service';
 import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './initialization/ng-zone-decorators';
 import { WorkbenchModuleConfig } from '../workbench-module-config';
 import { LogDelegate } from './initialization/log-delegate.service';
@@ -34,7 +34,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       },
       {
         provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
-        useExisting: MicrofrontendWorkbenchRouter,
+        useExisting: MicrofrontendNavigateCommandHandler,
         multi: true,
       },
       {
@@ -49,7 +49,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       LogDelegate,
       WorkbenchRouter,
       WorkbenchPopupService,
-      MicrofrontendWorkbenchRouter,
+      MicrofrontendNavigateCommandHandler,
       MicrofrontendPopupCommandHandler,
       MicrofrontendViewCommandHandler,
       NgZoneMessageClientDecorator,
