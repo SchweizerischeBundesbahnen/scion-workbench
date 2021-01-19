@@ -764,7 +764,7 @@ describe('Workbench Router', () => {
     const viewPagePO = new ViewPagePO(testeeViewId);
 
     // mark the view dirty
-    await viewPagePO.checkDirty(true);
+    await viewPagePO.markDirty();
 
     // perform self navigation by setting view params
     await routerPagePO.viewTabPO.activate();
@@ -816,7 +816,7 @@ describe('Workbench Router', () => {
     const viewPagePO = new ViewPagePO(testeeViewId);
 
     // mark the view dirty
-    await viewPagePO.checkDirty(true);
+    await viewPagePO.markDirty();
     await expect(await testeeViewTabPO.isDirty()).toBe(true);
 
     // navigate to another view in the testee view tab

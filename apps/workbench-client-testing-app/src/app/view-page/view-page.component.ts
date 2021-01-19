@@ -13,14 +13,13 @@ import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { ViewClosingEvent, ViewClosingListener, WorkbenchRouter, WorkbenchView } from '@scion/workbench-client';
 import { ActivatedRoute } from '@angular/router';
 import { UUID } from '@scion/toolkit/uuid';
-import { MonoTypeOperatorFunction, Subject } from 'rxjs';
-import { finalize, startWith, take, takeUntil } from 'rxjs/operators';
+import { EMPTY, MonoTypeOperatorFunction, Subject } from 'rxjs';
+import { finalize, mergeMapTo, startWith, take, takeUntil } from 'rxjs/operators';
 import { APP_INSTANCE_ID } from '../app-instance-id';
 import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
 
 const TITLE = 'title';
 const HEADING = 'heading';
-const DIRTY = 'dirty';
 const CLOSABLE = 'closable';
 const CONFIRM_CLOSING = 'confirmClosing';
 
@@ -33,7 +32,6 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
 
   public readonly TITLE = TITLE;
   public readonly HEADING = HEADING;
-  public readonly DIRTY = DIRTY;
   public readonly CLOSABLE = CLOSABLE;
   public readonly CONFIRM_CLOSING = CONFIRM_CLOSING;
 
@@ -52,20 +50,15 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [HEADING]: formBuilder.control(''),
-      [DIRTY]: formBuilder.control(false),
       [CLOSABLE]: formBuilder.control(true),
       [CONFIRM_CLOSING]: formBuilder.control(false),
     });
     this.viewParamsControl = formBuilder.array([]);
 
-    this.view.title = this.form.get(TITLE).valueChanges
-      .pipe(this.logCompletion('TitleObservableComplete'));
-    this.view.heading = this.form.get(HEADING).valueChanges
-      .pipe(this.logCompletion('HeadingObservableComplete'));
-    this.view.dirty = this.form.get(DIRTY).valueChanges
-      .pipe(this.logCompletion('DirtyObservableComplete'));
-    this.view.closable = this.form.get(CLOSABLE).valueChanges
-      .pipe(this.logCompletion('ClosableObservableComplete'));
+    this.view.setTitle(this.form.get(TITLE).valueChanges.pipe(this.logCompletion('TitleObservableComplete')));
+    this.view.setHeading(this.form.get(HEADING).valueChanges.pipe(this.logCompletion('HeadingObservableComplete')));
+    this.view.markDirty(new Subject<void>().pipe(mergeMapTo(EMPTY), this.logCompletion('DirtyObservableComplete')));
+    this.view.setClosable(this.form.get(CLOSABLE).valueChanges.pipe(this.logCompletion('ClosableObservableComplete')));
 
     this.installClosingListener();
     this.installViewActiveStateLogger();
@@ -80,6 +73,15 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
 
     if (!confirm('Do you want to close this view?')) {
       event.preventDefault();
+    }
+  }
+
+  public onMarkDirty(dirty?: boolean): void {
+    if (dirty === undefined) {
+      this.view.markDirty();
+    }
+    else {
+      this.view.markDirty(dirty);
     }
   }
 
@@ -116,9 +118,9 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
       )
       .subscribe(params => {
         if (params.has('initialTitle')) {
-          this.view.title = params.get('initialTitle');
+          this.view.setTitle(params.get('initialTitle'));
           // Restore title observer
-          this.view.title = this.form.get(TITLE).valueChanges;
+          this.view.setTitle(this.form.get(TITLE).valueChanges);
         }
       });
   }

@@ -74,7 +74,7 @@ export abstract class WorkbenchView {
    * You can provide the title either as a string literal or as Observable. If you pass an Observable, it will be unsubscribed when navigating
    * to another microfrontend, whether from the same app or a different one.
    */
-  public abstract title: string | Observable<string>;
+  public abstract setTitle(title: string | Observable<string>): void;
 
   /**
    * Sets the sub title to be displayed in the view tab.
@@ -82,15 +82,17 @@ export abstract class WorkbenchView {
    * You can provide the heading either as a string literal or as Observable. If you pass an Observable, it will be unsubscribed when navigating
    * to another microfrontend, whether from the same app or a different one.
    */
-  public abstract heading: string | Observable<string>;
+  public abstract setHeading(heading: string | Observable<string>): void;
 
   /**
    * Sets whether this view is dirty or pristine. When navigating to another microfrontend, the view's dirty state is set to pristine.
    *
    * You can provide the dirty/pristine state either as a boolean or as Observable. If you pass an Observable, it will be unsubscribed when
    * navigating to another microfrontend, whether from the same app or a different one.
+   *
+   * If not passing an argument, the view is marked as dirty. To mark it as pristine, you need to pass `false`.
    */
-  public abstract dirty: boolean | Observable<boolean>;
+  public abstract markDirty(dirty?: boolean | Observable<boolean>): void;
 
   /**
    * Controls whether the user should be allowed to close this workbench view.
@@ -98,7 +100,7 @@ export abstract class WorkbenchView {
    * You can provide either a boolean or Observable. If you pass an Observable, it will be unsubscribed when navigating to another microfrontend,
    * whether from the same app or a different one.
    */
-  public abstract closable: boolean | Observable<boolean>;
+  public abstract setClosable(closable: boolean | Observable<boolean>): void;
 
   /**
    * Initiates the closing of this workbench view.
@@ -188,7 +190,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
   /**
    * @inheritDoc
    */
-  public set title(title: string | Observable<string>) {
+  public setTitle(title: string | Observable<string>): void {
     this._propertyChange$.next('title');
 
     Observables.coerce(title)
@@ -202,7 +204,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
   /**
    * @inheritDoc
    */
-  public set heading(heading: string | Observable<string>) {
+  public setHeading(heading: string | Observable<string>): void {
     this._propertyChange$.next('heading');
 
     Observables.coerce(heading)
@@ -216,10 +218,10 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
   /**
    * @inheritDoc
    */
-  public set dirty(dirty: boolean | Observable<boolean>) {
+  public markDirty(dirty: undefined | boolean | Observable<boolean>): void {
     this._propertyChange$.next('dirty');
 
-    Observables.coerce(dirty)
+    Observables.coerce(dirty ?? true)
       .pipe(
         mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewDirtyTopic(this.viewId), it)),
         takeUntil(merge(this._propertyChange$.pipe(filter(prop => prop === 'dirty')), this._beforeInAppNavigation$, this._beforeUnload$, this._destroy$)),
@@ -230,7 +232,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
   /**
    * @inheritDoc
    */
-  public set closable(closable: boolean | Observable<boolean>) {
+  public setClosable(closable: boolean | Observable<boolean>): void {
     this._propertyChange$.next('closable');
 
     Observables.coerce(closable)

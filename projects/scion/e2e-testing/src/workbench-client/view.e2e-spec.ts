@@ -194,11 +194,14 @@ describe('Workbench View', () => {
     const viewPagePO = await ViewPagePO.openInNewTab('app1');
     const viewTabPO = viewPagePO.viewTabPO;
 
-    await viewPagePO.checkDirty(true);
+    await viewPagePO.markDirty(true);
     await expect(await viewTabPO.isDirty()).toBe(true);
 
-    await viewPagePO.checkDirty(false);
+    await viewPagePO.markDirty(false);
     await expect(await viewTabPO.isDirty()).toBe(false);
+
+    await viewPagePO.markDirty(); // noarg
+    await expect(await viewTabPO.isDirty()).toBe(true);
   });
 
   it('should allow updating the viewtab closable flag', async () => {
