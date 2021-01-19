@@ -22,7 +22,7 @@ import { MicrofrontendViewRoutes } from '../routing/microfrontend-routes';
 /**
  * Handles commands of microfrontends loaded into workbench views, such as setting view tab properties or closing the view.
  *
- * This class is constructed eagerly before the Microfrontend Platform activates registered micro apps. See {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}.
+ * This class is constructed before the Microfrontend Platform activates micro applications via {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION} DI token.
  */
 @Injectable()
 export class MicrofrontendViewCommandHandler implements OnDestroy {
@@ -57,7 +57,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
       )
       .subscribe((view: WorkbenchView) => {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(view.viewId);
-        this._messageClient.publish(commandTopic, view.active, {retain: true}).then();
+        this._messageClient.publish(commandTopic, view.active, {retain: true});
       });
   }
 

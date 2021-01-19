@@ -15,6 +15,7 @@ import { $, browser, ElementFinder, protractor } from 'protractor';
 import { Qualifier } from '@scion/microfrontend-platform';
 import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
 import { RouterOutletPO } from './router-outlet.po';
+import { Dictionary } from '@scion/toolkit/util';
 
 const EC = protractor.ExpectedConditions;
 
@@ -69,7 +70,7 @@ export class RouterPagePO {
     await paramsEnterPO.enterParams(qualifier);
   }
 
-  public async enterParams(params: Qualifier): Promise<void> {
+  public async enterParams(params: Dictionary): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
     const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-params'));

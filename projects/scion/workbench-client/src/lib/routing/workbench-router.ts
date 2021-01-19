@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Intent, IntentClient, ManifestService, MessageClient, Qualifier, throwOnErrorStatus } from '@scion/microfrontend-platform';
+import { Intent, IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, throwOnErrorStatus } from '@scion/microfrontend-platform';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchViewCapability } from '../view/workbench-view-capability';
 import { take } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import { WorkbenchView } from '../view/workbench-view';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
 import { Dictionaries, Dictionary, Maps } from '@scion/toolkit/util';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
-import { mapArray } from '@scion/toolkit/operators';
+import { ɵWorkbenchRouterNavigateCommand } from './workbench-router-navigate-command';
 
 /**
  * Allows navigating to a microfrontend in a workbench view.
@@ -49,44 +49,50 @@ export class WorkbenchRouter {
    *                     When navigating in the context of a view, you can pass an empty qualifier to navigate to the current view again, e.g.,
    *                     to update view parameters to reflect the view state in the URL.
    * @param  extras - Options to control navigation.
-   * @return Promise that resolves upon successful navigation, or that rejects if navigation failed, e.g., if missing the view intention declaration,
-   *         or because no application provides the requested view.
+   * @return Promise that resolves to `true` when navigation succeeds, to `false` when navigation fails, or is rejected on error,
+   *         e.g., if not qualified or because no application provides the requested view.
    */
-  public async navigate(qualifier: Qualifier | {}, extras?: WorkbenchNavigationExtras): Promise<void> {
+  public async navigate(qualifier: Qualifier | {}, extras?: WorkbenchNavigationExtras): Promise<boolean> {
     // To be able to integrate views from apps without workbench integration, we do not delegate the navigation to the app
     // that provides the requested view, but interact with the workbench directly. Nevertheless, we issue an intent so that
     // the platform throws an error in case of unqualified interaction.
-
-    const navigateHeaders = new Map();
-    // Check if to navigate to the current view, e.g., to update view parameters to reflect the view state in the URL.
-    if (!qualifier || Object.keys(qualifier).length === 0) {
-      const {capability, intent} = await this.currentNavigation();
-      navigateHeaders
-        .set(ɵWorkbenchNavigationMessageHeaders.CAPABILITY_IDS, [capability.metadata.id])
-        .set(ɵWorkbenchNavigationMessageHeaders.NAVIGATION_EXTRAS, this.coerceNavigationExtras(intent.qualifier, extras));
-    }
-    else {
-      await Beans.get(IntentClient).publish({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras.params)});
-
-      // Look up matching view capabilities. We only get views for which we have declared an intention and which are visible to us.
-      const capabilityIds = await Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View, qualifier})
-        .pipe(mapArray(capability => capability.metadata.id), take(1))
-        .toPromise();
-      navigateHeaders
-        .set(ɵWorkbenchNavigationMessageHeaders.CAPABILITY_IDS, capabilityIds)
-        .set(ɵWorkbenchNavigationMessageHeaders.NAVIGATION_EXTRAS, this.coerceNavigationExtras(qualifier, extras));
+    if (!this.isSelfNavigation(qualifier)) {
+      await Beans.get(IntentClient).publish({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras.params)}, extras);
     }
 
-    // Trigger the navigation.
-    await Beans.get(MessageClient).request$(ɵWorkbenchCommands.navigate, undefined, {headers: navigateHeaders})
+    const navigateCommand = await this.constructNavigateCommand(qualifier, extras);
+    return Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.navigate, navigateCommand)
       .pipe(
         take(1),
         throwOnErrorStatus(),
+        mapToBody(),
       )
       .toPromise();
   }
 
-  private coerceNavigationExtras(qualifier: Qualifier, extras?: WorkbenchNavigationExtras): WorkbenchNavigationExtras {
+  /**
+   * Constructs the command to instruct the Workbench Router to navigate to the microfrontend of given view capability(-ies).
+   */
+  private async constructNavigateCommand(qualifier: Qualifier, extras: WorkbenchNavigationExtras | undefined): Promise<ɵWorkbenchRouterNavigateCommand> {
+    if (this.isSelfNavigation(qualifier)) {
+      const {intent, capability} = await this.currentNavigation();
+      return {
+        capabilities: [capability],
+        extras: this.constructNavigationExtras(intent.qualifier, extras),
+      };
+    }
+    else {
+      return {
+        capabilities: await this.lookupViewCapabilities(qualifier),
+        extras: this.constructNavigationExtras(qualifier, extras),
+      };
+    }
+  }
+
+  /**
+   * Constructs navigation extras based on the given extras to instrument the Workbench Router.
+   */
+  private constructNavigationExtras(qualifier: Qualifier, extras: WorkbenchNavigationExtras | undefined): WorkbenchNavigationExtras {
     return {
       ...extras,
       selfViewId: extras?.selfViewId ?? Beans.opt(WorkbenchView)?.viewId,
@@ -95,6 +101,17 @@ export class WorkbenchRouter {
         ...qualifier,
       },
     };
+  }
+
+  /**
+   * Looks up the requested view capabilities.
+   *
+   * Returns a Promise that resolves to the requested capabilities. Only capabilities for which the requester is qualified are returned.
+   */
+  private async lookupViewCapabilities(qualifier: Qualifier): Promise<WorkbenchViewCapability[]> {
+    return await Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View, qualifier})
+      .pipe(take(1))
+      .toPromise();
   }
 
   private async currentNavigation(): Promise<CurrentNavigation> {
@@ -123,6 +140,13 @@ export class WorkbenchRouter {
         qualifier: currentIntentQualifier,
       },
     };
+  }
+
+  /**
+   * Checks whether requesting a self navigation, e.g., for updating params to be reflected in the top-level URL (persistent workbench navigation).
+   */
+  private isSelfNavigation(qualifier: Qualifier): boolean {
+    return !qualifier || Object.keys(qualifier).length === 0;
   }
 }
 
@@ -169,38 +193,11 @@ export interface WorkbenchNavigationExtras {
 
 /**
  * Represents the current navigation.
+ *
+ * @ignore
  */
 interface CurrentNavigation {
   intent: Intent;
   capability: WorkbenchViewCapability;
 }
 
-/**
- * Message headers to instruct the Workbench router to navigate.
- *
- * @docs-private Not public API, intended for internal use only.
- * @ignore
- */
-export enum ɵWorkbenchNavigationMessageHeaders {
-  /**
-   * View capability ids resolved for the current navigation.
-   */
-  CAPABILITY_IDS = 'ɵWORKBENCH-ROUTER:VIEW_CAPABILITY_IDS',
-  /**
-   * Options to control navigation.
-   */
-  NAVIGATION_EXTRAS = 'ɵWORKBENCH-ROUTER:NAVIGATION_EXTRAS',
-}
-
-/**
- * Named parameters used in microfrontend routes.
- *
- * @docs-private Not public API, intended for internal use only.
- * @ignore
- */
-export enum ɵMicrofrontendRouteParams {
-  /**
-   * Named path segment in the microfrontend route representing the view capability for which to embed its microfrontend.
-   */
-  ɵVIEW_CAPABILITY_ID = 'ɵViewCapabilityId',
-}
