@@ -70,16 +70,20 @@
     <input [formControlName]="HEADING" class="e2e-heading">
   </sci-form-field>
 
-  <sci-form-field label="Dirty">
-    <sci-checkbox [formControlName]="DIRTY" class="e2e-dirty"></sci-checkbox>
-  </sci-form-field>
-
   <sci-form-field label="Closable">
     <sci-checkbox [formControlName]="CLOSABLE" class="e2e-closable"></sci-checkbox>
   </sci-form-field>
 
   <sci-form-field label="Confirm Closing">
     <sci-checkbox [formControlName]="CONFIRM_CLOSING" class="e2e-confirm-closing"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Dirty State">
+    <div class="dirty-state-actions">
+      <button (click)="onMarkDirty()" class="e2e-mark-dirty-noarg">Mark as dirty (no arg)</button>
+      <button (click)="onMarkDirty(true)" class="e2e-mark-dirty">Mark as dirty</button>
+      <button (click)="onMarkDirty(false)" class="e2e-mark-pristine">Mark as pristine</button>
+    </div>
   </sci-form-field>
 </form>
 

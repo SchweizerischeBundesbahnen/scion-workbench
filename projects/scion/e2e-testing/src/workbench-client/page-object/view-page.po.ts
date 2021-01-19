@@ -160,10 +160,23 @@ export class ViewPagePO {
     await enterText(heading, this._pageFinder.$('input.e2e-heading'));
   }
 
-  public async checkDirty(check: boolean): Promise<void> {
+  public async markDirty(dirty?: boolean): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
-    await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-dirty')).toggle(check);
+    switch (dirty) {
+      case true: {
+        await this._pageFinder.$('button.e2e-mark-dirty').click();
+        break;
+      }
+      case false: {
+        await this._pageFinder.$('button.e2e-mark-pristine').click();
+        break;
+      }
+      default: {
+        await this._pageFinder.$('button.e2e-mark-dirty-noarg').click();
+        break;
+      }
+    }
   }
 
   public async checkClosable(check: boolean): Promise<void> {

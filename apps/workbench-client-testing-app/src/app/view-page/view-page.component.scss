@@ -16,6 +16,12 @@
       margin-bottom: 2em;
       font-weight: bold;
     }
+
+    > sci-form-field div.dirty-state-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 200px);
+      column-gap: .25em;
+    }
   }
 
   > sci-accordion {
