@@ -32,7 +32,7 @@ const routes: Routes = [
   },
   {
     path: 'test-messagebox',
-    loadChildren: (): any => import('./messagebox-page/messagebox-page.module').then(m => m.MessageboxPageModule),
+    loadChildren: (): any => import('./message-box-opener-page/message-box-opener-page.module').then(m => m.MessageBoxOpenerPageModule),
     data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-messagebox', pinToStartPage: true},
   },
   {

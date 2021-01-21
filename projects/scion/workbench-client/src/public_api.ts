@@ -24,3 +24,6 @@ export { WorkbenchPopup, ɵWorkbenchPopupMessageHeaders } from './lib/popup/work
 export { WorkbenchPopupCapability, PopupSize } from './lib/popup/workbench-popup-capability';
 export { WorkbenchPopupConfig, PopupOrigin, CloseStrategy } from './lib/popup/workbench-popup.config';
 export { ɵPopupContext, ɵPOPUP_CONTEXT } from './lib/popup/workbench-popup-context';
+export { WorkbenchMessageBoxCapability } from './lib/message-box/workbench-message-box-capability';
+export { WorkbenchMessageBoxService } from './lib/message-box/workbench-message-box-service';
+export { WorkbenchMessageBoxConfig } from './lib/message-box/workbench-message-box.config';

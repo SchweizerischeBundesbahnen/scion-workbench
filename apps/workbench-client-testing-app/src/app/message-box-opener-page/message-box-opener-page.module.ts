@@ -10,15 +10,13 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciPropertyModule } from '@scion/toolkit.internal/widgets';
+import { SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule } from '@scion/toolkit.internal/widgets';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
-import { ViewPageComponent } from './view-page.component';
-import { WorkbenchModule } from '@scion/workbench';
-import { UtilModule } from '../util/util.module';
+import { MessageBoxOpenerPageComponent } from './message-box-opener-page.component';
 
 const routes: Routes = [
-  {path: '', component: ViewPageComponent},
+  {path: '', component: MessageBoxOpenerPageComponent},
 ];
 
 @NgModule({
@@ -28,15 +26,12 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forChild(routes),
     SciFormFieldModule,
-    SciPropertyModule,
     SciCheckboxModule,
-    SciAccordionModule,
-    WorkbenchModule.forChild(),
-    UtilModule,
+    SciParamsEnterModule,
   ],
   declarations: [
-    ViewPageComponent,
+    MessageBoxOpenerPageComponent,
   ],
 })
-export class ViewPageModule {
+export class MessageBoxOpenerPageModule {
 }

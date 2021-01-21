@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { WorkbenchModule } from '@scion/workbench';
 import { PopupPageComponent } from './popup-page.component';
 import { SciViewportModule } from '@scion/toolkit/viewport';
-import { UtilModule } from '../../util/util.module';
+import { UtilModule } from '../util/util.module';
 
 @NgModule({
   imports: [

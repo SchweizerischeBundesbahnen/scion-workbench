@@ -24,6 +24,8 @@ import { environment } from '../environments/environment';
 import { provideConfirmWorkbenchStartupInitializer } from './workbench/confirm-workbench-startup-initializer.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { InspectMessageBoxModule } from './inspect-message-box-provider/inspect-message-box.module';
+import { provideInspectMessageBoxProvider } from './inspect-message-box-provider/inspect-message-box-provider.service';
 
 @NgModule({
   declarations: [
@@ -45,6 +47,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     SciViewportModule,
     SciTabbarModule,
     SciFilterFieldModule,
+    InspectMessageBoxModule,
     animationModuleIfEnabled(),
   ],
   bootstrap: [
@@ -52,6 +55,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   ],
   providers: [
     provideConfirmWorkbenchStartupInitializer(),
+    provideInspectMessageBoxProvider(),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

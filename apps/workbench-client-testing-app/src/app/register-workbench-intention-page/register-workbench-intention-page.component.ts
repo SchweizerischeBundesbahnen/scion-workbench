@@ -36,7 +36,7 @@ export class RegisterWorkbenchIntentionPageComponent {
   constructor(formBuilder: FormBuilder, private _manifestService: ManifestService) {
     this.form = formBuilder.group({
       [TYPE]: formBuilder.control('', Validators.required),
-      [QUALIFIER]: formBuilder.array([], Validators.required),
+      [QUALIFIER]: formBuilder.array([]),
     });
   }
 

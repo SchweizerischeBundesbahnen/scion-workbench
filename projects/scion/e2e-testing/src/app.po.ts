@@ -14,9 +14,6 @@ import { StartPagePO } from './start-page.po';
 import { coerceArray, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { WebdriverExecutionContexts } from './helper/webdriver-execution-context';
 
-declare type Duration = 'short' | 'medium' | 'long' | 'infinite';
-declare type Severity = 'info' | 'warn' | 'error';
-
 export class AppPO {
 
   private _workbenchStartupQueryParams: URLSearchParams;
@@ -366,6 +363,15 @@ export class AppPO {
   }
 
   /**
+   * Returns the number of opened message boxes.
+   */
+  public async getMessageBoxCount(): Promise<number> {
+    await WebdriverExecutionContexts.switchToDefault();
+    return $('wb-workbench').$$('wb-message-box').count();
+  }
+  }
+
+  /**
    * Returns a handle representing the notification having given CSS class(es) set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
@@ -388,7 +394,7 @@ export class AppPO {
         return notificationFinder.$('.e2e-text').getText();
       }
 
-      public async getSeverity(): Promise<Severity> {
+      public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
         await WebdriverExecutionContexts.switchToDefault();
         const cssClasses = await getCssClasses(notificationFinder);
         if (cssClasses.includes('e2e-severity-info')) {
@@ -403,7 +409,7 @@ export class AppPO {
         return null;
       }
 
-      public async getDuration(): Promise<Duration> {
+      public async getDuration(): Promise<'short' | 'medium' | 'long' | 'infinite'> {
         await WebdriverExecutionContexts.switchToDefault();
         const cssClasses = await getCssClasses(notificationFinder);
         if (cssClasses.includes('e2e-duration-short')) {
@@ -435,12 +441,21 @@ export class AppPO {
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
   public findMessageBox(findBy: { cssClass: string | string[] }): MessageBoxPO {
-    const msgboxFinder = $('wb-workbench').$(`wb-message-box.${coerceArray(findBy.cssClass).join('.')}`);
+    const msgboxFinder = $(`wb-message-box.${coerceArray(findBy.cssClass).join('.')}`);
+    const msgboxComponentFinder = msgboxFinder.$('.e2e-body');
 
     return new class implements MessageBoxPO {
       public async isPresent(): Promise<boolean> {
         await WebdriverExecutionContexts.switchToDefault();
-        return msgboxFinder.isPresent();
+        return await msgboxFinder.isPresent() && await msgboxComponentFinder.isPresent();
+      }
+
+      public async isDisplayed(): Promise<boolean> {
+        await WebdriverExecutionContexts.switchToDefault();
+        if (!await this.isPresent()) {
+          return false;
+        }
+        return await msgboxFinder.isDisplayed() && await msgboxComponentFinder.isDisplayed();
       }
 
       public async getTitle(): Promise<string> {
@@ -448,12 +463,7 @@ export class AppPO {
         return msgboxFinder.$('.e2e-title').getText();
       }
 
-      public async getText(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return msgboxFinder.$('.e2e-text').getText();
-      }
-
-      public async getSeverity(): Promise<Severity | null> {
+      public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
         await WebdriverExecutionContexts.switchToDefault();
         const cssClasses = await getCssClasses(msgboxFinder);
         if (cssClasses.includes('e2e-severity-info')) {
@@ -465,30 +475,19 @@ export class AppPO {
         else if (cssClasses.includes('e2e-severity-error')) {
           return 'error';
         }
-        return null;
+        throw Error('Expected severity CSS class to be present, but was not.');
       }
 
-      public async getModality(): Promise<'application' | 'view' | null> {
+      public async getModality(): Promise<'application' | 'view'> {
         await WebdriverExecutionContexts.switchToDefault();
-        const cssClasses = await getCssClasses(msgboxFinder);
-        if (cssClasses.includes('e2e-modality-application')) {
-          return 'application';
-        }
-        else if (cssClasses.includes('e2e-severity-view')) {
+
+        if (await $(`wb-message-box-stack.e2e-view-modal ${msgboxFinder.locator().value}`).isPresent()) {
           return 'view';
         }
-        return null;
-      }
-
-      public async isContentSelectable(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const text = await msgboxFinder.$('.e2e-text').getText();
-
-        await browser.actions().mouseMove(msgboxFinder.$('.e2e-text')).perform();
-        await browser.actions().doubleClick().perform();
-        const selection: string = await browser.executeScript('return window.getSelection().toString();') as string;
-
-        return selection && selection.length && text.includes(selection);
+        if (await $(`wb-message-box-stack.e2e-application-modal ${msgboxFinder.locator().value}`).isPresent()) {
+          return 'application';
+        }
+        throw Error('Message box not found in the view-modal nor in the application-modal message box stack.');
       }
 
       public async getActions(): Promise<{ [key: string]: string }> {
@@ -514,9 +513,8 @@ export class AppPO {
         await browser.wait(protractor.ExpectedConditions.stalenessOf(msgboxFinder), 5000);
       }
 
-      public async isDisplayed(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return msgboxFinder.isDisplayed();
+      public $(selector: string): ElementFinder {
+        return msgboxComponentFinder.$(selector);
       }
     };
   }
@@ -761,10 +759,10 @@ export interface NotificationPO {
   getTitle(): Promise<string>;
 
   getText(): Promise<string>;
+  getSeverity(): Promise<'info' | 'warn' | 'error' | null>;
 
-  getSeverity(): Promise<Severity | null>;
+  getDuration(): Promise<'short' | 'medium' | 'long' | 'infinite' | null>;
 
-  getDuration(): Promise<Duration | null>;
 
   close(): Promise<void>;
 }
@@ -772,21 +770,19 @@ export interface NotificationPO {
 export interface MessageBoxPO {
   isPresent(): Promise<boolean>;
 
+  isDisplayed(): Promise<boolean>;
+
   getTitle(): Promise<string>;
 
-  getText(): Promise<string>;
-
-  getSeverity(): Promise<Severity | null>;
+  getSeverity(): Promise<'info' | 'warn' | 'error' | null>;
 
   getModality(): Promise<'view' | 'application' | null>;
-
-  isContentSelectable(): Promise<boolean>;
 
   getActions(): Promise<{ [key: string]: string }>;
 
   close(action: string): Promise<void>;
 
-  isDisplayed(): Promise<boolean>;
+  $(selector: string): ElementFinder;
 }
 
 export interface ViewPartActionPO {

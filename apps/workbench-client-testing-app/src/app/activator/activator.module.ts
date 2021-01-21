@@ -163,5 +163,24 @@ export class ActivatorModule {
           cssClass: 'e2e-test-popup',
         },
       });
+
+    // Register view to open a workbench message box.
+    await this._manifestService.registerCapability(
+      {
+        type: WorkbenchCapabilities.View,
+        qualifier: {
+          component: 'message-box',
+          app,
+        },
+        description: '[e2e] Allows displaying a message in a workbench message box',
+        private: false,
+        properties: {
+          path: 'test-message-box',
+          pinToStartPage: true,
+          title: 'Workbench Message Box',
+          heading,
+          cssClass: 'e2e-test-message-box',
+        },
+      });
   }
 }

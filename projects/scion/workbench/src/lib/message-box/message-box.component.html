@@ -5,7 +5,7 @@
         (wbMoveEnd)="onMoveEnd()">
 </header>
 <div class="outline">
-  <div class="body">
+  <div class="body e2e-body">
     <h1 *ngIf="!!title" class="e2e-title">{{title}}</h1>
     <ng-container *ngIf="textual; then text_template; else component_template"></ng-container>
   </div>
@@ -26,7 +26,7 @@
 </div>
 
 <ng-template #text_template>
-  <span class="text e2e-text">{{text}}</span>
+  <span class="text">{{text}}</span>
 </ng-template>
 
 <ng-template #component_template>

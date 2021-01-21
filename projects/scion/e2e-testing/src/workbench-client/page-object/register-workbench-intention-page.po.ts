@@ -41,7 +41,7 @@ export class RegisterWorkbenchIntentionPagePO {
    *
    * Returns a Promise that resolves to the intention ID upon successful registration, or that rejects on registration error.
    */
-  public async registerIntention(intention: Intention & { type: 'view' | 'popup' }): Promise<string> {
+  public async registerIntention(intention: Intention & { type: 'view' | 'popup' | 'message-box' }): Promise<string> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 
@@ -61,7 +61,7 @@ export class RegisterWorkbenchIntentionPagePO {
     }
   }
 
-  public async selectType(type: 'view' | 'popup'): Promise<void> {
+  public async selectType(type: 'view' | 'popup' | 'message-box'): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
     await selectOption(type, this._pageFinder.$('select.e2e-type'));
@@ -72,7 +72,9 @@ export class RegisterWorkbenchIntentionPagePO {
     await assertPageToDisplay(this._pageFinder);
     const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-qualifier'));
     await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(qualifier);
+    if (qualifier && Object.keys(qualifier).length) {
+      await paramsEnterPO.enterParams(qualifier);
+    }
   }
 
   public async clickRegister(): Promise<void> {

@@ -13,11 +13,22 @@
  */
 export enum WorkbenchCapabilities {
   /**
-   * Allows the contribution of a microfrontend for display in workbench view.
+   * Allows contributing a microfrontend for display in workbench view.
+   *
+   * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.
    */
   View = 'view',
   /**
-   * Allows the contribution of a microfrontend for display in workbench popup.
+   * Allows contributing a microfrontend for display in workbench popup.
+   *
+   * A popup is a visual workbench component for displaying content above other content.
    */
   Popup = 'popup',
+  /**
+   * Allows contributing a message box provider in the host app.
+   *
+   * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
+   * message and one or more buttons.
+   */
+  MessageBox = 'message-box',
 }

@@ -10,18 +10,19 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NullIfEmptyPipe } from './null-if-empty.pipe';
+import { InspectMessageBoxComponent } from './inspect-message-box.component';
+import { UtilModule } from '../util/util.module';
+import { SciViewportModule } from '@scion/toolkit/viewport';
 
 @NgModule({
+  declarations: [
+    InspectMessageBoxComponent,
+  ],
   imports: [
     CommonModule,
-  ],
-  declarations: [
-    NullIfEmptyPipe,
-  ],
-  exports: [
-    NullIfEmptyPipe,
+    UtilModule,
+    SciViewportModule,
   ],
 })
-export class UtilModule {
+export class InspectMessageBoxModule {
 }

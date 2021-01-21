@@ -20,10 +20,11 @@ import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench
  * The Workbench provides core features of a modern rich web application.
  *
  * - tabbed, movable and stackable views
- * - activity panel as application entry point
- * - global notifications
- * - global or view-local message boxes
- * - URL encoded navigational state
+ * - notifications
+ * - message boxes (view or application modal)
+ * - popups
+ * - persistent view navigation (via browser URL)
+ * - microfrontend support for embedding microfrontends in views or popups
  *
  * Activities are modelled in `app.component.html` as content children of <wb-workbench> in the form of <wb-activity> elements.
  *
