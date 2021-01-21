@@ -79,7 +79,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
               private _manifestService: ManifestService) {
     this.form = formBuilder.group({
       [TYPE]: formBuilder.control('', Validators.required),
-      [QUALIFIER]: formBuilder.array([], Validators.required),
+      [QUALIFIER]: formBuilder.array([]),
       [REQUIRED_PARAMS]: formBuilder.control(''),
       [OPTIONAL_PARAMS]: formBuilder.control(''),
       [PRIVATE]: formBuilder.control(true),

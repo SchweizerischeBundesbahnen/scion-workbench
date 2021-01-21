@@ -44,6 +44,6 @@ export class ViewContainerReference {
 export const IFRAME_HOST = new InjectionToken<string>('IFRAME_HOST');
 
 /**
- * DI token to inject the DOM location where to insert view-local message boxes.
+ * DI token to inject the DOM location where to insert view-modal message boxes.
  */
 export const VIEW_LOCAL_MESSAGE_BOX_HOST = new InjectionToken<string>('VIEW_LOCAL_MESSAGE_BOX_HOST');

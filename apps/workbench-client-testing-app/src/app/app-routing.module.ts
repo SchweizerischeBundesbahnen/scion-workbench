@@ -33,6 +33,10 @@ const routes: Routes = [
     loadChildren: (): any => import('./popup-page/popup-page.module').then(m => m.PopupPageModule),
   },
   {
+    path: 'test-message-box',
+    loadChildren: (): any => import('./message-box-opener-page/message-box-opener-page.module').then(m => m.MessageBoxOpenerPageModule),
+  },
+  {
     path: 'register-workbench-capability',
     loadChildren: (): any => import('./register-workbench-capability-page/register-workbench-capability-page.module').then(m => m.RegisterWorkbenchCapabilityPageModule),
   },

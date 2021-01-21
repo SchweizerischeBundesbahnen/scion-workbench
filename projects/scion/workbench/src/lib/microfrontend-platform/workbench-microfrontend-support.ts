@@ -4,13 +4,15 @@ import { MICROFRONTEND_PLATFORM_PRE_ACTIVATION, MicrofrontendPlatformInitializer
 import { IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformConfig, PlatformPropertyService } from '@scion/microfrontend-platform';
 import { WorkbenchInitializer } from '../startup/workbench-initializer';
 import { Beans } from '@scion/toolkit/bean-manager';
-import { WorkbenchPopupService, WorkbenchRouter } from '@scion/workbench-client';
+import { WorkbenchMessageBoxService, WorkbenchPopupService, WorkbenchRouter } from '@scion/workbench-client';
 import { MicrofrontendNavigateCommandHandler } from './routing/microfrontend-navigate-command-handler.service';
 import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './initialization/ng-zone-decorators';
 import { WorkbenchModuleConfig } from '../workbench-module-config';
 import { LogDelegate } from './initialization/log-delegate.service';
 import { MicrofrontendViewCommandHandler } from './microfrontend-view/microfrontend-view-command-handler.service';
 import { MicrofrontendPopupCommandHandler } from './microfrontend-popup/microfrontend-popup-command-handler.service';
+import { MicrofrontendMessageBoxIntentHandlerService } from './microfrontend-message-box/microfrontend-message-box-intent-handler.service';
+import { provideDefaultMessageBox } from './microfrontend-message-box/microfrontend-message-box-provider';
 
 /**
  * Registers a set of DI providers to set up microfrontend support in the workbench.
@@ -28,33 +30,37 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
         multi: true,
       },
       {
-        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
-        useExisting: MicrofrontendViewCommandHandler,
-        multi: true,
-      },
-      {
-        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
-        useExisting: MicrofrontendNavigateCommandHandler,
-        multi: true,
-      },
-      {
-        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
-        useExisting: MicrofrontendPopupCommandHandler,
-        multi: true,
-      },
-      {
         provide: MicrofrontendPlatformConfigLoader,
         useClass: typeof workbenchModuleConfig.microfrontends.platform === 'function' ? workbenchModuleConfig.microfrontends.platform : MicrofrontendPlatformModuleConfigLoader,
+      },
+      {
+        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        useClass: MicrofrontendViewCommandHandler,
+        multi: true,
+      },
+      {
+        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        useClass: MicrofrontendNavigateCommandHandler,
+        multi: true,
+      },
+      {
+        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        useClass: MicrofrontendPopupCommandHandler,
+        multi: true,
+      },
+      {
+        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        useClass: MicrofrontendMessageBoxIntentHandlerService,
+        multi: true,
       },
       LogDelegate,
       WorkbenchRouter,
       WorkbenchPopupService,
-      MicrofrontendNavigateCommandHandler,
-      MicrofrontendPopupCommandHandler,
-      MicrofrontendViewCommandHandler,
+      WorkbenchMessageBoxService,
       NgZoneMessageClientDecorator,
       NgZoneIntentClientDecorator,
       provideMicrofrontendPlatformBeans(),
+      provideDefaultMessageBox(),
     ] : [],
   ];
 }

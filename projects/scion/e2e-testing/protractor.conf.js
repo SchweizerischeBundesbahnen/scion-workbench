@@ -78,6 +78,9 @@ exports.config = {
     'workbench-client::popup-size': [
       './src/workbench-client/**/popup-size.e2e-spec.ts',
     ],
+    'workbench-client::message-box': [
+      './src/workbench-client/**/message-box.e2e-spec.ts',
+    ],
   },
   capabilities: {
     browserName: 'chrome',

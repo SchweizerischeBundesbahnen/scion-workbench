@@ -1,0 +1,19 @@
+:host {
+  display: grid;
+  row-gap: 2em;
+
+  > section {
+    > header {
+      margin-top: 0;
+      margin-bottom: 2em;
+      font-weight: bold;
+    }
+
+    > sci-viewport {
+      white-space: pre;
+      font-family: monospace;
+      font-size: smaller;
+      max-height: 200px;
+    }
+  }
+}

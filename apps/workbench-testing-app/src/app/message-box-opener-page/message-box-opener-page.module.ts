@@ -12,12 +12,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule } from '@scion/toolkit.internal/widgets';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MessageboxPageComponent } from './messagebox-page.component';
+import { MessageBoxOpenerPageComponent } from './message-box-opener-page.component';
 import { RouterModule, Routes } from '@angular/router';
 import { WorkbenchModule } from '@scion/workbench';
 
 const routes: Routes = [
-  {path: '', component: MessageboxPageComponent},
+  {path: '', component: MessageBoxOpenerPageComponent},
 ];
 
 @NgModule({
@@ -31,8 +31,8 @@ const routes: Routes = [
     WorkbenchModule.forChild(),
   ],
   declarations: [
-    MessageboxPageComponent,
+    MessageBoxOpenerPageComponent,
   ],
 })
-export class MessageboxPageModule {
+export class MessageBoxOpenerPageModule {
 }

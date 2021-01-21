@@ -66,17 +66,18 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
 
     // Register initializer to instantiate services registered under {MICROFRONTEND_PLATFORM_PRE_ACTIVATION} DI token.
     Beans.registerInitializer({
-      useFunction: async () => {
-        this._injector.get(MICROFRONTEND_PLATFORM_PRE_ACTIVATION, undefined, InjectFlags.Optional);
-      },
-      runlevel: Runlevel.Two, // The Microfrontend Platform install activator microfrontends in runlevel 3.
+      useFunction: () => void (this._injector.get(MICROFRONTEND_PLATFORM_PRE_ACTIVATION, undefined, InjectFlags.Optional)),
+      runlevel: Runlevel.Two, // Activator microfrontends are loaded in runlevel 3.
+    });
+
+    // Register wildcard view intention, allowing the host app to look up all view capabilities required for workbench routing to read view properties.
+    Beans.registerInitializer({
+      useFunction: () => this.registerWildcardIntention(WorkbenchCapabilities.View),
+      runlevel: Runlevel.Two, // Activator microfrontends are loaded in runlevel 3.
     });
 
     // Start the microfrontend platform host.
     await MicrofrontendPlatform.startHost(effectiveMicrofrontendPlatformConfig, {symbolicName: effectiveHostSymbolicName});
-
-    // Register wildcard intentions to look up view capabilities, required for reading the microfrontend path.
-    await this.registerWildcardIntention(WorkbenchCapabilities.View);
 
     this._logger.debug('SCION Microfrontend Platform started.', LoggerNames.LIFECYCLE, effectiveMicrofrontendPlatformConfig);
   }

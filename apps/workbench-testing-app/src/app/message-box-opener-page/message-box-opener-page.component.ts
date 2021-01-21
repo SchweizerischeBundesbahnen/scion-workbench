@@ -23,11 +23,11 @@ const CSS_CLASS = 'cssClass';
 const ACTIONS = 'actions';
 
 @Component({
-  selector: 'app-messagebox-page',
-  templateUrl: './messagebox-page.component.html',
-  styleUrls: ['./messagebox-page.component.scss'],
+  selector: 'app-message-box-opener-page',
+  templateUrl: './message-box-opener-page.component.html',
+  styleUrls: ['./message-box-opener-page.component.scss'],
 })
-export class MessageboxPageComponent {
+export class MessageBoxOpenerPageComponent {
 
   public readonly TITLE = TITLE;
   public readonly CONTENT = CONTENT;

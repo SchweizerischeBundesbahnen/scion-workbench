@@ -10,7 +10,7 @@
 
 import { APP_INITIALIZER, Provider } from '@angular/core';
 import { ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformPropertyService, PreferredSizeService } from '@scion/microfrontend-platform';
-import { WorkbenchClient, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchView } from '@scion/workbench-client';
+import { WorkbenchClient, WorkbenchMessageBoxService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchView } from '@scion/workbench-client';
 import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './ng-zone-decorators';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { environment } from '../../environments/environment';
@@ -45,6 +45,7 @@ export function provideWorkbenchClientInitializer(): Provider[] {
     {provide: WorkbenchView, useFactory: () => Beans.opt(WorkbenchView)},
     {provide: WorkbenchPopupService, useFactory: () => Beans.get(WorkbenchPopupService)},
     {provide: WorkbenchPopup, useFactory: () => Beans.opt(WorkbenchPopup)},
+    {provide: WorkbenchMessageBoxService, useFactory: () => Beans.get(WorkbenchMessageBoxService)},
   ];
 }
 
