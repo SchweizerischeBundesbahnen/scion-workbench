@@ -12,6 +12,8 @@ import { LogDelegate } from './initialization/log-delegate.service';
 import { MicrofrontendViewCommandHandler } from './microfrontend-view/microfrontend-view-command-handler.service';
 import { MicrofrontendPopupCommandHandler } from './microfrontend-popup/microfrontend-popup-command-handler.service';
 import { MicrofrontendMessageBoxIntentHandlerService } from './microfrontend-message-box/microfrontend-message-box-intent-handler.service';
+import { MicrofrontendNotificationIntentHandlerService } from './microfrontend-notification/microfrontend-notification-intent-handler.service';
+import { provideDefaultNotification } from './microfrontend-notification/microfrontend-notification-provider';
 import { provideDefaultMessageBox } from './microfrontend-message-box/microfrontend-message-box-provider';
 
 /**
@@ -53,6 +55,11 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
         useClass: MicrofrontendMessageBoxIntentHandlerService,
         multi: true,
       },
+      {
+        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        useClass: MicrofrontendNotificationIntentHandlerService,
+        multi: true,
+      },
       LogDelegate,
       WorkbenchRouter,
       WorkbenchPopupService,
@@ -61,6 +68,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       NgZoneIntentClientDecorator,
       provideMicrofrontendPlatformBeans(),
       provideDefaultMessageBox(),
+      provideDefaultNotification(),
     ] : [],
   ];
 }
@@ -92,4 +100,3 @@ function provideMicrofrontendPlatformBeans(): Provider[] {
     {provide: PlatformPropertyService, useFactory: () => Beans.get(PlatformPropertyService)},
   ];
 }
-

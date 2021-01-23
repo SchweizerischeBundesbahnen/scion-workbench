@@ -12,12 +12,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SciFormFieldModule } from '@scion/toolkit.internal/widgets';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NotificationPageComponent } from './notification-page.component';
+import { NotificationOpenerPageComponent } from './notification-opener-page.component';
 import { RouterModule, Routes } from '@angular/router';
 import { WorkbenchModule } from '@scion/workbench';
 
 const routes: Routes = [
-  {path: '', component: NotificationPageComponent},
+  {path: '', component: NotificationOpenerPageComponent},
 ];
 
 @NgModule({
@@ -29,8 +29,8 @@ const routes: Routes = [
     WorkbenchModule.forChild(),
   ],
   declarations: [
-    NotificationPageComponent,
+    NotificationOpenerPageComponent,
   ],
 })
-export class NotificationPageModule {
+export class NotificationOpenerPageModule {
 }

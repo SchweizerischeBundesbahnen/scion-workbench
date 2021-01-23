@@ -1,6 +1,7 @@
 <wb-content-as-overlay [overlayHost]="iframeHost">
   <sci-router-outlet #router_outlet
                      [name]="viewId"
-                     [ngClass]="microfrontendCssClasses">
+                     [ngClass]="microfrontendCssClasses"
+                     keystrokes="keydown.escape"> <!-- bubble the ESC key to close notifications -->
   </sci-router-outlet>
 </wb-content-as-overlay>

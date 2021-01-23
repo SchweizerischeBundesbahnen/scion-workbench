@@ -15,6 +15,7 @@ import { WorkbenchRouter } from './routing/workbench-router';
 import { WorkbenchPopupService } from './popup/workbench-popup-service';
 import { WorkbenchPopupInitializer } from './popup/workbench-popup-initializer';
 import { WorkbenchMessageBoxService } from './message-box/workbench-message-box-service';
+import { WorkbenchNotificationService } from './notification/workbench-notification-service';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -102,6 +103,7 @@ export class WorkbenchClient {
     Beans.register(WorkbenchRouter);
     Beans.register(WorkbenchPopupService);
     Beans.register(WorkbenchMessageBoxService);
+    Beans.register(WorkbenchNotificationService);
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
     await MicrofrontendPlatform.connectToHost(config);

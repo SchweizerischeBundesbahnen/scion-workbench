@@ -151,6 +151,8 @@ jobs:
             project: workbench-client
           - name: message-box
             project: workbench-client
+          - name: notification
+            project: workbench-client
     steps:
       - uses: actions/checkout@v2
       - name: 'Downloading dist/workbench and dist/workbench-client'

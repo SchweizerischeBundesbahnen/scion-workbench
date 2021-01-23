@@ -21,11 +21,11 @@ const GROUP = 'group';
 const CSS_CLASS = 'cssClass';
 
 @Component({
-  selector: 'app-notification-page',
-  templateUrl: './notification-page.component.html',
-  styleUrls: ['./notification-page.component.scss'],
+  selector: 'app-notification-opener-page',
+  templateUrl: './notification-opener-page.component.html',
+  styleUrls: ['./notification-opener-page.component.scss'],
 })
-export class NotificationPageComponent {
+export class NotificationOpenerPageComponent {
 
   public readonly TITLE = TITLE;
   public readonly CONTENT = CONTENT;

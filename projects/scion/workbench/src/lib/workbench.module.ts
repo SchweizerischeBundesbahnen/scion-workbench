@@ -93,6 +93,7 @@ import { ViewTabDragImageRenderer } from './view-dnd/view-tab-drag-image-rendere
 import { PopupComponent } from './popup/popup.component';
 import { MicrofrontendPopupComponent } from './microfrontend-platform/microfrontend-popup/microfrontend-popup.component';
 import { TextMessageComponent } from './message-box/text-message.component';
+import { TextNotificationComponent } from './notification/text-notification.component';
 
 @NgModule({
   imports: [
@@ -151,6 +152,7 @@ import { TextMessageComponent } from './message-box/text-message.component';
     SplashComponent,
     PopupComponent,
     TextMessageComponent,
+    TextNotificationComponent,
   ],
   exports: [
     WorkbenchComponent,

@@ -37,7 +37,7 @@ const routes: Routes = [
   },
   {
     path: 'test-notification',
-    loadChildren: (): any => import('./notification-page/notification-page.module').then(m => m.NotificationPageModule),
+    loadChildren: (): any => import('./notification-opener-page/notification-opener-page.module').then(m => m.NotificationOpenerPageModule),
     data: {title: 'Workbench Notification', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-notification', pinToStartPage: true},
   },
   {

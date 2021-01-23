@@ -15,12 +15,14 @@
       "WorkbenchRouter",
       "WorkbenchPopupService",
       "WorkbenchMessageBoxService",
+      "WorkbenchNotificationService",
       "WorkbenchView",
       "WorkbenchPopup",
       "WorkbenchCapabilities",
       "WorkbenchViewCapability",
       "WorkbenchPopupCapability",
-      "WorkbenchMessageBoxCapability"
+      "WorkbenchMessageBoxCapability",
+      "WorkbenchNotificationCapability"
     ],
     "categorizeByGroup": true
   }

@@ -1,0 +1,56 @@
+<ng-container [formGroup]="form">
+  <section>
+    <sci-form-field label="Qualifier">
+      <sci-params-enter [paramsFormArray]="$any(form.get(QUALIFIER))" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+    </sci-form-field>
+
+    <sci-form-field label="Params">
+      <sci-params-enter [paramsFormArray]="$any(form.get(PARAMS))" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <sci-form-field label="Title">
+      <input [formControlName]="TITLE" class="e2e-title">
+    </sci-form-field>
+
+    <sci-form-field label="Content">
+      <input [formControlName]="CONTENT" class="e2e-content">
+    </sci-form-field>
+
+    <sci-form-field label="Severity">
+      <select [formControlName]="SEVERITY" class="e2e-severity">
+        <option value="info">info</option>
+        <option value="warn">warn</option>
+        <option value="error">error</option>
+        <option value="">&lt;default&gt;</option>
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="Duration">
+      <select [formControlName]="DURATION" class="e2e-duration">
+        <option value="short">short</option>
+        <option value="medium">medium</option>
+        <option value="long">long</option>
+        <option value="infinite">infinite</option>
+        <option value="">&lt;default&gt;</option>
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="Group">
+      <input [formControlName]="GROUP" class="e2e-group">
+    </sci-form-field>
+
+    <sci-form-field label="CSS Class(es)">
+      <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+    </sci-form-field>
+  </section>
+</ng-container>
+
+<button (click)="onNotificationShow()" class="open e2e-show" [disabled]="form.invalid">
+  Show notification
+</button>
+
+<output class="error e2e-error" *ngIf="error">
+  {{error}}
+</output>

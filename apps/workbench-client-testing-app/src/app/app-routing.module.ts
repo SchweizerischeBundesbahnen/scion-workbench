@@ -37,6 +37,10 @@ const routes: Routes = [
     loadChildren: (): any => import('./message-box-opener-page/message-box-opener-page.module').then(m => m.MessageBoxOpenerPageModule),
   },
   {
+    path: 'test-notification',
+    loadChildren: (): any => import('./notification-opener-page/notification-opener-page.module').then(m => m.NotificationOpenerPageModule),
+  },
+  {
     path: 'register-workbench-capability',
     loadChildren: (): any => import('./register-workbench-capability-page/register-workbench-capability-page.module').then(m => m.RegisterWorkbenchCapabilityPageModule),
   },

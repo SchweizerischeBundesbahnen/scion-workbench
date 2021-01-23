@@ -256,14 +256,6 @@ export class AppPO {
   }
 
   /**
-   * Returns the number of notifications.
-   */
-  public async getNotificationCount(): Promise<number> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return $('wb-workbench').$$('wb-notification').count();
-  }
-
-  /**
    * Returns whether the default page is displayed in the active part.
    * The default page is displayed if there are no open tabs in the part.
    */
@@ -369,6 +361,13 @@ export class AppPO {
     await WebdriverExecutionContexts.switchToDefault();
     return $('wb-workbench').$$('wb-message-box').count();
   }
+
+  /**
+   * Returns the number of displayed notifications.
+   */
+  public async getNotificationCount(): Promise<number> {
+    await WebdriverExecutionContexts.switchToDefault();
+    return $('wb-workbench').$$('wb-notification').count();
   }
 
   /**
@@ -384,14 +383,17 @@ export class AppPO {
         return notificationFinder.isPresent();
       }
 
+      public async isDisplayed(): Promise<boolean> {
+        await WebdriverExecutionContexts.switchToDefault();
+        if (!await this.isPresent()) {
+          return false;
+        }
+        return notificationFinder.isDisplayed();
+      }
+
       public async getTitle(): Promise<string> {
         await WebdriverExecutionContexts.switchToDefault();
         return notificationFinder.$('.e2e-title').getText();
-      }
-
-      public async getText(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return notificationFinder.$('.e2e-text').getText();
       }
 
       public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
@@ -427,11 +429,15 @@ export class AppPO {
         return null;
       }
 
-      public async close(): Promise<void> {
+      public async clickClose(): Promise<void> {
         await WebdriverExecutionContexts.switchToDefault();
         await notificationFinder.$('.e2e-close').click();
         // wait until the animation completes
         await browser.wait(protractor.ExpectedConditions.stalenessOf(notificationFinder), 5000);
+      }
+
+      public $(selector: string): ElementFinder {
+        return notificationFinder.$(selector);
       }
     };
   }
@@ -506,7 +512,7 @@ export class AppPO {
         return actions;
       }
 
-      public async close(action: string): Promise<void> {
+      public async clickActionButton(action: string): Promise<void> {
         await WebdriverExecutionContexts.switchToDefault();
         await msgboxFinder.$(`button.e2e-action.e2e-action-key-${action}`).click();
         // wait until the animation completes
@@ -754,17 +760,19 @@ export interface PopupPO {
 }
 
 export interface NotificationPO {
+  isDisplayed(): Promise<boolean>;
+
   isPresent(): Promise<boolean>;
 
   getTitle(): Promise<string>;
 
-  getText(): Promise<string>;
   getSeverity(): Promise<'info' | 'warn' | 'error' | null>;
 
   getDuration(): Promise<'short' | 'medium' | 'long' | 'infinite' | null>;
 
+  clickClose(): Promise<void>;
 
-  close(): Promise<void>;
+  $(selector: string): ElementFinder;
 }
 
 export interface MessageBoxPO {
@@ -780,7 +788,7 @@ export interface MessageBoxPO {
 
   getActions(): Promise<{ [key: string]: string }>;
 
-  close(action: string): Promise<void>;
+  clickActionButton(action: string): Promise<void>;
 
   $(selector: string): ElementFinder;
 }
