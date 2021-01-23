@@ -36,7 +36,6 @@ export class NotificationListComponent implements OnDestroy {
   }
 
   @HostListener('document:keydown.escape')
-  @HostListener('document:sci-escape')
   public onEscape(): void {
     this.notifications.length && this.onNotificationClose(this.notifications.length - 1);
   }

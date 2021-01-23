@@ -24,6 +24,8 @@ import { environment } from '../environments/environment';
 import { provideConfirmWorkbenchStartupInitializer } from './workbench/confirm-workbench-startup-initializer.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { provideInspectNotificationProvider } from './inspect-notification-provider/inspect-notification-provider.service';
+import { InspectNotificationModule } from './inspect-notification-provider/inspect-notification.module';
 import { InspectMessageBoxModule } from './inspect-message-box-provider/inspect-message-box.module';
 import { provideInspectMessageBoxProvider } from './inspect-message-box-provider/inspect-message-box-provider.service';
 
@@ -48,6 +50,7 @@ import { provideInspectMessageBoxProvider } from './inspect-message-box-provider
     SciTabbarModule,
     SciFilterFieldModule,
     InspectMessageBoxModule,
+    InspectNotificationModule,
     animationModuleIfEnabled(),
   ],
   bootstrap: [
@@ -56,6 +59,7 @@ import { provideInspectMessageBoxProvider } from './inspect-message-box-provider
   providers: [
     provideConfirmWorkbenchStartupInitializer(),
     provideInspectMessageBoxProvider(),
+    provideInspectNotificationProvider(),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

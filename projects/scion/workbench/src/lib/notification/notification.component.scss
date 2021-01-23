@@ -4,7 +4,7 @@ $severity-border-size: 6px;
 $border-radius: 4px;
 
 :host {
-  display: block;
+  display: grid;
   background-color: constants.$notification-bgcolor;
   color: constants.$notification-fgcolor;
   font-size: constants.$notification-font-size;
@@ -12,8 +12,8 @@ $border-radius: 4px;
   box-shadow: constants.$popup-box-shadow;
   width: constants.$notification-width;
   max-width: calc(100vw - #{2*constants.$notification-margin});
-
   border-left: $severity-border-size solid transparent;
+  position: relative; // positioning context
 
   &.info {
     border-left-color: constants.$info-color;
@@ -28,13 +28,13 @@ $border-radius: 4px;
   }
 
   > div.outline {
-    position: relative; // positioning context
     border: 1px solid constants.$notification-border-color;
     border-left: none;
     padding: 1em 1.5em;
     border-top-right-radius: $border-radius;
     border-bottom-right-radius: $border-radius;
-    font-size: 12px;
+    font-size: .9em;
+    white-space: pre-line;
 
     > h1 {
       font-size: 1em;
@@ -42,25 +42,27 @@ $border-radius: 4px;
       margin-top: 0;
       margin-bottom: .75em;
     }
+  }
 
-    > button.close {
-      position: absolute;
-      right: 2px;
-      top: 4px;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      outline: none;
-      font-size: .75em;
-      color: inherit;
+  > button.close {
+    position: absolute;
+    align-self: start;
+    justify-self: end;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    color: inherit;
+    margin: 0;
+    padding: .25em .5em 0 0;
+    font-size: 1.1em;
 
-      &::before {
-        content: '\e5cd';
-      }
+    &::before {
+      content: '\e5cd';
+    }
 
-      &:hover::before {
-        content: '\e5c9';
-      }
+    &:hover::before {
+      font-weight: bold;
     }
   }
 }

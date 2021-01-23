@@ -41,7 +41,7 @@ export class RegisterWorkbenchIntentionPagePO {
    *
    * Returns a Promise that resolves to the intention ID upon successful registration, or that rejects on registration error.
    */
-  public async registerIntention(intention: Intention & { type: 'view' | 'popup' | 'message-box' }): Promise<string> {
+  public async registerIntention(intention: Intention & { type: 'view' | 'popup' | 'message-box' | 'notification' }): Promise<string> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 
@@ -61,7 +61,7 @@ export class RegisterWorkbenchIntentionPagePO {
     }
   }
 
-  public async selectType(type: 'view' | 'popup' | 'message-box'): Promise<void> {
+  public async selectType(type: 'view' | 'popup' | 'message-box' | 'notification'): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
     await selectOption(type, this._pageFinder.$('select.e2e-type'));

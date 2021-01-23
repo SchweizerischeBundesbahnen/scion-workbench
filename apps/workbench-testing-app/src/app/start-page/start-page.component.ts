@@ -64,9 +64,9 @@ export class StartPageComponent implements OnDestroy {
     if (workbenchModuleConfig.microfrontends) {
       this.microfrontendViewCapabilities$ = this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View, qualifier: {'*': '*'}})
         .pipe(
-          filterArray(viewCapability => viewCapability.properties['pinToStartPage'] === true),
+          filterArray(viewCapability => viewCapability?.properties['pinToStartPage'] === true),
           expand(viewCapabilities => this.filterControl.valueChanges.pipe(take(1), mapTo(viewCapabilities))),
-          filterArray(viewCapability => !this.filterControl.value || viewCapability.properties.title?.match(toFilterRegExp(this.filterControl.value)) !== null),
+          filterArray(viewCapability => !this.filterControl.value || viewCapability?.properties.title?.match(toFilterRegExp(this.filterControl.value)) !== null),
           sortArray((a, b) => a.metadata.appSymbolicName.localeCompare(b.metadata.appSymbolicName)),
         );
     }

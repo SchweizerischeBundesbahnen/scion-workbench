@@ -27,3 +27,6 @@ export { ɵPopupContext, ɵPOPUP_CONTEXT } from './lib/popup/workbench-popup-con
 export { WorkbenchMessageBoxCapability } from './lib/message-box/workbench-message-box-capability';
 export { WorkbenchMessageBoxService } from './lib/message-box/workbench-message-box-service';
 export { WorkbenchMessageBoxConfig } from './lib/message-box/workbench-message-box.config';
+export { WorkbenchNotificationCapability } from './lib/notification/workbench-notification-capability';
+export { WorkbenchNotificationService } from './lib/notification/workbench-notification-service';
+export { WorkbenchNotificationConfig } from './lib/notification/workbench-notification.config';

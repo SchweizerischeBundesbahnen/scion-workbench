@@ -81,6 +81,9 @@ exports.config = {
     'workbench-client::message-box': [
       './src/workbench-client/**/message-box.e2e-spec.ts',
     ],
+    'workbench-client::notification': [
+      './src/workbench-client/**/notification.e2e-spec.ts',
+    ],
   },
   capabilities: {
     browserName: 'chrome',
