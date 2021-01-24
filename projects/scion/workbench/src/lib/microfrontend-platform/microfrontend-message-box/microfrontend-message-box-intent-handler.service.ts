@@ -89,7 +89,7 @@ export class MicrofrontendMessageBoxIntentHandlerService implements OnDestroy {
     return messageBoxService.open({
       title: config.title,
       content: provider.component,
-      input: new Map([
+      componentInput: new Map([
         ...intentRequest.headers,
         ...params,
         ...Maps.coerce(intentRequest.intent.qualifier),

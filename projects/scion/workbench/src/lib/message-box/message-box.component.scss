@@ -4,27 +4,25 @@ $severity-border-size: 6px;
 $border-radius: 4px;
 
 @mixin message-box-theme($color, $opacity: 1) {
-  $red: red($color);
-  $green: green($color);
-  $blue: blue($color);
-
   border-top: $severity-border-size solid $color;
 
   div.outline > div.button-bar > div.button-outline > button.action {
     &:focus, &:active {
       color: $color;
-      border-color: rgba($red, $green, $blue, .8);
-      box-shadow: 0 0 8px 0 rgba($red, $green, $blue, .25);
+      border-color: rgba($color, .8);
+      box-shadow: 0 0 8px 0 rgba($color, .25);
     }
   }
 }
 
 :host {
-  font-size: constants.$messagebox-font-size;
+  display: block;
+  font-size: 1rem;
   border-radius: $border-radius;
   color: constants.$messagebox-fgcolor;
   box-shadow: constants.$popup-box-shadow;
   background-color: constants.$messagebox-bgcolor;
+  outline: none;
 
   > header.move-handle {
     $size: $severity-border-size + 5px;
@@ -37,8 +35,6 @@ $border-radius: 4px;
   > div.outline {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    width: 100%;
     border: 1px solid constants.$messagebox-border-color;
     border-top: none;
     border-bottom-left-radius: $border-radius;
@@ -50,14 +46,10 @@ $border-radius: 4px;
       padding: 1.5em;
       max-width: constants.$messagebox-max-width;
       user-select: none;
-      font-size: 1em;
       white-space: pre-line;
 
-      > h1 {
-        user-select: none;
-        font-size: 1em;
+      > header {
         font-weight: bold;
-        margin-top: 0;
         margin-bottom: 1.5em;
       }
     }
@@ -66,21 +58,20 @@ $border-radius: 4px;
       flex: none;
       height: 3em;
       display: flex;
-      justify-content: space-between;
       margin-top: 1em;
 
       > div.button-outline {
         flex: 1 1 0;
-        display: flex;
+        display: grid;
         background-color: rgb(250, 250, 250);
         border-top: 1px solid constants.$messagebox-border-color;
+        min-width: 7.5em;
 
         &:not(:first-child) {
           border-left: 1px solid constants.$messagebox-border-color;
         }
 
         > button.action {
-          flex: auto;
           font-family: inherit;
           color: rgba(51, 51, 51, .8);
           background-color: transparent;
@@ -88,8 +79,8 @@ $border-radius: 4px;
           border: 1px solid transparent;
           border-radius: 2px;
           transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-          min-width: 7.5em;
           cursor: pointer;
+          user-select: none;
 
           &:focus, &:active {
             outline: none;

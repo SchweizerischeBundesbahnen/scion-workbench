@@ -36,7 +36,6 @@ import { WorkbenchViewRegistry } from './view/workbench-view.registry';
 import { WorkbenchUrlObserver } from './routing/workbench-url-observer.service';
 import { WbActivityActionDirective } from './activity-part/wb-activity-action.directive';
 import { WbActivityDirective } from './activity-part/wb-activity.directive';
-import { MoveDirective } from './move.directive';
 import { WorkbenchModuleConfig } from './workbench-module-config';
 import { ContentProjectionDirective } from './content-projection/content-projection.directive';
 import { ContentAsOverlayComponent } from './content-projection/content-as-overlay.component';
@@ -44,9 +43,6 @@ import { ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.const
 import { NotificationService } from './notification/notification.service';
 import { NotificationListComponent } from './notification/notification-list.component';
 import { NotificationComponent } from './notification/notification.component';
-import { MessageBoxStackComponent } from './message-box/message-box-stack.component';
-import { MessageBoxComponent } from './message-box/message-box.component';
-import { APP_MESSAGE_BOX_SERVICE, MessageBoxService } from './message-box/message-box.service';
 import { EmptyOutletComponent } from './routing/empty-outlet.component';
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
@@ -92,8 +88,8 @@ import { ViewDragService } from './view-dnd/view-drag.service';
 import { ViewTabDragImageRenderer } from './view-dnd/view-tab-drag-image-renderer.service';
 import { PopupComponent } from './popup/popup.component';
 import { MicrofrontendPopupComponent } from './microfrontend-platform/microfrontend-popup/microfrontend-popup.component';
-import { TextMessageComponent } from './message-box/text-message.component';
 import { TextNotificationComponent } from './notification/text-notification.component';
+import { MessageBoxModule } from './message-box/message-box.module';
 
 @NgModule({
   imports: [
@@ -109,6 +105,7 @@ import { TextNotificationComponent } from './notification/text-notification.comp
     SciThrobberModule,
     OverlayModule,
     A11yModule,
+    MessageBoxModule,
   ],
   declarations: [
     WorkbenchComponent,
@@ -132,9 +129,6 @@ import { TextNotificationComponent } from './notification/text-notification.comp
     WbRouterLinkWithHrefDirective,
     NotificationListComponent,
     NotificationComponent,
-    MessageBoxStackComponent,
-    MessageBoxComponent,
-    MoveDirective,
     ContentProjectionDirective,
     EmptyOutletComponent,
     ContentAsOverlayComponent,
@@ -151,7 +145,6 @@ import { TextNotificationComponent } from './notification/text-notification.comp
     MicrofrontendPopupComponent,
     SplashComponent,
     PopupComponent,
-    TextMessageComponent,
     TextNotificationComponent,
   ],
   exports: [
@@ -208,7 +201,6 @@ export class WorkbenchModule {
         WorkbenchAuxiliaryRoutesRegistrator,
         ActivityResolver,
         NotificationService,
-        MessageBoxService,
         WorkbenchUrlObserver,
         WorkbenchViewRegistry,
         WorkbenchViewPartRegistry,
@@ -225,10 +217,6 @@ export class WorkbenchModule {
         WbBeforeDestroyGuard,
         ViewDragService,
         ViewTabDragImageRenderer,
-        {
-          provide: APP_MESSAGE_BOX_SERVICE,
-          useExisting: MessageBoxService,
-        },
         {
           provide: ROUTE_REUSE_PROVIDER,
           multi: true,

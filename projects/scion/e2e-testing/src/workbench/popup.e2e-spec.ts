@@ -484,7 +484,7 @@ describe('Workbench Popup', () => {
 
   describe('popup closing', () => {
 
-    it('should close the popup on focus lost ', async () => {
+    it('should close the popup on focus lost', async () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab();
@@ -502,7 +502,7 @@ describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isDisplayed()).toBe(false);
     });
 
-    it('should not close the popup on focus lost ', async () => {
+    it('should not close the popup on focus lost', async () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab();
@@ -520,7 +520,7 @@ describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isDisplayed()).toBe(true);
     });
 
-    it('should close the popup on escape keystroke ', async () => {
+    it('should close the popup on escape keystroke', async () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab();
@@ -538,7 +538,7 @@ describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isDisplayed()).toBe(false);
     });
 
-    it('should not close the popup on escape keystroke ', async () => {
+    it('should not close the popup on escape keystroke', async () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab();

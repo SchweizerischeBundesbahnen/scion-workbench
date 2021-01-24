@@ -4,31 +4,21 @@
         (wbMove)="onMove($event)"
         (wbMoveEnd)="onMoveEnd()">
 </header>
-<div class="outline">
+<div class="outline" cdkTrapFocus cdkTrapFocusAutoCapture>
   <div class="body e2e-body">
-    <h1 *ngIf="!!title" class="e2e-title">{{title}}</h1>
-    <ng-container *ngIf="textual; then text_template; else component_template"></ng-container>
+    <header *ngIf="messageBox.title$ | async | wbCoerceObservable$ | async as title" class="e2e-title">{{title}}</header>
+    <ng-container *cdkPortalOutlet="portal"></ng-container>
   </div>
-  <div class="button-bar">
-    <div *ngFor="let action of actions; index as i" class="button-outline">
+  <div class="button-bar e2e-button-bar">
+    <div *ngFor="let action of messageBox.actions$ | async; index as i" class="button-outline">
       <button #action_button
-              class="action e2e-action e2e-action-key-{{action}}"
-              tabindex="0"
-              (click)="onAction(action)"
-              (keydown.tab)="onTab(i, 'next')"
-              (keydown.arrowRight)="onTab(i, 'next')"
-              (keydown.shift.tab)="onTab(i, 'prev')"
-              (keydown.arrowLeft)="onTab(i, 'prev')">
-        {{getActionLabel(action)}}
+              (click)="onActionButtonClick(action)"
+              (focus)="onActionButtonFocus(action_button)"
+              (keydown.arrowLeft)="onArrowKey(i, 'left')"
+              (keydown.arrowRight)="onArrowKey(i, 'right')"
+              class="action e2e-action e2e-action-key-{{action.key}}">
+        {{action.label | wbCoerceObservable$ | async}}
       </button>
     </div>
   </div>
 </div>
-
-<ng-template #text_template>
-  <span class="text">{{text}}</span>
-</ng-template>
-
-<ng-template #component_template>
-  <ng-container *ngComponentOutlet="componentType; injector: injector"></ng-container>
-</ng-template>

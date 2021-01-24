@@ -8,16 +8,77 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MessageBox } from '@scion/workbench';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { UUID } from '@scion/toolkit/uuid';
+
+const TITLE = 'title';
+const SEVERITY = 'severity';
+const CSS_CLASS = 'cssClass';
+const ACTIONS = 'actions';
+const RETURN_VALUE = 'returnValue';
 
 @Component({
   selector: 'app-inspect-message-box',
   templateUrl: './inspect-message-box.component.html',
   styleUrls: ['./inspect-message-box.component.scss'],
 })
-export class InspectMessageBoxComponent {
+export class InspectMessageBoxComponent implements OnDestroy {
 
-  constructor(public messageBox: MessageBox) {
+  public readonly TITLE = TITLE;
+  public readonly SEVERITY = SEVERITY;
+  public readonly CSS_CLASS = CSS_CLASS;
+  public readonly ACTIONS = ACTIONS;
+  public readonly RETURN_VALUE = RETURN_VALUE;
+
+  private _destroy$ = new Subject<void>();
+
+  public uuid = UUID.randomUUID();
+  public form: FormGroup;
+
+  constructor(public messageBox: MessageBox<Map<string, any>>, formBuilder: FormBuilder) {
+    this.form = formBuilder.group({
+      [TITLE]: formBuilder.control(''),
+      [SEVERITY]: formBuilder.control(''),
+      [CSS_CLASS]: formBuilder.control(''),
+      [ACTIONS]: formBuilder.array([]),
+      [RETURN_VALUE]: formBuilder.control(''),
+    });
+
+    this.form.get(TITLE).valueChanges
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(title => {
+        this.messageBox.setTitle(title || undefined);
+      });
+
+    this.form.get(SEVERITY).valueChanges
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(severity => {
+        this.messageBox.setSeverity(severity || undefined);
+      });
+
+    this.form.get(CSS_CLASS).valueChanges
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(cssClass => {
+        this.messageBox.setCssClass(cssClass.split(/\s+/).filter(Boolean) || undefined);
+      });
+
+    this.form.get(ACTIONS).valueChanges
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((actions: Array<{ paramName: string, paramValue: string }>) => {
+        this.messageBox.setActions(actions.map(action => ({
+            key: action.paramName,
+            label: action.paramValue,
+            onAction: () => `${action.paramName} => ${this.form.get(RETURN_VALUE).value}`,
+          })),
+        );
+      });
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }

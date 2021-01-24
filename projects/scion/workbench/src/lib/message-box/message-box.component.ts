@@ -8,45 +8,35 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, HostListener, Injector, Input, OnDestroy, Output, QueryList, ViewChildren } from '@angular/core';
-import { Action, Actions, MessageBox, ɵMessageBox } from './message-box';
-import { MoveDelta } from '../move.directive';
-import { asyncScheduler, Subject, timer } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, HostListener, Injector, Input, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { MessageBoxAction, MessageBox } from './message-box';
+import { ɵMessageBox } from './ɵmessage-box';
+import { asapScheduler, merge, Subject, timer } from 'rxjs';
+import { observeOn, takeUntil } from 'rxjs/operators';
 import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
-import { Arrays } from '@scion/toolkit/util';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { MoveDelta } from './move.directive';
+import { coerceElement } from '@angular/cdk/coercion';
 
+/**
+ * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
+ * message and one or more buttons.
+ */
 @Component({
   selector: 'wb-message-box',
   templateUrl: './message-box.component.html',
   styleUrls: ['./message-box.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MessageBoxComponent implements AfterViewInit, OnDestroy {
+export class MessageBoxComponent implements OnInit, OnDestroy {
 
-  private _messageBox: ɵMessageBox;
-  private _actions: Actions;
-  private _buttons: HTMLButtonElement[];
   private _accDeltaX = 0;
   private _accDeltaY = 0;
-
   private _destroy$ = new Subject<void>();
   private _cancelBlinkTimer$ = new Subject<void>();
+  private _activeActionButton: HTMLElement | undefined;
 
-  public text: string;
-  public textual: boolean;
-
-  public componentType: any;
-  public injector: Injector;
-
-  @HostBinding('attr.class')
-  public get cssClass(): string {
-    return [
-      ...Arrays.coerce(this._messageBox.cssClass),
-      this._messageBox.severity,
-      `e2e-severity-${this._messageBox.severity}`,
-    ].join(' ');
-  }
+  public portal: ComponentPortal<any>;
 
   @HostBinding('style.transform')
   public transform: string;
@@ -55,73 +45,45 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   public blinking: boolean;
 
   @HostBinding('class.text-selectable')
-  public get textSelectable(): boolean {
-    return this._messageBox.contentSelectable;
-  }
+  public textSelectable: boolean;
 
-  @ViewChildren('action_button')
-  public set buttons(buttons: QueryList<ElementRef<HTMLButtonElement>>) {
-    this._buttons = buttons.map(it => it.nativeElement);
-    this._buttons[0].focus();
-  }
+  @HostBinding('attr.tabindex')
+  public tabindex = -1;
 
   @Input()
-  public set messageBox(messageBox: ɵMessageBox) {
-    this._messageBox = messageBox;
-    this._messageBox.onPropertyChange = (): void => this._cd.markForCheck();
-    this._actions = messageBox.actions;
-    if (!this._actions || Object.keys(this._actions).length === 0) {
-      this._actions = {'ok': 'OK'};
-    }
-
-    this.textual = typeof messageBox.content === 'string';
-    if (this.textual) {
-      this.text = messageBox.content as string;
-    }
-    else {
-      this.injector = Injector.create({
-        parent: this._injector,
-        providers: [{provide: MessageBox, useValue: messageBox}],
-      });
-
-      this.componentType = messageBox.content;
-    }
-  }
+  public messageBox: ɵMessageBox;
 
   @Input()
   public set positionDelta(delta: number) {
     this.onMove({deltaX: delta, deltaY: delta});
   }
 
-  @Output() // tslint:disable-line:no-output-native
-  public close = new EventEmitter<Action>();
+  @ViewChildren('action_button')
+  public actionButtons: QueryList<ElementRef<HTMLElement>>;
 
   constructor(private _injector: Injector,
               private _cd: ChangeDetectorRef,
               private _workbenchLayout: WorkbenchLayoutService) {
   }
 
-  public ngAfterViewInit(): void {
-    // Initiate manual change detection cycle because property may change during custom component construction.
-    if (this._messageBox.content) {
-      asyncScheduler.schedule(() => this._cd.markForCheck());
-    }
+  public ngOnInit(): void {
+    this.portal = this.createPortal(this.messageBox);
+    this.textSelectable = this.messageBox.config.contentSelectable;
+    this.installBlinkRequestHandler();
+    this.installFocusRequestHandler();
   }
 
   @HostListener('keydown.escape', ['$event'])
-  public onEscape($event: Event): void {
-    if (this.actions.includes('cancel')) {
-      this.close.emit('cancel');
-      $event.stopPropagation();
-    }
-    if (this.actions.includes('no')) {
-      this.close.emit('no');
-      $event.stopPropagation();
+  public onEscape(event: Event): void {
+    const escapeAction = this.messageBox.actions$.value.find(action => ['cancel', 'close'].includes(action.key));
+    if (escapeAction) {
+      this.close(escapeAction);
+      event.stopPropagation();
     }
   }
 
-  public onAction(action: Action): void {
-    this.close.emit(action);
+  public onActionButtonClick(action: MessageBoxAction): void {
+    this.close(action);
   }
 
   public onMoveStart(): void {
@@ -138,43 +100,62 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
     this._workbenchLayout.notifyDragEnding();
   }
 
-  public onTab(index: number, direction: 'prev' | 'next'): boolean {
-    const buttonCount = this._buttons.length;
-    const newIndex = (direction === 'prev' ? index - 1 : index + 1);
-    this._buttons[((newIndex + buttonCount) % buttonCount)].focus();
-
-    return false;
+  private createPortal(messageBox: ɵMessageBox): ComponentPortal<any> {
+    const componentConstructOptions = messageBox.config.componentConstructOptions;
+    return new ComponentPortal(messageBox.component, componentConstructOptions?.viewContainerRef || null, Injector.create({
+      parent: messageBox.config.componentConstructOptions?.injector || this._injector,
+      providers: [
+        {provide: MessageBox, useValue: messageBox},
+      ],
+    }), componentConstructOptions?.componentFactoryResolver || null);
   }
 
-  public get title(): string {
-    return this._messageBox.title;
+  private close(action: MessageBoxAction): void {
+    this.messageBox.close(action.onAction ? action.onAction() : action.key);
   }
 
   /**
    * Makes the message box blink for some short time.
    */
-  public blink(): void {
+  private blink(): void {
     this._cancelBlinkTimer$.next();
     this.blinking = true;
     this._cd.markForCheck();
 
     timer(500)
-      .pipe(
-        takeUntil(this._cancelBlinkTimer$),
-        takeUntil(this._destroy$),
-      )
+      .pipe(takeUntil(merge(this._cancelBlinkTimer$, this._destroy$)))
       .subscribe(() => {
         this.blinking = false;
         this._cd.markForCheck();
       });
   }
 
-  public get actions(): Action[] {
-    return Object.keys(this._actions);
+  private installBlinkRequestHandler(): void {
+    this.messageBox.blink$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(() => this.blink());
   }
 
-  public getActionLabel(action: Action): string {
-    return this._actions[action] || '?';
+  private installFocusRequestHandler(): void {
+    this.messageBox.requestFocus$
+      .pipe(
+        observeOn(asapScheduler), // ensures the message box to be displayed
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        coerceElement(this._activeActionButton || this.actionButtons.first)?.focus();
+      });
+  }
+
+  public onArrowKey(index: number, direction: 'left' | 'right'): void {
+    const actionButtons = this.actionButtons.toArray();
+    const actionButtonCount = actionButtons.length;
+    const newIndex = (direction === 'left' ? index - 1 : index + 1);
+    actionButtons[((newIndex + actionButtonCount) % actionButtonCount)].nativeElement.focus();
+  }
+
+  public onActionButtonFocus(actionButton: HTMLButtonElement): void {
+    this._activeActionButton = actionButton;
   }
 
   public ngOnDestroy(): void {

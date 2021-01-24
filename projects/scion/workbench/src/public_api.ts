@@ -27,8 +27,7 @@ export { WorkbenchActivityPartService } from './lib/activity-part/workbench-acti
 export { WbActivityActionDirective } from './lib/activity-part/wb-activity-action.directive';
 export { Notification, Duration } from './lib/notification/notification';
 export { NotificationService } from './lib/notification/notification.service';
-export { MessageBox, Action, Actions } from './lib/message-box/message-box';
-export { MessageBoxService } from './lib/message-box/message-box.service';
+export * from './lib/message-box/public_api';
 export { WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM } from './lib/routing/routing-params.constants';
 export { Severity, ROUTE_REUSE_PROVIDER, VIEW_TAB_CONTEXT, ViewTabContext } from './lib/workbench.constants';
 export { WorkbenchLauncher, WorkbenchStartup } from './lib/startup/workbench-launcher.service';

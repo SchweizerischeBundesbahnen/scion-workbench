@@ -9,14 +9,14 @@
  */
 
 import { animate, AnimationMetadata, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
-
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MessageBoxService } from './message-box.service';
-import { Action, ɵMessageBox } from './message-box';
-import { MessageBoxComponent } from './message-box.component';
+import { ɵMessageBox } from './ɵmessage-box';
+import { Observable } from 'rxjs';
 
+/**
+ * Stacks message boxes of the current context. Does not include message boxes of parent contexts.
+ */
 @Component({
   selector: 'wb-message-box-stack',
   templateUrl: './message-box-stack.component.html',
@@ -27,44 +27,22 @@ import { MessageBoxComponent } from './message-box.component';
     trigger('leave', MessageBoxStackComponent.provideLeaveAnimation()),
   ],
 })
-export class MessageBoxStackComponent implements OnDestroy {
+export class MessageBoxStackComponent {
 
-  private _destroy$ = new Subject<void>();
+  public messageBoxes$: Observable<ɵMessageBox[]>;
 
-  public messageBoxes: ɵMessageBox[] = [];
-
-  constructor(messageBoxService: MessageBoxService, private _cd: ChangeDetectorRef) {
-    messageBoxService.open$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((messageBox) => {
-        this.messageBoxes.push(messageBox);
-        this._cd.markForCheck();
-      });
-  }
-
-  public onClose(index: number, action: Action): void {
-    this.messageBoxes.splice(index, 1)
-      .map(messageBox => messageBox.close$)
-      .forEach(close$ => {
-        close$.next(action);
-        close$.complete();
-      });
-
-    this._cd.markForCheck();
+  constructor(messageBoxService: MessageBoxService) {
+    this.messageBoxes$ = messageBoxService.messageBoxes$({includeParents: false});
   }
 
   /**
    * This method is invoked when the user clicks outside the message box.
    */
-  public onGlasspaneClick(event: MouseEvent, messageBox: MessageBoxComponent): void {
-    event.stopPropagation(); // to not loose focus
+  public onGlasspaneClick(event: MouseEvent, messageBox: ɵMessageBox): void {
+    event.stopPropagation(); // to not lose focus
     event.stopImmediatePropagation();
     event.preventDefault();
     messageBox.blink();
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 
   /**

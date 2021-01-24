@@ -16,9 +16,7 @@ import { first, takeUntil } from 'rxjs/operators';
 /**
  * Allows moving the host element while holding down the primary mouse button, e.g. to move a message box.
  */
-@Directive({
-  selector: '[wbMove]',
-})
+@Directive({selector: '[wbMove]'})
 export class MoveDirective implements OnDestroy {
 
   private _destroy$ = new Subject<void>();

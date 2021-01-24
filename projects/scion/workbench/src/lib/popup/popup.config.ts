@@ -12,7 +12,11 @@ import { ComponentFactoryResolver, ElementRef, Injector, Type, ViewContainerRef 
 import { Observable } from 'rxjs';
 
 /**
- * Configures the popup to display a component in a workbench popup using {@link PopupService}.
+ * Configures the content to be displayed in a popup.
+ *
+ * A popup is a visual workbench component for displaying content above other content. It is positioned relative to an anchor,
+ * which can be either a page coordinate (x/y) or an HTML element. When using an element as the popup anchor, the popup also
+ * moves when the anchor element moves.
  */
 export abstract class PopupConfig {
   /**
@@ -34,13 +38,13 @@ export abstract class PopupConfig {
    */
   public readonly component: Type<any>;
   /**
-   * Instructs Angular how to construct the component. In most cases, construct options need to to be set.
+   * Instructs Angular how to construct the component. In most cases, construct options need not to be set.
    */
   public readonly componentConstructOptions?: {
     /**
      * Sets the injector for the instantiation of the popup component, giving you control over the objects available
      * for injection into the popup component. If not specified, uses the application's root injector, or the view's
-     * injector if in the context of a view.
+     * injector if opened in the context of a view.
      *
      * ```ts
      * Injector.create({
@@ -159,12 +163,12 @@ export interface PopupSize {
  * Handle that a popup component can inject to interact with the popup, for example,
  * to read input data or the configured size, or to close the popup.
  */
-export abstract class Popup<T = any | undefined> {
+export abstract class Popup<T = any> {
 
   /**
    * Input data as passed by the popup opener when opened the popup, or `undefined` if not passed.
    */
-  public readonly input: T | undefined;
+  public readonly input: T;
 
   /**
    * Preferred popup size as specified by the popup opener, or `undefined` if not set.

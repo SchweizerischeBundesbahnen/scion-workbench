@@ -9,8 +9,8 @@
  */
 
 import { ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild, ViewContainerRef } from '@angular/core';
-import { AsyncSubject, combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { AsyncSubject, combineLatest, EMPTY, fromEvent, Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { SciViewportComponent } from '@scion/toolkit/viewport';
 import { WbRouterOutletDirective } from '../routing/wb-router-outlet.directive';
@@ -65,10 +65,15 @@ export class ViewComponent implements OnDestroy {
     return this._view.cssClasses.join(' ');
   }
 
+  @HostBinding('class.blocked')
+  public get blocked(): boolean {
+    return this._view.blocked;
+  }
+
   constructor(private _view: ɵWorkbenchView,
               private _logger: Logger,
+              private _host: ElementRef<HTMLElement>,
               public workbenchStartup: WorkbenchStartup,
-              host: ElementRef<HTMLElement>,
               messageBoxService: MessageBoxService,
               viewContextMenuService: ViewMenuService,
               cd: ChangeDetectorRef,
@@ -104,16 +109,22 @@ export class ViewComponent implements OnDestroy {
       });
     }
 
-    messageBoxService.count$
+    messageBoxService.messageBoxes$({includeParents: true})
       .pipe(takeUntil(this._destroy$))
-      .subscribe(count => this._view.blocked = count > 0);
-    viewContextMenuService.installMenuItemAccelerators$(host, this._view)
+      .subscribe(messageBoxes => this._view.blocked = messageBoxes.length > 0);
+
+    viewContextMenuService.installMenuItemAccelerators$(this._host, this._view)
       .pipe(takeUntil(this._destroy$))
       .subscribe();
 
     combineLatest([this._view.active$, this._viewport$])
       .pipe(takeUntil(this._destroy$))
       .subscribe(([active, viewport]) => active ? this.onActivateView(viewport) : this.onDeactivateView(viewport));
+
+    // Prevent this view from getting the focus when it is blocked, for example, when displaying a message box.
+    this._view.blocked$
+      .pipe(switchMap(blocked => blocked ? fromEvent(this._host.nativeElement, 'focusin', {capture: true}) : EMPTY))
+      .subscribe(() => messageBoxService.focusTop());
   }
 
   private onActivateView(viewport: SciViewportComponent): void {

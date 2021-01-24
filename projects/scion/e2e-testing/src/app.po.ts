@@ -9,10 +9,11 @@
  */
 
 import { $, $$, browser, ElementFinder, Key, protractor } from 'protractor';
-import { getCssClasses, isCssClassPresent, runOutsideAngularSynchronization } from './helper/testing.util';
+import { getCssClasses, isActiveElement, isCssClassPresent, runOutsideAngularSynchronization } from './helper/testing.util';
 import { StartPagePO } from './start-page.po';
 import { coerceArray, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { WebdriverExecutionContexts } from './helper/webdriver-execution-context';
+import { Dictionary } from '@scion/toolkit/util';
 
 export class AppPO {
 
@@ -464,6 +465,20 @@ export class AppPO {
         return await msgboxFinder.isDisplayed() && await msgboxComponentFinder.isDisplayed();
       }
 
+      public async getClientRect(): Promise<ClientRect> {
+        await WebdriverExecutionContexts.switchToDefault();
+        const {width, height} = await msgboxFinder.getSize();
+        const {x, y} = await msgboxFinder.getLocation();
+        return {
+          top: y,
+          left: x,
+          right: x + width,
+          bottom: y + height,
+          width,
+          height,
+        };
+      }
+
       public async getTitle(): Promise<string> {
         await WebdriverExecutionContexts.switchToDefault();
         return msgboxFinder.$('.e2e-title').getText();
@@ -496,9 +511,9 @@ export class AppPO {
         throw Error('Message box not found in the view-modal nor in the application-modal message box stack.');
       }
 
-      public async getActions(): Promise<{ [key: string]: string }> {
+      public async getActions(): Promise<Dictionary<string>> {
         await WebdriverExecutionContexts.switchToDefault();
-        const actions: { [key: string]: string } = {};
+        const actions: Dictionary<string> = {};
 
         const actionsFinder = msgboxFinder.$$('button.e2e-action');
         const count = await actionsFinder.count();
@@ -517,6 +532,15 @@ export class AppPO {
         await msgboxFinder.$(`button.e2e-action.e2e-action-key-${action}`).click();
         // wait until the animation completes
         await browser.wait(protractor.ExpectedConditions.stalenessOf(msgboxFinder), 5000);
+      }
+
+      public async isActionActive(actionKey: string): Promise<boolean> {
+        await WebdriverExecutionContexts.switchToDefault();
+        return isActiveElement(msgboxFinder.$('.e2e-button-bar').$(`button.e2e-action.e2e-action-key-${actionKey}`));
+      }
+
+      public getCssClasses(): Promise<string[]> {
+        return getCssClasses(msgboxFinder);
       }
 
       public $(selector: string): ElementFinder {
@@ -780,15 +804,21 @@ export interface MessageBoxPO {
 
   isDisplayed(): Promise<boolean>;
 
+  getClientRect(): Promise<ClientRect>;
+
   getTitle(): Promise<string>;
 
   getSeverity(): Promise<'info' | 'warn' | 'error' | null>;
 
   getModality(): Promise<'view' | 'application' | null>;
 
-  getActions(): Promise<{ [key: string]: string }>;
+  getActions(): Promise<Dictionary<string>>;
 
   clickActionButton(action: string): Promise<void>;
+
+  isActionActive(actionKey: string): Promise<boolean>;
+
+  getCssClasses(): Promise<string[]>;
 
   $(selector: string): ElementFinder;
 }
