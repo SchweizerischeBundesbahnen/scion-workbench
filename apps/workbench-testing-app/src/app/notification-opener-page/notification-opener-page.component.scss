@@ -4,17 +4,11 @@
   row-gap: 1em;
   padding: 1em;
 
-  > section, form {
+  > section {
     display: grid;
     grid-row-gap: .5em;
     border: 1px solid var(--sci-color-P400);
     border-radius: 5px;
     padding: 1em;
-
-    > header {
-      margin-top: 0;
-      margin-bottom: 2em;
-      font-weight: bold;
-    }
   }
 }

@@ -17,6 +17,7 @@ import { InspectNotificationPO } from '../inspect-notification.po';
 import { expectMap } from '../helper/expect-map-matcher';
 import { expectPromise } from '../helper/expect-promise-matcher';
 import { NotificationOpenerPagePO } from './page-object/notification-opener-page.po';
+import { browser } from 'protractor';
 
 describe('Workbench Notification', () => {
 
@@ -285,6 +286,26 @@ describe('Workbench Notification', () => {
     const notificationOpenerPagePO = await NotificationOpenerPagePO.openInNewTab('app1');
     await notificationOpenerPagePO.enterCssClass('testee');
     await expectPromise(notificationOpenerPagePO.clickShow()).toReject(/NotQualifiedError/);
+  });
+
+  it('should close the notification after the auto-close timeout', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register notification intention
+    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    await registerIntentionPagePO.registerIntention({type: 'notification'});
+
+    // display the notification
+    const notificationOpenerPagePO = await NotificationOpenerPagePO.openInNewTab('app1');
+    await notificationOpenerPagePO.enterCssClass('testee');
+    await notificationOpenerPagePO.selectDuration(1);
+    await notificationOpenerPagePO.enterContent('Notification should close after 1s');
+    await notificationOpenerPagePO.clickShow();
+
+    const textNotificationPO = new TextNotificationPO('testee');
+    await expect(await textNotificationPO.isDisplayed()).toBe(true);
+    await browser.sleep(2000);
+    await expect(await textNotificationPO.isDisplayed()).toBe(false);
   });
 
   describe('Custom Notification Provider', () => {

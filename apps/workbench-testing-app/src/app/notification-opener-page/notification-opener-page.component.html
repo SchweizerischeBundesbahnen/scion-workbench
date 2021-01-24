@@ -1,43 +1,63 @@
-<form autocomplete="off" [formGroup]="form">
-  <header>Notification</header>
+<ng-container [formGroup]="form">
+  <section>
+    <sci-form-field label="Component">
+      <select [formControlName]="COMPONENT" class="e2e-component">
+        <option value="inspect-notification">InspectNotificationComponent</option>
+        <option value="">default</option>
+      </select>
+    </sci-form-field>
 
-  <sci-form-field label="Title">
-    <input [formControlName]="TITLE" class="e2e-title">
-  </sci-form-field>
+    <sci-form-field label="Content" *ngIf="!isUseComponent()">
+      <input [formControlName]="CONTENT" class="e2e-content">
+    </sci-form-field>
 
-  <sci-form-field label="Content">
-    <input [formControlName]="CONTENT" class="e2e-content">
-  </sci-form-field>
+    <sci-form-field label="Component Input" *ngIf="isUseComponent()">
+      <input [formControlName]="COMPONENT_INPUT" class="e2e-component-input">
+    </sci-form-field>
+  </section>
 
-  <sci-form-field label="Severity">
-    <select [formControlName]="SEVERITY" class="e2e-severity">
-      <option value="info">info</option>
-      <option value="warn">warn</option>
-      <option value="error">error</option>
-      <option value="">&lt;default&gt;</option>
-    </select>
-  </sci-form-field>
+  <section>
+    <sci-form-field label="Title">
+      <input [formControlName]="TITLE" class="e2e-title">
+    </sci-form-field>
 
-  <sci-form-field label="Duration">
-    <select [formControlName]="DURATION" class="e2e-duration">
-      <option value="short">short</option>
-      <option value="medium">medium</option>
-      <option value="long">long</option>
-      <option value="infinite">infinite</option>
-      <option value="">&lt;default&gt;</option>
-    </select>
-  </sci-form-field>
+    <sci-form-field label="Severity">
+      <select [formControlName]="SEVERITY" class="e2e-severity">
+        <option value="info">info</option>
+        <option value="warn">warn</option>
+        <option value="error">error</option>
+        <option value="">default</option>
+      </select>
+    </sci-form-field>
 
-  <sci-form-field label="Group">
-    <input [formControlName]="GROUP" class="e2e-group">
-  </sci-form-field>
+    <sci-form-field label="Duration">
+      <input [formControlName]="DURATION" list="duration" class="e2e-duration">
+      <datalist id="duration">
+        <option value="short">short</option>
+        <option value="medium">medium</option>
+        <option value="long">long</option>
+        <option value="infinite">infinite</option>
+        <option value="">default</option>
+      </datalist>
+    </sci-form-field>
 
-  <sci-form-field label="CSS Class(es)">
-    <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
-  </sci-form-field>
-</form>
+    <sci-form-field label="CSS Class(es)">
+      <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+    </sci-form-field>
+  </section>
 
-<button (click)="onOpen()" class="e2e-open">
-  Display notification
+  <section>
+    <sci-form-field label="Group">
+      <input [formControlName]="GROUP" class="e2e-group">
+    </sci-form-field>
+
+    <sci-form-field label="Input Reducer">
+      <sci-checkbox [formControlName]="USE_GROUP_INPUT_REDUCER" class="e2e-use-group-input-reducer"></sci-checkbox>
+    </sci-form-field>
+  </section>
+</ng-container>
+
+<button (click)="onNotificationShow()" class="e2e-show" [disabled]="form.invalid">
+  Show notification
 </button>
 

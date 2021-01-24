@@ -392,6 +392,20 @@ export class AppPO {
         return notificationFinder.isDisplayed();
       }
 
+      public async getClientRect(): Promise<ClientRect> {
+        await WebdriverExecutionContexts.switchToDefault();
+        const {width, height} = await notificationFinder.getSize();
+        const {x, y} = await notificationFinder.getLocation();
+        return {
+          top: y,
+          left: x,
+          right: x + width,
+          bottom: y + height,
+          width,
+          height,
+        };
+      }
+
       public async getTitle(): Promise<string> {
         await WebdriverExecutionContexts.switchToDefault();
         return notificationFinder.$('.e2e-title').getText();
@@ -435,6 +449,10 @@ export class AppPO {
         await notificationFinder.$('.e2e-close').click();
         // wait until the animation completes
         await browser.wait(protractor.ExpectedConditions.stalenessOf(notificationFinder), 5000);
+      }
+
+      public getCssClasses(): Promise<string[]> {
+        return getCssClasses(notificationFinder);
       }
 
       public $(selector: string): ElementFinder {
@@ -788,6 +806,8 @@ export interface NotificationPO {
 
   isPresent(): Promise<boolean>;
 
+  getClientRect(): Promise<ClientRect>;
+
   getTitle(): Promise<string>;
 
   getSeverity(): Promise<'info' | 'warn' | 'error' | null>;
@@ -795,6 +815,8 @@ export interface NotificationPO {
   getDuration(): Promise<'short' | 'medium' | 'long' | 'infinite' | null>;
 
   clickClose(): Promise<void>;
+
+  getCssClasses(): Promise<string[]>;
 
   $(selector: string): ElementFinder;
 }

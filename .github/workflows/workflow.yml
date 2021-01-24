@@ -137,6 +137,8 @@ jobs:
             project: workbench
           - name: message-box
             project: workbench
+          - name: notification
+            project: workbench
           - name: router
             project: workbench-client
           - name: router-params

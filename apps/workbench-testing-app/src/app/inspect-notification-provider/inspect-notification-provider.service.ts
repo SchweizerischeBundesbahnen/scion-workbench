@@ -13,7 +13,7 @@ export class InspectNotificationProvider implements MicrofrontendNotificationPro
   public description = 'Allows inspecting a notification.';
   public requiredParams = ['param1'];
   public optionalParams = ['param2'];
-  public inputReduceFn = addNotificationCount;
+  public groupInputReduceFn = addNotificationCount;
 }
 
 /**

@@ -11,7 +11,7 @@
 import { Observable } from 'rxjs';
 
 /**
- * Handle that a message box component can inject to interact with the message box, for example,
+ * Represents a handle that a message box component can inject to interact with the message box, for example,
  * to read input data or to configure the message box.
  *
  * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text

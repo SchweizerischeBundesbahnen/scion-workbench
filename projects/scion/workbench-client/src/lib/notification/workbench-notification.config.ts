@@ -43,14 +43,15 @@ export interface WorkbenchNotificationConfig {
   params?: Map<string, any> | Dictionary;
 
   /**
-   * Specifies the severity of the message. Defaults to `info`.
+   * Specifies the severity of the notification. Defaults to `info`.
    */
   severity?: 'info' | 'warn' | 'error';
 
   /**
    * Specifies the timeout after which to close the notification automatically. Defaults to `medium`.
+   * Can be either a duration alias, or a number in seconds.
    */
-  duration?: 'short' | 'medium' | 'long' | 'infinite';
+  duration?: 'short' | 'medium' | 'long' | 'infinite' | number;
 
   /**
    * Specifies the group which this notification belongs to.

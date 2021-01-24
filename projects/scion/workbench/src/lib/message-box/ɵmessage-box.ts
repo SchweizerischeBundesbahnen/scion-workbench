@@ -31,7 +31,7 @@ export class ɵMessageBox<T = any> implements MessageBox<T> { // tslint:disable-
 
   constructor(public config: MessageBoxConfig) {
     this.title$ = new BehaviorSubject(this.config.title);
-    this.severity$ = new BehaviorSubject(this.config.severity || 'info');
+    this.severity$ = new BehaviorSubject(this.config.severity ?? 'info');
     this.cssClass$ = new BehaviorSubject(Arrays.coerce(this.config.cssClass));
     this.actions$ = new BehaviorSubject(this.parseActions(config.actions || {'ok': 'OK'}));
     if (this.config.content === undefined || typeof this.config.content === 'string') {
@@ -53,7 +53,7 @@ export class ɵMessageBox<T = any> implements MessageBox<T> { // tslint:disable-
   }
 
   public setSeverity(severity: 'info' | 'warn' | 'error' | undefined): void {
-    this.severity$.next(severity || 'info');
+    this.severity$.next(severity ?? 'info');
   }
 
   public setCssClass(cssClass: string | string[]): void {

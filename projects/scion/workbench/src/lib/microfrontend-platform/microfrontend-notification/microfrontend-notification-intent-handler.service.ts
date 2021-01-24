@@ -86,7 +86,7 @@ export class MicrofrontendNotificationIntentHandlerService implements OnDestroy 
     this._notificationService.notify({
       title: config.title,
       content: provider.component,
-      input: new Map([
+      componentInput: new Map([
         ...intentRequest.headers,
         ...params,
         ...Maps.coerce(intentRequest.intent.qualifier),
@@ -95,7 +95,7 @@ export class MicrofrontendNotificationIntentHandlerService implements OnDestroy 
       severity: config.severity,
       duration: config.duration,
       group: provider.group ?? config.group,
-      groupInputReduceFn: provider.inputReduceFn,
+      groupInputReduceFn: provider.groupInputReduceFn,
       cssClass: config.cssClass,
     });
   }

@@ -60,6 +60,9 @@ exports.config = {
     'workbench::message-box': [
       './src/workbench/**/message-box.e2e-spec.ts',
     ],
+    'workbench::notification': [
+      './src/workbench/**/notification.e2e-spec.ts',
+    ],
     'workbench-client::router': [
       './src/workbench-client/**/router.e2e-spec.ts',
     ],

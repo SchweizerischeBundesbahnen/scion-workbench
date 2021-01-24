@@ -1,13 +1,5 @@
 <div class="outline">
-  <h1 *ngIf="!!title" class="e2e-title">{{title}}</h1>
-  <ng-container *ngIf="textual; then text_template; else component_template"></ng-container>
+  <header *ngIf="notification.title$ | async | wbCoerceObservable$ | async as title" class="e2e-title">{{title}}</header>
+  <ng-container *cdkPortalOutlet="portal"></ng-container>
 </div>
 <button type="button" class="close wb-icons e2e-close" (click)="onClose()"></button>
-
-<ng-template #text_template>
-  <span>{{text}}</span>
-</ng-template>
-
-<ng-template #component_template>
-  <ng-container *ngComponentOutlet="componentType; injector: injector"></ng-container>
-</ng-template>
