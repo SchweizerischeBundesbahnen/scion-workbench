@@ -31,9 +31,9 @@ const routes: Routes = [
     data: {title: 'Workbench View', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-view', pinToStartPage: true},
   },
   {
-    path: 'test-messagebox',
+    path: 'test-message-box',
     loadChildren: (): any => import('./message-box-opener-page/message-box-opener-page.module').then(m => m.MessageBoxOpenerPageModule),
-    data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-messagebox', pinToStartPage: true},
+    data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-message-box', pinToStartPage: true},
   },
   {
     path: 'test-notification',

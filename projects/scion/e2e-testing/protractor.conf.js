@@ -57,6 +57,9 @@ exports.config = {
     'workbench::popup-size': [
       './src/workbench/**/popup-size.e2e-spec.ts',
     ],
+    'workbench::message-box': [
+      './src/workbench/**/message-box.e2e-spec.ts',
+    ],
     'workbench-client::router': [
       './src/workbench-client/**/router.e2e-spec.ts',
     ],

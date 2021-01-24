@@ -27,7 +27,7 @@
         <option value="info">info</option>
         <option value="warn">warn</option>
         <option value="error">error</option>
-        <option value="">&lt;default&gt;</option>
+        <option value="">default</option>
       </select>
     </sci-form-field>
 
@@ -35,7 +35,7 @@
       <select [formControlName]="MODALITY" class="e2e-modality">
         <option value="application">application</option>
         <option value="view">view</option>
-        <option value="">&lt;default&gt;</option>
+        <option value="">default</option>
       </select>
     </sci-form-field>
 
@@ -55,7 +55,7 @@
   </section>
 </ng-container>
 
-<button (click)="onMessageBoxOpen()" class="open e2e-open" [disabled]="form.invalid">
+<button (click)="onMessageBoxOpen()" class="e2e-open" [disabled]="form.invalid">
   Open message box
 </button>
 

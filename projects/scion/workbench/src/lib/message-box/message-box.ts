@@ -8,104 +8,68 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Type } from '@angular/core';
-import { Subject } from 'rxjs';
-import { Severity } from '../workbench.constants';
+import { Observable } from 'rxjs';
 
 /**
- * Represents a message box to be displayed to the user.
- */
-export abstract class MessageBox {
-
-  /**
-   * Specifies the optional title.
-   */
-  public title?: string;
-
-  /**
-   * Specifies the message box text, or the component to be displayed as content.
-   * @see input
-   */
-  public content: string | Type<any>;
-
-  /**
-   * Data available in the message box component if providing a custom message box component via the {@link #content} property.
-   */
-  public input?: any;
-
-  /**
-   * Specifies which buttons to display on the message box.
-   */
-  public actions?: Actions;
-
-  /**
-   * Specifies the optional severity.
-   */
-  public severity?: Severity | null = 'info';
-
-  /**
-   * Specifies the modality context created by the message box.
-   *
-   * By default, and if in the context of a view, view modality is used.
-   */
-  public modality?: 'application' | 'view' = 'view';
-
-  /**
-   * Specifies if the user can select the message box text.
-   */
-  public contentSelectable?: boolean = false; // tslint:disable-line:no-inferrable-types
-  /**
-   * Specifies CSS class(es) added to the <wb-message-box> element, e.g. used for e2e testing.
-   */
-  public cssClass?: string | string[];
-}
-
-export class ɵMessageBox extends MessageBox { // tslint:disable-line:class-name
-
-  public readonly close$ = new Subject<Action>();
-
-  /**
-   * Allows to register a callback that will be called when a property like 'severity' or 'title' is changed.
-   */
-  public onPropertyChange: () => void;
-
-  constructor(messageBox: MessageBox) {
-    super();
-
-    // Intercept properties to initiate change detection cycle if properties are set in content component.
-    ['title', 'actions', 'severity'].forEach(property => {
-      Object.defineProperty(this, property, {
-        set: (arg: any): void => {
-          this[`_${property}`] = arg;
-          this.onPropertyChange && this.onPropertyChange();
-        },
-        get: (): any => {
-          return this[`_${property}`];
-        },
-      });
-    });
-
-    // Copy properties of object literal to this instance
-    Object.keys(messageBox)
-      .filter(key => typeof messageBox[key] !== 'undefined')
-      .forEach(key => this[key] = messageBox[key]);
-
-    this.severity = this.severity || 'info';
-    this.modality = this.modality || 'view';
-  }
-}
-
-/**
- * Represents a key to confirm a message box.
- */
-export declare type Action = string;
-
-/**
- * Dictionary of actions to confirm a message box.
+ * Handle that a message box component can inject to interact with the message box, for example,
+ * to read input data or to configure the message box.
  *
- * The key acts a action key, and the value as display text.
+ * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
+ * message and one or more buttons.
  */
-export interface Actions {
-  [key: string]: string;
+export abstract class MessageBox<T = any> {
+
+  /**
+   * Input data as passed by the message box opener when opened the message box, or `undefined` if not passed.
+   */
+  public readonly input: T | undefined;
+
+  /**
+   * Sets the title of the message box; can be a string literal or an Observable.
+   */
+  public abstract setTitle(title: string | undefined | Observable<string | undefined>): void;
+
+  /**
+   * Sets the severity of the message.
+   */
+  public abstract setSeverity(severity: 'info' | 'warn' | 'error'): void;
+
+  /**
+   * Sets CSS class(es) to be added to the message box, e.g. used for e2e testing.
+   *
+   * This operation is additive, that is, it does not override CSS classes set by the message box opener.
+   */
+  public abstract setCssClass(cssClass: string | string[]): void;
+
+  /**
+   * Defines the actions that will be displayed to the user in the form of buttons to close the message box.
+   *
+   * This operation overrides actions defined by the message box opener.
+   */
+  public abstract setActions(actions: MessageBoxAction[]): void;
 }
 
+/**
+ * Represents a close action which is displayed as a button in the message box.
+ */
+export interface MessageBoxAction {
+  /**
+   * Specifies the key to be returned to the message box opener when the user closes the message box via this close action.
+   * The key is also added to the action button as a CSS class in the format `e2e-action-<KEY>`.
+   *
+   * If to include additional data in the return value, for example, when prompting the user for data, consider registering
+   * an {@link onAction action listener} to control the return value.
+   */
+  key: string;
+  /**
+   * The label to display to the user; can be a string literal or an Observable.
+   */
+  label: string | Observable<string>;
+  /**
+   * Listener called when the user closes the message box via this action.
+   *
+   * Setting a listener is optional, allowing to control the value which to return to the message box opener
+   * when closing the message box via this action. By default, if not set, will return the action key.
+   */
+  onAction?: () => any;
+}

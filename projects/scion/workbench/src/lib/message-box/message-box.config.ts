@@ -8,7 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
+import { ComponentFactoryResolver, Injector, ViewContainerRef } from '@angular/core';
+import { ComponentType } from '@angular/cdk/portal/portal';
 import { Dictionary } from '@scion/toolkit/util';
+import { Observable } from 'rxjs';
 
 /**
  * Configures the content and appearance of a message presented to the user in the form of a message box.
@@ -27,42 +30,68 @@ import { Dictionary } from '@scion/toolkit/util';
  *   can interact with other views, close them or open new views, or arrange them any other way. A view-modal message box sticks to
  *   its view; that is, it is displayed only when the view is visible. By default, when opening the message box in the context of a
  *   view, it is opened as a view-modal message box. When opened outside of a view, setting the modality to 'view' has no effect.
- *
- * @category MessageBox
  */
-export interface WorkbenchMessageBoxConfig {
+export interface MessageBoxConfig {
 
   /**
-   * Specifies the title of the message box.
+   * Optional title of the message box; can be a string literal or an Observable.
    */
-  title?: string;
+  title?: string | Observable<string>;
 
   /**
-   * Specifies the content to be displayed in the message box.
+   * Content of the message box, can be either a plain text message or a component.
    *
-   * The content may differ per message box provider, as dermined by the qualifier. For example, the built-in message box expects a
-   * text message in form of a string literal. Refer to the documentation of the message box capability provider for more information.
+   * Consider using a component when displaying structured content or prompting the user for input.
+   * You can pass data to the component using the {@link componentInput} property or by providing a custom
+   * injector in {@link componentConstructOptions.injector}.
    */
-  content?: any;
+  content: string | ComponentType<any>;
 
   /**
-   * Allows passing data to the message box. The message box provider can declare mandatory and optional parameters.
-   * No additional parameters may be included. Refer to the documentation of the message box capability provider for more information.
+   * If using a component as the message box content, optionally instructs Angular how to construct the component.
+   * In most cases, construct options need not to be set.
    */
-  params?: Map<string, any> | Dictionary;
+  componentConstructOptions?: {
+
+    /**
+     * Sets the injector for the instantiation of the message box component, giving you control over the objects available
+     * for injection into the message box component. If not specified, uses the application's root injector, or the view's
+     * injector if opened in the context of a view.
+     *
+     * ```ts
+     * Injector.create({
+     *   parent: ...,
+     *   providers: [
+     *    {provide: <DiToken>, useValue: <value>}
+     *   ],
+     * })
+     * ```
+     */
+    injector?: Injector;
+
+    /**
+     * Sets the component's attachment point in Angular's logical component tree (not the DOM tree used for rendering), effecting when
+     * Angular checks the component for changes during a change detection cycle. If not set, inserts the component at the top level
+     * in the component tree.
+     */
+    viewContainerRef?: ViewContainerRef;
+
+    /**
+     * Sets the component factory for Angular to resolve the component for construction. Must be set if Angular cannot resolve the component.
+     */
+    componentFactoryResolver?: ComponentFactoryResolver | null;
+  };
+
+  /**
+   * Optional data to pass to the message box component. In the component, you can inject the message box handle {@link MessageBox} to
+   * read input data. Use only in combination with a custom message box component, has no effect otherwise.
+   */
+  componentInput?: any;
 
   /**
    * Defines the actions that will be displayed to the user in the form of buttons to close the message box.
-   *
-   * When the user closes the message box, the key of the closing action will be returned to the message box opener.
-   * The value of an action is used as the display text of the button.
-   *
-   * If not specifying actions, an 'OK' action button is displayed by default. Note that the provider of the message box can also specify
-   * actions. Then, provided actions will be ignored. Refer to the documentation of the message box capability provider for more information.
    */
-  actions?: {
-    [key: string]: string
-  };
+  actions?: Dictionary<string>;
 
   /**
    * Specifies the severity of the message. Defaults to `info`.

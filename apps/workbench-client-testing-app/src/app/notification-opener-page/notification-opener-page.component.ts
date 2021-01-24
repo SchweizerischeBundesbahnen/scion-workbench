@@ -61,8 +61,8 @@ export class NotificationOpenerPageComponent {
 
     this.error = null;
     this._notificationService.show({
-      title: this.form.get(TITLE).value.replace(/\\n/g, '\n') || undefined, // restore new lines as sanitized by the user agent
-      content: this.form.get(CONTENT).value.replace(/\\n/g, '\n') || undefined, // restore new lines as sanitized by the user agent
+      title: this.form.get(TITLE).value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
+      content: this.form.get(CONTENT).value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
       params,
       severity: this.form.get(SEVERITY).value || undefined,
       duration: this.form.get(DURATION).value || undefined,

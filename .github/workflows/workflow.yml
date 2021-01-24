@@ -135,6 +135,8 @@ jobs:
             project: workbench
           - name: popup-size
             project: workbench
+          - name: message-box
+            project: workbench
           - name: router
             project: workbench-client
           - name: router-params

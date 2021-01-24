@@ -8,104 +8,152 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Inject, Injectable, InjectionToken, NgZone, Optional, SkipSelf } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, MessageBox, ɵMessageBox } from './message-box';
+import { Injectable, NgZone, OnDestroy, Optional, SkipSelf } from '@angular/core';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
+import { MessageBoxConfig } from './message-box.config';
+import { ɵMessageBox } from './ɵmessage-box';
+import { Arrays } from '@scion/toolkit/util';
+import { filter, map, takeUntil } from 'rxjs/operators';
+import { WorkbenchView } from '../view/workbench-view.model';
 
 /**
- * DI injection token to inject the {MessageBoxService} with application modality context.
+ * Allows displaying a message to the user in a workbench message box.
+ *
+ * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
+ * message and one or more buttons.
+ *
+ * The workbench supports the following two modality types:
+ *
+ * - **Application-modal:**
+ *   An application-modal message box blocks the entire workbench. The user cannot switch between views, close or open views,
+ *   or arrange views in the workbench layout.
+ *
+ * - **View-modal:**
+ *   A view-modal message box blocks only the view in which it was opened. In contrast to application-modal message boxes, the user
+ *   can interact with other views, close them or open new views, or arrange them any other way. A view-modal message box sticks to
+ *   its view; that is, it is displayed only when the view is visible. By default, when opening the message box in the context of a
+ *   view, it is opened as a view-modal message box. When opened outside of a view, setting the modality to 'view' has no effect.
+ *
+ * By default, the message box supports the display of a plain text message. To display structured content or prompting the user for
+ * input, consider passing a component to {@link MessageBoxConfig#content} instead.
+ *
+ * Unlike views, message boxes are not part of the persistent workbench navigation, meaning that message boxes do not survive a page reload.
  */
-export const APP_MESSAGE_BOX_SERVICE = new InjectionToken<MessageBoxService>('APP_MESSAGE_BOX_SERVICE');
+@Injectable({providedIn: 'root'})
+export class MessageBoxService implements OnDestroy {
 
-/**
- * Displays message boxes to the user.
- */
-@Injectable()
-export class MessageBoxService {
+  private _destroy$ = new Subject<void>();
+  private _messageBoxes$ = new BehaviorSubject<ɵMessageBox[]>([]);
+  private _messageBoxServiceHierarchy: MessageBoxService[];
 
-  private _count$ = new BehaviorSubject<number>(0);
-
-  private _open$ = new Subject<ɵMessageBox>();
-
-  constructor(@Optional() @SkipSelf() @Inject(APP_MESSAGE_BOX_SERVICE) private _globalMessageBoxService: MessageBoxService,
+  constructor(@Optional() @SkipSelf() private _parentMessageBoxService: MessageBoxService,
+              @Optional() view: WorkbenchView,
               private _zone: NgZone) {
+    this._messageBoxServiceHierarchy = this.computeMessageBoxServiceHierarchy();
+    view && this.restoreFocusOnViewActivation(view);
   }
 
   /**
-   * Displays the specified message to the user.
+   * Presents the user with a message that is displayed in a message box based on the given config.
    *
-   * Returns a promise that resolves to the action key which the user pressed to confirm the message.
+   * By default, when the message box is opened in the context of a workbench view, it is opened as a view-modal message box.
    *
-   * Example usage:
-   *
-   *  messageBoxService.open({
-   *      content: 'Do you want to continue?',
-   *      severity: 'info',
-   *      actions: {
-   *        yes: 'Yes',
-   *        no: 'No',
-   *        cancel: 'Cancel'
-   *      }
-   * })
-   * .then((action: Action) => {
-   *   ...
+   * ### Usage:
+   * ```typescript
+   * const action = await messageBoxService.open({
+   *   content: 'Do you want to continue?',
+   *   severity: 'info',
+   *   actions: {
+   *     yes: 'Yes',
+   *     no: 'No',
+   *     cancel: 'Cancel',
+   *   },
    * });
+   * ```
+   *
+   * @param  message - Configures the content and appearance of the message.
+   * @return Promise that resolves to the key of the action button that the user pressed to close the message box.
+   *         Depending on the message box component, additional data may be included, such as user's input when prompting the user to
+   *         enter data.
    */
-  public open(messageBox: MessageBox | string): Promise<Action> {
-    // Ensure to run in Angular zone to display the message box even if called from outside of the Angular zone, e.g. from error handler
-    return this._zone.run(() => this.openInternal(messageBox));
-  }
+  public open(message: string | MessageBoxConfig): Promise<any> {
+    const config: MessageBoxConfig = typeof message === 'string' ? {content: message} : message;
 
-  private openInternal(messageBox: MessageBox | string): Promise<Action> {
-    const msgBox: ɵMessageBox = ((): ɵMessageBox => {
-      if (typeof messageBox === 'string') {
-        return new ɵMessageBox({content: messageBox});
-      }
-      else {
-        return new ɵMessageBox(messageBox);
-      }
-    })();
-
-    if (msgBox.modality === 'application' && this._globalMessageBoxService) {
-      return this._globalMessageBoxService.open(msgBox);
+    // Ensure to run in Angular zone to display the message box even when called from outside of the Angular zone, e.g. from an error handler.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.open(config));
     }
 
-    this._count$.next(this._count$.value + 1);
-    this._open$.next(msgBox);
+    if (config.modality === 'application' && this._parentMessageBoxService) {
+      return this._parentMessageBoxService.open(config);
+    }
 
-    return msgBox.close$.toPromise().then((action: Action) => {
-      this._count$.next(this._count$.value - 1);
-      return action;
+    const messageBox = new ɵMessageBox(config);
+    this._messageBoxes$.next(this._messageBoxes$.value.concat(messageBox));
+    return messageBox.whenClose.finally(() => {
+      this._messageBoxes$.next(this._messageBoxes$.value.filter(it => it !== messageBox));
     });
   }
 
   /**
-   * Allows to subscribe for message boxes.
+   * Emits the message boxes opened in the current context and each time when they change.
+   * Optionally, includes message boxes of parent contexts.
    *
    * @internal
    */
-  public get open$(): Observable<ɵMessageBox> {
-    return this._open$;
+  public messageBoxes$(options: { includeParents: boolean }): Observable<ɵMessageBox[]> {
+    if (options.includeParents) {
+      return combineLatest(this._messageBoxServiceHierarchy.map(service => service.messageBoxes$({includeParents: false})))
+        .pipe(map(() => this.messageBoxStack()));
+    }
+    return this._messageBoxes$;
   }
 
   /**
-   * Returns the number of displayed message boxes.
+   * Computes the message box stack including message boxes of parent stacks.
    *
-   * @internal
+   * The message boxes are returned in ascending stack order, i.e., subsequent message boxes overlap previous ones.
    */
-  public get count(): number {
-    return this._count$.getValue();
+  private messageBoxStack(): ɵMessageBox[] {
+    return this._messageBoxServiceHierarchy
+      .reduce((stack, service) => stack.concat(service._messageBoxes$.value), new Array<ɵMessageBox>());
   }
 
   /**
-   * Emits the number of displayed message boxes.
-   *
-   * Upon subscription, the current count is emitted, and then emits continuously
-   * when a message box is opened or closed. It never completes.
+   * Returns the message box service hierarchy.
+   */
+  private computeMessageBoxServiceHierarchy(): MessageBoxService[] {
+    const hierarchy: MessageBoxService[] = [];
+    let current: MessageBoxService = this;
+    do {
+      hierarchy.push(current);
+    } while ((current = current._parentMessageBoxService)); // tslint:disable-line:no-conditional-assignment
+    return hierarchy;
+  }
+
+  /**
+   * Focuses the topmost message box in the message box hierarchy of the current context.
+   * Has no effect if no message box is displaying.
    *
    * @internal
    */
-  public get count$(): Observable<number> {
-    return this._count$;
+  public focusTop(): void {
+    Arrays.last(this.messageBoxStack())?.focus();
+  }
+
+  private restoreFocusOnViewActivation(view: WorkbenchView): void {
+    view.active$
+      .pipe(
+        filter(Boolean),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        this.focusTop();
+      });
+  }
+
+  /* @docs-private */
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }

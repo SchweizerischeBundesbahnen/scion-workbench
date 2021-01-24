@@ -40,7 +40,6 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
   public heading: string;
   public dirty: boolean;
   public closable: boolean;
-  public blocked: boolean;
 
   public scrollTop: number | null;
   public scrollLeft: number | null;
@@ -49,6 +48,7 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
   public readonly active$: BehaviorSubject<boolean>;
   public readonly cssClasses$: BehaviorSubject<string[]>;
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
+  public readonly blocked$ = new BehaviorSubject(false);
 
   constructor(public readonly viewId: string,
               public readonly portal: WbComponentPortal<ViewComponent>,
@@ -178,6 +178,14 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
         this._menuItemProviders$.next(this._menuItemProviders$.value.filter(it => it !== factoryFn));
       },
     };
+  }
+
+  public get blocked(): boolean {
+    return this.blocked$.value;
+  }
+
+  public set blocked(blocked: boolean) {
+    this.blocked$.next(blocked);
   }
 
   public get destroyed(): boolean {
