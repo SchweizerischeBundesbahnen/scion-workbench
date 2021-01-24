@@ -65,10 +65,21 @@ export class NotificationOpenerPageComponent {
       content: this.form.get(CONTENT).value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
       params,
       severity: this.form.get(SEVERITY).value || undefined,
-      duration: this.form.get(DURATION).value || undefined,
+      duration: this.parseDurationFromUI(),
       group: this.form.get(GROUP).value || undefined,
       cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
     }, qualifier)
       .catch(error => this.error = error);
+  }
+
+  private parseDurationFromUI(): 'short' | 'medium' | 'long' | 'infinite' | number | undefined {
+    const duration = this.form.get(DURATION).value;
+    if (duration === '') {
+      return undefined;
+    }
+    if (isNaN(Number(duration))) {
+      return duration;
+    }
+    return Number(duration);
   }
 }

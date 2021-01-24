@@ -160,7 +160,7 @@ export interface PopupSize {
 }
 
 /**
- * Handle that a popup component can inject to interact with the popup, for example,
+ * Represents a handle that a popup component can inject to interact with the popup, for example,
  * to read input data or the configured size, or to close the popup.
  */
 export abstract class Popup<T = any> {

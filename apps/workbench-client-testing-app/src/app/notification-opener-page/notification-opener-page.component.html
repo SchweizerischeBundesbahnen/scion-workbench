@@ -23,18 +23,19 @@
         <option value="info">info</option>
         <option value="warn">warn</option>
         <option value="error">error</option>
-        <option value="">&lt;default&gt;</option>
+        <option value="">default</option>
       </select>
     </sci-form-field>
 
     <sci-form-field label="Duration">
-      <select [formControlName]="DURATION" class="e2e-duration">
+      <input [formControlName]="DURATION" list="duration" class="e2e-duration">
+      <datalist id="duration">
         <option value="short">short</option>
         <option value="medium">medium</option>
         <option value="long">long</option>
         <option value="infinite">infinite</option>
-        <option value="">&lt;default&gt;</option>
-      </select>
+        <option value="">default</option>
+      </datalist>
     </sci-form-field>
 
     <sci-form-field label="Group">
@@ -47,7 +48,7 @@
   </section>
 </ng-container>
 
-<button (click)="onNotificationShow()" class="open e2e-show" [disabled]="form.invalid">
+<button (click)="onNotificationShow()" class="e2e-show" [disabled]="form.invalid">
   Show notification
 </button>
 

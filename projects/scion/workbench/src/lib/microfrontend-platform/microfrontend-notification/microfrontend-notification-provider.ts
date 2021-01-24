@@ -104,13 +104,15 @@ export abstract class MicrofrontendNotificationProvider {
   public abstract readonly group?: string;
   /**
    * Use in combination with {@link group} to reduce the input to be passed to a notification.
-   * Each time a notification of a group is displayed and there is already present a notification of this group, the
-   * reduce function is called with the input of the previous notification and the input of the notification to be
-   * displayed, allowing for the aggregation of input values.
    *
+   * Note that the reducer function, if specified, is only invoked for notifications that belong to a group.
    * If no reducer is specified, the input of the notification is passed as is.
+   *
+   * Each time when to display a notification that belongs to a group and if there is already present a
+   * notification of that group, the reduce function is called with the input of that present notification
+   * and the input of the new notification, allowing for the aggregation of the input values.
    */
-  public inputReduceFn?: (prevInput: Map<string, any> | undefined, currInput: Map<string, any>) => Map<string, any>;
+  public groupInputReduceFn?: (prevInput: Map<string, any>, currInput: Map<string, any>) => Map<string, any>;
 }
 
 /**

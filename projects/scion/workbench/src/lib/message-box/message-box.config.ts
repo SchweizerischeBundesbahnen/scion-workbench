@@ -48,7 +48,7 @@ export interface MessageBoxConfig {
   content: string | ComponentType<any>;
 
   /**
-   * If using a component as the message box content, optionally instructs Angular how to construct the component.
+   * If using a component as the message box content, optionally instruct Angular how to construct the component.
    * In most cases, construct options need not to be set.
    */
   componentConstructOptions?: {

@@ -9,13 +9,15 @@
  */
 
 import { animate, AnimationMetadata, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, TrackByFunction } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TrackByFunction } from '@angular/core';
 
-import { ɵNotification } from './notification';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
 import { NotificationService } from './notification.service';
+import { ɵNotification } from './ɵnotification';
+import { Observable } from 'rxjs';
 
+/**
+ * Displays notifications on the right side.  Multiple notifications are stacked vertically.
+ */
 @Component({
   selector: 'wb-notification-list',
   templateUrl: './notification-list.component.html',
@@ -23,51 +25,21 @@ import { NotificationService } from './notification.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [trigger('notification-enter-or-leave', NotificationListComponent.provideAnimation())],
 })
-export class NotificationListComponent implements OnDestroy {
+export class NotificationListComponent {
 
-  private _destroy$ = new Subject<void>();
+  public notifications$: Observable<ɵNotification[]>;
 
-  public notifications: ɵNotification[] = [];
-
-  constructor(notificationService: NotificationService, private _cd: ChangeDetectorRef) {
-    notificationService.notify$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((notification) => this.onNotification(notification));
+  constructor(private _notificationService: NotificationService) {
+    this.notifications$ = this._notificationService.notifications$;
   }
 
-  @HostListener('document:keydown.escape')
-  public onEscape(): void {
-    this.notifications.length && this.onNotificationClose(this.notifications.length - 1);
-  }
-
-  /**
-   * Invoked upon the receipt of a new notification.
-   */
-  private onNotification(notification: ɵNotification): void {
-    // Find potential notification which belongs to the same group.
-    const index = notification.group && this.notifications.findIndex(it => it.group === notification.group);
-    if (notification.group && index >= 0) {
-      notification.input = notification.groupInputReduceFn(this.notifications[index].input, notification.input);
-      this.notifications[index] = notification;
-    }
-    else {
-      this.notifications.push(notification);
-    }
-    this._cd.markForCheck();
-  }
-
-  public onNotificationClose(index: number): void {
-    this.notifications.splice(index, 1);
-    this._cd.markForCheck();
+  public onNotificationClose(notification: ɵNotification): void {
+    this._notificationService.closeNotification(notification);
   }
 
   public trackByFn: TrackByFunction<ɵNotification> = (index: number, notification: ɵNotification): any => {
-    return notification.group || notification;
+    return notification.config.group || notification;
   };
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
 
   /**
    * Returns animation metadata to slide-in a new notification, and to fade-out upon dismiss.

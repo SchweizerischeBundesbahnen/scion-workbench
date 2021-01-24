@@ -1,19 +1,17 @@
 :host {
   display: grid;
-  row-gap: 2em;
+  grid-row-gap: 1em;
 
-  > section {
-    > header {
-      margin-top: 0;
-      margin-bottom: 2em;
-      font-weight: bold;
-    }
+  > sci-form-field section.input {
+    border: 1px solid var(--sci-color-P400);
+    border-radius: 5px;
+    padding: 1em;
+    max-height: 200px;
 
     > sci-viewport {
       white-space: pre;
       font-family: monospace;
       font-size: smaller;
-      max-height: 200px;
     }
   }
 }

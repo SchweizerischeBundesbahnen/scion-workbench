@@ -8,114 +8,95 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Injector, Input, NgZone, OnDestroy, Output } from '@angular/core';
-import { Notification, ɵNotification } from './notification';
-import { asyncScheduler, Subject, timer } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { Arrays } from '@scion/toolkit/util';
+import { ChangeDetectionStrategy, Component, EventEmitter, Injector, Input, NgZone, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { EMPTY, merge, Subject, timer } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
+import { ɵNotification } from './ɵnotification';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { Notification } from './notification';
+import { observeInside, subscribeInside } from '@scion/toolkit/operators';
 
+/**
+ * A notification is a closable message that appears in the top right corner and disappears automatically after a few seconds.
+ * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
+ */
 @Component({
   selector: 'wb-notification',
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotificationComponent implements AfterViewInit, OnDestroy {
+export class NotificationComponent implements OnChanges, OnDestroy {
 
   private _destroy$ = new Subject<void>();
   private _closeTimerChange$ = new Subject<void>();
-  private _notification: ɵNotification;
 
-  public text: string;
-  public textual: boolean;
-
-  public componentType: any;
-  public injector: Injector;
+  public portal: ComponentPortal<any>;
 
   @Input()
-  public set notification(notification: ɵNotification) {
-    this._notification = notification;
-    this._notification.onPropertyChange = (): void => this._cd.markForCheck();
+  public notification: ɵNotification;
+
+  @Output()
+  public closeNotification = new EventEmitter<void>();
+
+  constructor(private _injector: Injector, private _zone: NgZone) {
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
     this.installAutoCloseTimer();
-
-    this.textual = typeof notification.content === 'string';
-    if (this.textual) {
-      this.text = notification.content as string;
-    }
-    else {
-      this.injector = Injector.create({
-        parent: this._injector,
-        providers: [{provide: Notification, useValue: notification}],
-      });
-      this.componentType = notification.content;
-    }
-  }
-
-  @Output() // tslint:disable-line:no-output-native
-  public close = new EventEmitter<void>();
-
-  @HostBinding('attr.class')
-  public get cssClass(): string {
-    return [
-      ...Arrays.coerce(this._notification.cssClass),
-      this._notification.severity,
-      `e2e-severity-${this._notification.severity}`,
-      `e2e-duration-${this._notification.duration}`,
-    ].join(' ');
-  }
-
-  constructor(private _injector: Injector, private _cd: ChangeDetectorRef, private _zone: NgZone) {
-  }
-
-  public ngAfterViewInit(): void {
-    // Initiate manual change detection cycle because property may change during custom component construction.
-    if (this._notification.content) {
-      asyncScheduler.schedule(() => this._cd.markForCheck());
-    }
+    this.portal = this.createPortal(this.notification);
   }
 
   public onClose(): void {
-    this.close.emit();
+    this.closeNotification.emit();
+  }
+
+  private createPortal(notification: ɵNotification): ComponentPortal<any> {
+    const componentConstructOptions = notification.config.componentConstructOptions;
+    return new ComponentPortal(notification.component, componentConstructOptions?.viewContainerRef || null, Injector.create({
+      parent: notification.config.componentConstructOptions?.injector || this._injector,
+      providers: [
+        {provide: Notification, useValue: notification},
+      ],
+    }), componentConstructOptions?.componentFactoryResolver || null);
   }
 
   /**
-   * Installs an auto-close timer if this notification is auto closable and,
-   * if an existing timer is in place, that timer is cancelled.
+   * Installs an auto-close timer if this notification is auto closable.
+   * An existing timer, if any, is cancelled.
    */
   private installAutoCloseTimer(): void {
     this._closeTimerChange$.next();
 
-    if (this._notification.duration === 'infinite') {
-      return;
-    }
-
-    const autoCloseTimeout = ((): number => {
-      switch (this._notification.duration) {
-        case 'short':
-          return 7000;
-        case 'medium':
-          return 15000;
-        case 'long':
-          return 30000;
-      }
-    })();
-
     // Run the timer outside of Angular to allow Protractor tests to continue interacting with the browser.
-    // Otherwise, tests must set 'browser.waitForAngularEnabled(false)' which can cause flaky tests.
-    this._zone.runOutsideAngular(() => {
-      timer(autoCloseTimeout)
-        .pipe(
-          takeUntil(this._destroy$),
-          takeUntil(this._closeTimerChange$),
-        )
-        .subscribe(() => {
-          this._zone.run(() => this.onClose());
-        });
-    });
-  }
-
-  public get title(): string {
-    return this._notification.title;
+    // Otherwise, we would urge tests to call 'browser.waitForAngularEnabled(false)', which can lead to flaky
+    // tests.
+    this.notification.duration$
+      .pipe(
+        switchMap(duration => {
+          switch (duration) {
+            case 'short':
+              return timer(7000);
+            case 'medium':
+              return timer(15000);
+            case 'long':
+              return timer(30000);
+            case 'infinite':
+              return EMPTY;
+            default:
+              if (typeof duration === 'number') {
+                return timer(duration * 1000);
+              }
+              return EMPTY;
+          }
+        }),
+        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
+        observeInside(continueFn => this._zone.run(continueFn)),
+        takeUntil(merge(this._closeTimerChange$, this._destroy$)),
+      )
+      .subscribe(() => {
+        this.closeNotification.emit();
+      });
   }
 
   public ngOnDestroy(): void {

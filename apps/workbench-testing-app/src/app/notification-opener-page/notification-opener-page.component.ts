@@ -8,16 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component } from '@angular/core';
+import { Component, Type } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NotificationService, WorkbenchView } from '@scion/workbench';
 import { ActivatedRoute } from '@angular/router';
+import { InspectNotificationComponent } from '../inspect-notification-provider/inspect-notification.component';
 
 const TITLE = 'title';
 const CONTENT = 'content';
+const COMPONENT = 'component';
+const COMPONENT_INPUT = 'componentInput';
 const SEVERITY = 'severity';
 const DURATION = 'duration';
 const GROUP = 'group';
+const USE_GROUP_INPUT_REDUCER = 'groupInputReducer';
 const CSS_CLASS = 'cssClass';
 
 @Component({
@@ -29,9 +33,12 @@ export class NotificationOpenerPageComponent {
 
   public readonly TITLE = TITLE;
   public readonly CONTENT = CONTENT;
+  public readonly COMPONENT = COMPONENT;
+  public readonly COMPONENT_INPUT = COMPONENT_INPUT;
   public readonly SEVERITY = SEVERITY;
   public readonly DURATION = DURATION;
   public readonly GROUP = GROUP;
+  public readonly USE_GROUP_INPUT_REDUCER = USE_GROUP_INPUT_REDUCER;
   public readonly CSS_CLASS = CSS_CLASS;
 
   public form: FormGroup;
@@ -47,21 +54,65 @@ export class NotificationOpenerPageComponent {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [CONTENT]: formBuilder.control(''),
+      [COMPONENT]: formBuilder.control(''),
+      [COMPONENT_INPUT]: formBuilder.control(''),
       [SEVERITY]: formBuilder.control(''),
       [DURATION]: formBuilder.control(''),
       [GROUP]: formBuilder.control(''),
+      [USE_GROUP_INPUT_REDUCER]: formBuilder.control(false),
       [CSS_CLASS]: formBuilder.control(''),
     });
   }
 
-  public onOpen(): void {
+  public onNotificationShow(): void {
     this._notificationService.notify({
-      title: this.form.get(TITLE).value || undefined,
-      content: this.form.get(CONTENT).value || undefined,
+      title: this.restoreLineBreaks(this.form.get(TITLE).value) || undefined,
+      content: (this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.get(CONTENT).value)) || undefined,
+      componentInput: (this.isUseComponent() ? this.form.get(COMPONENT_INPUT).value : undefined) || undefined,
       severity: this.form.get(SEVERITY).value || undefined,
-      duration: this.form.get(DURATION).value || undefined,
+      duration: this.parseDurationFromUI(),
       group: this.form.get(GROUP).value || undefined,
+      groupInputReduceFn: this.isUseGroupInputReducer() ? concatInput : undefined,
       cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
     });
   }
+
+  private parseComponentFromUI(): Type<any> {
+    switch (this.form.get(COMPONENT).value) {
+      case 'inspect-notification':
+        return InspectNotificationComponent;
+      default:
+        throw Error(`[IllegalNotificationComponent] Notification component not supported: ${this.form.get(COMPONENT).value}`);
+    }
+  }
+
+  private parseDurationFromUI(): 'short' | 'medium' | 'long' | 'infinite' | number | undefined {
+    const duration = this.form.get(DURATION).value;
+    if (duration === '') {
+      return undefined;
+    }
+    if (isNaN(Number(duration))) {
+      return duration;
+    }
+    return Number(duration);
+  }
+
+  public isUseComponent(): boolean {
+    return !!this.form.get(COMPONENT).value;
+  }
+
+  public isUseGroupInputReducer(): boolean {
+    return this.form.get(USE_GROUP_INPUT_REDUCER).value;
+  }
+
+  /**
+   * Restores line breaks as sanitized by the user agent.
+   */
+  private restoreLineBreaks(value: string): string {
+    return value.replace(/\\n/g, '\n');
+  }
+}
+
+function concatInput(prevInput: string, currInput: string): string {
+  return `${prevInput}, ${currInput}`;
 }

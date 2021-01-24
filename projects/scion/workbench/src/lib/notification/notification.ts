@@ -8,81 +8,42 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Type } from '@angular/core';
-import { Severity } from '../workbench.constants';
+import { Observable } from 'rxjs';
 
 /**
- * Represents a notification to be displayed to the user.
+ * Represents a handle that a notification component can inject to interact with the notification, for example,
+ * to read input data or to configure the notification.
+ *
+ * A notification is a closable message that appears in the top right corner and disappears automatically after a few seconds.
+ * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
  */
-export abstract class Notification {
+export abstract class Notification<T = any> {
+
   /**
-   * Specifies the optional title.
+   * Input data as passed by the notification reporter, or `undefined` if not passed.
    */
-  public title?: string;
+  public readonly input: T | undefined;
+
   /**
-   * Specifies the notification text, or the component to be displayed as notification.
-   * @see input
+   * Sets the title of the notification; can be a string literal or an Observable.
    */
-  public content: string | Type<any>;
+  public abstract setTitle(title: string | undefined | Observable<string | undefined>): void;
+
   /**
-   * Data available in the notification box component if providing a custom notification component via the {@link #content} property.
+   * Sets the severity of the notification.
    */
-  public input?: any;
+  public abstract setSeverity(severity: 'info' | 'warn' | 'error'): void;
+
   /**
-   * Specifies the optional severity.
+   * Sets the timeout upon which to close the notification automatically.
+   * Can be either a duration alias, or a number in seconds.
    */
-  public severity?: Severity | null = 'info';
+  public abstract setDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number): void;
+
   /**
-   * Specifies the optional timeout upon which to close this notification automatically.
-   * If not specified, a 'medium' timeout is applied. Use 'Duration.infinite' to not close this notification automatically.
+   * Sets CSS class(es) to be added to the notification, e.g. used for e2e testing.
+   *
+   * This operation is additive, that is, it does not override CSS classes set by the notification reporter.
    */
-  public duration?: Duration;
-  /**
-   * Specifies the optional group which this notification belongs to.
-   * If specified, this notification closes all notification of the same group before being presented.
-   */
-  public group?: string;
-  /**
-   * Specifies CSS class(es) added to the <wb-notification> element, e.g. used for e2e testing.
-   */
-  public cssClass?: string | string[];
-  /**
-   * Reducer function used in combination with 'group' to combine the inputs of the new and current notification.
-   */
-  public groupInputReduceFn?: (prevInput: any, currInput: any) => any = (prevInput, currInput) => currInput;
+  public abstract setCssClass(cssClass: string | string[]): void;
 }
-
-export class ɵNotification extends Notification { // tslint:disable-line:class-name
-
-  /**
-   * Allows to register a callback that will be called when a property like 'severity' or 'title' is changed.
-   */
-  public onPropertyChange: () => void;
-
-  constructor(notification: Notification) {
-    super();
-
-    // Patch setters to initiate change detection cycle if properties are set in content component.
-    ['title', 'severity'].forEach(property => {
-      Object.defineProperty(this, property, {
-        set: (arg: any): void => {
-          this[`_${property}`] = arg;
-          this.onPropertyChange && this.onPropertyChange();
-        },
-        get: (): any => {
-          return this[`_${property}`];
-        },
-      });
-    });
-
-    // Copy properties of object literal to this instance
-    Object.keys(notification)
-      .filter(key => typeof notification[key] !== 'undefined')
-      .forEach(key => this[key] = notification[key]);
-
-    this.severity = this.severity || 'info';
-    this.duration = this.duration || 'medium';
-  }
-}
-
-export type Duration = 'short' | 'medium' | 'long' | 'infinite';

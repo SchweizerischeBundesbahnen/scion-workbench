@@ -73,9 +73,3 @@ export declare type ViewTabContext = 'tabbar' | 'tabbar-dropdown' | 'drag-image'
  * DI injection token to inject the context in which the viewtab is rendered.
  */
 export const VIEW_TAB_CONTEXT = new InjectionToken<ViewTabContext>('VIEW_TAB_CONTEXT');
-
-/**
- * Represents severity levels.
- */
-export type Severity = 'info' | 'warn' | 'error';
-

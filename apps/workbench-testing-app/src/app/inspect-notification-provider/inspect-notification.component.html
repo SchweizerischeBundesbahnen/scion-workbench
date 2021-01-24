@@ -1,13 +1,41 @@
-<section>
-  <header>Input</header>
-  <sci-viewport>
-    <output class="e2e-input">{{notification.input | wbStringify}}</output>
-  </sci-viewport>
-</section>
+<sci-form-field label="Instance ID" title="Unique identifier of this component instance">
+  <span class="e2e-component-instance-id">{{uuid}}</span>
+</sci-form-field>
 
-<section>
-  <header>Content</header>
-  <sci-viewport>
-    <output class="e2e-content">{{notification.content | wbStringify}}</output>
-  </sci-viewport>
-</section>
+<sci-form-field label="Input" direction="column" *ngIf="notification.input">
+  <section class="input">
+    <sci-viewport>
+      <output class="e2e-input">{{notification.input | wbStringify}}</output>
+    </sci-viewport>
+  </section>
+</sci-form-field>
+
+<ng-container [formGroup]="form">
+  <sci-form-field label="Title" direction="column">
+    <input [formControlName]="TITLE" class="e2e-title">
+  </sci-form-field>
+
+  <sci-form-field label="Severity" direction="column">
+    <select [formControlName]="SEVERITY" class="e2e-severity">
+      <option value="info">info</option>
+      <option value="warn">warn</option>
+      <option value="error">error</option>
+      <option value="">default</option>
+    </select>
+  </sci-form-field>
+
+  <sci-form-field label="Duration" direction="column">
+    <input [formControlName]="DURATION" list="duration" class="e2e-duration">
+    <datalist id="duration">
+      <option value="short">short</option>
+      <option value="medium">medium</option>
+      <option value="long">long</option>
+      <option value="infinite">infinite</option>
+      <option value="">default</option>
+    </datalist>
+  </sci-form-field>
+
+  <sci-form-field label="CSS Class(es)" direction="column">
+    <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+  </sci-form-field>
+</ng-container>

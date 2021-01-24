@@ -8,47 +8,145 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, NgZone } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { Notification, ɵNotification } from './notification';
+import { Inject, Injectable, NgZone, OnDestroy } from '@angular/core';
+import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
+import { ɵNotification } from './ɵnotification';
+import { NotificationConfig } from './notification.config';
+import { DOCUMENT } from '@angular/common';
+import { filter, map, takeUntil } from 'rxjs/operators';
+import { observeInside, subscribeInside } from '@scion/toolkit/operators';
+import { Arrays } from '@scion/toolkit/util';
 
 /**
- * Displays notifications to the user.
+ * Allows displaying a notification to the user.
+ *
+ * A notification is a closable message that appears in the top right corner and disappears automatically after a few seconds.
+ * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
+ *
+ * Multiple notifications are stacked vertically. Notifications can be grouped. For each group, only the last notification is
+ * displayed at any given time.
+ *
+ * By default, the workbench notification supports the display of a plain text message. To display structured content, consider
+ * passing a component to {@link NotificationConfig#content} instead.
  */
-@Injectable()
-export class NotificationService {
+@Injectable({providedIn: 'root'})
+export class NotificationService implements OnDestroy {
 
-  private _notify$ = new Subject<ɵNotification>();
+  private _notifications$ = new BehaviorSubject<ɵNotification[]>([]);
+  private _destroy$ = new Subject<void>();
 
-  constructor(private _zone: NgZone) {
+  constructor(private _zone: NgZone, @Inject(DOCUMENT) document: any) {
+    this.installEscapeHandler();
   }
 
   /**
-   * Pops up a notification.
+   * Presents the user with a notification that is displayed in the top right corner based on the given config.
+   *
+   * To display structured content, consider passing a component to {@link NotificationConfig#content}.
+   *
+   * ### Usage:
+   * ```typescript
+   * notificationService.notify({
+   *   content: 'Task scheduled for execution.',
+   *   severity: 'info',
+   *   duration: 'short',
+   * });
+   * ```
+   *
+   * @param  notification - Configures the content and appearance of the notification.
    */
-  public notify(notification: Notification | string): void {
-    // Ensure to run in Angular zone to display the notification even if called from outside of the Angular zone, e.g. from error handler
-    this._zone.run(() => this.notifyInternal(notification));
+  public notify(notification: string | NotificationConfig): void {
+    const config: NotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
+
+    // Ensure to run in Angular zone to display the notification even when called from outside of the Angular zone, e.g. from an error handler.
+    if (!NgZone.isInAngularZone()) {
+      this._zone.run(() => this.addNotification(config));
+    }
+    else {
+      this.addNotification(config);
+    }
   }
 
-  private notifyInternal(notification: Notification | string): void {
-    const note = ((): ɵNotification => {
-      if (typeof notification === 'string') {
-        return new ɵNotification({content: notification});
-      }
-      else {
-        return new ɵNotification(notification);
-      }
-    })();
-
-    this._notify$.next(note);
+  private addNotification(config: NotificationConfig): void {
+    const notifications = [...this.notifications];
+    const {insertionIndex, notification} = this.constructNotification(config, notifications);
+    notifications.splice(insertionIndex, 1, notification);
+    this._notifications$.next(notifications);
   }
 
   /**
-   * Allows to subscribe for notifications.
+   * Constructs the notification based on the given config and computes its insertion index.
+   */
+  private constructNotification(config: NotificationConfig, notifications: ReadonlyArray<ɵNotification>): { notification: ɵNotification, insertionIndex: number } {
+    config = {...config};
+
+    // Check whether the notification belongs to a group. If so, replace any present notification of that group.
+    const group = config.group;
+    if (!group) {
+      return {
+        notification: new ɵNotification(config),
+        insertionIndex: notifications.length,
+      };
+    }
+
+    // Check whether there is a notification of the same group present.
+    const index = notifications.findIndex(it => it.config.group === group);
+    if (index === -1) {
+      return {
+        notification: new ɵNotification(config),
+        insertionIndex: notifications.length,
+      };
+    }
+
+    // Reduce the notification's input, if specified a reducer.
+    if (config.groupInputReduceFn) {
+      config.componentInput = config.groupInputReduceFn(notifications[index].input, config.componentInput);
+    }
+
+    return {
+      notification: new ɵNotification(config),
+      insertionIndex: index,
+    };
+  }
+
+  private get notifications(): ɵNotification[] {
+    return this._notifications$.value;
+  }
+
+  /**
    * @internal
    */
-  public get notify$(): Observable<ɵNotification> {
-    return this._notify$;
+  public closeNotification(notification: ɵNotification): void {
+    this._notifications$.next(this.notifications.filter(it => it !== notification));
+  }
+
+  /**
+   * @internal
+   */
+  public get notifications$(): Observable<ɵNotification[]> {
+    return this._notifications$;
+  }
+
+  /**
+   * Installs a keystroke listener to close the last notification when the user presses the escape keystroke.
+   */
+  private installEscapeHandler(): void {
+    fromEvent(document, 'keydown')
+      .pipe(
+        filter((event: KeyboardEvent) => event.key === 'Escape'),
+        map(() => Arrays.last(this.notifications)),
+        filter<ɵNotification>(Boolean),
+        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
+        observeInside(continueFn => this._zone.run(continueFn)),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(lastNotification => {
+        this.closeNotification(lastNotification);
+      });
+  }
+
+  /* @docs-private */
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }

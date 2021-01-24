@@ -40,9 +40,6 @@ import { WorkbenchModuleConfig } from './workbench-module-config';
 import { ContentProjectionDirective } from './content-projection/content-projection.directive';
 import { ContentAsOverlayComponent } from './content-projection/content-as-overlay.component';
 import { ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
-import { NotificationService } from './notification/notification.service';
-import { NotificationListComponent } from './notification/notification-list.component';
-import { NotificationComponent } from './notification/notification.component';
 import { EmptyOutletComponent } from './routing/empty-outlet.component';
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
@@ -88,8 +85,8 @@ import { ViewDragService } from './view-dnd/view-drag.service';
 import { ViewTabDragImageRenderer } from './view-dnd/view-tab-drag-image-renderer.service';
 import { PopupComponent } from './popup/popup.component';
 import { MicrofrontendPopupComponent } from './microfrontend-platform/microfrontend-popup/microfrontend-popup.component';
-import { TextNotificationComponent } from './notification/text-notification.component';
 import { MessageBoxModule } from './message-box/message-box.module';
+import { NotificationModule } from './notification/notification.module';
 
 @NgModule({
   imports: [
@@ -106,6 +103,7 @@ import { MessageBoxModule } from './message-box/message-box.module';
     OverlayModule,
     A11yModule,
     MessageBoxModule,
+    NotificationModule,
   ],
   declarations: [
     WorkbenchComponent,
@@ -127,8 +125,6 @@ import { MessageBoxModule } from './message-box/message-box.module';
     WbRouterOutletDirective,
     WbRouterLinkDirective,
     WbRouterLinkWithHrefDirective,
-    NotificationListComponent,
-    NotificationComponent,
     ContentProjectionDirective,
     EmptyOutletComponent,
     ContentAsOverlayComponent,
@@ -145,7 +141,6 @@ import { MessageBoxModule } from './message-box/message-box.module';
     MicrofrontendPopupComponent,
     SplashComponent,
     PopupComponent,
-    TextNotificationComponent,
   ],
   exports: [
     WorkbenchComponent,
@@ -200,7 +195,6 @@ export class WorkbenchModule {
         WorkbenchActivityPartService,
         WorkbenchAuxiliaryRoutesRegistrator,
         ActivityResolver,
-        NotificationService,
         WorkbenchUrlObserver,
         WorkbenchViewRegistry,
         WorkbenchViewPartRegistry,

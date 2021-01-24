@@ -10,14 +10,13 @@
 
 import { assertPageToDisplay, enterText, selectOption, sendKeys } from '../../helper/testing.util';
 import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciParamsEnterPO } from '@scion/toolkit.internal/widgets.po';
-import { $, browser, ElementFinder, Key } from 'protractor';
+import { browser, ElementFinder, Key } from 'protractor';
 import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { Qualifier } from '@scion/microfrontend-platform';
-import { Arrays, Dictionary } from '@scion/toolkit/util';
+import { Arrays } from '@scion/toolkit/util';
+import { SciCheckboxPO } from '@scion/toolkit.internal/widgets.po';
 
 /**
- * Page object to interact {@link NotificationOpenerPageComponent}.
+ * Page object to interact {@link NotificationPageComponent}.
  */
 export class NotificationOpenerPagePO {
 
@@ -31,98 +30,84 @@ export class NotificationOpenerPagePO {
   constructor(public viewId: string) {
     this.viewPO = this._appPO.findView({viewId: viewId});
     this.viewTabPO = this._appPO.findViewTab({viewId: viewId});
-    this._pageFinder = $('app-notification-opener-page');
+    this._pageFinder = this.viewPO.$('app-notification-opener-page');
   }
 
-  public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+  public async isPresent(): Promise<boolean> {
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
-    const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-qualifier'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(qualifier);
+    return this._pageFinder.isPresent();
   }
 
-  public async enterParams(params: Dictionary): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+  public async selectComponent(component: 'inspect-notification' | 'default'): Promise<void> {
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
-    const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-params'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(params);
-  }
-
-  public async enterTitle(title: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(title, this._pageFinder.$('input.e2e-title'));
+    await selectOption(component, this._pageFinder.$('select.e2e-component'));
   }
 
   public async enterContent(content: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
     await enterText(content, this._pageFinder.$('input.e2e-content'));
   }
 
+  public async enterComponentInput(componentInput: string): Promise<void> {
+    await WebdriverExecutionContexts.switchToDefault();
+    await assertPageToDisplay(this._pageFinder);
+    await enterText(componentInput, this._pageFinder.$('input.e2e-component-input'));
+  }
+
+  public async enterTitle(title: string): Promise<void> {
+    await WebdriverExecutionContexts.switchToDefault();
+    await assertPageToDisplay(this._pageFinder);
+    await enterText(title, this._pageFinder.$('input.e2e-title'));
+  }
+
   public async selectSeverity(severity: 'info' | 'warn' | 'error'): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
     await selectOption(severity, this._pageFinder.$('select.e2e-severity'));
   }
 
   public async selectDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
     await enterText(`${duration}`, this._pageFinder.$('input.e2e-duration'));
   }
 
   public async enterGroup(group: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
     await enterText(group, this._pageFinder.$('input.e2e-group'));
   }
 
+  public async checkUseGroupInputReduceFn(check: boolean): Promise<void> {
+    await WebdriverExecutionContexts.switchToDefault();
+    await assertPageToDisplay(this._pageFinder);
+    await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-use-group-input-reducer')).toggle(check);
+  }
+
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
     this._cssClasses = Arrays.coerce(cssClass);
     await enterText(this._cssClasses.join(' '), this._pageFinder.$('input.e2e-class'));
   }
 
   public async clickShow(): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
 
     if (!this._cssClasses || !this._cssClasses.length) {
       throw Error('Missing required CSS class to wait for the notification to display.');
     }
 
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await this._pageFinder.$('button.e2e-show').click();
-
-    // Evaluate the response: resolves the promise on success, or rejects it on error.
-    const errorFinder = this._pageFinder.$('output.e2e-error');
-    await browser.wait(async () => {
-      // Test if the notification is showing
-      if (await this._appPO.findNotification({cssClass: this._cssClasses}).isDisplayed()) {
-        return true;
-      }
-
-      // Test if an error is present
-      await WebdriverExecutionContexts.switchToIframe(this.viewId);
-      if (await errorFinder.isPresent()) {
-        return true;
-      }
-
-      return false;
-    }, 5000);
-
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    if (await errorFinder.isPresent()) {
-      return Promise.reject(await errorFinder.getText());
-    }
+    await browser.wait(() => this._appPO.findNotification({cssClass: this._cssClasses}).isDisplayed(), 5000);
   }
 
   public async pressEscape(): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
     await this._pageFinder.click();
     await sendKeys(Key.ESCAPE);
@@ -131,10 +116,10 @@ export class NotificationOpenerPagePO {
   /**
    * Opens the page to test the notification in a new view tab.
    */
-  public static async openInNewTab(app: 'app1' | 'app2'): Promise<NotificationOpenerPagePO> {
+  public static async openInNewTab(): Promise<NotificationOpenerPagePO> {
     const appPO = new AppPO();
     const startPO = await appPO.openNewViewTab();
-    await startPO.openMicrofrontendView('e2e-test-notification', `workbench-client-testing-${app}`);
+    await startPO.openWorkbenchView('e2e-test-notification');
     const viewId = await appPO.findActiveView().getViewId();
     return new NotificationOpenerPagePO(viewId);
   }

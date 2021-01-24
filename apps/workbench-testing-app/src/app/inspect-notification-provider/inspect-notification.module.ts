@@ -13,6 +13,8 @@ import { CommonModule } from '@angular/common';
 import { InspectNotificationComponent } from './inspect-notification.component';
 import { UtilModule } from '../util/util.module';
 import { SciViewportModule } from '@scion/toolkit/viewport';
+import { SciFormFieldModule, SciParamsEnterModule } from '@scion/toolkit.internal/widgets';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,10 @@ import { SciViewportModule } from '@scion/toolkit/viewport';
   imports: [
     CommonModule,
     UtilModule,
+    SciFormFieldModule,
     SciViewportModule,
+    SciParamsEnterModule,
+    ReactiveFormsModule,
   ],
 })
 export class InspectNotificationModule {
