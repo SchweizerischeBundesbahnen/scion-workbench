@@ -40,6 +40,8 @@ Although SCION Workbench is designed for use in Angular applications, its workbe
 - [**SCION Workbench Demo**][link-demo]\
   See a live demo of the SCION Workbench.
   
+  To explore the workbench and experiment with its features, you can play around with our technical demo app, available at the following URL: https://scion-workbench-testing-app.now.sh.
+  
 - [**How To Guides**][link-howto]\
   Get answers to the most common questions when developing an application with SCION Workbench.
   
@@ -49,7 +51,7 @@ Although SCION Workbench is designed for use in Angular applications, its workbe
 ***
 
 ### Versions
-- `v11.0.0-beta.2` Limited microfrontend support; more coming soon
+- `v11.0.0-beta.3` Built-in Microfrontend support from the [SCION Microfrontend Platform][link-scion-microfrontend-platform].
 - `v11.0.0-beta.1` and newer are only compatible with Angular version 11.x.
 - `v0.0.0-beta.35` and newer are only compatible with Angular version 10.x.
 - `v0.0.0-beta.33` and newer are only compatible with Angular version 9.x.

@@ -7,6 +7,13 @@
 
 On this page you will find the latest news about the development of the SCION Workbench.
 
+- **2021-01: Built-in Microfrontend Support**\
+We have added microfrontend support to the SCION Workbench.
+
+  SCION Workbench has built-in microfrontend support from the [SCION Microfrontend Platform][link-scion-microfrontend-platform], a lightweight library for embedding microfrontends. Microfrontends embedded as views can interact seamlessly with the workbench using the [SCION Workbench Client][link-scion-workbench-client] or communicate with other microfrontends via the SCION Microfrontend Platform. Any web application can be integrated as a workbench view. Likewise, a workbench view can embed further microfrontends, and so on.
+
+  Documentation and step-by-step instructions are still missing, but the JSDoc is quite detailed. See [WorkbenchModuleConfig][link-workbench-module-config.ts] on how to enable microfrontend support in the workbench. In the meantime, for micro apps that want to interact with the workbench, we refer you to the [published TypeDoc][link-scion-workbench-client-api].
+
 - **2020-11: Deletion of the SCION Application Platform**\
 We have deleted the SCION application platform from our Git repository and deprecated respective NPM modules. This project is discontinued and will no longer be maintained. Its documentation is still online. The following NPM modules are deprecated: `@scion/workbench-application-platform`, `@scion/workbench-application-platform.api`, `@scion/workbench-application.core`, `@scion/workbench-application.angular`, `@scion/mouse-dispatcher`, `@scion/dimension` (moved to `@scion/toolkit`), `@scion/viewport` (moved to `@scion/toolkit`). 
 
@@ -23,6 +30,9 @@ On the way to a true workbench layout, we deprecate activities to introduce the 
 
 
 [link-scion-microfrontend-platform]: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md 
+[link-scion-workbench-client]: https://www.npmjs.com/package/@scion/workbench-client
+[link-scion-workbench-client-api]: https://scion-workbench-client-api.now.sh 
+[link-workbench-module-config.ts]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/projects/scion/workbench/src/lib/workbench-module-config.ts
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
