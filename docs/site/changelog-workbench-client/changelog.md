@@ -6,6 +6,53 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.1...workbench-client-1.0.0-beta.2) (2021-01-25)
+
+
+### Bug Fixes
+
+* **workbench:** start microfrontend platform outside the Angular zone ([296f6b0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/296f6b037a42c697c85c4b8974e4ce8884bf18ca))
+
+
+### Code Refactoring
+
+* **workbench-client/message-box:** consolidate message box API to be consistent with the popup API ([4a386c3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4a386c3147b6c3c663ff86f636a883fcd9e896af))
+* **workbench-client/notification:** consolidate notification API to be consistent with the message box and popup API ([162a70d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/162a70d1fc6d7c8c2badd646d88a04befb4a1417))
+
+
+### Features
+
+* **workbench-client/message-box:** allow messages to be displayed from microfrontends ([30aef07](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/30aef07bf6cf9db5f267afd4560aedae79bd1ebe))
+* **workbench-client/notification:** allow notifications to be displayed from microfrontends ([4757ac3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4757ac3fb050692e1b4b6b56ec0691431cae98d8))
+* **workbench-client/popup:** allow providing a microfrontend for display in a workbench popup ([bc23e65](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/bc23e65e835ba48bd71a762823b2cab0621a588f))
+* **workbench/popup:** allow to open a popup from a screen coordinate and bind it to the lifecycle of a view ([864d75c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/864d75c98172b49aa80ffd5b8ab4981107a60ef0))
+
+
+### BREAKING CHANGES
+
+* **workbench-client/notification:** The refactoring of the notification introduced a breaking change as properties were renamed:
+
+    - To display a notification, pass a `NotificationConfig` instead of a `Notification` object. The `Notification` object is now used exclusively as the handle for injection into the notification component. It has the following new methods: `setTitle`, `setSeverity`, `setDuration`, `setCssClass`.
+    - If passing data to the notification component, set it via `componentInput` config property instead of the `input` property.
+* **workbench-client/message-box:** The refactoring of the message box introduced a breaking change as properties were renamed:
+
+    - To display a message box, pass a `MessageBoxConfig` instead of a `MessageBox` object. The `MessageBox` object is now used exclusively as the handle for injection into the message box component. It has the following new methods: `setTitle`, `setSeverity`, `setActions`, `setCssClass`.
+    - If passing data to the message box component, set it via `componentInput` config property instead of the `input` property.
+* **workbench/popup:** consolidated the config for opening a popup in preparation for the microfrontend popup integration
+
+    To migrate:
+    - Rename the `position` property to `align`. This property is used for aligning the popup relative to its anchor.
+    - Remove the closing strategy `onLayoutChange` as binding a popup to a Workbench view is now supported. This strategy existed only as a workaround to close popups when switching between views.
+    - Pass the preferred popup overlay size as `PopupSize` object literal instead of separate top-level config properties, as follows:
+        - `PopupConfig.width` -> `PopupConfig.size.width`
+        - `PopupConfig.height`-> `PopupConfig.size.height`
+        - `PopupConfig.minWidth` -> `PopupConfig.size.minWidth`
+        - `PopupConfig.maxWidth` -> `PopupConfig.size.maxWidth`
+        - `PopupConfig.minHeight` -> `PopupConfig.size.minHeight`
+        - `PopupConfig.maxHeight`-> `PopupConfig.size.maxHeight`
+
+
+
 # 1.0.0-beta.1 (2020-12-22)
 
 
