@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ElementRef, Inject, Injectable, Injector, Optional } from '@angular/core';
+import { ElementRef, Inject, Injectable, Injector, NgZone, Optional } from '@angular/core';
 import { ConnectedOverlayPositionChange, ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { from, fromEvent, MonoTypeOperatorFunction, Observable } from 'rxjs';
 import { filter, map, shareReplay, take, takeUntil } from 'rxjs/operators';
@@ -22,6 +22,7 @@ import { fromBoundingClientRect$, fromDimension$ } from '@scion/toolkit/observab
 import { coerceElement } from '@angular/cdk/coercion';
 import { PopupComponent } from './popup.component';
 import { DOCUMENT } from '@angular/common';
+import { observeInside, subscribeInside } from '@scion/toolkit/operators';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top'};
@@ -44,6 +45,7 @@ export class PopupService {
               private _overlay: Overlay,
               private _focusManager: FocusMonitor,
               private _viewRegistry: WorkbenchViewRegistry,
+              private _zone: NgZone,
               @Inject(DOCUMENT) private _document: any,
               @Optional() private _view: WorkbenchView) {
   }
@@ -187,6 +189,8 @@ export class PopupService {
       fromEvent(popupElement, 'keydown')
         .pipe(
           filter((event: KeyboardEvent) => event.key === 'Escape'),
+          subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
+          observeInside(continueFn => this._zone.run(continueFn)),
           takeUntilClose(),
         )
         .subscribe(() => popupHandle.close());
@@ -272,7 +276,10 @@ export class PopupService {
       });
 
     fromEvent(overlayRef.overlayElement, 'focusin')
-      .pipe(takeUntilClose())
+      .pipe(
+        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
+        takeUntilClose(),
+      )
       .subscribe(() => {
         activeElement = this._document.activeElement instanceof HTMLElement ? this._document.activeElement : undefined;
       });

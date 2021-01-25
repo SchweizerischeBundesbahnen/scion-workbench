@@ -24,8 +24,8 @@
     "@angular/animations": "^11.0.0-rc.0 || ^11.0.0",
     "@angular/forms": "^11.0.0-rc.0 || ^11.0.0",
     "@angular/router": "^11.0.0-rc.0 || ^11.0.0",
-    "@scion/toolkit": "^11.0.0-beta.5 || ^11.0.0-rc.0 || ^11.0.0",
-    "@scion/microfrontend-platform": ">= 1.0.0-beta.8",
+    "@scion/toolkit": ">=11.0.0-beta.6",
+    "@scion/microfrontend-platform": ">= 1.0.0-beta.10",
     "@scion/workbench-client": ">= 1.0.0-beta.1",
     "rxjs": "^6.0.0"
   },
