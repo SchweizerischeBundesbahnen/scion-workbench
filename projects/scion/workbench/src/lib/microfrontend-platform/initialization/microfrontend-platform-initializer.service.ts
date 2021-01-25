@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, InjectFlags, InjectionToken, Injector, OnDestroy } from '@angular/core';
+import { Injectable, Injector, OnDestroy } from '@angular/core';
 import { ApplicationConfig, ApplicationManifest, IntentClient, Logger as MicrofrontendPlatformLogger, ManifestService, MessageClient, MicrofrontendPlatform, PlatformConfig, Runlevel } from '@scion/microfrontend-platform';
 import { WorkbenchModuleConfig } from '../../workbench-module-config';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchCapabilities } from '@scion/workbench-client';
 import { Logger, LoggerNames } from '../../logging';
 import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './ng-zone-decorators';
-import { WorkbenchInitializer } from '../../startup/workbench-initializer';
+import { MICROFRONTEND_PLATFORM_PRE_ACTIVATION, runWorkbenchInitializers, WorkbenchInitializer } from '../../startup/workbench-initializer';
 import { MicrofrontendPlatformConfigLoader } from '../microfrontend-platform-config-loader';
 import { LogDelegate } from './log-delegate.service';
 
@@ -66,7 +66,7 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
 
     // Register initializer to instantiate services registered under {MICROFRONTEND_PLATFORM_PRE_ACTIVATION} DI token.
     Beans.registerInitializer({
-      useFunction: () => void (this._injector.get(MICROFRONTEND_PLATFORM_PRE_ACTIVATION, undefined, InjectFlags.Optional)),
+      useFunction: () => runWorkbenchInitializers(MICROFRONTEND_PLATFORM_PRE_ACTIVATION, this._injector),
       runlevel: Runlevel.Two, // Activator microfrontends are loaded in runlevel 3.
     });
 
@@ -119,8 +119,3 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
     this._hostAppConfigIfAbsent && URL.revokeObjectURL(this._hostAppConfigIfAbsent.manifestUrl);
   }
 }
-
-/**
- * DI token to register services that are to be constructed before the SCION Microfrontend Platform installs activator microfrontends.
- */
-export const MICROFRONTEND_PLATFORM_PRE_ACTIVATION = new InjectionToken<string>('MICROFRONTEND_PLATFORM_PRE_ACTIVATION');

@@ -9,7 +9,7 @@
  */
 
 import { Injectable, Provider } from '@angular/core';
-import { WorkbenchInitializer } from '@scion/workbench';
+import { WORKBENCH_STARTUP, WorkbenchInitializer } from '@scion/workbench';
 import { WorkbenchStartupQueryParams } from './workbench-startup-query-params';
 import { asyncScheduler } from 'rxjs';
 
@@ -39,7 +39,7 @@ export function provideConfirmWorkbenchStartupInitializer(): Provider[] {
   if (WorkbenchStartupQueryParams.confirmStartup()) {
     return [
       {
-        provide: WorkbenchInitializer,
+        provide: WORKBENCH_STARTUP,
         multi: true,
         useClass: ConfirmWorkbenchStartupInitializer,
       },

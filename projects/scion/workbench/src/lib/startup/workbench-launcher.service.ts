@@ -9,8 +9,8 @@
  */
 
 import { WorkbenchModuleConfig } from '../workbench-module-config';
-import { APP_INITIALIZER, ApplicationInitStatus, Inject, Injectable, InjectFlags, InjectionToken, Injector, Optional, Provider } from '@angular/core';
-import { WorkbenchInitializer } from './workbench-initializer';
+import { APP_INITIALIZER, ApplicationInitStatus, Injectable, Injector, Provider } from '@angular/core';
+import { runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_STARTUP } from './workbench-initializer';
 import { Logger, LoggerNames } from '../logging';
 
 /**
@@ -42,8 +42,7 @@ export class WorkbenchLauncher {
 
   private _state: StartupState = StartupState.Stopped;
 
-  constructor(@Optional() @Inject(WorkbenchInitializer) private _workbenchInitializers: WorkbenchInitializer[],
-              private _startup: WorkbenchStartup,
+  constructor(private _startup: WorkbenchStartup,
               private _logger: Logger,
               private _injector: Injector) {
   }
@@ -52,11 +51,52 @@ export class WorkbenchLauncher {
    * Launches the SCION Workbench.
    *
    * This method represents the initial entry point that should be called to launch the workbench. The launcher runs
-   * registered workbench initializers and waits for them to complete. Calling this method has no effect if the
-   * workbench is already starting or has started.
+   * registered workbench initializers and waits for them to complete. Calling this method has no effect if the workbench
+   * is already starting or has started.
    *
+   * ### Splash
    * When mounting the workbench root component `<wb-workbench>` to the DOM before the workbench startup has finished,
    * the workbench will display a startup splash until completed startup.
+   *
+   * ### Startup Lifecycle Hooks
+   * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
+   * Hooks are called at defined points during startup, enabling the application's controlled initialization.
+   *
+   * The application can associate one or more initializers with any of these DI tokens. An initializer can be any object and is to be
+   * provided by a multi-provider. If the initializer implements the interface {@link WorkbenchInitializer}, which defines a single
+   * method, `init`, the workbench waits for its returned Promise to resolve before proceeding with the startup. Initializers associated
+   * with the same DI token may run in parallel.
+   *
+   * Following DI tokens are available as hooks into the workbench's startup process, listed in the order in which they are injected and
+   * executed.
+   *
+   * - {@link WORKBENCH_STARTUP}
+   * - {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}
+   * - {@link WORKBENCH_POST_STARTUP}
+   *
+   * ### Example of how to associate an initializer with the DI token {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}.
+   *
+   * ```typescript
+   * @NgModule({
+   *   ...
+   *   providers: [
+   *     {
+   *       provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+   *       multi: true,
+   *       useClass: AppInitializer,
+   *     }
+   *   ]
+   * })
+   * export class AppModule {}
+   *
+   * @Injectable()
+   * export class AppInitializer implements WorkbenchInitializer {
+   *
+   *   public init(): Promise<void> {
+   *     ...
+   *   }
+   * }
+   * ```
    *
    * @return A Promise that resolves when the workbench has completed the startup or that rejects if the startup failed.
    */
@@ -65,14 +105,9 @@ export class WorkbenchLauncher {
       case StartupState.Stopped: {
         this._logger.debug(() => `Starting Workbench. Waiting for workbench initializers to complete. [launcher=${this._injector.get(ApplicationInitStatus).done ? 'LAZY' : 'APP_INITIALIZER'}]`, LoggerNames.LIFECYCLE);
         this._state = StartupState.Starting;
-        if (this._workbenchInitializers) {
-          await Promise.all(this._workbenchInitializers
-            .filter(initializer => typeof initializer.init === 'function')
-            .map(initializer => initializer.init()),
-          );
-        }
+        await runWorkbenchInitializers(WORKBENCH_STARTUP, this._injector);
         this._state = StartupState.Started;
-        this._injector.get(WORKBENCH_POST_STARTUP, undefined, InjectFlags.Optional);
+        await runWorkbenchInitializers(WORKBENCH_POST_STARTUP, this._injector);
         this._logger.debug(() => 'Workbench started.', LoggerNames.LIFECYCLE);
         this._startup.notifyStarted();
         return Promise.resolve();
@@ -148,7 +183,3 @@ export function launchWorkbench(workbenchLauncher: WorkbenchLauncher): () => Pro
   return () => workbenchLauncher.launch();
 }
 
-/**
- * DI token to register services that are to be constructed immediately after the workbench has started.
- */
-export const WORKBENCH_POST_STARTUP = new InjectionToken<string>('WORKBENCH_POST_STARTUP');

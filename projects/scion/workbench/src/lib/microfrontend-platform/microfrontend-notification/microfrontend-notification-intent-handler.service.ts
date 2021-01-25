@@ -19,6 +19,7 @@ import { NotificationService } from '../../notification/notification.service';
 import { MicrofrontendNotificationProvider } from './microfrontend-notification-provider';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { Maps } from '@scion/toolkit/util';
+import { WorkbenchInitializer } from '../../startup/workbench-initializer';
 
 /**
  * Handles notification intents, displaying a notification using {@link NotificationService}.
@@ -26,9 +27,10 @@ import { Maps } from '@scion/toolkit/util';
  * This class is constructed before the Microfrontend Platform activates micro applications via {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION} DI token.
  */
 @Injectable()
-export class MicrofrontendNotificationIntentHandlerService implements OnDestroy {
+export class MicrofrontendNotificationIntentHandlerService implements WorkbenchInitializer, OnDestroy {
 
   private _destroy$ = new Subject<void>();
+  private _notificationProviders: MicrofrontendNotificationProvider[];
 
   constructor(private _intentClient: IntentClient,
               private _messageClient: MessageClient,
@@ -36,17 +38,21 @@ export class MicrofrontendNotificationIntentHandlerService implements OnDestroy 
               private _logger: Logger,
               private _safeRunner: SafeRunner,
               @Optional() @Inject(MicrofrontendNotificationProvider) notificationProviders: MicrofrontendNotificationProvider[]) {
-    (notificationProviders || []).forEach(provider => {
-      this.registerNotificationCapability(provider);
-      this.handleNotificationIntents(provider);
-    });
+    this._notificationProviders = notificationProviders || [];
+  }
+
+  public async init(): Promise<void> {
+    for (const notificationProvider of this._notificationProviders) {
+      await this.registerNotificationCapability(notificationProvider);
+      this.handleNotificationIntents(notificationProvider);
+    }
   }
 
   /**
    * Registers the notification capability in the host app.
    */
-  private registerNotificationCapability(provider: MicrofrontendNotificationProvider): void {
-    Beans.get(ManifestService).registerCapability({
+  private async registerNotificationCapability(provider: MicrofrontendNotificationProvider): Promise<void> {
+    await Beans.get(ManifestService).registerCapability({
       type: WorkbenchCapabilities.Notification,
       qualifier: provider.qualifier,
       private: false,

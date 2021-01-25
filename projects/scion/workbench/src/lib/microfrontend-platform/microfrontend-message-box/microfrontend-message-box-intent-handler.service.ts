@@ -20,6 +20,7 @@ import { MessageBoxService } from '../../message-box/message-box.service';
 import { MicrofrontendMessageBoxProvider } from './microfrontend-message-box-provider';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { Maps } from '@scion/toolkit/util';
+import { WorkbenchInitializer } from '../../startup/workbench-initializer';
 
 /**
  * Handles message box intents, displaying a message box using {@link MessageBoxService}.
@@ -27,9 +28,10 @@ import { Maps } from '@scion/toolkit/util';
  * This class is constructed before the Microfrontend Platform activates micro applications via {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION} DI token.
  */
 @Injectable()
-export class MicrofrontendMessageBoxIntentHandlerService implements OnDestroy {
+export class MicrofrontendMessageBoxIntentHandlerService implements WorkbenchInitializer, OnDestroy {
 
   private _destroy$ = new Subject<void>();
+  private _messageBoxProviders: MicrofrontendMessageBoxProvider[];
 
   constructor(private _intentClient: IntentClient,
               private _messageClient: MessageClient,
@@ -38,17 +40,21 @@ export class MicrofrontendMessageBoxIntentHandlerService implements OnDestroy {
               private _logger: Logger,
               private _safeRunner: SafeRunner,
               @Optional() @Inject(MicrofrontendMessageBoxProvider) messageBoxProviders: MicrofrontendMessageBoxProvider[]) {
-    (messageBoxProviders || []).forEach(provider => {
-      this.registerMessageBoxCapability(provider);
-      this.handleMessageBoxIntents(provider);
-    });
+    this._messageBoxProviders = messageBoxProviders || [];
+  }
+
+  public async init(): Promise<void> {
+    for (const messageBoxProvider of this._messageBoxProviders) {
+      await this.registerMessageBoxCapability(messageBoxProvider);
+      this.handleMessageBoxIntents(messageBoxProvider);
+    }
   }
 
   /**
    * Registers the message box capability in the host app.
    */
-  private registerMessageBoxCapability(provider: MicrofrontendMessageBoxProvider): void {
-    Beans.get(ManifestService).registerCapability({
+  private async registerMessageBoxCapability(provider: MicrofrontendMessageBoxProvider): Promise<void> {
+    await Beans.get(ManifestService).registerCapability({
       type: WorkbenchCapabilities.MessageBox,
       qualifier: provider.qualifier,
       private: false,

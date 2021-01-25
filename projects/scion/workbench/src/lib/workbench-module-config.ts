@@ -100,17 +100,22 @@ export abstract class WorkbenchModuleConfig {
   /**
    * Enables microfrontend support in the workbench, allowing the integration of microfrontends as workbench views.
    *
-   * The workbench allows any web page to be embedded as a workbench view. The web page has to provide a manifest in which it
-   * describes its views. It is conceivable that the manifest is provided by another application, e.g., when integrating
-   * third-party applications where no adaptation is possible. If embedded content needs to interact with the workbench,
-   * it can use the library `@scion/workbench-client`, a pure TypeScript library based on the web stack-agnostic
-   * `@scion/microfrontend-platform` library.
+   * The workbench uses the SCION Microfrontend Platform for providing microfrontend support. To learn more about the
+   * SCION Microfrontend Platform, refer to https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform.
+   *
+   * The workbench allows any web page to be embedded as a workbench view. The web app has to provide a manifest in which it
+   * describes its views. If integrating a third-party app where customization is not possible, it is conceivable to provide
+   * its manifest in this app (also called the host app) as a surrogate. If embedded content needs to interact with the
+   * workbench, the web app can use the library `@scion/workbench-client`, a pure TypeScript library based on the web
+   * stack-agnostic `@scion/microfrontend-platform` library.
    *
    * The workbench integrates microfrontends through so-called intents, a mechanism known from Android development, enabling
    * controlled collaboration across application boundaries. SCION DevTools can help to inspect integrated applications and
-   * dependencies. They are available in the form of a microfrontend that you can embed like any other microfrontend.
+   * dependencies. They are available in the form of a microfrontend that can be embed like any other microfrontend.
    *
-   * To learn more about the SCION Microfrontend Platform, refer to https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform.
+   * Typically, the host app provides functionality to integrated micro apps over messaging. Consider registering message
+   * and intent handlers under the DI token {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}. See {@link WorkbenchInitializer}
+   * to learn more about workbench initialization.
    */
   public abstract microfrontends?: WorkbenchMicrofrontendConfig;
 }
