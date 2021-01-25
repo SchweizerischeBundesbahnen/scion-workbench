@@ -24,13 +24,12 @@ import { Arrays } from '@scion/toolkit/util';
 import { filterArray } from '@scion/toolkit/operators';
 import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
 import { WorkbenchView } from '../../view/workbench-view.model';
-import { WorkbenchInitializer } from '../../startup/workbench-initializer';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
  */
 @Injectable()
-export class ViewMenuService implements WorkbenchInitializer {
+export class ViewMenuService {
 
   private static readonly TOP_LEFT: ConnectedPosition = {originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'top'};
   private static readonly TOP_RIGHT: ConnectedPosition = {originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top'};
@@ -42,12 +41,6 @@ export class ViewMenuService implements WorkbenchInitializer {
               private _viewRegistry: WorkbenchViewRegistry,
               private _workbench: WorkbenchService,
               private _workbenchModuleConfig: WorkbenchModuleConfig) {
-  }
-
-  /**
-   * @docs-private Not public API, intended for internal use only.
-   */
-  public init(): Promise<void> {
     // Registers built-in menu items added to the context menu of every view tab.
     this.registerCloseViewMenuItem();
     this.registerCloseOtherViewsMenuItem();
@@ -59,7 +52,6 @@ export class ViewMenuService implements WorkbenchInitializer {
     this.registerMoveUpMenuItem();
     this.registerMoveDownMenuItem();
     this.registerMoveToNewWindowMenuItem();
-    return Promise.resolve();
   }
 
   /**

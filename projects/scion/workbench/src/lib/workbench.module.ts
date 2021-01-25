@@ -70,11 +70,10 @@ import { ViewMoveHandler } from './view/view-move-handler.service';
 import { ɵWorkbenchService } from './ɵworkbench.service';
 import { WorkbenchLayoutDiffer } from './routing/workbench-layout-differ';
 import { provideWorkbenchMicrofrontendSupport } from './microfrontend-platform/workbench-microfrontend-support';
-import { provideWorkbenchLauncher, WORKBENCH_POST_STARTUP } from './startup/workbench-launcher.service';
+import { provideWorkbenchLauncher } from './startup/workbench-launcher.service';
 import { MicrofrontendViewComponent } from './microfrontend-platform/microfrontend-view/microfrontend-view.component';
 import { SplashComponent } from './startup/splash/splash.component';
 import { provideLogging } from './logging';
-import { WorkbenchInitializer } from './startup/workbench-initializer';
 import { IFRAME_HOST, VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference } from './content-projection/view-container.reference';
 import { MicrofrontendViewRoutes } from './microfrontend-platform/routing/microfrontend-routes';
 import { SafeRunner } from './safe-runner';
@@ -87,6 +86,7 @@ import { PopupComponent } from './popup/popup.component';
 import { MicrofrontendPopupComponent } from './microfrontend-platform/microfrontend-popup/microfrontend-popup.component';
 import { MessageBoxModule } from './message-box/message-box.module';
 import { NotificationModule } from './notification/notification.module';
+import { WORKBENCH_POST_STARTUP } from './startup/workbench-initializer';
 
 @NgModule({
   imports: [
@@ -226,7 +226,7 @@ export class WorkbenchModule {
           deps: [[WorkbenchService, new Optional(), new SkipSelf()]],
         },
         {
-          provide: WorkbenchInitializer,
+          provide: WORKBENCH_POST_STARTUP,
           useExisting: ViewMenuService,
           multi: true,
         },

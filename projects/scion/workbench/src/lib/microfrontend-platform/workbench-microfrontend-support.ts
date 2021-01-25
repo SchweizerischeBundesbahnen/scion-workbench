@@ -1,8 +1,8 @@
 import { MicrofrontendPlatformConfigLoader } from './microfrontend-platform-config-loader';
 import { Injectable, Provider } from '@angular/core';
-import { MICROFRONTEND_PLATFORM_PRE_ACTIVATION, MicrofrontendPlatformInitializerService } from './initialization/microfrontend-platform-initializer.service';
+import { MicrofrontendPlatformInitializerService } from './initialization/microfrontend-platform-initializer.service';
 import { IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformConfig, PlatformPropertyService } from '@scion/microfrontend-platform';
-import { WorkbenchInitializer } from '../startup/workbench-initializer';
+import { MICROFRONTEND_PLATFORM_PRE_ACTIVATION, WORKBENCH_STARTUP } from '../startup/workbench-initializer';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchMessageBoxService, WorkbenchPopupService, WorkbenchRouter } from '@scion/workbench-client';
 import { MicrofrontendNavigateCommandHandler } from './routing/microfrontend-navigate-command-handler.service';
@@ -27,7 +27,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
   return [
     workbenchModuleConfig.microfrontends ? [
       {
-        provide: WorkbenchInitializer,
+        provide: WORKBENCH_STARTUP,
         useClass: MicrofrontendPlatformInitializerService,
         multi: true,
       },
