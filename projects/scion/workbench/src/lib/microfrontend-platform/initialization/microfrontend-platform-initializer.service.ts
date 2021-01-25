@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, Injector, OnDestroy } from '@angular/core';
+import { Injectable, Injector, NgZone, OnDestroy } from '@angular/core';
 import { ApplicationConfig, ApplicationManifest, IntentClient, Logger as MicrofrontendPlatformLogger, ManifestService, MessageClient, MicrofrontendPlatform, PlatformConfig, Runlevel } from '@scion/microfrontend-platform';
 import { WorkbenchModuleConfig } from '../../workbench-module-config';
 import { Beans } from '@scion/toolkit/bean-manager';
@@ -33,6 +33,7 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
               private _ngZoneIntentClientDecorator: NgZoneIntentClientDecorator,
               private _microfrontendPlatformLogDelegate: LogDelegate,
               private _injector: Injector,
+              private _zone: NgZone,
               private _logger: Logger) {
   }
 
@@ -77,7 +78,11 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
     });
 
     // Start the microfrontend platform host.
-    await MicrofrontendPlatform.startHost(effectiveMicrofrontendPlatformConfig, {symbolicName: effectiveHostSymbolicName});
+    // It is important to start the platform outside the Angular zone as the platform subscribes to keyboard and mouse
+    // events at the document level. Otherwise, excessive change detection cycles would be triggered for irrelevant events.
+    await this._zone.runOutsideAngular(() => {
+      return MicrofrontendPlatform.startHost(effectiveMicrofrontendPlatformConfig, {symbolicName: effectiveHostSymbolicName});
+    });
 
     this._logger.debug('SCION Microfrontend Platform started.', LoggerNames.LIFECYCLE, effectiveMicrofrontendPlatformConfig);
   }

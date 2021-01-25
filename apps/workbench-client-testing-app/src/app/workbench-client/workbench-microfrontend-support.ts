@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { APP_INITIALIZER, Provider } from '@angular/core';
+import { APP_INITIALIZER, NgZone, Provider } from '@angular/core';
 import { ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformPropertyService, PreferredSizeService } from '@scion/microfrontend-platform';
 import { WorkbenchClient, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchView } from '@scion/workbench-client';
 import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './ng-zone-decorators';
@@ -27,7 +27,7 @@ export function provideWorkbenchClientInitializer(): Provider[] {
     {
       provide: APP_INITIALIZER,
       useFactory: connectToWorkbenchFn,
-      deps: [NgZoneMessageClientDecorator, NgZoneIntentClientDecorator],
+      deps: [NgZoneMessageClientDecorator, NgZoneIntentClientDecorator, NgZone],
       multi: true,
     },
     NgZoneMessageClientDecorator,
@@ -53,11 +53,15 @@ export function provideWorkbenchClientInitializer(): Provider[] {
 /**
  * Connects this app to the workbench in the host app.
  */
-export function connectToWorkbenchFn(ngZoneMessageClientDecorator: NgZoneMessageClientDecorator, ngZoneIntentClientDecorator: NgZoneIntentClientDecorator): () => Promise<void> {
+export function connectToWorkbenchFn(ngZoneMessageClientDecorator: NgZoneMessageClientDecorator, ngZoneIntentClientDecorator: NgZoneIntentClientDecorator, zone: NgZone): () => Promise<void> {
   return (): Promise<void> => {
     Beans.registerDecorator(MessageClient, {useValue: ngZoneMessageClientDecorator});
     Beans.registerDecorator(IntentClient, {useValue: ngZoneIntentClientDecorator});
-    return WorkbenchClient.connect({symbolicName: determineAppSymbolicName()});
+    // It is important to start the platform outside the Angular zone as the platform subscribes to keyboard and mouse
+    // events at the document level. Otherwise, excessive change detection cycles would be triggered for irrelevant events.
+    return zone.runOutsideAngular(() => {
+      return WorkbenchClient.connect({symbolicName: determineAppSymbolicName()});
+    });
   };
 }
 

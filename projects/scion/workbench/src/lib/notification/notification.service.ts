@@ -35,7 +35,7 @@ export class NotificationService implements OnDestroy {
   private _notifications$ = new BehaviorSubject<ɵNotification[]>([]);
   private _destroy$ = new Subject<void>();
 
-  constructor(private _zone: NgZone, @Inject(DOCUMENT) document: any) {
+  constructor(private _zone: NgZone, @Inject(DOCUMENT) private _document: any) {
     this.installEscapeHandler();
   }
 
@@ -131,7 +131,7 @@ export class NotificationService implements OnDestroy {
    * Installs a keystroke listener to close the last notification when the user presses the escape keystroke.
    */
   private installEscapeHandler(): void {
-    fromEvent(document, 'keydown')
+    fromEvent(this._document, 'keydown')
       .pipe(
         filter((event: KeyboardEvent) => event.key === 'Escape'),
         map(() => Arrays.last(this.notifications)),
