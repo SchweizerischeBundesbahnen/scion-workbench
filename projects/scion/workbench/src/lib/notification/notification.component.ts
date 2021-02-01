@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Injector, Input, NgZone, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { EMPTY, merge, Subject, timer } from 'rxjs';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { asapScheduler, EMPTY, merge, Subject, timer } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { ɵNotification } from './ɵnotification';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -39,12 +39,17 @@ export class NotificationComponent implements OnChanges, OnDestroy {
   @Output()
   public closeNotification = new EventEmitter<void>();
 
-  constructor(private _injector: Injector, private _zone: NgZone) {
+  constructor(private _injector: Injector, private _zone: NgZone, private _cd: ChangeDetectorRef) {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.installAutoCloseTimer();
-    this.portal = this.createPortal(this.notification);
+    // Create the portal in a microtask for instant synchronization of notification properties with the user interface,
+    // for example, if they are set in the constructor of the notification component.
+    asapScheduler.schedule(() => {
+      this.portal = this.createPortal(this.notification);
+      this._cd.detectChanges();
+    });
   }
 
   public onClose(): void {
