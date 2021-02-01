@@ -57,7 +57,7 @@ export class WorkbenchRouter {
     // that provides the requested view, but interact with the workbench directly. Nevertheless, we issue an intent so that
     // the platform throws an error in case of unqualified interaction.
     if (!this.isSelfNavigation(qualifier)) {
-      await Beans.get(IntentClient).publish({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras.params)}, extras);
+      await Beans.get(IntentClient).publish({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras?.params)}, extras);
     }
 
     const navigateCommand = await this.constructNavigateCommand(qualifier, extras);
