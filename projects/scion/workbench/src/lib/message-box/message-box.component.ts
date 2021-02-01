@@ -67,7 +67,12 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.portal = this.createPortal(this.messageBox);
+    // Create the portal in a microtask for instant synchronization of message box properties with the user interface,
+    // for example, if they are set in the constructor of the message box component.
+    asapScheduler.schedule(() => {
+      this.portal = this.createPortal(this.messageBox);
+      this._cd.detectChanges();
+    });
     this.textSelectable = this.messageBox.config.contentSelectable;
     this.installBlinkRequestHandler();
     this.installFocusRequestHandler();
