@@ -30,7 +30,7 @@ export enum WorkbenchCapabilities {
    * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
    * message and one or more buttons.
    */
-  MessageBox = 'message-box',
+  MessageBox = 'messagebox',
   /**
    * Allows contributing a notification provider in the host app.
    *

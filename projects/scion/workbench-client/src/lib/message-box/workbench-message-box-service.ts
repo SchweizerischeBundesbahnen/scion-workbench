@@ -34,7 +34,7 @@ import { Maps } from '@scion/toolkit/util';
  *   its view; that is, it is displayed only when the view is visible. By default, when opening the message box in the context of a
  *   view, it is opened as a view-modal message box. When opened outside of a view, setting the modality to 'view' has no effect.
  *
- * The built-in message box supports the display of a plain text message and is available as 'message-box' capability without a qualifier.
+ * The built-in message box supports the display of a plain text message and is available as 'messagebox' capability without a qualifier.
  * Other message box capabilities can be contributed in the host app via {MicrofrontendMessageBoxProvider}, e.g., to display structured
  * content or to provide out-of-the-box message templates. The use of a qualifier distinguishes different message box providers.
  *

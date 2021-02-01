@@ -158,7 +158,7 @@ export class ActivatorModule {
     await this._manifestService.registerCapability({
       type: WorkbenchCapabilities.View,
       qualifier: {
-        component: 'message-box',
+        component: 'messagebox',
         app,
       },
       description: '[e2e] Allows displaying a message in a workbench message box',
