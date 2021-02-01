@@ -31,7 +31,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -49,7 +49,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -67,7 +67,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -85,7 +85,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -103,7 +103,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -120,7 +120,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -138,7 +138,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -156,7 +156,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -174,7 +174,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -191,7 +191,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -209,7 +209,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -227,7 +227,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -253,7 +253,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -283,7 +283,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -302,7 +302,7 @@ describe('Workbench Message Box', () => {
 
     // register message box intention
     const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-    await registerIntentionPagePO.registerIntention({type: 'message-box'});
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     // open the message box
     const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -337,7 +337,7 @@ describe('Workbench Message Box', () => {
 
       // register message box intention
       const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'message-box', qualifier: {'component': 'inspector'}});
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
 
       // open the message box
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -355,7 +355,7 @@ describe('Workbench Message Box', () => {
 
       // register message box intention
       const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'message-box', qualifier: {'component': 'inspector'}});
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
 
       // open the message box
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -374,7 +374,7 @@ describe('Workbench Message Box', () => {
 
       // register message box intention
       const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'message-box', qualifier: {'component': 'inspector'}});
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
 
       // open the message box
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -394,7 +394,7 @@ describe('Workbench Message Box', () => {
 
       // register message box intention
       const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'message-box', qualifier: {'component': 'inspector'}});
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
 
       // open the message box
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -416,7 +416,7 @@ describe('Workbench Message Box', () => {
 
       // register message box intention
       const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'message-box', qualifier: {'component': 'inspector'}});
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
 
       // open the message box
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -437,7 +437,7 @@ describe('Workbench Message Box', () => {
 
       // register message box intention
       const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'message-box', qualifier: {'component': 'inspector'}});
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
 
       // open the message box
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -458,7 +458,7 @@ describe('Workbench Message Box', () => {
 
       // register message box intention
       const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'message-box', qualifier: {'component': 'inspector'}});
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
 
       // open the message box
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
@@ -472,7 +472,7 @@ describe('Workbench Message Box', () => {
 
       // register message box intention
       const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'message-box', qualifier: {'component': 'inspector'}});
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
 
       // open the message box
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
