@@ -24,7 +24,7 @@ import { WorkbenchInitializer } from '../../startup/workbench-initializer';
 /**
  * Handles notification intents, displaying a notification using {@link NotificationService}.
  *
- * This class is constructed before the Microfrontend Platform activates micro applications via {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION} DI token.
+ * This class is constructed before the Microfrontend Platform activates micro applications via {@link POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
  */
 @Injectable()
 export class MicrofrontendNotificationIntentHandlerService implements WorkbenchInitializer, OnDestroy {

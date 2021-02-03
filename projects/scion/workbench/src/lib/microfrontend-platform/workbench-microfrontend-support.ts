@@ -1,8 +1,8 @@
 import { MicrofrontendPlatformConfigLoader } from './microfrontend-platform-config-loader';
 import { Injectable, Provider } from '@angular/core';
-import { MicrofrontendPlatformInitializerService } from './initialization/microfrontend-platform-initializer.service';
+import { MicrofrontendPlatformInitializer } from './initialization/microfrontend-platform-initializer.service';
 import { IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformConfig, PlatformPropertyService } from '@scion/microfrontend-platform';
-import { MICROFRONTEND_PLATFORM_PRE_ACTIVATION, WORKBENCH_STARTUP } from '../startup/workbench-initializer';
+import { POST_MICROFRONTEND_PLATFORM_CONNECT, WORKBENCH_STARTUP } from '../startup/workbench-initializer';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchMessageBoxService, WorkbenchPopupService, WorkbenchRouter } from '@scion/workbench-client';
 import { MicrofrontendNavigateCommandHandler } from './routing/microfrontend-navigate-command-handler.service';
@@ -28,7 +28,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
     workbenchModuleConfig.microfrontends ? [
       {
         provide: WORKBENCH_STARTUP,
-        useClass: MicrofrontendPlatformInitializerService,
+        useClass: MicrofrontendPlatformInitializer,
         multi: true,
       },
       {
@@ -36,27 +36,27 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
         useClass: typeof workbenchModuleConfig.microfrontends.platform === 'function' ? workbenchModuleConfig.microfrontends.platform : MicrofrontendPlatformModuleConfigLoader,
       },
       {
-        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
         useClass: MicrofrontendViewCommandHandler,
         multi: true,
       },
       {
-        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
         useClass: MicrofrontendNavigateCommandHandler,
         multi: true,
       },
       {
-        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
         useClass: MicrofrontendPopupCommandHandler,
         multi: true,
       },
       {
-        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
         useClass: MicrofrontendMessageBoxIntentHandlerService,
         multi: true,
       },
       {
-        provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+        provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
         useClass: MicrofrontendNotificationIntentHandlerService,
         multi: true,
       },

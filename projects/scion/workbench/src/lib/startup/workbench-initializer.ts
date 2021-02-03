@@ -17,16 +17,16 @@ import { InjectFlags, InjectionToken, Injector } from '@angular/core';
  * After all initializers associated with this DI token have completed, the workbench transitions into the "started" state.
  * The workbench by itself also bootstraps in an initializer associated with this DI token.
  */
-export const WORKBENCH_STARTUP = new InjectionToken<string>('WORKBENCH_STARTUP');
+export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializer | any>('WORKBENCH_STARTUP');
 
 /**
  * A DI token for providing one or more workbench startup initializers.
  *
- * Initializers registered under this DI token are injected and executed just before the SCION Microfrontend Platform installs activator
- * microfrontends. At this point, the host app is connected to the SCION Microfrontend Platform and client-side messaging is enabled,
- * hence this is the place where intent and message handlers can be installed.
+ * Initializers registered under this DI token are injected and executed once the host app is connected to the SCION Microfrontend Platform
+ * and client-side messaging is enabled, hence this is the place where intent and message handlers should be installed. It is called just
+ * just before the SCION Microfrontend Platform installs activator microfrontends.
  */
-export const MICROFRONTEND_PLATFORM_PRE_ACTIVATION = new InjectionToken<string>('MICROFRONTEND_PLATFORM_PRE_ACTIVATION');
+export const POST_MICROFRONTEND_PLATFORM_CONNECT = new InjectionToken<WorkbenchInitializer | any>('POST_MICROFRONTEND_PLATFORM_CONNECT');
 
 /**
  * A DI token for providing one or more workbench startup initializers.
@@ -34,7 +34,7 @@ export const MICROFRONTEND_PLATFORM_PRE_ACTIVATION = new InjectionToken<string>(
  * Initializers registered under this DI token are injected and executed just before the {@link WorkbenchLauncher} completes the workbench
  * startup, that is, after all initializers associated with the {@link WORKBENCH_STARTUP} DI token have completed initialization.
  */
-export const WORKBENCH_POST_STARTUP = new InjectionToken<string>('WORKBENCH_POST_STARTUP');
+export const WORKBENCH_POST_STARTUP = new InjectionToken<WorkbenchInitializer | any>('WORKBENCH_POST_STARTUP');
 
 /**
  * Allows initializing the application during workbench startup.
@@ -51,17 +51,17 @@ export const WORKBENCH_POST_STARTUP = new InjectionToken<string>('WORKBENCH_POST
  * executed.
  *
  * - {@link WORKBENCH_STARTUP}
- * - {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}
+ * - {@link POST_MICROFRONTEND_PLATFORM_CONNECT}
  * - {@link WORKBENCH_POST_STARTUP}
  *
- * ### Example of how to associate an initializer with the DI token {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}.
+ * ### Example of how to associate an initializer with the DI token {@link POST_MICROFRONTEND_PLATFORM_CONNECT}.
  *
  * ```typescript
  * @NgModule({
  *   ...
  *   providers: [
  *     {
- *       provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+ *       provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
  *       multi: true,
  *       useClass: AppInitializer,
  *     }

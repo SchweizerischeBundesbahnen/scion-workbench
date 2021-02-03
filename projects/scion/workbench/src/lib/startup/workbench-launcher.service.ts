@@ -71,17 +71,17 @@ export class WorkbenchLauncher {
    * executed.
    *
    * - {@link WORKBENCH_STARTUP}
-   * - {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}
+   * - {@link POST_MICROFRONTEND_PLATFORM_CONNECT}
    * - {@link WORKBENCH_POST_STARTUP}
    *
-   * ### Example of how to associate an initializer with the DI token {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}.
+   * ### Example of how to associate an initializer with the DI token {@link POST_MICROFRONTEND_PLATFORM_CONNECT}.
    *
    * ```typescript
    * @NgModule({
    *   ...
    *   providers: [
    *     {
-   *       provide: MICROFRONTEND_PLATFORM_PRE_ACTIVATION,
+   *       provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
    *       multi: true,
    *       useClass: AppInitializer,
    *     }

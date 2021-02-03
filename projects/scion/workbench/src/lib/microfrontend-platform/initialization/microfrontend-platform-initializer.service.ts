@@ -15,7 +15,7 @@ import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchCapabilities } from '@scion/workbench-client';
 import { Logger, LoggerNames } from '../../logging';
 import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './ng-zone-decorators';
-import { MICROFRONTEND_PLATFORM_PRE_ACTIVATION, runWorkbenchInitializers, WorkbenchInitializer } from '../../startup/workbench-initializer';
+import { POST_MICROFRONTEND_PLATFORM_CONNECT, runWorkbenchInitializers, WorkbenchInitializer } from '../../startup/workbench-initializer';
 import { MicrofrontendPlatformConfigLoader } from '../microfrontend-platform-config-loader';
 import { LogDelegate } from './log-delegate.service';
 
@@ -23,7 +23,7 @@ import { LogDelegate } from './log-delegate.service';
  * Initializes and starts the SCION Microfrontend Platform in host mode.
  */
 @Injectable()
-export class MicrofrontendPlatformInitializerService implements WorkbenchInitializer, OnDestroy {
+export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, OnDestroy {
 
   private _hostAppConfigIfAbsent: ApplicationConfig;
 
@@ -65,9 +65,9 @@ export class MicrofrontendPlatformInitializerService implements WorkbenchInitial
     // Delegate log messages of the microfrontend platform to the workbench logger.
     Beans.register(MicrofrontendPlatformLogger, {useValue: this._microfrontendPlatformLogDelegate});
 
-    // Register initializer to instantiate services registered under {MICROFRONTEND_PLATFORM_PRE_ACTIVATION} DI token.
+    // Register initializer to instantiate services registered under {POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
     Beans.registerInitializer({
-      useFunction: () => runWorkbenchInitializers(MICROFRONTEND_PLATFORM_PRE_ACTIVATION, this._injector),
+      useFunction: () => runWorkbenchInitializers(POST_MICROFRONTEND_PLATFORM_CONNECT, this._injector),
       runlevel: Runlevel.Two, // Activator microfrontends are loaded in runlevel 3.
     });
 
