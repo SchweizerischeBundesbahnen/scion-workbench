@@ -124,8 +124,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
   private setViewProperties(viewCapability: WorkbenchViewCapability): void {
-    this._view.title = viewCapability.properties?.title;
-    this._view.heading = viewCapability.properties?.heading;
+    this._view.title = viewCapability.properties?.title ?? this._view.title; // to support setting the view's title via 'wb.title' param
+    this._view.heading = viewCapability.properties?.heading ?? this._view.heading; // to support setting the view's heading via 'wb.view-heading' param
     this._view.cssClass = viewCapability.properties?.cssClass;
     this._view.closable = viewCapability.properties?.closable ?? true;
     this._view.dirty = false;
