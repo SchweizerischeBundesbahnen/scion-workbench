@@ -1,3 +1,20 @@
+# [11.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.3...11.0.0-beta.4) (2021-02-03)
+
+
+### Bug Fixes
+
+* **workbench/message-box:** display message box with properties as set in message box component ([496249e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/496249e99502e156dd4bac34447e1e3b70eccc80)), closes [#253](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/253)
+* **workbench/notification:** display notification with properties as set in notification component ([4159a09](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4159a0958c7098b3f401d6db97e41a0b862a9c29)), closes [#253](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/253)
+* **workbench/view:** allow setting a microfrontend's view title via matrix param ([c86b680](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c86b6802cdc82c991a4e255547fc023755391ef3))
+* **workbench/view:** fill content of views loaded from lazy modules vertically and horizontally ([24f6038](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/24f60384f626a5246f5eb12d2f6af1f31ea3e5a7))
+
+
+### Features
+
+* **workbench/microfrontend:** upgrade to @scion/microfrontend-platform@1.0.0-beta.11 ([11c2f20](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/11c2f20d00d8a73f0fa32ec738bf4378971c5648))
+
+
+
 # [11.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.2...11.0.0-beta.3) (2021-01-25)
 
 
