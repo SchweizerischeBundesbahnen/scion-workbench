@@ -11,10 +11,13 @@
 import { Component } from '@angular/core';
 
 /**
- * This component is an identical copy of the internal Angular component {EmptyOutletComponent}.
- * It is required for lazy loading of aux routes. See Angular PR #23459.
+ * This component is an identical copy of the internal Angular component {ɵEmptyOutletComponent}.
+ * It is required for lazy loading of aux routes. See 'router/src/utils/config.ts#standardizeConfig'
+ * and Angular PR #23459.
  *
  * ---
+ * ### Angular documentation of ɵEmptyOutletComponent in `empty_outlet.ts`:
+ *
  * This component is used internally within the router to be a placeholder when an empty
  * router-outlet is needed. For example, with a config such as:
  *
@@ -22,9 +25,11 @@ import { Component } from '@angular/core';
  *
  * In order to render, there needs to be a component on this config, which will default
  * to this `EmptyOutletComponent`.
- *
  * ---
  */
-@Component({template: '<router-outlet></router-outlet>'})
+@Component({
+  template: '<router-outlet></router-outlet>',
+  styleUrls: ['./empty-outlet.component.scss'],
+})
 export class EmptyOutletComponent {
 }

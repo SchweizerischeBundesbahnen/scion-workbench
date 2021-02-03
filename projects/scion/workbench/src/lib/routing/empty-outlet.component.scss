@@ -1,0 +1,7 @@
+:host {
+  display: grid; // make content fill remaining space vertically and horizontally
+
+  > router-outlet {
+    position: absolute; // outlet out of the document flow
+  }
+}

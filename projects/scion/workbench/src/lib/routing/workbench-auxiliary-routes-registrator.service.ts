@@ -51,7 +51,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
         outletAuxRoutes.push({
           ...primaryRoute,
           outlet: outlet,
-          component: primaryRoute.component || EmptyOutletComponent, // used for lazy loading of aux routes; see Angular PR #23459
+          component: primaryRoute.component || EmptyOutletComponent, // EmptyOutletComponent is used for lazy loading of aux routes; see 'router/src/utils/config.ts#standardizeConfig' and Angular PR #23459.
           canActivate: [...(params.canActivate || []), ...(primaryRoute.canActivate || [])],
           canDeactivate: [...(params.canDeactivate || []), ...(primaryRoute.canDeactivate || [])],
           data: {...primaryRoute.data, ...params.data},
