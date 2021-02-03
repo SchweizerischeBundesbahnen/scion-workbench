@@ -8,15 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Intent, IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, throwOnErrorStatus } from '@scion/microfrontend-platform';
+import { Intent, IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, RequestError } from '@scion/microfrontend-platform';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchViewCapability } from '../view/workbench-view-capability';
-import { take } from 'rxjs/operators';
+import { catchError, take } from 'rxjs/operators';
 import { WorkbenchView } from '../view/workbench-view';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
 import { Dictionaries, Dictionary, Maps } from '@scion/toolkit/util';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
 import { ɵWorkbenchRouterNavigateCommand } from './workbench-router-navigate-command';
+import { throwError } from 'rxjs';
 
 /**
  * Allows navigating to a microfrontend in a workbench view.
@@ -63,9 +64,8 @@ export class WorkbenchRouter {
     const navigateCommand = await this.constructNavigateCommand(qualifier, extras);
     return Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.navigate, navigateCommand)
       .pipe(
-        take(1),
-        throwOnErrorStatus(),
         mapToBody(),
+        catchError(error => throwError(error instanceof RequestError ? error.message : error)),
       )
       .toPromise();
   }

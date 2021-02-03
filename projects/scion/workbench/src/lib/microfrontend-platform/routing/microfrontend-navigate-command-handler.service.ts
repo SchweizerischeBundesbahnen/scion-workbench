@@ -8,16 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { MessageClient, MessageHeaders, ResponseStatusCodes } from '@scion/microfrontend-platform';
+import { Injectable } from '@angular/core';
+import { MessageClient } from '@scion/microfrontend-platform';
 import { WorkbenchNavigationExtras, WorkbenchViewCapability, ɵWorkbenchCommands, ɵWorkbenchRouterNavigateCommand } from '@scion/workbench-client';
-import { Subject } from 'rxjs';
 import { WorkbenchRouter } from '../../routing/workbench-router.service';
-import { takeUntil } from 'rxjs/operators';
 import { Params } from '@angular/router';
 import { Logger, LoggerNames } from '../../logging';
 import { MicrofrontendViewRoutes } from './microfrontend-routes';
-import { SafeRunner } from '../../safe-runner';
 
 /**
  * Handles microfrontend navigate commands, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
@@ -25,38 +22,23 @@ import { SafeRunner } from '../../safe-runner';
  * This class is constructed before the Microfrontend Platform activates micro applications via {@link POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
  */
 @Injectable()
-export class MicrofrontendNavigateCommandHandler implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class MicrofrontendNavigateCommandHandler {
 
   constructor(private _messageClient: MessageClient,
               private _workbenchRouter: WorkbenchRouter,
-              private _logger: Logger,
-              safeRunner: SafeRunner) {
-    this._messageClient.observe$<ɵWorkbenchRouterNavigateCommand>(ɵWorkbenchCommands.navigate)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(navigateCommand => safeRunner.run(async () => {
-        this._logger.debug(() => 'Handling microfrontend navigate command', LoggerNames.MICROFRONTEND, navigateCommand);
-        const replyTo = navigateCommand.headers.get(MessageHeaders.ReplyTo);
-        try {
-          const success = await this.onNavigateCommand(navigateCommand.body);
-          await this._messageClient.publish<boolean>(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.OK)});
-        }
-        catch (error) {
-          await this._messageClient.publish(replyTo, readErrorMessage(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
-        }
-      }));
-  }
+              private _logger: Logger) {
+    this._messageClient.onMessage<ɵWorkbenchRouterNavigateCommand, boolean>(ɵWorkbenchCommands.navigate, async ({body: command}) => {
+      this._logger.debug(() => 'Handling microfrontend navigate command', LoggerNames.MICROFRONTEND, command);
 
-  private async onNavigateCommand(command: ɵWorkbenchRouterNavigateCommand): Promise<boolean> {
-    // For multiple capabilities, navigate sequentially to avoid resolving to the same view for target 'blank'.
-    for (const viewCapability of command.capabilities) {
-      const success = await this.navigate(viewCapability, command.extras);
-      if (!success) {
-        return false;
+      // For multiple capabilities, navigate sequentially to avoid resolving to the same view for target 'blank'.
+      for (const viewCapability of command.capabilities) {
+        const success = await this.navigate(viewCapability, command.extras);
+        if (!success) {
+          return false;
+        }
       }
-    }
-    return true;
+      return true;
+    });
   }
 
   private navigate(viewCapability: WorkbenchViewCapability, navigationExtras: WorkbenchNavigationExtras): Promise<boolean> {
@@ -81,18 +63,4 @@ export class MicrofrontendNavigateCommandHandler implements OnDestroy {
     const matrixParamCommand = Object.keys(matrixParams).length > 0 ? [matrixParams] : [];
     return ([MicrofrontendViewRoutes.ROUTE_PREFIX, viewCapabilityId] as any[]).concat(matrixParamCommand);
   }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
-}
-
-/**
- * Returns the error message if given an error object, or the `toString` representation otherwise.
- */
-function readErrorMessage(error: any): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return error?.toString();
 }

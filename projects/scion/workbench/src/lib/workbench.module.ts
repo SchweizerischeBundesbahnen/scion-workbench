@@ -76,7 +76,6 @@ import { SplashComponent } from './startup/splash/splash.component';
 import { provideLogging } from './logging';
 import { IFRAME_HOST, VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference } from './content-projection/view-container.reference';
 import { MicrofrontendViewRoutes } from './microfrontend-platform/routing/microfrontend-routes';
-import { SafeRunner } from './safe-runner';
 import { BroadcastChannelService } from './broadcast-channel.service';
 import { WbAddViewToPartGuard } from './routing/add-view-to-part.guard';
 import { WbBeforeDestroyGuard } from './view/wb-before-destroy.guard';
@@ -205,7 +204,6 @@ export class WorkbenchModule {
         ViewMenuService,
         ViewContainerReference,
         ViewMoveHandler,
-        SafeRunner,
         BroadcastChannelService,
         WbAddViewToPartGuard,
         WbBeforeDestroyGuard,

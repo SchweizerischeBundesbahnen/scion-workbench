@@ -8,13 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, NgZone, OnDestroy } from '@angular/core';
-import { mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes } from '@scion/microfrontend-platform';
+import { Injectable, NgZone } from '@angular/core';
+import { mapToBody, MessageClient } from '@scion/microfrontend-platform';
 import { ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand } from '@scion/workbench-client';
-import { combineLatest, Observable, of, Subject } from 'rxjs';
-import { filter, map, takeUntil } from 'rxjs/operators';
+import { combineLatest, Observable, of } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { Logger, LoggerNames } from '../../logging';
-import { SafeRunner } from '../../safe-runner';
 import { MicrofrontendPopupComponent } from './microfrontend-popup.component';
 import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
 import { fromDimension$ } from '@scion/toolkit/observable';
@@ -28,52 +27,37 @@ import { PopupService } from '../../popup/popup.service';
  * This class is constructed before the Microfrontend Platform activates micro applications via {@link POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
  */
 @Injectable()
-export class MicrofrontendPopupCommandHandler implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class MicrofrontendPopupCommandHandler {
 
   constructor(private _messageClient: MessageClient,
               private _popupService: PopupService,
               private _logger: Logger,
               private _viewRegistry: WorkbenchViewRegistry,
-              safeRunner: SafeRunner,
               private _zone: NgZone) {
-    this._messageClient.observe$<ɵWorkbenchPopupCommand>(ɵWorkbenchCommands.popup)
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(popupCommand => safeRunner.run(async () => {
-        this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, popupCommand);
-        const replyTo = popupCommand.headers.get(MessageHeaders.ReplyTo);
-        try {
-          const result = await this.onPopupCommand(popupCommand.body);
-          await this._messageClient.publish(replyTo, result, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.OK)});
-        }
-        catch (error) {
-          await this._messageClient.publish(replyTo, readErrorMessage(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
-        }
-      }));
-  }
+    this._messageClient.onMessage<ɵWorkbenchPopupCommand>(ɵWorkbenchCommands.popup, async ({body: command}) => {
+      this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
 
-  private async onPopupCommand(command: ɵWorkbenchPopupCommand): Promise<any> {
-    const popupCapability = command.capability;
-    const popupContext: ɵPopupContext = {
-      popupId: command.popupId,
-      capability: popupCapability,
-      params: coerceMap(command.params),
-      closeOnFocusLost: command.closeStrategy?.onFocusLost ?? true,
-    };
+      const popupCapability = command.capability;
+      const popupContext: ɵPopupContext = {
+        popupId: command.popupId,
+        capability: popupCapability,
+        params: coerceMap(command.params),
+        closeOnFocusLost: command.closeStrategy?.onFocusLost ?? true,
+      };
 
-    return this._popupService.open({
-      component: MicrofrontendPopupComponent,
-      input: popupContext,
-      anchor: this.observePopupOrigin$(command),
-      viewRef: command.viewId,
-      align: command.align,
-      size: popupCapability.properties?.size,
-      closeStrategy: {
-        ...command.closeStrategy,
-        onFocusLost: false, // Closing the popup on focus loss is handled in {MicrofrontendPopupComponent}
-      },
-      cssClass: popupCapability.properties?.cssClass,
+      return this._popupService.open({
+        component: MicrofrontendPopupComponent,
+        input: popupContext,
+        anchor: this.observePopupOrigin$(command),
+        viewRef: command.viewId,
+        align: command.align,
+        size: popupCapability.properties?.size,
+        closeStrategy: {
+          ...command.closeStrategy,
+          onFocusLost: false, // Closing the popup on focus loss is handled in {MicrofrontendPopupComponent}
+        },
+        cssClass: popupCapability.properties?.cssClass,
+      });
     });
   }
 
@@ -112,20 +96,6 @@ export class MicrofrontendPopupCommandHandler implements OnDestroy {
     return this._messageClient.observe$<ClientRect>(ɵWorkbenchCommands.popupOriginTopic(popupId))
       .pipe(mapToBody());
   }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
-}
-
-/**
- * Returns the error message if given an error object, or the `toString` representation otherwise.
- */
-function readErrorMessage(error: any): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return error?.toString();
 }
 
 /**

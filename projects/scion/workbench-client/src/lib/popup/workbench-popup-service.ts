@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, throwOnErrorStatus } from '@scion/microfrontend-platform';
+import { IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, RequestError } from '@scion/microfrontend-platform';
 import { Beans } from '@scion/toolkit/bean-manager';
-import { map, take } from 'rxjs/operators';
+import { catchError, map, take } from 'rxjs/operators';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
 import { Maps, Observables } from '@scion/toolkit/util';
 import { fromBoundingClientRect$ } from '@scion/toolkit/observable';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { WorkbenchView } from '../view/workbench-view';
 import { ɵWorkbenchPopupCommand } from './workbench-popup-open-command';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
@@ -90,9 +90,8 @@ export class WorkbenchPopupService {
     try {
       return await Beans.get(MessageClient).request$<T>(ɵWorkbenchCommands.popup, popupCommand)
         .pipe(
-          take(1),
-          throwOnErrorStatus(),
           mapToBody(),
+          catchError(error => throwError(error instanceof RequestError ? error.message : error)),
         )
         .toPromise();
     }

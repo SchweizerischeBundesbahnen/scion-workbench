@@ -9,14 +9,13 @@
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { ManifestService, Message, MessageClient, MessageHeaders, TopicMessage } from '@scion/microfrontend-platform';
+import { ManifestService, Message, MessageClient, MessageHeaders } from '@scion/microfrontend-platform';
 import { Logger } from '../../logging';
 import { WorkbenchView } from '../../view/workbench-view.model';
 import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
 import { map, mapTo, switchMap, takeUntil } from 'rxjs/operators';
-import { WorkbenchViewCapability, WorkbenchCapabilities, ɵWorkbenchCommands } from '@scion/workbench-client';
+import { WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands } from '@scion/workbench-client';
 import { merge, Subject } from 'rxjs';
-import { SafeRunner } from '../../safe-runner';
 import { MicrofrontendViewRoutes } from '../routing/microfrontend-routes';
 
 /**
@@ -33,7 +32,6 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   constructor(private _messageClient: MessageClient,
               private _viewRegistry: WorkbenchViewRegistry,
               private _manifestService: ManifestService,
-              private _safeRunner: SafeRunner,
               private _logger: Logger) {
     this.installViewCapabilityObserver();
     this.installViewActiveStatePublisher();
@@ -65,70 +63,60 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Handles commands to update the title of a view.
    */
   private installViewTitleCommandHandler(): void {
-    this._messageClient.observe$(ɵWorkbenchCommands.viewTitleTopic(':viewId'))
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((message: TopicMessage<string>) => this._safeRunner.run(() => {
-        const viewId = message.params.get('viewId');
-        this.runIfPrivileged(viewId, message, view => {
-          view.title = message.body;
-        });
-      }));
+    this._messageClient.onMessage(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
+      const viewId = message.params.get('viewId');
+      this.runIfPrivileged(viewId, message, view => {
+        view.title = message.body;
+      });
+    });
   }
 
   /**
    * Handles commands to update the heading of a view.
    */
   private installViewHeadingCommandHandler(): void {
-    this._messageClient.observe$(ɵWorkbenchCommands.viewHeadingTopic(':viewId'))
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((message: TopicMessage<string>) => this._safeRunner.run(() => {
-        const viewId = message.params.get('viewId');
-        this.runIfPrivileged(viewId, message, view => {
-          view.heading = message.body;
-        });
-      }));
+    this._messageClient.onMessage(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
+      const viewId = message.params.get('viewId');
+      this.runIfPrivileged(viewId, message, view => {
+        view.heading = message.body;
+      });
+    });
   }
 
   /**
    * Handles commands to update the dirty state of a view.
    */
   private installViewDirtyCommandHandler(): void {
-    this._messageClient.observe$(ɵWorkbenchCommands.viewDirtyTopic(':viewId'))
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((message: TopicMessage<boolean>) => this._safeRunner.run(() => {
-        const viewId = message.params.get('viewId');
-        this.runIfPrivileged(viewId, message, view => {
-          view.dirty = message.body;
-        });
-      }));
+    this._messageClient.onMessage(ɵWorkbenchCommands.viewDirtyTopic(':viewId'), message => {
+      const viewId = message.params.get('viewId');
+      this.runIfPrivileged(viewId, message, view => {
+        view.dirty = message.body;
+      });
+    });
   }
 
   /**
    * Handles commands to update the closable property of a view.
    */
   private installViewClosableCommandHandler(): void {
-    this._messageClient.observe$(ɵWorkbenchCommands.viewClosableTopic(':viewId'))
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((message: TopicMessage<boolean>) => this._safeRunner.run(() => {
-        const viewId = message.params.get('viewId');
-        this.runIfPrivileged(viewId, message, view => {
-          view.closable = message.body;
-        });
-      }));
+    this._messageClient.onMessage(ɵWorkbenchCommands.viewClosableTopic(':viewId'), message => {
+      const viewId = message.params.get('viewId');
+      this.runIfPrivileged(viewId, message, view => {
+        view.closable = message.body;
+      });
+    });
   }
 
   /**
    * Handles commands to close a view.
    */
   private installViewCloseCommandHandler(): void {
-    this._messageClient.observe$(ɵWorkbenchCommands.viewCloseTopic(':viewId'))
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((message: TopicMessage<boolean>) => this._safeRunner.run(() => {
-        const viewId = message.params.get('viewId');
-        this.runIfPrivileged(viewId, message, view => {
-          view.close().then();
-        });
-      }));
+    this._messageClient.onMessage(ɵWorkbenchCommands.viewCloseTopic(':viewId'), message => {
+      const viewId = message.params.get('viewId');
+      this.runIfPrivileged(viewId, message, view => {
+        view.close().then();
+      });
+    });
   }
 
   private installViewCapabilityObserver(): void {
