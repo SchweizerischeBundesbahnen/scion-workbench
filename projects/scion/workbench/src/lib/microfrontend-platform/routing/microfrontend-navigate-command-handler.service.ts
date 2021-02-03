@@ -22,7 +22,7 @@ import { SafeRunner } from '../../safe-runner';
 /**
  * Handles microfrontend navigate commands, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
  *
- * This class is constructed before the Microfrontend Platform activates micro applications via {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION} DI token.
+ * This class is constructed before the Microfrontend Platform activates micro applications via {@link POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
  */
 @Injectable()
 export class MicrofrontendNavigateCommandHandler implements OnDestroy {

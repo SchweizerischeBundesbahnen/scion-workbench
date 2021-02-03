@@ -114,7 +114,7 @@ export abstract class WorkbenchModuleConfig {
    * dependencies. They are available in the form of a microfrontend that can be embed like any other microfrontend.
    *
    * Typically, the host app provides functionality to integrated micro apps over messaging. Consider registering message
-   * and intent handlers under the DI token {@link MICROFRONTEND_PLATFORM_PRE_ACTIVATION}. See {@link WorkbenchInitializer}
+   * and intent handlers under the DI token {@link POST_MICROFRONTEND_PLATFORM_CONNECT}. See {@link WorkbenchInitializer}
    * to learn more about workbench initialization.
    */
   public abstract microfrontends?: WorkbenchMicrofrontendConfig;
