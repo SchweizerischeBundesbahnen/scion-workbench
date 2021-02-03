@@ -12,7 +12,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { ManifestService, MessageClient, MicroApplicationConfig } from '@scion/microfrontend-platform';
-import { WorkbenchCapabilities } from '@scion/workbench-client';
+import { WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability } from '@scion/workbench-client';
+
+declare type TestingAppViewCapability = WorkbenchViewCapability & { properties: { pinToStartPage: boolean } };
 
 @NgModule({
   providers: [],
@@ -31,7 +33,7 @@ export class ActivatorModule {
     const heading = `${app}: Workbench Client E2E Testpage`;
 
     // Register view to interact with the workbench view object.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'view',
@@ -50,7 +52,7 @@ export class ActivatorModule {
     });
 
     // Register view to navigate using the workbench router.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'router',
@@ -68,7 +70,7 @@ export class ActivatorModule {
     });
 
     // Register view to register workbench capabilities dynamically at runtime.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'register-workbench-capability',
@@ -86,7 +88,7 @@ export class ActivatorModule {
     });
 
     // Register view to unregister workbench capabilities dynamically at runtime.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'unregister-workbench-capability',
@@ -104,7 +106,7 @@ export class ActivatorModule {
     });
 
     // Register view to register view intentions dynamically at runtime.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'register-workbench-intention',
@@ -122,7 +124,7 @@ export class ActivatorModule {
     });
 
     // Register view to open a workbench popup.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'popup',
@@ -140,7 +142,7 @@ export class ActivatorModule {
     });
 
     // Register the popup microfrontend.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<WorkbenchPopupCapability>({
       type: WorkbenchCapabilities.Popup,
       qualifier: {
         component: 'popup',
@@ -155,7 +157,7 @@ export class ActivatorModule {
     });
 
     // Register view to open a workbench message box.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'messagebox',
@@ -173,7 +175,7 @@ export class ActivatorModule {
     });
 
     // Register view to display a workbench notification.
-    await this._manifestService.registerCapability({
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'notification',

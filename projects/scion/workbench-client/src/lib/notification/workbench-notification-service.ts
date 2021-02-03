@@ -8,12 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { IntentClient, mapToBody, Qualifier, throwOnErrorStatus } from '@scion/microfrontend-platform';
+import { IntentClient, mapToBody, Qualifier, RequestError } from '@scion/microfrontend-platform';
 import { WorkbenchNotificationConfig } from './workbench-notification.config';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { take } from 'rxjs/operators';
 import { Maps } from '@scion/toolkit/util';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 /**
  * Allows displaying a notification to the user.
@@ -62,9 +63,8 @@ export class WorkbenchNotificationService {
 
     return Beans.get(IntentClient).request$<void>({type: WorkbenchCapabilities.Notification, qualifier, params}, config)
       .pipe(
-        take(1),
-        throwOnErrorStatus(),
         mapToBody(),
+        catchError(error => throwError(error instanceof RequestError ? error.message : error)),
       )
       .toPromise();
   }

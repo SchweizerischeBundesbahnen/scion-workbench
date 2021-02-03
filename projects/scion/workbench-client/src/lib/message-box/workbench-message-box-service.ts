@@ -8,13 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { IntentClient, mapToBody, Qualifier, throwOnErrorStatus } from '@scion/microfrontend-platform';
+import { IntentClient, mapToBody, Qualifier, RequestError } from '@scion/microfrontend-platform';
 import { WorkbenchMessageBoxConfig } from './workbench-message-box.config';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { take } from 'rxjs/operators';
 import { WorkbenchView } from '../view/workbench-view';
 import { Maps } from '@scion/toolkit/util';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 /**
  * Allows displaying a message to the user in a workbench message box.
@@ -79,9 +80,8 @@ export class WorkbenchMessageBoxService {
 
     return Beans.get(IntentClient).request$<R>({type: WorkbenchCapabilities.MessageBox, qualifier, params}, config)
       .pipe(
-        take(1),
-        throwOnErrorStatus(),
         mapToBody(),
+        catchError(error => throwError(error instanceof RequestError ? error.message : error)),
       )
       .toPromise();
   }

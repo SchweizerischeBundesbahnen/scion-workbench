@@ -200,7 +200,7 @@ describe('Workbench Popup', () => {
     const popupPagePO = new PopupPagePO('testee');
     await popupPagePO.clickClose({returnValue: 'ERROR', closeWithError: true});
 
-    await expect(await popupOpenerPagePO.getPopupCloseAction()).toEqual({type: 'closed-with-error', value: '[500] ERROR'});
+    await expect(await popupOpenerPagePO.getPopupCloseAction()).toEqual({type: 'closed-with-error', value: 'ERROR'});
   });
 
   it('should stick the popup to the HTMLElement anchor when moving the anchor element', async () => {
