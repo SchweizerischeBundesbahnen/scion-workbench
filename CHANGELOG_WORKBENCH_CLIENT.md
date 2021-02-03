@@ -1,3 +1,18 @@
+# [1.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.2...workbench-client-1.0.0-beta.3) (2021-02-03)
+
+
+### Bug Fixes
+
+* **workbench-client/message-box:** provide the messagebox capability under the type `messagebox` instead of `message-box` ([ad15ba1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ad15ba1497ccac391eaa4c5ea11f83506510736e))
+* **workbench-client/routing:** allow view navigation without specifying navigation extras ([4ade8a9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4ade8a985b0dc8e9e86e72900a25b82f897a4810))
+
+
+### Features
+
+* **workbench/microfrontend:** upgrade to @scion/microfrontend-platform@1.0.0-beta.11 ([11c2f20](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/11c2f20d00d8a73f0fa32ec738bf4378971c5648))
+
+
+
 # [1.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.1...workbench-client-1.0.0-beta.2) (2021-01-25)
 
 
