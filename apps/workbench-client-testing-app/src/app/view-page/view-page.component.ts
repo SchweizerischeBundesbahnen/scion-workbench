@@ -22,6 +22,10 @@ const TITLE = 'title';
 const HEADING = 'heading';
 const CLOSABLE = 'closable';
 const CONFIRM_CLOSING = 'confirmClosing';
+const SELF_NAVIGATION = 'selfNavigation';
+const PARAMS = 'params';
+const PARAMS_HANDLING = 'paramsHandling';
+const NAVIGATE_PER_PARAM = 'navigatePerParam';
 
 @Component({
   selector: 'app-view-page',
@@ -34,11 +38,13 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
   public readonly HEADING = HEADING;
   public readonly CLOSABLE = CLOSABLE;
   public readonly CONFIRM_CLOSING = CONFIRM_CLOSING;
+  public readonly SELF_NAVIGATION = SELF_NAVIGATION;
+  public readonly PARAMS = PARAMS;
+  public readonly PARAMS_HANDLING = PARAMS_HANDLING;
+  public readonly NAVIGATE_PER_PARAM = NAVIGATE_PER_PARAM;
 
   public form: FormGroup;
   public uuid = UUID.randomUUID();
-
-  public viewParamsControl: FormArray;
 
   private _destroy$ = new Subject<void>();
 
@@ -52,8 +58,12 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
       [HEADING]: formBuilder.control(''),
       [CLOSABLE]: formBuilder.control(true),
       [CONFIRM_CLOSING]: formBuilder.control(false),
+      [SELF_NAVIGATION]: formBuilder.group({
+        [PARAMS]: formBuilder.array([]),
+        [PARAMS_HANDLING]: formBuilder.control(''),
+        [NAVIGATE_PER_PARAM]: formBuilder.control(false),
+      }),
     });
-    this.viewParamsControl = formBuilder.array([]);
 
     this.view.setTitle(this.form.get(TITLE).valueChanges.pipe(this.logCompletion('TitleObservableComplete')));
     this.view.setHeading(this.form.get(HEADING).valueChanges.pipe(this.logCompletion('HeadingObservableComplete')));
@@ -85,10 +95,29 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
     }
   }
 
-  public onUpdateViewParams(): void {
-    const params = SciParamsEnterComponent.toParamsDictionary(this.viewParamsControl);
-    this.viewParamsControl.clear();
-    this._router.navigate({}, {params}).then();
+  public onSelfNavigate(): void {
+    const selfNavigationGroup = this.form.get(SELF_NAVIGATION);
+    const params = SciParamsEnterComponent.toParamsDictionary(selfNavigationGroup.get(PARAMS) as FormArray, false);
+    const paramsHandling = selfNavigationGroup.get(PARAMS_HANDLING).value;
+
+    // Replace `<undefined>` with `undefined`, and `<null>` with `null`.
+    Object.entries(params).forEach(([paramName, paramValue]) => {
+      if ('<undefined>' === paramValue) {
+        params[paramName] = undefined;
+      }
+      else if ('<null>' === paramValue) {
+        params[paramName] = null;
+      }
+    });
+
+    if (selfNavigationGroup.get(NAVIGATE_PER_PARAM).value) {
+      Object.entries(params).forEach(([paramName, paramValue]) => {
+        this._router.navigate({}, {params: {[paramName]: paramValue}, paramsHandling: paramsHandling || undefined}).then();
+      });
+    }
+    else {
+      this._router.navigate({}, {params, paramsHandling: paramsHandling || undefined}).then();
+    }
   }
 
   private installClosingListener(): void {

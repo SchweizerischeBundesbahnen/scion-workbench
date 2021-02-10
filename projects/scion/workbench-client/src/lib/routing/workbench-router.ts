@@ -14,7 +14,7 @@ import { WorkbenchViewCapability } from '../view/workbench-view-capability';
 import { catchError, take } from 'rxjs/operators';
 import { WorkbenchView } from '../view/workbench-view';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { Dictionaries, Dictionary, Maps } from '@scion/toolkit/util';
+import { Dictionary, Maps } from '@scion/toolkit/util';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
 import { ɵWorkbenchRouterNavigateCommand } from './workbench-router-navigate-command';
 import { throwError } from 'rxjs';
@@ -47,8 +47,10 @@ export class WorkbenchRouter {
    * If multiple view capabilities match the qualifier, they are all opened.
    *
    * @param  qualifier - Identifies the view capability that provides the microfrontend.
-   *                     When navigating in the context of a view, you can pass an empty qualifier to navigate to the current view again, e.g.,
-   *                     to update view parameters to reflect the view state in the URL.
+   *                     By passing an empty qualifier (`{}`), the currently loaded view can update its parameters in the workbench URL, e.g., to support
+   *                     persistent navigation. This type of navigation is referred to as self-navigation and is supported only if in the context
+   *                     of a view. Setting {@link WorkbenchNavigationExtras#paramsHandling} allows instructing the workbench router how to handle
+   *                     params. By default, new params replace params contained in the URL.
    * @param  extras - Options to control navigation.
    * @return Promise that resolves to `true` when navigation succeeds, to `false` when navigation fails, or is rejected on error,
    *         e.g., if not qualified or because no application provides the requested view.
@@ -78,27 +80,23 @@ export class WorkbenchRouter {
       const {intent, capability} = await this.currentNavigation();
       return {
         capabilities: [capability],
-        extras: this.constructNavigationExtras(intent.qualifier, extras),
+        qualifier: intent.qualifier,
+        extras: {
+          ...extras,
+          target: 'self',
+          selfViewId: Beans.get(WorkbenchView).viewId,
+          paramsHandling: extras?.paramsHandling ?? 'replace',
+        },
       };
     }
-    else {
-      return {
-        capabilities: await this.lookupViewCapabilities(qualifier),
-        extras: this.constructNavigationExtras(qualifier, extras),
-      };
-    }
-  }
 
-  /**
-   * Constructs navigation extras based on the given extras to instrument the Workbench Router.
-   */
-  private constructNavigationExtras(qualifier: Qualifier, extras: WorkbenchNavigationExtras | undefined): WorkbenchNavigationExtras {
     return {
-      ...extras,
-      selfViewId: extras?.selfViewId ?? Beans.opt(WorkbenchView)?.viewId,
-      params: {
-        ...Dictionaries.coerce(extras?.params),
-        ...qualifier,
+      capabilities: await this.lookupViewCapabilities(qualifier),
+      qualifier,
+      extras: {
+        ...extras,
+        selfViewId: extras?.selfViewId ?? Beans.opt(WorkbenchView)?.viewId,
+        paramsHandling: undefined, // `paramsHandling` cannot be set for navigations other than self-navigation
       },
     };
   }
@@ -115,38 +113,49 @@ export class WorkbenchRouter {
   }
 
   private async currentNavigation(): Promise<CurrentNavigation> {
-    const view = Beans.opt(WorkbenchView);
-    if (!view) {
-      throw Error('[NullViewContextError] Navigating to the current view requires you to be in the context of a view.');
-    }
+    const view = Beans.get(WorkbenchView);
     const currentCapability = await view.capability$
       .pipe(take(1))
       .toPromise();
     const currentParams = await view.params$
       .pipe(take(1))
       .toPromise();
-    const currentIntentQualifier = Object.keys(currentCapability.qualifier).reduce((acc, key) => {
-      if (!currentParams.has(key)) {
-        throw Error(`[ViewContextError] Missing required qualifier param '${key}'.`);
-      }
-      acc[key] = currentParams.get(key);
-      return acc;
-    }, {});
 
     return {
       capability: currentCapability,
-      intent: {
-        type: WorkbenchCapabilities.View,
-        qualifier: currentIntentQualifier,
-      },
+      intent: this.deriveViewIntent(currentCapability.qualifier, currentParams),
     };
   }
 
   /**
-   * Checks whether requesting a self navigation, e.g., for updating params to be reflected in the top-level URL (persistent workbench navigation).
+   * Checks whether requesting a self-navigation.
+   *
+   * Self-navigation must be performed in the context of a view, allowing a view to update its parameters in the workbench URL
+   * to support persistent navigation. A self-navigation is initiated by passing an empty qualifier.
    */
   private isSelfNavigation(qualifier: Qualifier): boolean {
+    if (!Beans.opt(WorkbenchView)) {
+      return false;
+    }
     return !qualifier || Object.keys(qualifier).length === 0;
+  }
+
+  /**
+   * Derives the intent that was issued to open the view of the passed capability.
+   */
+  private deriveViewIntent(capabilityQualifier: Qualifier, params: Map<string, any>): Intent {
+    const intentQualifier = Object.entries(capabilityQualifier).reduce((acc, [key, value]) => {
+      if (!params.has(key) && value !== '?') {
+        throw Error(`[ViewContextError] Missing required qualifier param '${key}'.`);
+      }
+
+      if (params.has(key)) {
+        acc[key] = params.get(key);
+      }
+      return acc;
+    }, {});
+
+    return {type: WorkbenchCapabilities.View, qualifier: intentQualifier};
   }
 }
 
@@ -162,6 +171,20 @@ export interface WorkbenchNavigationExtras {
    * If the fulfilling capability(-ies) declare(s) mandatory parameters, be sure to include them, otherwise navigation will be rejected.
    */
   params?: Map<string, any> | Dictionary;
+
+  /**
+   * Instructs the workbench router how to handle params in self-navigation.
+   *
+   * Self-navigation allows a view to update its parameters in the workbench URL to support persistent navigation. Setting a `paramsHandling`
+   * strategy has no effect on navigations other than self-navigation. A self-navigation is initiated by passing an empty qualifier.
+   *
+   * One of:
+   * * `replace`: Discards parameters in the URL and uses the new parameters instead (which is by default if not set).
+   * * `merge`:   Merges new parameters with the parameters currently contained in the URL. In case of a key collision, new parameters overwrite
+   *              the parameters contained in the URL. A parameter can be removed by passing `undefined` as its value.
+   */
+  paramsHandling?: 'merge' | 'replace' | undefined;
+
   /**
    * Activates the view if present. Note that you can only activate views for which you have an intention and which are visible to your app.
    * If no qualified view is present, the requested view is opened according to the specified target strategy.
@@ -174,8 +197,9 @@ export interface WorkbenchNavigationExtras {
   /**
    * Controls where to open the view.
    *
-   * 'self':    opens the view in the current view tab (which is by default)
-   * 'blank':   opens the view in a new view tab
+   * One of:
+   * * `self`:  Opens the microfrontend in the current view tab, replacing the currently displaying microfrontend (which is by default if not set).
+   * * `blank`: Opens the microfrontend in a new view tab.
    */
   target?: 'self' | 'blank';
   /**

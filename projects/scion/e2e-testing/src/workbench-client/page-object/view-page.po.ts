@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText } from '../../helper/testing.util';
+import { assertPageToDisplay, enterText, selectOption } from '../../helper/testing.util';
 import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
 import { SciAccordionPO, SciCheckboxPO, SciParamsEnterPO, SciPropertyPO } from '@scion/toolkit.internal/widgets.po';
 import { $, ElementFinder } from 'protractor';
@@ -201,17 +201,19 @@ export class ViewPagePO {
     // do not close the accordion as this action removes the iframe from the DOM.
   }
 
-  public async updateViewParams(params: Params): Promise<void> {
+  public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace', navigatePerParam?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 
-    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-update-view-params'));
+    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-self-navigation'));
     await accordionPO.expand();
     try {
-      const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-view-params'));
+      const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-accordion.e2e-self-navigation').$('sci-params-enter.e2e-params'));
       await paramsEnterPO.clear();
       await paramsEnterPO.enterParams(params);
-      await this._pageFinder.$('button.e2e-update-view-params').click();
+      await selectOption(options?.paramsHandling || '', this._pageFinder.$('sci-accordion.e2e-self-navigation').$('select.e2e-param-handling'));
+      await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-navigate-per-param')).toggle(options?.navigatePerParam ?? false);
+      await this._pageFinder.$('sci-accordion.e2e-self-navigation').$('button.e2e-navigate-self').click();
     }
     finally {
       await accordionPO.collapse();

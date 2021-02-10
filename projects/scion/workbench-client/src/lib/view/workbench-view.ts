@@ -56,7 +56,7 @@ export abstract class WorkbenchView {
    * navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
    * another microfrontend.
    */
-  public readonly params$: Observable<Map<string, string>>;
+  public readonly params$: Observable<Map<string, any>>;
 
   /**
    * Indicates whether this is the active view in its view part.
@@ -143,13 +143,13 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
 
   public active$: Observable<boolean>;
   public capability$: Observable<WorkbenchViewCapability>;
-  public params$: Observable<Map<string, string>>;
+  public params$: Observable<Map<string, any>>;
 
   constructor(public viewId: string) {
     this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.viewId))
       .pipe(mapTo(undefined));
 
-    this.params$ = Beans.get(MessageClient).observe$<Map<string, string>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
+    this.params$ = Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
       .pipe(
         mapToBody(),
         coerceMap(),
