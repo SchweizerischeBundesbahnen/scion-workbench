@@ -1,3 +1,12 @@
+# [11.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.4...11.0.0-beta.5) (2021-02-10)
+
+
+### Features
+
+* support for merging parameters in self navigation ([a984ace](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a984ace36cdb66e34b25f1f62fc73bb71b36308e)), closes [#259](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/259)
+
+
+
 # [11.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.3...11.0.0-beta.4) (2021-02-03)
 
 
