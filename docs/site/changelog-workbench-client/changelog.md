@@ -6,6 +6,15 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.3...workbench-client-1.0.0-beta.4) (2021-02-10)
+
+
+### Features
+
+* support for merging parameters in self navigation ([a984ace](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a984ace36cdb66e34b25f1f62fc73bb71b36308e)), closes [#259](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/259)
+
+
+
 # [1.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.2...workbench-client-1.0.0-beta.3) (2021-02-03)
 
 
