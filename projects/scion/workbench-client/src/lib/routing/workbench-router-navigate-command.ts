@@ -10,6 +10,7 @@
 
 import { WorkbenchViewCapability } from '../view/workbench-view-capability';
 import { WorkbenchNavigationExtras } from './workbench-router';
+import { Qualifier } from '@scion/microfrontend-platform';
 
 /**
  * Command object for instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
@@ -20,6 +21,7 @@ import { WorkbenchNavigationExtras } from './workbench-router';
 export interface ɵWorkbenchRouterNavigateCommand { // tslint:disable-line:class-name
   capabilities: WorkbenchViewCapability[];
   extras: WorkbenchNavigationExtras;
+  qualifier: Qualifier;
 }
 
 /**

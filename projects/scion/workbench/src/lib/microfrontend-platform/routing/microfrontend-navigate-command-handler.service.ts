@@ -9,7 +9,7 @@
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { MessageClient, MessageHeaders, ResponseStatusCodes, TopicMessage } from '@scion/microfrontend-platform';
+import { MessageClient, MessageHeaders, Qualifier, ResponseStatusCodes, TopicMessage } from '@scion/microfrontend-platform';
 import { WorkbenchNavigationExtras, WorkbenchViewCapability, ɵWorkbenchCommands, ɵWorkbenchRouterNavigateCommand } from '@scion/workbench-client';
 import { WorkbenchRouter } from '../../routing/workbench-router.service';
 import { Params, Router } from '@angular/router';
@@ -53,7 +53,7 @@ export class MicrofrontendNavigateCommandHandler implements OnDestroy {
     // For multiple capabilities, navigate sequentially to avoid resolving to the same view for target 'blank'.
     try {
       for (const viewCapability of navigateCommand.capabilities) {
-        const success = await this.navigate(viewCapability, navigateCommand.extras);
+        const success = await this.navigate(viewCapability, navigateCommand.qualifier, navigateCommand.extras);
         if (!success) {
           await this._messageClient.publish(replyTo, false, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
           return;
@@ -67,8 +67,8 @@ export class MicrofrontendNavigateCommandHandler implements OnDestroy {
     }
   }
 
-  private navigate(viewCapability: WorkbenchViewCapability, extras: WorkbenchNavigationExtras): Promise<boolean> {
-    const matrixParams = this.computeMatrixParams(extras);
+  private navigate(viewCapability: WorkbenchViewCapability, qualifier: Qualifier, extras: WorkbenchNavigationExtras): Promise<boolean> {
+    const matrixParams = this.computeMatrixParams(qualifier, extras);
     const routerNavigateCommand = this.buildRouterNavigateCommand(viewCapability.metadata.id, matrixParams);
 
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, routerNavigateCommand, viewCapability);
@@ -86,8 +86,11 @@ export class MicrofrontendNavigateCommandHandler implements OnDestroy {
    * Computes matrix parameters according to the defined `paramsHandling` strategy.
    * Parameters with the value `undefined` are ignored.
    */
-  private computeMatrixParams(extras: WorkbenchNavigationExtras): Dictionary {
-    const params = Dictionaries.coerce(extras.params);
+  private computeMatrixParams(qualifier: Qualifier, extras: WorkbenchNavigationExtras): Dictionary {
+    const params = {
+      ...Dictionaries.coerce(extras.params),
+      ...qualifier, // Qualifier entries have priority, i.e., they cannot be overwritten by params.
+    };
 
     if (extras.paramsHandling === 'merge' && extras.target === 'self' && extras.selfViewId) {
       const currentViewUrlSegments = this._router.parseUrl(this._router.url).root.children[extras.selfViewId].segments;

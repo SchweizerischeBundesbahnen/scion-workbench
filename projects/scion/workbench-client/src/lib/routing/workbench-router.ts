@@ -14,7 +14,7 @@ import { WorkbenchViewCapability } from '../view/workbench-view-capability';
 import { catchError, take } from 'rxjs/operators';
 import { WorkbenchView } from '../view/workbench-view';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { Dictionaries, Dictionary, Maps } from '@scion/toolkit/util';
+import { Dictionary, Maps } from '@scion/toolkit/util';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
 import { ɵWorkbenchRouterNavigateCommand } from './workbench-router-navigate-command';
 import { throwError } from 'rxjs';
@@ -80,14 +80,11 @@ export class WorkbenchRouter {
       const {intent, capability} = await this.currentNavigation();
       return {
         capabilities: [capability],
+        qualifier: intent.qualifier,
         extras: {
           ...extras,
           target: 'self',
           selfViewId: Beans.get(WorkbenchView).viewId,
-          params: {
-            ...Dictionaries.coerce(extras?.params),
-            ...intent.qualifier, // Qualifier entries have precedence and cannot be overwritten by params
-          },
           paramsHandling: extras?.paramsHandling ?? 'replace',
         },
       };
@@ -95,13 +92,10 @@ export class WorkbenchRouter {
 
     return {
       capabilities: await this.lookupViewCapabilities(qualifier),
+      qualifier,
       extras: {
         ...extras,
         selfViewId: extras?.selfViewId ?? Beans.opt(WorkbenchView)?.viewId,
-        params: {
-          ...Dictionaries.coerce(extras?.params),
-          ...qualifier, // Qualifier entries have priority, i.e., they cannot be overwritten by params.
-        },
         paramsHandling: undefined, // `paramsHandling` cannot be set for navigations other than self-navigation
       },
     };
@@ -127,21 +121,9 @@ export class WorkbenchRouter {
       .pipe(take(1))
       .toPromise();
 
-    // Derive the qualifier of the current view. We can't just use the qualifier of the capability since it might contain wildcards.
-    const currentIntentQualifier = Object.keys(currentCapability.qualifier).reduce((acc, key) => {
-      if (!currentParams.has(key)) {
-        throw Error(`[ViewContextError] Missing required qualifier param '${key}'.`);
-      }
-      acc[key] = currentParams.get(key);
-      return acc;
-    }, {});
-
     return {
       capability: currentCapability,
-      intent: {
-        type: WorkbenchCapabilities.View,
-        qualifier: currentIntentQualifier,
-      },
+      intent: this.deriveViewIntent(currentCapability.qualifier, currentParams),
     };
   }
 
@@ -156,6 +138,24 @@ export class WorkbenchRouter {
       return false;
     }
     return !qualifier || Object.keys(qualifier).length === 0;
+  }
+
+  /**
+   * Derives the intent that was issued to open the view of the passed capability.
+   */
+  private deriveViewIntent(capabilityQualifier: Qualifier, params: Map<string, any>): Intent {
+    const intentQualifier = Object.entries(capabilityQualifier).reduce((acc, [key, value]) => {
+      if (!params.has(key) && value !== '?') {
+        throw Error(`[ViewContextError] Missing required qualifier param '${key}'.`);
+      }
+
+      if (params.has(key)) {
+        acc[key] = params.get(key);
+      }
+      return acc;
+    }, {});
+
+    return {type: WorkbenchCapabilities.View, qualifier: intentQualifier};
   }
 }
 
