@@ -96,12 +96,29 @@
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="update-view-params e2e-update-view-params" variant="solid">
-  <ng-template sciAccordionItem [panel]="panel_update_view_params">
-    <header>Update View Params</header>
-  </ng-template>
-  <ng-template #panel_update_view_params>
-    <sci-params-enter [paramsFormArray]="viewParamsControl" [addable]="true" [removable]="true" class="e2e-view-params"></sci-params-enter>
-    <button (click)="onUpdateViewParams()" class="update-view-params e2e-update-view-params">Update</button>
-  </ng-template>
-</sci-accordion>
+<ng-container [formGroup]="form">
+  <sci-accordion class="self-navigation e2e-self-navigation" variant="solid" [formGroupName]="SELF_NAVIGATION">
+    <ng-template sciAccordionItem [panel]="panel_self_navigation">
+      <header>Self-Navigation</header>
+    </ng-template>
+    <ng-template #panel_self_navigation>
+      <sci-form-field label="Params">
+        <sci-params-enter [paramsFormArray]="$any(form.get([SELF_NAVIGATION, PARAMS]))" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+      </sci-form-field>
+
+      <sci-form-field label="ParamsHandling">
+        <select [formControlName]="PARAMS_HANDLING" class="e2e-param-handling">
+          <option value="merge">merge</option>
+          <option value="replace">replace</option>
+          <option value="">default</option>
+        </select>
+      </sci-form-field>
+
+      <sci-form-field label="Navigate per Param" title="Check to simulate the performing of bulk navigations">
+        <sci-checkbox [formControlName]="NAVIGATE_PER_PARAM" class="e2e-navigate-per-param"></sci-checkbox>
+      </sci-form-field>
+
+      <button (click)="onSelfNavigate()" class="navigate-self e2e-navigate-self">Perform self-navigation</button>
+    </ng-template>
+  </sci-accordion>
+</ng-container>

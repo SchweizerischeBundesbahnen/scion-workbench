@@ -109,7 +109,7 @@ describe('Workbench View', () => {
     ]));
 
     // update params (no microfrontend change)
-    await testeeViewPagePO.updateViewParams({param1: 'param-1'});
+    await testeeViewPagePO.navigateSelf({param1: 'param-1'});
 
     // expect following Observables to complete
     await expect(await consumeBrowserLog(Level.DEBUG, /ObservableComplete/)).toEqual([]);

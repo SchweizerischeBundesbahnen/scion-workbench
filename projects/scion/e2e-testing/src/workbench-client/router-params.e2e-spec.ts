@@ -191,31 +191,209 @@ describe('Workbench Router', () => {
     await expect(await testeeViewPagePO.getComponentInstanceId()).toEqual(testeeComponentInstanceId);
   });
 
-  it('should allow updating the current view\'s params by not passing a qualifier for navigation', async () => {
-    await appPO.navigateTo({microfrontendSupport: true});
+  describe('Self-Navigation', () => {
 
-    const viewPagePO = await ViewPagePO.openInNewTab('app1');
-    const componentInstanceId = await viewPagePO.getComponentInstanceId();
+    it('should, by default, replace params', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
 
-    await viewPagePO.updateViewParams({
-      param1: 'PARAM 1',
-      param2: 'PARAM 2',
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      const componentInstanceId = await viewPagePO.getComponentInstanceId();
+
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (a)',
+      });
+
+      // expect the view's params to be updated
+      await expect(await viewPagePO.getViewParams()).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'PARAM 2', param3: 'PARAM 3 (a)'}));
+      // expect the component to be the same instance
+      await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
+
+      await viewPagePO.navigateSelf({
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+      });
+
+      // expect the view's params to be updated
+      const params = await viewPagePO.getViewParams();
+      await expect(params).toEqual(jasmine.objectContaining({param3: 'PARAM 3 (b)', param4: 'PARAM 4', param5: 'PARAM 5'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param1: 'PARAM 1'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param2: 'PARAM 2'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param3: 'PARAM 3 (a)'}));
+
+      // expect the component to be the same instance
+      await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
-    // expect the view's params to be updated
-    await expect(await viewPagePO.getViewParams()).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'PARAM 2'}));
-    // expect the component to be the same instance
-    await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
+    it('should replace params', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
 
-    await viewPagePO.updateViewParams({
-      param3: 'PARAM 3',
-      param4: 'PARAM 4',
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      const componentInstanceId = await viewPagePO.getComponentInstanceId();
+
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (a)',
+      });
+
+      // expect the view's params to be updated
+      await expect(await viewPagePO.getViewParams()).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'PARAM 2', param3: 'PARAM 3 (a)'}));
+      // expect the component to be the same instance
+      await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
+
+      await viewPagePO.navigateSelf({
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+      }, {paramsHandling: 'replace'});
+
+      // expect the view's params to be updated
+      const params = await viewPagePO.getViewParams();
+      await expect(params).toEqual(jasmine.objectContaining({param3: 'PARAM 3 (b)', param4: 'PARAM 4', param5: 'PARAM 5'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param1: 'PARAM 1'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param2: 'PARAM 2'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param3: 'PARAM 3 (a)'}));
+      // expect the component to be the same instance
+      await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
-    // expect the view's params to be updated
-    await expect(await viewPagePO.getViewParams()).toEqual(jasmine.objectContaining({param3: 'PARAM 3', param4: 'PARAM 4'}));
-    await expect(await viewPagePO.getViewParams()).not.toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'PARAM 2'}));
-    // expect the component to be the same instance
-    await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
+    it('should merge params', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      const componentInstanceId = await viewPagePO.getComponentInstanceId();
+
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (a)',
+      });
+
+      // expect the view's params to be updated
+      await expect(await viewPagePO.getViewParams()).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'PARAM 2', param3: 'PARAM 3 (a)'}));
+      // expect the component to be the same instance
+      await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
+
+      await viewPagePO.navigateSelf({
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+      }, {paramsHandling: 'merge'});
+
+      // expect the view's params to be updated
+      const params = await viewPagePO.getViewParams();
+      await expect(params).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'PARAM 2', param3: 'PARAM 3 (b)', param4: 'PARAM 4', param5: 'PARAM 5'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param3: 'PARAM 3 (a)'}));
+      // expect the component to be the same instance
+      await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    it('should correctly merge params when performing bulk navigations', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+      }, {paramsHandling: 'merge', navigatePerParam: true});
+
+      // expect the view's params to be updated
+      await expect(await viewPagePO.getViewParams()).toEqual(jasmine.objectContaining({
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+      }));
+    });
+
+    it('should correctly replace params when performing bulk navigations', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+      }, {paramsHandling: 'replace', navigatePerParam: true});
+
+      // expect the view's params to be updated
+      const params = await viewPagePO.getViewParams();
+      await expect(params).not.toEqual(jasmine.objectContaining({param1: 'PARAM 1'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param2: 'PARAM 2'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param3: 'PARAM 3'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param4: 'PARAM 4'}));
+      await expect(params).toEqual(jasmine.objectContaining({param5: 'PARAM 5'}));
+    });
+
+    it('should remove params having `undefined` as value [paramsHandling=replace]', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: '<undefined>',
+        param3: 'PARAM 3',
+      }, {paramsHandling: 'replace'});
+
+      // expect the view's params to be updated
+      const params = await viewPagePO.getViewParams();
+      await expect(params).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param3: 'PARAM 3'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param2: jasmine.anything()}));
+    });
+
+    it('should remove params having `undefined` as their value [paramsHandling=merge]', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: '<undefined>',
+        param3: 'PARAM 3',
+      }, {paramsHandling: 'merge'});
+
+      // expect the view's params to be updated
+      const params = await viewPagePO.getViewParams();
+      await expect(params).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param3: 'PARAM 3'}));
+      await expect(params).not.toEqual(jasmine.objectContaining({param2: jasmine.anything()}));
+    });
+
+    it('should not remove params having `null` as their value [paramsHandling=replace]', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: '<null>',
+        param3: 'PARAM 3',
+      }, {paramsHandling: 'replace'});
+
+      // expect the view's params to be updated
+      const params = await viewPagePO.getViewParams();
+      await expect(params).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'null', param3: 'PARAM 3'}));
+    });
+
+    it('should remove params having `null` as their value [paramsHandling=merge]', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      const viewPagePO = await ViewPagePO.openInNewTab('app1');
+      await viewPagePO.navigateSelf({
+        param1: 'PARAM 1',
+        param2: '<null>',
+        param3: 'PARAM 3',
+      }, {paramsHandling: 'merge'});
+
+      // expect the view's params to be updated
+      const params = await viewPagePO.getViewParams();
+      await expect(params).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'null', param3: 'PARAM 3'}));
+    });
   });
 });

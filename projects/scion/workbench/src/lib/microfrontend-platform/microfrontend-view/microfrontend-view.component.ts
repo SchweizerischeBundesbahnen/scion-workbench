@@ -19,6 +19,7 @@ import { Logger, LoggerNames } from '../../logging';
 import { WorkbenchView } from '../../view/workbench-view.model';
 import { WbBeforeDestroy } from '../../workbench.model';
 import { IFRAME_HOST, ViewContainerReference } from '../../content-projection/view-container.reference';
+import { serializeExecution } from '../../operators';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -45,7 +46,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
               private _messageClient: MessageClient,
               private _logger: Logger,
               @Inject(IFRAME_HOST) iframeHost: ViewContainerReference) {
-    this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.viewId}]`, LoggerNames.MICROFRONTEND);
+    this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.viewId}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.iframeHost = iframeHost.get();
   }
 
@@ -54,12 +55,12 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
 
     this._route.params
       .pipe(
-        switchMap(params => this.observeViewCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID])),
-        startWith(undefined as WorkbenchViewCapability), // initialize 'pairwise' operator
+        switchMap(params => this.observeViewCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]).pipe(map(capability => ({capability, params})))),
+        startWith(undefined as { capability: WorkbenchViewCapability, params: Params }), // initialize 'pairwise' operator
         pairwise(),
-        switchMap(([prev, curr]) => this.onNavigate(this._route.snapshot.params, prev, curr)),
+        serializeExecution(([prev, curr]) => this.onNavigate(curr.params, prev?.capability, curr.capability)),
         catchError((error, caught) => {
-          this._logger.error(() => '[MicrofrontendLoadError] An unexpected error occurred.', LoggerNames.MICROFRONTEND, error);
+          this._logger.error(() => '[MicrofrontendLoadError] An unexpected error occurred.', LoggerNames.MICROFRONTEND_ROUTING, error);
           return caught; // re-subscribe to the params Observable
         }),
         takeUntil(this._destroy$),
@@ -69,21 +70,21 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
 
   private async onNavigate(params: Params, prevViewCapability: WorkbenchViewCapability | undefined, viewCapability: WorkbenchViewCapability | undefined): Promise<void> {
     if (!viewCapability) {
-      this._logger.warn(() => `[NullViewError] No application found to provide a view of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND);
+      this._logger.warn(() => `[NullViewError] No application found to provide a view of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
       await this._view.close();
       return;
     }
 
     const microfrontendPath = viewCapability.properties?.path;
     if (microfrontendPath === undefined || microfrontendPath === null) { // empty path is a valid path
-      this._logger.error(() => `[ViewProviderError] Requested view has no path to the microfrontend defined.`, LoggerNames.MICROFRONTEND, viewCapability);
+      this._logger.error(() => `[ViewProviderError] Requested view has no path to the microfrontend defined.`, LoggerNames.MICROFRONTEND_ROUTING, viewCapability);
       await this._view.close();
       return;
     }
 
     const application = this.lookupApplication(viewCapability.metadata.appSymbolicName);
     if (!application) {
-      this._logger.error(() => `[NullApplicationError] Unexpected. Cannot resolve application '${viewCapability.metadata.appSymbolicName}'.`, LoggerNames.MICROFRONTEND, viewCapability);
+      this._logger.error(() => `[NullApplicationError] Unexpected. Cannot resolve application '${viewCapability.metadata.appSymbolicName}'.`, LoggerNames.MICROFRONTEND_ROUTING, viewCapability);
       await this._view.close();
       return;
     }
@@ -111,7 +112,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     }
 
     // Navigate to the microfrontend.
-    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.viewId}, app=${viewCapability.metadata.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND, params, viewCapability);
+    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.viewId}, app=${viewCapability.metadata.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND_ROUTING, params, viewCapability);
     await this._outletRouter.navigate(microfrontendPath, {
       outlet: this.viewId,
       relativeTo: application.baseUrl,
