@@ -49,7 +49,7 @@ export class MicrofrontendPopupCommandHandler {
         component: MicrofrontendPopupComponent,
         input: popupContext,
         anchor: this.observePopupOrigin$(command),
-        viewRef: command.viewId,
+        context: command.context,
         align: command.align,
         size: popupCapability.properties?.size,
         closeStrategy: {
@@ -62,8 +62,9 @@ export class MicrofrontendPopupCommandHandler {
   }
 
   private observePopupOrigin$(command: ɵWorkbenchPopupCommand): Observable<PopupOrigin> {
+    const contextualViewId = command.context?.viewId;
     return combineLatest([
-      command.viewId ? this.observeViewBoundingBox$(command.viewId) : of(undefined),
+      contextualViewId ? this.observeViewBoundingBox$(contextualViewId) : of(undefined),
       this.observeMicrofrontendPopupOrigin$(command.popupId),
     ])
       .pipe(
@@ -71,7 +72,7 @@ export class MicrofrontendPopupCommandHandler {
           // Swallow emissions until both sources report a non-empty dimension. For example, when deactivating
           // the popup's contextual view, the view reports an empty bounding box, causing the popup to flicker
           // when activating it again.
-          return !isNullClientRect(viewBoundingBox) && !isNullClientRect(popupOrigin);
+          return (!viewBoundingBox || !isNullClientRect(viewBoundingBox)) && !isNullClientRect(popupOrigin);
         }),
         map(([viewBoundingBox, popupOrigin]: [ClientRect | undefined, ClientRect]) => {
           return {

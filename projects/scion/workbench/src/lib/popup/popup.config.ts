@@ -81,17 +81,17 @@ export abstract class PopupConfig {
    */
   public readonly closeStrategy?: CloseStrategy;
   /**
-   * Allows sticking the popup to the lifecycle of a workbench view so that it is only displayed when the referenced view is the active view
-   * in its viewpart, or closed when closing the view.
-   *
-   * If you open the popup directly from a workbench view component, you do not need to set the view reference - it is already set by the popup
-   * service. You only need to set the view reference if you open the popup from a service that is not provided at the view component level, i.e.,
-   * a service provided at the root injector, e.g., if you annotate the service with `@Injectable({providedIn: 'root'})`.
-   *
-   * Note that binding the popup to a workbench view only makes sense if it is opened from a view, and only if the popup does not close on focus loss.
-   * You can set the closing strategy via {@link closeStrategy} property.
+   * Specifies the context in which to display the popup.
    */
-  public readonly viewRef?: string;
+  public readonly context?: {
+    /**
+     * Allows sticking the popup to the lifecycle of a workbench view so that it is only displayed when the referenced view is the active view
+     * in its viewpart, or closed when closing the view.
+     *
+     * By default, when opening the popup in the context of a view, that view is used as the popup's contextual view.
+     */
+    viewId?: string;
+  };
   /**
    * Specifies the preferred popup size. If not specified, the popup adjusts its size to the content size.
    */

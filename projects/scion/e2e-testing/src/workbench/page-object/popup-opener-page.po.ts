@@ -162,10 +162,10 @@ export class PopupOpenerPagePO {
     }
   }
 
-  public async enterViewRef(viewRef: string | '<null>'): Promise<void> {
+  public async enterContextualViewId(viewId: string | '<null>'): Promise<void> {
     await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
-    await enterText(viewRef, this._pageFinder.$('input.e2e-view-ref'));
+    await enterText(viewId, this._pageFinder.$('input.e2e-contextual-view-id'));
   }
 
   public async clickOpen(): Promise<void> {

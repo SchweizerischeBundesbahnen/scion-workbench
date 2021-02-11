@@ -81,7 +81,9 @@ export class WorkbenchPopupService {
         ...Maps.coerce(config.params),
         ...Maps.coerce(qualifier),
       ]),
-      viewId: Beans.opt(WorkbenchView)?.viewId,
+      context: {
+        viewId: Beans.opt(WorkbenchView)?.viewId,
+      },
     };
     const popupOriginPublisher = this.observePopupOrigin$(config).subscribe(origin => {
       Beans.get(MessageClient).publish<ClientRect>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), origin, {retain: true});

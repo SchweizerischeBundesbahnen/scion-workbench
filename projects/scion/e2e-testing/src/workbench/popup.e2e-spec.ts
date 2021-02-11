@@ -402,7 +402,7 @@ describe('Workbench Popup', () => {
 
       const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab();
       await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.enterViewRef(startPagePO.viewId);
+      await popupOpenerPagePO.enterContextualViewId(startPagePO.viewId);
       await popupOpenerPagePO.selectAnchor('coordinate');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
@@ -457,7 +457,7 @@ describe('Workbench Popup', () => {
       const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab();
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.enterViewRef('<null>');
+      await popupOpenerPagePO.enterContextualViewId('<null>');
       await popupOpenerPagePO.selectAnchor('coordinate');
       await popupOpenerPagePO.clickOpen();
 

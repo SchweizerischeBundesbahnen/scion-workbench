@@ -23,5 +23,7 @@ export interface ɵWorkbenchPopupCommand { // tslint:disable-line:class-name
   params: Map<string, any>;
   align?: 'east' | 'west' | 'north' | 'south';
   closeStrategy?: CloseStrategy;
-  viewId?: string;
+  context?: {
+    viewId?: string;
+  };
 }
