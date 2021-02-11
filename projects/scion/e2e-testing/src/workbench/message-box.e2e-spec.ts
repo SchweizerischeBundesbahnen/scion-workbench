@@ -228,6 +228,64 @@ describe('Workbench Message Box', () => {
     await expect(await msgboxPO.getModality()).toEqual('application');
   });
 
+  it('should allow opening a message box in any view', async () => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const viewTab1PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
+    const viewTab2PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
+    const viewTab3PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
+
+    // open the message box in view 2
+    const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab();
+    await msgboxOpenerPagePO.enterCssClass('testee');
+    await msgboxOpenerPagePO.selectModality('view');
+    await msgboxOpenerPagePO.enterContextualViewId(await viewTab2PO.getViewId());
+    await msgboxOpenerPagePO.clickOpen();
+
+    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    await expect(await appPO.getMessageBoxCount()).toEqual(1);
+    await expect(await msgboxPO.isDisplayed()).toBe(false);
+    await expect(await msgboxPO.isPresent()).toBe(true);
+
+    // activate view 1
+    await viewTab1PO.activate();
+    await expect(await msgboxPO.isDisplayed()).toBe(false);
+    await expect(await msgboxPO.isPresent()).toBe(true);
+    await expect(await appPO.getMessageBoxCount()).toEqual(1);
+
+    // activate view 2
+    await viewTab2PO.activate();
+    await expect(await msgboxPO.isDisplayed()).toBe(true);
+    await expect(await msgboxPO.isPresent()).toBe(true);
+    await expect(await appPO.getMessageBoxCount()).toEqual(1);
+
+    // activate view 3
+    await viewTab3PO.activate();
+    await expect(await msgboxPO.isDisplayed()).toBe(false);
+    await expect(await msgboxPO.isPresent()).toBe(true);
+    await expect(await appPO.getMessageBoxCount()).toEqual(1);
+
+    // close view 3
+    await viewTab3PO.close();
+    await expect(await viewTab2PO.isActive()).toBe(true);
+    await expect(await msgboxPO.isDisplayed()).toBe(true);
+    await expect(await msgboxPO.isPresent()).toBe(true);
+    await expect(await appPO.getMessageBoxCount()).toEqual(1);
+
+    // close view 2
+    await viewTab2PO.close();
+    await expect(await viewTab1PO.isActive()).toBe(true);
+    await expect(await msgboxPO.isDisplayed()).toBe(false);
+    await expect(await msgboxPO.isPresent()).toBe(false);
+    await expect(await appPO.getMessageBoxCount()).toEqual(0);
+
+    // close view 1
+    await viewTab1PO.close();
+    await expect(await msgboxPO.isDisplayed()).toBe(false);
+    await expect(await msgboxPO.isPresent()).toBe(false);
+    await expect(await appPO.getMessageBoxCount()).toEqual(0);
+  });
+
   it('should display configured actions in the order as specified', async () => {
     await appPO.navigateTo({microfrontendSupport: false});
 

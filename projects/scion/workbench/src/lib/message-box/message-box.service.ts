@@ -15,6 +15,7 @@ import { ɵMessageBox } from './ɵmessage-box';
 import { Arrays } from '@scion/toolkit/util';
 import { filter, map, takeUntil } from 'rxjs/operators';
 import { WorkbenchView } from '../view/workbench-view.model';
+import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
 
 /**
  * Allows displaying a message to the user in a workbench message box.
@@ -29,10 +30,11 @@ import { WorkbenchView } from '../view/workbench-view.model';
  *   or arrange views in the workbench layout.
  *
  * - **View-modal:**
- *   A view-modal message box blocks only the view in which it was opened. In contrast to application-modal message boxes, the user
- *   can interact with other views, close them or open new views, or arrange them any other way. A view-modal message box sticks to
- *   its view; that is, it is displayed only when the view is visible. By default, when opening the message box in the context of a
- *   view, it is opened as a view-modal message box. When opened outside of a view, setting the modality to 'view' has no effect.
+ *   A view-modal message box blocks only the view in which it was opened, or the contextual view if specified. In contrast to
+ *   application-modal message boxes, the user can interact with other views, close them or open new views, or arrange them any
+ *   other way. A view-modal message box sticks to its view; that is, it is displayed only when the view is visible. By default,
+ *   when opening the message box in the context of a view, it is opened as a view-modal message box. When opened outside of a
+ *   view, setting the modality to 'view' has no effect, unless setting {@link MessageBoxConfig.context.viewId}.
  *
  * By default, the message box supports the display of a plain text message. To display structured content or prompting the user for
  * input, consider passing a component to {@link MessageBoxConfig#content} instead.
@@ -47,10 +49,11 @@ export class MessageBoxService implements OnDestroy {
   private _messageBoxServiceHierarchy: MessageBoxService[];
 
   constructor(@Optional() @SkipSelf() private _parentMessageBoxService: MessageBoxService,
-              @Optional() view: WorkbenchView,
+              @Optional() private _view: WorkbenchView,
+              private _viewRegistry: WorkbenchViewRegistry,
               private _zone: NgZone) {
     this._messageBoxServiceHierarchy = this.computeMessageBoxServiceHierarchy();
-    view && this.restoreFocusOnViewActivation(view);
+    this._view && this.restoreFocusOnViewActivation(this._view);
   }
 
   /**
@@ -84,10 +87,18 @@ export class MessageBoxService implements OnDestroy {
       return this._zone.run(() => this.open(config));
     }
 
-    if (config.modality === 'application' && this._parentMessageBoxService) {
-      return this._parentMessageBoxService.open(config);
+    if (config.modality === 'application') {
+      return Arrays.last(this._messageBoxServiceHierarchy).addMessageBox(config);
     }
+    else if (config.context?.viewId) {
+      const view = this._viewRegistry.getElseThrow(config.context.viewId);
+      const viewInjector = view.portal.componentRef.injector;
+      return viewInjector.get(MessageBoxService).addMessageBox(config);
+    }
+    return this.addMessageBox(config);
+  }
 
+  private addMessageBox(config: MessageBoxConfig): Promise<any> {
     const messageBox = new ɵMessageBox(config);
     this._messageBoxes$.next(this._messageBoxes$.value.concat(messageBox));
     return messageBox.whenClose.finally(() => {
