@@ -36,7 +36,7 @@ export class ɵMessageBox<T = any> implements MessageBox<T> { // tslint:disable-
     this.actions$ = new BehaviorSubject(this.parseActions(config.actions || {'ok': 'OK'}));
     if (this.config.content === undefined || typeof this.config.content === 'string') {
       this.component = TextMessageComponent;
-      this.input = new Map().set('$implicit', this.config.content) as any; // contract of {TextMessageComponent}
+      this.input = this.config.content as any;
     }
     else {
       this.component = this.config.content;

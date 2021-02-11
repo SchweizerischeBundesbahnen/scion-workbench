@@ -350,7 +350,7 @@ describe('Workbench Message Box', () => {
       await expect(await inspectorPO.isDisplayed()).toBe(true);
     });
 
-    it('should contain the qualifier in the input Map of the message box handle', async () => {
+    it('should hide a \'view-modal\' message box when activating another view of the viewpart', async () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register message box intention
@@ -364,12 +364,22 @@ describe('Workbench Message Box', () => {
       await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1'});
       await msgboxOpenerPagePO.clickOpen();
 
-      const inspectorPO = new InspectMessageBoxPO('testee');
-      await expect(await inspectorPO.isDisplayed()).toBe(true);
-      await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map().set('component', 'inspector'));
+      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      await expect(await msgboxPO.isPresent()).toBe(true);
+      await expect(await msgboxPO.isDisplayed()).toBe(true);
+
+      // open a new view
+      await appPO.openNewViewTab();
+      await expect(await msgboxPO.isPresent()).toBe(true);
+      await expect(await msgboxPO.isDisplayed()).toBe(false);
+
+      // expect the message box to display when activating the view again
+      await msgboxOpenerPagePO.viewTabPO.activate();
+      await expect(await msgboxPO.isPresent()).toBe(true);
+      await expect(await msgboxPO.isDisplayed()).toBe(true);
     });
 
-    it('should contain passed content in the input Map of the message box handle under the `$implicit` key', async () => {
+    it('should open a message box \'application-modal\' if not in the context of a view', async () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register message box intention
@@ -380,77 +390,84 @@ describe('Workbench Message Box', () => {
       const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
       await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
       await msgboxOpenerPagePO.enterCssClass('testee');
+      await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1'});
+      await msgboxOpenerPagePO.checkViewContextActive(false);
+      await msgboxOpenerPagePO.clickOpen();
+
+      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      await expect(await msgboxPO.isDisplayed()).toBe(true);
+      await expect(await msgboxPO.getModality()).toEqual('application');
+    });
+
+    it('should allow opening a message box \'application-modal\' even if in the context of a view', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // register message box intention
+      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
+
+      // open the message box
+      const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
+      await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
+      await msgboxOpenerPagePO.enterCssClass('testee');
+      await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1'});
+      await msgboxOpenerPagePO.selectModality('application');
+      await msgboxOpenerPagePO.clickOpen();
+
+      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      await expect(await msgboxPO.isDisplayed()).toBe(true);
+      await expect(await msgboxPO.getModality()).toEqual('application');
+    });
+
+    it('should allow passing a custom input to the message box', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // register message box intention
+      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
+
+      // open the message box
+      const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
+      await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
+      await msgboxOpenerPagePO.enterCssClass('testee');
+      await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
       await msgboxOpenerPagePO.enterContent('CONTENT');
-      await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1'});
-      await msgboxOpenerPagePO.clickOpen();
-
-      const inspectorPO = new InspectMessageBoxPO('testee');
-      await expect(await inspectorPO.isDisplayed()).toBe(true);
-      await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map().set('$implicit', 'CONTENT'));
-    });
-
-    it('should contain passed parameters in the input Map of the message box handle ', async () => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register message box intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
-
-      // open the message box
-      const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
-      await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await msgboxOpenerPagePO.enterCssClass('testee');
-      await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
       await msgboxOpenerPagePO.clickOpen();
 
       const inspectorPO = new InspectMessageBoxPO('testee');
       await expect(await inspectorPO.isDisplayed()).toBe(true);
       await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map()
-        .set('param1', 'PARAM 1')
-        .set('param2', 'PARAM 2'),
-      );
-    });
-
-    it('should contain infos about the requestor in the input Map of the message box handle under the `ɵAPP_SYMBOLIC_NAME` key (MessageHeaders.AppSymbolicName)', async () => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register message box intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
-
-      // open the message box
-      const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
-      await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await msgboxOpenerPagePO.enterCssClass('testee');
-      await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
-      await msgboxOpenerPagePO.clickOpen();
-
-      const inspectorPO = new InspectMessageBoxPO('testee');
-      await expect(await inspectorPO.isDisplayed()).toBe(true);
-      await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map()
-        .set('ɵAPP_SYMBOLIC_NAME', 'workbench-client-testing-app1'),
-      );
-    });
-
-    it('should contain the replyTo topic in the input Map of the message box handle under the `ɵREPLY_TO` key (MessageHeaders.ReplyTo)', async () => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register message box intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
-
-      // open the message box
-      const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
-      await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await msgboxOpenerPagePO.enterCssClass('testee');
-      await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1'});
-      await msgboxOpenerPagePO.clickOpen();
-
-      const inspectorPO = new InspectMessageBoxPO('testee');
-      await expect(await inspectorPO.isDisplayed()).toBe(true);
-      await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map()
+        .set('component', 'inspector') // qualifier
+        .set('$implicit', 'CONTENT') // content
+        .set('param1', 'PARAM 1') // params
+        .set('param2', 'PARAM 2') // params
+        .set('ɵAPP_SYMBOLIC_NAME', 'workbench-client-testing-app1') // headers
         .set('ɵREPLY_TO', jasmine.any(String)),
       );
+    });
+
+    it('should allow controlling message box settings', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // register message box intention
+      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      await registerIntentionPagePO.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
+
+      // open the message box
+      const msgboxOpenerPagePO = await MessageBoxOpenerPagePO.openInNewTab('app1');
+      await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
+      await msgboxOpenerPagePO.enterCssClass('testee');
+      await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1'});
+      await msgboxOpenerPagePO.selectSeverity('warn');
+      await msgboxOpenerPagePO.enterTitle('TITLE');
+      await msgboxOpenerPagePO.enterActions({yes: 'Yes', no: 'No'});
+      await msgboxOpenerPagePO.clickOpen();
+
+      const inspectorPO = new InspectMessageBoxPO('testee');
+      await expect(await inspectorPO.isDisplayed()).toBe(true);
+      await expect(await inspectorPO.msgboxPO.getSeverity()).toEqual('warn');
+      await expect(await inspectorPO.msgboxPO.getTitle()).toEqual('TITLE');
+      await expect(await inspectorPO.msgboxPO.getActions()).toEqual({yes: 'Yes', no: 'No'});
     });
 
     it('should throw when not passing params required by the message box provider', async () => {

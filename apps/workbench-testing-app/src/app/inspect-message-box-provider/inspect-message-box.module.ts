@@ -8,13 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InspectMessageBoxComponent } from './inspect-message-box.component';
 import { UtilModule } from '../util/util.module';
 import { SciViewportModule } from '@scion/toolkit/viewport';
 import { SciFormFieldModule, SciParamsEnterModule } from '@scion/toolkit.internal/widgets';
 import { ReactiveFormsModule } from '@angular/forms';
+import { POST_MICROFRONTEND_PLATFORM_CONNECT } from '@scion/workbench';
+import { InspectMessageBoxIntentHandler } from './inspect-message-box-intent-handler.service';
 
 @NgModule({
   declarations: [
@@ -30,4 +32,13 @@ import { ReactiveFormsModule } from '@angular/forms';
   ],
 })
 export class InspectMessageBoxModule {
+
+  public static forRoot(): ModuleWithProviders<InspectMessageBoxModule> {
+    return {
+      ngModule: InspectMessageBoxModule,
+      providers: [
+        {provide: POST_MICROFRONTEND_PLATFORM_CONNECT, useClass: InspectMessageBoxIntentHandler, multi: true},
+      ],
+    };
+  }
 }

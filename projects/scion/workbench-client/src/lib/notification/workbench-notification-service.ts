@@ -26,8 +26,8 @@ import { throwError } from 'rxjs';
  * displayed at any given time.
  *
  * The built-in notification supports the display of a plain text message and is available as 'notification' capability without a qualifier.
- * Other notification capabilities can be contributed in the host app via {MicrofrontendNotificationProvider}, e.g., to display structured
- * content or to provide out-of-the-box notification templates. The use of a qualifier distinguishes different notification providers.
+ * Other notification capabilities can be contributed in the host app, e.g., to display structured content or to provide out-of-the-box
+ * notification templates. The use of a qualifier distinguishes different notification providers.
  *
  * Applications need to declare an intention in their application manifest for displaying a notification to the user, as illustrated below:
  *

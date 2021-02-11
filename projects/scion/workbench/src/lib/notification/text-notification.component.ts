@@ -14,6 +14,6 @@ export class TextNotificationComponent {
   public text: string;
 
   constructor(notification: Notification) {
-    this.text = notification.input.get('$implicit');
+    this.text = notification.input;
   }
 }
