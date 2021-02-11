@@ -8,12 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, Injectable, Injector, Type } from '@angular/core';
+import { Component, Injectable, Injector, OnDestroy, Type } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { MessageBoxService, WorkbenchView } from '@scion/workbench';
 import { ActivatedRoute } from '@angular/router';
 import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
 import { InspectMessageBoxComponent } from '../inspect-message-box-provider/inspect-message-box.component';
+import { startWith, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 const TITLE = 'title';
 const CONTENT = 'content';
@@ -21,6 +23,7 @@ const COMPONENT = 'component';
 const COMPONENT_INPUT = 'componentInput';
 const SEVERITY = 'severity';
 const MODALITY = 'modality';
+const CONTEXTUAL_VIEW_ID = 'contextualViewId';
 const CONTENT_SELECTABLE = 'contentSelectable';
 const CSS_CLASS = 'cssClass';
 const ACTIONS = 'actions';
@@ -31,7 +34,7 @@ const VIEW_CONTEXT = 'viewContext';
   templateUrl: './message-box-opener-page.component.html',
   styleUrls: ['./message-box-opener-page.component.scss'],
 })
-export class MessageBoxOpenerPageComponent {
+export class MessageBoxOpenerPageComponent implements OnDestroy {
 
   public readonly TITLE = TITLE;
   public readonly CONTENT = CONTENT;
@@ -39,10 +42,13 @@ export class MessageBoxOpenerPageComponent {
   public readonly COMPONENT_INPUT = COMPONENT_INPUT;
   public readonly SEVERITY = SEVERITY;
   public readonly MODALITY = MODALITY;
+  public readonly CONTEXTUAL_VIEW_ID = CONTEXTUAL_VIEW_ID;
   public readonly CONTENT_SELECTABLE = CONTENT_SELECTABLE;
   public readonly CSS_CLASS = CSS_CLASS;
   public readonly ACTIONS = ACTIONS;
   public readonly VIEW_CONTEXT = VIEW_CONTEXT;
+
+  private _destroy$ = new Subject<void>();
 
   public form: FormGroup;
 
@@ -65,11 +71,13 @@ export class MessageBoxOpenerPageComponent {
       [COMPONENT_INPUT]: formBuilder.control(''),
       [SEVERITY]: formBuilder.control(''),
       [MODALITY]: formBuilder.control(''),
+      [CONTEXTUAL_VIEW_ID]: formBuilder.control(''),
       [CONTENT_SELECTABLE]: formBuilder.control(false),
       [CSS_CLASS]: formBuilder.control(''),
       [ACTIONS]: formBuilder.array([]),
       [VIEW_CONTEXT]: formBuilder.control(true),
     });
+    this.installContextualViewIdEnabler();
   }
 
   public async onMessageBoxOpen(): Promise<void> {
@@ -86,6 +94,9 @@ export class MessageBoxOpenerPageComponent {
       componentInput: (this.isUseComponent() ? this.form.get(COMPONENT_INPUT).value : undefined) || undefined,
       severity: this.form.get(SEVERITY).value || undefined,
       modality: this.form.get(MODALITY).value || undefined,
+      context: {
+        viewId: this.form.get(CONTEXTUAL_VIEW_ID).value || undefined,
+      },
       contentSelectable: this.form.get(CONTENT_SELECTABLE).value || undefined,
       cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
       actions: SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as FormArray) || undefined,
@@ -112,6 +123,30 @@ export class MessageBoxOpenerPageComponent {
    */
   private restoreLineBreaks(value: string): string {
     return value.replace(/\\n/g, '\n');
+  }
+
+  /**
+   * Enables the field for setting a contextual view reference when choosing view modality.
+   */
+  private installContextualViewIdEnabler(): void {
+    this.form.get(MODALITY).valueChanges
+      .pipe(
+        startWith(this.form.get(MODALITY).value as string),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(modality => {
+        if (modality === 'view') {
+          this.form.get(CONTEXTUAL_VIEW_ID).enable();
+        }
+        else {
+          this.form.get(CONTEXTUAL_VIEW_ID).setValue('');
+          this.form.get(CONTEXTUAL_VIEW_ID).disable();
+        }
+      });
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }
 

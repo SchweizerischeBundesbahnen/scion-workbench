@@ -81,6 +81,12 @@ export class MessageBoxOpenerPagePO {
     await selectOption(modality, this._pageFinder.$('select.e2e-modality'));
   }
 
+  public async enterContextualViewId(contextualViewId: string): Promise<void> {
+    await WebdriverExecutionContexts.switchToDefault();
+    await assertPageToDisplay(this._pageFinder);
+    await enterText(contextualViewId, this._pageFinder.$('input.e2e-contextual-view-id'));
+  }
+
   public async checkContentSelectable(check: boolean): Promise<void> {
     await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
