@@ -2,6 +2,6 @@
   <sci-router-outlet #router_outlet
                      [name]="viewId"
                      [ngClass]="microfrontendCssClasses"
-                     keystrokes="keydown.escape"> <!-- bubble the ESC key to close notifications -->
+                     [keystrokes]="keystrokesToBubble$ | async">
   </sci-router-outlet>
 </wb-content-as-overlay>

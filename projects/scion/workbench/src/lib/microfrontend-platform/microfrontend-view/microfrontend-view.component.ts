@@ -10,16 +10,18 @@
 
 import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Observable, Subject } from 'rxjs';
+import { combineLatest, Observable, of, Subject } from 'rxjs';
 import { catchError, first, map, pairwise, startWith, switchMap, take, takeUntil } from 'rxjs/operators';
 import { Application, ManifestService, mapToBody, MessageClient, OutletRouter, SciRouterOutletElement, takeUntilUnsubscribe } from '@scion/microfrontend-platform';
 import { WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchCommands } from '@scion/workbench-client';
 import { Maps } from '@scion/toolkit/util';
 import { Logger, LoggerNames } from '../../logging';
-import { WorkbenchView } from '../../view/workbench-view.model';
 import { WbBeforeDestroy } from '../../workbench.model';
 import { IFRAME_HOST, ViewContainerReference } from '../../content-projection/view-container.reference';
 import { serializeExecution } from '../../operators';
+import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
+import { filterArray, mapArray } from '@scion/toolkit/operators';
+import { ViewMenuService } from '../../view-part/view-context-menu/view-menu.service';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -32,6 +34,9 @@ import { serializeExecution } from '../../operators';
 export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDestroy {
 
   private _destroy$ = new Subject<void>();
+  private _universalKeystrokes = [
+    'keydown.escape', // allows closing notifications
+  ];
 
   public microfrontendCssClasses: string[];
   public iframeHost: Promise<ViewContainerRef>;
@@ -39,19 +44,35 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement: ElementRef<SciRouterOutletElement>;
 
+  /**
+   * Keystrokes which to bubble across iframe boundaries of embedded content.
+   */
+  public keystrokesToBubble$: Observable<string[]>;
+
   constructor(private _route: ActivatedRoute,
-              private _view: WorkbenchView,
+              private _view: ɵWorkbenchView,
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
               private _messageClient: MessageClient,
               private _logger: Logger,
+              private _viewContextMenuService: ViewMenuService,
               @Inject(IFRAME_HOST) iframeHost: ViewContainerReference) {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.viewId}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.iframeHost = iframeHost.get();
+    this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
+      .pipe(map(keystrokes => [].concat(...keystrokes)));
   }
 
   public ngOnInit(): void {
+    // Construct the view context, allowing embedded content to interact with this view.
     this.routerOutletElement.nativeElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.viewId);
+
+    // Since the iframe is added at a top-level location in the DOM, that is, not as a child element of this component,
+    // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
+    // menu of this view do not work, so we install the accelerators on the router outlet as well.
+    this._viewContextMenuService.installMenuItemAccelerators$(this.routerOutletElement.nativeElement, this._view)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe();
 
     this._route.params
       .pipe(
@@ -198,6 +219,31 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
       )
       .toPromise()
       .then(close => close ?? true);
+  }
+
+  /**
+   * Upon subscription, emits the keystrokes registered with menu items of this view's context menu,
+   * and then continuously when they change. The observable never completes.
+   */
+  private viewContextMenuKeystrokes$(): Observable<string[]> {
+    return this._view.menuItems$
+      .pipe(
+        filterArray(menuItem => !!menuItem.accelerator),
+        mapArray(menuItem => menuItem.accelerator.map(accelerator => {
+          // Normalize keystrokes according to `SciRouterOutletElement#keystrokes`
+          switch (accelerator) {
+            case 'ctrl':
+              return 'control';
+            case '.':
+              return 'dot';
+            case ' ':
+              return 'space';
+            default:
+              return accelerator;
+          }
+        })),
+        mapArray(accelerator => ['keydown'].concat(accelerator).join('.')),
+      );
   }
 
   public ngOnDestroy(): void {
