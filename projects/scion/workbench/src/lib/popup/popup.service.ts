@@ -206,8 +206,8 @@ export class PopupService {
         .subscribe(() => popupHandle.close());
     }
     // If in the context of a view, hide the popup when inactivating the view, or close it when closing the view.
-    else if (config.viewRef || (config.viewRef === undefined /* undefined, not null */ && this._view)) {
-      const view = this.resolveViewFromContext(config.viewRef);
+    else if (config.context?.viewId || (config.context?.viewId === undefined /* undefined, not null */ && this._view)) {
+      const view = this.resolveViewFromContext(config.context?.viewId);
       overlayRef.overlayElement.classList.add('wb-view-context');
 
       // Hide the popup when inactivating the view.
@@ -244,9 +244,9 @@ export class PopupService {
     }
   }
 
-  private resolveViewFromContext(viewRef: string | undefined): WorkbenchView {
-    if (viewRef) {
-      return this._viewRegistry.getElseThrow(viewRef);
+  private resolveViewFromContext(contextualViewId: string | undefined): WorkbenchView {
+    if (contextualViewId) {
+      return this._viewRegistry.getElseThrow(contextualViewId);
     }
 
     if (!this._view) {

@@ -20,7 +20,7 @@ import { defer, Observable, Subject } from 'rxjs';
 const POPUP_COMPONENT = 'popupComponent';
 const ANCHOR = 'anchor';
 const BINDING = 'binding';
-const VIEW_REF = 'viewRef';
+const CONTEXTUAL_VIEW_ID = 'contextualViewId';
 const ALIGN = 'align';
 const INPUT = 'input';
 const CSS_CLASS = 'cssClass';
@@ -47,7 +47,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
   public readonly POPUP_COMPONENT = POPUP_COMPONENT;
   public readonly ANCHOR = ANCHOR;
   public readonly BINDING = BINDING;
-  public readonly VIEW_REF = VIEW_REF;
+  public readonly CONTEXTUAL_VIEW_ID = CONTEXTUAL_VIEW_ID;
   public readonly ALIGN = ALIGN;
   public readonly INPUT = INPUT;
   public readonly CSS_CLASS = CSS_CLASS;
@@ -93,7 +93,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
         [WIDTH]: formBuilder.control('0'),
         [HEIGHT]: formBuilder.control('0'),
       }),
-      [VIEW_REF]: formBuilder.control({disabled: true, value: ''}),
+      [CONTEXTUAL_VIEW_ID]: formBuilder.control({disabled: true, value: ''}),
       [ALIGN]: formBuilder.control(''),
       [CSS_CLASS]: formBuilder.control(''),
       [INPUT]: formBuilder.control(''),
@@ -110,7 +110,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
         [MAX_WIDTH]: formBuilder.control(''),
       }),
     });
-    this.installViewRefEnabler();
+    this.installContextualViewIdEnabler();
 
     this._coordinateAnchor$ = defer(() => this.form.get(ANCHOR)
       .valueChanges
@@ -140,7 +140,6 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
 
     await this._popupService.open<string>({
       component: this.parsePopupComponentInput(),
-      viewRef: this.parseViewRefInput(),
       input: this.form.get(INPUT).value || undefined,
       anchor: this.form.get([ANCHOR, BINDING]).value === 'element' ? this._openButton : this._coordinateAnchor$,
       align: this.form.get(ALIGN).value || undefined,
@@ -157,6 +156,9 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
         minHeight: this.form.get([SIZE, MIN_HEIGHT]).value || undefined,
         maxHeight: this.form.get([SIZE, MAX_HEIGHT]).value || undefined,
       }),
+      context: {
+        viewId: this.parseContextualViewIdInput(),
+      },
     })
       .then(result => this.returnValue = result)
       .catch(error => this.popupError = error ?? 'Popup was closed with an error');
@@ -173,31 +175,31 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  private parseViewRefInput(): string | null | undefined {
-    const viewRef = this.form.get(VIEW_REF).value;
-    switch (viewRef) {
+  private parseContextualViewIdInput(): string | null | undefined {
+    const viewId = this.form.get(CONTEXTUAL_VIEW_ID).value;
+    switch (viewId) {
       case '':
         return undefined;
       case '<null>':
         return null;
       default:
-        return viewRef;
+        return viewId;
     }
   }
 
   /**
-   * Enables the field for setting a view reference when choosing not to close the popup on focus loss.
+   * Enables the field for setting a contextual view reference when choosing not to close the popup on focus loss.
    */
-  private installViewRefEnabler(): void {
+  private installContextualViewIdEnabler(): void {
     this.form.get([CLOSE_STRATEGY, ON_FOCUS_LOST]).valueChanges
       .pipe(takeUntil(this._destroy$))
       .subscribe(closeOnFocusLost => {
         if (closeOnFocusLost) {
-          this.form.get(VIEW_REF).setValue('');
-          this.form.get(VIEW_REF).disable();
+          this.form.get(CONTEXTUAL_VIEW_ID).setValue('');
+          this.form.get(CONTEXTUAL_VIEW_ID).disable();
         }
         else {
-          this.form.get(VIEW_REF).enable();
+          this.form.get(CONTEXTUAL_VIEW_ID).enable();
         }
       });
   }
