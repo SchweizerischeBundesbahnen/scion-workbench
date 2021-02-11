@@ -31,7 +31,7 @@ export class ɵNotification<T = any> implements Notification<T> { // tslint:disa
     this.cssClass$ = new BehaviorSubject(Arrays.coerce(this.config.cssClass));
     if (this.config.content === undefined || typeof this.config.content === 'string') {
       this.component = TextNotificationComponent;
-      this.input = new Map().set('$implicit', this.config.content) as any; // contract of {TextNotificationComponent}
+      this.input = this.config.content as any;
     }
     else {
       this.component = this.config.content;

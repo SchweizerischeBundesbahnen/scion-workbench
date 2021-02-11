@@ -12,10 +12,10 @@ import { IntentClient, mapToBody, Qualifier, RequestError } from '@scion/microfr
 import { WorkbenchMessageBoxConfig } from './workbench-message-box.config';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { WorkbenchView } from '../view/workbench-view';
 import { Maps } from '@scion/toolkit/util';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { WorkbenchView } from '../view/workbench-view';
 
 /**
  * Allows displaying a message to the user in a workbench message box.
@@ -36,15 +36,15 @@ import { throwError } from 'rxjs';
  *   view, it is opened as a view-modal message box. When opened outside of a view, setting the modality to 'view' has no effect.
  *
  * The built-in message box supports the display of a plain text message and is available as 'messagebox' capability without a qualifier.
- * Other message box capabilities can be contributed in the host app via {MicrofrontendMessageBoxProvider}, e.g., to display structured
- * content or to provide out-of-the-box message templates. The use of a qualifier distinguishes different message box providers.
+ * Other message box capabilities can be contributed in the host app, e.g., to display structured content or to provide out-of-the-box
+ * message templates. The use of a qualifier distinguishes different message box providers.
  *
  * Applications need to declare an intention in their application manifest for displaying a message box to the user, as illustrated below:
  *
  * ```json
  * {
  *   "intentions": [
- *     { "type": "message-box" }
+ *     { "type": "messagebox" }
  *   ]
  * }
  * ```
@@ -74,9 +74,12 @@ export class WorkbenchMessageBoxService {
    */
   public open<R = string>(message: string | WorkbenchMessageBoxConfig, qualifier?: Qualifier): Promise<R> {
     const config: WorkbenchMessageBoxConfig = typeof message === 'string' ? {content: message} : message;
-    const params = Maps
-      .coerce(config.params)
-      .set('viewId', Beans.opt(WorkbenchView)?.viewId);
+    const params = Maps.coerce(config.params);
+
+    config.context = {
+      ...config.context,
+      viewId: config.context?.viewId ?? Beans.opt(WorkbenchView)?.viewId,
+    };
 
     return Beans.get(IntentClient).request$<R>({type: WorkbenchCapabilities.MessageBox, qualifier, params}, config)
       .pipe(

@@ -11,10 +11,8 @@ import { WorkbenchModuleConfig } from '../workbench-module-config';
 import { LogDelegate } from './initialization/log-delegate.service';
 import { MicrofrontendViewCommandHandler } from './microfrontend-view/microfrontend-view-command-handler.service';
 import { MicrofrontendPopupCommandHandler } from './microfrontend-popup/microfrontend-popup-command-handler.service';
-import { MicrofrontendMessageBoxIntentHandlerService } from './microfrontend-message-box/microfrontend-message-box-intent-handler.service';
-import { MicrofrontendNotificationIntentHandlerService } from './microfrontend-notification/microfrontend-notification-intent-handler.service';
-import { provideDefaultNotification } from './microfrontend-notification/microfrontend-notification-provider';
-import { provideDefaultMessageBox } from './microfrontend-message-box/microfrontend-message-box-provider';
+import { MicrofrontendMessageBoxProvider } from './microfrontend-message-box/microfrontend-message-box-provider.service';
+import { MicrofrontendNotificationProvider } from './microfrontend-notification/microfrontend-notification-provider.service';
 
 /**
  * Registers a set of DI providers to set up microfrontend support in the workbench.
@@ -52,12 +50,12 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       },
       {
         provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
-        useClass: MicrofrontendMessageBoxIntentHandlerService,
+        useClass: MicrofrontendMessageBoxProvider,
         multi: true,
       },
       {
         provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
-        useClass: MicrofrontendNotificationIntentHandlerService,
+        useClass: MicrofrontendNotificationProvider,
         multi: true,
       },
       LogDelegate,
@@ -67,8 +65,6 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       NgZoneMessageClientDecorator,
       NgZoneIntentClientDecorator,
       provideMicrofrontendPlatformBeans(),
-      provideDefaultMessageBox(),
-      provideDefaultNotification(),
     ] : [],
   ];
 }

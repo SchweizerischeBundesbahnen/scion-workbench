@@ -24,10 +24,9 @@ import { environment } from '../environments/environment';
 import { provideConfirmWorkbenchStartupInitializer } from './workbench/confirm-workbench-startup-initializer.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { provideInspectNotificationProvider } from './inspect-notification-provider/inspect-notification-provider.service';
 import { InspectNotificationModule } from './inspect-notification-provider/inspect-notification.module';
 import { InspectMessageBoxModule } from './inspect-message-box-provider/inspect-message-box.module';
-import { provideInspectMessageBoxProvider } from './inspect-message-box-provider/inspect-message-box-provider.service';
+import { workbenchManifest } from './workbench-manifest';
 
 @NgModule({
   declarations: [
@@ -43,14 +42,20 @@ import { provideInspectMessageBoxProvider } from './inspect-message-box-provider
       startup: {
         launcher: WorkbenchStartupQueryParams.launcher(),
       },
-      microfrontends: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendConfig,
+      microfrontends: WorkbenchStartupQueryParams.standalone() ? undefined : {
+        ...environment.microfrontendConfig,
+        platformHost: {
+          symbolicName: 'workbench-host-app',
+          manifest: workbenchManifest,
+        },
+      },
     }),
     ReactiveFormsModule,
     SciViewportModule,
     SciTabbarModule,
     SciFilterFieldModule,
-    InspectMessageBoxModule,
-    InspectNotificationModule,
+    InspectMessageBoxModule.forRoot(),
+    InspectNotificationModule.forRoot(),
     animationModuleIfEnabled(),
   ],
   bootstrap: [
@@ -58,8 +63,6 @@ import { provideInspectMessageBoxProvider } from './inspect-message-box-provider
   ],
   providers: [
     provideConfirmWorkbenchStartupInitializer(),
-    provideInspectMessageBoxProvider(),
-    provideInspectNotificationProvider(),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -70,3 +73,4 @@ export class AppModule {
 function animationModuleIfEnabled(): Type<NoopAnimationsModule | BrowserAnimationsModule> {
   return environment.animationEnabled ? BrowserAnimationsModule : NoopAnimationsModule; // animations should be disabled during e2e test execution
 }
+

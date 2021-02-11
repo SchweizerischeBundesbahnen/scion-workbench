@@ -327,26 +327,7 @@ describe('Workbench Notification', () => {
       await expect(await inspectorPO.isDisplayed()).toBe(true);
     });
 
-    it('should contain the qualifier in the input Map of the notification handle', async () => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register notification intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
-
-      // display the notification
-      const notificationOpenerPagePO = await NotificationOpenerPagePO.openInNewTab('app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPagePO.clickShow();
-
-      const inspectorPO = new InspectNotificationPO('testee');
-      await expect(await inspectorPO.isDisplayed()).toBe(true);
-      await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map().set('component', 'inspector'));
-    });
-
-    it('should contain passed content in the input Map of the notification handle under the `$implicit` key', async () => {
+    it('should allow passing a custom input to the notification box', async () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register notification intention
@@ -358,76 +339,65 @@ describe('Workbench Notification', () => {
       await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
       await notificationOpenerPagePO.enterCssClass('testee');
       await notificationOpenerPagePO.enterContent('CONTENT');
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPagePO.clickShow();
-
-      const inspectorPO = new InspectNotificationPO('testee');
-      await expect(await inspectorPO.isDisplayed()).toBe(true);
-      await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map().set('$implicit', 'CONTENT'));
-    });
-
-    it('should contain passed parameters in the input Map of the notification handle ', async () => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register notification intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
-
-      // display the notification
-      const notificationOpenerPagePO = await NotificationOpenerPagePO.openInNewTab('app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
       await notificationOpenerPagePO.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
       await notificationOpenerPagePO.clickShow();
 
       const inspectorPO = new InspectNotificationPO('testee');
       await expect(await inspectorPO.isDisplayed()).toBe(true);
       await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map()
-        .set('param1', 'PARAM 1')
-        .set('param2', 'PARAM 2'),
-      );
-    });
-
-    it('should contain infos about the requestor in the input Map of the notification handle under the `ɵAPP_SYMBOLIC_NAME` key (MessageHeaders.AppSymbolicName)', async () => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register notification intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
-
-      // display the notification
-      const notificationOpenerPagePO = await NotificationOpenerPagePO.openInNewTab('app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
-      await notificationOpenerPagePO.clickShow();
-
-      const inspectorPO = new InspectNotificationPO('testee');
-      await expect(await inspectorPO.isDisplayed()).toBe(true);
-      await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map()
-        .set('ɵAPP_SYMBOLIC_NAME', 'workbench-client-testing-app1'),
-      );
-    });
-
-    it('should contain the `replyTo` topic in the input Map of the notification handle under the `ɵREPLY_TO` key (MessageHeaders.ReplyTo)', async () => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register notification intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
-
-      // display the notification
-      const notificationOpenerPagePO = await NotificationOpenerPagePO.openInNewTab('app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPagePO.clickShow();
-
-      const inspectorPO = new InspectNotificationPO('testee');
-      await expect(await inspectorPO.isDisplayed()).toBe(true);
-      await expectMap(await inspectorPO.getInputAsMap()).toContain(new Map()
+        .set('component', 'inspector') // qualifier
+        .set('$implicit', 'CONTENT') // content
+        .set('param1', 'PARAM 1') // params
+        .set('param2', 'PARAM 2') // params
+        .set('ɵAPP_SYMBOLIC_NAME', 'workbench-client-testing-app1') // headers
         .set('ɵREPLY_TO', jasmine.any(String)),
       );
+    });
+
+    it('should allow controlling notification settings', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // register notification intention
+      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+
+      // display the notification
+      const notificationOpenerPagePO = await NotificationOpenerPagePO.openInNewTab('app1');
+      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPagePO.enterCssClass('testee');
+      await notificationOpenerPagePO.enterTitle('TITLE');
+      await notificationOpenerPagePO.enterContent('CONTENT');
+      await notificationOpenerPagePO.selectSeverity('warn');
+      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
+      await notificationOpenerPagePO.clickShow();
+
+      const inspectorPO = new InspectNotificationPO('testee');
+      await expect(await inspectorPO.isDisplayed()).toBe(true);
+      await expect(await inspectorPO.notificationPO.getSeverity()).toEqual('warn');
+      await expect(await inspectorPO.notificationPO.getTitle()).toEqual('TITLE');
+    });
+
+    it('should open separate notifications if not specifying a group', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // register notification intention
+      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+
+      // display the first notification
+      const notificationOpenerPagePO = await NotificationOpenerPagePO.openInNewTab('app1');
+      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1'});
+      await notificationOpenerPagePO.enterCssClass('testee-1');
+      await notificationOpenerPagePO.clickShow();
+
+      // display another notification
+      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1'});
+      await notificationOpenerPagePO.enterCssClass('testee-2');
+      await notificationOpenerPagePO.clickShow();
+
+      await expect(await appPO.getNotificationCount()).toEqual(2);
     });
 
     it('should throw when not passing params required by the notification provider', async () => {

@@ -93,4 +93,16 @@ export interface WorkbenchMessageBoxConfig {
    * Specifies CSS class(es) added to the message box, e.g. used for e2e testing.
    */
   cssClass?: string | string[];
+
+  /**
+   * Specifies the context in which to open the message box.
+   */
+  context?: {
+    /**
+     * Allows controlling which view to block when opening a view-modal message box.
+     *
+     * By default, when opening the message box in the context of a view, that view is used as the contextual view.
+     */
+    viewId?: string;
+  };
 }
