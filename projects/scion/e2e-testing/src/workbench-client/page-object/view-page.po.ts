@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, selectOption } from '../../helper/testing.util';
+import { assertPageToDisplay, enterText, selectOption, sendKeys } from '../../helper/testing.util';
 import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
 import { SciAccordionPO, SciCheckboxPO, SciParamsEnterPO, SciPropertyPO } from '@scion/toolkit.internal/widgets.po';
 import { $, ElementFinder } from 'protractor';
@@ -218,6 +218,13 @@ export class ViewPagePO {
     finally {
       await accordionPO.collapse();
     }
+  }
+
+  public async sendKeys(...keys: string[]): Promise<void> {
+    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await assertPageToDisplay(this._pageFinder);
+    await this._pageFinder.$('input.e2e-title').click();
+    await sendKeys(...keys);
   }
 
   /**

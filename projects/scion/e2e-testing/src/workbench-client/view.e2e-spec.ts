@@ -13,7 +13,7 @@ import { RouterPagePO } from './page-object/router-page.po';
 import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
 import { RegisterWorkbenchCapabilityPagePO } from './page-object/register-workbench-capability-page.po';
 import { ViewPagePO } from './page-object/view-page.po';
-import { logging } from 'protractor';
+import { Key, logging } from 'protractor';
 import { RegisterWorkbenchIntentionPagePO } from './page-object/register-workbench-intention-page.po';
 import { confirmAlert, consumeBrowserLog, dismissAlert } from '../helper/testing.util';
 import Level = logging.Level;
@@ -545,6 +545,63 @@ describe('Workbench View', () => {
 
     const testee3ViewId = await appPO.findViewTab({cssClass: 'testee-3'}).getViewId();
     await expect(await new ViewPagePO(testee3ViewId).getViewId()).toEqual(testee3ViewId);
+  });
+
+  describe('keystroke bubbling of view context menu items', () => {
+
+    it('should propagate `ctrl+k` for closing the current view', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+      const viewPage1PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage2PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage3PO = await ViewPagePO.openInNewTab('app1');
+
+      await expect(await appPO.getViewTabCount()).toEqual(3);
+
+      // Press 'ctrl+k' in view 2
+      await viewPage2PO.viewTabPO.activate();
+      await viewPage2PO.sendKeys(Key.chord(Key.CONTROL, 'k'));
+
+      await expect(await appPO.getViewTabCount()).toEqual(2);
+      await expect(await viewPage1PO.isPresent()).toBe(true);
+      await expect(await viewPage2PO.isPresent()).toBe(false);
+      await expect(await viewPage3PO.isPresent()).toBe(true);
+    });
+
+    it('should propagate `ctrl+shift+k` for closing other views', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+      const viewPage1PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage2PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage3PO = await ViewPagePO.openInNewTab('app1');
+
+      await expect(await appPO.getViewTabCount()).toEqual(3);
+
+      // Press 'ctrl+shift+k' in view 2
+      await viewPage2PO.viewTabPO.activate();
+      await viewPage2PO.sendKeys(Key.chord(Key.CONTROL, Key.SHIFT, 'k'));
+
+      await expect(await appPO.getViewTabCount()).toEqual(1);
+      await expect(await viewPage1PO.isPresent()).toBe(false);
+      await expect(await viewPage2PO.isPresent()).toBe(true);
+      await expect(await viewPage3PO.isPresent()).toBe(false);
+    });
+
+    it('should propagate `ctrl+shift+alt+k` for closing all views', async () => {
+      await appPO.navigateTo({microfrontendSupport: true});
+      const viewPage1PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage2PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage3PO = await ViewPagePO.openInNewTab('app1');
+
+      await expect(await appPO.getViewTabCount()).toEqual(3);
+
+      // Press 'ctrl+shift+alt+k' in view 2
+      await viewPage2PO.viewTabPO.activate();
+      await viewPage2PO.sendKeys(Key.chord(Key.CONTROL, Key.SHIFT, Key.ALT, 'k'));
+
+      await expect(await appPO.getViewTabCount()).toEqual(0);
+      await expect(await viewPage1PO.isPresent()).toBe(false);
+      await expect(await viewPage2PO.isPresent()).toBe(false);
+      await expect(await viewPage3PO.isPresent()).toBe(false);
+    });
   });
 });
 
