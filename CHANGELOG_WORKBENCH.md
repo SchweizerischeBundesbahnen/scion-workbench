@@ -1,3 +1,30 @@
+# [11.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.5...11.0.0-beta.6) (2021-02-12)
+
+
+### Bug Fixes
+
+* **workbench-client/router:** provide microfrontends with the most recent view capability ([0b8f140](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0b8f140fcc87f5aa2b3672a0e939db9b2c91d993))
+* **workbench/view:** support workbench keystrokes from embedded content ([e031f96](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e031f96a621b86739dcb2242ffbe6f0e7b781b0d))
+
+
+### Code Refactoring
+
+* **workbench/popup:** configure contextual reference(s) via context object ([0591e7a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0591e7a1e0c7080888b4a697ee70995dcb9cbbfc))
+
+
+### Features
+
+* **workbench/message-box:** allow controlling which view to block when opening a view-modal message box ([3434e5b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3434e5bde65d08651c269cf6d602bb8afc0e95c9)), closes [#251](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/251)
+
+
+### BREAKING CHANGES
+
+* **workbench/popup:** Changed popup config for passing contextual reference(s)
+
+  To migrate: Set a popup's view reference via `PopupConfig#context#viewId` instead of `PopupConfig#viewRef`.
+
+
+
 # [11.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.4...11.0.0-beta.5) (2021-02-10)
 
 

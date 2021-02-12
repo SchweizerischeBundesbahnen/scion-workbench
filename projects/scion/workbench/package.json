@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench",
-  "version": "11.0.0-beta.5",
+  "version": "11.0.0-beta.6",
   "description": "SCION Workbench provides a workbench layout for Angular applications useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel.",
   "license": "EPL-2.0",
   "private": false,
@@ -25,8 +25,8 @@
     "@angular/forms": "^11.0.0-rc.0 || ^11.0.0",
     "@angular/router": "^11.0.0-rc.0 || ^11.0.0",
     "@scion/toolkit": ">=11.0.0-beta.7",
-    "@scion/microfrontend-platform": ">= 1.0.0-beta.11",
-    "@scion/workbench-client": ">= 1.0.0-beta.2",
+    "@scion/microfrontend-platform": ">=1.0.0-beta.11",
+    "@scion/workbench-client": ">=1.0.0-beta.5",
     "rxjs": "^6.0.0"
   },
   "keywords": [
