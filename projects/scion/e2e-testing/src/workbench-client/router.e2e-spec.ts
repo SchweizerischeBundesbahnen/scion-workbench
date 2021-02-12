@@ -16,7 +16,7 @@ import { ViewPagePO } from './page-object/view-page.po';
 import { RegisterWorkbenchIntentionPagePO } from './page-object/register-workbench-intention-page.po';
 import { expectPromise } from '../helper/expect-promise-matcher';
 import { assertPageToDisplay, consumeBrowserLog } from '../helper/testing.util';
-import { $, logging } from 'protractor';
+import { $, browser, logging } from 'protractor';
 import { WebdriverExecutionContexts } from '../helper/webdriver-execution-context';
 import { UnregisterWorkbenchCapabilityPagePO } from './page-object/unregister-workbench-capability-page.po';
 import Level = logging.Level;
@@ -947,4 +947,62 @@ describe('Workbench Router', () => {
     // expect the view to be closed
     await expect(await appPO.getViewTabCount()).toEqual(1);
   });
+
+  /**
+   * When having loaded microfrontend 1 of an app, and when then navigating to microfrontend 2 of that app, and when then self-navigating
+   * in microfrontend-2 upon its construction, the router should not navigate back to microfrontend 1.
+   */
+  it('should not navigate back to the previous microfrontend when self-navigating upon microfrontend construction', async () => {
+    await appPO.navigateTo({microfrontendSupport: true, simulateSlowCapabilityLookup: true});
+
+    // register microfrontend-1 view
+    const registerCapabilityApp1PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    await registerCapabilityApp1PO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'microfrontend-1'},
+      properties: {
+        path: 'test-view/view1',
+        title: 'Microfrontend 1',
+        cssClass: 'microfrontend-1',
+      },
+    });
+
+    // register microfrontend-2 view
+    await registerCapabilityApp1PO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'microfrontend-2'},
+      properties: {
+        path: 'test-view/view2',
+        title: 'Microfrontend 2',
+        cssClass: 'microfrontend-2',
+      },
+    });
+
+    // navigate to microfrontend-1 view
+    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    await routerPagePO.enterQualifier({component: 'microfrontend-1'});
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigate();
+
+    // Construct the PO to interact with the opened view
+    const viewId = await appPO.findActiveViewTab().getViewId();
+    const viewTabPO = appPO.findViewTab({viewId});
+    const viewPagePO = new ViewPagePO(viewId);
+
+    // Assert the correct capability to be loaded
+    await expect(await viewPagePO.getPath()).toEqual('/test-view/view1');
+
+    // navigate to microfrontend-2 view
+    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.enterQualifier({component: 'microfrontend-2'});
+    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.selectTarget('self');
+    await routerPagePO.clickNavigate();
+
+    // self-navigate in microfrontend-2 view
+    await viewTabPO.activate();
+    await viewPagePO.navigateSelf({param: 'PARAM'});
+    await browser.sleep(2000);
+    await expect(await viewPagePO.getPath()).toEqual('/test-view/view2');
+  }, 30000 /* simulateSlowCapabilityLookup */);
 });

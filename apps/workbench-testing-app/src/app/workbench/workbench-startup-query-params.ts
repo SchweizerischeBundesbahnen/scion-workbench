@@ -34,6 +34,11 @@ export namespace WorkbenchStartupQueryParams {
   export const CONFIRM_STARTUP_QUERY_PARAM = 'confirmStartup';
 
   /**
+   * Query param to throttle capability lookups to simulate slow capability retrievals.
+   */
+  export const SIMULATE_SLOW_CAPABILITY_LOOKUP = 'simulateSlowCapabilityLookup';
+
+  /**
    * Reads the query param to set the workbench launching strategy.
    */
   export function launcher(): 'APP_INITIALIZER' | 'LAZY' {
@@ -52,6 +57,13 @@ export namespace WorkbenchStartupQueryParams {
    */
   export function confirmStartup(): boolean {
     return coerceBooleanProperty(new URL(window.location.href).searchParams.get(CONFIRM_STARTUP_QUERY_PARAM));
+  }
+
+  /**
+   * Reads the query param if to throttle capability lookups to simulate slow capability retrievals.
+   */
+  export function simulateSlowCapabilityLookup(): boolean {
+    return coerceBooleanProperty(new URL(window.location.href).searchParams.get(SIMULATE_SLOW_CAPABILITY_LOOKUP));
   }
 }
 

@@ -31,6 +31,7 @@ export class AppPO {
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, features?.launcher ?? 'LAZY');
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(features?.microfrontendSupport ?? true) === false}`);
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${features?.confirmStartup ?? false}`);
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${features?.simulateSlowCapabilityLookup ?? false}`);
 
     const featureQueryParams = new URLSearchParams();
     if (features?.stickyStartViewTab !== undefined) {
@@ -721,6 +722,10 @@ export interface Features {
    * Allows pausing the workbench startup by displaying an alert dialog that the user must confirm in order to continue the workbench startup.
    */
   confirmStartup?: boolean;
+  /**
+   * Simulates the slow retrieval of the microfrontend's current view capability by delaying capability lookups by 2000ms.
+   */
+  simulateSlowCapabilityLookup?: boolean;
 }
 
 /**
@@ -741,6 +746,10 @@ enum WorkenchStartupQueryParams {
    * Query param if to display an alert dialog during workbench startup to pause the workbench startup until the user confirms the alert.
    */
   CONFIRM_STARTUP = 'confirmStartup',
+  /**
+   * Query param to throttle capability lookups to simulate slow capability retrievals.
+   */
+  SIMULATE_SLOW_CAPABILITY_LOOKUP = 'simulateSlowCapabilityLookup',
 }
 
 export interface PartPO {
