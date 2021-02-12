@@ -6,6 +6,27 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.4...workbench-client-1.0.0-beta.5) (2021-02-12)
+
+
+### Bug Fixes
+
+* **workbench-client/router:** provide microfrontends with the most recent view capability ([0b8f140](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0b8f140fcc87f5aa2b3672a0e939db9b2c91d993))
+
+
+### Code Refactoring
+
+* **workbench/popup:** configure contextual reference(s) via context object ([0591e7a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0591e7a1e0c7080888b4a697ee70995dcb9cbbfc))
+
+
+### BREAKING CHANGES
+
+* **workbench/popup:** Changed popup config for passing contextual reference(s)
+
+  To migrate: Set a popup's view reference via `PopupConfig#context#viewId` instead of `PopupConfig#viewRef`.
+
+
+
 # [1.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.3...workbench-client-1.0.0-beta.4) (2021-02-10)
 
 
