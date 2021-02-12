@@ -10,15 +10,19 @@
   <sci-form-field label="Component Instance" title="Unique identifier of this component instance">
     <span class="e2e-component-instance-id">{{uuid}}</span>
   </sci-form-field>
+
+  <sci-form-field label="Path">
+    <span class="e2e-path">{{location.path()}}</span>
+  </sci-form-field>
 </section>
 
-<sci-accordion class="view-capability e2e-view-capability" variant="solid">
+<sci-accordion class="view-capability e2e-view-capability" variant="solid" *ngIf="view.capability$ | async as capability">
   <ng-template sciAccordionItem [panel]="panel_capability">
     <header>View Capability</header>
   </ng-template>
   <ng-template #panel_capability>
     <sci-viewport>
-      <div class="e2e-view-capability capability">{{view.capability$ | async | json}}</div>
+      <div class="e2e-view-capability capability">{{capability | json}}</div>
     </sci-viewport>
   </ng-template>
 </sci-accordion>

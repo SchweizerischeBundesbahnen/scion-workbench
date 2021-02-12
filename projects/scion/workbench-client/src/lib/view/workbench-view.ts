@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { merge, MonoTypeOperatorFunction, Observable, Subject, Subscription } from 'rxjs';
+import { merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription } from 'rxjs';
 import { WorkbenchViewCapability } from './workbench-view-capability';
 import { Beans, PreDestroy } from '@scion/toolkit/bean-manager';
 import { ManifestService, mapToBody, MessageClient, MessageHeaders } from '@scion/microfrontend-platform';
-import { distinctUntilChanged, filter, map, mapTo, mergeMap, shareReplay, skip, switchMap, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, mapTo, mergeMap, shareReplay, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Observables } from '@scion/toolkit/util';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
 import { ɵMicrofrontendRouteParams } from '../routing/workbench-router-navigate-command';
@@ -160,10 +160,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
     this.capability$ = this.params$
       .pipe(
         map(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID)),
-        distinctUntilChanged(),
-        switchMap(capabilityId => Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({id: capabilityId})),
-        map(capabilities => capabilities[0]),
-        shareReplay({refCount: true, bufferSize: 1}),
+        lookupViewCapabilityAndShareReplay(),
         takeUntil(this._beforeUnload$),
       );
 
@@ -388,3 +385,27 @@ function coerceMap<K, V>(): MonoTypeOperatorFunction<Map<K, V>> {
  * @see {@link ContextService}
  */
 export const ɵVIEW_ID_CONTEXT_KEY = 'ɵworkbench.view.id'; // tslint:disable-line:variable-name
+
+/**
+ * Looks up the corresponding view capability for each capability id emitted by the source Observable.
+ *
+ * For new subscribers, the most recently looked up capability is replayed. It is guaranteed that no stale capability
+ * is replayed, that is, that the replayed capability always corresponds to the most recent emitted capability id of
+ * the source Observable.
+ */
+function lookupViewCapabilityAndShareReplay(): OperatorFunction<string, WorkbenchViewCapability> {
+  let latestViewCapabilityId: string;
+
+  return pipe(
+    distinctUntilChanged(),
+    tap(viewCapabilityId => latestViewCapabilityId = viewCapabilityId),
+    switchMap(viewCapabilityId => Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({id: viewCapabilityId})), // async call; long-living
+    map(viewCapabilities => viewCapabilities[0]),
+    // Replay the latest looked up capability for new subscribers.
+    shareReplay({refCount: true, bufferSize: 1}),
+    // Ensure not to replay a stale capability upon the subscription of new subscribers. For this reason, we install a filter to filter them out.
+    // The 'shareReplay' operator would replay a stale capability if the source has emitted a new capability id, but the lookup for it did not complete yet.
+    filter(viewCapability => latestViewCapabilityId === viewCapability.metadata.id),
+  );
+}
+

@@ -482,6 +482,115 @@ describe('Workbench View', () => {
     }));
   });
 
+  /**
+   * When having loaded a microfrontend of an app, and when then navigating to another microfrontend of the same app,
+   * the new microfrontend should get its own capability and not the capability of the previous loaded microfrontend.
+   */
+  it('should emit the navigation\'s effective capability when navigating to another microfrontend of the same app', async () => {
+    await appPO.navigateTo({microfrontendSupport: true, simulateSlowCapabilityLookup: true});
+
+    // register testee-1 view in app1
+    const registerCapabilityApp1PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    const capability1Id = await registerCapabilityApp1PO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'testee-1'},
+      properties: {
+        path: 'test-view/view1',
+        title: 'Testee 1',
+        heading: 'app 1',
+        cssClass: 'testee-1',
+      },
+    });
+
+    // register testee-2 view in app1
+    const capability2Id = await registerCapabilityApp1PO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'testee-2'},
+      properties: {
+        path: 'test-view/view2',
+        title: 'Testee 2',
+        heading: 'app 1',
+        cssClass: 'testee-2',
+      },
+    });
+
+    // register testee-3 view in app2
+    const registerCapabilityApp2PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app2');
+    const capability3Id = await registerCapabilityApp2PO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'testee-3'},
+      private: false,
+      properties: {
+        path: 'test-view',
+        title: 'Testee 3',
+        heading: 'app 2',
+        cssClass: 'testee-3',
+      },
+    });
+
+    // allow app1 to open testee-3 view of app2
+    const registerIntentionPage2PO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    await registerIntentionPage2PO.registerIntention({type: 'view', qualifier: {component: 'testee-3'}});
+
+    // navigate to testee-1 view (app1)
+    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    await routerPagePO.enterQualifier({component: 'testee-1'});
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigate();
+
+    // Construct the PO to interact with the opened view
+    const viewId = await appPO.findActiveViewTab().getViewId();
+    const viewTabPO = appPO.findViewTab({viewId});
+    const viewPagePO = new ViewPagePO(viewId);
+
+    // Assert the correct capability to be loaded
+    await expect(await viewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
+    await expect(await consumeBrowserLog(Level.DEBUG, /ViewCapability\$::first/)).toEqual(jasmine.arrayWithExactContents([
+      `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability1Id}]`,
+    ]));
+
+    // navigate to testee-2 view (app1)
+    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.enterQualifier({component: 'testee-2'});
+    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.selectTarget('self');
+    await routerPagePO.clickNavigate();
+
+    // Assert the correct capability to be loaded
+    await viewTabPO.activate();
+    await expect(await viewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({metadata: {id: capability2Id, appSymbolicName: 'workbench-client-testing-app1'}}));
+    await expect(await consumeBrowserLog(Level.DEBUG, /ViewCapability\$::first/)).toEqual(jasmine.arrayWithExactContents([
+      `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability2Id}]`,
+    ]));
+
+    // navigate to testee-1 view (app1)
+    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.enterQualifier({component: 'testee-1'});
+    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.selectTarget('self');
+    await routerPagePO.clickNavigate();
+
+    // Assert the correct capability to be loaded
+    await viewTabPO.activate();
+    await expect(await viewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
+    await expect(await consumeBrowserLog(Level.DEBUG, /ViewCapability\$::first/)).toEqual(jasmine.arrayWithExactContents([
+      `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability1Id}]`,
+    ]));
+
+    // navigate to testee-3 view (app2)
+    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.enterQualifier({component: 'testee-3'});
+    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.clickNavigate();
+
+    // Assert the correct capability to be loaded
+    await viewTabPO.activate();
+    await expect(await viewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({metadata: {id: capability3Id, appSymbolicName: 'workbench-client-testing-app2'}}));
+    await expect(await consumeBrowserLog(Level.DEBUG, /ViewCapability\$::first/)).toEqual(jasmine.arrayWithExactContents([
+      `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability3Id}]`,
+    ]));
+  }, 60000 /* simulateSlowCapabilityLookup */);
+
   it('should provide the view\'s identity', async () => {
     await appPO.navigateTo({microfrontendSupport: true});
 

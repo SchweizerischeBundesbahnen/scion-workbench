@@ -11,11 +11,13 @@
 import { assertPageToDisplay, enterText, selectOption, sendKeys } from '../../helper/testing.util';
 import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
 import { SciAccordionPO, SciCheckboxPO, SciParamsEnterPO, SciPropertyPO } from '@scion/toolkit.internal/widgets.po';
-import { $, ElementFinder } from 'protractor';
+import { $, browser, ElementFinder, protractor } from 'protractor';
 import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
 import { Params } from '@angular/router';
 import { WorkbenchViewCapability } from '@scion/workbench-client';
 import { RouterOutletPO } from './router-outlet.po';
+
+const EC = protractor.ExpectedConditions;
 
 /**
  * Page object to interact {@link ViewPageComponent} of workbench-client testing app.
@@ -72,6 +74,12 @@ export class ViewPagePO {
     return this._pageFinder.$('span.e2e-component-instance-id').getText();
   }
 
+  public async getPath(): Promise<string> {
+    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    await assertPageToDisplay(this._pageFinder);
+    return this._pageFinder.$('span.e2e-path').getText();
+  }
+
   public async getAppInstanceId(): Promise<string> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
@@ -82,7 +90,9 @@ export class ViewPagePO {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 
-    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-view-capability'));
+    const capabilityAccordionFinder = this._pageFinder.$('sci-accordion.e2e-view-capability');
+    await browser.wait(EC.presenceOf(capabilityAccordionFinder), 5000);
+    const accordionPO = new SciAccordionPO(capabilityAccordionFinder);
     await accordionPO.expand();
     try {
       return JSON.parse(await this._pageFinder.$('div.e2e-view-capability').getText());
@@ -201,7 +211,7 @@ export class ViewPagePO {
     // do not close the accordion as this action removes the iframe from the DOM.
   }
 
-  public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace', navigatePerParam?: boolean}): Promise<void> {
+  public async navigateSelf(params: Params, options?: { paramsHandling?: 'merge' | 'replace', navigatePerParam?: boolean }): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 

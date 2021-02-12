@@ -31,6 +31,17 @@ export const POST_MICROFRONTEND_PLATFORM_CONNECT = new InjectionToken<WorkbenchI
 /**
  * A DI token for providing one or more workbench startup initializers.
  *
+ * Initializers registered under this DI token are injected and executed immediately when calling {@link WorkbenchLauncher#launch},
+ * but before running workbench initializers associated with the {@link WORKBENCH_STARTUP} injection token.
+ *
+ * At this point the workbench has not yet initiated the start of the `SCION Microfrontend Platform`. Therefore, this is the place where
+ * the `SCION Microfrontend Platform` can be configured, e.g., by registering interceptors and bean decorators.
+ */
+export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | any>('WORKBENCH_PRE_STARTUP');
+
+/**
+ * A DI token for providing one or more workbench startup initializers.
+ *
  * Initializers registered under this DI token are injected and executed just before the {@link WorkbenchLauncher} completes the workbench
  * startup, that is, after all initializers associated with the {@link WORKBENCH_STARTUP} DI token have completed initialization.
  */

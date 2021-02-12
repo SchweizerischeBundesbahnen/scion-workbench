@@ -27,6 +27,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { InspectNotificationModule } from './inspect-notification-provider/inspect-notification.module';
 import { InspectMessageBoxModule } from './inspect-message-box-provider/inspect-message-box.module';
 import { workbenchManifest } from './workbench-manifest';
+import { provideThrottleCapabilityLookupInterceptor } from './workbench/throttle-capability-lookup-initializer.service';
 
 @NgModule({
   declarations: [
@@ -63,6 +64,7 @@ import { workbenchManifest } from './workbench-manifest';
   ],
   providers: [
     provideConfirmWorkbenchStartupInitializer(),
+    provideThrottleCapabilityLookupInterceptor(),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -73,4 +75,3 @@ export class AppModule {
 function animationModuleIfEnabled(): Type<NoopAnimationsModule | BrowserAnimationsModule> {
   return environment.animationEnabled ? BrowserAnimationsModule : NoopAnimationsModule; // animations should be disabled during e2e test execution
 }
-

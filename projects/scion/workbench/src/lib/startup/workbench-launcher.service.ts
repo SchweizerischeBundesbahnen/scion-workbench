@@ -10,7 +10,7 @@
 
 import { WorkbenchModuleConfig } from '../workbench-module-config';
 import { APP_INITIALIZER, ApplicationInitStatus, Injectable, Injector, Provider } from '@angular/core';
-import { runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_STARTUP } from './workbench-initializer';
+import { runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP } from './workbench-initializer';
 import { Logger, LoggerNames } from '../logging';
 
 /**
@@ -105,6 +105,7 @@ export class WorkbenchLauncher {
       case StartupState.Stopped: {
         this._logger.debug(() => `Starting Workbench. Waiting for workbench initializers to complete. [launcher=${this._injector.get(ApplicationInitStatus).done ? 'LAZY' : 'APP_INITIALIZER'}]`, LoggerNames.LIFECYCLE);
         this._state = StartupState.Starting;
+        await runWorkbenchInitializers(WORKBENCH_PRE_STARTUP, this._injector);
         await runWorkbenchInitializers(WORKBENCH_STARTUP, this._injector);
         this._state = StartupState.Started;
         await runWorkbenchInitializers(WORKBENCH_POST_STARTUP, this._injector);

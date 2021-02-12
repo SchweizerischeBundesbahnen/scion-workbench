@@ -17,6 +17,7 @@ import { EMPTY, MonoTypeOperatorFunction, Subject } from 'rxjs';
 import { finalize, mergeMapTo, startWith, take, takeUntil } from 'rxjs/operators';
 import { APP_INSTANCE_ID } from '../app-instance-id';
 import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
+import { Location } from '@angular/common';
 
 const TITLE = 'title';
 const HEADING = 'heading';
@@ -52,7 +53,8 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
               public view: WorkbenchView,
               public route: ActivatedRoute,
               @Inject(APP_INSTANCE_ID) public appInstanceId: string,
-              private _router: WorkbenchRouter) {
+              private _router: WorkbenchRouter,
+              public location: Location) {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [HEADING]: formBuilder.control(''),
@@ -74,6 +76,15 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
     this.installViewActiveStateLogger();
     this.installObservableCompletionLogger();
     this.setInitialTitleFromParams();
+
+    this.view.capability$
+      .pipe(
+        take(1),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(capability => {
+        console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata.id}]`); // tslint:disable-line:no-console
+      });
   }
 
   public async onClosing(event: ViewClosingEvent): Promise<void> {
