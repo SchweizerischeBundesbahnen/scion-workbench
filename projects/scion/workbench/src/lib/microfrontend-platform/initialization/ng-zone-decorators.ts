@@ -17,7 +17,7 @@ import { observeInside, subscribeInside } from '@scion/toolkit/operators';
 /**
  * Synchronizes Observable emissions of the {@link MessageClient} with the Angular zone.
  *
- * Refer to https://scion-microfrontend-platform-developer-guide.now.sh/#chapter:angular_integration_guide for more information.
+ * Refer to https://scion-microfrontend-platform-developer-guide.vercel.app/#chapter:angular_integration_guide for more information.
  */
 @Injectable()
 export class NgZoneMessageClientDecorator implements BeanDecorator<MessageClient> {
@@ -55,7 +55,7 @@ export class NgZoneMessageClientDecorator implements BeanDecorator<MessageClient
 /**
  * Synchronizes Observable emissions of the {@link IntentClient} with the Angular zone.
  *
- * Refer to https://scion-microfrontend-platform-developer-guide.now.sh/#chapter:angular_integration_guide for more information.
+ * Refer to https://scion-microfrontend-platform-developer-guide.vercel.app/#chapter:angular_integration_guide for more information.
  */
 @Injectable()
 export class NgZoneIntentClientDecorator implements BeanDecorator<IntentClient> {

@@ -17,11 +17,11 @@ export const environment = {
   apps: {
     app1: {
       symbolicName: 'workbench-client-testing-app1',
-      url: 'http://scion-workbench-client-testing-app1.now.sh',
+      url: 'http://scion-workbench-client-testing-app1.vercel.app',
     },
     app2: {
       symbolicName: 'workbench-client-testing-app2',
-      url: 'http://scion-workbench-client-testing-app2.now.sh',
+      url: 'http://scion-workbench-client-testing-app2.vercel.app',
     },
   },
 };
