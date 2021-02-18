@@ -40,7 +40,7 @@ Although SCION Workbench is designed for use in Angular applications, its workbe
 - [**SCION Workbench Demo**][link-demo]\
   See a live demo of the SCION Workbench.
   
-  To explore the workbench and experiment with its features, you can play around with our technical demo app, available at the following URL: https://scion-workbench-testing-app.now.sh.
+  To explore the workbench and experiment with its features, you can play around with our technical demo app, available at the following URL: https://scion-workbench-testing-app.vercel.app.
   
 - [**How To Guides**][link-howto]\
   Get answers to the most common questions when developing an application with SCION Workbench.

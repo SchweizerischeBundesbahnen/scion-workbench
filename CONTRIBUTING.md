@@ -298,9 +298,9 @@ This chapter describes the tasks to publish a new release for `@scion/workbench`
 1. Verify that: 
    - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
    - **Testing Apps** are deployed to:
-      - https://scion-workbench-testing-app.now.sh
-      - https://scion-workbench-client-testing-app1.now.sh (contributes microfrontends)
-      - https://scion-workbench-client-testing-app2.now.sh (contributes microfrontends)
+      - https://scion-workbench-testing-app.vercel.app
+      - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
+      - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
 
 </details>
 
@@ -318,12 +318,12 @@ This chapter describes the tasks to publish a new release for `@scion/workbench-
 1. Verify that: 
    - **@scion/workbench-client** is published to: https://www.npmjs.com/package/@scion/workbench-client.
    - **Testing Apps** are deployed to:
-      - https://scion-workbench-testing-app.now.sh
-      - https://scion-workbench-client-testing-app1.now.sh (contributes microfrontends)
-      - https://scion-workbench-client-testing-app2.now.sh (contributes microfrontends)
+      - https://scion-workbench-testing-app.vercel.app
+      - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
+      - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
    - **API Documentation (TypeDoc)** is deployed to: 
-      - https://scion-workbench-client-api.now.sh
-      - https://scion-workbench-client-api-vX-X-X.now.sh
+      - https://scion-workbench-client-api.vercel.app
+      - https://scion-workbench-client-api-vX-X-X.vercel.app
 </details>
 
 [link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions

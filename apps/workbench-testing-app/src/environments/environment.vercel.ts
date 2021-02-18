@@ -24,8 +24,8 @@ const microfrontendConfig: WorkbenchMicrofrontendConfig = {
       },
     },
     apps: [
-      {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'https://scion-workbench-client-testing-app1.now.sh/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
-      {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'https://scion-workbench-client-testing-app2.now.sh/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
+      {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'https://scion-workbench-client-testing-app1.vercel.app/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
+      {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'https://scion-workbench-client-testing-app2.vercel.app/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
       {symbolicName: 'devtools', manifestUrl: '/assets/manifest-devtools.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
     ],
   },

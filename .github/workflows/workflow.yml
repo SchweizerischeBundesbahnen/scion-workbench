@@ -245,7 +245,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_TESTING_APP_PROJECT_ID }}
-          aliases: scion-workbench-testing-app.now.sh
+          aliases: scion-workbench-testing-app.vercel.app
       - name: 'Deploying workbench-client-testing-app to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
@@ -254,8 +254,8 @@ jobs:
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_TESTING_APP_PROJECT_ID }}
           aliases: |
-            scion-workbench-client-testing-app1.now.sh,
-            scion-workbench-client-testing-app2.now.sh,
+            scion-workbench-client-testing-app1.vercel.app,
+            scion-workbench-client-testing-app2.vercel.app,
   release-workbench:
     name: 'Releasing @scion/workbench'
     if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' }}
@@ -295,8 +295,8 @@ jobs:
           project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_API_PROJECT_ID }}
           version: ${{ needs.build-libs.outputs.workbench-client-version }}
           aliases: |
-            scion-workbench-client-api.now.sh,
-            scion-workbench-client-api-v%v.now.sh
+            scion-workbench-client-api.vercel.app,
+            scion-workbench-client-api-v%v.vercel.app
       - name: 'Publishing @scion/workbench-client to NPM'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/npm-publish@master
         with:

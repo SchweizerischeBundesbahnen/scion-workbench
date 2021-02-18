@@ -31,7 +31,7 @@ On the way to a true workbench layout, we deprecate activities to introduce the 
 
 [link-scion-microfrontend-platform]: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md 
 [link-scion-workbench-client]: https://www.npmjs.com/package/@scion/workbench-client
-[link-scion-workbench-client-api]: https://scion-workbench-client-api.now.sh 
+[link-scion-workbench-client-api]: https://scion-workbench-client-api.vercel.app 
 [link-workbench-module-config.ts]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/blob/master/projects/scion/workbench/src/lib/workbench-module-config.ts
 
 [menu-home]: /README.md
