@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ComponentFactoryResolver, ElementRef, Injector, Type, ViewContainerRef } from '@angular/core';
+import { ComponentFactoryResolver, ElementRef, Injector, StaticProvider, Type, ViewContainerRef } from '@angular/core';
 import { Observable } from 'rxjs';
 
 /**
@@ -56,6 +56,11 @@ export abstract class PopupConfig {
      * ```
      */
     injector?: Injector;
+    /**
+     * Specifies providers to be registered with the popup injector. Unlike providers that are registered via a separate {@link injector},
+     * passed providers are registered in the same injector as the popup handle itself, allowing for dependency injection of the popup handle.
+     */
+    providers?: StaticProvider[];
     /**
      * Sets the component's attachment point in Angular's logical component tree (not the DOM tree used for rendering), effecting when
      * Angular checks the component for changes during a change detection cycle. If not set, inserts the component at the top level
