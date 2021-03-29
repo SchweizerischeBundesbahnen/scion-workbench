@@ -26,7 +26,7 @@ import { ViewDropZoneDirective } from './view-dnd/view-drop-zone.directive';
 import { PartsLayoutComponent } from './layout/parts-layout.component';
 import { WorkbenchLayoutService } from './layout/workbench-layout.service';
 import { ViewComponent } from './view/view.component';
-import { WbRouterOutletDirective } from './routing/wb-router-outlet.directive';
+import { WbRouterOutletComponent } from './routing/wb-router-outlet.component';
 import { TreeNodeComponent } from './layout/tree-node.component';
 import { WbPortalOutletComponent } from './portal/wb-portal-outlet.component';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
@@ -39,7 +39,7 @@ import { WbActivityDirective } from './activity-part/wb-activity.directive';
 import { WorkbenchModuleConfig } from './workbench-module-config';
 import { ContentProjectionDirective } from './content-projection/content-projection.directive';
 import { ContentAsOverlayComponent } from './content-projection/content-as-overlay.component';
-import { ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
+import { ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME, ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD } from './workbench.constants';
 import { EmptyOutletComponent } from './routing/empty-outlet.component';
 import { WbActivityRouteReuseProvider } from './routing/wb-activity-route-reuse-provider.service';
 import { WbRouteReuseStrategy } from './routing/wb-route-reuse-strategy.service';
@@ -121,7 +121,7 @@ import { WORKBENCH_POST_STARTUP } from './startup/workbench-initializer';
     TreeNodeComponent,
     ViewDropZoneDirective,
     WbPortalOutletComponent,
-    WbRouterOutletDirective,
+    WbRouterOutletComponent,
     WbRouterLinkDirective,
     WbRouterLinkWithHrefDirective,
     ContentProjectionDirective,
@@ -285,7 +285,9 @@ export function installWorkbenchRouting(injector: Injector): () => void {
   // We cannot return the lamda directly as this would break the AOT build. Instead, we add a redundant assignment.
   const fn = () => {
     injector.get(WorkbenchUrlObserver);
-    injector.get(WorkbenchAuxiliaryRoutesRegistrator).registerActivityAuxiliaryRoutes();
+    injector.get(WorkbenchAuxiliaryRoutesRegistrator).registerOutletAuxiliaryRoutes(ACTIVITY_OUTLET_NAME, {
+      resolve: {[ACTIVITY_DATA_KEY]: ActivityResolver},
+    });
   };
   return fn;
 }

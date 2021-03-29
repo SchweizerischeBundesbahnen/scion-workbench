@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Intent, IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, RequestError } from '@scion/microfrontend-platform';
+import { Intent, IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, QualifierMatcher, RequestError } from '@scion/microfrontend-platform';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { WorkbenchViewCapability } from '../view/workbench-view-capability';
 import { catchError, take } from 'rxjs/operators';
@@ -18,6 +18,7 @@ import { Dictionary, Maps } from '@scion/toolkit/util';
 import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
 import { ɵWorkbenchRouterNavigateCommand } from './workbench-router-navigate-command';
 import { throwError } from 'rxjs';
+import { filterArray } from '@scion/toolkit/operators';
 
 /**
  * Allows navigating to a microfrontend in a workbench view.
@@ -107,9 +108,18 @@ export class WorkbenchRouter {
    * Returns a Promise that resolves to the requested capabilities. Only capabilities for which the requester is qualified are returned.
    */
   private async lookupViewCapabilities(qualifier: Qualifier): Promise<WorkbenchViewCapability[]> {
-    return await Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View, qualifier})
-      .pipe(take(1))
+    const viewCapabilities = await Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
+      .pipe(
+        filterArray(viewCapability => new QualifierMatcher(viewCapability.qualifier, {evalOptional: true, evalAsterisk: true}).matches(qualifier)),
+        take(1),
+      )
       .toPromise();
+
+    if (viewCapabilities.length === 0) {
+      throw Error(`[NullProviderError] Qualifier matches no view capability. Maybe, the requested view capability is not public API or the providing application not available. [type=${WorkbenchCapabilities.View}, qualifier=${JSON.stringify(qualifier)}]`);
+    }
+
+    return viewCapabilities;
   }
 
   private async currentNavigation(): Promise<CurrentNavigation> {

@@ -86,16 +86,22 @@ export abstract class PopupConfig {
    */
   public readonly closeStrategy?: CloseStrategy;
   /**
-   * Specifies the context in which to display the popup.
+   * Specifies the context in which the popup is opened.
    */
   public readonly context?: {
     /**
+     * Specifies the view from which the popup was opened.
+     *
      * Allows sticking the popup to the lifecycle of a workbench view so that it is only displayed when the referenced view is the active view
      * in its viewpart, or closed when closing the view.
      *
      * By default, when opening the popup in the context of a view, that view is used as the popup's contextual view.
      */
     viewId?: string;
+    /**
+     * Specifies the microfrontend capability from which the popup was opened.
+     */
+    capabilityId?: string;
   };
   /**
    * Specifies the preferred popup size. If not specified, the popup adjusts its size to the content size.

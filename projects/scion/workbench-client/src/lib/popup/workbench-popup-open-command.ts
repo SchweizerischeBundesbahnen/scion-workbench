@@ -25,5 +25,6 @@ export interface ɵWorkbenchPopupCommand { // tslint:disable-line:class-name
   closeStrategy?: CloseStrategy;
   context?: {
     viewId?: string;
+    capabilityId?: string;
   };
 }

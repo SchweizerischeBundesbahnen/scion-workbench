@@ -45,6 +45,10 @@ const routes: Routes = [
     loadChildren: (): any => import('./popup-opener-page/popup-opener-page.module').then(m => m.PopupOpenerPageModule),
     data: {title: 'Workbench Popup', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-popup', pinToStartPage: true},
   },
+  {
+    path: 'host-popup',
+    loadChildren: (): any => import('./host-popup-page/host-popup-page.module').then(m => m.HostPopupPageModule),
+  },
 ];
 
 @NgModule({

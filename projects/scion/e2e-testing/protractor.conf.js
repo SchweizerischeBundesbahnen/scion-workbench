@@ -81,6 +81,9 @@ exports.config = {
     'workbench-client::popup-router': [
       './src/workbench-client/**/popup-router.e2e-spec.ts',
     ],
+    'workbench-client::host-popup': [
+      './src/workbench-client/**/host-popup.e2e-spec.ts',
+    ],
     'workbench-client::popup-size': [
       './src/workbench-client/**/popup-size.e2e-spec.ts',
     ],

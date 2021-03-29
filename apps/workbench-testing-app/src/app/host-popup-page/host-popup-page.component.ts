@@ -9,15 +9,19 @@
  */
 
 import { Component, HostBinding } from '@angular/core';
-import { Popup } from '@scion/workbench';
 import { UUID } from '@scion/toolkit/uuid';
+import { ActivatedRoute } from '@angular/router';
+import { WorkbenchPopup } from '@scion/workbench-client';
 
+/**
+ * Popup component provided by the host app via a popup capability.
+ */
 @Component({
-  selector: 'app-popup-page',
-  templateUrl: './popup-page.component.html',
-  styleUrls: ['./popup-page.component.scss'],
+  selector: 'app-host-popup-page',
+  templateUrl: './host-popup-page.component.html',
+  styleUrls: ['./host-popup-page.component.scss'],
 })
-export class PopupPageComponent {
+export class HostPopupPageComponent {
 
   public uuid = UUID.randomUUID();
 
@@ -41,7 +45,8 @@ export class PopupPageComponent {
 
   public result: string;
 
-  constructor(public popup: Popup) {
+  constructor(public route: ActivatedRoute,
+              public popup: WorkbenchPopup) {
   }
 
   public onClose(): void {

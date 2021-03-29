@@ -62,7 +62,7 @@ export class StartPageComponent implements OnDestroy {
 
     // Read microfrontend views to be pinned to the start page.
     if (workbenchModuleConfig.microfrontends) {
-      this.microfrontendViewCapabilities$ = this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View, qualifier: {'*': '*'}})
+      this.microfrontendViewCapabilities$ = this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
           filterArray(viewCapability => viewCapability?.properties['pinToStartPage'] === true),
           expand(viewCapabilities => this.filterControl.valueChanges.pipe(take(1), mapTo(viewCapabilities))),
