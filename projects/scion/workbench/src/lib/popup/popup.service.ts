@@ -115,6 +115,7 @@ export class PopupService {
       providers: [
         {provide: PopupConfig, useValue: config},
         {provide: Popup, useValue: popupHandle},
+        ...[config.componentConstructOptions?.providers || []],
       ],
     }));
     const componentRef = overlayRef.attach(popupPortal);
