@@ -11,12 +11,13 @@
 import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
 import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
 import { Arrays, Defined } from '@scion/toolkit/util';
-import { Injectable, IterableChanges } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { ACTIVITY_OUTLET_NAME, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX, VIEW_TARGET } from '../workbench.constants';
 import { PartsLayout } from '../layout/parts-layout';
 import { filter, take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
+import { WorkbenchLayoutDiff } from './workbench-layout-differ';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -371,13 +372,9 @@ export interface WorkbenchNavigationContext {
    */
   partsLayout: PartsLayout;
   /**
-   * Parts that are added or removed by this navigation.
+   * Changes in the workbench layout to be applied by the current navigation.
    */
-  partChanges: IterableChanges<string> | null;
-  /**
-   * Views outlets that are added or removed by this navigation.
-   */
-  viewOutletChanges: IterableChanges<string> | null;
+  layoutDiff: WorkbenchLayoutDiff;
 }
 
 /**

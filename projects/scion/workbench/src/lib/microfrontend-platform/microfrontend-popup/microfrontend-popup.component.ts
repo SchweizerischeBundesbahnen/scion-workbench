@@ -62,7 +62,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     // Obtain the microfrontend path.
     const microfrontendPath = popupCapability.properties?.path;
     if (microfrontendPath === undefined || microfrontendPath === null) { // empty path is a valid path
-      this._popup.closeWithError(`[PopupProviderError] Popup has no path to the microfrontend defined.`);
+      this._popup.closeWithError(`[PopupProviderError] Popup capability has no path to the microfrontend defined: ${JSON.stringify(popupCapability)}`);
       return;
     }
 
@@ -123,6 +123,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this._outletRouter.navigate(null, {outlet: this.popupId});
     this._destroy$.next();
   }
 }

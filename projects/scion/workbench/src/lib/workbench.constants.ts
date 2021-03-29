@@ -51,6 +51,11 @@ export const VIEW_PART_REF_PREFIX = 'viewpart.';
 export const VIEW_REF_PREFIX = 'view.';
 
 /**
+ * Specifies the prefix used to name popups.
+ */
+export const POPUP_REF_PREFIX = 'popup.';
+
+/**
  * Name of the query parameter that contains the parts layout in the URL.
  */
 export const PARTS_LAYOUT_QUERY_PARAM = 'parts';

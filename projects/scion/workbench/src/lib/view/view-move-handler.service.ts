@@ -2,12 +2,13 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
 import { ViewDragService, ViewMoveEvent } from '../view-dnd/view-drag.service';
 import { UUID } from '@scion/toolkit/uuid';
-import { Router, UrlSegment } from '@angular/router';
+import { Router } from '@angular/router';
 import { WorkbenchViewRegistry } from './workbench-view.registry';
 import { LocationStrategy } from '@angular/common';
 import { Subject } from 'rxjs';
 import { ɵWorkbenchService } from '../ɵworkbench.service';
 import { WorkbenchRouter } from '../routing/workbench-router.service';
+import { RouterUtils } from '../routing/router.util';
 
 /**
  * Subscribes to view move requests for moving views in the {@link PartsLayout} when the user arranges views via drag and drop or view context menu.
@@ -73,7 +74,7 @@ export class ViewMoveHandler implements OnDestroy {
   private addView(event: ViewMoveEvent): void {
     const addToNewViewPart = (event.target.region || 'center') !== 'center';
 
-    const commands = segmentsToCommands(event.source.viewUrlSegments);
+    const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
     if (addToNewViewPart) {
       const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
       const newPartId = event.target.newPartId || UUID.randomUUID();
@@ -142,19 +143,4 @@ function coerceLayoutAlignment(region: 'north' | 'east' | 'south' | 'west' | 'ce
     default:
       throw Error(`[UnsupportedRegionError] Supported regions are: \'north\', \'east\', \'south\' or \'west\' [actual=${region}]`);
   }
-}
-
-/**
- * Converts URL segments into an array of routable commands.
- *
- * @see UrlSegment
- * @see Router#navigate
- */
-function segmentsToCommands(segments: UrlSegment[]): any[] {
-  return segments.reduce((acc: any[], segment: UrlSegment) => {
-    return acc.concat(
-      segment.path || [],
-      segment.parameters && Object.keys(segment.parameters).length ? segment.parameters : [],
-    );
-  }, []);
 }

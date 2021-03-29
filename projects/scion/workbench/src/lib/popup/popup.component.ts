@@ -58,11 +58,11 @@ export class PopupComponent {
   }
 
   constructor(private _popupConfig: PopupConfig, injector: Injector) {
-    this.portal = new ComponentPortal(this._popupConfig.component, this._popupConfig.componentConstructOptions?.viewContainerRef || null, Injector.create({
-      parent: injector,
-      providers: [
-        {provide: PopupConfig, useValue: undefined}, // Injector barrier for the popup config
-      ],
-    }), this._popupConfig.componentConstructOptions?.componentFactoryResolver || null);
+    this.portal = new ComponentPortal(
+      this._popupConfig.component,
+      this._popupConfig.componentConstructOptions?.viewContainerRef || null,
+      injector,
+      this._popupConfig.componentConstructOptions?.componentFactoryResolver || null,
+    );
   }
 }

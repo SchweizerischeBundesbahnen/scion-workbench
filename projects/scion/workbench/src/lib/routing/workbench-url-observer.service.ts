@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChildrenOutletContexts, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Route, Router, RouterEvent } from '@angular/router';
+import { ChildrenOutletContexts, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { ComponentFactoryResolver, Injectable, Injector, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
@@ -28,6 +28,8 @@ import { WorkbenchNavigationContext, WorkbenchRouter } from './workbench-router.
 import { PartsLayoutFactory } from '../layout/parts-layout.factory';
 import { WorkbenchLayoutDiffer } from './workbench-layout-differ';
 import { Logger, LoggerNames } from '../logging';
+import { WbAddViewToPartGuard } from './add-view-to-part.guard';
+import { WbBeforeDestroyGuard } from '../view/wb-before-destroy.guard';
 
 /**
  * Tracks the browser URL for layout changes.
@@ -42,7 +44,6 @@ import { Logger, LoggerNames } from '../logging';
 export class WorkbenchUrlObserver implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  private _undoRouteRegistrationFn: () => void;
 
   constructor(private _router: Router,
               private _auxRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
@@ -61,15 +62,16 @@ export class WorkbenchUrlObserver implements OnDestroy {
   /** Invoked at the beginning of each navigation */
   private onNavigationStart(event: NavigationStart): void {
     const context = this.computeWorkbenchLayoutDiff(event.url);
-    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, this.navigationContextToString(context));
+    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.partsLayout.parts.map(part => part.partId)}, layoutDiff=${context.layoutDiff.toString()}]`);
     this._workbenchRouter.setCurrentNavigationContext(context);
-    this.registerAddedViewOutletRoutes();
+    this.registerAddedViewOutletAuxiliaryRoutes();
+    this.registerAddedPopupOutletAuxiliaryRoutes();
   }
 
   /** Invoked upon successful navigation */
   private onNavigationEnd(event: NavigationEnd): void {
     this._logger.debug(() => 'onNavigationEnd', LoggerNames.ROUTING, event);
-    this.unregisterRemovedViewOutletRoutes();
+    this.unregisterRemovedOutletAuxiliaryRoutes();
     this.updateViewRegistry();
     this.updateViewPartRegistry();
     this.applyPartsLayout();
@@ -79,16 +81,16 @@ export class WorkbenchUrlObserver implements OnDestroy {
   /** Invoked when cancelled the navigation, e.g., in a guard */
   private onNavigationCancel(event: NavigationCancel): void {
     this._logger.debug(() => 'onNavigationCancel', LoggerNames.ROUTING, event);
+    this.undoAuxiliaryRoutesRegistration();
     this.undoWorkbenchLayoutDiffer();
-    this.undoRouteRegistration();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
 
   /** Invoked when the navigation failed */
   private onNavigationError(event: NavigationError): void {
     this._logger.debug(() => 'onNavigationError', LoggerNames.ROUTING, event);
+    this.undoAuxiliaryRoutesRegistration();
     this.undoWorkbenchLayoutDiffer();
-    this.undoRouteRegistration();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
 
@@ -105,42 +107,41 @@ export class WorkbenchUrlObserver implements OnDestroy {
     const serializedPartsLayout = urlTree.queryParamMap.get(PARTS_LAYOUT_QUERY_PARAM);
     const partsLayout = this._partsLayoutFactory.create(serializedPartsLayout);
     return {
-      ...this._workbenchLayoutDiffer.diff(urlTree, partsLayout),
       partsLayout,
+      layoutDiff: this._workbenchLayoutDiffer.diff(urlTree, partsLayout),
     };
   }
 
   /**
-   * For each view outlet added, registers view specific auxiliary routes of all primary routes.
+   * For each view outlet added, registers view outlet auxiliary routes of all primary routes.
    */
-  private registerAddedViewOutletRoutes(): void {
+  private registerAddedViewOutletAuxiliaryRoutes(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    this._undoRouteRegistrationFn = null;
+    const addedViewOutlets = navigationContext.layoutDiff.addedViews;
 
-    if (!navigationContext.viewOutletChanges) {
-      return;
+    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewOutlets, {canActivate: [WbAddViewToPartGuard], canDeactivate: [WbBeforeDestroyGuard]});
+    if (newAuxiliaryRoutes.length) {
+      this._logger.debug(() => `Registered auxiliary routes for view outlet(s): ${addedViewOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
     }
-
-    const addedViewIds: string[] = [];
-    navigationContext.viewOutletChanges.forEachAddedItem(({item: viewId}) => addedViewIds.push(viewId));
-    if (!addedViewIds.length) {
-      return;
-    }
-
-    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerViewAuxiliaryRoutes(...addedViewIds);
-    this._logger.debug(() => 'Registering view outlet auxiliary routes: ', LoggerNames.ROUTING, newAuxiliaryRoutes);
-
-    // Prepare undo action in case navigation is rejected, e.g. by a routing guard.
-    this._undoRouteRegistrationFn = (): void => {
-      this._logger.debug(() => 'Undoing view outlet auxiliary route registrations: ', LoggerNames.ROUTING, newAuxiliaryRoutes);
-      this._auxRoutesRegistrator.replaceRouterConfig(this._router.config.filter(route => !newAuxiliaryRoutes.includes(route)));
-    };
   }
 
   /**
-   * Reverts the layout differ to the state before navigation started.
+   * For each popup outlet added, registers popup outlet auxiliary routes of all primary routes.
+   */
+  public registerAddedPopupOutletAuxiliaryRoutes(): void {
+    const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
+    const addedPopupOutlets = navigationContext.layoutDiff.addedPopups;
+
+    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedPopupOutlets);
+    if (newAuxiliaryRoutes.length) {
+      this._logger.debug(() => `Registered auxiliary routes for popup outlet(s): ${addedPopupOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
+    }
+  }
+
+  /**
+   * Reverts the layout differ to the state before the navigation.
    *
-   * To be invoked if the navigation failed or was cancelled. Navigation is cancelled when guards perform a redirect or reject navigation.
+   * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
    */
   private undoWorkbenchLayoutDiffer(): void {
     const preNavigateUrl = this._router.url; // Browser URL is only updated after successful navigation
@@ -149,13 +150,17 @@ export class WorkbenchUrlObserver implements OnDestroy {
   }
 
   /**
-   * Undoes the registration of view auxiliary routes.
+   * Undoes the registration of auxiliary routes.
    *
-   * To be invoked if the navigation failed or was cancelled. Navigation is cancelled when guards perform a redirect or reject navigation.
+   * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
    */
-  private undoRouteRegistration(): void {
-    this._undoRouteRegistrationFn && this._undoRouteRegistrationFn();
-    this._undoRouteRegistrationFn = null;
+  private undoAuxiliaryRoutesRegistration(): void {
+    const layoutDiff = this._workbenchRouter.getCurrentNavigationContext().layoutDiff;
+    const addedOutlets: string[] = [...layoutDiff.addedViews, ...layoutDiff.addedPopups];
+    if (addedOutlets.length) {
+      this._auxRoutesRegistrator.unregisterOutletAuxiliaryRoutes(addedOutlets);
+      this._logger.debug(() => `Undo auxiliary routes registration for outlet(s): ${addedOutlets}`, LoggerNames.ROUTING);
+    }
   }
 
   /**
@@ -170,25 +175,15 @@ export class WorkbenchUrlObserver implements OnDestroy {
   }
 
   /**
-   * Unregisters auxiliary routes of removed view outlets.
+   * Unregisters auxiliary routes of removed workbench outlets.
    */
-  private unregisterRemovedViewOutletRoutes(): void {
-    const viewOutletChanges = this._workbenchRouter.getCurrentNavigationContext().viewOutletChanges;
-    if (!viewOutletChanges) {
-      return;
+  private unregisterRemovedOutletAuxiliaryRoutes(): void {
+    const layoutDiff = this._workbenchRouter.getCurrentNavigationContext().layoutDiff;
+    const removedOutlets: string[] = [...layoutDiff.removedViews, ...layoutDiff.removedPopups];
+    if (removedOutlets.length) {
+      this._logger.debug(() => 'Unregistering outlet auxiliary routes: ', LoggerNames.ROUTING, removedOutlets);
+      this._auxRoutesRegistrator.unregisterOutletAuxiliaryRoutes(removedOutlets);
     }
-
-    const routes = this._router.config;
-    const discardedRoutes: Route[] = [];
-    viewOutletChanges.forEachRemovedItem(({item: viewId}) => {
-      discardedRoutes.push(...routes.filter(route => route.outlet === viewId));
-    });
-    if (!discardedRoutes.length) {
-      return;
-    }
-
-    this._logger.debug(() => 'Unregistering view outlet auxiliary routes: ', LoggerNames.ROUTING, discardedRoutes);
-    this._auxRoutesRegistrator.replaceRouterConfig(routes.filter(route => !discardedRoutes.includes(route)));
   }
 
   /**
@@ -196,14 +191,14 @@ export class WorkbenchUrlObserver implements OnDestroy {
    * - For each removed view, destroys the {@link WorkbenchView} and unregisters it in {@link WorkbenchViewRegistry}
    */
   private updateViewRegistry(): void {
-    const {viewOutletChanges, partsLayout} = this._workbenchRouter.getCurrentNavigationContext();
+    const {layoutDiff, partsLayout} = this._workbenchRouter.getCurrentNavigationContext();
 
-    viewOutletChanges?.forEachAddedItem(({item: viewId}) => {
+    layoutDiff.addedViews.forEach(viewId => {
       this._logger.debug(() => `Constructing ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
       this._viewRegistry.register(this.createWorkbenchView(viewId, partsLayout.isViewActive(viewId)));
 
     });
-    viewOutletChanges?.forEachRemovedItem(({item: viewId}) => {
+    layoutDiff.removedViews.forEach(viewId => {
       this._logger.debug(() => `Destroying ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
       this._viewRegistry.remove(viewId);
     });
@@ -215,20 +210,18 @@ export class WorkbenchUrlObserver implements OnDestroy {
    * - Updates part properties, e.g., the active view
    */
   private updateViewPartRegistry(): void {
-    const {partChanges, partsLayout} = this._workbenchRouter.getCurrentNavigationContext();
+    const {layoutDiff, partsLayout} = this._workbenchRouter.getCurrentNavigationContext();
 
     // Register new parts.
-    partChanges?.forEachAddedItem(({item: partId}) => {
+    layoutDiff.addedParts.forEach(partId => {
       this._logger.debug(() => `Constructing ɵWorkbenchViewPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
       this._viewPartRegistry.register(this.createWorkbenchViewPart(partId));
     });
 
     // Destroy parts which are no longer used.
-    const partIdsToRemove: string[] = [];
-    partChanges?.forEachRemovedItem(({item: partId}) => partIdsToRemove.push(partId));
-    if (partIdsToRemove.length) {
+    if (layoutDiff.removedParts.length) {
       // Invoke `preDestroy` lifecycle hook.
-      partIdsToRemove.forEach(partId => {
+      layoutDiff.removedParts.forEach(partId => {
         this._logger.debug(() => `Pre-Destroying ɵWorkbenchViewPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
         this._viewPartRegistry.getElseThrow(partId).preDestroy();
       });
@@ -236,7 +229,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
       // Invoke `destroy` lifecycle hook.
       // IMPORTANT: Destroy parts after notifying about the layout change. Otherwise, moving of the last view to another part
       // would fail because the view would already be destroyed.
-      this._layoutService.whenLayoutChange().then(() => partIdsToRemove.forEach(partId => {
+      this._layoutService.whenLayoutChange().then(() => layoutDiff.removedParts.forEach(partId => {
         this._logger.debug(() => `Destroying ɵWorkbenchViewPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
         this._viewPartRegistry.remove(partId);
       }));
@@ -300,28 +293,6 @@ export class WorkbenchUrlObserver implements OnDestroy {
           this.onGuardsCheckEnd(event);
         }
       });
-  }
-
-  private navigationContextToString(context: WorkbenchNavigationContext): string {
-    const partIds = context.partsLayout.parts.map(part => part.partId);
-
-    const partIdsToAdd: string[] = [];
-    context.partChanges?.forEachAddedItem(({item: partId}) => partIdsToAdd.push(partId));
-    const partIdsToRemove: string[] = [];
-    context.partChanges?.forEachRemovedItem(({item: partId}) => partIdsToRemove.push(partId));
-
-    const viewOutletIdsToAdd: string[] = [];
-    context.viewOutletChanges?.forEachAddedItem(({item: viewId}) => viewOutletIdsToAdd.push(viewId));
-    const viewOutletIdsToRemove: string[] = [];
-    context.viewOutletChanges?.forEachRemovedItem(({item: viewId}) => viewOutletIdsToRemove.push(viewId));
-
-    return `NavigationContext [${[]
-      .concat(`parts=[${partIds}]`)
-      .concat(partIdsToAdd.length ? `partsToAdd=[${partIdsToAdd}]` : [])
-      .concat(partIdsToRemove.length ? `partsToRemove=[${partIdsToRemove}]` : [])
-      .concat(viewOutletIdsToAdd.length ? `viewsToAdd=[${viewOutletIdsToAdd}]` : [])
-      .concat(viewOutletIdsToRemove.length ? `viewsToRemove=[${viewOutletIdsToRemove}]` : [])
-      .join(', ')}]`;
   }
 
   public ngOnDestroy(): void {

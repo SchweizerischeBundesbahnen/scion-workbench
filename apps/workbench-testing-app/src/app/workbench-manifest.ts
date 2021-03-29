@@ -23,5 +23,19 @@ export const workbenchManifest: ApplicationManifest = {
       optionalParams: ['param2'],
       description: 'Allows inspecting a notification.',
     },
+    // TODO [#271]: Remove this popup capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.Popup,
+      qualifier: {
+        component: 'host-popup'
+      },
+      private: false,
+      description: 'Represents a popup provided by the host app.',
+      optionalParams: ['param1'],
+      properties: {
+        path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
+        cssClass: 'host-popup'
+      },
+    },
   ],
 };

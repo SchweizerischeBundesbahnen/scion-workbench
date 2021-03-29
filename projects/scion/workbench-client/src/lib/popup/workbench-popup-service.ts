@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, RequestError } from '@scion/microfrontend-platform';
+import { IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, QualifierMatcher, RequestError } from '@scion/microfrontend-platform';
 import { Beans } from '@scion/toolkit/bean-manager';
 import { catchError, map, take } from 'rxjs/operators';
 import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
@@ -21,6 +21,7 @@ import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
 import { UUID } from '@scion/toolkit/uuid';
 import { WorkbenchPopupCapability } from './workbench-popup-capability';
 import { PopupOrigin, WorkbenchPopupConfig } from './workbench-popup.config';
+import { filterArray } from '@scion/toolkit/operators';
 
 /**
  * Allows displaying a microfrontend in a workbench popup.
@@ -72,6 +73,7 @@ export class WorkbenchPopupService {
     // so that the platform throws an error in case of unqualified interaction.
     await Beans.get(IntentClient).publish<WorkbenchPopupConfig>({type: WorkbenchCapabilities.Popup, qualifier, params: Maps.coerce(config.params)}, {...config, anchor: undefined});
 
+    const view = Beans.opt(WorkbenchView);
     const popupCommand: ɵWorkbenchPopupCommand = {
       popupId: UUID.randomUUID(),
       capability: await this.lookupPopupCapabilityElseReject(qualifier),
@@ -82,7 +84,8 @@ export class WorkbenchPopupService {
         ...Maps.coerce(qualifier),
       ]),
       context: {
-        viewId: Beans.opt(WorkbenchView)?.viewId,
+        viewId: view?.viewId,
+        capabilityId: await view?.capability$.pipe(map(capability => capability.metadata.id), take(1)).toPromise(),
       },
     };
     const popupOriginPublisher = this.observePopupOrigin$(config).subscribe(origin => {
@@ -111,17 +114,20 @@ export class WorkbenchPopupService {
    * Only capabilities for which the requester is qualified are returned.
    */
   private async lookupPopupCapabilityElseReject(qualifier: Qualifier): Promise<WorkbenchPopupCapability> {
-    const capabilityIds = await Beans.get(ManifestService).lookupCapabilities$<WorkbenchPopupCapability>({type: WorkbenchCapabilities.Popup, qualifier})
-      .pipe(take(1))
+    const popupCapabilities = await Beans.get(ManifestService).lookupCapabilities$<WorkbenchPopupCapability>({type: WorkbenchCapabilities.Popup})
+      .pipe(
+        filterArray(popupCapability => new QualifierMatcher(popupCapability.qualifier, {evalOptional: true, evalAsterisk: true}).matches(qualifier)),
+        take(1),
+      )
       .toPromise();
 
-    if (capabilityIds.length === 0) {
-      throw Error(`[NullProviderError] Qualifier matches no popup capability. Maybe, the requested popup capability is not public API or the providing application not available. [type=${WorkbenchCapabilities.Popup}, qualifier=${qualifier}]`);
+    if (popupCapabilities.length === 0) {
+      throw Error(`[NullProviderError] Qualifier matches no popup capability. Maybe, the requested popup capability is not public API or the providing application not available. [type=${WorkbenchCapabilities.Popup}, qualifier=${JSON.stringify(qualifier)}]`);
     }
-    if (capabilityIds.length > 1) {
+    if (popupCapabilities.length > 1) {
       throw Error(`[MultiProviderError] The popup capability cannot be uniquely identified. Multiple providers match the popup qualifier. [type=${WorkbenchCapabilities.Popup}, qualifier=${JSON.stringify(qualifier)}]`);
     }
-    return capabilityIds[0];
+    return popupCapabilities[0];
   }
 
   /**

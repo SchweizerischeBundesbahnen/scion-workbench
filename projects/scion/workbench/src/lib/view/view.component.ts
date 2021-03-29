@@ -13,7 +13,7 @@ import { AsyncSubject, combineLatest, EMPTY, fromEvent, Subject } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { SciViewportComponent } from '@scion/toolkit/viewport';
-import { WbRouterOutletDirective } from '../routing/wb-router-outlet.directive';
+import { WbRouterOutletComponent } from '../routing/wb-router-outlet.component';
 import { WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
 import { MessageBoxService } from '../message-box/message-box.service';
 import { ViewMenuService } from '../view-part/view-context-menu/view-menu.service';
@@ -53,7 +53,7 @@ export class ViewComponent implements OnDestroy {
   }
 
   @ViewChild('router_outlet')
-  public routerOutlet: WbRouterOutletDirective; // specs
+  public routerOutlet: WbRouterOutletComponent; // specs
 
   @HostBinding('attr.data-viewid')
   public get viewId(): string {

@@ -151,6 +151,8 @@ jobs:
             project: workbench-client
           - name: popup-router
             project: workbench-client
+          - name: host-popup
+            project: workbench-client
           - name: popup-size
             project: workbench-client
           - name: message-box
