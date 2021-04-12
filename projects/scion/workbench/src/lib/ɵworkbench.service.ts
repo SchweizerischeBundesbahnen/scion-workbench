@@ -17,6 +17,8 @@ import { Disposable } from './disposable';
 import { WorkbenchService } from './workbench.service';
 import { WorkbenchRouter } from './routing/workbench-router.service';
 import { map } from 'rxjs/operators';
+import { WorkbenchView } from './view/workbench-view.model';
+import { WorkbenchViewRegistry } from './view/workbench-view.registry';
 
 @Injectable()
 export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-line:class-name
@@ -25,7 +27,9 @@ export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   public readonly appInstanceId = UUID.randomUUID();
 
-  constructor(private _wbRouter: WorkbenchRouter, private _layoutService: WorkbenchLayoutService) {
+  constructor(private _wbRouter: WorkbenchRouter,
+              private _viewRegistry: WorkbenchViewRegistry,
+              private _layoutService: WorkbenchLayoutService) {
   }
 
   public destroyView(...viewIds: string[]): Promise<boolean> {
@@ -42,6 +46,10 @@ export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-
 
   public get views$(): Observable<string[]> {
     return this._layoutService.layout$.pipe(map(layout => layout.parts.reduce((viewIds, part) => viewIds.concat(part.viewIds), [])));
+  }
+
+  public getView(viewId: string): WorkbenchView | null {
+    return this._viewRegistry.getElseNull(viewId);
   }
 
   public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {

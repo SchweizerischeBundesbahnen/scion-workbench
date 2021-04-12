@@ -11,6 +11,7 @@
 import { Observable } from 'rxjs';
 import { Disposable } from './disposable';
 import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench.model';
+import { WorkbenchView } from './view/workbench-view.model';
 
 /**
  * Root object for the SCION Workbench.
@@ -45,6 +46,11 @@ export abstract class WorkbenchService {
    * when new views are opened or existing views closed. It never completes.
    */
   public readonly views$: Observable<string[]>;
+
+  /**
+   * Returns a reference to the specified {@link WorkbenchView}, or `null` if not found.
+   */
+  public abstract getView(viewId: string): WorkbenchView | null;
 
   /**
    * Destroys the specified workbench view(s) and associated routed component.
