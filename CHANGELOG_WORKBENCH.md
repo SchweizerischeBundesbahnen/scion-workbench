@@ -1,3 +1,22 @@
+# [11.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.6...11.0.0-beta.7) (2021-04-13)
+
+
+### Features
+
+* **workbench/core:** allow getting a reference to a workbench view ([934ec66](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/934ec668828627a4f25c3fabe28bd4b86e532f6b))
+* **workbench/popup:** allow registering providers for dependency injection ([c2cec23](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c2cec233dda5773a0d7de181c63fcaf4b7a35305))
+* **workbench/popup:** allow the host app to provide popup capabilities ([a4e74b1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a4e74b1430c8cc3dc8fbc9c8de90f6f1d738dab6)), closes [#270](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/270)
+
+
+### BREAKING CHANGES
+
+* **workbench/popup:** Adding support for opening a popup of the host app from within a microfrontend introduced a breaking change in the host/client
+  communication protocol.
+
+  The communication protocol between host and client HAS CHANGED for opening a popup. You need to update host and clients to the new version simultaneously. The API has not changed; the breaking change applies only to the version of `@scion/workbench` and `@scion/workbench-client`. To migrate, upgrade to `@scion/workbench@11.0.0-beta.7` and `@scion/workbench-client@1.0.0-beta.6`, respectively.
+
+
+
 # [11.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.5...11.0.0-beta.6) (2021-02-12)
 
 
