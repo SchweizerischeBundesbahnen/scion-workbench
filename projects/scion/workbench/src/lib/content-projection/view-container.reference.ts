@@ -16,7 +16,7 @@ import { Injectable, InjectionToken, ViewContainerRef } from '@angular/core';
 @Injectable()
 export class ViewContainerReference {
 
-  private _resolve: (host: ViewContainerRef) => void;
+  private _resolve: ((host: ViewContainerRef) => void) | null = null;
   private _promise = new Promise<ViewContainerRef>(resolve => this._resolve = resolve);
 
   /**

@@ -24,6 +24,7 @@ import { ROUTER_OUTLET_NAME } from '../../workbench.constants';
 import { Router } from '@angular/router';
 import { WbRouterOutletComponent } from '../../routing/wb-router-outlet.component';
 import { RouterUtils } from '../../routing/router.util';
+import { Commands } from '../../routing/workbench-router.service';
 
 /**
  * Handles microfrontend popup commands, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
@@ -40,10 +41,11 @@ export class MicrofrontendPopupCommandHandler {
               private _router: Router,
               private _zone: NgZone,
               {symbolicName: hostAppSymbolicName}: MicroApplicationConfig) {
-    this._messageClient.onMessage<ɵWorkbenchPopupCommand>(ɵWorkbenchCommands.popup, async ({body: command}) => {
+    this._messageClient.onMessage<ɵWorkbenchPopupCommand>(ɵWorkbenchCommands.popup, async message => {
+      const command = message.body!;
       this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
 
-      if (command.capability.metadata.appSymbolicName === hostAppSymbolicName) {
+      if (command.capability.metadata!.appSymbolicName === hostAppSymbolicName) {
         return this.openHostComponentPopup(command);
       }
       else {
@@ -164,8 +166,8 @@ export class MicrofrontendPopupCommandHandler {
     // Replace placeholders with the values of the qualifier and params, if any.
     path = RouterUtils.substituteNamedParameters(path, extras.params);
 
-    const outletCommands: any[] = (path !== null ? RouterUtils.segmentsToCommands(RouterUtils.parsePath(this._router, path)) : null);
-    const commands: any[] = [{outlets: {[extras.outletName]: outletCommands}}];
+    const outletCommands: Commands | null = (path !== null ? RouterUtils.segmentsToCommands(RouterUtils.parsePath(this._router, path)) : null);
+    const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
     return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'merge'});
   }
 }

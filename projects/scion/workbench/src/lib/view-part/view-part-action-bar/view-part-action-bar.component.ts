@@ -43,8 +43,8 @@ export class ViewPartActionBarComponent {
   }
 }
 
-function combineAndFilterViewPartActions(align: 'start' | 'end'): OperatorFunction<[WorkbenchViewPartAction[], WorkbenchViewPartAction[], string], WorkbenchViewPartAction[]> {
-  return map(([localActions, globalActions, activeViewId]: [WorkbenchViewPartAction[], WorkbenchViewPartAction[], string]): WorkbenchViewPartAction[] => {
+function combineAndFilterViewPartActions(align: 'start' | 'end'): OperatorFunction<[WorkbenchViewPartAction[], WorkbenchViewPartAction[], string | null], WorkbenchViewPartAction[]> {
+  return map(([localActions, globalActions, activeViewId]: [WorkbenchViewPartAction[], WorkbenchViewPartAction[], string | null]): WorkbenchViewPartAction[] => {
       return [...localActions, ...globalActions]
         .filter(action => (action.align || 'start') === align)
         .filter(action => !action.viewId || action.viewId === activeViewId);

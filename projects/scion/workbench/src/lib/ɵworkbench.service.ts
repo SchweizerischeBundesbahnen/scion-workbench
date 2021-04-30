@@ -25,11 +25,16 @@ export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-
 
   public readonly viewPartActions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
+  public readonly views$: Observable<string[]>;
   public readonly appInstanceId = UUID.randomUUID();
 
   constructor(private _wbRouter: WorkbenchRouter,
               private _viewRegistry: WorkbenchViewRegistry,
               private _layoutService: WorkbenchLayoutService) {
+    this.views$ = this._layoutService.layout$.pipe(map(layout => layout.parts.reduce(
+      (viewIds, part) => viewIds.concat(part.viewIds),
+      new Array<string>())),
+    );
   }
 
   public destroyView(...viewIds: string[]): Promise<boolean> {
@@ -41,11 +46,7 @@ export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-
   }
 
   public resolveViewPart(viewId: string): string {
-    return this._layoutService.layout.findPartByViewId(viewId, {orElseThrow: true}).partId;
-  }
-
-  public get views$(): Observable<string[]> {
-    return this._layoutService.layout$.pipe(map(layout => layout.parts.reduce((viewIds, part) => viewIds.concat(part.viewIds), [])));
+    return this._layoutService.layout!.findPartByViewId(viewId, {orElseThrow: true}).partId;
   }
 
   public getView(viewId: string): WorkbenchView | null {

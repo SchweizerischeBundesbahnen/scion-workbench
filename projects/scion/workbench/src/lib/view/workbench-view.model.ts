@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { UrlSegment } from '@angular/router';
 import { Disposable } from '../disposable';
-import { WorkbenchMenuItem} from '../workbench.model';
+import { WorkbenchMenuItem } from '../workbench.model';
 import { WorkbenchViewPart } from '../view-part/workbench-view-part.model';
 
 /**
@@ -13,24 +13,24 @@ export abstract class WorkbenchView {
   /**
    * View outlet identity which is unique in this application.
    */
-  public readonly viewId: string;
+  public abstract readonly viewId: string;
 
   /**
    * The viewpart which contains this view.
    *
    * Note: the viewpart of a view can change, e.g. when the view is moved to another viewpart.
    */
-  public readonly part: WorkbenchViewPart;
+  public abstract readonly part: WorkbenchViewPart | null;
 
   /**
    * Specifies the title to be displayed in the view tab.
    */
-  public title: string;
+  public abstract title: string | null;
 
   /**
    * Specifies the sub title to be displayed in the view tab.
    */
-  public heading: string;
+  public abstract heading: string | null;
 
   /**
    * Specifies CSS class(es) added to the <wb-view-tab> and <wb-view> elements, e.g. used for e2e testing.
@@ -40,54 +40,61 @@ export abstract class WorkbenchView {
   /**
    * Returns CSS classes specified, if any.
    */
-  public abstract get cssClasses(): string[];
+  public abstract readonly cssClasses: string[];
 
   /**
    * Specifies if the content of the current view is dirty.
    * If dirty, a dirty marker is displayed in the view tab.
    */
-  public dirty: boolean;
+  public abstract dirty: boolean;
 
   /**
    * Specifies if the view is blocked, e.g., not interactable because of showing a view-modal message box.
    */
-  public blocked: boolean;
+  public abstract blocked: boolean;
 
   /**
    * Specifies if a close button should be displayed in the view tab.
    */
-  public closable: boolean;
+  public abstract closable: boolean;
 
   /**
    * Indicates whether this view is the active viewpart view.
    */
-  public abstract get active(): boolean;
+  public abstract readonly active: boolean;
 
   /**
    * Indicates whether this view is the active viewpart view.
    * Emits the current state upon subscription.
    */
-  public abstract get active$(): Observable<boolean>;
+  public abstract readonly active$: Observable<boolean>;
 
   /**
    * The position of this view in the tabbar.
    */
-  public readonly position: number;
+  public abstract readonly position: number;
 
   /**
    * `True` when this view is the first view in the tabbar.
    */
-  public readonly first: boolean;
+  public abstract readonly first: boolean;
 
   /**
    * `True` when this view is the last view in the tabbar.
    */
-  public readonly last: boolean;
+  public abstract readonly last: boolean;
 
   /**
    * Indicates whether this view is destroyed.
    */
-  public abstract get destroyed(): boolean;
+  public abstract readonly destroyed: boolean;
+
+  /**
+   * Returns the URL segments of this view.
+   *
+   * A {@link UrlSegment} is a part of a URL between the two slashes. It contains a path and the matrix parameters associated with the segment.
+   */
+  public abstract readonly urlSegments: UrlSegment[];
 
   /**
    * Destroys this view (or sibling views) and the associated routed component.
@@ -110,13 +117,6 @@ export abstract class WorkbenchView {
    * Moves this view to a new part in the specified region, or to a new browser window if 'blank-window'.
    */
   public abstract move(region: 'north' | 'south' | 'west' | 'east' | 'blank-window'): Promise<boolean>;
-
-  /**
-   * Returns the URL segments of this view.
-   *
-   * A {@link UrlSegment} is a part of a URL between the two slashes. It contains a path and the matrix parameters associated with the segment.
-   */
-  public abstract get urlSegments(): UrlSegment[];
 
   /**
    * Registers a menu item which is added to the context menu of the view tab.

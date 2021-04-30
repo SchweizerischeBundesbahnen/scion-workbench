@@ -137,7 +137,7 @@ export class WorkbenchStartup {
   private _started = false;
 
   /* @internal */
-  public notifyStarted: () => void;
+  public notifyStarted!: () => void;
 
   /**
    * Promise that resolves when the workbench has completed the startup.

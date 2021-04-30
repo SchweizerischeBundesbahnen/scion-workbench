@@ -180,6 +180,8 @@ export class PartsLayout {
    *
    * By providing an options object, you can control if to throw an error if not found.
    */
+  public findPart(partId: string, options: { orElseThrow: true }): Readonly<NonNullable<MPart>>;
+  public findPart(partId: string, options: { orElseThrow: false } | {}): Readonly<MPart | null>;
   public findPart(partId: string, options: { orElseThrow: boolean }): Readonly<MPart | null> {
     return this._findPart(partId, options);
   }
@@ -189,6 +191,8 @@ export class PartsLayout {
    *
    * By providing an object object, you can control if to throw an error if not found.
    */
+  public findPartByViewId(viewId: string, options: { orElseThrow: true }): Readonly<NonNullable<MPart>>;
+  public findPartByViewId(viewId: string, options: { orElseThrow: false } | {}): Readonly<MPart | null>;
   public findPartByViewId(viewId: string, options: { orElseThrow: boolean }): Readonly<MPart | null> {
     assertNotNullish(viewId, {orElseThrow: () => Error(`[PartsLayoutError] ViewId must not be 'null' or 'undefined'.`)});
     return this._findPartByViewId(viewId, options);
@@ -202,6 +206,8 @@ export class PartsLayout {
    * @param options - Controls the serialization into a URL-safe base64 string.
    *                  - `nullIfEmpty`: if `true` (or if not specified), returns `null` if containing a single root part with no views added to it.
    */
+  public serialize(options: { nullIfEmpty: false }): string;
+  public serialize(options?: { nullIfEmpty?: true } | {}): string | null;
   public serialize(options?: { nullIfEmpty?: boolean }): string | null {
     if ((options?.nullIfEmpty ?? true) && this._root instanceof MPart && this._root.isEmpty()) {
       return null;
@@ -258,23 +264,22 @@ export class PartsLayout {
   private _removePart(partId: string): this {
     assertNotNullish(partId, {orElseThrow: () => Error(`[PartsLayoutError] PartId must not be 'null' or 'undefined'.`)});
 
-    const part = this._findPart(partId, {orElseThrow: true});
-
     // The last part is never removed.
     if (this.parts.length === 1) {
       return this;
     }
 
+    const part = this._findPart(partId, {orElseThrow: true});
     const partIndex = this.parts.indexOf(part);
-    const siblingElement = (part.parent.child1 === part ? part.parent.child2 : part.parent.child1);
-    if (!part.parent.parent) {
+    const siblingElement = (part.parent!.child1 === part ? part.parent!.child2 : part.parent!.child1);
+    if (!part.parent!.parent) {
       this._root = siblingElement;
     }
-    else if (part.parent.parent.child1 === part.parent) {
-      part.parent.parent.child1 = siblingElement;
+    else if (part.parent!.parent.child1 === part.parent) {
+      part.parent!.parent.child1 = siblingElement;
     }
     else {
-      part.parent.parent.child2 = siblingElement;
+      part.parent!.parent.child2 = siblingElement;
     }
 
     // If the removed part was the active part, make it's adjacent part the active part.
@@ -398,6 +403,8 @@ export class PartsLayout {
     return this;
   }
 
+  private _findPart(partId: string, options: { orElseThrow: true }): NonNullable<MPart>;
+  private _findPart(partId: string, options: { orElseThrow: false } | {}): MPart | null;
   private _findPart(partId: string, options: { orElseThrow: boolean }): MPart | null {
     assertNotNullish(partId, {orElseThrow: () => Error(`[PartsLayoutError] PartId must not be 'null' or 'undefined'.`)});
     const part = this._findTreeElements(element => element instanceof MPart && element.partId === partId, {findFirst: true})[0] as MPart;
@@ -407,6 +414,8 @@ export class PartsLayout {
     return part || null;
   }
 
+  private _findPartByViewId(viewId: string, options: { orElseThrow: true }): NonNullable<MPart>;
+  private _findPartByViewId(viewId: string, options: { orElseThrow: false } | {}): MPart | null;
   private _findPartByViewId(viewId: string, options: { orElseThrow: boolean }): MPart | null {
     assertNotNullish(viewId, {orElseThrow: () => Error(`[PartsLayoutError] ViewId must not be 'null' or 'undefined'.`)});
     const part = this._findTreeElements(element => element instanceof MPart && element.viewIds.includes(viewId), {findFirst: true})[0] as MPart;
@@ -416,6 +425,8 @@ export class PartsLayout {
     return part || null;
   }
 
+  private _findTreeNode(nodeId: string, options: { orElseThrow: true }): NonNullable<MTreeNode>;
+  private _findTreeNode(nodeId: string, options: { orElseThrow: false } | {}): MTreeNode | null;
   private _findTreeNode(nodeId: string, options: { orElseThrow: boolean }): MTreeNode | null {
     assertNotNullish(nodeId, {orElseThrow: () => Error(`[PartsLayoutError] NodeId must not be 'null' or 'undefined'.`)});
 
@@ -468,9 +479,8 @@ function createRootLayout(workbenchAccessor: PartsLayoutWorkbenchAccessor): MPar
 
 /**
  * Serializes this layout into a URL-safe base64 string.
- * Returns `null` if the layout is empty.
  */
-function serializeLayout(layout: MPartsLayout): string | null {
+function serializeLayout(layout: MPartsLayout): string {
   return btoa(JSON.stringify(layout, (key, value) => {
     return (key === 'parent') ? undefined : value; // do not serialize node parents.
   }));
@@ -491,14 +501,14 @@ function deserializeLayout(serializedLayout: string): MPartsLayout {
   });
 
   // Link parent tree nodes
-  (function linkParentNodes(node: MTreeNode | MPart, parent: MTreeNode): void {
+  (function linkParentNodes(node: MTreeNode | MPart, parent: MTreeNode | undefined): void {
     node.parent = parent;
 
     if (node instanceof MTreeNode) {
       linkParentNodes(node.child1, node);
       linkParentNodes(node.child2, node);
     }
-  })(layout.root, null);
+  })(layout.root, undefined);
 
   return layout;
 }

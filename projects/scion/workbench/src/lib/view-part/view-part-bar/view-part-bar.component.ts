@@ -37,29 +37,29 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   private _host: HTMLElement;
 
   @ViewChildren(ViewTabComponent)
-  private _viewTabs: QueryList<ViewTabComponent>;
+  private _viewTabs!: QueryList<ViewTabComponent>;
 
   @ViewChild(SciViewportComponent, {static: true})
-  private _viewport: SciViewportComponent;
+  private _viewport!: SciViewportComponent;
 
   @ViewChild(ViewListButtonComponent, {static: true, read: ElementRef})
-  private _viewListButtonElement: ElementRef<HTMLElement>;
+  private _viewListButtonElement!: ElementRef<HTMLElement>;
 
   /**
    * Transfer data of the view being dragged over this tabbar.
    */
-  public dragData: ViewDragData;
+  public dragData: ViewDragData | null = null;
 
   /**
    * Reference to the viewtab over which the user is dragging a viewtab.
    */
-  public dropTargetViewTab: ViewTabComponent;
+  public dropTargetViewTab: ViewTabComponent | null = null;
 
   /**
    * Reference to the viewtab on which the drag operation started.
    * This reference is only set if the drag operation started on a viewtab of this tabbar.
    */
-  public dragSourceViewTab: ViewTabComponent;
+  public dragSourceViewTab: ViewTabComponent | null = null;
 
   /**
    * Indicates if the user is dragging a viewtab over this component.
@@ -72,19 +72,19 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
    * Indicates if the user is dragging over the viewtab where the drag operation started.
    */
   public get isDragSourceDragOver(): boolean {
-    return this.dragSourceViewTab && this.dropTargetViewTab === this.dragSourceViewTab;
+    return !!this.dragSourceViewTab && this.dropTargetViewTab === this.dragSourceViewTab;
   }
 
   /**
    * Indicates if the user is dragging a viewtab over a valid viewtab drop slot,
    * which is either when dragging over a viewtab or the tabbar tail.
    */
-  public isTabDropSlotDragOver: boolean;
+  public isTabDropSlotDragOver = false;
 
   /**
    * Indicates if the user is auto scrolling the viewtabs.
    */
-  public isAutoScroll: boolean;
+  public isAutoScroll = false;
 
   /**
    * Locks the y-axis of the viewtab drag image to snap it to the tabbar while dragging over.
@@ -156,7 +156,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   @HostListener('dragstart')
   public onViewDragStart(): void {
     this.dragData = this._viewDragService.getViewDragData();
-    this.dragSourceViewTab = this.dropTargetViewTab = this._viewTabs.find(viewTab => viewTab.viewId === this.dragData.viewId);
+    this.dragSourceViewTab = this.dropTargetViewTab = this._viewTabs.find(viewTab => viewTab.viewId === this.dragData!.viewId)!;
   }
 
   /**
@@ -172,7 +172,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
    */
   private onTabbarDragEnter(): void {
     this.dragData = this._viewDragService.getViewDragData();
-    setCssVariable(this._host, '--drag-source-width', `${this.dragData.viewTabWidth}px`);
+    setCssVariable(this._host, '--drag-source-width', `${this.dragData!.viewTabWidth}px`);
 
     // Lock the y-axis to snap the view drag image to the view tabbar.
     this._viewTabDragImageRenderer.setConstrainDragImageRectFn(this.constrainFn);
@@ -190,13 +190,13 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     // Determine over which viewtab the user is dragging.
     this.dropTargetViewTab = this._viewTabs.find(viewTab => {
       return pointerOffsetX >= viewTab.host.offsetLeft && pointerOffsetX <= viewTab.host.offsetLeft + viewTab.host.offsetWidth;
-    });
+    })!;
 
     // Compute if the user is dragging over a viewtab drop slot. A drop slot is some valid drop target within the tabbar,
     // which is either when dragging over a viewtab or the tabbar tail.
     const lastViewTab = Arrays.last(this._viewTabs.toArray(), viewTab => viewTab !== this.dragSourceViewTab);
     const viewTabsWidth = lastViewTab ? (lastViewTab.host.offsetLeft + lastViewTab.host.offsetWidth) : 0;
-    this.isTabDropSlotDragOver = pointerOffsetX <= viewTabsWidth + this.dragData.viewTabWidth;
+    this.isTabDropSlotDragOver = pointerOffsetX <= viewTabsWidth + this.dragData!.viewTabWidth;
   }
 
   /**
@@ -221,13 +221,13 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const dropIndex = this._viewTabs.toArray().indexOf(this.dropTargetViewTab);
+    const dropIndex = this._viewTabs.toArray().indexOf(this.dropTargetViewTab!);
     this._viewDragService.dispatchViewMoveEvent({
       source: {
-        appInstanceId: this.dragData.appInstanceId,
-        partId: this.dragData.partId,
-        viewId: this.dragData.viewId,
-        viewUrlSegments: this.dragData.viewUrlSegments,
+        appInstanceId: this.dragData!.appInstanceId,
+        partId: this.dragData!.partId,
+        viewId: this.dragData!.viewId,
+        viewUrlSegments: this.dragData!.viewUrlSegments,
       },
       target: {
         appInstanceId: this._workbench.appInstanceId,

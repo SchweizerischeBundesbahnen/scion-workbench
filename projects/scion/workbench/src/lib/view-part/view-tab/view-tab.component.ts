@@ -43,8 +43,8 @@ export class ViewTabComponent implements OnDestroy {
   private _context: 'tabbar' | 'tabbar-dropdown';
 
   public host: HTMLElement;
-  public view: ɵWorkbenchView;
-  public viewTabContentPortal: ComponentPortal<any>;
+  public view!: ɵWorkbenchView;
+  public viewTabContentPortal!: ComponentPortal<any>;
 
   @Input()
   @HostBinding('attr.data-viewid')
@@ -125,6 +125,10 @@ export class ViewTabComponent implements OnDestroy {
   @HostListener('dragstart', ['$event'])
   public onDragStart(event: DragEvent): void {
     this._viewPart.activateView(this.viewId).then(() => {
+      if (!event.dataTransfer) {
+        return;
+      }
+
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer.setData(VIEW_DRAG_TRANSFER_TYPE, this.view.viewId);
       // Use an invisible <div> as the native drag image because the effective drag image is rendered by {ViewTabDragImageRenderer}.
@@ -132,8 +136,8 @@ export class ViewTabComponent implements OnDestroy {
 
       this._viewDragService.setViewDragData({
         viewId: this.view.viewId,
-        viewTitle: this.view.title,
-        viewHeading: this.view.heading,
+        viewTitle: this.view.title ?? '',
+        viewHeading: this.view.heading ?? '',
         viewClosable: this.view.closable,
         viewDirty: this.view.dirty,
         viewUrlSegments: this.view.urlSegments,
@@ -150,7 +154,7 @@ export class ViewTabComponent implements OnDestroy {
   @HostListener('dragend', ['$event'])
   public onDragEnd(event: DragEvent): void {
     // Ensure this view stays activated if the user cancels the drag operation.
-    if (event.dataTransfer.dropEffect === 'none') {
+    if (event.dataTransfer?.dropEffect === 'none') {
       this._viewPart.activateView(this.viewId).then();
     }
     this._viewDragService.unsetViewDragData();
@@ -211,7 +215,7 @@ export class ViewTabComponent implements OnDestroy {
       .pipe(
         switchMap(() => this.view.cssClasses$),
         map(cssClasses => differ.diff(cssClasses)),
-        filter(Boolean),
+        filter((diff): diff is IterableChanges<string> => diff !== null),
         takeUntil(this._destroy$),
       )
       .subscribe((diff: IterableChanges<string>) => {

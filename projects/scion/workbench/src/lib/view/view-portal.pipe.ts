@@ -22,7 +22,10 @@ export class ViewPortalPipe implements PipeTransform {
   constructor(private _viewRegistry: WorkbenchViewRegistry) {
   }
 
-  public transform<T>(viewId: string): WbComponentPortal<ViewComponent> | null {
-    return this._viewRegistry.getElseNull(viewId)?.portal;
+  public transform<T>(viewId: string | null): WbComponentPortal<ViewComponent> | null {
+    if (!viewId) {
+      return null;
+    }
+    return this._viewRegistry.getElseNull(viewId)?.portal ?? null;
   }
 }

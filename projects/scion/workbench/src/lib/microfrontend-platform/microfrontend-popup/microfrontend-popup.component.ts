@@ -31,17 +31,17 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   private _focusWithin$ = new Subject<boolean>();
   private _popupContext: ɵPopupContext;
 
-  public microfrontendCssClasses: string[];
+  public microfrontendCssClasses!: string[];
 
   @ViewChild('router_outlet', {static: true})
-  public routerOutletElement: ElementRef<SciRouterOutletElement>;
+  public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
   constructor(private _popup: Popup<ɵPopupContext>,
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
               private _messageClient: MessageClient,
               private _logger: Logger) {
-    this._popupContext = this._popup.input;
+    this._popupContext = this._popup.input!;
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
   }
 
@@ -53,9 +53,9 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     const popupCapability = this._popupContext.capability;
 
     // Obtain the capability provider.
-    const application = this.lookupApplication(popupCapability.metadata.appSymbolicName);
+    const application = this.lookupApplication(popupCapability.metadata!.appSymbolicName);
     if (!application) {
-      this._popup.closeWithError(`[NullApplicationError] Unexpected. Cannot resolve application '${popupCapability.metadata.appSymbolicName}'.`);
+      this._popup.closeWithError(`[NullApplicationError] Unexpected. Cannot resolve application '${popupCapability.metadata!.appSymbolicName}'.`);
       return;
     }
 
@@ -92,10 +92,10 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
     // Make the popup context available to embedded content.
     this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
-    this.microfrontendCssClasses = ['e2e-popup', `e2e-${popupCapability.metadata.appSymbolicName}`, ...Arrays.coerce(popupCapability.properties.cssClass)];
+    this.microfrontendCssClasses = ['e2e-popup', `e2e-${popupCapability.metadata!.appSymbolicName}`, ...Arrays.coerce(popupCapability.properties.cssClass)];
 
     // Navigate to the microfrontend.
-    this._logger.debug(() => `Loading microfrontend into workbench popup [app=${popupCapability.metadata.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, popupCapability);
+    this._logger.debug(() => `Loading microfrontend into workbench popup [app=${popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, popupCapability);
     await this._outletRouter.navigate(microfrontendPath, {
       outlet: this.popupId,
       relativeTo: application.baseUrl,

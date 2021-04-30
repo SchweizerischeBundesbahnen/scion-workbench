@@ -15,12 +15,12 @@ export abstract class WorkbenchViewPart {
   /**
    * Emits the currently active view in this viewpart.
    */
-  public abstract get activeViewId$(): Observable<string | null>;
+  public abstract readonly activeViewId$: Observable<string | null>;
 
   /**
    * The currently active view, if any.
    */
-  public abstract get activeViewId(): string | null;
+  public abstract readonly activeViewId: string | null;
 
   /**
    * Emits the views opened in this viewpart.
@@ -28,9 +28,12 @@ export abstract class WorkbenchViewPart {
    * Upon subscription, the currently opened views are emitted, and then emits continuously
    * when new views are opened or existing views closed. It never completes.
    */
-  public abstract get viewIds$(): Observable<string[]>;
+  public abstract readonly viewIds$: Observable<string[]>;
 
-  public abstract get viewIds(): string[];
+  /**
+   * The currently opened views in this viewpart.
+   */
+  public abstract readonly viewIds: string[];
 
   /**
    * Emits the actions of this viewpart.
@@ -38,7 +41,7 @@ export abstract class WorkbenchViewPart {
    * Upon subscription, the actions are emitted, and then emits continuously
    * when new actions are added or removed. It never completes.
    */
-  public abstract get actions$(): Observable<WorkbenchViewPartAction[]>;
+  public abstract readonly actions$: Observable<WorkbenchViewPartAction[]>;
 
   /**
    * Registers an action with this viewpart.

@@ -11,7 +11,7 @@ import { MessageBox } from './message-box';
 })
 export class TextMessageComponent {
 
-  public text: string;
+  public text?: string;
 
   constructor(messageBox: MessageBox<string>) {
     this.text = messageBox.input;

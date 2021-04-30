@@ -21,7 +21,7 @@ import { WorkbenchRouter } from '../routing/workbench-router.service';
 
 export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disable-line:class-name
 
-  private _part: MPart;
+  private _part!: MPart;
   private _hiddenViewTabs = new Set<string>();
   private _hiddenViewTabs$ = new BehaviorSubject<string[]>([]);
   private _layoutService: WorkbenchLayoutService;
@@ -45,15 +45,15 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
 
     this._part = part;
     viewIdsChange && this.viewIds$.next(part.viewIds);
-    activeViewChange && this.activeViewId$.next(part.activeViewId);
+    activeViewChange && this.activeViewId$.next(part.activeViewId ?? null);
   }
 
   public get viewIds(): string[] {
     return this._part.viewIds;
   }
 
-  public get activeViewId(): string {
-    return this._part.activeViewId;
+  public get activeViewId(): string | null {
+    return this._part.activeViewId ?? null;
   }
 
   public registerViewPartAction(action: WorkbenchViewPartAction): Disposable {
@@ -109,15 +109,15 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
    * Note: This instruction runs asynchronously via URL routing.
    */
   public async activateSiblingView(): Promise<boolean> {
-    if (this._markedForDestruction) {
+    if (this._markedForDestruction || !this.activeViewId) {
       return false;
     }
 
-    return this._wbRouter.ɵnavigate(layout => layout.activateAdjacentView(this.activeViewId));
+    return this._wbRouter.ɵnavigate(layout => layout.activateAdjacentView(this.activeViewId!));
   }
 
   public isActive(): boolean {
-    return (this._layoutService.layout.activePart.partId === this.partId);
+    return (this._layoutService.layout?.activePart.partId === this.partId);
   }
 
   public setHiddenViewTabs(viewIds: string[]): void {

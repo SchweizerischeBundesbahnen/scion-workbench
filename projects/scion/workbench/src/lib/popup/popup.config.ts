@@ -29,14 +29,14 @@ export abstract class PopupConfig {
    *
    * The align setting can be used to further control where the popup opens relative to its anchor.
    */
-  public readonly anchor: ElementRef<Element> | Element | PopupOrigin | Observable<PopupOrigin>;
+  public abstract readonly anchor: ElementRef<Element> | Element | PopupOrigin | Observable<PopupOrigin>;
   /**
    * Specifies the component to display in the popup.
    *
    * In the component, you can inject the popup handle {@link Popup} to interact with the popup, such as to close it
    * or obtain its input data.
    */
-  public readonly component: Type<any>;
+  public abstract readonly component: Type<any>;
   /**
    * Instructs Angular how to construct the component. In most cases, construct options need not to be set.
    */
@@ -179,12 +179,12 @@ export abstract class Popup<T = any> {
   /**
    * Input data as passed by the popup opener when opened the popup, or `undefined` if not passed.
    */
-  public readonly input: T;
+  public abstract readonly input: T | undefined;
 
   /**
    * Preferred popup size as specified by the popup opener, or `undefined` if not set.
    */
-  public readonly size: PopupSize | undefined;
+  public abstract readonly size: PopupSize | undefined;
 
   /**
    * Closes the popup. Optionally, pass a result to the popup opener.
@@ -202,11 +202,11 @@ export abstract class Popup<T = any> {
  */
 export class ɵPopup implements Popup { // tslint:disable-line:class-name
 
-  private _closeResolveFn: (result: any | undefined) => void;
+  private _closeResolveFn!: (result: any | undefined) => void;
 
   public readonly whenClose = new Promise<any | undefined>(resolve => this._closeResolveFn = resolve);
 
-  constructor(public readonly input: any | undefined, public readonly size: PopupSize) {
+  constructor(public readonly input: any | undefined, public readonly size: PopupSize | undefined) {
   }
 
   /**

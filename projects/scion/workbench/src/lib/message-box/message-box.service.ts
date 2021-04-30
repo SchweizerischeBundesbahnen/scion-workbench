@@ -46,7 +46,7 @@ export class MessageBoxService implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
   private _messageBoxes$ = new BehaviorSubject<ɵMessageBox[]>([]);
-  private _messageBoxServiceHierarchy: MessageBoxService[];
+  private _messageBoxServiceHierarchy: [MessageBoxService, ...MessageBoxService[]]; // minItems: 1
 
   constructor(@Optional() @SkipSelf() private _parentMessageBoxService: MessageBoxService,
               @Optional() private _view: WorkbenchView,
@@ -88,7 +88,7 @@ export class MessageBoxService implements OnDestroy {
     }
 
     if (config.modality === 'application') {
-      return Arrays.last(this._messageBoxServiceHierarchy).addMessageBox(config);
+      return Arrays.last(this._messageBoxServiceHierarchy)!.addMessageBox(config);
     }
     else if (config.context?.viewId) {
       const view = this._viewRegistry.getElseThrow(config.context.viewId);
@@ -133,13 +133,13 @@ export class MessageBoxService implements OnDestroy {
   /**
    * Returns the message box service hierarchy.
    */
-  private computeMessageBoxServiceHierarchy(): MessageBoxService[] {
+  private computeMessageBoxServiceHierarchy(): [MessageBoxService, ...MessageBoxService[]] {
     const hierarchy: MessageBoxService[] = [];
     let current: MessageBoxService = this;
     do {
       hierarchy.push(current);
     } while ((current = current._parentMessageBoxService)); // tslint:disable-line:no-conditional-assignment
-    return hierarchy;
+    return hierarchy as [MessageBoxService, ...MessageBoxService[]];
   }
 
   /**

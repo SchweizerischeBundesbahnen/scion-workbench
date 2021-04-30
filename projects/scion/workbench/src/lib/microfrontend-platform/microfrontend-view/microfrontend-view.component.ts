@@ -38,11 +38,11 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     'keydown.escape', // allows closing notifications
   ];
 
-  public microfrontendCssClasses: string[];
+  public microfrontendCssClasses!: string[];
   public iframeHost: Promise<ViewContainerRef>;
 
   @ViewChild('router_outlet', {static: true})
-  public routerOutletElement: ElementRef<SciRouterOutletElement>;
+  public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
   /**
    * Keystrokes which to bubble across iframe boundaries of embedded content.
@@ -60,7 +60,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.viewId}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.iframeHost = iframeHost.get();
     this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
-      .pipe(map(keystrokes => [].concat(...keystrokes)));
+      .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
   }
 
   public ngOnInit(): void {
@@ -76,8 +76,9 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
 
     this._route.params
       .pipe(
-        switchMap(params => this.observeViewCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]).pipe(map(capability => ({capability, params})))),
-        startWith(undefined as { capability: WorkbenchViewCapability, params: Params }), // initialize 'pairwise' operator
+        switchMap(params => this.observeViewCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID])
+          .pipe(map<WorkbenchViewCapability | undefined, WorkbenchViewCapabilityWithParams>(capability => ({capability, params})))),
+        startWith(undefined! as WorkbenchViewCapabilityWithParams), // initialize 'pairwise' operator
         pairwise(),
         serializeExecution(([prev, curr]) => this.onNavigate(curr.params, prev?.capability, curr.capability)),
         catchError((error, caught) => {
@@ -103,20 +104,20 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
       return;
     }
 
-    const application = this.lookupApplication(viewCapability.metadata.appSymbolicName);
+    const application = this.lookupApplication(viewCapability.metadata!.appSymbolicName);
     if (!application) {
-      this._logger.error(() => `[NullApplicationError] Unexpected. Cannot resolve application '${viewCapability.metadata.appSymbolicName}'.`, LoggerNames.MICROFRONTEND_ROUTING, viewCapability);
+      this._logger.error(() => `[NullApplicationError] Unexpected. Cannot resolve application '${viewCapability.metadata!.appSymbolicName}'.`, LoggerNames.MICROFRONTEND_ROUTING, viewCapability);
       await this._view.close();
       return;
     }
 
     // Set this view's properties, but only when displaying its initial microfrontend, or when navigating to another microfrontend.
-    if (!prevViewCapability || prevViewCapability.metadata.id !== viewCapability.metadata.id) {
+    if (!prevViewCapability || prevViewCapability.metadata!.id !== viewCapability.metadata!.id) {
       this.setViewProperties(viewCapability);
     }
 
     // Signal that the currently loaded microfrontend, if any, is about to be replaced by a microfrontend of another application.
-    if (prevViewCapability && prevViewCapability.metadata.appSymbolicName !== viewCapability.metadata.appSymbolicName) {
+    if (prevViewCapability && prevViewCapability.metadata!.appSymbolicName !== viewCapability.metadata!.appSymbolicName) {
       await this._messageClient.publish(ɵWorkbenchCommands.viewUnloadingTopic(this.viewId));
     }
 
@@ -127,13 +128,13 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     // new microfrontend into the iframe, allowing the currently loaded microfrontend to cleanup subscriptions. Params include the
     // capability id.
     if (prevViewCapability
-      && prevViewCapability.metadata.appSymbolicName === viewCapability.metadata.appSymbolicName
-      && prevViewCapability.metadata.id !== viewCapability.metadata.id) {
-      await this.waitForCapabilityParam(viewCapability.metadata.id);
+      && prevViewCapability.metadata!.appSymbolicName === viewCapability.metadata!.appSymbolicName
+      && prevViewCapability.metadata!.id !== viewCapability.metadata!.id) {
+      await this.waitForCapabilityParam(viewCapability.metadata!.id);
     }
 
     // Navigate to the microfrontend.
-    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.viewId}, app=${viewCapability.metadata.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND_ROUTING, params, viewCapability);
+    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.viewId}, app=${viewCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND_ROUTING, params, viewCapability);
     await this._outletRouter.navigate(microfrontendPath, {
       outlet: this.viewId,
       relativeTo: application.baseUrl,
@@ -146,12 +147,12 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
   private setViewProperties(viewCapability: WorkbenchViewCapability): void {
-    this._view.title = viewCapability.properties?.title ?? this._view.title; // to support setting the view's title via 'wb.title' param
-    this._view.heading = viewCapability.properties?.heading ?? this._view.heading; // to support setting the view's heading via 'wb.view-heading' param
-    this._view.cssClass = viewCapability.properties?.cssClass;
-    this._view.closable = viewCapability.properties?.closable ?? true;
+    this._view.title = viewCapability.properties.title ?? this._view.title; // to support setting the view's title via 'wb.title' param
+    this._view.heading = viewCapability.properties.heading ?? this._view.heading; // to support setting the view's heading via 'wb.view-heading' param
+    this._view.cssClass = viewCapability.properties.cssClass ?? [];
+    this._view.closable = viewCapability.properties.closable ?? true;
     this._view.dirty = false;
-    this.microfrontendCssClasses = ['e2e-view', `e2e-${viewCapability.metadata.appSymbolicName}`, ...this._view.cssClasses];
+    this.microfrontendCssClasses = ['e2e-view', `e2e-${viewCapability.metadata!.appSymbolicName}`, ...this._view.cssClasses];
   }
 
   /**
@@ -229,7 +230,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     return this._view.menuItems$
       .pipe(
         filterArray(menuItem => !!menuItem.accelerator),
-        mapArray(menuItem => menuItem.accelerator.map(accelerator => {
+        mapArray(menuItem => menuItem.accelerator!.map(accelerator => {
           // Normalize keystrokes according to `SciRouterOutletElement#keystrokes`
           switch (accelerator) {
             case 'ctrl':
@@ -252,4 +253,9 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.viewId), undefined, {retain: true}).then();
     this._destroy$.next();
   }
+}
+
+interface WorkbenchViewCapabilityWithParams {
+  capability?: WorkbenchViewCapability;
+  params: Params;
 }

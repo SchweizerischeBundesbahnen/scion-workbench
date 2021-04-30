@@ -25,7 +25,7 @@ import { WorkbenchLayoutDiff } from './workbench-layout-differ';
 @Injectable()
 export class WorkbenchRouter {
 
-  private _currentNavigationContext$ = new BehaviorSubject<WorkbenchNavigationContext>(null);
+  private _currentNavigationContext$ = new BehaviorSubject<WorkbenchNavigationContext | null>(null);
 
   constructor(private _router: Router,
               private _viewRegistry: WorkbenchViewRegistry,
@@ -55,7 +55,7 @@ export class WorkbenchRouter {
    *
    * @see WbRouterLinkDirective
    */
-  public async navigate(commandList: any[], extras: WbNavigationExtras = {}): Promise<boolean> {
+  public async navigate(commandList: Commands, extras: WbNavigationExtras = {}): Promise<boolean> {
     const commands = this.normalizeCommands(commandList, extras.relativeTo);
 
     if (extras.closeIfPresent) {
@@ -101,7 +101,7 @@ export class WorkbenchRouter {
           throw Error(`[WorkbenchRouterError] Target view outlet not found: ${extras.selfViewId}'`);
         }
 
-        return this.ɵnavigate(layout => ({layout, viewOutlets: {[extras.selfViewId]: commands}}), extras);
+        return this.ɵnavigate(layout => ({layout, viewOutlets: {[extras.selfViewId!]: commands}}), extras);
       }
       default: {
         throw Error(`[WorkbenchRouterError] Invalid routing target. Expected 'self' or 'blank', but received ${extras.target}'.`);
@@ -133,7 +133,7 @@ export class WorkbenchRouter {
     await this.waitForNavigationToComplete();
 
     // Let the caller modify the layout.
-    const result = computeNavigationFn(this._layoutService.layout);
+    const result = computeNavigationFn(this._layoutService.layout!);
 
     // Coerce the result to a {WorkbenchNavigation} object.
     const navigation: WorkbenchNavigation = result instanceof PartsLayout ? ({layout: result}) : result;
@@ -156,7 +156,7 @@ export class WorkbenchRouter {
   /**
    * @see normalizeCommands
    */
-  private normalizeOutletCommands(outlets?: { [outlet: string]: any[]; }, relativeTo?: ActivatedRoute | null): { [outlet: string]: any[]; } | null {
+  private normalizeOutletCommands(outlets?: { [outlet: string]: Commands | null }, relativeTo?: ActivatedRoute | null): { [outlet: string]: Commands | null } | null {
     if (!outlets || !Object.keys(outlets).length) {
       return null;
     }
@@ -184,11 +184,11 @@ export class WorkbenchRouter {
    *
    * @internal
    */
-  public normalizeCommands(commands: any[], relativeTo?: ActivatedRoute | null): any[] {
-    const normalizeFn = (outlet: string, extras?: NavigationExtras): any[] => {
+  public normalizeCommands(commands: Commands, relativeTo?: ActivatedRoute | null): Commands {
+    const normalizeFn = (outlet: string, extras?: NavigationExtras): Commands => {
       return this._router.createUrlTree(commands, extras)
         .root.children[outlet].segments
-        .reduce((acc, p) => [...acc, p.path, ...(Object.keys(p.parameters).length ? [p.parameters] : [])], []);
+        .reduce<Commands>((acc, p) => [...acc, p.path, ...(Object.keys(p.parameters).length ? [p.parameters] : [])], []);
     };
 
     if (!relativeTo) {
@@ -208,7 +208,7 @@ export class WorkbenchRouter {
    *
    * @internal
    */
-  public resolvePresentViewIds(commands: any[]): string[] {
+  public resolvePresentViewIds(commands: Commands): string[] {
     const serializeCommands = this.serializeCommands(commands);
     const urlTree = this._router.parseUrl(this._router.url);
     const urlSegmentGroups = urlTree.root.children;
@@ -236,7 +236,7 @@ export class WorkbenchRouter {
    *
    * @internal
    */
-  public setCurrentNavigationContext(context: WorkbenchNavigationContext): void {
+  public setCurrentNavigationContext(context: WorkbenchNavigationContext | null): void {
     this._currentNavigationContext$.next(context);
   }
 
@@ -271,13 +271,13 @@ export class WorkbenchRouter {
   /**
    * Serializes given commands into valid URL segments.
    */
-  private serializeCommands(commands: any[]): string[] {
+  private serializeCommands(commands: Commands): string[] {
     const serializedCommands: string[] = [];
 
     commands.forEach(cmd => {
       // if matrix param, append it to the last segment
       if (typeof cmd === 'object') {
-        serializedCommands.push(new UrlSegment(serializedCommands.pop(), cmd).toString());
+        serializedCommands.push(new UrlSegment(serializedCommands.pop()!, cmd).toString());
       }
       else {
         serializedCommands.push(encodeURIComponent(cmd));
@@ -378,7 +378,7 @@ export interface WorkbenchNavigationContext {
 }
 
 /**
- * An array of URL fragments with which to construct the target URL.
+ * An array of URL fragments with which to construct a view's URL.
  *
  * If the path is static, can be the literal URL string. For a dynamic path, pass an array of path segments,
  * followed by the parameters for each segment.
@@ -388,8 +388,6 @@ export interface WorkbenchNavigationContext {
  * available in {@link ActivatedRoute#params}.
  *
  * Example command array with 'details' as matrix parameter: `['user', userName, {details: true}]`,
- *
- * @internal
  */
 export type Commands = any[];
 
@@ -408,5 +406,5 @@ export interface WorkbenchNavigation {
    * add a property to this dictionary and set the commands to construct the outlet URL.
    * To remove an outlet from the URL, set its commands to `null`.
    */
-  viewOutlets?: { [outlet: string]: Commands; };
+  viewOutlets?: { [outlet: string]: Commands | null };
 }

@@ -22,10 +22,10 @@ import { first, takeUntil } from 'rxjs/operators';
 export class SashDirective implements OnDestroy, OnChanges {
 
   private _destroy$ = new Subject<void>();
-  private _mousePosition: number;
+  private _mousePosition: number | undefined;
 
   @Input('wbSash') // tslint:disable-line:no-input-rename
-  public wbDirection: 'vertical' | 'horizontal';
+  public wbDirection: 'vertical' | 'horizontal' = 'horizontal';
 
   @Output()
   public wbSashStart = new EventEmitter<void>(false);
@@ -40,7 +40,7 @@ export class SashDirective implements OnDestroy, OnChanges {
   public wbSashReset = new EventEmitter<void>(false);
 
   @HostBinding('style.cursor')
-  public cursor: string;
+  public cursor: string | undefined;
 
   constructor(@Inject(DOCUMENT) private _document: any) {
   }
@@ -51,7 +51,7 @@ export class SashDirective implements OnDestroy, OnChanges {
 
   @HostListener('dblclick')
   public onDoubleClick(): void {
-    this.wbSashReset.emit(null);
+    this.wbSashReset.emit();
   }
 
   @HostListener('mousedown', ['$event'])
@@ -68,12 +68,12 @@ export class SashDirective implements OnDestroy, OnChanges {
     this._document.body.style.cursor = this.cursor;
 
     // Listen for 'mousemove' events
-    const mousemoveListener = fromEvent(this._document, 'mousemove')
+    const mousemoveListener = fromEvent<MouseEvent>(this._document, 'mousemove')
       .pipe(takeUntil(this._destroy$))
       .subscribe((mousemoveEvent: MouseEvent) => {
         mousemoveEvent.preventDefault();
         const mousePosition = this.extractMousePosition(mousemoveEvent);
-        const delta = mousePosition - this._mousePosition;
+        const delta = mousePosition - this._mousePosition!;
         this._mousePosition = mousePosition;
         this.wbSashChange.emit(delta);
       });
@@ -86,7 +86,7 @@ export class SashDirective implements OnDestroy, OnChanges {
       )
       .subscribe(() => {
         mousemoveListener.unsubscribe();
-        this._mousePosition = null;
+        this._mousePosition = undefined;
         this._document.body.style.cursor = oldCursor;
         this.wbSashEnd.next();
       });

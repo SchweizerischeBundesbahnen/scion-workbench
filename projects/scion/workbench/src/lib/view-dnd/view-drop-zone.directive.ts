@@ -17,7 +17,7 @@ import { ViewDragData, ViewDragService } from './view-drag.service';
 const DROP_REGION_MAX_SIZE = 150;
 const DROP_REGION_GAP = 20;
 const DROP_REGION_BGCOLOR = 'rgba(0, 0, 0, .1)';
-const NULL_BOUNDS: Bounds = null;
+const NULL_BOUNDS: Bounds = null!;
 
 /**
  * Adds a view drop zone to the host element allowing the view to be dropped either in the north,
@@ -34,17 +34,17 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
   private _host: HTMLElement;
 
-  private _dropZoneOverlay: HTMLElement;
-  private _dropRegionElement1: HTMLElement;
-  private _dropRegionElement2: HTMLElement;
+  private _dropZoneOverlay!: HTMLElement;
+  private _dropRegionElement1!: HTMLElement;
+  private _dropRegionElement2!: HTMLElement;
 
-  private _dropRegion: Region;
+  private _dropRegion: Region | null = null;
 
   /**
    * Specifies which drop regions to allow. If not specified, all regions are allowed.
    */
   @Input()
-  public wbViewDropZoneRegions: Region[];
+  public wbViewDropZoneRegions?: Region[];
 
   /**
    * Emits upon a view drop action.
@@ -146,8 +146,8 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
 
   private onDrop(event: DragEvent): void {
     const dropEvent: WbViewDropEvent = {
-      dropRegion: this._dropRegion,
-      dragData: this._viewDragService.getViewDragData(),
+      dropRegion: this._dropRegion!,
+      dragData: this._viewDragService.getViewDragData()!,
       sourceEvent: event,
     };
 
@@ -296,7 +296,7 @@ interface Bounds {
   right: string;
   bottom: string;
   left: string;
-  background: string;
+  background: string | null;
 }
 
 export interface WbViewDropEvent {

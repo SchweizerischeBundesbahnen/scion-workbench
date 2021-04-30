@@ -17,11 +17,12 @@ export function createElement(tag: string, options: ElementCreateOptions): HTMLE
 /**
  * Applies the given style(s) to the given element.
  *
- * To unset a style property provide `null` as its value.
+ * Specify styles to be modified by passing a dictionary containing CSS property names (hyphen case).
+ * To remove a style, set its value to `null`.
  */
 export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, style: { [style: string]: any | null }): void {
   const target = coerceElement(element);
-  Object.keys(style).forEach(key => target.style[key] = style[key]);
+  Object.keys(style).forEach(key => target.style.setProperty(key, style[key]));
 }
 
 /**

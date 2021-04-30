@@ -14,6 +14,8 @@ import { filter, map, startWith, takeUntil } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 import { LogAppender, LogEvent, LoggerName, LogLevel } from './logging.model';
 
+type LogLevelStrings = keyof typeof LogLevel;
+
 /**
  * Logger used by the workbench to log messages.
  *
@@ -84,7 +86,7 @@ export abstract class Logger {
 export class ɵLogger implements Logger, OnDestroy {  // tslint:disable-line:class-name
 
   private _destroy$ = new Subject<void>();
-  private _logLevel: LogLevel;
+  private _logLevel!: LogLevel;
 
   constructor(@Inject(LogAppender) @Optional() private _logAppenders: LogAppender[],
               router: Router,
@@ -128,10 +130,10 @@ export class ɵLogger implements Logger, OnDestroy {  // tslint:disable-line:cla
     return router.events
       .pipe(
         startWith(router.url),
-        filter(event => event instanceof NavigationStart),
+        filter((event): event is NavigationStart => event instanceof NavigationStart),
         map<RouterEvent, ParamMap>(routerEvent => router.parseUrl(routerEvent.url).queryParamMap),
-        map(queryParamMap => queryParamMap.get('loglevel')?.toUpperCase()),
-        map(logLevelRaw => LogLevel[logLevelRaw]),
+        map(queryParamMap => queryParamMap.get('loglevel')?.toUpperCase() as LogLevelStrings | undefined),
+        map(logLevelString => logLevelString ? LogLevel[logLevelString] : undefined),
       );
   }
 

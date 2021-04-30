@@ -131,11 +131,11 @@ export class NotificationService implements OnDestroy {
    * Installs a keystroke listener to close the last notification when the user presses the escape keystroke.
    */
   private installEscapeHandler(): void {
-    fromEvent(this._document, 'keydown')
+    fromEvent<KeyboardEvent>(this._document, 'keydown')
       .pipe(
         filter((event: KeyboardEvent) => event.key === 'Escape'),
         map(() => Arrays.last(this.notifications)),
-        filter<ɵNotification>(Boolean),
+        filter((notification): notification is ɵNotification => !!notification),
         subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
         observeInside(continueFn => this._zone.run(continueFn)),
         takeUntil(this._destroy$),

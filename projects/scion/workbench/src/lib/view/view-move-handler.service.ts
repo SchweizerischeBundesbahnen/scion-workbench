@@ -72,7 +72,8 @@ export class ViewMoveHandler implements OnDestroy {
   }
 
   private addView(event: ViewMoveEvent): void {
-    const addToNewViewPart = (event.target.region || 'center') !== 'center';
+    const region = event.target.region || 'center';
+    const addToNewViewPart = region !== 'center';
 
     const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
     if (addToNewViewPart) {
@@ -80,7 +81,7 @@ export class ViewMoveHandler implements OnDestroy {
       const newPartId = event.target.newPartId || UUID.randomUUID();
       this._wbRouter.ɵnavigate(layout => ({
         layout: layout
-          .addPart(newPartId, {relativeTo: event.target.partId, align: coerceLayoutAlignment(event.target.region)})
+          .addPart(newPartId, {relativeTo: event.target.partId ?? undefined, align: coerceLayoutAlignment(region)})
           .addView(newPartId, newViewId),
         viewOutlets: {[newViewId]: commands},
       })).then();
@@ -88,7 +89,7 @@ export class ViewMoveHandler implements OnDestroy {
     else {
       const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
       this._wbRouter.ɵnavigate(layout => ({
-        layout: layout.addView(event.target.partId, newViewId, event.target.insertionIndex),
+        layout: layout.addView(event.target.partId!, newViewId, event.target.insertionIndex),
         viewOutlets: {[newViewId]: commands},
       })).then();
     }
@@ -98,7 +99,7 @@ export class ViewMoveHandler implements OnDestroy {
     const urlTree = await this._wbRouter.createUrlTree(layout => ({
       layout: layout.clear(),
       viewOutlets: layout.parts
-        .reduce((viewIds, part) => viewIds.concat(part.viewIds), [])
+        .reduce((viewIds, part) => viewIds.concat(part.viewIds), new Array<string>())
         .filter(viewId => viewId !== event.source.viewId)
         .reduce((acc, viewId) => ({...acc, [viewId]: null}), {}),
     }));
@@ -116,12 +117,12 @@ export class ViewMoveHandler implements OnDestroy {
     if (addToNewPart) {
       const newPartId = event.target.newPartId || UUID.randomUUID();
       this._wbRouter.ɵnavigate(layout => layout
-        .addPart(newPartId, {relativeTo: event.target.partId, align: coerceLayoutAlignment(event.target.region)})
+        .addPart(newPartId, {relativeTo: event.target.partId!, align: coerceLayoutAlignment(event.target.region!)})
         .moveView(event.source.viewId, newPartId),
       ).then();
     }
     else {
-      this._wbRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, event.target.partId, event.target.insertionIndex)).then();
+      this._wbRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, event.target.partId!, event.target.insertionIndex)).then();
     }
   }
 

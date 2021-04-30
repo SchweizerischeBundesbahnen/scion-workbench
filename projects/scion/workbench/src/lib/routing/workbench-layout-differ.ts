@@ -76,7 +76,7 @@ export class WorkbenchLayoutDiff {
   }
 
   public toString(): string {
-    return `${[]
+    return `${new Array<string>()
       .concat(this.addedParts.length ? `addedParts=[${this.addedParts}]` : [])
       .concat(this.removedParts.length ? `removedParts=[${this.removedParts}]` : [])
       .concat(this.addedViews.length ? `addedViews=[${this.addedViews}]` : [])

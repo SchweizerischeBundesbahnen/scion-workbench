@@ -31,7 +31,7 @@ export class MicrofrontendMessageBoxProvider implements WorkbenchInitializer {
       logger.debug(() => 'Opening message box', LoggerNames.MICROFRONTEND, config);
       return messageBoxService.open({
         ...config,
-        content: config.content ?? '',
+        content: config!.content ?? '',
       });
     });
   }

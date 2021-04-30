@@ -1,6 +1,6 @@
 import { Directive, EventEmitter, Input, OnDestroy, Optional, Output, TemplateRef } from '@angular/core';
-import { Disposable } from './../../disposable';
-import { WorkbenchMenuItem} from '../../workbench.model';
+import { Disposable } from '../../disposable';
+import { WorkbenchMenuItem } from '../../workbench.model';
 import { WorkbenchService } from '../../workbench.service';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { WorkbenchView } from '../../view/workbench-view.model';
@@ -34,19 +34,19 @@ export class ViewMenuItemDirective implements OnDestroy {
    * Supported modifiers are 'ctrl', 'shift', 'alt' and 'meta'.
    */
   @Input()
-  public accelerator: string[];
+  public accelerator?: string[];
 
   /**
    * Allows grouping menu items of the same group.
    */
   @Input()
-  public group: string;
+  public group?: string;
 
   /**
    * Allows disabling the menu item based on a condition.
    */
   @Input()
-  public disabled: boolean;
+  public disabled = false;
 
   /**
    * Emits when the user performs the menu action, either by clicking the menu or via keyboard accelerator, if any.
@@ -67,7 +67,7 @@ export class ViewMenuItemDirective implements OnDestroy {
 
   private createMenuItem(view: WorkbenchView): WorkbenchMenuItem {
     return ({
-      portal: new TemplatePortal<any>(this._template, null, {$implicit: view}),
+      portal: new TemplatePortal<any>(this._template, null!, {$implicit: view}),
       accelerator: this.accelerator,
       group: this.group,
       isDisabled: (): boolean => this.disabled,

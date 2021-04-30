@@ -28,32 +28,32 @@ export class PopupComponent {
   public portal: ComponentPortal<any>;
 
   @HostBinding('style.width')
-  public get popupWidth(): string {
+  public get popupWidth(): string | undefined {
     return this._popupConfig.size?.width;
   }
 
   @HostBinding('style.min-width')
-  public get popupMinWidth(): string {
+  public get popupMinWidth(): string | undefined {
     return this._popupConfig.size?.minWidth;
   }
 
   @HostBinding('style.max-width')
-  public get popupMaxWidth(): string {
+  public get popupMaxWidth(): string | undefined {
     return this._popupConfig.size?.maxWidth;
   }
 
   @HostBinding('style.height')
-  public get popupHeight(): string {
+  public get popupHeight(): string | undefined {
     return this._popupConfig.size?.height;
   }
 
   @HostBinding('style.min-height')
-  public get popupMinHeight(): string {
+  public get popupMinHeight(): string | undefined {
     return this._popupConfig.size?.minHeight;
   }
 
   @HostBinding('style.max-height')
-  public get popupMaxHeight(): string {
+  public get popupMaxHeight(): string | undefined {
     return this._popupConfig.size?.maxHeight;
   }
 

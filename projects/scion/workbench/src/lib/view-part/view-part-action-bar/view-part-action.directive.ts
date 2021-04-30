@@ -38,7 +38,7 @@ import { asapScheduler } from 'rxjs';
 @Directive({selector: 'ng-template[wbViewPartAction]'})
 export class ViewPartActionDirective implements OnInit, OnDestroy {
 
-  private _action: Disposable;
+  private _action!: Disposable;
 
   @Input()
   public align: 'start' | 'end' = 'start';
