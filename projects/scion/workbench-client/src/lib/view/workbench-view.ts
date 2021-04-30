@@ -36,7 +36,7 @@ export abstract class WorkbenchView {
   /**
    * Represents the identity of this workbench view.
    */
-  public readonly viewId: string;
+  public abstract readonly viewId: string;
 
   /**
    * Observable containing the view capability that represents the microfrontend loaded into this workbench view.
@@ -46,7 +46,7 @@ export abstract class WorkbenchView {
    * or navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before
    * displaying another microfrontend.
    */
-  public readonly capability$: Observable<WorkbenchViewCapability>;
+  public abstract readonly capability$: Observable<WorkbenchViewCapability>;
 
   /**
    * Observable containing the parameters including the qualifier as passed for navigation in {@link WorkbenchNavigationExtras.params}.
@@ -56,7 +56,7 @@ export abstract class WorkbenchView {
    * navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
    * another microfrontend.
    */
-  public readonly params$: Observable<Map<string, any>>;
+  public abstract readonly params$: Observable<Map<string, any>>;
 
   /**
    * Indicates whether this is the active view in its view part.
@@ -66,7 +66,7 @@ export abstract class WorkbenchView {
    * the view or navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
    * another microfrontend.
    */
-  public readonly active$: Observable<boolean>;
+  public abstract readonly active$: Observable<boolean>;
 
   /**
    * Sets the title to be displayed in the view tab.
@@ -139,7 +139,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
    */
   private _beforeInAppNavigation$ = new Subject<void>();
   private _closingListeners = new Set<ViewClosingListener>();
-  private _closingSubscription: Subscription;
+  private _closingSubscription: Subscription | undefined;
 
   public active$: Observable<boolean>;
   public capability$: Observable<WorkbenchViewCapability>;
@@ -264,7 +264,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:di
   public removeClosingListener(listener: ViewClosingListener): void {
     if (this._closingListeners.delete(listener) && this._closingListeners.size === 0) {
       this._closingSubscription?.unsubscribe();
-      this._closingSubscription = null;
+      this._closingSubscription = undefined;
     }
   }
 
@@ -405,7 +405,7 @@ function lookupViewCapabilityAndShareReplay(): OperatorFunction<string, Workbenc
     shareReplay({refCount: true, bufferSize: 1}),
     // Ensure not to replay a stale capability upon the subscription of new subscribers. For this reason, we install a filter to filter them out.
     // The 'shareReplay' operator would replay a stale capability if the source has emitted a new capability id, but the lookup for it did not complete yet.
-    filter(viewCapability => latestViewCapabilityId === viewCapability.metadata.id),
+    filter(viewCapability => latestViewCapabilityId === viewCapability.metadata!.id),
   );
 }
 

@@ -74,7 +74,7 @@ export class MessageBoxOpenerPageComponent {
     const currentView = Beans.get(WorkbenchView);
     const unsetViewContext = (this.form.get(VIEW_CONTEXT).value === false);
 
-    unsetViewContext && Beans.register(WorkbenchView, {useValue: undefined});
+    unsetViewContext && Beans.register(WorkbenchView, {useValue: null});
     try {
       this._messageBoxService.open({
         title: this.form.get(TITLE).value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent

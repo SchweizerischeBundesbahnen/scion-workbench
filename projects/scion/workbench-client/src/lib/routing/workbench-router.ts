@@ -81,7 +81,7 @@ export class WorkbenchRouter {
       const {intent, capability} = await this.currentNavigation();
       return {
         capabilities: [capability],
-        qualifier: intent.qualifier,
+        qualifier: intent.qualifier!, // a view must always be qualified
         extras: {
           ...extras,
           target: 'self',
@@ -133,7 +133,7 @@ export class WorkbenchRouter {
 
     return {
       capability: currentCapability,
-      intent: this.deriveViewIntent(currentCapability.qualifier, currentParams),
+      intent: this.deriveViewIntent(currentCapability.qualifier!, currentParams), // a view must always be qualified
     };
   }
 
@@ -154,7 +154,7 @@ export class WorkbenchRouter {
    * Derives the intent that was issued to open the view of the passed capability.
    */
   private deriveViewIntent(capabilityQualifier: Qualifier, params: Map<string, any>): Intent {
-    const intentQualifier = Object.entries(capabilityQualifier).reduce((acc, [key, value]) => {
+    const intentQualifier = Object.entries(capabilityQualifier).reduce<Qualifier>((acc, [key, value]) => {
       if (!params.has(key) && value !== '?') {
         throw Error(`[ViewContextError] Missing required qualifier param '${key}'.`);
       }
