@@ -45,12 +45,12 @@ export abstract class WorkbenchPopup {
   /**
    * Capability that represents the microfrontend loaded into this workbench popup.
    */
-  public readonly capability: WorkbenchPopupCapability;
+  public abstract readonly capability: WorkbenchPopupCapability;
 
   /**
    * Parameters including qualifier entries as passed for navigation by the popup opener.
    */
-  public readonly params: Map<string, any>;
+  public abstract readonly params: Map<string, any>;
 
   /**
    * Closes the popup. Optionally, pass a result to the popup opener.

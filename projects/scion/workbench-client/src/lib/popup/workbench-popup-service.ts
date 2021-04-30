@@ -71,7 +71,7 @@ export class WorkbenchPopupService {
     // To be able to integrate popups from apps without workbench integration, we do not delegate the opening of the popup to
     // the app that provides the requested popup, but interact with the workbench directly. Nevertheless, we issue an intent
     // so that the platform throws an error in case of unqualified interaction.
-    await Beans.get(IntentClient).publish<WorkbenchPopupConfig>({type: WorkbenchCapabilities.Popup, qualifier, params: Maps.coerce(config.params)}, {...config, anchor: undefined});
+    await Beans.get(IntentClient).publish<WorkbenchPopupConfig>({type: WorkbenchCapabilities.Popup, qualifier, params: Maps.coerce(config.params)}, {...config, anchor: undefined!});
 
     const view = Beans.opt(WorkbenchView);
     const popupCommand: ɵWorkbenchPopupCommand = {
@@ -85,7 +85,7 @@ export class WorkbenchPopupService {
       ]),
       context: {
         viewId: view?.viewId,
-        capabilityId: await view?.capability$.pipe(map(capability => capability.metadata.id), take(1)).toPromise(),
+        capabilityId: await view?.capability$.pipe(map(capability => capability.metadata!.id), take(1)).toPromise(),
       },
     };
     const popupOriginPublisher = this.observePopupOrigin$(config).subscribe(origin => {
