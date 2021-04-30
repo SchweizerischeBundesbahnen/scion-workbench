@@ -20,7 +20,7 @@ import { PartsLayout } from './parts-layout';
 @Injectable()
 export class WorkbenchLayoutService {
 
-  private _layout: PartsLayout;
+  private _layout: PartsLayout | null = null;
   private _layoutChange$ = new Subject<void>();
   private _maximized$ = new BehaviorSubject<boolean>(false);
   private _dragStart$ = new Subject<void>();
@@ -48,14 +48,14 @@ export class WorkbenchLayoutService {
   public readonly layout$: Observable<PartsLayout> = this._layoutChange$
     .pipe(
       startWith(undefined as void),
-      map(() => this.layout),
-      filter<PartsLayout>(Boolean),
+      map<void, PartsLayout | null>(() => this.layout),
+      filter((layout: PartsLayout | null): layout is PartsLayout => layout !== null),
     );
 
   constructor(viewDragService: ViewDragService, private _zone: NgZone) {
-    this.dragging$ = merge<'start' | 'end'>(
-      merge(this._dragStart$, viewDragService.viewDragStart$).pipe(mapTo('start')),
-      merge(this._dragEnd$, viewDragService.viewDragEnd$).pipe(mapTo('end')),
+    this.dragging$ = merge(
+      merge(this._dragStart$, viewDragService.viewDragStart$).pipe(mapTo<void, 'start'>('start')),
+      merge(this._dragEnd$, viewDragService.viewDragEnd$).pipe(mapTo<void, 'end'>('end')),
     );
   }
 
@@ -95,7 +95,7 @@ export class WorkbenchLayoutService {
    * Returns a reference to current {@link PartsLayout}, if any. Is `null` until the initial navigation is performed.
    */
   public get layout(): PartsLayout | null {
-    return this._layout || null;
+    return this._layout;
   }
 
   /**

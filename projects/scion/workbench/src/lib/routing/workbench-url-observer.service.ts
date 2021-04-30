@@ -9,7 +9,7 @@
  */
 
 import { ChildrenOutletContexts, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent } from '@angular/router';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { ComponentFactoryResolver, Injectable, Injector, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { WorkbenchAuxiliaryRoutesRegistrator } from './workbench-auxiliary-routes-registrator.service';
@@ -104,7 +104,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
    */
   private computeWorkbenchLayoutDiff(url: string): WorkbenchNavigationContext {
     const urlTree = this._router.parseUrl(url);
-    const serializedPartsLayout = urlTree.queryParamMap.get(PARTS_LAYOUT_QUERY_PARAM);
+    const serializedPartsLayout = urlTree.queryParamMap.get(PARTS_LAYOUT_QUERY_PARAM) ?? undefined;
     const partsLayout = this._partsLayoutFactory.create(serializedPartsLayout);
     return {
       partsLayout,
@@ -144,9 +144,9 @@ export class WorkbenchUrlObserver implements OnDestroy {
    * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
    */
   private undoWorkbenchLayoutDiffer(): void {
-    const preNavigateUrl = this._router.url; // Browser URL is only updated after successful navigation
-    const preNavigateLayout = this._layoutService.layout; // Layout in `LayoutService` is only updated after successful navigation
-    this._workbenchLayoutDiffer.diff(this._router.parseUrl(preNavigateUrl), preNavigateLayout);
+    const prevNavigateUrl = this._router.url; // Browser URL is only updated after successful navigation
+    const prevNavigateLayout = this._layoutService.layout; // Layout in `LayoutService` is only updated after successful navigation
+    this._workbenchLayoutDiffer.diff(this._router.parseUrl(prevNavigateUrl), prevNavigateLayout ?? undefined);
   }
 
   /**
@@ -275,7 +275,10 @@ export class WorkbenchUrlObserver implements OnDestroy {
 
   private installRouterEventListeners(): void {
     this._router.events
-      .pipe(takeUntil(this._destroy$))
+      .pipe(
+        filter((event): event is RouterEvent => event instanceof RouterEvent),
+        takeUntil(this._destroy$),
+      )
       .subscribe((event: RouterEvent) => {
         if (event instanceof NavigationStart) {
           this.onNavigationStart(event);

@@ -20,8 +20,8 @@ import { first, takeUntil } from 'rxjs/operators';
 export class MoveDirective implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  private _x: number;
-  private _y: number;
+  private _x = 0;
+  private _y = 0;
 
   @Output()
   public wbMoveStart = new EventEmitter<void>();
@@ -53,7 +53,7 @@ export class MoveDirective implements OnDestroy {
     this._document.body.style.cursor = this.cursor;
 
     // Listen for 'mousemove' events
-    const mousemoveListener = fromEvent(this._document, 'mousemove')
+    const mousemoveListener = fromEvent<MouseEvent>(this._document, 'mousemove')
       .pipe(takeUntil(this._destroy$))
       .subscribe((mousemoveEvent: MouseEvent) => {
         mousemoveEvent.preventDefault(); // prevent drag and drop

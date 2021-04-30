@@ -18,13 +18,13 @@ import { ComponentFactory, ComponentFactoryResolver, ComponentRef, InjectFlags, 
  */
 export class WbComponentPortal<T> {
 
-  private _config: PortalConfig;
+  private _config!: PortalConfig;
   private _componentFactory: ComponentFactory<T>;
 
-  private _viewContainerRef: ViewContainerRef | null;
-  private _reattachFn: () => void;
-  private _componentRef: ComponentRef<T> | null;
-  private _portalInjector: WbPortalInjector;
+  private _viewContainerRef: ViewContainerRef | null = null;
+  private _reattachFn: (() => void) | null = null;
+  private _componentRef: ComponentRef<T> | null = null;
+  private _portalInjector!: WbPortalInjector;
 
   constructor(componentFactoryResolver: ComponentFactoryResolver, componentType: ComponentType<T>) {
     this._componentFactory = componentFactoryResolver.resolveComponentFactory(componentType);
@@ -81,7 +81,7 @@ export class WbComponentPortal<T> {
 
     this.detachFromComponentTree();
     this._viewContainerRef = viewContainerRef;
-    this._portalInjector.elementInjector = this.viewContainerRef ? this.viewContainerRef.injector : null;
+    this._portalInjector.elementInjector = this.viewContainerRef ? this.viewContainerRef.injector : Injector.NULL;
     this.attachToComponentTree();
   }
 
@@ -96,8 +96,8 @@ export class WbComponentPortal<T> {
     }
 
     // Attach this portlet
-    this._viewContainerRef.insert(this._componentRef.hostView, 0);
-    this._componentRef.changeDetectorRef.reattach();
+    this._viewContainerRef!.insert(this._componentRef!.hostView, 0);
+    this._componentRef!.changeDetectorRef.reattach();
 
     // Invoke 'onAttach' lifecycle hook
     this._config.onAttach && this._config.onAttach();
@@ -120,28 +120,31 @@ export class WbComponentPortal<T> {
     this._config.onDetach && this._config.onDetach();
 
     // Detach this portlet
-    const index = this._viewContainerRef.indexOf(this._componentRef.hostView);
-    this._viewContainerRef.detach(index);
-    this._componentRef.changeDetectorRef.detach();
+    const index = this._viewContainerRef!.indexOf(this._componentRef!.hostView);
+    this._viewContainerRef!.detach(index);
+    this._componentRef!.changeDetectorRef.detach();
   }
 
   /**
    * Destroys the component instance and all of the data structures associated with it.
    */
   public destroy(): void {
-    this._componentRef.destroy();
+    this.componentRef.destroy();
   }
 
   public get componentRef(): ComponentRef<T> {
+    if (!this._componentRef) {
+      throw Error('[PortalError] Illegal state: Portal already destroyed.');
+    }
     return this._componentRef;
   }
 
-  public get viewContainerRef(): ViewContainerRef {
+  public get viewContainerRef(): ViewContainerRef | null {
     return this._viewContainerRef;
   }
 
   public get isAttached(): boolean {
-    return this._viewContainerRef && this._viewContainerRef.indexOf(this._componentRef.hostView) > -1 || false;
+    return this._componentRef && this._viewContainerRef && this._viewContainerRef.indexOf(this._componentRef.hostView) > -1 || false;
   }
 
   public get isDestroyed(): boolean {
@@ -208,6 +211,6 @@ class WbPortalInjector implements Injector {
      *  - el1.injector.get(token, NOT_FOUND_CHECK_ONLY_ELEMENT_INJECTOR) -> do not check the module
      *  - mod2.injector.get(token, default)
      */
-    return (this.elementInjector || Injector.NULL).get(token, notFoundValue, flags);
+    return this.elementInjector.get(token, notFoundValue, flags);
   }
 }

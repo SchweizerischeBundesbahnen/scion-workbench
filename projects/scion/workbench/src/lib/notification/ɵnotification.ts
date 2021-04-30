@@ -18,7 +18,7 @@ import { TextNotificationComponent } from './text-notification.component';
 export class ɵNotification<T = any> implements Notification<T> { // tslint:disable-line:class-name
 
   public readonly input: T;
-  public readonly title$: BehaviorSubject<string | undefined | Observable<string | undefined>>;
+  public readonly title$: BehaviorSubject<string | undefined | Observable<string>>;
   public readonly severity$: BehaviorSubject<'info' | 'warn' | 'error'>;
   public readonly duration$: BehaviorSubject<'short' | 'medium' | 'long' | 'infinite' | number>;
   public readonly cssClass$: BehaviorSubject<string[]>;
@@ -39,7 +39,7 @@ export class ɵNotification<T = any> implements Notification<T> { // tslint:disa
     }
   }
 
-  public setTitle(title: string | undefined | Observable<string | undefined>): void {
+  public setTitle(title: string | undefined | Observable<string>): void {
     this.title$.next(title);
   }
 

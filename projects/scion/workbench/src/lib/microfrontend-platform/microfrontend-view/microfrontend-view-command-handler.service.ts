@@ -64,7 +64,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewTitleCommandHandler(): void {
     this._messageClient.onMessage(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
-      const viewId = message.params.get('viewId');
+      const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.title = message.body;
       });
@@ -76,7 +76,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewHeadingCommandHandler(): void {
     this._messageClient.onMessage(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
-      const viewId = message.params.get('viewId');
+      const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.heading = message.body;
       });
@@ -88,7 +88,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewDirtyCommandHandler(): void {
     this._messageClient.onMessage(ɵWorkbenchCommands.viewDirtyTopic(':viewId'), message => {
-      const viewId = message.params.get('viewId');
+      const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.dirty = message.body;
       });
@@ -100,7 +100,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewClosableCommandHandler(): void {
     this._messageClient.onMessage(ɵWorkbenchCommands.viewClosableTopic(':viewId'), message => {
-      const viewId = message.params.get('viewId');
+      const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.closable = message.body;
       });
@@ -112,7 +112,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewCloseCommandHandler(): void {
     this._messageClient.onMessage(ɵWorkbenchCommands.viewCloseTopic(':viewId'), message => {
-      const viewId = message.params.get('viewId');
+      const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.close().then();
       });
@@ -123,7 +123,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
     this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
       .pipe(takeUntil(this._destroy$))
       .subscribe(viewCapabilities => {
-        this._viewCapabilities = viewCapabilities.reduce((acc, capability) => acc.set(capability.metadata.id, capability), new Map<string, WorkbenchViewCapability>());
+        this._viewCapabilities = viewCapabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map<string, WorkbenchViewCapability>());
       });
   }
 
@@ -153,7 +153,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
       return false;
     }
 
-    return viewCapability.metadata.appSymbolicName === sender;
+    return viewCapability.metadata!.appSymbolicName === sender;
   }
 
   public ngOnDestroy(): void {

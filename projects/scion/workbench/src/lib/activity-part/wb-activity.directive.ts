@@ -37,7 +37,7 @@ export class WbActivityDirective implements OnInit, OnDestroy {
    * Specifies the title of the activity.
    */
   @Input()
-  public set title(title: string) {
+  public set title(title: string | null) {
     this.activity.title = title;
   }
 
@@ -47,7 +47,7 @@ export class WbActivityDirective implements OnInit, OnDestroy {
    * You can use it in combination with `itemCssClass`, e.g. to render an icon glyph by using its textual name.
    */
   @Input()
-  public set itemText(itemText: string) {
+  public set itemText(itemText: string | null) {
     this.activity.itemText = itemText;
   }
 
@@ -55,7 +55,7 @@ export class WbActivityDirective implements OnInit, OnDestroy {
    * Specifies CSS class(es) added to the activity item, e.g. used for e2e testing or to set an icon font class.
    */
   @Input()
-  public set itemCssClass(itemCssClass: string | string[]) {
+  public set itemCssClass(itemCssClass: string | string[] | undefined) {
     this.activity.itemCssClass = itemCssClass;
   }
 
@@ -63,7 +63,7 @@ export class WbActivityDirective implements OnInit, OnDestroy {
    * Specifies CSS class(es) added to the activity item and activity panel, e.g. used for e2e testing.
    */
   @Input()
-  public set cssClass(cssClass: string | string[]) {
+  public set cssClass(cssClass: string | string[] | undefined) {
     this.activity.cssClass = cssClass;
   }
 

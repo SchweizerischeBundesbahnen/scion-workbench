@@ -37,7 +37,7 @@ export abstract class WorkbenchService {
   /**
    * A unique ID per instance of the app. If opened in a different browser tab, it has a different instance ID.
    */
-  public readonly appInstanceId: string;
+  public abstract readonly appInstanceId: string;
 
   /**
    * Emits the views opened in the workbench.
@@ -45,7 +45,7 @@ export abstract class WorkbenchService {
    * Upon subscription, the currently opened views are emitted, and then emits continuously
    * when new views are opened or existing views closed. It never completes.
    */
-  public readonly views$: Observable<string[]>;
+  public abstract readonly views$: Observable<string[]>;
 
   /**
    * Returns a reference to the specified {@link WorkbenchView}, or `null` if not found.

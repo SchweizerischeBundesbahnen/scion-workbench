@@ -78,7 +78,7 @@ export class WbRouterLinkDirective {
 export class WbRouterLinkWithHrefDirective extends WbRouterLinkDirective implements OnChanges {
 
   @HostBinding('href')
-  public href: string;
+  public href: string | undefined;
 
   constructor(private _router: Router,
               private _locationStrategy: LocationStrategy,

@@ -35,7 +35,7 @@ export class ViewMenuComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    fromEvent(this._overlayRef.backdropElement, 'mousedown')
+    fromEvent(this._overlayRef.backdropElement!, 'mousedown')
       .pipe(takeUntil(this._destroy$))
       .subscribe(() => this.closeContextMenu());
   }

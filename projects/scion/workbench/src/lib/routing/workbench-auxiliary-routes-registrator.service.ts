@@ -42,7 +42,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
       }));
 
     this.replaceRouterConfig([
-      ...this._router.config.filter(route => !outletNames.has(route.outlet)), // all registered routes, except auxiliary routes for any of the given outlets
+      ...this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)), // all registered routes, except auxiliary routes for any of the given outlets
       ...outletAuxRoutes,
     ]);
 
@@ -58,7 +58,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
       return;
     }
 
-    this.replaceRouterConfig(this._router.config.filter(route => !outletNames.has(route.outlet)));
+    this.replaceRouterConfig(this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)));
   }
 
   /**

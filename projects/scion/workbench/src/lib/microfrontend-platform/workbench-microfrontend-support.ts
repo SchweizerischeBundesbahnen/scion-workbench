@@ -79,7 +79,7 @@ class MicrofrontendPlatformModuleConfigLoader implements MicrofrontendPlatformCo
   }
 
   public load(): Promise<PlatformConfig> {
-    return Promise.resolve(this._workbenchModuleConfig.microfrontends.platform as PlatformConfig);
+    return Promise.resolve(this._workbenchModuleConfig.microfrontends!.platform as PlatformConfig);
   }
 }
 

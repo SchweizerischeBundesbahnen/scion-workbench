@@ -17,10 +17,10 @@ import { TextMessageComponent } from './text-message.component';
 
 export class ɵMessageBox<T = any> implements MessageBox<T> { // tslint:disable-line:class-name
 
-  private _closeResolveFn: (action: any) => void;
+  private _closeResolveFn!: (action: any) => void;
 
   public readonly input: T;
-  public readonly title$: BehaviorSubject<string | undefined | Observable<string | undefined>>;
+  public readonly title$: BehaviorSubject<string | undefined | Observable<string>>;
   public readonly actions$: BehaviorSubject<MessageBoxAction[]>;
   public readonly severity$: BehaviorSubject<'info' | 'warn' | 'error'>;
   public readonly cssClass$: BehaviorSubject<string[]>;
@@ -48,7 +48,7 @@ export class ɵMessageBox<T = any> implements MessageBox<T> { // tslint:disable-
     this.actions$.next(actions || []);
   }
 
-  public setTitle(title: string | undefined | Observable<string | undefined>): void {
+  public setTitle(title: string | undefined | Observable<string>): void {
     this.title$.next(title);
   }
 

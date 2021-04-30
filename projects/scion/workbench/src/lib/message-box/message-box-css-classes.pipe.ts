@@ -13,7 +13,7 @@ export class MessageBoxCssClassesPipe implements PipeTransform {
   public transform(messageBox: ɵMessageBox): Observable<string[]> {
     return combineLatest([messageBox.severity$, messageBox.cssClass$])
       .pipe(
-        map(([severity, cssClasses]) => []
+        map(([severity, cssClasses]) => new Array<string>()
           .concat(cssClasses)
           .concat(severity)
           .concat(`e2e-severity-${severity}`)),

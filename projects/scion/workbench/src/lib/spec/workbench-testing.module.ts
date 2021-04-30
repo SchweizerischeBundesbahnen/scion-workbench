@@ -28,7 +28,7 @@ export class WorkbenchTestingModule {
     return {
       ngModule: WorkbenchTestingModule,
       providers: [
-        WorkbenchModule.forRoot(workbenchModuleConfig).providers,
+        WorkbenchModule.forRoot(workbenchModuleConfig).providers ?? [],
         {provide: ViewActivationInstantProvider, useClass: ViewActivationTestingInstantProvider},
         {provide: PARTS_LAYOUT_ROOT_PART_IDENTITY, useValue: 'main'},
       ],

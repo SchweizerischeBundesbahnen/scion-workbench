@@ -30,11 +30,11 @@ export interface MPartsLayout {
  */
 export class MTreeNode {
 
-  public nodeId: string;
-  public child1: MTreeNode | MPart;
-  public child2: MTreeNode | MPart;
-  public ratio: number;
-  public direction: 'column' | 'row';
+  public nodeId!: string;
+  public child1!: MTreeNode | MPart;
+  public child2!: MTreeNode | MPart;
+  public ratio!: number;
+  public direction!: 'column' | 'row';
   public parent?: MTreeNode;
 
   constructor(treeNode: Partial<MTreeNode>) {
@@ -61,10 +61,10 @@ export class MTreeNode {
  */
 export class MPart {
 
-  public partId: string;
+  public partId!: string;
   public parent?: MTreeNode;
   public viewIds: string[] = [];
-  public activeViewId: string;
+  public activeViewId?: string;
 
   constructor(part: Partial<MPart>) {
     part.parent && assertType(part.parent, {toBeOneOf: MTreeNode}); // check the type to ensure that it is not an object literal
@@ -76,7 +76,7 @@ export class MPart {
    */
   public getPath(): string[] {
     const path: string[] = [];
-    let parent: MTreeNode = this.parent;
+    let parent: MTreeNode | undefined = this.parent;
     while (parent) {
       path.push(parent.nodeId);
       parent = parent.parent;

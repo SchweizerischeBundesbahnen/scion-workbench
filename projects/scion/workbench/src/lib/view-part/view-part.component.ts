@@ -26,8 +26,8 @@ export class ViewPartComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  public hasViews: boolean;
-  public hasActions: boolean;
+  public hasViews = false;
+  public hasActions = false;
 
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
@@ -79,7 +79,7 @@ export class ViewPartComponent implements OnDestroy {
     });
   }
 
-  public get activeViewId$(): Observable<string> {
+  public get activeViewId$(): Observable<string | null> {
     return this._part.activeViewId$;
   }
 

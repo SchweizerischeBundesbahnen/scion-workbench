@@ -14,43 +14,43 @@ export abstract class Activity {
   /**
    * Specifies the title of the activity.
    */
-  public title: string;
+  public abstract title: string | null;
 
   /**
    * Specifies CSS class(es) added to the activity item and activity panel, e.g. used for e2e testing.
    */
-  public cssClass: string | string[];
+  public abstract cssClass: string | string[] | undefined;
 
   /**
    * Specifies the text for the activity item.
    *
    * You can use it in combination with `itemCssClass`, e.g. to render an icon glyph by using its textual name.
    */
-  public itemText: string;
+  public abstract itemText: string | null;
 
   /**
    * Specifies CSS class(es) added to the activity item, e.g. used for e2e testing or to set an icon font class.
    */
-  public itemCssClass: string | string[];
+  public abstract itemCssClass: string | string[] | undefined;
   /**
    * Controls whether to open this activity in the activity panel or to open it in a separate view.
    */
-  public target: 'activity-panel' | 'view';
+  public abstract target: 'activity-panel' | 'view';
 
   /**
    * Controls whether to show or hide this activity. By default, this activity is showing.
    */
-  public visible: boolean;
+  public abstract visible: boolean;
 
   /**
    * Specifies where to insert this activity in the list of activities.
    */
-  public position: number;
+  public abstract position: number | undefined;
 
   /**
    * Specifies the number of pixels added to the activity panel width if this is the active activity.
    */
-  public panelWidthDelta: number;
+  public abstract panelWidthDelta: number;
 
   /**
    * Specifies the routing commands used by Angular router to navigate when this activity is activated.
@@ -61,27 +61,27 @@ export abstract class Activity {
   /**
    * Returns the routing commands of this activity.
    */
-  public abstract get commands(): any[];
+  public abstract readonly commands: any[];
 
   /**
    * Returns the routing path of this activity.
    */
-  public abstract get path(): string;
+  public abstract readonly path: string | undefined;
 
   /**
    * Emits upon activation change of this activity.
    */
-  public abstract get active$(): Observable<boolean>;
+  public abstract readonly active$: Observable<boolean>;
 
   /**
    * Indicates if this activity is currently active.
    */
-  public abstract get active(): boolean;
+  public abstract readonly active: boolean;
 
   /**
    * Returns the actions associated with this activity.
    */
-  public abstract get actions(): ActivityAction[];
+  public abstract readonly actions: ActivityAction[];
 
   /**
    * Associates an action with this activity. When this activity is active, it is displayed in the activity panel header.
@@ -95,19 +95,19 @@ export class InternalActivity implements Activity {
 
   private _commands: any[] = [];
   private _actions: ActivityAction[] = [];
-  private _path: string;
+  private _path: string | undefined;
   private _active$ = new BehaviorSubject<boolean>(false);
 
   public panelWidthDelta = 0;
-  public title: string;
-  public cssClass: string | string[];
+  public title: string | null = null;
+  public cssClass: string | string[] | undefined;
 
-  public itemText: string;
-  public itemCssClass: string | string[];
+  public itemText: string | null = null;
+  public itemCssClass: string | string[] | undefined;
 
   public target: 'activity-panel' | 'view' = 'activity-panel';
   public visible = true;
-  public position: number;
+  public position: number | undefined;
 
   constructor(private _wbRouter: WorkbenchRouter, private _injector: Injector) {
   }
@@ -125,7 +125,7 @@ export class InternalActivity implements Activity {
     return this._commands;
   }
 
-  public get path(): string {
+  public get path(): string | undefined {
     return this._path;
   }
 

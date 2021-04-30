@@ -34,7 +34,7 @@ export class WbAddViewToPartGuard implements CanActivate {
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const viewId: string = route.outlet;
-    const viewTarget: ViewTarget = ((this._router.getCurrentNavigation().extras.state || {})[VIEW_TARGET] || {})[viewId] || {};
+    const viewTarget: ViewTarget = ((this._router.getCurrentNavigation()!.extras.state || {})[VIEW_TARGET] || {})[viewId] || {};
 
     // Read the layout from the URL.
     const partsLayout = this._workbenchRouter.getCurrentNavigationContext().partsLayout;
@@ -84,7 +84,7 @@ export class WbAddViewToPartGuard implements CanActivate {
     switch (insertionIndex) {
       case undefined: {  // index after the active view, if any, or after the last view otherwise
         const part = partsLayout.findPart(partId, {orElseThrow: true});
-        const index = part.viewIds.indexOf(part.activeViewId);
+        const index = part.viewIds.indexOf(part.activeViewId!);
         return (index > -1 ? index + 1 : part.viewIds.length);
       }
       case 'start': {

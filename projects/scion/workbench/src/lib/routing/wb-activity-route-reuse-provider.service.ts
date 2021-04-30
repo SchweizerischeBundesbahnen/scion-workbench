@@ -47,7 +47,7 @@ export class WbActivityRouteReuseProvider implements WbRouteReuseProvider {
     }
 
     return hierarchy
-      .reduce((path, routeSnapshot) => [...path, ...routeSnapshot.url.map(it => it.path)], [])
+      .reduce((path, routeSnapshot) => [...path, ...routeSnapshot.url.map(it => it.path)], new Array<string>())
       .join('/');
   }
 }

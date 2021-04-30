@@ -36,14 +36,14 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
   private readonly _router: Router;
   private readonly _viewActivationInstantProvider: ViewActivationInstantProvider;
 
-  public title: string;
-  public heading: string;
+  public title: string | null = null;
+  public heading: string | null = null;
   public dirty: boolean;
   public closable: boolean;
 
-  public scrollTop: number | null;
-  public scrollLeft: number | null;
-  public activationInstant: number;
+  public scrollTop = 0;
+  public scrollLeft = 0;
+  public activationInstant!: number;
 
   public readonly active$: BehaviorSubject<boolean>;
   public readonly cssClasses$: BehaviorSubject<string[]>;
@@ -63,6 +63,7 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
 
     this.active$ = new BehaviorSubject<boolean>(active);
     this.cssClasses$ = new BehaviorSubject<string[]>([]);
+    this.dirty = false;
     this.closable = true;
 
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbench.viewMenuItemProviders$])
@@ -115,7 +116,7 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
       return viewPart;
     }
 
-    const part = this._layoutService.layout.findPartByViewId(this.viewId, {orElseThrow: true});
+    const part = this._layoutService.layout!.findPartByViewId(this.viewId, {orElseThrow: true});
     return this._viewPartRegistry.getElseThrow(part.partId);
   }
 

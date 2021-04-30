@@ -50,17 +50,17 @@ export class PartsLayoutComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  public root: MTreeNode | MPart;
+  public root!: MTreeNode | MPart;
 
   /**
    * Reference to the root part of the layout. Is only set if the layout root is of the type {@link MPart}.
    */
-  public rootPart: WbComponentPortal<ViewPartComponent>;
+  public rootPart: WbComponentPortal<ViewPartComponent> | null = null;
 
   /**
    * Reference to the root node of the layout. Is only set if the layout root is of the type {@link MTreeNode}.
    */
-  public rootNode: MTreeNode;
+  public rootNode: MTreeNode | null = null;
 
   constructor(private _viewPartRegistry: WorkbenchViewPartRegistry,
               private _layoutService: WorkbenchLayoutService,
@@ -70,11 +70,11 @@ export class PartsLayoutComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this._layoutService.layout$
       .pipe(
-        startWith(null as PartsLayout), // start with a null layout to initialize the 'pairwise' operator, so it emits once the layout is set.
+        startWith(null! as PartsLayout), // start with a null layout to initialize the 'pairwise' operator, so it emits once the layout is set.
         pairwise(),
         takeUntil(this._destroy$),
       )
-      .subscribe(([prevLayout, curLayout]: [PartsLayout, PartsLayout]) => {
+      .subscribe(([prevLayout, curLayout]: [PartsLayout | null, PartsLayout]) => {
         // Determine the parts which are about to be re-parented in the DOM, and detach them temporarily from the Angular component tree,
         // so that they are not destroyed when being re-parented.
         const reattachFn = this.detachPortalsToBeMovedFromComponentTree(prevLayout, curLayout);
@@ -98,22 +98,29 @@ export class PartsLayoutComponent implements OnInit, OnDestroy {
    *
    * Returns a function to attach the detached portals to the Angular component tree anew.
    */
-  private detachPortalsToBeMovedFromComponentTree(prevLayout: PartsLayout, newLayout: PartsLayout): () => void {
+  private detachPortalsToBeMovedFromComponentTree(prevLayout: PartsLayout | null, currLayout: PartsLayout): () => void {
     if (!prevLayout) {
       return noop; // no current layout in place, so no portal is moved
     }
 
     // For each part, compute its path in the layout tree. The path is the list of all parent node ids.
-    const newPartPaths: Map<string, string[]> = newLayout.parts.reduce((acc, part) => {
+    const currPartPathsByPartId: Map<string, string[]> = currLayout.parts.reduce((acc, part) => {
       return acc.set(part.partId, part.getPath());
     }, new Map<string, string[]>());
 
     // Determine parts to be moved in the layout tree.
     const partPortalsToBeMoved: WbComponentPortal<ViewPartComponent>[] = prevLayout.parts.reduce((acc, prevPart) => {
-      const prevPartPath = prevPart.getPath();
-      const newPartPath = newPartPaths.get(prevPart.partId);
+      const prevPartPath: string[] = prevPart.getPath();
+      const currPartPath: string[] | undefined = currPartPathsByPartId.get(prevPart.partId);
 
-      if (!Arrays.isEqual(newPartPath, prevPartPath)) {
+      // If the part is no longer contained in the layout but is still present in the parts registry, detach it so that its views
+      // will not get destroyed when applying the new layout, i.e., when moving all its views to another part.
+      if (!currPartPath) {
+        return acc.concat(this._viewPartRegistry.getElseNull(prevPart.partId)?.portal || []);
+      }
+
+      // If the part is moved in the layout, detach it to not destroy its views.
+      if (!Arrays.isEqual(currPartPath, prevPartPath)) {
         return acc.concat(this._viewPartRegistry.getElseThrow(prevPart.partId).portal);
       }
       return acc;

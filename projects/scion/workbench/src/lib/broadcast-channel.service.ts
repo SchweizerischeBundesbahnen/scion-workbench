@@ -33,7 +33,7 @@ export class BroadcastChannelService {
         filter(event => event.storageArea === localStorage),
         filter(event => event.key === BROADCAST_CHANNEL_ITEM_KEY),
         filter(event => event.newValue !== null), // skip item remove events
-        map(event => JSON.parse(event.newValue)),
+        map(event => JSON.parse(event.newValue!)),
       );
   }
 

@@ -89,8 +89,8 @@ export class WorkbenchActivityPartService {
   /**
    * Returns the activity of the current routing context, or `null` if not in the routing context of an activity.
    */
-  public getActivityFromRoutingContext(route: ActivatedRouteSnapshot): Activity {
-    for (let testee = route; testee !== null; testee = testee.parent) {
+  public getActivityFromRoutingContext(route: ActivatedRouteSnapshot): Activity | null {
+    for (let testee: ActivatedRouteSnapshot | null = route; testee !== null; testee = testee.parent) {
       const activity = testee.data[ACTIVITY_DATA_KEY];
       if (activity) {
         return activity;

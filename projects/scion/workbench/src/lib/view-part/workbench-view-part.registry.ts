@@ -27,8 +27,15 @@ export class WorkbenchViewPartRegistry implements OnDestroy {
    * Destroys the viewpart of the given id and removes it from this registry.
    */
   public remove(partId: string): void {
-    this._viewPartRegistry.get(partId).destroy();
+    this.getElseThrow(partId).destroy();
     this._viewPartRegistry.delete(partId);
+  }
+
+  /**
+   * Returns the {@link WorkbenchViewPart} of the given identity, or `null` if not found.
+   */
+  public getElseNull(partId: string): ɵWorkbenchViewPart | null {
+    return this._viewPartRegistry.get(partId) || null;
   }
 
   /**

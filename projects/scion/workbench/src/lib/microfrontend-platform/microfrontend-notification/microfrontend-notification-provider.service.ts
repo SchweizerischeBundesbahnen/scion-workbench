@@ -31,7 +31,7 @@ export class MicrofrontendNotificationProvider implements WorkbenchInitializer {
       logger.debug(() => 'Showing notification', LoggerNames.MICROFRONTEND, config);
       notificationService.notify({
         ...config,
-        content: config.content ?? '',
+        content: config!.content ?? '',
       });
     });
   }

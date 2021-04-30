@@ -52,11 +52,8 @@ export class ActivityPartComponent {
   private _panelWidth = PANEL_INITIAL_WIDTH;
   private _panelWidth$ = new Subject<number>();
 
-  @ViewChild('viewport')
-  public viewport: ElementRef;
-
   @ViewChild('panel', {read: ElementRef})
-  private _panelElementRef: ElementRef;
+  private _panelElementRef!: ElementRef;
 
   constructor(public host: ElementRef<HTMLElement>,
               public activityPartService: WorkbenchActivityPartService,
@@ -69,7 +66,7 @@ export class ActivityPartComponent {
     return this.activityPartService.activities.filter(it => it.visible);
   }
 
-  public get activeActivity(): Activity {
+  public get activeActivity(): Activity | null {
     const activeActivity = this.activityPartService.activeActivity;
     return activeActivity && activeActivity.visible ? activeActivity : null;
   }

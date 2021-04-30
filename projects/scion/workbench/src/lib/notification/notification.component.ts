@@ -31,10 +31,10 @@ export class NotificationComponent implements OnChanges, OnDestroy {
   private _destroy$ = new Subject<void>();
   private _closeTimerChange$ = new Subject<void>();
 
-  public portal: ComponentPortal<any>;
+  public portal: ComponentPortal<any> | undefined;
 
   @Input()
-  public notification: ɵNotification;
+  public notification!: ɵNotification;
 
   @Output()
   public closeNotification = new EventEmitter<void>();

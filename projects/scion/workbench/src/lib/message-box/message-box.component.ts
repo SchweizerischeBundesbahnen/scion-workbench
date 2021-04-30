@@ -36,22 +36,22 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
   private _cancelBlinkTimer$ = new Subject<void>();
   private _activeActionButton: HTMLElement | undefined;
 
-  public portal: ComponentPortal<any>;
+  public portal: ComponentPortal<any> | undefined;
 
   @HostBinding('style.transform')
-  public transform: string;
+  public transform: string | undefined;
 
   @HostBinding('class.blinking')
-  public blinking: boolean;
+  public blinking = false;
 
   @HostBinding('class.text-selectable')
-  public textSelectable: boolean;
+  public textSelectable = false;
 
   @HostBinding('attr.tabindex')
   public tabindex = -1;
 
   @Input()
-  public messageBox: ɵMessageBox;
+  public messageBox!: ɵMessageBox;
 
   @Input()
   public set positionDelta(delta: number) {
@@ -59,7 +59,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
   }
 
   @ViewChildren('action_button')
-  public actionButtons: QueryList<ElementRef<HTMLElement>>;
+  public actionButtons!: QueryList<ElementRef<HTMLElement>>;
 
   constructor(private _injector: Injector,
               private _cd: ChangeDetectorRef,
@@ -73,7 +73,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
       this.portal = this.createPortal(this.messageBox);
       this._cd.detectChanges();
     });
-    this.textSelectable = this.messageBox.config.contentSelectable;
+    this.textSelectable = this.messageBox.config.contentSelectable ?? false;
     this.installBlinkRequestHandler();
     this.installFocusRequestHandler();
   }

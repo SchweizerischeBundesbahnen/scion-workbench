@@ -187,7 +187,7 @@ export class PopupService {
   private installPopupCloser(config: PopupConfig, popupElement: HTMLElement, overlayRef: OverlayRef, popupHandle: Popup, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
     // Close the popup on escape keystroke.
     if (config.closeStrategy?.onEscape ?? true) {
-      fromEvent(popupElement, 'keydown')
+      fromEvent<KeyboardEvent>(popupElement, 'keydown')
         .pipe(
           filter((event: KeyboardEvent) => event.key === 'Escape'),
           subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),

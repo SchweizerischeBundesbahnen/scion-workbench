@@ -47,7 +47,7 @@ export class MicrofrontendNavigateCommandHandler implements OnDestroy {
   }
 
   private async handleNavigateCommand(message: TopicMessage<ɵWorkbenchRouterNavigateCommand>): Promise<void> {
-    const navigateCommand = message.body;
+    const navigateCommand = message.body!;
     const replyTo = message.headers.get(MessageHeaders.ReplyTo);
 
     // For multiple capabilities, navigate sequentially to avoid resolving to the same view for target 'blank'.
@@ -69,7 +69,7 @@ export class MicrofrontendNavigateCommandHandler implements OnDestroy {
 
   private navigate(viewCapability: WorkbenchViewCapability, qualifier: Qualifier, extras: WorkbenchNavigationExtras): Promise<boolean> {
     const matrixParams = this.computeMatrixParams(qualifier, extras);
-    const routerNavigateCommand = this.buildRouterNavigateCommand(viewCapability.metadata.id, matrixParams);
+    const routerNavigateCommand = this.buildRouterNavigateCommand(viewCapability.metadata!.id, matrixParams);
 
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, routerNavigateCommand, viewCapability);
 
@@ -94,7 +94,7 @@ export class MicrofrontendNavigateCommandHandler implements OnDestroy {
 
     if (extras.paramsHandling === 'merge' && extras.target === 'self' && extras.selfViewId) {
       const currentViewUrlSegments = this._router.parseUrl(this._router.url).root.children[extras.selfViewId].segments;
-      const currentMatrixParams = Arrays.last(currentViewUrlSegments).parameters;
+      const currentMatrixParams = Arrays.last(currentViewUrlSegments)!.parameters;
       const mergedMatrixParams = {
         ...currentMatrixParams,
         ...params, // new params have precedence over params contained in the URL
@@ -132,7 +132,7 @@ function stringifyError(error: any): string {
  * Returns a new dictionary with `undefined` values removed.
  */
 function withoutUndefinedEntries(object: Dictionary): Dictionary {
-  return Object.entries(object).reduce((dictionary, [key, value]) => {
+  return Object.entries(object).reduce<Dictionary>((dictionary, [key, value]) => {
     if (value !== undefined) {
       dictionary[key] = value;
     }

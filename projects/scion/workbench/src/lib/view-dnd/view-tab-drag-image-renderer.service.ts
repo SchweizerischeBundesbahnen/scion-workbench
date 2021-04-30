@@ -34,9 +34,9 @@ export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 export class ViewTabDragImageRenderer implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  private _viewDragImagePortalOutlet: DomPortalOutlet;
-  private _constrainDragImageRectFn: (rect: ViewDragImageRect) => ViewDragImageRect;
-  private _dragData: ViewDragData;
+  private _viewDragImagePortalOutlet: DomPortalOutlet | null = null;
+  private _constrainDragImageRectFn: ((rect: ViewDragImageRect) => ViewDragImageRect) | null = null;
+  private _dragData: ViewDragData | null = null;
 
   constructor(private _viewDragService: ViewDragService,
               private _workbenchModuleConfig: WorkbenchModuleConfig,
@@ -59,7 +59,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
    */
   public unsetConstrainDragImageRectFn(fn: (rect: ViewDragImageRect) => ViewDragImageRect): void {
     if (fn === this._constrainDragImageRectFn) {
-      this._constrainDragImageRectFn = undefined;
+      this._constrainDragImageRectFn = null;
     }
   }
 
@@ -70,7 +70,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
    * or when dragging the view tab into this window if started the drag operation in another window.
    */
   private onWindowDragEnter(event: DragEvent): void {
-    this._dragData = this._viewDragService.getViewDragData();
+    this._dragData = this._viewDragService.getViewDragData()!;
     const dragPosition = this.computeDragImageRect(this._dragData, event);
 
     // create the drag image
@@ -93,10 +93,10 @@ export class ViewTabDragImageRenderer implements OnDestroy {
    * Method invoked while dragging a view over the current window. It is invoked ouside of the Angular zone.
    */
   private onWindowDragOver(event: DragEvent): void {
-    const dragPosition = this.computeDragImageRect(this._dragData, event);
+    const dragPosition = this.computeDragImageRect(this._dragData!, event);
 
     // update the drag image position
-    setStyle(this._viewDragImagePortalOutlet.outletElement as HTMLElement, {
+    setStyle(this._viewDragImagePortalOutlet!.outletElement as HTMLElement, {
       left: `${dragPosition.x}px`,
       top: `${dragPosition.y}px`,
     });
@@ -124,7 +124,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
   }
 
   private disposeDragImage(): void {
-    this._viewDragImagePortalOutlet.dispose();
+    this._viewDragImagePortalOutlet!.dispose();
     this._viewDragImagePortalOutlet = null;
     this._dragData = null;
   }
@@ -167,7 +167,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
     const injector = Injector.create({
       parent: this._injector,
       providers: [
-        {provide: WorkbenchView, useValue: new DragImageWorkbenchView(this._dragData)},
+        {provide: WorkbenchView, useValue: new DragImageWorkbenchView(this._dragData!)},
         {provide: VIEW_TAB_CONTEXT, useValue: 'drag-image'},
       ],
     });

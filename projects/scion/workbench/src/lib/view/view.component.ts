@@ -53,7 +53,7 @@ export class ViewComponent implements OnDestroy {
   }
 
   @ViewChild('router_outlet')
-  public routerOutlet: WbRouterOutletComponent; // specs
+  public routerOutlet!: WbRouterOutletComponent; // specs
 
   @HostBinding('attr.data-viewid')
   public get viewId(): string {

@@ -32,7 +32,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
    * Destroys the view of the given id and removes it from this registry.
    */
   public remove(viewId: string): void {
-    this._viewRegistry.get(viewId).destroy();
+    this.getElseThrow(viewId).destroy();
     this._viewRegistry.delete(viewId);
     this._viewRegistryChange$.next();
   }
@@ -68,7 +68,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
    * Returns the {@link WorkbenchView} of the given identity, or returns `null` if not found.
    */
   public getElseNull(viewId: string): ɵWorkbenchView | null {
-    return this._viewRegistry.get(viewId) || null;
+    return this._viewRegistry.get(viewId) ?? null;
   }
 
   public get viewIds(): string[] {

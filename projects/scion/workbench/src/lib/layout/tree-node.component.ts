@@ -26,10 +26,10 @@ import { WorkbenchRouter } from '../routing/workbench-router.service';
 })
 export class TreeNodeComponent {
 
-  private _treeNode: MTreeNode;
+  private _treeNode!: MTreeNode;
 
-  public sash1: Sash;
-  public sash2: Sash;
+  public sash1!: Sash;
+  public sash2!: Sash;
 
   @Input()
   public set treeNode(treeNode: MTreeNode) {
@@ -65,8 +65,8 @@ export class TreeNodeComponent {
 
   private createSash(content: MTreeNode | MPart, proportion: string): Sash {
     return {
-      portal: content instanceof MPart ? this._viewPartRegistry.getElseThrow(content.partId).portal : null,
-      treeNode: content instanceof MTreeNode ? content : null,
+      portal: content instanceof MPart ? this._viewPartRegistry.getElseThrow(content.partId).portal : undefined,
+      treeNode: content instanceof MTreeNode ? content : undefined,
       proportion: proportion,
     };
   }

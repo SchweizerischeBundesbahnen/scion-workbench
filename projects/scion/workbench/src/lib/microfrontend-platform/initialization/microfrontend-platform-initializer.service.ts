@@ -25,7 +25,7 @@ import { LogDelegate } from './log-delegate.service';
 @Injectable()
 export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, OnDestroy {
 
-  private _hostAppConfigIfAbsent: ApplicationConfig;
+  private _syntheticHostAppConfig: ApplicationConfig | null = null;
 
   constructor(private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
@@ -44,13 +44,13 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     const microfrontendPlatformConfig = await this._microfrontendPlatformConfigLoader.load();
 
     // Create a synthetic app config for the workbench host if not passed in the app list.
-    this._hostAppConfigIfAbsent = this.createHostAppConfigIfAbsent(microfrontendPlatformConfig);
+    this._syntheticHostAppConfig = this.createSyntheticHostAppConfigIfAbsent(microfrontendPlatformConfig);
 
     // Assemble the effective microfrontend platform config.
-    const effectiveHostSymbolicName = this._hostAppConfigIfAbsent?.symbolicName || this._workbenchModuleConfig.microfrontends.platformHost?.symbolicName;
+    const effectiveHostSymbolicName = this._syntheticHostAppConfig?.symbolicName || this._workbenchModuleConfig.microfrontends!.platformHost!.symbolicName!;
     const effectiveMicrofrontendPlatformConfig: PlatformConfig = {
       ...microfrontendPlatformConfig,
-      apps: microfrontendPlatformConfig.apps.concat(this._hostAppConfigIfAbsent || []),
+      apps: microfrontendPlatformConfig.apps.concat(this._syntheticHostAppConfig || []),
     };
 
     // Enable the API to register intentions at runtime, required for microfrontend routing to register the wildcard `view` intention.
@@ -93,27 +93,27 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
    * Regarding the manifest URL, we create an object URL for the manifest object as passed to the workbench module config,
    * or use an empty manifest if absent.
    */
-  private createHostAppConfigIfAbsent(microfrontendPlatformConfig: PlatformConfig): ApplicationConfig | null {
+  private createSyntheticHostAppConfigIfAbsent(microfrontendPlatformConfig: PlatformConfig): ApplicationConfig | null {
     // Do nothing if the host config is present in the app list.
-    const hostSymbolicName = this._workbenchModuleConfig.microfrontends.platformHost?.symbolicName;
+    const hostSymbolicName = this._workbenchModuleConfig.microfrontends!.platformHost?.symbolicName;
     if (microfrontendPlatformConfig.apps.some(app => app.symbolicName === hostSymbolicName)) {
       return null;
     }
 
     // Get the manifest object passed to the workbench module config, or create an empty manifest if absent.
-    const hostManifest: ApplicationManifest = this._workbenchModuleConfig.microfrontends.platformHost?.manifest || {name: 'Workbench Host'};
+    const hostManifest: ApplicationManifest = this._workbenchModuleConfig.microfrontends!.platformHost?.manifest || {name: 'Workbench Host'};
     return {
-      symbolicName: this._workbenchModuleConfig.microfrontends.platformHost?.symbolicName || 'workbench-host',
+      symbolicName: this._workbenchModuleConfig.microfrontends!.platformHost?.symbolicName || 'workbench-host',
       manifestUrl: URL.createObjectURL(new Blob([JSON.stringify(hostManifest)], {type: 'application/json'})),
     };
   }
 
   private enableIntentionRegisterApi(microfrontendPlatformConfig: PlatformConfig, appSymbolicName: string): void {
-    microfrontendPlatformConfig.apps.find(app => app.symbolicName === appSymbolicName).intentionRegisterApiDisabled = false;
+    microfrontendPlatformConfig.apps.find(app => app.symbolicName === appSymbolicName)!.intentionRegisterApiDisabled = false;
   }
 
   private disableScopeCheck(microfrontendPlatformConfig: PlatformConfig, appSymbolicName: string): void {
-    microfrontendPlatformConfig.apps.find(app => app.symbolicName === appSymbolicName).scopeCheckDisabled = true;
+    microfrontendPlatformConfig.apps.find(app => app.symbolicName === appSymbolicName)!.scopeCheckDisabled = true;
   }
 
   private async registerWildcardIntention(type: WorkbenchCapabilities): Promise<void> {
@@ -121,6 +121,6 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
   }
 
   public ngOnDestroy(): void {
-    this._hostAppConfigIfAbsent && URL.revokeObjectURL(this._hostAppConfigIfAbsent.manifestUrl);
+    this._syntheticHostAppConfig && URL.revokeObjectURL(this._syntheticHostAppConfig.manifestUrl);
   }
 }

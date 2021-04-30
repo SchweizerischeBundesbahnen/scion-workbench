@@ -49,7 +49,7 @@ export class ViewDragService {
   /**
    * Indicates if this app is the drag source for the ongoing drag operation (if any).
    */
-  private _isDragSource: boolean;
+  private _isDragSource = false;
 
   constructor(private _broadcastChannel: BroadcastChannelService, private _zone: NgZone) {
     fromEvent(window, 'unload')
@@ -61,7 +61,7 @@ export class ViewDragService {
    * Checks if the given event is a view drag event with the same origin.
    */
   public isViewDragEvent(event: DragEvent): boolean {
-    return event.dataTransfer.types.includes(VIEW_DRAG_TRANSFER_TYPE) && this.getViewDragData() !== null;
+    return !!event.dataTransfer && event.dataTransfer.types.includes(VIEW_DRAG_TRANSFER_TYPE) && this.getViewDragData() !== null;
   }
 
   /**
@@ -84,7 +84,7 @@ export class ViewDragService {
 
     const fromEvent$ = (eventName: ViewDragEventType): Observable<DragEvent> => {
       if (!options || !options.eventType || Arrays.coerce(options.eventType).includes(eventName)) {
-        return fromEvent<DragEvent>(target, eventName, options);
+        return fromEvent<DragEvent>(target, eventName, options ?? {});
       }
       return EMPTY;
     };
@@ -234,8 +234,9 @@ export interface ViewMoveEvent {
   target: {
     /**
      * Part to which to add the view. If using a {@link region} other than 'center', that part is used as a reference for creating a new part.
+     * Set the part to `null` if moving the view to a blank window.
      */
-    partId: string;
+    partId: string | null;
     /**
      * Identity of the new part to be created, if the region is either 'north', 'east', 'south', or 'west'.
      * If not set, a UUID is generated.

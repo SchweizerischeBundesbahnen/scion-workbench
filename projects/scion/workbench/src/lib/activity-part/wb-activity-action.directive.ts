@@ -10,7 +10,6 @@
 
 import { Directive, OnDestroy, TemplateRef } from '@angular/core';
 import { WorkbenchActivityPartService } from './workbench-activity-part.service';
-import { Activity } from './activity';
 import { ActivatedRoute } from '@angular/router';
 import { Disposable } from '../disposable';
 
@@ -34,18 +33,17 @@ import { Disposable } from '../disposable';
 })
 export class WbActivityActionDirective implements OnDestroy {
 
-  private readonly _activity: Activity;
   private readonly _action: Disposable;
 
   constructor(private _template: TemplateRef<void>,
               activityService: WorkbenchActivityPartService,
               route: ActivatedRoute) {
-    this._activity = activityService.getActivityFromRoutingContext(route.snapshot);
-    if (!this._activity) {
+    const activity = activityService.getActivityFromRoutingContext(route.snapshot);
+    if (!activity) {
       throw Error('[RoutingContextError] Route not in the context of an activity');
     }
 
-    this._action = this._activity.registerAction(this._template);
+    this._action = activity.registerAction(this._template);
   }
 
   public ngOnDestroy(): void {

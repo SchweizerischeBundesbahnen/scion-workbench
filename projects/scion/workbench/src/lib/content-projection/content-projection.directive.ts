@@ -24,19 +24,19 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
 
   private _boundingBoxElement: HTMLElement;
-  private _contentViewRef: EmbeddedViewRef<any>;
+  private _contentViewRef!: EmbeddedViewRef<any>;
 
   /**
    * Reference to the view container where to insert the overlay.
    */
   @Input('wbContentProjectionOverlayHost') // tslint:disable-line:no-input-rename
-  public overlayHost: ViewContainerRef | Promise<ViewContainerRef>;
+  public overlayHost!: ViewContainerRef | Promise<ViewContainerRef>;
 
   /**
    * Template which to render as overlay. The template will stick to the bounding box of the host element of this directive.
    */
   @Input('wbContentProjectionContent') // tslint:disable-line:no-input-rename
-  public contentTemplateRef: TemplateRef<void>;
+  public contentTemplateRef!: TemplateRef<void>;
 
   constructor(host: ElementRef<HTMLElement>, @Optional() private _view: WorkbenchView) {
     this._boundingBoxElement = host.nativeElement;

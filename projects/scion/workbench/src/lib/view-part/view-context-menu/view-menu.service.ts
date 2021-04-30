@@ -18,7 +18,7 @@ import { filter, mapTo, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { fromEvent, merge, Observable, Subject, TeardownLogic } from 'rxjs';
 import { coerceElement } from '@angular/cdk/coercion';
 import { TEXT, TextComponent } from '../view-context-menu/text.component';
-import { WorkbenchModuleConfig } from '../../workbench-module-config';
+import { MenuItemConfig, WorkbenchModuleConfig } from '../../workbench-module-config';
 import { WorkbenchService } from '../../workbench.service';
 import { Arrays } from '@scion/toolkit/util';
 import { filterArray } from '@scion/toolkit/operators';
@@ -72,7 +72,7 @@ export class ViewMenuService {
     const config = new OverlayConfig({
       scrollStrategy: this._overlay.scrollStrategies.noop(),
       hasBackdrop: true,
-      backdropClass: null,
+      backdropClass: undefined,
       disposeOnNavigation: true,
       positionStrategy: this._overlay.position()
         .flexibleConnectedTo(location)
@@ -103,16 +103,16 @@ export class ViewMenuService {
       view.menuItems$
         .pipe(
           // skip menu items which have no accelerator configured
-          filterArray((menuItem: WorkbenchMenuItem) => menuItem.accelerator && menuItem.accelerator.length > 0),
+          filterArray((menuItem: WorkbenchMenuItem) => !!menuItem.accelerator && menuItem.accelerator.length > 0),
           // register the menu item keyboard accelerators
           switchMap((menuItems: WorkbenchMenuItem[]): Observable<WorkbenchMenuItem> => {
             const accelerators$ = menuItems.map(menuItem => {
-              const key = Arrays.last(menuItem.accelerator);
-              const modifierKeys = menuItem.accelerator.slice(0, -1);
+              const key = Arrays.last(menuItem.accelerator!);
+              const modifierKeys = menuItem.accelerator!.slice(0, -1);
 
               return fromEvent<KeyboardEvent>(coerceElement(target), 'keydown')
                 .pipe(
-                  filter(event => event.key?.toLowerCase() === key.toLowerCase()), // ignore the shift modifier when comparing the pressed key
+                  filter(event => event.key?.toLowerCase() === key!.toLowerCase()), // ignore the shift modifier when comparing the pressed key
                   filter(event => Arrays.isEqual(modifierKeys, getModifierState(event), {exactOrder: false})), // check the modifier state of the pressed key
                   tap(event => {
                     event.preventDefault();
@@ -135,8 +135,8 @@ export class ViewMenuService {
   }
 
   private registerCloseViewMenuItem(): void {
-    const defaults = {visible: true, text: 'Close tab', group: 'close', accelerator: ['ctrl', 'k']};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.close;
+    const defaults: MenuItemConfig = {visible: true, text: 'Close tab', group: 'close', accelerator: ['ctrl', 'k']};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.close;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -154,8 +154,8 @@ export class ViewMenuService {
   }
 
   private registerCloseOtherViewsMenuItem(): void {
-    const defaults = {visible: true, text: 'Close other tabs', group: 'close', accelerator: ['ctrl', 'shift', 'k']};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.closeOthers;
+    const defaults: MenuItemConfig = {visible: true, text: 'Close other tabs', group: 'close', accelerator: ['ctrl', 'shift', 'k']};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeOthers;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -174,8 +174,8 @@ export class ViewMenuService {
   }
 
   private registerCloseAllViewsMenuItem(): void {
-    const defaults = {visible: true, text: 'Close all tabs', group: 'close', accelerator: ['ctrl', 'shift', 'alt', 'k']};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.closeAll;
+    const defaults: MenuItemConfig = {visible: true, text: 'Close all tabs', group: 'close', accelerator: ['ctrl', 'shift', 'alt', 'k']};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeAll;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -193,8 +193,8 @@ export class ViewMenuService {
   }
 
   private registerCloseViewsToTheRightMenuItem(): void {
-    const defaults = {visible: true, text: 'Close tabs to the right', group: 'close'};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.closeToTheRight;
+    const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the right', group: 'close'};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeToTheRight;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -213,8 +213,8 @@ export class ViewMenuService {
   }
 
   private registerCloseViewsToTheLeftMenuItem(): void {
-    const defaults = {visible: true, text: 'Close tabs to the left', group: 'close'};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.closeToTheLeft;
+    const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the left', group: 'close'};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeToTheLeft;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -233,8 +233,8 @@ export class ViewMenuService {
   }
 
   private registerMoveRightMenuItem(): void {
-    const defaults = {visible: true, text: 'Move right', group: 'move', accelerator: ['ctrl', 'alt', 'end']};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.moveRight;
+    const defaults: MenuItemConfig = {visible: true, text: 'Move right', group: 'move', accelerator: ['ctrl', 'alt', 'end']};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveRight;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -253,8 +253,8 @@ export class ViewMenuService {
   }
 
   private registerMoveLeftMenuItem(): void {
-    const defaults = {visible: true, text: 'Move left', group: 'move'};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.moveLeft;
+    const defaults: MenuItemConfig = {visible: true, text: 'Move left', group: 'move'};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveLeft;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -273,8 +273,8 @@ export class ViewMenuService {
   }
 
   private registerMoveUpMenuItem(): void {
-    const defaults = {visible: true, text: 'Move up', group: 'move'};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.moveUp;
+    const defaults: MenuItemConfig = {visible: true, text: 'Move up', group: 'move'};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveUp;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -293,8 +293,8 @@ export class ViewMenuService {
   }
 
   private registerMoveDownMenuItem(): void {
-    const defaults = {visible: true, text: 'Move down', group: 'move'};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.moveDown;
+    const defaults: MenuItemConfig = {visible: true, text: 'Move down', group: 'move'};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveDown;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -313,8 +313,8 @@ export class ViewMenuService {
   }
 
   private registerMoveToNewWindowMenuItem(): void {
-    const defaults = {visible: true, text: 'Move to new window', group: 'open'};
-    const appConfig = this._workbenchModuleConfig.viewMenuItems?.moveBlank;
+    const defaults: MenuItemConfig = {visible: true, text: 'Move to new window', group: 'open'};
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveBlank;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbench.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
