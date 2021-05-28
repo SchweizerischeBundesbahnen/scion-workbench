@@ -8,10 +8,11 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
+    "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "es2015",
+    "target": "es2017",
     "module": "es2020",
     "noUnusedLocals": true,
     "lib": [
@@ -39,10 +40,10 @@
      */
     //    "paths": {
     //      "@scion/workbench": [
-    //        "projects/scion/workbench/src/public_api"
+    //        "projects/scion/workbench/src/public-api"
     //      ],
     //      "@scion/workbench-client": [
-    //        "projects/scion/workbench-client/src/public_api"
+    //        "projects/scion/workbench-client/src/public-api"
     //      ],
     //      "@scion/microfrontend-platform": [
     //        "./node_modules/@scion/microfrontend-platform"
@@ -54,7 +55,7 @@
     //        "./node_modules/@scion/toolkit.internal/*"
     //      ],
     //      //      "@scion/microfrontend-platform": [
-    //      //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public_api"
+    //      //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public-api"
     //      //      ],
     //      //      "@scion/toolkit/util": [
     //      //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
@@ -101,7 +102,6 @@
     //    }
   },
   "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true

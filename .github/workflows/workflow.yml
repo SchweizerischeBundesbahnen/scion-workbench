@@ -1,11 +1,16 @@
 name: Continuous Integration and Delivery
 on: [ push, pull_request ]
+env:
+  NODE_VERSION: 14.17.0
 jobs:
   install:
     name: 'Installing NPM modules'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: 'Caching NPM modules if necessary'
         uses: actions/cache@v2
         id: node-modules-cache
@@ -20,6 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: 'Restoring NPM modules from cache'
         uses: actions/cache@v2
         with:
@@ -35,6 +43,9 @@ jobs:
       workbench-client-version: ${{ steps.workbench-client-package-json.outputs.version }}
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: 'Reading package.json version of scion/workbench'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/package-json@master
         id: workbench-package-json
@@ -77,6 +88,9 @@ jobs:
             cmd: npm run workbench-client-testing-app:vercel:build
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: 'Restoring NPM modules from cache'
         uses: actions/cache@v2
         with:
@@ -99,6 +113,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/workbench and dist/workbench-client'
         uses: actions/download-artifact@v2
         with:
@@ -161,6 +178,9 @@ jobs:
             project: workbench-client
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/workbench and dist/workbench-client'
         uses: actions/download-artifact@v2
         with:

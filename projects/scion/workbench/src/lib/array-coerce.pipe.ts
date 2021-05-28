@@ -16,7 +16,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({name: 'wbCoerceArray', pure: true})
 export class ArrayCoercePipe implements PipeTransform {
 
-  public transform<T>(arrayLike: T | T[]): T[] {
+  public transform<T>(arrayLike: T | T[] | null | undefined): T[] {
     if (arrayLike === null || arrayLike === undefined) {
       return [];
     }
