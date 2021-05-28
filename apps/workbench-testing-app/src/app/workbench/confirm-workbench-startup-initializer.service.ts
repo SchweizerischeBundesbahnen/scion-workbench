@@ -23,7 +23,7 @@ export class ConfirmWorkbenchStartupInitializer implements WorkbenchInitializer 
 
   public async init(): Promise<void> {
     // Do not open the alert dialog until the next macrotask so that Angular can complete the initial navigation to create routed view components.
-    await new Promise(resolve => asyncScheduler.schedule(() => {
+    await new Promise<void>(resolve => asyncScheduler.schedule(() => {
       alert('Click to continue Workbench Startup.');
       resolve();
     }));

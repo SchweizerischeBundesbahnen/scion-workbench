@@ -16,7 +16,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({name: 'wbFormatAccelerator', pure: true})
 export class WbFormatAcceleratorPipe implements PipeTransform {
 
-  public transform(accelerator: string[]): string {
+  public transform(accelerator: string[] | null | undefined): string {
     if (!accelerator || accelerator.length === 0) {
       return '';
     }

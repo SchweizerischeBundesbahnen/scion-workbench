@@ -13,10 +13,11 @@
 </ul>
 
 <!-- Activity Panel -->
+<!-- $any() is used as a workaround for issue https://github.com/angular/angular/issues/39280-->
 <div *ngIf="activeActivity as activity"
      #panel
      class="activity-panel e2e-activity-panel"
-     [ngClass]="activity.cssClass"
+     [ngClass]="$any(activity.cssClass)"
      [style.width.px]="panelWidth + activity.panelWidthDelta"
      [@panel-enter-or-leave]
      (@panel-enter-or-leave.done)="onPanelAnimationDone()">
@@ -26,7 +27,7 @@
     <ul class="e2e-activity-actions">
       <li *ngFor="let action of activity.actions">
         <ng-container *ngIf="action.component">
-          <ng-container *ngComponentOutlet="action.component; injector: action.injector"></ng-container>
+          <ng-container *ngComponentOutlet="action.component; injector: $any(action.injector)"></ng-container>
         </ng-container>
         <ng-container *ngIf="action.template">
           <ng-container *ngTemplateOutlet="action.template"></ng-container>

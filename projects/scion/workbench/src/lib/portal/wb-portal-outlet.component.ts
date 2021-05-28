@@ -18,13 +18,13 @@ import { WbComponentPortal } from './wb-component-portal';
 })
 export class WbPortalOutletComponent implements OnDestroy {
 
-  private _portal: WbComponentPortal<any> | undefined;
+  private _portal: WbComponentPortal<any> | null = null;
 
   @ViewChild(TemplateRef, {read: ViewContainerRef, static: true})
   private _viewContainerRef!: ViewContainerRef;
 
   @Input('wbPortal') // tslint:disable-line:no-input-rename
-  public set portal(portal: WbComponentPortal<any>) {
+  public set portal(portal: WbComponentPortal<any> | null) {
     this.detachPortal();
     this._portal = portal;
     this.attachPortal();

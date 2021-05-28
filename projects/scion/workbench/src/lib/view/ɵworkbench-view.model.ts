@@ -10,7 +10,6 @@
 
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { WbComponentPortal } from '../portal/wb-component-portal';
-import { ViewComponent } from './view.component';
 import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
 import { Router, UrlSegment } from '@angular/router';
 import { ViewDragService } from '../view-dnd/view-drag.service';
@@ -51,7 +50,7 @@ export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:c
   public readonly blocked$ = new BehaviorSubject(false);
 
   constructor(public readonly viewId: string,
-              public readonly portal: WbComponentPortal<ViewComponent>,
+              public readonly portal: WbComponentPortal<any>, // do not reference `ViewComponent` to avoid import cycles
               active: boolean,
               injector: Injector) {
     this._workbench = injector.get(ɵWorkbenchService);

@@ -2,9 +2,10 @@
      class="glasspane"
      [@leave]
      (mousedown)="onGlasspaneClick($event, messageBox)">
+  <!-- $any() is used as a workaround for issue https://github.com/angular/angular/issues/39280-->
   <wb-message-box [messageBox]="messageBox"
                   [positionDelta]="i * 10"
-                  [ngClass]="messageBox | wbMessageBoxCssClasses$ | async"
+                  [ngClass]="$any(messageBox | wbMessageBoxCssClasses$ | async)"
                   [@enter]
                   (mousedown)="$event.stopPropagation()">
   </wb-message-box>

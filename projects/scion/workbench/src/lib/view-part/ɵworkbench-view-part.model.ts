@@ -11,7 +11,6 @@ import { MPart } from '../layout/parts-layout.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
 import { WbComponentPortal } from '../portal/wb-component-portal';
-import { ViewPartComponent } from './view-part.component';
 import { Injector } from '@angular/core';
 import { Arrays } from '@scion/toolkit/util';
 import { Disposable } from '../disposable';
@@ -33,7 +32,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disabl
   public readonly activeViewId$ = new BehaviorSubject<string | null>(null);
 
   constructor(public readonly partId: string,
-              public readonly portal: WbComponentPortal<ViewPartComponent>,
+              public readonly portal: WbComponentPortal<any>, // do not reference `ViewPartComponent` to avoid import cycles
               injector: Injector) {
     this._layoutService = injector.get(WorkbenchLayoutService);
     this._wbRouter = injector.get(WorkbenchRouter);
