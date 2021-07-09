@@ -6,6 +6,14 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [11.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.7...11.0.0-beta.8) (2021-07-09)
+
+### chore
+
+* compile with TypeScript strict checks enabled ([c13e3b6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c13e3b6067df597bdf182ff27c482b0ec3b98b74)), closes [#246](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/246)
+
+
+
 # [11.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.6...11.0.0-beta.7) (2021-04-13)
 
 
