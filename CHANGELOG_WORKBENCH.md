@@ -1,3 +1,12 @@
+# [12.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.8...12.0.0-beta.1) (2021-07-12)
+
+
+### chore
+
+* update project workspace to Angular 12 ([8be4410](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/8be4410c755a8cec150a84e0cfc0a1a43d0773b8)), closes [#277](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/277)
+
+
+
 # [11.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.7...11.0.0-beta.8) (2021-07-09)
 
 ### chore

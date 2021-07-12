@@ -51,6 +51,7 @@ Although SCION Workbench is designed for use in Angular applications, its workbe
 ***
 
 ### Versions
+- `v12.0.0-beta.1` and newer are only compatible with Angular version 12.x.
 - `v11.0.0-beta.3` provides built-in microfrontend support from the [SCION Microfrontend Platform][link-scion-microfrontend-platform].
 - `v11.0.0-beta.1` and newer are only compatible with Angular version 11.x.
 - `v0.0.0-beta.35` and newer are only compatible with Angular version 10.x.
