@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ElementFinder } from 'protractor';
-import { SciTabbarPO } from '@scion/toolkit.internal/widgets.po';
-import { AppPO, ViewPO, ViewTabPO } from './app.po';
-import { WebdriverExecutionContexts } from './helper/webdriver-execution-context';
-import { Arrays } from '@scion/toolkit/util';
+import {ElementFinder} from 'protractor';
+import {SciTabbarPO} from '@scion/toolkit.internal/widgets.po';
+import {AppPO, ViewPO, ViewTabPO} from './app.po';
+import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Page object to interact {@link StartPageComponent}.

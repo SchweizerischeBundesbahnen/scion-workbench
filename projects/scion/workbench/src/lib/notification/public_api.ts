@@ -8,6 +8,6 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-export { Notification } from './notification';
-export { NotificationConfig } from './notification.config';
-export { NotificationService } from './notification.service';
+export {Notification} from './notification';
+export {NotificationConfig} from './notification.config';
+export {NotificationService} from './notification.service';

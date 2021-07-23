@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ComponentType } from '@angular/cdk/portal';
-import { ApplicationManifest, PlatformConfig } from '@scion/microfrontend-platform';
-import { Type } from '@angular/core';
-import { MicrofrontendPlatformConfigLoader } from './microfrontend-platform/microfrontend-platform-config-loader';
-import { LogAppender, LogLevel } from './logging';
+import {ComponentType} from '@angular/cdk/portal';
+import {ApplicationManifest, PlatformConfig} from '@scion/microfrontend-platform';
+import {Type} from '@angular/core';
+import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
+import {LogAppender, LogLevel} from './logging';
 
 /**
  * Configures the SCION Workbench module.

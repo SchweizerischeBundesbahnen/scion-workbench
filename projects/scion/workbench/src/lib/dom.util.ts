@@ -1,6 +1,6 @@
-import { coerceElement } from '@angular/cdk/coercion';
-import { ElementRef } from '@angular/core';
-import { Arrays } from '@scion/toolkit/util';
+import {coerceElement} from '@angular/cdk/coercion';
+import {ElementRef} from '@angular/core';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Creates a HTML element and optionally adds it to the DOM.
@@ -20,7 +20,7 @@ export function createElement(tag: string, options: ElementCreateOptions): HTMLE
  * Specify styles to be modified by passing a dictionary containing CSS property names (hyphen case).
  * To remove a style, set its value to `null`.
  */
-export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, style: { [style: string]: any | null }): void {
+export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, style: {[style: string]: any | null}): void {
   const target = coerceElement(element);
   Object.keys(style).forEach(key => target.style.setProperty(key, style[key]));
 }
@@ -56,6 +56,6 @@ export interface ElementCreateOptions {
    */
   parent?: Node;
   cssClass?: string | string[];
-  style?: { [style: string]: any };
+  style?: {[style: string]: any};
   text?: string;
 }

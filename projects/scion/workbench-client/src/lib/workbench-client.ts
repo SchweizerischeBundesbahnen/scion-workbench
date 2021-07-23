@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Beans } from '@scion/toolkit/bean-manager';
-import { WorkbenchViewInitializer } from './view/workbench-view-initializer';
-import { MicroApplicationConfig, MicrofrontendPlatform } from '@scion/microfrontend-platform';
-import { WorkbenchRouter } from './routing/workbench-router';
-import { WorkbenchPopupService } from './popup/workbench-popup-service';
-import { WorkbenchPopupInitializer } from './popup/workbench-popup-initializer';
-import { WorkbenchMessageBoxService } from './message-box/workbench-message-box-service';
-import { WorkbenchNotificationService } from './notification/workbench-notification-service';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {WorkbenchViewInitializer} from './view/workbench-view-initializer';
+import {MicroApplicationConfig, MicrofrontendPlatform} from '@scion/microfrontend-platform';
+import {WorkbenchRouter} from './routing/workbench-router';
+import {WorkbenchPopupService} from './popup/workbench-popup-service';
+import {WorkbenchPopupInitializer} from './popup/workbench-popup-initializer';
+import {WorkbenchMessageBoxService} from './message-box/workbench-message-box-service';
+import {WorkbenchNotificationService} from './notification/workbench-notification-service';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**

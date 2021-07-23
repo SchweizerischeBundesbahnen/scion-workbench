@@ -1,9 +1,9 @@
-import { Injectable, ModuleWithProviders, NgModule } from '@angular/core';
-import { ViewActivationInstantProvider } from '../view/view-activation-instant-provider.service';
-import { WorkbenchModule } from '../workbench.module';
-import { WorkbenchModuleConfig } from '../workbench-module-config';
-import { FromDimension } from '@scion/toolkit/observable';
-import { PARTS_LAYOUT_ROOT_PART_IDENTITY } from '../layout/parts-layout.factory';
+import {Injectable, ModuleWithProviders, NgModule} from '@angular/core';
+import {ViewActivationInstantProvider} from '../view/view-activation-instant-provider.service';
+import {WorkbenchModule} from '../workbench.module';
+import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {FromDimension} from '@scion/toolkit/observable';
+import {PARTS_LAYOUT_ROOT_PART_IDENTITY} from '../layout/parts-layout.factory';
 
 @Injectable()
 export class ViewActivationTestingInstantProvider implements ViewActivationInstantProvider {

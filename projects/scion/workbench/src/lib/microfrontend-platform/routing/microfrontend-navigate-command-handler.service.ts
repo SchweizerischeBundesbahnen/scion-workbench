@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { MessageClient, MessageHeaders, Qualifier, ResponseStatusCodes, TopicMessage } from '@scion/microfrontend-platform';
-import { WorkbenchNavigationExtras, WorkbenchViewCapability, ɵWorkbenchCommands, ɵWorkbenchRouterNavigateCommand } from '@scion/workbench-client';
-import { WorkbenchRouter } from '../../routing/workbench-router.service';
-import { Params, Router } from '@angular/router';
-import { Logger, LoggerNames } from '../../logging';
-import { MicrofrontendViewRoutes } from './microfrontend-routes';
-import { Arrays, Dictionaries, Dictionary } from '@scion/toolkit/util';
-import { Subject } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
-import { serializeExecution } from '../../operators';
+import {Injectable, OnDestroy} from '@angular/core';
+import {MessageClient, MessageHeaders, Qualifier, ResponseStatusCodes, TopicMessage} from '@scion/microfrontend-platform';
+import {WorkbenchNavigationExtras, WorkbenchViewCapability, ɵWorkbenchCommands, ɵWorkbenchRouterNavigateCommand} from '@scion/workbench-client';
+import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {Params, Router} from '@angular/router';
+import {Logger, LoggerNames} from '../../logging';
+import {MicrofrontendViewRoutes} from './microfrontend-routes';
+import {Arrays, Dictionaries, Dictionary} from '@scion/toolkit/util';
+import {Subject} from 'rxjs';
+import {catchError, takeUntil} from 'rxjs/operators';
+import {serializeExecution} from '../../operators';
 
 /**
  * Handles microfrontend navigate commands, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.

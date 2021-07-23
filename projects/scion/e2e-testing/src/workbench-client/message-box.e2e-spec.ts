@@ -8,15 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { consumeBrowserLog } from '../helper/testing.util';
-import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
-import { RegisterWorkbenchIntentionPagePO } from './page-object/register-workbench-intention-page.po';
-import { MessageBoxOpenerPagePO } from './page-object/message-box-opener-page.po';
-import { TextMessagePO } from '../text-message.po';
-import { InspectMessageBoxPO } from '../inspect-message-box.po';
-import { expectMap } from '../helper/expect-map-matcher';
-import { expectPromise } from '../helper/expect-promise-matcher';
+import {AppPO} from '../app.po';
+import {consumeBrowserLog} from '../helper/testing.util';
+import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
+import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
+import {TextMessagePO} from '../text-message.po';
+import {InspectMessageBoxPO} from '../inspect-message-box.po';
+import {expectMap} from '../helper/expect-map-matcher';
+import {expectPromise} from '../helper/expect-promise-matcher';
 
 describe('Workbench Message Box', () => {
 

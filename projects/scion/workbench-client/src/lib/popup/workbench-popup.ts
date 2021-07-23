@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { WorkbenchPopupCapability } from './workbench-popup-capability';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { MessageClient } from '@scion/microfrontend-platform';
-import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
-import { ɵPopupContext } from './workbench-popup-context';
+import {WorkbenchPopupCapability} from './workbench-popup-capability';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {MessageClient} from '@scion/microfrontend-platform';
+import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
+import {ɵPopupContext} from './workbench-popup-context';
 
 /**
  * A popup is a visual workbench component for displaying content above other content.
@@ -66,7 +66,7 @@ export abstract class WorkbenchPopup {
 /**
  * @ignore
  */
-export class ɵWorkbenchPopup implements WorkbenchPopup { // tslint:disable-line:class-name
+export class ɵWorkbenchPopup implements WorkbenchPopup {
 
   public params: Map<string, any>;
   public capability: WorkbenchPopupCapability;

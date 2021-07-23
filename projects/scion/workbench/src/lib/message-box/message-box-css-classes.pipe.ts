@@ -1,7 +1,7 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { combineLatest, Observable } from 'rxjs';
-import { ɵMessageBox } from './ɵmessage-box';
-import { map } from 'rxjs/operators';
+import {Pipe, PipeTransform} from '@angular/core';
+import {combineLatest, Observable} from 'rxjs';
+import {ɵMessageBox} from './ɵmessage-box';
+import {map} from 'rxjs/operators';
 
 /**
  * Collects CSS classes to be applied to the passed message box instance and returns them as

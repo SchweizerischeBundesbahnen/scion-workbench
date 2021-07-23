@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, selectOption } from '../../helper/testing.util';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciCheckboxPO, SciParamsEnterPO } from '@scion/toolkit.internal/widgets.po';
-import { $, browser, ElementFinder, protractor } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { coerceArray } from '@angular/cdk/coercion';
-import { RouterOutletPO } from './router-outlet.po';
-import { WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability } from '@scion/workbench-client';
+import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciCheckboxPO, SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
+import {$, browser, ElementFinder, protractor} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {coerceArray} from '@angular/cdk/coercion';
+import {RouterOutletPO} from './router-outlet.po';
+import {WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
 
 const EC = protractor.ExpectedConditions;
 
@@ -28,8 +28,8 @@ const EC = protractor.ExpectedConditions;
  *
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property with a string literal.
  */
-export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & { type: 'view', properties: { pinToStartPage?: boolean } };
-export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & { type: 'popup' };
+export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view', properties: {pinToStartPage?: boolean}};
+export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'};
 
 /**
  * Page object to interact {@link RegisterWorkbenchCapabilityPageComponent}.

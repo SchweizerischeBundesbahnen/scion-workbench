@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { ViewPagePO } from './page-object/view-page.po';
-import { RouterPagePO } from './page-object/router-page.po';
-import { consumeBrowserLog } from '../helper/testing.util';
-import { logging } from 'protractor';
+import {AppPO} from '../app.po';
+import {ViewPagePO} from './page-object/view-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
+import {consumeBrowserLog} from '../helper/testing.util';
+import {logging} from 'protractor';
 import Level = logging.Level;
 
 describe('Workbench View', () => {

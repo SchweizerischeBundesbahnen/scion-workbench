@@ -1,5 +1,5 @@
-import { ApplicationManifest } from '@scion/microfrontend-platform';
-import { WorkbenchCapabilities } from '@scion/workbench-client';
+import {ApplicationManifest} from '@scion/microfrontend-platform';
+import {WorkbenchCapabilities} from '@scion/workbench-client';
 
 /**
  * Represents the manifest of the Workbench Host App.
@@ -27,14 +27,14 @@ export const workbenchManifest: ApplicationManifest = {
     {
       type: WorkbenchCapabilities.Popup,
       qualifier: {
-        component: 'host-popup'
+        component: 'host-popup',
       },
       private: false,
       description: 'Represents a popup provided by the host app.',
       optionalParams: ['param1'],
       properties: {
         path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
-        cssClass: 'host-popup'
+        cssClass: 'host-popup',
       },
     },
   ],

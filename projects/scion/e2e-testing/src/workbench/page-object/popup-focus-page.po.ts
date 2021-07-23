@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, isActiveElement } from '../../helper/testing.util';
-import { AppPO, PopupPO } from '../../app.po';
-import { ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
+import {assertPageToDisplay, isActiveElement} from '../../helper/testing.util';
+import {AppPO, PopupPO} from '../../app.po';
+import {ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 
 /**
  * Page object to interact {@link PopupFocusPageComponent}.

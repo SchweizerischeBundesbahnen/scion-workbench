@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, Provider } from '@angular/core';
-import { WORKBENCH_STARTUP, WorkbenchInitializer } from '@scion/workbench';
-import { WorkbenchStartupQueryParams } from './workbench-startup-query-params';
-import { asyncScheduler } from 'rxjs';
+import {Injectable, Provider} from '@angular/core';
+import {WORKBENCH_STARTUP, WorkbenchInitializer} from '@scion/workbench';
+import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
+import {asyncScheduler} from 'rxjs';
 
 /**
  * Displays an alert dialog during workbench startup to pause the workbench startup until the user confirms the alert.

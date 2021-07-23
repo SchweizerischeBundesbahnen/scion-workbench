@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Observable } from 'rxjs';
-import { Disposable } from './disposable';
-import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench.model';
-import { WorkbenchView } from './view/workbench-view.model';
+import {Observable} from 'rxjs';
+import {Disposable} from './disposable';
+import {WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction} from './workbench.model';
+import {WorkbenchView} from './view/workbench-view.model';
 
 /**
  * Root object for the SCION Workbench.

@@ -1,0 +1,53 @@
+{
+  "extends": "../../../.eslintrc.json",
+  "ignorePatterns": [
+    "!**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "parserOptions": {
+        "project": [
+          "projects/scion/workbench/tsconfig.lib.json",
+          "projects/scion/workbench/tsconfig.lib.prod.json",
+          "projects/scion/workbench/tsconfig.spec.json"
+        ]
+      },
+      "rules": {
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": [
+              "wb",
+              "sci",
+              "spec"
+            ],
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": [
+              "wb",
+              "sci",
+              "spec"
+            ],
+            "style": "kebab-case"
+          }
+        ],
+        "@typescript-eslint/no-non-null-assertion": "off"
+      }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "rules": {}
+    }
+  ]
+}

@@ -8,21 +8,21 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ElementRef, Inject, Injectable, Injector, NgZone, Optional } from '@angular/core';
-import { ConnectedOverlayPositionChange, ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { from, fromEvent, MonoTypeOperatorFunction, Observable } from 'rxjs';
-import { filter, map, shareReplay, take, takeUntil } from 'rxjs/operators';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { Popup, PopupConfig, PopupOrigin, ɵPopup, ɵPopupError } from './popup.config';
-import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
-import { Arrays, Observables } from '@scion/toolkit/util';
-import { WorkbenchView } from '../view/workbench-view.model';
-import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
-import { fromBoundingClientRect$, fromDimension$ } from '@scion/toolkit/observable';
-import { coerceElement } from '@angular/cdk/coercion';
-import { PopupComponent } from './popup.component';
-import { DOCUMENT } from '@angular/common';
-import { observeInside, subscribeInside } from '@scion/toolkit/operators';
+import {ElementRef, Inject, Injectable, Injector, NgZone, Optional} from '@angular/core';
+import {ConnectedOverlayPositionChange, ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
+import {from, fromEvent, MonoTypeOperatorFunction, Observable} from 'rxjs';
+import {filter, map, shareReplay, take, takeUntil} from 'rxjs/operators';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {Popup, PopupConfig, PopupOrigin, ɵPopup, ɵPopupError} from './popup.config';
+import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
+import {Arrays, Observables} from '@scion/toolkit/util';
+import {WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {fromBoundingClientRect$, fromDimension$} from '@scion/toolkit/observable';
+import {coerceElement} from '@angular/cdk/coercion';
+import {PopupComponent} from './popup.component';
+import {DOCUMENT} from '@angular/common';
+import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top'};

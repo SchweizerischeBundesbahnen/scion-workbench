@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, Input, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
-import { WbComponentPortal } from './wb-component-portal';
+import {Component, Input, OnDestroy, TemplateRef, ViewChild, ViewContainerRef} from '@angular/core';
+import {WbComponentPortal} from './wb-component-portal';
 
 @Component({
   selector: 'wb-portal-outlet',
@@ -23,7 +23,7 @@ export class WbPortalOutletComponent implements OnDestroy {
   @ViewChild(TemplateRef, {read: ViewContainerRef, static: true})
   private _viewContainerRef!: ViewContainerRef;
 
-  @Input('wbPortal') // tslint:disable-line:no-input-rename
+  @Input('wbPortal') // eslint-disable-line @angular-eslint/no-input-rename
   public set portal(portal: WbComponentPortal<any> | null) {
     this.detachPortal();
     this._portal = portal;

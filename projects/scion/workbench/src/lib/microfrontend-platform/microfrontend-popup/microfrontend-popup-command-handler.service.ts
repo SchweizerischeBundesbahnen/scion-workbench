@@ -8,23 +8,23 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, NgZone, StaticProvider } from '@angular/core';
-import { mapToBody, MessageClient, MicroApplicationConfig } from '@scion/microfrontend-platform';
-import { WorkbenchPopup, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand } from '@scion/workbench-client';
-import { combineLatest, Observable, of } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
-import { Logger, LoggerNames } from '../../logging';
-import { MicrofrontendPopupComponent } from './microfrontend-popup.component';
-import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
-import { fromDimension$ } from '@scion/toolkit/observable';
-import { Popup, PopupOrigin } from '../../popup/popup.config';
-import { observeInside, subscribeInside } from '@scion/toolkit/operators';
-import { PopupService } from '../../popup/popup.service';
-import { ROUTER_OUTLET_NAME } from '../../workbench.constants';
-import { Router } from '@angular/router';
-import { WbRouterOutletComponent } from '../../routing/wb-router-outlet.component';
-import { RouterUtils } from '../../routing/router.util';
-import { Commands } from '../../routing/workbench-router.service';
+import {Injectable, NgZone, StaticProvider} from '@angular/core';
+import {mapToBody, MessageClient, MicroApplicationConfig} from '@scion/microfrontend-platform';
+import {WorkbenchPopup, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
+import {combineLatest, Observable, of} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
+import {Logger, LoggerNames} from '../../logging';
+import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {fromDimension$} from '@scion/toolkit/observable';
+import {Popup, PopupOrigin} from '../../popup/popup.config';
+import {observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {PopupService} from '../../popup/popup.service';
+import {ROUTER_OUTLET_NAME} from '../../workbench.constants';
+import {Router} from '@angular/router';
+import {WbRouterOutletComponent} from '../../routing/wb-router-outlet.component';
+import {RouterUtils} from '../../routing/router.util';
+import {Commands} from '../../routing/workbench-router.service';
 
 /**
  * Handles microfrontend popup commands, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
@@ -162,7 +162,7 @@ export class MicrofrontendPopupCommandHandler {
   /**
    * Performs navigation in the specified outlet, substituting path params if any. To clear navigation, pass `null` as the path.
    */
-  private navigate(path: string | null, extras: { outletName: string; params?: Map<string, any> }): Promise<boolean> {
+  private navigate(path: string | null, extras: {outletName: string; params?: Map<string, any>}): Promise<boolean> {
     // Replace placeholders with the values of the qualifier and params, if any.
     path = RouterUtils.substituteNamedParameters(path, extras.params);
 

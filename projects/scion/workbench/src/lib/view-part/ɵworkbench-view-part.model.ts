@@ -7,18 +7,18 @@
  *
  *  SPDX-License-Identifier: EPL-2.0
  */
-import { MPart } from '../layout/parts-layout.model';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
-import { WbComponentPortal } from '../portal/wb-component-portal';
-import { Injector } from '@angular/core';
-import { Arrays } from '@scion/toolkit/util';
-import { Disposable } from '../disposable';
-import { WorkbenchViewPartAction } from '../workbench.model';
-import { WorkbenchViewPart } from './workbench-view-part.model';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
+import {MPart} from '../layout/parts-layout.model';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {WbComponentPortal} from '../portal/wb-component-portal';
+import {Injector} from '@angular/core';
+import {Arrays} from '@scion/toolkit/util';
+import {Disposable} from '../disposable';
+import {WorkbenchViewPartAction} from '../workbench.model';
+import {WorkbenchViewPart} from './workbench-view-part.model';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
 
-export class ɵWorkbenchViewPart implements WorkbenchViewPart { // tslint:disable-line:class-name
+export class ɵWorkbenchViewPart implements WorkbenchViewPart {
 
   private _part!: MPart;
   private _hiddenViewTabs = new Set<string>();

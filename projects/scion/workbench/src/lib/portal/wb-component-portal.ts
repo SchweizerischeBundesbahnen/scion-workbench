@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ComponentType } from '@angular/cdk/portal';
-import { ComponentFactory, ComponentFactoryResolver, ComponentRef, InjectFlags, InjectionToken, Injector, Type, ViewContainerRef } from '@angular/core';
+import {ComponentType} from '@angular/cdk/portal';
+import {ComponentFactory, ComponentFactoryResolver, ComponentRef, InjectFlags, InjectionToken, Injector, Type, ViewContainerRef} from '@angular/core';
 
 /**
  * Like Angular CDK 'ComponentPortal' but with functionality to detach the portal from its outlet without destroying the component.

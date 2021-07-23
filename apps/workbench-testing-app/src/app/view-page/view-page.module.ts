@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciPropertyModule } from '@scion/toolkit.internal/widgets';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule, Routes } from '@angular/router';
-import { ViewPageComponent } from './view-page.component';
-import { WorkbenchModule } from '@scion/workbench';
-import { UtilModule } from '../util/util.module';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciPropertyModule} from '@scion/toolkit.internal/widgets';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {RouterModule, Routes} from '@angular/router';
+import {ViewPageComponent} from './view-page.component';
+import {WorkbenchModule} from '@scion/workbench';
+import {UtilModule} from '../util/util.module';
 
 const routes: Routes = [
   {path: '', component: ViewPageComponent},

@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciParamsEnterPO } from '@scion/toolkit.internal/widgets.po';
-import { $, browser, ElementFinder, protractor } from 'protractor';
-import { Intention, Qualifier } from '@scion/microfrontend-platform';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { assertPageToDisplay, selectOption } from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
+import {$, browser, ElementFinder, protractor} from 'protractor';
+import {Intention, Qualifier} from '@scion/microfrontend-platform';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {assertPageToDisplay, selectOption} from '../../helper/testing.util';
 
 const EC = protractor.ExpectedConditions;
 
@@ -41,7 +41,7 @@ export class RegisterWorkbenchIntentionPagePO {
    *
    * Returns a Promise that resolves to the intention ID upon successful registration, or that rejects on registration error.
    */
-  public async registerIntention(intention: Intention & { type: 'view' | 'popup' | 'messagebox' | 'notification' }): Promise<string> {
+  public async registerIntention(intention: Intention & {type: 'view' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 

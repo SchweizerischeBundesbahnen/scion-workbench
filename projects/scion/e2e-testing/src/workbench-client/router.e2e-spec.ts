@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { RouterPagePO } from './page-object/router-page.po';
-import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
-import { RegisterWorkbenchCapabilityPagePO } from './page-object/register-workbench-capability-page.po';
-import { ViewPagePO } from './page-object/view-page.po';
-import { RegisterWorkbenchIntentionPagePO } from './page-object/register-workbench-intention-page.po';
-import { expectPromise } from '../helper/expect-promise-matcher';
-import { assertPageToDisplay, consumeBrowserLog } from '../helper/testing.util';
-import { $, browser, logging } from 'protractor';
-import { WebdriverExecutionContexts } from '../helper/webdriver-execution-context';
-import { UnregisterWorkbenchCapabilityPagePO } from './page-object/unregister-workbench-capability-page.po';
+import {AppPO} from '../app.po';
+import {RouterPagePO} from './page-object/router-page.po';
+import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
+import {ViewPagePO} from './page-object/view-page.po';
+import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
+import {expectPromise} from '../helper/expect-promise-matcher';
+import {assertPageToDisplay, consumeBrowserLog} from '../helper/testing.util';
+import {$, browser, logging} from 'protractor';
+import {WebdriverExecutionContexts} from '../helper/webdriver-execution-context';
+import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-workbench-capability-page.po';
 import Level = logging.Level;
 
 export declare type HTMLElement = any;

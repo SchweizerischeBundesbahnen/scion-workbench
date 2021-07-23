@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { MessageBox } from '@scion/workbench';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { UUID } from '@scion/toolkit/uuid';
+import {Component, OnDestroy} from '@angular/core';
+import {MessageBox} from '@scion/workbench';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {UUID} from '@scion/toolkit/uuid';
 
 const TITLE = 'title';
 const SEVERITY = 'severity';
@@ -68,7 +68,7 @@ export class InspectMessageBoxComponent implements OnDestroy {
 
     this.form.get(ACTIONS).valueChanges
       .pipe(takeUntil(this._destroy$))
-      .subscribe((actions: Array<{ paramName: string, paramValue: string }>) => {
+      .subscribe((actions: Array<{paramName: string, paramValue: string}>) => {
         this.messageBox.setActions(actions.map(action => ({
             key: action.paramName,
             label: action.paramValue,

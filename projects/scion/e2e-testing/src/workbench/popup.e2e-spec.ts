@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { PopupOpenerPagePO } from './page-object/popup-opener-page.po';
-import { Key } from 'protractor';
-import { PopupPagePO } from './page-object/popup-page.po';
-import { consumeBrowserLog, sendKeys } from '../helper/testing.util';
-import { PopupFocusPagePO } from './page-object/popup-focus-page.po';
+import {AppPO} from '../app.po';
+import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {Key} from 'protractor';
+import {PopupPagePO} from './page-object/popup-page.po';
+import {consumeBrowserLog, sendKeys} from '../helper/testing.util';
+import {PopupFocusPagePO} from './page-object/popup-focus-page.po';
 
 const POPUP_DIAMOND_ANCHOR_SIZE = 8;
 

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { WorkbenchPopupCapability } from './workbench-popup-capability';
+import {WorkbenchPopupCapability} from './workbench-popup-capability';
 
 /**
  * Information about the popup embedding a microfrontend.
@@ -18,7 +18,7 @@ import { WorkbenchPopupCapability } from './workbench-popup-capability';
  * @docs-private Not public API, intended for internal use only.
  * @ignore
  */
-export interface ɵPopupContext { // tslint:disable-line:class-name
+export interface ɵPopupContext {
   popupId: string;
   params: Map<string, any>;
   capability: WorkbenchPopupCapability;
@@ -35,4 +35,4 @@ export interface ɵPopupContext { // tslint:disable-line:class-name
  * @see {@link ContextService}
  * @see {@link ɵPopupContext}
  */
-export const ɵPOPUP_CONTEXT = 'ɵworkbench.popup';  // tslint:disable-line:variable-name
+export const ɵPOPUP_CONTEXT = 'ɵworkbench.popup';

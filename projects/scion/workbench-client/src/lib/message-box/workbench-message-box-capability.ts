@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Capability } from '@scion/microfrontend-platform';
-import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
+import {Capability} from '@scion/microfrontend-platform';
+import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 
 /**
  * Represents the built-in message box for displaying a plain text message to the user.

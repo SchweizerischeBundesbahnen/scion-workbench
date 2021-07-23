@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
-import { NgModule, NgModuleFactoryLoader } from '@angular/core';
-import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
-import { Router } from '@angular/router';
-import { WorkbenchModule } from '../workbench.module';
+import {fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
+import {NgModule, NgModuleFactoryLoader} from '@angular/core';
+import {RouterTestingModule, SpyNgModuleFactoryLoader} from '@angular/router/testing';
+import {Router} from '@angular/router';
+import {WorkbenchModule} from '../workbench.module';
 
 describe('WorkbenchModule', () => {
 
@@ -29,7 +29,6 @@ describe('WorkbenchModule', () => {
   // TODO [Angular 9]:
   // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
   // See Angular internal tests in `integration.spec.ts` file.
-  // tslint:disable-next-line:deprecation
   it('throws an error when forRoot() is used in a lazy context', fakeAsync(inject([Router, NgModuleFactoryLoader], async (router: Router, loader: SpyNgModuleFactoryLoader) => {
     // Use forRoot() in a lazy context (illegal)
     @NgModule({

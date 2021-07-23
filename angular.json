@@ -34,14 +34,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "projects/scion/workbench/tsconfig.lib.json",
-              "projects/scion/workbench/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "projects/scion/workbench/**/*.ts",
+              "projects/scion/workbench/**/*.html"
             ]
           }
         }
@@ -130,13 +127,11 @@
           "defaultConfiguration": "development"
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "apps/workbench-testing-app/tsconfig.app.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "apps/workbench-testing-app/**/*.ts",
+              "apps/workbench-testing-app/**/*.html"
             ]
           }
         }
@@ -180,14 +175,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "projects/scion/workbench-client/tsconfig.lib.json",
-              "projects/scion/workbench-client/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "projects/scion/workbench-client/**/*.ts",
+              "projects/scion/workbench-client/**/*.html"
             ]
           }
         }
@@ -276,13 +268,11 @@
           "defaultConfiguration": "development"
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "apps/workbench-client-testing-app/tsconfig.app.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "apps/workbench-client-testing-app/**/*.ts",
+              "apps/workbench-client-testing-app/**/*.html"
             ]
           }
         }
@@ -306,20 +296,22 @@
             "protractorConfig": "projects/scion/e2e-testing/protractor.conf.js",
             "webdriverUpdate": false
           },
-          "configurations": {
-          }
+          "configurations": {}
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": "projects/scion/e2e-testing/tsconfig.json",
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "projects/scion/e2e-testing/**/*.ts",
+              "projects/scion/e2e-testing/**/*.html"
             ]
           }
         }
       }
     }
   },
-  "defaultProject": "@scion/workbench"
+  "defaultProject": "@scion/workbench",
+  "cli": {
+    "defaultCollection": "@angular-eslint/schematics"
+  }
 }

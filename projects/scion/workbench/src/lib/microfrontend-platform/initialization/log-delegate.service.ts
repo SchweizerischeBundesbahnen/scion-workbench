@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Logger } from '@scion/microfrontend-platform';
-import { LoggerNames, Logger as WbLogger } from '../../logging';
-import { Injectable } from '@angular/core';
+import {Logger} from '@scion/microfrontend-platform';
+import {Logger as WbLogger, LoggerNames} from '../../logging';
+import {Injectable} from '@angular/core';
 
 /**
  * Delegates log events of the SCION Microfrontend Platform to the workbench logger.

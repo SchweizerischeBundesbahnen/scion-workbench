@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, pressModifierThenClick, selectOption } from '../../helper/testing.util';
-import { Params } from '@angular/router';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciCheckboxPO, SciParamsEnterPO } from '@scion/toolkit.internal/widgets.po';
-import { ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
+import {assertPageToDisplay, enterText, pressModifierThenClick, selectOption} from '../../helper/testing.util';
+import {Params} from '@angular/router';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciCheckboxPO, SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
+import {ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 
 /**
  * Page object to interact {@link RouterPageComponent}.

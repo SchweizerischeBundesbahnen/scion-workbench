@@ -1,4 +1,4 @@
-<!-- $any() is used as a workaround for issue https://github.com/angular/angular/issues/39280-->
+<!-- $any() is used as a workaround for issue https://github.com/angular/angular/issues/39280 -->
 <wb-notification *ngFor="let notification of notifications$ | async; trackBy: trackByFn"
                  [notification]="notification"
                  [@notification-enter-or-leave]

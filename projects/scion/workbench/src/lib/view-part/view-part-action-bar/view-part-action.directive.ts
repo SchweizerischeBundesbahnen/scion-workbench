@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, Input, OnDestroy, OnInit, Optional, TemplateRef } from '@angular/core';
-import { Disposable } from '../../disposable';
-import { WorkbenchService } from '../../workbench.service';
-import { WorkbenchView } from '../../view/workbench-view.model';
-import { WorkbenchViewPart } from '../workbench-view-part.model';
-import { asapScheduler } from 'rxjs';
+import {Directive, Input, OnDestroy, OnInit, Optional, TemplateRef} from '@angular/core';
+import {Disposable} from '../../disposable';
+import {WorkbenchService} from '../../workbench.service';
+import {WorkbenchView} from '../../view/workbench-view.model';
+import {WorkbenchViewPart} from '../workbench-view-part.model';
+import {asapScheduler} from 'rxjs';
 
 /**
  * Use this directive to model an action contributed to the viewpart action bar located to the right of the view tabs.

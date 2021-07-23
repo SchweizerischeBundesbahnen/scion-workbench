@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, HostBinding, HostListener, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
-import { WbNavigationExtras, WorkbenchRouter } from './workbench-router.service';
-import { noop } from 'rxjs';
-import { LocationStrategy } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { WorkbenchService } from '../workbench.service';
-import { WorkbenchView } from '../view/workbench-view.model';
+import {Directive, HostBinding, HostListener, Input, OnChanges, Optional, SimpleChanges} from '@angular/core';
+import {WbNavigationExtras, WorkbenchRouter} from './workbench-router.service';
+import {noop} from 'rxjs';
+import {LocationStrategy} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {WorkbenchService} from '../workbench.service';
+import {WorkbenchView} from '../view/workbench-view.model';
 
 /**
  * Like 'RouterLink' but with functionality to target a view outlet.
@@ -36,7 +36,7 @@ export class WbRouterLinkDirective {
     this._commands = (commands ? (Array.isArray(commands) ? commands : [commands]) : []);
   }
 
-  @Input('wbRouterLinkExtras') // tslint:disable-line:no-input-rename
+  @Input('wbRouterLinkExtras') // eslint-disable-line @angular-eslint/no-input-rename
   public set extras(extras: WbNavigationExtras) {
     this._extras = extras || {};
   }

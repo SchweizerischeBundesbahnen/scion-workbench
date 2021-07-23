@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy } from '@angular/core';
-import { OverlayRef } from '@angular/cdk/overlay';
-import { animate, style, transition, trigger } from '@angular/animations';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy} from '@angular/core';
+import {OverlayRef} from '@angular/cdk/overlay';
+import {animate, style, transition, trigger} from '@angular/animations';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
 
 @Component({
   selector: 'wb-view-list',

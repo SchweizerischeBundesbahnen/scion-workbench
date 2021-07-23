@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Type } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Arrays } from '@scion/toolkit/util';
-import { Notification } from './notification';
-import { NotificationConfig } from './notification.config';
-import { TextNotificationComponent } from './text-notification.component';
+import {Type} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {Arrays} from '@scion/toolkit/util';
+import {Notification} from './notification';
+import {NotificationConfig} from './notification.config';
+import {TextNotificationComponent} from './text-notification.component';
 
-export class ɵNotification<T = any> implements Notification<T> { // tslint:disable-line:class-name
+export class ɵNotification<T = any> implements Notification<T> {
 
   public readonly input: T;
   public readonly title$: BehaviorSubject<string | undefined | Observable<string>>;

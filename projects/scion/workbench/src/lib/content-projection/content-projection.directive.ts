@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, ElementRef, EmbeddedViewRef, Input, OnDestroy, OnInit, Optional, TemplateRef, ViewContainerRef } from '@angular/core';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
-import { WorkbenchView } from '../view/workbench-view.model';
-import { fromDimension$ } from '@scion/toolkit/observable';
-import { setStyle } from '../dom.util';
+import {Directive, ElementRef, EmbeddedViewRef, Input, OnDestroy, OnInit, Optional, TemplateRef, ViewContainerRef} from '@angular/core';
+import {takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+import {WorkbenchView} from '../view/workbench-view.model';
+import {fromDimension$} from '@scion/toolkit/observable';
+import {setStyle} from '../dom.util';
 
 /**
  * Renders a given template as overlay. The template will stick to the bounding box of the host element of this directive.
@@ -29,13 +29,13 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   /**
    * Reference to the view container where to insert the overlay.
    */
-  @Input('wbContentProjectionOverlayHost') // tslint:disable-line:no-input-rename
+  @Input('wbContentProjectionOverlayHost') // eslint-disable-line @angular-eslint/no-input-rename
   public overlayHost!: ViewContainerRef | Promise<ViewContainerRef>;
 
   /**
    * Template which to render as overlay. The template will stick to the bounding box of the host element of this directive.
    */
-  @Input('wbContentProjectionContent') // tslint:disable-line:no-input-rename
+  @Input('wbContentProjectionContent') // eslint-disable-line @angular-eslint/no-input-rename
   public contentTemplateRef!: TemplateRef<void>;
 
   constructor(host: ElementRef<HTMLElement>, @Optional() private _view: WorkbenchView) {
@@ -88,7 +88,7 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
     this.styleContent({display: visible ? null : 'none'});
   }
 
-  private styleContent(style: { [style: string]: any }): void {
+  private styleContent(style: {[style: string]: any}): void {
     this._contentViewRef.rootNodes.forEach(node => setStyle(node, style));
   }
 

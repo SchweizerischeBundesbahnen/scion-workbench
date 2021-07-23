@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Observable } from 'rxjs';
+import {Observable} from 'rxjs';
 
 /**
  * Represents a handle that a notification component can inject to interact with the notification, for example,

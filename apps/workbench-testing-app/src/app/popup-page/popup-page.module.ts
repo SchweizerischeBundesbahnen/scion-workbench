@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SciAccordionModule, SciFormFieldModule } from '@scion/toolkit.internal/widgets';
-import { FormsModule } from '@angular/forms';
-import { WorkbenchModule } from '@scion/workbench';
-import { PopupPageComponent } from './popup-page.component';
-import { SciViewportModule } from '@scion/toolkit/viewport';
-import { UtilModule } from '../util/util.module';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {SciAccordionModule, SciFormFieldModule} from '@scion/toolkit.internal/widgets';
+import {FormsModule} from '@angular/forms';
+import {WorkbenchModule} from '@scion/workbench';
+import {PopupPageComponent} from './popup-page.component';
+import {SciViewportModule} from '@scion/toolkit/viewport';
+import {UtilModule} from '../util/util.module';
 
 @NgModule({
   imports: [

@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, Input } from '@angular/core';
-import { WbComponentPortal } from '../portal/wb-component-portal';
-import { WorkbenchLayoutService } from './workbench-layout.service';
-import { ViewPartComponent } from '../view-part/view-part.component';
-import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
-import { MPart, MTreeNode } from './parts-layout.model';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
+import {Component, Input} from '@angular/core';
+import {WbComponentPortal} from '../portal/wb-component-portal';
+import {WorkbenchLayoutService} from './workbench-layout.service';
+import {ViewPartComponent} from '../view-part/view-part.component';
+import {WorkbenchViewPartRegistry} from '../view-part/workbench-view-part.registry';
+import {MPart, MTreeNode} from './parts-layout.model';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
 
 /**
  * Visual representation of a {@link MTreeNode} in {@link PartsLayout}.

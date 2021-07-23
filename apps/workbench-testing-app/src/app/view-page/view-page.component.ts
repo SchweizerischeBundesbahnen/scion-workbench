@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { WorkbenchStartup, WorkbenchView } from '@scion/workbench';
-import { merge, Observable, Subject } from 'rxjs';
-import { filter, map, startWith, takeUntil } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
-import { UUID } from '@scion/toolkit/uuid';
-import { FormControl } from '@angular/forms';
-import { Arrays } from '@scion/toolkit/util';
+import {Component, OnDestroy} from '@angular/core';
+import {WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {merge, Observable, Subject} from 'rxjs';
+import {filter, map, startWith, takeUntil} from 'rxjs/operators';
+import {ActivatedRoute} from '@angular/router';
+import {UUID} from '@scion/toolkit/uuid';
+import {FormControl} from '@angular/forms';
+import {Arrays} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-view-page',
@@ -109,10 +109,10 @@ export class ViewPageComponent implements OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(active => {
         if (active) {
-          console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+          console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`);
         }
         else {
-          console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+          console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
         }
       });
   }

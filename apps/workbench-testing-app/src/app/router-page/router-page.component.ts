@@ -8,15 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { WbNavigationExtras, WorkbenchRouter, WorkbenchView } from '@scion/workbench';
-import { ActivatedRoute, Params, PRIMARY_OUTLET, Router, Routes } from '@angular/router';
-import { coerceNumberProperty } from '@angular/cdk/coercion';
-import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
-import { Dictionary, Objects } from '@scion/toolkit/util';
+import {Component} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {WbNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
+import {ActivatedRoute, Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
+import {coerceNumberProperty} from '@angular/cdk/coercion';
+import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
+import {Dictionary, Objects} from '@scion/toolkit/util';
 
 const PATH = 'path';
 const QUERY_PARAMS = 'queryParams';

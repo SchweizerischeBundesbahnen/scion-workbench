@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable } from '@angular/core';
-import { LogAppender, LogEvent, LogLevel } from './logging.model';
+import {Injectable} from '@angular/core';
+import {LogAppender, LogEvent, LogLevel} from './logging.model';
 
 /**
  * Logs messages to the console, if available.
@@ -17,7 +17,6 @@ import { LogAppender, LogEvent, LogLevel } from './logging.model';
 @Injectable()
 export class ConsoleAppender implements LogAppender {
 
-  // tslint:disable:no-console
   public onLogMessage(event: LogEvent): void {
     switch (event.level) {
       case LogLevel.DEBUG: {

@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable } from '@angular/core';
-import { IntentClient, ManifestService } from '@scion/microfrontend-platform';
-import { WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchMessageBoxConfig } from '@scion/workbench-client';
-import { Logger, LoggerNames } from '../../logging';
-import { MessageBoxService } from '../../message-box/message-box.service';
-import { WorkbenchInitializer } from '../../startup/workbench-initializer';
+import {Injectable} from '@angular/core';
+import {IntentClient, ManifestService} from '@scion/microfrontend-platform';
+import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchMessageBoxConfig} from '@scion/workbench-client';
+import {Logger, LoggerNames} from '../../logging';
+import {MessageBoxService} from '../../message-box/message-box.service';
+import {WorkbenchInitializer} from '../../startup/workbench-initializer';
 
 /**
  * Provides the built-in message box capability for microfrontends to display a plain text message.

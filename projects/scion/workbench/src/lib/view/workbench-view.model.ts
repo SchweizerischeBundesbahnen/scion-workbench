@@ -1,8 +1,8 @@
-import { Observable } from 'rxjs';
-import { UrlSegment } from '@angular/router';
-import { Disposable } from '../disposable';
-import { WorkbenchMenuItem } from '../workbench.model';
-import { WorkbenchViewPart } from '../view-part/workbench-view-part.model';
+import {Observable} from 'rxjs';
+import {UrlSegment} from '@angular/router';
+import {Disposable} from '../disposable';
+import {WorkbenchMenuItem} from '../workbench.model';
+import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
 
 /**
  * A view is a visual component within the Workbench to present content,

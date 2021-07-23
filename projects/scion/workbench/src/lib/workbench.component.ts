@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, Inject, Injector, OnDestroy, ViewChild, ViewContainerRef } from '@angular/core';
-import { WorkbenchLayoutService } from './layout/workbench-layout.service';
-import { IFRAME_HOST, VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference } from './content-projection/view-container.reference';
-import { map, takeUntil } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
-import { WorkbenchActivityPartService } from './activity-part/workbench-activity-part.service';
-import { WorkbenchLauncher } from './startup/workbench-launcher.service';
-import { WorkbenchModuleConfig } from './workbench-module-config';
-import { ComponentType } from '@angular/cdk/portal';
-import { SplashComponent } from './startup/splash/splash.component';
-import { Logger, LoggerNames } from './logging';
+import {Component, HostBinding, Inject, Injector, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {WorkbenchLayoutService} from './layout/workbench-layout.service';
+import {IFRAME_HOST, VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference} from './content-projection/view-container.reference';
+import {map, takeUntil} from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {WorkbenchActivityPartService} from './activity-part/workbench-activity-part.service';
+import {WorkbenchLauncher} from './startup/workbench-launcher.service';
+import {WorkbenchModuleConfig} from './workbench-module-config';
+import {ComponentType} from '@angular/cdk/portal';
+import {SplashComponent} from './startup/splash/splash.component';
+import {Logger, LoggerNames} from './logging';
 
 @Component({
   selector: 'wb-workbench',

@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, selectOption, sendKeys } from '../../helper/testing.util';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { browser, ElementFinder, Key } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { Arrays } from '@scion/toolkit/util';
-import { SciCheckboxPO } from '@scion/toolkit.internal/widgets.po';
+import {assertPageToDisplay, enterText, selectOption, sendKeys} from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {browser, ElementFinder, Key} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {Arrays} from '@scion/toolkit/util';
+import {SciCheckboxPO} from '@scion/toolkit.internal/widgets.po';
 
 /**
  * Page object to interact {@link NotificationPageComponent}.

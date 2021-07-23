@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
-import { WorkbenchViewRegistry } from './workbench-view.registry';
-import { WbComponentPortal } from '../portal/wb-component-portal';
-import { ViewComponent } from '../view/view.component';
+import {Pipe, PipeTransform} from '@angular/core';
+import {WorkbenchViewRegistry} from './workbench-view.registry';
+import {WbComponentPortal} from '../portal/wb-component-portal';
+import {ViewComponent} from '../view/view.component';
 
 /**
  * Resolves the portal for a given view id, or `null` if not found.
@@ -22,7 +22,7 @@ export class ViewPortalPipe implements PipeTransform {
   constructor(private _viewRegistry: WorkbenchViewRegistry) {
   }
 
-  public transform<T>(viewId: string | null): WbComponentPortal<ViewComponent> | null {
+  public transform(viewId: string | null): WbComponentPortal<ViewComponent> | null {
     if (!viewId) {
       return null;
     }

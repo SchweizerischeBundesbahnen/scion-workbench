@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, selectOption, sendKeys } from '../../helper/testing.util';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciParamsEnterPO } from '@scion/toolkit.internal/widgets.po';
-import { $, browser, ElementFinder, Key } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { Qualifier } from '@scion/microfrontend-platform';
-import { Arrays, Dictionary } from '@scion/toolkit/util';
+import {assertPageToDisplay, enterText, selectOption, sendKeys} from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
+import {$, browser, ElementFinder, Key} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {Qualifier} from '@scion/microfrontend-platform';
+import {Arrays, Dictionary} from '@scion/toolkit/util';
 
 /**
  * Page object to interact {@link NotificationOpenerPageComponent}.

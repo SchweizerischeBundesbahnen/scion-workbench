@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, selectOption } from '../../helper/testing.util';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciCheckboxPO, SciParamsEnterPO } from '@scion/toolkit.internal/widgets.po';
-import { browser, ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { coerceArray } from '@angular/cdk/coercion';
-import { Dictionary } from '@scion/toolkit/util';
+import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciCheckboxPO, SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
+import {browser, ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {coerceArray} from '@angular/cdk/coercion';
+import {Dictionary} from '@scion/toolkit/util';
 
 /**
  * Page object to interact {@link MessageBoxOpenerPageComponent}.

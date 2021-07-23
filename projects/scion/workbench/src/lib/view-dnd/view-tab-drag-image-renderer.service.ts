@@ -8,19 +8,19 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone, OnDestroy } from '@angular/core';
-import { EMPTY, of, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
-import { createElement, setStyle } from '../dom.util';
-import { ViewDragData, ViewDragService } from './view-drag.service';
-import { ComponentPortal, DomPortalOutlet } from '@angular/cdk/portal';
-import { ViewTabContentComponent } from '../view-part/view-tab-content/view-tab-content.component';
-import { WorkbenchMenuItem } from '../workbench.model';
-import { WorkbenchModuleConfig } from '../workbench-module-config';
-import { VIEW_TAB_CONTEXT } from '../workbench.constants';
-import { UrlSegment } from '@angular/router';
-import { Disposable } from '../disposable';
-import { WorkbenchView } from '../view/workbench-view.model';
+import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
+import {EMPTY, of, Subject} from 'rxjs';
+import {take, takeUntil} from 'rxjs/operators';
+import {createElement, setStyle} from '../dom.util';
+import {ViewDragData, ViewDragService} from './view-drag.service';
+import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
+import {ViewTabContentComponent} from '../view-part/view-tab-content/view-tab-content.component';
+import {WorkbenchMenuItem} from '../workbench.model';
+import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {VIEW_TAB_CONTEXT} from '../workbench.constants';
+import {UrlSegment} from '@angular/router';
+import {Disposable} from '../disposable';
+import {WorkbenchView} from '../view/workbench-view.model';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 

@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, selectOption } from '../../helper/testing.util';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciCheckboxPO, SciParamsEnterPO } from '@scion/toolkit.internal/widgets.po';
-import { $, browser, ElementFinder, protractor } from 'protractor';
-import { Qualifier } from '@scion/microfrontend-platform';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { RouterOutletPO } from './router-outlet.po';
-import { Dictionary } from '@scion/toolkit/util';
+import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciCheckboxPO, SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
+import {$, browser, ElementFinder, protractor} from 'protractor';
+import {Qualifier} from '@scion/microfrontend-platform';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {RouterOutletPO} from './router-outlet.po';
+import {Dictionary} from '@scion/toolkit/util';
 
 const EC = protractor.ExpectedConditions;
 
@@ -114,7 +114,7 @@ export class RouterPagePO {
    * Set `evalNavigateResponse` to `false` when replacing the current microfrontend,
    * as this unloads the current router page.
    */
-  public async clickNavigate(options?: { evalNavigateResponse?: boolean }): Promise<void> {
+  public async clickNavigate(options?: {evalNavigateResponse?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
     await this._pageFinder.$('button.e2e-navigate').click();

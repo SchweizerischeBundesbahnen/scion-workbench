@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BeanDecorator } from '@scion/toolkit/bean-manager';
-import { Intent, IntentClient, IntentMessage, IntentOptions, IntentSelector, MessageClient, PublishOptions, RequestOptions, TopicMessage } from '@scion/microfrontend-platform';
-import { Injectable, NgZone } from '@angular/core';
-import { MonoTypeOperatorFunction, Observable, pipe, Subscription } from 'rxjs';
-import { observeInside, subscribeInside } from '@scion/toolkit/operators';
+import {BeanDecorator} from '@scion/toolkit/bean-manager';
+import {Intent, IntentClient, IntentMessage, IntentOptions, IntentSelector, MessageClient, PublishOptions, RequestOptions, TopicMessage} from '@scion/microfrontend-platform';
+import {Injectable, NgZone} from '@angular/core';
+import {MonoTypeOperatorFunction, Observable, pipe, Subscription} from 'rxjs';
+import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 
 /**
  * Synchronizes Observable emissions of the {@link MessageClient} with the Angular zone.

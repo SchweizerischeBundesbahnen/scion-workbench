@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { browser, ElementFinder, Key, logging, protractor } from 'protractor';
+import {browser, ElementFinder, Key, logging, protractor} from 'protractor';
 import Level = logging.Level;
 
 const EC = protractor.ExpectedConditions;
@@ -138,7 +138,7 @@ export async function runOutsideAngularSynchronization<T = void>(fn: () => Promi
 /**
  * Confirms an alert dialog. Throws if there is no alert dialog showing.
  */
-export async function confirmAlert(options?: { confirmDelay?: number }): Promise<void> {
+export async function confirmAlert(options?: {confirmDelay?: number}): Promise<void> {
   await browser.wait(EC.alertIsPresent());
   const alert = await browser.switchTo().alert();
   try {
@@ -155,7 +155,7 @@ export async function confirmAlert(options?: { confirmDelay?: number }): Promise
 /**
  * Confirms an alert dialog. Throws if there is no alert dialog showing.
  */
-export async function dismissAlert(options?: { confirmDelay?: number }): Promise<void> {
+export async function dismissAlert(options?: {confirmDelay?: number}): Promise<void> {
   await browser.wait(EC.alertIsPresent());
   const alert = await browser.switchTo().alert();
   try {

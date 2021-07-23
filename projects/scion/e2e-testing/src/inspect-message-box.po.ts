@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO, MessageBoxPO } from './app.po';
-import { ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from './helper/webdriver-execution-context';
-import { assertPageToDisplay, enterText, selectOption } from './helper/testing.util';
-import { Arrays, Dictionary } from '@scion/toolkit/util';
-import { SciParamsEnterPO } from '@scion/toolkit.internal/widgets.po';
+import {AppPO, MessageBoxPO} from './app.po';
+import {ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
+import {assertPageToDisplay, enterText, selectOption} from './helper/testing.util';
+import {Arrays, Dictionary} from '@scion/toolkit/util';
+import {SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
 
 /**
  * Page object to interact {@link InspectMessageBoxComponent}.
@@ -73,7 +73,7 @@ export class InspectMessageBoxPO {
     const mapEntryRegex = /{"(?<key>.+)" => (?<value>.+)}/g;
 
     let match: RegExpExecArray;
-    while (match = mapEntryRegex.exec(rawContent)) { // tslint:disable-line:no-conditional-assignment
+    while (match = mapEntryRegex.exec(rawContent)) {
       const key = match.groups['key'];
       const value = match.groups['value'];
       map.set(key, value === 'undefined' ? undefined : JSON.parse(value));

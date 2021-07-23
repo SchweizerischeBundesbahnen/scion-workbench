@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Observable } from 'rxjs';
-import { Dictionary } from '@scion/toolkit/util';
+import {Observable} from 'rxjs';
+import {Dictionary} from '@scion/toolkit/util';
 
 /**
  * Configures the popup to display a microfrontend in a workbench popup using {@link WorkbenchPopupService}.

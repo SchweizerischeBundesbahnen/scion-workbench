@@ -1,7 +1,7 @@
-import { Injectable, Type } from '@angular/core';
-import { CanActivate, CanDeactivate, Data, PRIMARY_OUTLET, ResolveData, Router, Routes } from '@angular/router';
-import { EmptyOutletComponent } from './empty-outlet.component';
-import { Arrays } from '@scion/toolkit/util';
+import {Injectable, Type} from '@angular/core';
+import {CanActivate, CanDeactivate, Data, PRIMARY_OUTLET, ResolveData, Router, Routes} from '@angular/router';
+import {EmptyOutletComponent} from './empty-outlet.component';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Registers auxiliary routes for views and activities.

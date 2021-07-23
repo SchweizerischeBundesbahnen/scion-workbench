@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { APP_INITIALIZER, NgZone, Provider } from '@angular/core';
-import { ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformPropertyService, PreferredSizeService } from '@scion/microfrontend-platform';
-import { WorkbenchClient, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchView } from '@scion/workbench-client';
-import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './ng-zone-decorators';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { environment } from '../../environments/environment';
+import {APP_INITIALIZER, NgZone, Provider} from '@angular/core';
+import {ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
+import {WorkbenchClient, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './ng-zone-decorators';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {environment} from '../../environments/environment';
 
 /**
  * Registers a set of DI providers to set up microfrontend support and connect to the workbench.

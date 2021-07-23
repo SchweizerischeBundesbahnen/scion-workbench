@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, NgZone, OnDestroy, Optional, SkipSelf } from '@angular/core';
-import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
-import { MessageBoxConfig } from './message-box.config';
-import { ɵMessageBox } from './ɵmessage-box';
-import { Arrays } from '@scion/toolkit/util';
-import { filter, map, takeUntil } from 'rxjs/operators';
-import { WorkbenchView } from '../view/workbench-view.model';
-import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
+import {Injectable, NgZone, OnDestroy, Optional, SkipSelf} from '@angular/core';
+import {BehaviorSubject, combineLatest, Observable, Subject} from 'rxjs';
+import {MessageBoxConfig} from './message-box.config';
+import {ɵMessageBox} from './ɵmessage-box';
+import {Arrays} from '@scion/toolkit/util';
+import {filter, map, takeUntil} from 'rxjs/operators';
+import {WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 
 /**
  * Allows displaying a message to the user in a workbench message box.
@@ -112,7 +112,7 @@ export class MessageBoxService implements OnDestroy {
    *
    * @internal
    */
-  public messageBoxes$(options: { includeParents: boolean }): Observable<ɵMessageBox[]> {
+  public messageBoxes$(options: {includeParents: boolean}): Observable<ɵMessageBox[]> {
     if (options.includeParents) {
       return combineLatest(this._messageBoxServiceHierarchy.map(service => service.messageBoxes$({includeParents: false})))
         .pipe(map(() => this.messageBoxStack()));
@@ -135,10 +135,10 @@ export class MessageBoxService implements OnDestroy {
    */
   private computeMessageBoxServiceHierarchy(): [MessageBoxService, ...MessageBoxService[]] {
     const hierarchy: MessageBoxService[] = [];
-    let current: MessageBoxService = this;
+    let current: MessageBoxService = this; // eslint-disable-line @typescript-eslint/no-this-alias
     do {
       hierarchy.push(current);
-    } while ((current = current._parentMessageBoxService)); // tslint:disable-line:no-conditional-assignment
+    } while ((current = current._parentMessageBoxService));
     return hierarchy as [MessageBoxService, ...MessageBoxService[]];
   }
 

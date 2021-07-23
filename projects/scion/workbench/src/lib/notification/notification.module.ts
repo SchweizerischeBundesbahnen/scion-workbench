@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { PortalModule } from '@angular/cdk/portal';
-import { NotificationListComponent } from './notification-list.component';
-import { TextNotificationComponent } from './text-notification.component';
-import { NotificationComponent } from './notification.component';
-import { CoerceObservablePipe } from './coerce-observable.pipe';
-import { NotificationCssClassesPipe } from './notification-css-classes.pipe';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {PortalModule} from '@angular/cdk/portal';
+import {NotificationListComponent} from './notification-list.component';
+import {TextNotificationComponent} from './text-notification.component';
+import {NotificationComponent} from './notification.component';
+import {CoerceObservablePipe} from './coerce-observable.pipe';
+import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
 
 /**
  * Allows displaying a notification to the user.

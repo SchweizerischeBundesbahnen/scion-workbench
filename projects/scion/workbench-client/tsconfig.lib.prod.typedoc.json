@@ -1,7 +1,9 @@
 {
   "extends": "./tsconfig.lib.prod.json",
   "typedocOptions": {
-    "entryPoints": ["src/public-api.ts"],
+    "entryPoints": [
+      "src/public-api.ts"
+    ],
     "out": "../../../dist/workbench-client-api",
     "includeVersion": true,
     "listInvalidSymbolLinks": true,

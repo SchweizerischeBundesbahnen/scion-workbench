@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Observable, Subject } from 'rxjs';
-import { WbBeforeDestroy } from '../workbench.model';
-import { Component, OnDestroy } from '@angular/core';
-import { takeUntil } from 'rxjs/operators';
-import { WorkbenchView } from '../view/workbench-view.model';
+import {Observable, Subject} from 'rxjs';
+import {WbBeforeDestroy} from '../workbench.model';
+import {Component, OnDestroy} from '@angular/core';
+import {takeUntil} from 'rxjs/operators';
+import {WorkbenchView} from '../view/workbench-view.model';
 
 @Component({})
 export abstract class AbstractSpecViewComponent implements OnDestroy, WbBeforeDestroy {

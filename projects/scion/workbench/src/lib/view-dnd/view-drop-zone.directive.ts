@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
-import { asapScheduler, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { createElement, ElementCreateOptions, setStyle } from '../dom.util';
-import { ViewDragData, ViewDragService } from './view-drag.service';
+import {Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output} from '@angular/core';
+import {asapScheduler, Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {createElement, ElementCreateOptions, setStyle} from '../dom.util';
+import {ViewDragData, ViewDragService} from './view-drag.service';
 
 const DROP_REGION_MAX_SIZE = 150;
 const DROP_REGION_GAP = 20;

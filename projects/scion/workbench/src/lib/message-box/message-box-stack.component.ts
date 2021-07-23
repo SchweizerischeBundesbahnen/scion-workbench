@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { animate, AnimationMetadata, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { MessageBoxService } from './message-box.service';
-import { ɵMessageBox } from './ɵmessage-box';
-import { Observable } from 'rxjs';
+import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {MessageBoxService} from './message-box.service';
+import {ɵMessageBox} from './ɵmessage-box';
+import {Observable} from 'rxjs';
 
 /**
  * Stacks message boxes of the current context. Does not include message boxes of parent contexts.

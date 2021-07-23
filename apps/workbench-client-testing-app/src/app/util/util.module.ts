@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NullIfEmptyPipe } from './null-if-empty.pipe';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {NullIfEmptyPipe} from './null-if-empty.pipe';
 
 @NgModule({
   imports: [

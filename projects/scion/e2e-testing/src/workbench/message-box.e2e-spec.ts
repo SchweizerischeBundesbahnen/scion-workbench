@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { consumeBrowserLog, sendKeys } from '../helper/testing.util';
-import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
-import { MessageBoxOpenerPagePO } from './page-object/message-box-opener-page.po';
-import { TextMessagePO } from '../text-message.po';
-import { InspectMessageBoxPO } from '../inspect-message-box.po';
-import { Key } from 'protractor';
+import {AppPO} from '../app.po';
+import {consumeBrowserLog, sendKeys} from '../helper/testing.util';
+import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
+import {TextMessagePO} from '../text-message.po';
+import {InspectMessageBoxPO} from '../inspect-message-box.po';
+import {Key} from 'protractor';
 
 describe('Workbench Message Box', () => {
 

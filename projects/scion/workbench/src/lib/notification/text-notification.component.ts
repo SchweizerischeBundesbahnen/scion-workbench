@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Notification } from './notification';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {Notification} from './notification';
 
 /**
  * Component for displaying a plain text notification.

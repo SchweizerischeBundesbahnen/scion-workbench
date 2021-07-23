@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding } from '@angular/core';
-import { Popup } from '@scion/workbench';
-import { UUID } from '@scion/toolkit/uuid';
+import {Component, HostBinding} from '@angular/core';
+import {Popup} from '@scion/workbench';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-popup-page',

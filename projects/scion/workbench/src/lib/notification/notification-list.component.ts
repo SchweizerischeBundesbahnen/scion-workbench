@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { animate, AnimationMetadata, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, TrackByFunction } from '@angular/core';
+import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
+import {ChangeDetectionStrategy, Component, TrackByFunction} from '@angular/core';
 
-import { NotificationService } from './notification.service';
-import { ɵNotification } from './ɵnotification';
-import { Observable } from 'rxjs';
+import {NotificationService} from './notification.service';
+import {ɵNotification} from './ɵnotification';
+import {Observable} from 'rxjs';
 
 /**
  * Displays notifications on the right side.  Multiple notifications are stacked vertically.

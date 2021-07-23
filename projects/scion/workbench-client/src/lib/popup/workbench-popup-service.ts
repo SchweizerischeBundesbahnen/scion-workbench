@@ -8,20 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, QualifierMatcher, RequestError } from '@scion/microfrontend-platform';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { catchError, map, take } from 'rxjs/operators';
-import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { Maps, Observables } from '@scion/toolkit/util';
-import { fromBoundingClientRect$ } from '@scion/toolkit/observable';
-import { Observable, throwError } from 'rxjs';
-import { WorkbenchView } from '../view/workbench-view';
-import { ɵWorkbenchPopupCommand } from './workbench-popup-open-command';
-import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
-import { UUID } from '@scion/toolkit/uuid';
-import { WorkbenchPopupCapability } from './workbench-popup-capability';
-import { PopupOrigin, WorkbenchPopupConfig } from './workbench-popup.config';
-import { filterArray } from '@scion/toolkit/operators';
+import {IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, QualifierMatcher, RequestError} from '@scion/microfrontend-platform';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {catchError, map, take} from 'rxjs/operators';
+import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {Maps, Observables} from '@scion/toolkit/util';
+import {fromBoundingClientRect$} from '@scion/toolkit/observable';
+import {Observable, throwError} from 'rxjs';
+import {WorkbenchView} from '../view/workbench-view';
+import {ɵWorkbenchPopupCommand} from './workbench-popup-open-command';
+import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
+import {UUID} from '@scion/toolkit/uuid';
+import {WorkbenchPopupCapability} from './workbench-popup-capability';
+import {PopupOrigin, WorkbenchPopupConfig} from './workbench-popup.config';
+import {filterArray} from '@scion/toolkit/operators';
 
 /**
  * Allows displaying a microfrontend in a workbench popup.

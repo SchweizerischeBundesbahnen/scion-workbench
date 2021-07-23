@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { asapScheduler, EMPTY, merge, Subject, timer } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
-import { ɵNotification } from './ɵnotification';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { Notification } from './notification';
-import { observeInside, subscribeInside } from '@scion/toolkit/operators';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
+import {asapScheduler, EMPTY, merge, Subject, timer} from 'rxjs';
+import {switchMap, takeUntil} from 'rxjs/operators';
+import {ɵNotification} from './ɵnotification';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {Notification} from './notification';
+import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 
 /**
  * A notification is a closable message that appears in the top right corner and disappears automatically after a few seconds.

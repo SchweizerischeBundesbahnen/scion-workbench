@@ -102,8 +102,8 @@ exports.config = {
     },
     loggingPrefs: {
       // By default browser allows recording only WARNING and SEVERE level messages.
-      browser: 'ALL' // "OFF", "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST", "ALL".
-    }
+      browser: 'ALL', // "OFF", "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST", "ALL".
+    },
   },
   SELENIUM_PROMISE_MANAGER: false,
   directConnect: true,

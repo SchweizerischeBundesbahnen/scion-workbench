@@ -1,10 +1,10 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { ActivatedRouteSnapshot, NavigationEnd, Resolve, Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
-import { Activity, InternalActivity } from '../activity-part/activity';
-import { Subject } from 'rxjs';
-import { WorkbenchActivityPartService } from '../activity-part/workbench-activity-part.service';
-import { ACTIVITY_OUTLET_NAME } from '../workbench.constants';
-import { filter, takeUntil } from 'rxjs/operators';
+import {Injectable, OnDestroy} from '@angular/core';
+import {ActivatedRouteSnapshot, NavigationEnd, Resolve, Router, RouterStateSnapshot, UrlSegment} from '@angular/router';
+import {Activity, InternalActivity} from '../activity-part/activity';
+import {Subject} from 'rxjs';
+import {WorkbenchActivityPartService} from '../activity-part/workbench-activity-part.service';
+import {ACTIVITY_OUTLET_NAME} from '../workbench.constants';
+import {filter, takeUntil} from 'rxjs/operators';
 
 /**
  * Resolves the {Activity} of an activity route and makes it available to the routing context.

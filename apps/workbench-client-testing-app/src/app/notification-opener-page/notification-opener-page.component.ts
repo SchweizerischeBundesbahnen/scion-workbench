@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { WorkbenchNotificationService } from '@scion/workbench-client';
-import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
+import {Component} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {WorkbenchNotificationService} from '@scion/workbench-client';
+import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
 
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';

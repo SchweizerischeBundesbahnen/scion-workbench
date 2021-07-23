@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { NotificationService } from '@scion/workbench';
-import { WorkbenchCapabilities, WorkbenchMessageBoxConfig, WorkbenchNotificationConfig } from '@scion/workbench-client';
-import { IntentClient } from '@scion/microfrontend-platform';
-import { Maps } from '@scion/toolkit/util';
-import { InspectNotificationComponent } from './inspect-notification.component';
+import {Injectable} from '@angular/core';
+import {NotificationService} from '@scion/workbench';
+import {WorkbenchCapabilities, WorkbenchMessageBoxConfig, WorkbenchNotificationConfig} from '@scion/workbench-client';
+import {IntentClient} from '@scion/microfrontend-platform';
+import {Maps} from '@scion/toolkit/util';
+import {InspectNotificationComponent} from './inspect-notification.component';
 
 /**
  * Displays a custom notification for microfrontends to inspect notification properties.

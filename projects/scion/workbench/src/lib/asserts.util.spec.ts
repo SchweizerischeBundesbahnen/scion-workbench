@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertNotNullish, assertType } from './asserts.util';
+import {assertNotNullish, assertType} from './asserts.util';
 
 describe('Asserts', () => {
 

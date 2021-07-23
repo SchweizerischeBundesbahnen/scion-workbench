@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText } from '../../helper/testing.util';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { $, browser, ElementFinder, protractor } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
+import {assertPageToDisplay, enterText} from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {$, browser, ElementFinder, protractor} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 
 const EC = protractor.ExpectedConditions;
 

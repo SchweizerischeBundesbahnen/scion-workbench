@@ -13,11 +13,11 @@ import MatchersUtil = jasmine.MatchersUtil;
 import CustomEqualityTester = jasmine.CustomEqualityTester;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
-import { ComponentFixture } from '@angular/core/testing';
-import { PartsLayoutComponent } from '../../layout/parts-layout.component';
-import { DebugElement, Type } from '@angular/core';
-import { By } from '@angular/platform-browser';
-import { MPart, MTreeNode } from '../../layout/parts-layout.model';
+import {ComponentFixture} from '@angular/core/testing';
+import {PartsLayoutComponent} from '../../layout/parts-layout.component';
+import {DebugElement, Type} from '@angular/core';
+import {By} from '@angular/platform-browser';
+import {MPart, MTreeNode} from '../../layout/parts-layout.model';
 
 /**
  * Extends the Jasmine expect API to support chaining with project specific custom matchers.
@@ -59,8 +59,8 @@ export const jasmineCustomMatchers: jasmine.CustomMatcherFactories = {
 
 function createToShowMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
   return {
-    compare(actualFixture: any, expectedComponentType: Type<any>): CustomMatcherResult {
-      const failOutput = arguments[2];
+    compare(actualFixture: any, expectedComponentType: Type<any>, ...args: any[]): CustomMatcherResult {
+      const failOutput = args[0];
       const msgFn = (msg: string): string => [msg, failOutput].filter(Boolean).join(', ');
 
       // verify correct actual type
@@ -81,14 +81,14 @@ function createToShowMatcher(util: MatchersUtil, customEqualityTesters: CustomEq
 
 function createToEqualPartsLayoutMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
   return {
-    compare(actual: MTreeNode | MPart | ComponentFixture<PartsLayoutComponent>, expectedLayout: MTreeNode | MPart): CustomMatcherResult {
+    compare(actual: MTreeNode | MPart | ComponentFixture<PartsLayoutComponent>, expectedLayout: MTreeNode | MPart, ...args: any[]): CustomMatcherResult {
       try {
         assertPartsLayout(expectedLayout, actual);
         return {pass: true};
       }
       catch (error) {
         if (error instanceof PartsLayoutAssertError) {
-          const failOutput = arguments[2];
+          const failOutput = args[0];
           return {pass: false, message: [error.message, failOutput].filter(Boolean).join(', ')};
         }
         throw error;

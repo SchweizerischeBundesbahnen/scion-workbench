@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { waitForAsync } from '@angular/core/testing';
-import { MPart, MTreeNode } from './parts-layout.model';
-import { expect, jasmineCustomMatchers } from '../spec/util/jasmine-custom-matchers.spec';
-import { PartsLayout, PartsLayoutWorkbenchAccessor } from './parts-layout';
+import {waitForAsync} from '@angular/core/testing';
+import {MPart, MTreeNode} from './parts-layout.model';
+import {expect, jasmineCustomMatchers} from '../spec/util/jasmine-custom-matchers.spec';
+import {PartsLayout, PartsLayoutWorkbenchAccessor} from './parts-layout';
 import SpyObj = jasmine.SpyObj;
 
 describe('PartsLayout', () => {

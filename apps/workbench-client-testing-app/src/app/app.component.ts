@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, Optional } from '@angular/core';
-import { MicroApplicationConfig, PlatformPropertyService } from '@scion/microfrontend-platform';
+import {Component, HostBinding, Optional} from '@angular/core';
+import {MicroApplicationConfig, PlatformPropertyService} from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-root',

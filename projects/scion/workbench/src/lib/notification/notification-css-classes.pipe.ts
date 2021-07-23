@@ -1,7 +1,7 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { combineLatest, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { ɵNotification } from './ɵnotification';
+import {Pipe, PipeTransform} from '@angular/core';
+import {combineLatest, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {ɵNotification} from './ɵnotification';
 
 /**
  * Collects CSS classes to be applied to the passed notification instance and returns them as

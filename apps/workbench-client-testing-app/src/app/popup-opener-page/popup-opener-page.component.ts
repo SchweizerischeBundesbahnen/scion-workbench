@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { CloseStrategy, WorkbenchPopupService } from '@scion/workbench-client';
-import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
-import { undefinedIfEmpty } from '../util/util';
-import { defer, Observable } from 'rxjs';
-import { PopupOrigin } from '@scion/workbench';
-import { map, startWith } from 'rxjs/operators';
+import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {CloseStrategy, WorkbenchPopupService} from '@scion/workbench-client';
+import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {undefinedIfEmpty} from '../util/util';
+import {defer, Observable} from 'rxjs';
+import {PopupOrigin} from '@scion/workbench';
+import {map, startWith} from 'rxjs/operators';
 
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';
@@ -29,6 +29,13 @@ const X = 'x';
 const Y = 'y';
 const HEIGHT = 'height';
 const WIDTH = 'width';
+
+interface AnchorFormGroup {
+  x: string;
+  y: string;
+  width: string;
+  height: string;
+}
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -92,12 +99,12 @@ export class PopupOpenerPageComponent implements AfterViewInit {
     this._coordinateAnchor$ = defer(() => this.form.get(ANCHOR)
       .valueChanges
       .pipe(
-        startWith(this.form.get(ANCHOR).value as object),
-        map(formValue => ({
-            x: Number(formValue[X]),
-            y: Number(formValue[Y]),
-            width: Number(formValue[WIDTH]),
-            height: Number(formValue[HEIGHT]),
+        startWith<AnchorFormGroup>(this.form.get(ANCHOR).value as AnchorFormGroup),
+        map(anchorValue => ({
+            x: Number(anchorValue.x),
+            y: Number(anchorValue.y),
+            width: Number(anchorValue.width),
+            height: Number(anchorValue.height),
           }),
         ),
       ));

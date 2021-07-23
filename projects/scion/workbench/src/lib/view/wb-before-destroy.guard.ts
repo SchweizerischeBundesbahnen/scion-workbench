@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { WbBeforeDestroy } from '../workbench.model';
+import {ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot} from '@angular/router';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
+import {WbBeforeDestroy} from '../workbench.model';
 
 /**
  * Invokes 'wbBeforeDestroy' lifecycle hook, if applicable.

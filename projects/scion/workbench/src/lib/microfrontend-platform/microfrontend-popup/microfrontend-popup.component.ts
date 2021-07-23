@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Application, ManifestService, MessageClient, OutletRouter, SciRouterOutletElement } from '@scion/microfrontend-platform';
-import { Arrays } from '@scion/toolkit/util';
-import { Logger, LoggerNames } from '../../logging';
-import { ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders } from '@scion/workbench-client';
-import { Popup } from '../../popup/popup.config';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Subject} from 'rxjs';
+import {filter, takeUntil} from 'rxjs/operators';
+import {Application, ManifestService, MessageClient, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
+import {Arrays} from '@scion/toolkit/util';
+import {Logger, LoggerNames} from '../../logging';
+import {ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
+import {Popup} from '../../popup/popup.config';
 
 /**
  * Component displayed in a workbench popup for embedding the microfrontend of a popup capability.

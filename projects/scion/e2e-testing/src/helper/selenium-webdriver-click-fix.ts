@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { browser, ElementFinder, WebElement } from 'protractor';
-import { SciListItemPO } from '@scion/toolkit.internal/widgets.po';
+import {browser, ElementFinder, WebElement} from 'protractor';
+import {SciListItemPO} from '@scion/toolkit.internal/widgets.po';
 
 /**
  * Repairs clicking DOM elements contained in an iframe part of a shadow DOM.
@@ -32,7 +32,7 @@ import { SciListItemPO } from '@scion/toolkit.internal/widgets.po';
  * https://stackoverflow.com/q/51629411
  * https://stackoverflow.com/q/58872973
  */
-export class SeleniumWebDriverClickFix { // tslint:disable-line:new-parens
+export class SeleniumWebDriverClickFix {
 
   private origElementFinderClickFn = ElementFinder.prototype.click;
   private origWebElementClickFn = WebElement.prototype.click;

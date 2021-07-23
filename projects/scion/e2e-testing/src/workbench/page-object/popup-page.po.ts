@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText } from '../../helper/testing.util';
-import { AppPO, PopupPO } from '../../app.po';
-import { ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { PopupSize } from '@scion/workbench';
-import { SciAccordionPO } from '@scion/toolkit.internal/widgets.po';
-import { ISize } from 'selenium-webdriver';
+import {assertPageToDisplay, enterText} from '../../helper/testing.util';
+import {AppPO, PopupPO} from '../../app.po';
+import {ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {PopupSize} from '@scion/workbench';
+import {SciAccordionPO} from '@scion/toolkit.internal/widgets.po';
+import {ISize} from 'selenium-webdriver';
 
 /**
  * Page object to interact {@link PopupPageComponent}.
@@ -59,7 +59,7 @@ export class PopupPagePO {
     await enterText(size.maxHeight, this._pageFinder.$('input.e2e-max-height'));
   }
 
-  public async clickClose(options?: { returnValue?: string, closeWithError?: boolean }): Promise<void> {
+  public async clickClose(options?: {returnValue?: string, closeWithError?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
 

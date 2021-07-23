@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectionStrategy, Component, Injector, TemplateRef } from '@angular/core';
-import { combineLatest, Observable, OperatorFunction } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { WorkbenchViewPartAction } from '../../workbench.model';
-import { WorkbenchViewPart } from '../workbench-view-part.model';
-import { ɵWorkbenchService } from '../../ɵworkbench.service';
+import {ChangeDetectionStrategy, Component, Injector, TemplateRef} from '@angular/core';
+import {combineLatest, Observable, OperatorFunction} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {WorkbenchViewPartAction} from '../../workbench.model';
+import {WorkbenchViewPart} from '../workbench-view-part.model';
+import {ɵWorkbenchService} from '../../ɵworkbench.service';
 
 @Component({
   selector: 'wb-view-part-action-bar',

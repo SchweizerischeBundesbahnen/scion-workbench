@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
-import { Component, NgModule } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
-import { Router, RouteReuseStrategy } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { advance, clickElement } from './util/util.spec';
-import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { ActivityPartComponent } from '../activity-part/activity-part.component';
-import { By } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
-import { WorkbenchTestingModule } from './workbench-testing.module';
+import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
+import {Component, NgModule} from '@angular/core';
+import {RouterTestingModule} from '@angular/router/testing';
+import {Router, RouteReuseStrategy} from '@angular/router';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {advance, clickElement} from './util/util.spec';
+import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
+import {ActivityPartComponent} from '../activity-part/activity-part.component';
+import {By} from '@angular/platform-browser';
+import {CommonModule} from '@angular/common';
+import {WorkbenchTestingModule} from './workbench-testing.module';
 
 /**
  *

@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable } from '@angular/core';
-import { IntentClient, ManifestService } from '@scion/microfrontend-platform';
-import { WorkbenchCapabilities, WorkbenchNotificationCapability, WorkbenchNotificationConfig } from '@scion/workbench-client';
-import { Logger, LoggerNames } from '../../logging';
-import { WorkbenchInitializer } from '../../startup/workbench-initializer';
-import { NotificationService } from '../../notification/notification.service';
+import {Injectable} from '@angular/core';
+import {IntentClient, ManifestService} from '@scion/microfrontend-platform';
+import {WorkbenchCapabilities, WorkbenchNotificationCapability, WorkbenchNotificationConfig} from '@scion/workbench-client';
+import {Logger, LoggerNames} from '../../logging';
+import {WorkbenchInitializer} from '../../startup/workbench-initializer';
+import {NotificationService} from '../../notification/notification.service';
 
 /**
  * Provides the built-in notification capability for microfrontends to show a plain text notification.

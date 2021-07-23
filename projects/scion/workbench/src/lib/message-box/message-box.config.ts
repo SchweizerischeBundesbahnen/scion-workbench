@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ComponentFactoryResolver, Injector, ViewContainerRef } from '@angular/core';
-import { ComponentType } from '@angular/cdk/portal/portal';
-import { Dictionary } from '@scion/toolkit/util';
-import { Observable } from 'rxjs';
+import {ComponentFactoryResolver, Injector, ViewContainerRef} from '@angular/core';
+import {ComponentType} from '@angular/cdk/portal/portal';
+import {Dictionary} from '@scion/toolkit/util';
+import {Observable} from 'rxjs';
 
 /**
  * Configures the content and appearance of a message presented to the user in the form of a message box.

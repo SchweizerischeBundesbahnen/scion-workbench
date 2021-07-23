@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostBinding, HostListener, Injector } from '@angular/core';
-import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { ViewListComponent } from '../view-list/view-list.component';
-import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
+import {Component, ElementRef, HostBinding, HostListener, Injector} from '@angular/core';
+import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {ViewListComponent} from '../view-list/view-list.component';
+import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
 
 @Component({
   selector: 'wb-view-list-button',

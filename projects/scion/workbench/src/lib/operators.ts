@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Observable, OperatorFunction } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import {Observable, OperatorFunction} from 'rxjs';
+import {mergeMap} from 'rxjs/operators';
 
 /**
  * Serializes the execution of elements emitted by the source Observable.

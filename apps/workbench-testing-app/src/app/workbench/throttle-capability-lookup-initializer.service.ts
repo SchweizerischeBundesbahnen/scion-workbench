@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, Provider } from '@angular/core';
-import { WORKBENCH_PRE_STARTUP, WorkbenchInitializer } from '@scion/workbench';
-import { WorkbenchStartupQueryParams } from './workbench-startup-query-params';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { Handler, MessageHeaders, MessageInterceptor, TopicMessage } from '@scion/microfrontend-platform';
-import { asyncScheduler } from 'rxjs';
+import {Injectable, Provider} from '@angular/core';
+import {WORKBENCH_PRE_STARTUP, WorkbenchInitializer} from '@scion/workbench';
+import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {Handler, MessageHeaders, MessageInterceptor, TopicMessage} from '@scion/microfrontend-platform';
+import {asyncScheduler} from 'rxjs';
 
 /**
  * Simulates the slow retrieval of the microfrontend's current view capability by delaying capability lookups by 2000ms.

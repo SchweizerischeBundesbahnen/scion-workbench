@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, Inject } from '@angular/core';
-import { VIEW_TAB_CONTEXT, ViewTabContext } from '../../workbench.constants';
-import { WorkbenchView } from '../../view/workbench-view.model';
+import {Component, HostBinding, Inject} from '@angular/core';
+import {VIEW_TAB_CONTEXT, ViewTabContext} from '../../workbench.constants';
+import {WorkbenchView} from '../../view/workbench-view.model';
 
 @Component({
   selector: 'wb-view-tab-content',

@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { InjectionToken } from '@angular/core';
-import { WbRouteReuseProvider } from './routing/wb-route-reuse-strategy.service';
+import {InjectionToken} from '@angular/core';
+import {WbRouteReuseProvider} from './routing/wb-route-reuse-strategy.service';
 
 /**
  * DI injection token to inject a router outlet name for {WbRouterOutletDirective}.

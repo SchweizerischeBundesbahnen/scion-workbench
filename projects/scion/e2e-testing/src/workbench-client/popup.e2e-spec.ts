@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { PopupOpenerPagePO } from './page-object/popup-opener-page.po';
-import { consumeBrowserLog, sendKeys } from '../helper/testing.util';
-import { RegisterWorkbenchCapabilityPagePO } from './page-object/register-workbench-capability-page.po';
-import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
-import { PopupPagePO } from './page-object/popup-page.po';
-import { Key } from 'protractor';
+import {AppPO} from '../app.po';
+import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {consumeBrowserLog, sendKeys} from '../helper/testing.util';
+import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
+import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {PopupPagePO} from './page-object/popup-page.po';
+import {Key} from 'protractor';
 
 describe('Workbench Popup', () => {
 

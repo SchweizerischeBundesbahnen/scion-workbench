@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, Input, OnDestroy, OnInit } from '@angular/core';
-import { Activity } from './activity';
-import { WorkbenchActivityPartService } from './workbench-activity-part.service';
+import {Directive, Input, OnDestroy, OnInit} from '@angular/core';
+import {Activity} from './activity';
+import {WorkbenchActivityPartService} from './workbench-activity-part.service';
 
 /**
  * Use this directive to model an activity as content child of <wb-workbench>.
@@ -28,7 +28,7 @@ import { WorkbenchActivityPartService } from './workbench-activity-part.service'
  *   </wb-activity>
  * </wb-workbench>
  */
-@Directive({selector: 'wb-activity', exportAs: 'activity'}) // tslint:disable-line:directive-selector
+@Directive({selector: 'wb-activity', exportAs: 'activity'}) // eslint-disable-line @angular-eslint/directive-selector
 export class WbActivityDirective implements OnInit, OnDestroy {
 
   public readonly activity: Activity;

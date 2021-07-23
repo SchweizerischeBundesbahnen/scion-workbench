@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { $, browser, protractor } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
+import {$, browser, protractor} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 
 const EC = protractor.ExpectedConditions;
 

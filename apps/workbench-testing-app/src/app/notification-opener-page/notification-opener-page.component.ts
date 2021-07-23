@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, Type } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { NotificationService, WorkbenchView } from '@scion/workbench';
-import { ActivatedRoute } from '@angular/router';
-import { InspectNotificationComponent } from '../inspect-notification-provider/inspect-notification.component';
+import {Component, Type} from '@angular/core';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {NotificationService, WorkbenchView} from '@scion/workbench';
+import {ActivatedRoute} from '@angular/router';
+import {InspectNotificationComponent} from '../inspect-notification-provider/inspect-notification.component';
 
 const TITLE = 'title';
 const CONTENT = 'content';

@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree } from '@angular/router';
-import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
-import { Arrays, Defined } from '@scion/toolkit/util';
-import { Injectable } from '@angular/core';
-import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
-import { ACTIVITY_OUTLET_NAME, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX, VIEW_TARGET } from '../workbench.constants';
-import { PartsLayout } from '../layout/parts-layout';
-import { filter, take } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
-import { WorkbenchLayoutDiff } from './workbench-layout-differ';
+import {ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {Arrays, Defined} from '@scion/toolkit/util';
+import {Injectable} from '@angular/core';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {ACTIVITY_OUTLET_NAME, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX, VIEW_TARGET} from '../workbench.constants';
+import {PartsLayout} from '../layout/parts-layout';
+import {filter, take} from 'rxjs/operators';
+import {BehaviorSubject} from 'rxjs';
+import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -74,7 +74,7 @@ export class WorkbenchRouter {
     switch (extras.target || (extras.selfViewId ? 'self' : 'blank')) {
       case 'blank': {
         const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
-        const viewTarget: { [outlet: string]: ViewTarget } = {
+        const viewTarget: {[outlet: string]: ViewTarget} = {
           [newViewId]: {
             partId: extras.blankPartId,
             viewIndex: extras.blankInsertionIndex,
@@ -156,7 +156,7 @@ export class WorkbenchRouter {
   /**
    * @see normalizeCommands
    */
-  private normalizeOutletCommands(outlets?: { [outlet: string]: Commands | null }, relativeTo?: ActivatedRoute | null): { [outlet: string]: Commands | null } | null {
+  private normalizeOutletCommands(outlets?: {[outlet: string]: Commands | null}, relativeTo?: ActivatedRoute | null): {[outlet: string]: Commands | null} | null {
     if (!outlets || !Object.keys(outlets).length) {
       return null;
     }
@@ -406,5 +406,5 @@ export interface WorkbenchNavigation {
    * add a property to this dictionary and set the commands to construct the outlet URL.
    * To remove an outlet from the URL, set its commands to `null`.
    */
-  viewOutlets?: { [outlet: string]: Commands | null };
+  viewOutlets?: {[outlet: string]: Commands | null};
 }

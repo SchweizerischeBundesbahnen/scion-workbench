@@ -1,6 +1,6 @@
-import { ComponentFixture, tick } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { Type } from '@angular/core';
+import {ComponentFixture, tick} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
+import {Type} from '@angular/core';
 
 /**
  * Simulates the asynchronous passage of time for the timers and detects the fixture for changes.

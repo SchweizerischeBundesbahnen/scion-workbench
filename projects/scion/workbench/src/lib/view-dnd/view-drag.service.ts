@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, NgZone } from '@angular/core';
-import { EMPTY, fromEvent, merge, Observable, Observer, of, Subject, TeardownLogic } from 'rxjs';
-import { filter, take, takeUntil } from 'rxjs/operators';
-import { BroadcastChannelService } from '../broadcast-channel.service';
-import { Arrays, Defined } from '@scion/toolkit/util';
-import { UrlSegment } from '@angular/router';
+import {Injectable, NgZone} from '@angular/core';
+import {EMPTY, fromEvent, merge, Observable, Observer, of, Subject, TeardownLogic} from 'rxjs';
+import {filter, take, takeUntil} from 'rxjs/operators';
+import {BroadcastChannelService} from '../broadcast-channel.service';
+import {Arrays, Defined} from '@scion/toolkit/util';
+import {UrlSegment} from '@angular/router';
 
 /**
  * Events fired during view drag and drop operation.

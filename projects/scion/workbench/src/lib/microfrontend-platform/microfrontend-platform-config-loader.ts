@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { PlatformConfig } from '@scion/microfrontend-platform';
+import {PlatformConfig} from '@scion/microfrontend-platform';
 
 /**
  * Allows loading the platform config asynchronously, e.g., over the network or from a JSON file.

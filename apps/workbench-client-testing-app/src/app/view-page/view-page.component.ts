@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, Inject, OnDestroy } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { ViewClosingEvent, ViewClosingListener, WorkbenchRouter, WorkbenchView } from '@scion/workbench-client';
-import { ActivatedRoute } from '@angular/router';
-import { UUID } from '@scion/toolkit/uuid';
-import { EMPTY, MonoTypeOperatorFunction, Subject } from 'rxjs';
-import { finalize, mergeMapTo, startWith, take, takeUntil } from 'rxjs/operators';
-import { APP_INSTANCE_ID } from '../app-instance-id';
-import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
-import { Location } from '@angular/common';
+import {Component, Inject, OnDestroy} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {ViewClosingEvent, ViewClosingListener, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {ActivatedRoute} from '@angular/router';
+import {UUID} from '@scion/toolkit/uuid';
+import {EMPTY, MonoTypeOperatorFunction, Subject} from 'rxjs';
+import {finalize, mergeMapTo, startWith, take, takeUntil} from 'rxjs/operators';
+import {APP_INSTANCE_ID} from '../app-instance-id';
+import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {Location} from '@angular/common';
 
 const TITLE = 'title';
 const HEADING = 'heading';
@@ -83,7 +83,7 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
         takeUntil(this._destroy$),
       )
       .subscribe(capability => {
-        console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata.id}]`); // tslint:disable-line:no-console
+        console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata.id}]`);
       });
   }
 
@@ -170,10 +170,10 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(active => {
         if (active) {
-          console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+          console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`);
         }
         else {
-          console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+          console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
         }
       });
   }
@@ -193,7 +193,7 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
 
   private logCompletion<T>(logPrefix: string): MonoTypeOperatorFunction<T> {
     return finalize(() => {
-      console.debug(`[${logPrefix}] [component=ViewPageComponent@${this.uuid}]`); // tslint:disable-line:no-console
+      console.debug(`[${logPrefix}] [component=ViewPageComponent@${this.uuid}]`);
     });
   }
 

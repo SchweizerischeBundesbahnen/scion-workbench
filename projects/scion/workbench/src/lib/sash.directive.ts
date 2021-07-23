@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, EventEmitter, HostBinding, HostListener, Inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { fromEvent, Subject } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
-import { first, takeUntil } from 'rxjs/operators';
+import {Directive, EventEmitter, HostBinding, HostListener, Inject, Input, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
+import {fromEvent, Subject} from 'rxjs';
+import {DOCUMENT} from '@angular/common';
+import {first, takeUntil} from 'rxjs/operators';
 
 /**
  * Provides functionality to sash the host element.
@@ -24,7 +24,7 @@ export class SashDirective implements OnDestroy, OnChanges {
   private _destroy$ = new Subject<void>();
   private _mousePosition: number | undefined;
 
-  @Input('wbSash') // tslint:disable-line:no-input-rename
+  @Input('wbSash')
   public wbDirection: 'vertical' | 'horizontal' = 'horizontal';
 
   @Output()

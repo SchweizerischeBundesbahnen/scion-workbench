@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
-import { RegisterWorkbenchCapabilityPagePO } from './page-object/register-workbench-capability-page.po';
-import { consumeBrowserLog } from '../helper/testing.util';
-import { PopupOpenerPagePO } from './page-object/popup-opener-page.po';
-import { PopupPagePO } from './page-object/popup-page.po';
+import {AppPO} from '../app.po';
+import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
+import {consumeBrowserLog} from '../helper/testing.util';
+import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {PopupPagePO} from './page-object/popup-page.po';
 
 export declare type HTMLElement = any;
 

@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription } from 'rxjs';
-import { WorkbenchViewCapability } from './workbench-view-capability';
-import { Beans, PreDestroy } from '@scion/toolkit/bean-manager';
-import { ManifestService, mapToBody, MessageClient, MessageHeaders } from '@scion/microfrontend-platform';
-import { distinctUntilChanged, filter, map, mapTo, mergeMap, shareReplay, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Observables } from '@scion/toolkit/util';
-import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
-import { ɵMicrofrontendRouteParams } from '../routing/workbench-router-navigate-command';
+import {merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription} from 'rxjs';
+import {WorkbenchViewCapability} from './workbench-view-capability';
+import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
+import {ManifestService, mapToBody, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
+import {distinctUntilChanged, filter, map, mapTo, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {Observables} from '@scion/toolkit/util';
+import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
+import {ɵMicrofrontendRouteParams} from '../routing/workbench-router-navigate-command';
 
 /**
  * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.
@@ -124,7 +124,7 @@ export abstract class WorkbenchView {
 /**
  * @ignore
  */
-export class ɵWorkbenchView implements WorkbenchView, PreDestroy { // tslint:disable-line:class-name
+export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
   private _propertyChange$ = new Subject<'title' | 'heading' | 'dirty' | 'closable'>();
   private _destroy$ = new Subject<void>();
@@ -384,7 +384,7 @@ function coerceMap<K, V>(): MonoTypeOperatorFunction<Map<K, V>> {
  * @ignore
  * @see {@link ContextService}
  */
-export const ɵVIEW_ID_CONTEXT_KEY = 'ɵworkbench.view.id'; // tslint:disable-line:variable-name
+export const ɵVIEW_ID_CONTEXT_KEY = 'ɵworkbench.view.id';
 
 /**
  * Looks up the corresponding view capability for each capability id emitted by the source Observable.

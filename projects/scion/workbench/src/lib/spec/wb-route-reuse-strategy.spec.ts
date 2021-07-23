@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
-import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
-import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
-import { Router, RouteReuseStrategy, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { advance, clickElement } from './util/util.spec';
-import { ActivityPartComponent } from '../activity-part/activity-part.component';
-import { By } from '@angular/platform-browser';
-import { WorkbenchTestingModule } from './workbench-testing.module';
+import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
+import {Component, NgModule, NgModuleFactoryLoader} from '@angular/core';
+import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
+import {RouterTestingModule, SpyNgModuleFactoryLoader} from '@angular/router/testing';
+import {Router, RouteReuseStrategy, RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {advance, clickElement} from './util/util.spec';
+import {ActivityPartComponent} from '../activity-part/activity-part.component';
+import {By} from '@angular/platform-browser';
+import {WorkbenchTestingModule} from './workbench-testing.module';
 
 /**
  *
@@ -48,7 +48,6 @@ import { WorkbenchTestingModule } from './workbench-testing.module';
  * +----------------------------------------------+     +----------------------------------------------+
  *
  */
-// tslint:disable class-name
 describe('WbRouteReuseStrategy', () => {
 
   beforeEach(waitForAsync(() => {
@@ -64,7 +63,6 @@ describe('WbRouteReuseStrategy', () => {
   // TODO [Angular 9]:
   // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
   // See Angular internal tests in `integration.spec.ts` file.
-  // tslint:disable-next-line:deprecation
   it('reuses activity routes', fakeAsync(inject([Router, NgModuleFactoryLoader, RouteReuseStrategy], (router: Router, loader: SpyNgModuleFactoryLoader, routeReuseStrategy: RouteReuseStrategy) => {
     loader.stubbedModules = {
       './feature-a/feature-a.module': FeatureAModule,

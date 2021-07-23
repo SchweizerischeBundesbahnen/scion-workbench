@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 /**
  * Provider for instants at which a {WorkbenchView} is activated.

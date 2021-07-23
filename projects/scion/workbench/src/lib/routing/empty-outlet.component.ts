@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 /**
  * This component is an identical copy of the internal Angular component {ɵEmptyOutletComponent}.

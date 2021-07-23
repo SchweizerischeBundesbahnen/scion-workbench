@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { fromEvent, merge, Observable, Subject } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
-import { Injectable } from '@angular/core';
+import {fromEvent, merge, Observable, Subject} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
+import {Injectable} from '@angular/core';
 
 const BROADCAST_CHANNEL_ITEM_KEY = 'workbench/broadcast-channel';
 

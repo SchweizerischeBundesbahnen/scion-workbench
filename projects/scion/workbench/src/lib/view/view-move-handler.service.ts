@@ -1,14 +1,14 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { takeUntil } from 'rxjs/operators';
-import { ViewDragService, ViewMoveEvent } from '../view-dnd/view-drag.service';
-import { UUID } from '@scion/toolkit/uuid';
-import { Router } from '@angular/router';
-import { WorkbenchViewRegistry } from './workbench-view.registry';
-import { LocationStrategy } from '@angular/common';
-import { Subject } from 'rxjs';
-import { ɵWorkbenchService } from '../ɵworkbench.service';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
-import { RouterUtils } from '../routing/router.util';
+import {Injectable, OnDestroy} from '@angular/core';
+import {takeUntil} from 'rxjs/operators';
+import {ViewDragService, ViewMoveEvent} from '../view-dnd/view-drag.service';
+import {UUID} from '@scion/toolkit/uuid';
+import {Router} from '@angular/router';
+import {WorkbenchViewRegistry} from './workbench-view.registry';
+import {LocationStrategy} from '@angular/common';
+import {Subject} from 'rxjs';
+import {ɵWorkbenchService} from '../ɵworkbench.service';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {RouterUtils} from '../routing/router.util';
 
 /**
  * Subscribes to view move requests for moving views in the {@link PartsLayout} when the user arranges views via drag and drop or view context menu.

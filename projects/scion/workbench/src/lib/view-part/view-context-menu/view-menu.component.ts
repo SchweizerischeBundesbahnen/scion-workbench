@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { OverlayRef } from '@angular/cdk/overlay';
-import { fromEvent, Observable, OperatorFunction, Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
-import { WorkbenchMenuItem } from '../../workbench.model';
-import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {OverlayRef} from '@angular/cdk/overlay';
+import {fromEvent, Observable, OperatorFunction, Subject} from 'rxjs';
+import {map, takeUntil} from 'rxjs/operators';
+import {WorkbenchMenuItem} from '../../workbench.model';
+import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 
 declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
 
