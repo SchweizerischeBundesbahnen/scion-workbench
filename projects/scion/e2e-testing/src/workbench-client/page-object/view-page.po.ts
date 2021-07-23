@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, selectOption, sendKeys } from '../../helper/testing.util';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciAccordionPO, SciCheckboxPO, SciParamsEnterPO, SciPropertyPO } from '@scion/toolkit.internal/widgets.po';
-import { $, browser, ElementFinder, protractor } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { Params } from '@angular/router';
-import { WorkbenchViewCapability } from '@scion/workbench-client';
-import { RouterOutletPO } from './router-outlet.po';
+import {assertPageToDisplay, enterText, selectOption, sendKeys} from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciAccordionPO, SciCheckboxPO, SciParamsEnterPO, SciPropertyPO} from '@scion/toolkit.internal/widgets.po';
+import {$, browser, ElementFinder, protractor} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {Params} from '@angular/router';
+import {WorkbenchViewCapability} from '@scion/workbench-client';
+import {RouterOutletPO} from './router-outlet.po';
 
 const EC = protractor.ExpectedConditions;
 
@@ -211,7 +211,7 @@ export class ViewPagePO {
     // do not close the accordion as this action removes the iframe from the DOM.
   }
 
-  public async navigateSelf(params: Params, options?: { paramsHandling?: 'merge' | 'replace', navigatePerParam?: boolean }): Promise<void> {
+  public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace', navigatePerParam?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 

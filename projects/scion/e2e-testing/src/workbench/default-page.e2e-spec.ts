@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { StartPagePO } from '../start-page.po';
-import { ViewPagePO } from './page-object/view-page.po';
-import { consumeBrowserLog } from '../helper/testing.util';
+import {AppPO} from '../app.po';
+import {StartPagePO} from '../start-page.po';
+import {ViewPagePO} from './page-object/view-page.po';
+import {consumeBrowserLog} from '../helper/testing.util';
 
 describe('Default Page', () => {
 

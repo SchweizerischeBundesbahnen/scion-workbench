@@ -1,8 +1,8 @@
-import { Injector, TemplateRef } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { ComponentType } from '@angular/cdk/portal';
-import { Disposable } from '../disposable';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
+import {Injector, TemplateRef} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {ComponentType} from '@angular/cdk/portal';
+import {Disposable} from '../disposable';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
 
 /**
  * Represents an activity in the activity panel.

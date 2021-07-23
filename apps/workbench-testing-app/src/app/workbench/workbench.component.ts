@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { map, takeUntil } from 'rxjs/operators';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { combineLatest, Observable, Subject } from 'rxjs';
-import { WorkbenchRouter, WorkbenchService } from '@scion/workbench';
+import {Component, OnDestroy} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {map, takeUntil} from 'rxjs/operators';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+import {combineLatest, Observable, Subject} from 'rxjs';
+import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 
 @Component({
   selector: 'app-workbench',

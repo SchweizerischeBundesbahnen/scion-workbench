@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { WbComponentPortal } from '../portal/wb-component-portal';
-import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
-import { ViewPartComponent } from '../view-part/view-part.component';
-import { noop, Subject } from 'rxjs';
-import { pairwise, startWith, takeUntil } from 'rxjs/operators';
-import { PartsLayout } from './parts-layout';
-import { MPart, MTreeNode } from './parts-layout.model';
-import { Arrays } from '@scion/toolkit/util';
-import { WorkbenchLayoutService } from './workbench-layout.service';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {WbComponentPortal} from '../portal/wb-component-portal';
+import {WorkbenchViewPartRegistry} from '../view-part/workbench-view-part.registry';
+import {ViewPartComponent} from '../view-part/view-part.component';
+import {noop, Subject} from 'rxjs';
+import {pairwise, startWith, takeUntil} from 'rxjs/operators';
+import {PartsLayout} from './parts-layout';
+import {MPart, MTreeNode} from './parts-layout.model';
+import {Arrays} from '@scion/toolkit/util';
+import {WorkbenchLayoutService} from './workbench-layout.service';
 
 /**
  * Represents the arrangement of parts. Each part contains one or more views.

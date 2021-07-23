@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule } from '@scion/toolkit.internal/widgets';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MessageBoxOpenerPageComponent } from './message-box-opener-page.component';
-import { RouterModule, Routes } from '@angular/router';
-import { WorkbenchModule } from '@scion/workbench';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule} from '@scion/toolkit.internal/widgets';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MessageBoxOpenerPageComponent} from './message-box-opener-page.component';
+import {RouterModule, Routes} from '@angular/router';
+import {WorkbenchModule} from '@scion/workbench';
 
 const routes: Routes = [
   {path: '', component: MessageBoxOpenerPageComponent},

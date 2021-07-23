@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AfterViewInit, Component, ElementRef, OnDestroy, Type, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CloseStrategy, PopupOrigin, PopupService, PopupSize, WorkbenchView } from '@scion/workbench';
-import { ActivatedRoute } from '@angular/router';
-import { PopupPageComponent } from '../popup-page/popup-page.component';
-import { PopupFocusPageComponent } from '../popup-focus-page/popup-focus-page.component';
-import { map, startWith, takeUntil } from 'rxjs/operators';
-import { defer, Observable, Subject } from 'rxjs';
+import {AfterViewInit, Component, ElementRef, OnDestroy, Type, ViewChild} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {CloseStrategy, PopupOrigin, PopupService, PopupSize, WorkbenchView} from '@scion/workbench';
+import {ActivatedRoute} from '@angular/router';
+import {PopupPageComponent} from '../popup-page/popup-page.component';
+import {PopupFocusPageComponent} from '../popup-focus-page/popup-focus-page.component';
+import {map, startWith, takeUntil} from 'rxjs/operators';
+import {defer, Observable, Subject} from 'rxjs';
 
 const POPUP_COMPONENT = 'popupComponent';
 const ANCHOR = 'anchor';
@@ -36,6 +36,13 @@ const WIDTH = 'width';
 const MAX_WIDTH = 'maxWidth';
 const X = 'x';
 const Y = 'y';
+
+interface AnchorFormGroup {
+  x: string;
+  y: string;
+  width: string;
+  height: string;
+}
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -115,12 +122,12 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
     this._coordinateAnchor$ = defer(() => this.form.get(ANCHOR)
       .valueChanges
       .pipe(
-        startWith(this.form.get(ANCHOR).value as object),
-        map(formValue => ({
-            x: Number(formValue[X]),
-            y: Number(formValue[Y]),
-            width: Number(formValue[WIDTH]),
-            height: Number(formValue[HEIGHT]),
+        startWith<AnchorFormGroup>(this.form.get(ANCHOR).value as AnchorFormGroup),
+        map(anchorValue => ({
+            x: Number(anchorValue.x),
+            y: Number(anchorValue.y),
+            width: Number(anchorValue.width),
+            height: Number(anchorValue.height),
           }),
         ),
       ));

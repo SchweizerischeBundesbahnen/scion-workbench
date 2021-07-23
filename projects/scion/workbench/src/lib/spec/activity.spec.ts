@@ -8,18 +8,18 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
-import { Component, NgModule, OnDestroy } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
-import { ActivatedRoute, ParamMap, Router, RouteReuseStrategy } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { advance, clickElement } from './util/util.spec';
-import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { Subject } from 'rxjs';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
-import { ActivityPartComponent } from '../activity-part/activity-part.component';
-import { WorkbenchTestingModule } from './workbench-testing.module';
+import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
+import {Component, NgModule, OnDestroy} from '@angular/core';
+import {RouterTestingModule} from '@angular/router/testing';
+import {ActivatedRoute, ParamMap, Router, RouteReuseStrategy} from '@angular/router';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {advance, clickElement} from './util/util.spec';
+import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
+import {Subject} from 'rxjs';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+import {distinctUntilChanged, map, takeUntil} from 'rxjs/operators';
+import {ActivityPartComponent} from '../activity-part/activity-part.component';
+import {WorkbenchTestingModule} from './workbench-testing.module';
 
 describe('Activity part', () => {
 

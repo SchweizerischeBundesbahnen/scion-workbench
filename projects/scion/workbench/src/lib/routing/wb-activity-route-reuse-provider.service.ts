@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ActivatedRouteSnapshot } from '@angular/router';
-import { EmptyOutletComponent } from './empty-outlet.component';
-import { ACTIVITY_OUTLET_NAME } from '../workbench.constants';
-import { WbRouteReuseProvider } from './wb-route-reuse-strategy.service';
-import { Injectable } from '@angular/core';
-import { WorkbenchModuleConfig } from '../workbench-module-config';
-import { Defined } from '@scion/toolkit/util';
+import {ActivatedRouteSnapshot} from '@angular/router';
+import {EmptyOutletComponent} from './empty-outlet.component';
+import {ACTIVITY_OUTLET_NAME} from '../workbench.constants';
+import {WbRouteReuseProvider} from './wb-route-reuse-strategy.service';
+import {Injectable} from '@angular/core';
+import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {Defined} from '@scion/toolkit/util';
 
 /**
  * Provides reuse keys for activity routes to not destroy associated activity component

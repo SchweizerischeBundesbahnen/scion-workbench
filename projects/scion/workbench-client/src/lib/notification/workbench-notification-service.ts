@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { IntentClient, mapToBody, Qualifier, RequestError } from '@scion/microfrontend-platform';
-import { WorkbenchNotificationConfig } from './workbench-notification.config';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { Maps } from '@scion/toolkit/util';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import {IntentClient, mapToBody, Qualifier, RequestError} from '@scion/microfrontend-platform';
+import {WorkbenchNotificationConfig} from './workbench-notification.config';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {Maps} from '@scion/toolkit/util';
+import {catchError} from 'rxjs/operators';
+import {throwError} from 'rxjs';
 
 /**
  * Allows displaying a notification to the user.

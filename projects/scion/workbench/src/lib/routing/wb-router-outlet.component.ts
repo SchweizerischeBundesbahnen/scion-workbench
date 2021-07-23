@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, ComponentFactoryResolver, Inject, ViewContainerRef } from '@angular/core';
-import { ChildrenOutletContexts, RouterOutlet } from '@angular/router';
-import { ROUTER_OUTLET_NAME } from '../workbench.constants';
+import {ChangeDetectorRef, Component, ComponentFactoryResolver, Inject, ViewContainerRef} from '@angular/core';
+import {ChildrenOutletContexts, RouterOutlet} from '@angular/router';
+import {ROUTER_OUTLET_NAME} from '../workbench.constants';
 
 /**
  * Like 'RouterOutlet' but with functionality to dynamically set the router outlet name via {ROUTER_OUTLET_NAME} injection token.
@@ -18,7 +18,7 @@ import { ROUTER_OUTLET_NAME } from '../workbench.constants';
 @Component({selector: 'wb-router-outlet', template: '', exportAs: 'outlet'})
 export class WbRouterOutletComponent extends RouterOutlet {
 
-  public constructor(
+  constructor(
     @Inject(ROUTER_OUTLET_NAME) outlet: string,
     parentContexts: ChildrenOutletContexts,
     location: ViewContainerRef,

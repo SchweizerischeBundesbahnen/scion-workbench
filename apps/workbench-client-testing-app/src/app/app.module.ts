@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BrowserModule } from '@angular/platform-browser';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule, Type } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { provideWorkbenchClientInitializer } from './workbench-client/workbench-microfrontend-support';
-import { SciViewportModule } from '@scion/toolkit/viewport';
-import { provideAppInstanceId } from './app-instance-id';
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { environment } from '../environments/environment';
-import { A11yModule } from '@angular/cdk/a11y';
+import {BrowserModule} from '@angular/platform-browser';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule, Type} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {provideWorkbenchClientInitializer} from './workbench-client/workbench-microfrontend-support';
+import {SciViewportModule} from '@scion/toolkit/viewport';
+import {provideAppInstanceId} from './app-instance-id';
+import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {environment} from '../environments/environment';
+import {A11yModule} from '@angular/cdk/a11y';
 
 @NgModule({
   declarations: [

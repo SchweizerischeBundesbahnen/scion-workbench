@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { StartPageComponent } from './start-page/start-page.component';
-import { WorkbenchComponent } from './workbench/workbench.component';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {StartPageComponent} from './start-page/start-page.component';
+import {WorkbenchComponent} from './workbench/workbench.component';
 
 const routes: Routes = [
   {

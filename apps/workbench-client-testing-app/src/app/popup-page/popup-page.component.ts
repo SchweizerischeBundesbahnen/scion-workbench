@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostBinding } from '@angular/core';
-import { WorkbenchPopup } from '@scion/workbench-client';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { PreferredSizeService } from '@scion/microfrontend-platform';
-import { UUID } from '@scion/toolkit/uuid';
-import { ActivatedRoute } from '@angular/router';
+import {Component, ElementRef, HostBinding} from '@angular/core';
+import {WorkbenchPopup} from '@scion/workbench-client';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {PreferredSizeService} from '@scion/microfrontend-platform';
+import {UUID} from '@scion/toolkit/uuid';
+import {ActivatedRoute} from '@angular/router';
 
 /**
  * Popup test component which can grow and shrink.

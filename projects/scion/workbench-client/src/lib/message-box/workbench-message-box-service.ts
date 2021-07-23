@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { IntentClient, mapToBody, Qualifier, RequestError } from '@scion/microfrontend-platform';
-import { WorkbenchMessageBoxConfig } from './workbench-message-box.config';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { Maps } from '@scion/toolkit/util';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { WorkbenchView } from '../view/workbench-view';
+import {IntentClient, mapToBody, Qualifier, RequestError} from '@scion/microfrontend-platform';
+import {WorkbenchMessageBoxConfig} from './workbench-message-box.config';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {Maps} from '@scion/toolkit/util';
+import {catchError} from 'rxjs/operators';
+import {throwError} from 'rxjs';
+import {WorkbenchView} from '../view/workbench-view';
 
 /**
  * Allows displaying a message to the user in a workbench message box.

@@ -11,22 +11,22 @@
 /**
  * Entry point for all public APIs of this package.
  */
-export { WorkbenchClient } from './lib/workbench-client';
-export { WorkbenchRouter, WorkbenchNavigationExtras } from './lib/routing/workbench-router';
-export { ɵWorkbenchRouterNavigateCommand, ɵMicrofrontendRouteParams } from './lib/routing/workbench-router-navigate-command';
-export { WorkbenchViewCapability } from './lib/view/workbench-view-capability';
-export { WorkbenchView, ViewClosingListener, ViewClosingEvent, ɵVIEW_ID_CONTEXT_KEY } from './lib/view/workbench-view';
-export { WorkbenchCapabilities } from './lib/workbench-capabilities.enum';
-export { ɵWorkbenchCommands } from './lib/ɵworkbench-commands';
-export { ɵWorkbenchPopupCommand } from './lib/popup/workbench-popup-open-command';
-export { WorkbenchPopupService } from './lib/popup/workbench-popup-service';
-export { WorkbenchPopup, ɵWorkbenchPopupMessageHeaders } from './lib/popup/workbench-popup';
-export { WorkbenchPopupCapability, PopupSize } from './lib/popup/workbench-popup-capability';
-export { WorkbenchPopupConfig, PopupOrigin, CloseStrategy } from './lib/popup/workbench-popup.config';
-export { ɵPopupContext, ɵPOPUP_CONTEXT } from './lib/popup/workbench-popup-context';
-export { WorkbenchMessageBoxCapability } from './lib/message-box/workbench-message-box-capability';
-export { WorkbenchMessageBoxService } from './lib/message-box/workbench-message-box-service';
-export { WorkbenchMessageBoxConfig } from './lib/message-box/workbench-message-box.config';
-export { WorkbenchNotificationCapability } from './lib/notification/workbench-notification-capability';
-export { WorkbenchNotificationService } from './lib/notification/workbench-notification-service';
-export { WorkbenchNotificationConfig } from './lib/notification/workbench-notification.config';
+export {WorkbenchClient} from './lib/workbench-client';
+export {WorkbenchRouter, WorkbenchNavigationExtras} from './lib/routing/workbench-router';
+export {ɵWorkbenchRouterNavigateCommand, ɵMicrofrontendRouteParams} from './lib/routing/workbench-router-navigate-command';
+export {WorkbenchViewCapability} from './lib/view/workbench-view-capability';
+export {WorkbenchView, ViewClosingListener, ViewClosingEvent, ɵVIEW_ID_CONTEXT_KEY} from './lib/view/workbench-view';
+export {WorkbenchCapabilities} from './lib/workbench-capabilities.enum';
+export {ɵWorkbenchCommands} from './lib/ɵworkbench-commands';
+export {ɵWorkbenchPopupCommand} from './lib/popup/workbench-popup-open-command';
+export {WorkbenchPopupService} from './lib/popup/workbench-popup-service';
+export {WorkbenchPopup, ɵWorkbenchPopupMessageHeaders} from './lib/popup/workbench-popup';
+export {WorkbenchPopupCapability, PopupSize} from './lib/popup/workbench-popup-capability';
+export {WorkbenchPopupConfig, PopupOrigin, CloseStrategy} from './lib/popup/workbench-popup.config';
+export {ɵPopupContext, ɵPOPUP_CONTEXT} from './lib/popup/workbench-popup-context';
+export {WorkbenchMessageBoxCapability} from './lib/message-box/workbench-message-box-capability';
+export {WorkbenchMessageBoxService} from './lib/message-box/workbench-message-box-service';
+export {WorkbenchMessageBoxConfig} from './lib/message-box/workbench-message-box.config';
+export {WorkbenchNotificationCapability} from './lib/notification/workbench-notification-capability';
+export {WorkbenchNotificationService} from './lib/notification/workbench-notification-service';
+export {WorkbenchNotificationConfig} from './lib/notification/workbench-notification.config';

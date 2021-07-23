@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Inject, Injectable, NgZone, OnDestroy } from '@angular/core';
-import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
-import { ɵNotification } from './ɵnotification';
-import { NotificationConfig } from './notification.config';
-import { DOCUMENT } from '@angular/common';
-import { filter, map, takeUntil } from 'rxjs/operators';
-import { observeInside, subscribeInside } from '@scion/toolkit/operators';
-import { Arrays } from '@scion/toolkit/util';
+import {Inject, Injectable, NgZone, OnDestroy} from '@angular/core';
+import {BehaviorSubject, fromEvent, Observable, Subject} from 'rxjs';
+import {ɵNotification} from './ɵnotification';
+import {NotificationConfig} from './notification.config';
+import {DOCUMENT} from '@angular/common';
+import {filter, map, takeUntil} from 'rxjs/operators';
+import {observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Allows displaying a notification to the user.
@@ -77,7 +77,7 @@ export class NotificationService implements OnDestroy {
   /**
    * Constructs the notification based on the given config and computes its insertion index.
    */
-  private constructNotification(config: NotificationConfig, notifications: ReadonlyArray<ɵNotification>): { notification: ɵNotification, insertionIndex: number } {
+  private constructNotification(config: NotificationConfig, notifications: ReadonlyArray<ɵNotification>): {notification: ɵNotification, insertionIndex: number} {
     config = {...config};
 
     // Check whether the notification belongs to a group. If so, replace any present notification of that group.

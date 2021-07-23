@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, getInputValue } from '../../helper/testing.util';
-import { Params } from '@angular/router';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciAccordionPO, SciCheckboxPO, SciPropertyPO } from '@scion/toolkit.internal/widgets.po';
-import { Arrays } from '@scion/toolkit/util';
-import { ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
+import {assertPageToDisplay, enterText, getInputValue} from '../../helper/testing.util';
+import {Params} from '@angular/router';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciAccordionPO, SciCheckboxPO, SciPropertyPO} from '@scion/toolkit.internal/widgets.po';
+import {Arrays} from '@scion/toolkit/util';
+import {ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 
 /**
  * Page object to interact {@link ViewPageComponent}.
@@ -162,7 +162,7 @@ export class ViewPagePO {
     }
   }
 
-  public async addViewAction(viewpartAction: ViewpartAction | null, options?: { append?: boolean }): Promise<void> {
+  public async addViewAction(viewpartAction: ViewpartAction | null, options?: {append?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
 

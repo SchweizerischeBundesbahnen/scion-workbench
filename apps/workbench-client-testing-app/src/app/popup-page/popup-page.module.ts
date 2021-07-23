@@ -8,15 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
-import { SciAccordionModule, SciFormFieldModule, SciPropertyModule } from '@scion/toolkit.internal/widgets';
-import { FormsModule } from '@angular/forms';
-import { PopupPageComponent } from './popup-page.component';
-import { UtilModule } from '../util/util.module';
-import { SciViewportModule } from '@scion/toolkit/viewport';
-import { A11yModule } from '@angular/cdk/a11y';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterModule, Routes} from '@angular/router';
+import {SciAccordionModule, SciFormFieldModule, SciPropertyModule} from '@scion/toolkit.internal/widgets';
+import {FormsModule} from '@angular/forms';
+import {PopupPageComponent} from './popup-page.component';
+import {UtilModule} from '../util/util.module';
+import {SciViewportModule} from '@scion/toolkit/viewport';
+import {A11yModule} from '@angular/cdk/a11y';
 
 const routes: Routes = [
   {path: '', component: PopupPageComponent},

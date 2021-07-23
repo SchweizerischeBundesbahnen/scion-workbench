@@ -1,8 +1,8 @@
-import { Provider, Type } from '@angular/core';
-import { WorkbenchModuleConfig } from '../workbench-module-config';
-import { Logger, ɵLogger } from './logger';
-import { LogAppender, LogLevel } from './logging.model';
-import { ConsoleAppender } from './console-appender.service';
+import {Provider, Type} from '@angular/core';
+import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {Logger, ɵLogger} from './logger';
+import {LogAppender, LogLevel} from './logging.model';
+import {ConsoleAppender} from './console-appender.service';
 
 /**
  * Registers a set of DI providers for installing workbench logging.

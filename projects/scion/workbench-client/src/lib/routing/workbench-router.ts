@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Intent, IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, QualifierMatcher, RequestError } from '@scion/microfrontend-platform';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { WorkbenchViewCapability } from '../view/workbench-view-capability';
-import { catchError, take } from 'rxjs/operators';
-import { WorkbenchView } from '../view/workbench-view';
-import { WorkbenchCapabilities } from '../workbench-capabilities.enum';
-import { Dictionary, Maps } from '@scion/toolkit/util';
-import { ɵWorkbenchCommands } from '../ɵworkbench-commands';
-import { ɵWorkbenchRouterNavigateCommand } from './workbench-router-navigate-command';
-import { throwError } from 'rxjs';
-import { filterArray } from '@scion/toolkit/operators';
+import {Intent, IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, QualifierMatcher, RequestError} from '@scion/microfrontend-platform';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {WorkbenchViewCapability} from '../view/workbench-view-capability';
+import {catchError, take} from 'rxjs/operators';
+import {WorkbenchView} from '../view/workbench-view';
+import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {Dictionary, Maps} from '@scion/toolkit/util';
+import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
+import {ɵWorkbenchRouterNavigateCommand} from './workbench-router-navigate-command';
+import {throwError} from 'rxjs';
+import {filterArray} from '@scion/toolkit/operators';
 
 /**
  * Allows navigating to a microfrontend in a workbench view.

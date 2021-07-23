@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { LoggerName } from './logging.model';
+import {LoggerName} from './logging.model';
 
 /**
  * Set of logger names used by the workbench.

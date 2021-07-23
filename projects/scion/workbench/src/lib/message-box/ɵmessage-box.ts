@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Type } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Arrays, Dictionary } from '@scion/toolkit/util';
-import { MessageBoxConfig } from './message-box.config';
-import { MessageBoxAction, MessageBox } from './message-box';
-import { TextMessageComponent } from './text-message.component';
+import {Type} from '@angular/core';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {Arrays, Dictionary} from '@scion/toolkit/util';
+import {MessageBoxConfig} from './message-box.config';
+import {MessageBox, MessageBoxAction} from './message-box';
+import {TextMessageComponent} from './text-message.component';
 
-export class ɵMessageBox<T = any> implements MessageBox<T> { // tslint:disable-line:class-name
+export class ɵMessageBox<T = any> implements MessageBox<T> {
 
   private _closeResolveFn!: (action: any) => void;
 

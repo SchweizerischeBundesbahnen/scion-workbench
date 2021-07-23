@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ComponentFactoryResolver, Injector, ViewContainerRef } from '@angular/core';
-import { ComponentType } from '@angular/cdk/portal/portal';
-import { Observable } from 'rxjs';
+import {ComponentFactoryResolver, Injector, ViewContainerRef} from '@angular/core';
+import {ComponentType} from '@angular/cdk/portal/portal';
+import {Observable} from 'rxjs';
 
 /**
  * Configures the content and appearance of a notification presented to the user.

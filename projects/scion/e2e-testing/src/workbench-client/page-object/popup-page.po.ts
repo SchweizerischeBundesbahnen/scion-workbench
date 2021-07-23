@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText } from '../../helper/testing.util';
-import { AppPO, PopupPO } from '../../app.po';
-import { $, ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { PopupSize } from '@scion/workbench';
-import { SciAccordionPO, SciPropertyPO } from '@scion/toolkit.internal/widgets.po';
-import { ISize } from 'selenium-webdriver';
-import { Params } from '@angular/router';
-import { WorkbenchPopupCapability } from '@scion/workbench-client';
-import { RouterOutletPO } from './router-outlet.po';
+import {assertPageToDisplay, enterText} from '../../helper/testing.util';
+import {AppPO, PopupPO} from '../../app.po';
+import {$, ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {PopupSize} from '@scion/workbench';
+import {SciAccordionPO, SciPropertyPO} from '@scion/toolkit.internal/widgets.po';
+import {ISize} from 'selenium-webdriver';
+import {Params} from '@angular/router';
+import {WorkbenchPopupCapability} from '@scion/workbench-client';
+import {RouterOutletPO} from './router-outlet.po';
 
 /**
  * Page object to interact {@link PopupPageComponent}.
@@ -164,7 +164,7 @@ export class PopupPagePO {
     }
   }
 
-  public async clickClose(options?: { returnValue?: string, closeWithError?: boolean }): Promise<void> {
+  public async clickClose(options?: {returnValue?: string, closeWithError?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(await this._popupId);
     await assertPageToDisplay(this._pageFinder);
 

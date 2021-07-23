@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 /**
  * Concats the given arrays.
@@ -18,7 +18,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({name: 'wbConcatArray', pure: true})
 export class ArrayConcatPipe implements PipeTransform {
 
-  public transform<T>(input: string[], ...arrays: string[][]): string[] {
+  public transform(input: string[], ...arrays: string[][]): string[] {
     return (arrays || []).reduce((acc, array) => acc.concat(array), input);
   }
 }

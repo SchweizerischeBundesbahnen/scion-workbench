@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Routes, UrlSegment } from '@angular/router';
-import { MicrofrontendViewComponent } from '../microfrontend-view/microfrontend-view.component';
-import { ɵMicrofrontendRouteParams } from '@scion/workbench-client';
+import {Routes, UrlSegment} from '@angular/router';
+import {MicrofrontendViewComponent} from '../microfrontend-view/microfrontend-view.component';
+import {ɵMicrofrontendRouteParams} from '@scion/workbench-client';
 
 export namespace MicrofrontendViewRoutes {
 

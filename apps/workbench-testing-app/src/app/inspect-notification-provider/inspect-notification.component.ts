@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { Notification } from '@scion/workbench';
-import { Subject } from 'rxjs';
-import { UUID } from '@scion/toolkit/uuid';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { takeUntil } from 'rxjs/operators';
+import {Component, OnDestroy} from '@angular/core';
+import {Notification} from '@scion/workbench';
+import {Subject} from 'rxjs';
+import {UUID} from '@scion/toolkit/uuid';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {takeUntil} from 'rxjs/operators';
 
 const TITLE = 'title';
 const SEVERITY = 'severity';

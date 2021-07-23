@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Inject, Injectable, OnDestroy, Optional } from '@angular/core';
-import { NavigationStart, ParamMap, Router, RouterEvent } from '@angular/router';
-import { filter, map, startWith, takeUntil } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
-import { LogAppender, LogEvent, LoggerName, LogLevel } from './logging.model';
+import {Inject, Injectable, OnDestroy, Optional} from '@angular/core';
+import {NavigationStart, ParamMap, Router, RouterEvent} from '@angular/router';
+import {filter, map, startWith, takeUntil} from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {LogAppender, LogEvent, LoggerName, LogLevel} from './logging.model';
 
 type LogLevelStrings = keyof typeof LogLevel;
 
@@ -83,7 +83,7 @@ export abstract class Logger {
 }
 
 @Injectable()
-export class ɵLogger implements Logger, OnDestroy {  // tslint:disable-line:class-name
+export class ɵLogger implements Logger, OnDestroy {
 
   private _destroy$ = new Subject<void>();
   private _logLevel!: LogLevel;

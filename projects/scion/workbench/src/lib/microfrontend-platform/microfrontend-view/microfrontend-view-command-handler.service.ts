@@ -8,15 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { ManifestService, Message, MessageClient, MessageHeaders } from '@scion/microfrontend-platform';
-import { Logger } from '../../logging';
-import { WorkbenchView } from '../../view/workbench-view.model';
-import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
-import { map, mapTo, switchMap, takeUntil } from 'rxjs/operators';
-import { WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands } from '@scion/workbench-client';
-import { merge, Subject } from 'rxjs';
-import { MicrofrontendViewRoutes } from '../routing/microfrontend-routes';
+import {Injectable, OnDestroy} from '@angular/core';
+import {ManifestService, Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
+import {Logger} from '../../logging';
+import {WorkbenchView} from '../../view/workbench-view.model';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {map, mapTo, switchMap, takeUntil} from 'rxjs/operators';
+import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands} from '@scion/workbench-client';
+import {merge, Subject} from 'rxjs';
+import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 
 /**
  * Handles commands of microfrontends loaded into workbench views, such as setting view tab properties or closing the view.

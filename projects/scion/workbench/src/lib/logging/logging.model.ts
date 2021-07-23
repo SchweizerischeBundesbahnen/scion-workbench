@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 /**
  * Set of log levels to control logging output.

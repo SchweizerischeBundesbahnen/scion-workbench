@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO, NotificationPO } from './app.po';
-import { ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from './helper/webdriver-execution-context';
+import {AppPO, NotificationPO} from './app.po';
+import {ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
 
 /**
  * Page object to interact {@link TextNotificationComponent}.

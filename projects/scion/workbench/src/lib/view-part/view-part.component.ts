@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, HostListener, OnDestroy } from '@angular/core';
-import { combineLatest, Observable, Subject } from 'rxjs';
-import { WbViewDropEvent } from '../view-dnd/view-drop-zone.directive';
-import { takeUntil } from 'rxjs/operators';
-import { ViewDragService } from '../view-dnd/view-drag.service';
-import { ɵWorkbenchViewPart } from './ɵworkbench-view-part.model';
-import { ɵWorkbenchService } from '../ɵworkbench.service';
-import { Logger, LoggerNames } from '../logging';
+import {Component, HostBinding, HostListener, OnDestroy} from '@angular/core';
+import {combineLatest, Observable, Subject} from 'rxjs';
+import {WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
+import {takeUntil} from 'rxjs/operators';
+import {ViewDragService} from '../view-dnd/view-drag.service';
+import {ɵWorkbenchViewPart} from './ɵworkbench-view-part.model';
+import {ɵWorkbenchService} from '../ɵworkbench.service';
+import {Logger, LoggerNames} from '../logging';
 
 @Component({
   selector: 'wb-view-part',

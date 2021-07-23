@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, Input, ViewContainerRef } from '@angular/core';
+import {Component, Input, ViewContainerRef} from '@angular/core';
 
 /**
  * Structural component which adds its `ng-content` to a top-level workbench DOM element and projects it into this component's bounding box.

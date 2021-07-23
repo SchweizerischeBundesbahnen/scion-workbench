@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, Injector } from '@angular/core';
-import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME } from '../workbench.constants';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
-import { Activity, InternalActivity } from './activity';
-import { BehaviorSubject, Observable } from 'rxjs';
+import {Injectable, Injector} from '@angular/core';
+import {ActivatedRouteSnapshot, Router} from '@angular/router';
+import {ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME} from '../workbench.constants';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {Activity, InternalActivity} from './activity';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable()
 export class WorkbenchActivityPartService {

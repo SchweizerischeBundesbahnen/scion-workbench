@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { RouterPagePO } from './page-object/router-page.po';
-import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
-import { RegisterWorkbenchCapabilityPagePO } from './page-object/register-workbench-capability-page.po';
-import { ViewPagePO } from './page-object/view-page.po';
-import { Key, logging } from 'protractor';
-import { RegisterWorkbenchIntentionPagePO } from './page-object/register-workbench-intention-page.po';
-import { confirmAlert, consumeBrowserLog, dismissAlert } from '../helper/testing.util';
+import {AppPO} from '../app.po';
+import {RouterPagePO} from './page-object/router-page.po';
+import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
+import {ViewPagePO} from './page-object/view-page.po';
+import {Key, logging} from 'protractor';
+import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
+import {confirmAlert, consumeBrowserLog, dismissAlert} from '../helper/testing.util';
 import Level = logging.Level;
 
 export declare type HTMLElement = any;

@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MessageBoxStackComponent } from './message-box-stack.component';
-import { MessageBoxComponent } from './message-box.component';
-import { TextMessageComponent } from './text-message.component';
-import { MessageBoxCssClassesPipe } from './message-box-css-classes.pipe';
-import { MessageBoxService } from './message-box.service';
-import { A11yModule } from '@angular/cdk/a11y';
-import { PortalModule } from '@angular/cdk/portal';
-import { MoveDirective } from './move.directive';
-import { CoerceObservablePipe } from './coerce-observable.pipe';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {MessageBoxStackComponent} from './message-box-stack.component';
+import {MessageBoxComponent} from './message-box.component';
+import {TextMessageComponent} from './text-message.component';
+import {MessageBoxCssClassesPipe} from './message-box-css-classes.pipe';
+import {MessageBoxService} from './message-box.service';
+import {A11yModule} from '@angular/cdk/a11y';
+import {PortalModule} from '@angular/cdk/portal';
+import {MoveDirective} from './move.directive';
+import {CoerceObservablePipe} from './coerce-observable.pipe';
 
 /**
  * Provides a message box for the display of a message to the user.

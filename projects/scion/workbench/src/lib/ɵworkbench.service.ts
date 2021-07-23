@@ -8,20 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction } from './workbench.model';
-import { UUID } from '@scion/toolkit/uuid';
-import { WorkbenchLayoutService } from './layout/workbench-layout.service';
-import { Disposable } from './disposable';
-import { WorkbenchService } from './workbench.service';
-import { WorkbenchRouter } from './routing/workbench-router.service';
-import { map } from 'rxjs/operators';
-import { WorkbenchView } from './view/workbench-view.model';
-import { WorkbenchViewRegistry } from './view/workbench-view.registry';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction} from './workbench.model';
+import {UUID} from '@scion/toolkit/uuid';
+import {WorkbenchLayoutService} from './layout/workbench-layout.service';
+import {Disposable} from './disposable';
+import {WorkbenchService} from './workbench.service';
+import {WorkbenchRouter} from './routing/workbench-router.service';
+import {map} from 'rxjs/operators';
+import {WorkbenchView} from './view/workbench-view.model';
+import {WorkbenchViewRegistry} from './view/workbench-view.registry';
 
 @Injectable()
-export class ɵWorkbenchService implements WorkbenchService { // tslint:disable-line:class-name
+export class ɵWorkbenchService implements WorkbenchService {
 
   public readonly viewPartActions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);

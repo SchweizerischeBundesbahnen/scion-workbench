@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { MPart, MPartsLayout, MTreeNode } from './parts-layout.model';
-import { Defined } from '@scion/toolkit/util';
-import { UUID } from '@scion/toolkit/uuid';
-import { assertType, assertNotNullish } from '../asserts.util';
+import {MPart, MPartsLayout, MTreeNode} from './parts-layout.model';
+import {Defined} from '@scion/toolkit/util';
+import {UUID} from '@scion/toolkit/uuid';
+import {assertNotNullish, assertType} from '../asserts.util';
 
 /**
  * Represents the arrangement of parts and provides methods to modify the layout.
@@ -180,9 +180,9 @@ export class PartsLayout {
    *
    * By providing an options object, you can control if to throw an error if not found.
    */
-  public findPart(partId: string, options: { orElseThrow: true }): Readonly<NonNullable<MPart>>;
-  public findPart(partId: string, options: { orElseThrow: false } | {}): Readonly<MPart | null>;
-  public findPart(partId: string, options: { orElseThrow: boolean }): Readonly<MPart | null> {
+  public findPart(partId: string, options: {orElseThrow: true}): Readonly<NonNullable<MPart>>;
+  public findPart(partId: string, options: {orElseThrow: false} | {}): Readonly<MPart | null>;
+  public findPart(partId: string, options: {orElseThrow: boolean}): Readonly<MPart | null> {
     return this._findPart(partId, options);
   }
 
@@ -191,9 +191,9 @@ export class PartsLayout {
    *
    * By providing an object object, you can control if to throw an error if not found.
    */
-  public findPartByViewId(viewId: string, options: { orElseThrow: true }): Readonly<NonNullable<MPart>>;
-  public findPartByViewId(viewId: string, options: { orElseThrow: false } | {}): Readonly<MPart | null>;
-  public findPartByViewId(viewId: string, options: { orElseThrow: boolean }): Readonly<MPart | null> {
+  public findPartByViewId(viewId: string, options: {orElseThrow: true}): Readonly<NonNullable<MPart>>;
+  public findPartByViewId(viewId: string, options: {orElseThrow: false} | {}): Readonly<MPart | null>;
+  public findPartByViewId(viewId: string, options: {orElseThrow: boolean}): Readonly<MPart | null> {
     assertNotNullish(viewId, {orElseThrow: () => Error(`[PartsLayoutError] ViewId must not be 'null' or 'undefined'.`)});
     return this._findPartByViewId(viewId, options);
   }
@@ -206,9 +206,9 @@ export class PartsLayout {
    * @param options - Controls the serialization into a URL-safe base64 string.
    *                  - `nullIfEmpty`: if `true` (or if not specified), returns `null` if containing a single root part with no views added to it.
    */
-  public serialize(options: { nullIfEmpty: false }): string;
-  public serialize(options?: { nullIfEmpty?: true } | {}): string | null;
-  public serialize(options?: { nullIfEmpty?: boolean }): string | null {
+  public serialize(options: {nullIfEmpty: false}): string;
+  public serialize(options?: {nullIfEmpty?: true} | {}): string | null;
+  public serialize(options?: {nullIfEmpty?: boolean}): string | null {
     if ((options?.nullIfEmpty ?? true) && this._root instanceof MPart && this._root.isEmpty()) {
       return null;
     }
@@ -323,7 +323,7 @@ export class PartsLayout {
   /**
    * Note: This method name begins with an underscore, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private _removeView(viewId: string, options: { preventPartRemoval: boolean }): this {
+  private _removeView(viewId: string, options: {preventPartRemoval: boolean}): this {
     assertNotNullish(viewId, {orElseThrow: () => Error(`[PartsLayoutError] ViewId must not be 'null' or 'undefined'.`)});
 
     const part = this._findPartByViewId(viewId, {orElseThrow: true});
@@ -403,9 +403,9 @@ export class PartsLayout {
     return this;
   }
 
-  private _findPart(partId: string, options: { orElseThrow: true }): NonNullable<MPart>;
-  private _findPart(partId: string, options: { orElseThrow: false } | {}): MPart | null;
-  private _findPart(partId: string, options: { orElseThrow: boolean }): MPart | null {
+  private _findPart(partId: string, options: {orElseThrow: true}): NonNullable<MPart>;
+  private _findPart(partId: string, options: {orElseThrow: false} | {}): MPart | null;
+  private _findPart(partId: string, options: {orElseThrow: boolean}): MPart | null {
     assertNotNullish(partId, {orElseThrow: () => Error(`[PartsLayoutError] PartId must not be 'null' or 'undefined'.`)});
     const part = this._findTreeElements(element => element instanceof MPart && element.partId === partId, {findFirst: true})[0] as MPart;
     if (!part && options.orElseThrow) {
@@ -414,9 +414,9 @@ export class PartsLayout {
     return part || null;
   }
 
-  private _findPartByViewId(viewId: string, options: { orElseThrow: true }): NonNullable<MPart>;
-  private _findPartByViewId(viewId: string, options: { orElseThrow: false } | {}): MPart | null;
-  private _findPartByViewId(viewId: string, options: { orElseThrow: boolean }): MPart | null {
+  private _findPartByViewId(viewId: string, options: {orElseThrow: true}): NonNullable<MPart>;
+  private _findPartByViewId(viewId: string, options: {orElseThrow: false} | {}): MPart | null;
+  private _findPartByViewId(viewId: string, options: {orElseThrow: boolean}): MPart | null {
     assertNotNullish(viewId, {orElseThrow: () => Error(`[PartsLayoutError] ViewId must not be 'null' or 'undefined'.`)});
     const part = this._findTreeElements(element => element instanceof MPart && element.viewIds.includes(viewId), {findFirst: true})[0] as MPart;
     if (!part && options.orElseThrow) {
@@ -425,9 +425,9 @@ export class PartsLayout {
     return part || null;
   }
 
-  private _findTreeNode(nodeId: string, options: { orElseThrow: true }): NonNullable<MTreeNode>;
-  private _findTreeNode(nodeId: string, options: { orElseThrow: false } | {}): MTreeNode | null;
-  private _findTreeNode(nodeId: string, options: { orElseThrow: boolean }): MTreeNode | null {
+  private _findTreeNode(nodeId: string, options: {orElseThrow: true}): NonNullable<MTreeNode>;
+  private _findTreeNode(nodeId: string, options: {orElseThrow: false} | {}): MTreeNode | null;
+  private _findTreeNode(nodeId: string, options: {orElseThrow: boolean}): MTreeNode | null {
     assertNotNullish(nodeId, {orElseThrow: () => Error(`[PartsLayoutError] NodeId must not be 'null' or 'undefined'.`)});
 
     const node = this._findTreeElements(element => element instanceof MTreeNode && element.nodeId === nodeId, {findFirst: true})[0] as MTreeNode;
@@ -442,7 +442,7 @@ export class PartsLayout {
    *
    * By providing an object object, you can control if to stop traversing on first match.
    */
-  private _findTreeElements(predicateFn: (element: MPart | MTreeNode) => boolean, options?: { findFirst: boolean }): (MPart | MTreeNode)[] {
+  private _findTreeElements(predicateFn: (element: MPart | MTreeNode) => boolean, options?: {findFirst: boolean}): (MPart | MTreeNode)[] {
     const result: (MPart | MTreeNode)[] = [];
     (function visitParts(node: MTreeNode | MPart): boolean {
       if (predicateFn(node)) {

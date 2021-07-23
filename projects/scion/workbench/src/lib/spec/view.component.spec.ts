@@ -8,21 +8,21 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgModule } from '@angular/core';
-import { PartsLayoutComponent } from '../layout/parts-layout.component';
-import { WorkbenchService } from '../workbench.service';
-import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { By } from '@angular/platform-browser';
-import { RouterTestingModule } from '@angular/router/testing';
-import { Router } from '@angular/router';
-import { SpecView1Component, SpecView2Component } from './view-part.model.spec';
-import { ViewComponent } from '../view/view.component';
-import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
-import { advance } from './util/util.spec';
-import { WorkbenchTestingModule } from './workbench-testing.module';
-import { WorkbenchView } from '../view/workbench-view.model';
+import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgModule} from '@angular/core';
+import {PartsLayoutComponent} from '../layout/parts-layout.component';
+import {WorkbenchService} from '../workbench.service';
+import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
+import {By} from '@angular/platform-browser';
+import {RouterTestingModule} from '@angular/router/testing';
+import {Router} from '@angular/router';
+import {SpecView1Component, SpecView2Component} from './view-part.model.spec';
+import {ViewComponent} from '../view/view.component';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {advance} from './util/util.spec';
+import {WorkbenchTestingModule} from './workbench-testing.module';
+import {WorkbenchView} from '../view/workbench-view.model';
 
 describe('ViewComponent', () => {
 

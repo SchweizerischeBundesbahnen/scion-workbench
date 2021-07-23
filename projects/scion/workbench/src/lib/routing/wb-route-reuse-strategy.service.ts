@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy } from '@angular/router';
-import { Inject, Injectable, Optional } from '@angular/core';
-import { ROUTE_REUSE_PROVIDER } from '../workbench.constants';
+import {ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy} from '@angular/router';
+import {Inject, Injectable, Optional} from '@angular/core';
+import {ROUTE_REUSE_PROVIDER} from '../workbench.constants';
 
 /**
  * Route reuse strategy which delegates to registered {WbRouteReuseProvider} objects

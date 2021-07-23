@@ -1,7 +1,7 @@
 SCION Workbench
 ===============
 
-**The SCION Workbench provides a workbench layout for Angular applications similar to the Eclipse Workbench for Eclipse RCP applications.** 
+**The SCION Workbench provides a workbench layout for Angular applications similar to the Eclipse Workbench for Eclipse RCP applications.**
 
 Workbench layouts are useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel. Examples include specialized business applications, scientific or development tools, as well as command & control interfaces.
 

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { WorkbenchMicrofrontendConfig } from '@scion/workbench';
+import {WorkbenchMicrofrontendConfig} from '@scion/workbench';
 
 /**
  * Environment used when packaging the app for CI on GitHub.

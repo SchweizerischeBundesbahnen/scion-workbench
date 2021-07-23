@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
-import { Intention, ManifestService } from '@scion/microfrontend-platform';
-import { WorkbenchCapabilities } from '@scion/workbench-client';
+import {Component} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {Intention, ManifestService} from '@scion/microfrontend-platform';
+import {WorkbenchCapabilities} from '@scion/workbench-client';
 
 const TYPE = 'type';
 const QUALIFIER = 'qualifier';

@@ -8,19 +8,19 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ViewTabComponent } from '../view-tab/view-tab.component';
-import { WorkbenchLayoutService } from '../../layout/workbench-layout.service';
-import { switchMap, takeUntil, tap } from 'rxjs/operators';
-import { EMPTY, Observable, Subject, timer } from 'rxjs';
-import { SciViewportComponent } from '@scion/toolkit/viewport';
-import { ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer } from '../../view-dnd/view-tab-drag-image-renderer.service';
-import { WorkbenchService } from '../../workbench.service';
-import { ViewListButtonComponent } from '../view-list-button/view-list-button.component';
-import { ViewDragData, ViewDragService } from '../../view-dnd/view-drag.service';
-import { Arrays } from '@scion/toolkit/util';
-import { setCssVariable, unsetCssVariable } from '../../dom.util';
-import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {ViewTabComponent} from '../view-tab/view-tab.component';
+import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {switchMap, takeUntil, tap} from 'rxjs/operators';
+import {EMPTY, Observable, Subject, timer} from 'rxjs';
+import {SciViewportComponent} from '@scion/toolkit/viewport';
+import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
+import {WorkbenchService} from '../../workbench.service';
+import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
+import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
+import {Arrays} from '@scion/toolkit/util';
+import {setCssVariable, unsetCssVariable} from '../../dom.util';
+import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
 
 /**
  * Renders the view tabbar and viewpart actions, if any.
@@ -98,7 +98,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     };
   };
 
-  // tslint:disable-next-line:member-ordering
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   constructor(host: ElementRef<HTMLElement>,
               private _workbench: WorkbenchService,
               private _workbenchLayout: WorkbenchLayoutService,
@@ -244,7 +244,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  private unsetDragState(options: { unsetDragSource: boolean }): void {
+  private unsetDragState(options: {unsetDragSource: boolean}): void {
     if (options && options.unsetDragSource) {
       this.dragSourceViewTab = null;
     }

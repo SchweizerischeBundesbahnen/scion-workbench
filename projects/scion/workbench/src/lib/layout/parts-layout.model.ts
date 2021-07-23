@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertType } from '../asserts.util';
+import {assertType} from '../asserts.util';
 
 /**
  * Represents the arrangement of parts.

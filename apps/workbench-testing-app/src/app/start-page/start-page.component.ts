@@ -8,17 +8,17 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, Optional, ViewChild } from '@angular/core';
-import { WorkbenchModuleConfig, WorkbenchView } from '@scion/workbench';
-import { ManifestService, PlatformPropertyService } from '@scion/microfrontend-platform';
-import { Observable, of, Subject } from 'rxjs';
-import { WorkbenchCapabilities, WorkbenchRouter, WorkbenchViewCapability } from '@scion/workbench-client';
-import { filterArray, sortArray } from '@scion/toolkit/operators';
-import { WorkbenchStartupQueryParams } from '../workbench/workbench-startup-query-params';
-import { ActivatedRoute, NavigationEnd, PRIMARY_OUTLET, Router, Routes } from '@angular/router';
-import { expand, filter, mapTo, take, takeUntil } from 'rxjs/operators';
-import { FormControl } from '@angular/forms';
-import { SciFilterFieldComponent, toFilterRegExp } from '@scion/toolkit.internal/widgets';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, Optional, ViewChild} from '@angular/core';
+import {WorkbenchModuleConfig, WorkbenchView} from '@scion/workbench';
+import {ManifestService, PlatformPropertyService} from '@scion/microfrontend-platform';
+import {Observable, of, Subject} from 'rxjs';
+import {WorkbenchCapabilities, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
+import {filterArray, sortArray} from '@scion/toolkit/operators';
+import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
+import {ActivatedRoute, NavigationEnd, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
+import {expand, filter, mapTo, take, takeUntil} from 'rxjs/operators';
+import {FormControl} from '@angular/forms';
+import {SciFilterFieldComponent, toFilterRegExp} from '@scion/toolkit.internal/widgets';
 
 @Component({
   selector: 'app-start-page',
@@ -103,7 +103,7 @@ export class StartPageComponent implements OnDestroy {
   /**
    * Computes the URL to launch a new app instance with given startup options, preserving the current workbench layout.
    */
-  public computeAppUrl(options: { launcher: 'APP_INITIALIZER' | 'LAZY', standalone: boolean }): string {
+  public computeAppUrl(options: {launcher: 'APP_INITIALIZER' | 'LAZY', standalone: boolean}): string {
     const href = new URL(location.href);
     href.searchParams.append(WorkbenchStartupQueryParams.LAUNCHER_QUERY_PARAM, options.launcher);
     href.searchParams.append(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM, `${options.standalone}`);

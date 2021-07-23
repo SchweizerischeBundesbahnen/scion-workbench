@@ -8,19 +8,19 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ComponentFixture, ComponentFixtureAutoDetect, TestBed } from '@angular/core/testing';
-import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { Component, NgZone } from '@angular/core';
-import { PartsLayoutComponent } from '../layout/parts-layout.component';
-import { Router, UrlSegment } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
-import { WorkbenchTestingModule } from './workbench-testing.module';
-import { WorkbenchService } from '../workbench.service';
-import { ViewDragService } from '../view-dnd/view-drag.service';
-import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
-import { MPart, MTreeNode } from '../layout/parts-layout.model';
-import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
+import {ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
+import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
+import {Component, NgZone} from '@angular/core';
+import {PartsLayoutComponent} from '../layout/parts-layout.component';
+import {Router, UrlSegment} from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {WorkbenchTestingModule} from './workbench-testing.module';
+import {WorkbenchService} from '../workbench.service';
+import {ViewDragService} from '../view-dnd/view-drag.service';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {MPart, MTreeNode} from '../layout/parts-layout.model';
+import {WorkbenchViewPartRegistry} from '../view-part/workbench-view-part.registry';
 
 describe('PartsLayoutComponent', () => {
 

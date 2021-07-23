@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
-import { animate, AnimationBuilder, AnimationPlayer, style, transition, trigger } from '@angular/animations';
-import { WorkbenchActivityPartService } from './workbench-activity-part.service';
-import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
-import { noop, Observable, Subject } from 'rxjs';
-import { ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME } from '../workbench.constants';
-import { Activity } from './activity';
+import {ChangeDetectorRef, Component, ElementRef, ViewChild} from '@angular/core';
+import {animate, AnimationBuilder, AnimationPlayer, style, transition, trigger} from '@angular/animations';
+import {WorkbenchActivityPartService} from './workbench-activity-part.service';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {noop, Observable, Subject} from 'rxjs';
+import {ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME} from '../workbench.constants';
+import {Activity} from './activity';
 
 /**
  * Specifies the minimal panel width. If smaller, it is expanded to this value

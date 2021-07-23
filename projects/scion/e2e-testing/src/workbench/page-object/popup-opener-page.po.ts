@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { assertPageToDisplay, enterText, selectOption } from '../../helper/testing.util';
-import { AppPO, ViewPO, ViewTabPO } from '../../app.po';
-import { SciAccordionPO, SciCheckboxPO } from '@scion/toolkit.internal/widgets.po';
-import { ElementFinder } from 'protractor';
-import { WebdriverExecutionContexts } from '../../helper/webdriver-execution-context';
-import { coerceArray } from '@angular/cdk/coercion';
-import { PopupOrigin, PopupSize } from '@scion/workbench';
+import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing.util';
+import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {SciAccordionPO, SciCheckboxPO} from '@scion/toolkit.internal/widgets.po';
+import {ElementFinder} from 'protractor';
+import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {coerceArray} from '@angular/cdk/coercion';
+import {PopupOrigin, PopupSize} from '@scion/workbench';
 
 /**
  * Page object to interact {@link PopupOpenerPageComponent}.
@@ -96,7 +96,7 @@ export class PopupOpenerPagePO {
     await enterText(coerceArray(cssClass).join(' '), this._pageFinder.$('input.e2e-class'));
   }
 
-  public async enterCloseStrategy(options: { closeOnFocusLost?: boolean, closeOnEscape?: boolean }): Promise<void> {
+  public async enterCloseStrategy(options: {closeOnFocusLost?: boolean, closeOnEscape?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
 

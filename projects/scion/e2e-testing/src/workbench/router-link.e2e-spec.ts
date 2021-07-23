@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Key } from 'protractor';
-import { AppPO } from '../app.po';
-import { RouterPagePO } from './page-object/router-page.po';
-import { consumeBrowserLog } from '../helper/testing.util';
+import {Key} from 'protractor';
+import {AppPO} from '../app.po';
+import {RouterPagePO} from './page-object/router-page.po';
+import {consumeBrowserLog} from '../helper/testing.util';
 
 describe('Workbench RouterLink', () => {
 

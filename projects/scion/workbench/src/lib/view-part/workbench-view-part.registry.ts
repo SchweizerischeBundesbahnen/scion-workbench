@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { ɵWorkbenchViewPart } from './ɵworkbench-view-part.model';
+import {Injectable, OnDestroy} from '@angular/core';
+import {ɵWorkbenchViewPart} from './ɵworkbench-view-part.model';
 
 /**
  * Registry for {@link WorkbenchViewPart} model objects.

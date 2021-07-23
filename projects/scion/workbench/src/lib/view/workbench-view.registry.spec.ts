@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { WorkbenchViewRegistry } from './workbench-view.registry';
-import { ɵWorkbenchView } from './ɵworkbench-view.model';
-import { noop } from 'rxjs';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {WorkbenchViewRegistry} from './workbench-view.registry';
+import {ɵWorkbenchView} from './ɵworkbench-view.model';
+import {noop} from 'rxjs';
 
 describe('WorkbenchViewRegistry', () => {
 

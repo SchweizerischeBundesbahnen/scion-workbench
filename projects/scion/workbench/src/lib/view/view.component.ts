@@ -8,20 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild, ViewContainerRef } from '@angular/core';
-import { AsyncSubject, combineLatest, EMPTY, fromEvent, Subject } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
-import { SciViewportComponent } from '@scion/toolkit/viewport';
-import { WbRouterOutletComponent } from '../routing/wb-router-outlet.component';
-import { WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM } from '../routing/routing-params.constants';
-import { MessageBoxService } from '../message-box/message-box.service';
-import { ViewMenuService } from '../view-part/view-context-menu/view-menu.service';
-import { ɵWorkbenchView } from './ɵworkbench-view.model';
-import { WorkbenchStartup } from '../startup/workbench-launcher.service';
-import { Logger, LoggerNames } from '../logging';
-import { VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference } from '../content-projection/view-container.reference';
-import { PopupService } from '../popup/popup.service';
+import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {AsyncSubject, combineLatest, EMPTY, fromEvent, Subject} from 'rxjs';
+import {switchMap, takeUntil} from 'rxjs/operators';
+import {ActivatedRoute} from '@angular/router';
+import {SciViewportComponent} from '@scion/toolkit/viewport';
+import {WbRouterOutletComponent} from '../routing/wb-router-outlet.component';
+import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing-params.constants';
+import {MessageBoxService} from '../message-box/message-box.service';
+import {ViewMenuService} from '../view-part/view-context-menu/view-menu.service';
+import {ɵWorkbenchView} from './ɵworkbench-view.model';
+import {WorkbenchStartup} from '../startup/workbench-launcher.service';
+import {Logger, LoggerNames} from '../logging';
+import {VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference} from '../content-projection/view-container.reference';
+import {PopupService} from '../popup/popup.service';
 
 /**
  * Is the graphical representation of a workbench view.

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Dictionary } from '@scion/toolkit/util';
+import {Dictionary} from '@scion/toolkit/util';
 
 /**
  * Configures the content and appearance of a message presented to the user in the form of a message box.

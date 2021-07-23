@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, OnDestroy, TemplateRef } from '@angular/core';
-import { WorkbenchActivityPartService } from './workbench-activity-part.service';
-import { ActivatedRoute } from '@angular/router';
-import { Disposable } from '../disposable';
+import {Directive, OnDestroy, TemplateRef} from '@angular/core';
+import {WorkbenchActivityPartService} from './workbench-activity-part.service';
+import {ActivatedRoute} from '@angular/router';
+import {Disposable} from '../disposable';
 
 /**
  * Use this directive to model an action for an activity, which is displayed

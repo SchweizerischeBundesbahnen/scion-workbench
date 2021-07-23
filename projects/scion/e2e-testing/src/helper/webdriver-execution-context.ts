@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { $, browser, protractor, WebElement } from 'protractor';
-import { runOutsideAngularSynchronization, setAttribute } from './testing.util';
+import {$, browser, protractor, WebElement} from 'protractor';
+import {runOutsideAngularSynchronization, setAttribute} from './testing.util';
 
 const EC = protractor.ExpectedConditions;
 

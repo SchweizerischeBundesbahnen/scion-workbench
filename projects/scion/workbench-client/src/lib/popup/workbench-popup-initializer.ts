@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Beans, Initializer } from '@scion/toolkit/bean-manager';
-import { ContextService } from '@scion/microfrontend-platform';
-import { WorkbenchPopup, ɵWorkbenchPopup } from './workbench-popup';
-import { ɵPOPUP_CONTEXT, ɵPopupContext } from './workbench-popup-context';
+import {Beans, Initializer} from '@scion/toolkit/bean-manager';
+import {ContextService} from '@scion/microfrontend-platform';
+import {WorkbenchPopup, ɵWorkbenchPopup} from './workbench-popup';
+import {ɵPOPUP_CONTEXT, ɵPopupContext} from './workbench-popup-context';
 
 /**
  * Registers {@link WorkbenchPopup} in the bean manager if in the context of a workbench popup.

@@ -8,24 +8,24 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { WbComponentPortal } from '../portal/wb-component-portal';
-import { ViewActivationInstantProvider } from './view-activation-instant-provider.service';
-import { Router, UrlSegment } from '@angular/router';
-import { ViewDragService } from '../view-dnd/view-drag.service';
-import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
-import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
-import { map } from 'rxjs/operators';
-import { filterArray, mapArray } from '@scion/toolkit/operators';
-import { Arrays } from '@scion/toolkit/util';
-import { Injector, Type } from '@angular/core';
-import { Disposable } from '../disposable';
-import { WorkbenchMenuItem, WorkbenchMenuItemFactoryFn } from '../workbench.model';
-import { WorkbenchView } from './workbench-view.model';
-import { WorkbenchViewPart } from '../view-part/workbench-view-part.model';
-import { ɵWorkbenchService } from '../ɵworkbench.service';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {WbComponentPortal} from '../portal/wb-component-portal';
+import {ViewActivationInstantProvider} from './view-activation-instant-provider.service';
+import {Router, UrlSegment} from '@angular/router';
+import {ViewDragService} from '../view-dnd/view-drag.service';
+import {WorkbenchViewPartRegistry} from '../view-part/workbench-view-part.registry';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {map} from 'rxjs/operators';
+import {filterArray, mapArray} from '@scion/toolkit/operators';
+import {Arrays} from '@scion/toolkit/util';
+import {Injector, Type} from '@angular/core';
+import {Disposable} from '../disposable';
+import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
+import {WorkbenchView} from './workbench-view.model';
+import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
+import {ɵWorkbenchService} from '../ɵworkbench.service';
 
-export class ɵWorkbenchView implements WorkbenchView { // tslint:disable-line:class-name
+export class ɵWorkbenchView implements WorkbenchView {
 
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private readonly _workbench: ɵWorkbenchService;

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, InjectionToken, ViewContainerRef } from '@angular/core';
+import {Injectable, InjectionToken, ViewContainerRef} from '@angular/core';
 
 /**
  * Handle holding a reference to a DOM location.

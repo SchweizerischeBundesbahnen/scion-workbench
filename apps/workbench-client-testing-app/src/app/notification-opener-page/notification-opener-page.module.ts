@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SciFormFieldModule, SciParamsEnterModule } from '@scion/toolkit.internal/widgets';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule, Routes } from '@angular/router';
-import { NotificationOpenerPageComponent } from './notification-opener-page.component';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {SciFormFieldModule, SciParamsEnterModule} from '@scion/toolkit.internal/widgets';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {RouterModule, Routes} from '@angular/router';
+import {NotificationOpenerPageComponent} from './notification-opener-page.component';
 
 const routes: Routes = [
   {path: '', component: NotificationOpenerPageComponent},

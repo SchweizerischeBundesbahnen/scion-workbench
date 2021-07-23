@@ -8,23 +8,23 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Attribute, Component, ElementRef, HostBinding, HostListener, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnDestroy } from '@angular/core';
-import { SciViewportComponent } from '@scion/toolkit/viewport';
-import { fromEvent, merge, Subject } from 'rxjs';
-import { WorkbenchLayoutService } from '../../layout/workbench-layout.service';
-import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
-import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
-import { VIEW_DRAG_TRANSFER_TYPE, ViewDragService } from '../../view-dnd/view-drag.service';
-import { createElement } from '../../dom.util';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { VIEW_TAB_CONTEXT } from '../../workbench.constants';
-import { WorkbenchModuleConfig } from '../../workbench-module-config';
-import { ViewTabContentComponent } from '../view-tab-content/view-tab-content.component';
-import { ViewMenuService } from '../view-context-menu/view-menu.service';
-import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
-import { ɵWorkbenchViewPart } from '../ɵworkbench-view-part.model';
-import { WorkbenchView } from '../../view/workbench-view.model';
-import { ɵWorkbenchService } from '../../ɵworkbench.service';
+import {Attribute, Component, ElementRef, HostBinding, HostListener, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnDestroy} from '@angular/core';
+import {SciViewportComponent} from '@scion/toolkit/viewport';
+import {fromEvent, merge, Subject} from 'rxjs';
+import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
+import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
+import {createElement} from '../../dom.util';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {VIEW_TAB_CONTEXT} from '../../workbench.constants';
+import {WorkbenchModuleConfig} from '../../workbench-module-config';
+import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
+import {ViewMenuService} from '../view-context-menu/view-menu.service';
+import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
+import {WorkbenchView} from '../../view/workbench-view.model';
+import {ɵWorkbenchService} from '../../ɵworkbench.service';
 
 /**
  * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
@@ -52,6 +52,10 @@ export class ViewTabComponent implements OnDestroy {
     this.view = this._viewRegistry.getElseThrow(viewId);
     this.viewTabContentPortal = this.createViewTabContentPortal();
     this._viewIdChange$.next();
+  }
+
+  public get viewId(): string {
+    return this.view.viewId;
   }
 
   constructor(host: ElementRef<HTMLElement>,
@@ -174,10 +178,6 @@ export class ViewTabComponent implements OnDestroy {
     if (!this.isVisibleInViewport()) {
       this._viewport.scrollIntoView(this.host);
     }
-  }
-
-  public get viewId(): string {
-    return this.view.viewId;
   }
 
   /**

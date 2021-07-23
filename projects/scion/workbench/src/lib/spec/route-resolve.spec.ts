@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
-import { Component, NgModule } from '@angular/core';
-import { PartsLayoutComponent } from '../layout/parts-layout.component';
-import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { RouterTestingModule } from '@angular/router/testing';
-import { Router } from '@angular/router';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
-import { advance } from './util/util.spec';
-import { WorkbenchTestingModule } from './workbench-testing.module';
-import { WorkbenchView } from '../view/workbench-view.model';
+import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
+import {Component, NgModule} from '@angular/core';
+import {PartsLayoutComponent} from '../layout/parts-layout.component';
+import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
+import {RouterTestingModule} from '@angular/router/testing';
+import {Router} from '@angular/router';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {advance} from './util/util.spec';
+import {WorkbenchTestingModule} from './workbench-testing.module';
+import {WorkbenchView} from '../view/workbench-view.model';
 
 describe('WorkbenchRouter', () => {
 

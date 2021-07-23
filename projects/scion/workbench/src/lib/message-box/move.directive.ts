@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Directive, EventEmitter, HostBinding, HostListener, Inject, OnDestroy, Output } from '@angular/core';
-import { fromEvent, Subject } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
-import { first, takeUntil } from 'rxjs/operators';
+import {Directive, EventEmitter, HostBinding, HostListener, Inject, OnDestroy, Output} from '@angular/core';
+import {fromEvent, Subject} from 'rxjs';
+import {DOCUMENT} from '@angular/common';
+import {first, takeUntil} from 'rxjs/operators';
 
 /**
  * Allows moving the host element while holding down the primary mouse button, e.g. to move a message box.

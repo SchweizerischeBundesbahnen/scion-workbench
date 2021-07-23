@@ -8,6 +8,6 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-export { MessageBox, MessageBoxAction } from './message-box';
-export { MessageBoxConfig } from './message-box.config';
-export { MessageBoxService } from './message-box.service';
+export {MessageBox, MessageBoxAction} from './message-box';
+export {MessageBoxConfig} from './message-box.config';
+export {MessageBoxService} from './message-box.service';

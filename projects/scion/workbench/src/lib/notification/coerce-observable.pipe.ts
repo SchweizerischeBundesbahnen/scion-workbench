@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Observables } from '@scion/toolkit/util';
+import {Pipe, PipeTransform} from '@angular/core';
+import {Observable} from 'rxjs';
+import {Observables} from '@scion/toolkit/util';
 
 /**
  * Creates an `Observable` from the given value, or returns the value if already an `Observable`.

@@ -8,11 +8,11 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { VIEW_REF_PREFIX } from '../workbench.constants';
-import { Observable, Subject } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
-import { ɵWorkbenchView } from './ɵworkbench-view.model';
+import {Injectable, OnDestroy} from '@angular/core';
+import {VIEW_REF_PREFIX} from '../workbench.constants';
+import {Observable, Subject} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
+import {ɵWorkbenchView} from './ɵworkbench-view.model';
 
 /**
  * Registry for {@link WorkbenchView} model objects.

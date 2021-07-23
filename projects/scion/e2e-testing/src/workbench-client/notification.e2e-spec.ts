@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { consumeBrowserLog } from '../helper/testing.util';
-import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
-import { RegisterWorkbenchIntentionPagePO } from './page-object/register-workbench-intention-page.po';
-import { TextNotificationPO } from '../text-notification.po';
-import { InspectNotificationPO } from '../inspect-notification.po';
-import { expectMap } from '../helper/expect-map-matcher';
-import { expectPromise } from '../helper/expect-promise-matcher';
-import { NotificationOpenerPagePO } from './page-object/notification-opener-page.po';
-import { browser } from 'protractor';
+import {AppPO} from '../app.po';
+import {consumeBrowserLog} from '../helper/testing.util';
+import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
+import {TextNotificationPO} from '../text-notification.po';
+import {InspectNotificationPO} from '../inspect-notification.po';
+import {expectMap} from '../helper/expect-map-matcher';
+import {expectPromise} from '../helper/expect-promise-matcher';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
+import {browser} from 'protractor';
 
 describe('Workbench Notification', () => {
 

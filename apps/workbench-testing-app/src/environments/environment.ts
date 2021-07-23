@@ -17,7 +17,7 @@
  */
 // import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
 
-import { WorkbenchMicrofrontendConfig } from '@scion/workbench';
+import {WorkbenchMicrofrontendConfig} from '@scion/workbench';
 
 /**
  * Environment used when starting the app locally.

@@ -8,26 +8,26 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { BrowserModule } from '@angular/platform-browser';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule, Type } from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule, Type} from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { WorkbenchModule } from '@scion/workbench';
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { StartPageComponent } from './start-page/start-page.component';
-import { SciFilterFieldModule, SciTabbarModule } from '@scion/toolkit.internal/widgets';
-import { SciViewportModule } from '@scion/toolkit/viewport';
-import { WorkbenchStartupQueryParams } from './workbench/workbench-startup-query-params';
-import { WorkbenchComponent } from './workbench/workbench.component';
-import { environment } from '../environments/environment';
-import { provideConfirmWorkbenchStartupInitializer } from './workbench/confirm-workbench-startup-initializer.service';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { InspectNotificationModule } from './inspect-notification-provider/inspect-notification.module';
-import { InspectMessageBoxModule } from './inspect-message-box-provider/inspect-message-box.module';
-import { workbenchManifest } from './workbench-manifest';
-import { provideThrottleCapabilityLookupInterceptor } from './workbench/throttle-capability-lookup-initializer.service';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {WorkbenchModule} from '@scion/workbench';
+import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {StartPageComponent} from './start-page/start-page.component';
+import {SciFilterFieldModule, SciTabbarModule} from '@scion/toolkit.internal/widgets';
+import {SciViewportModule} from '@scion/toolkit/viewport';
+import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
+import {WorkbenchComponent} from './workbench/workbench.component';
+import {environment} from '../environments/environment';
+import {provideConfirmWorkbenchStartupInitializer} from './workbench/confirm-workbench-startup-initializer.service';
+import {CommonModule} from '@angular/common';
+import {ReactiveFormsModule} from '@angular/forms';
+import {InspectNotificationModule} from './inspect-notification-provider/inspect-notification.module';
+import {InspectMessageBoxModule} from './inspect-message-box-provider/inspect-message-box.module';
+import {workbenchManifest} from './workbench-manifest';
+import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup-initializer.service';
 
 @NgModule({
   declarations: [

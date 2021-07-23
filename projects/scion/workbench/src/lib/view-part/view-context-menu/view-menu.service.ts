@@ -8,22 +8,22 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ElementRef, Injectable, Injector } from '@angular/core';
-import { ConnectedPosition, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { ViewMenuComponent } from './view-menu.component';
-import { WorkbenchMenuItem } from '../../workbench.model';
-import { WorkbenchViewRegistry } from '../../view/workbench-view.registry';
-import { filter, mapTo, switchMap, take, takeUntil, tap } from 'rxjs/operators';
-import { fromEvent, merge, Observable, Subject, TeardownLogic } from 'rxjs';
-import { coerceElement } from '@angular/cdk/coercion';
-import { TEXT, TextComponent } from '../view-context-menu/text.component';
-import { MenuItemConfig, WorkbenchModuleConfig } from '../../workbench-module-config';
-import { WorkbenchService } from '../../workbench.service';
-import { Arrays } from '@scion/toolkit/util';
-import { filterArray } from '@scion/toolkit/operators';
-import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
-import { WorkbenchView } from '../../view/workbench-view.model';
+import {ElementRef, Injectable, Injector} from '@angular/core';
+import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {ViewMenuComponent} from './view-menu.component';
+import {WorkbenchMenuItem} from '../../workbench.model';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {filter, mapTo, switchMap, take, takeUntil, tap} from 'rxjs/operators';
+import {fromEvent, merge, Observable, Subject, TeardownLogic} from 'rxjs';
+import {coerceElement} from '@angular/cdk/coercion';
+import {TEXT, TextComponent} from '../view-context-menu/text.component';
+import {MenuItemConfig, WorkbenchModuleConfig} from '../../workbench-module-config';
+import {WorkbenchService} from '../../workbench.service';
+import {Arrays} from '@scion/toolkit/util';
+import {filterArray} from '@scion/toolkit/operators';
+import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {WorkbenchView} from '../../view/workbench-view.model';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.

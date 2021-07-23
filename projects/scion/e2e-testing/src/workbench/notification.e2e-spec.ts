@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { AppPO } from '../app.po';
-import { consumeBrowserLog } from '../helper/testing.util';
-import { installSeleniumWebDriverClickFix } from '../helper/selenium-webdriver-click-fix';
-import { TextNotificationPO } from '../text-notification.po';
-import { NotificationOpenerPagePO } from './page-object/notification-opener-page.po';
-import { browser } from 'protractor';
-import { InspectNotificationPO } from '../inspect-notification.po';
+import {AppPO} from '../app.po';
+import {consumeBrowserLog} from '../helper/testing.util';
+import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {TextNotificationPO} from '../text-notification.po';
+import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
+import {browser} from 'protractor';
+import {InspectNotificationPO} from '../inspect-notification.po';
 
 describe('Workbench Notification', () => {
 

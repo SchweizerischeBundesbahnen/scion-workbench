@@ -1,6 +1,6 @@
-import { Observable } from 'rxjs';
-import { Disposable } from '../disposable';
-import { WorkbenchViewPartAction } from '../workbench.model';
+import {Observable} from 'rxjs';
+import {Disposable} from '../disposable';
+import {WorkbenchViewPartAction} from '../workbench.model';
 
 /**
  * A viewpart is a container for multiple views.

@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { $, $$, browser, ElementFinder, Key, protractor } from 'protractor';
-import { getCssClasses, isActiveElement, isCssClassPresent, runOutsideAngularSynchronization } from './helper/testing.util';
-import { StartPagePO } from './start-page.po';
-import { coerceArray, coerceBooleanProperty } from '@angular/cdk/coercion';
-import { WebdriverExecutionContexts } from './helper/webdriver-execution-context';
-import { Dictionary } from '@scion/toolkit/util';
+import {$, $$, browser, ElementFinder, Key, protractor} from 'protractor';
+import {getCssClasses, isActiveElement, isCssClassPresent, runOutsideAngularSynchronization} from './helper/testing.util';
+import {StartPagePO} from './start-page.po';
+import {coerceArray, coerceBooleanProperty} from '@angular/cdk/coercion';
+import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
+import {Dictionary} from '@scion/toolkit/util';
 
 export class AppPO {
 
@@ -96,7 +96,7 @@ export class AppPO {
    *          <li>cssClass?: Identifies the view by its CSS class</li>
    *        </ul>
    */
-  public findViewTab(findBy: { partId?: string, viewId?: string, cssClass?: string }): ViewTabPO {
+  public findViewTab(findBy: {partId?: string, viewId?: string, cssClass?: string}): ViewTabPO {
     const viewTabFinder = createViewTabFinder(findBy);
 
     return new class implements ViewTabPO {
@@ -176,7 +176,7 @@ export class AppPO {
    *          <li>cssClass?: Identifies the view by its CSS class</li>
    *        </ul>
    */
-  public findView(findBy: { partId?: string, viewId?: string, cssClass?: string }): ViewPO {
+  public findView(findBy: {partId?: string, viewId?: string, cssClass?: string}): ViewPO {
     const viewFinder = createViewFinder(findBy);
     const viewTabPO = this.findViewTab(findBy);
 
@@ -234,7 +234,7 @@ export class AppPO {
    *
    * Optionally, provide a CSS class to only count view tabs of given view.
    */
-  public async getViewTabCount(findBy?: { partId?: string, viewCssClass?: string }): Promise<number> {
+  public async getViewTabCount(findBy?: {partId?: string, viewCssClass?: string}): Promise<number> {
     const {partId, viewCssClass} = findBy || {};
     await WebdriverExecutionContexts.switchToDefault();
 
@@ -280,7 +280,7 @@ export class AppPO {
    * Returns a handle representing the popup having given CSS class(es) set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public findPopup(findBy: { cssClass: string | string[] }): PopupPO {
+  public findPopup(findBy: {cssClass: string | string[]}): PopupPO {
     const popupOverlayFinder = $(`.wb-popup.${coerceArray(findBy.cssClass).join('.')}`);
     const popupComponentFinder = popupOverlayFinder.$('wb-popup');
 
@@ -376,7 +376,7 @@ export class AppPO {
    * Returns a handle representing the notification having given CSS class(es) set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public findNotification(findBy: { cssClass: string | string[] }): NotificationPO {
+  public findNotification(findBy: {cssClass: string | string[]}): NotificationPO {
     const notificationFinder = $('wb-workbench').$(`wb-notification.${coerceArray(findBy.cssClass).join('.')}`);
 
     return new class implements NotificationPO {
@@ -466,7 +466,7 @@ export class AppPO {
    * Returns a handle representing the message box having given CSS class(es) set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public findMessageBox(findBy: { cssClass: string | string[] }): MessageBoxPO {
+  public findMessageBox(findBy: {cssClass: string | string[]}): MessageBoxPO {
     const msgboxFinder = $(`wb-message-box.${coerceArray(findBy.cssClass).join('.')}`);
     const msgboxComponentFinder = msgboxFinder.$('.e2e-body');
 
@@ -597,7 +597,7 @@ export class AppPO {
    * Returns a handle representing the viewpart action which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
-  public findViewPartAction(findBy: { partId?: string, buttonCssClass: string }): ViewPartActionPO {
+  public findViewPartAction(findBy: {partId?: string, buttonCssClass: string}): ViewPartActionPO {
     const actionFinder = createViewPartActionBarFinder(findBy.partId).$(`button.${findBy.buttonCssClass}`);
 
     return new class implements ViewPartActionPO {
@@ -658,7 +658,7 @@ function createViewPartActionBarFinder(partId?: string): ElementFinder {
  *          <li>cssClass?: Identifies the view by its CSS class</li>
  *        </ul>
  */
-function createViewTabFinder(findBy: { partId?: string, viewId?: string, cssClass?: string }): ElementFinder {
+function createViewTabFinder(findBy: {partId?: string, viewId?: string, cssClass?: string}): ElementFinder {
   const viewPartBarFinder = createViewPartBarFinder(findBy.partId);
 
   if (findBy.viewId !== undefined) {
@@ -682,7 +682,7 @@ function createViewTabFinder(findBy: { partId?: string, viewId?: string, cssClas
  *          <li>cssClass?: Identifies the view by its CSS class</li>
  *        </ul>
  */
-function createViewFinder(findBy: { partId?: string, viewId?: string, cssClass?: string }): ElementFinder {
+function createViewFinder(findBy: {partId?: string, viewId?: string, cssClass?: string}): ElementFinder {
   const viewPartFinder = createViewPartFinder(findBy.partId);
 
   if (findBy.viewId !== undefined) {

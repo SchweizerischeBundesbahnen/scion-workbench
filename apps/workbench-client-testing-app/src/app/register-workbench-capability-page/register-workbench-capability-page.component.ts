@@ -8,12 +8,12 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SciParamsEnterComponent } from '@scion/toolkit.internal/widgets';
-import { Capability, ManifestService } from '@scion/microfrontend-platform';
-import { PopupSize, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability } from '@scion/workbench-client';
-import { undefinedIfEmpty } from '../util/util';
+import {Component} from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {Capability, ManifestService} from '@scion/microfrontend-platform';
+import {PopupSize, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {undefinedIfEmpty} from '../util/util';
 
 const TYPE = 'type';
 const QUALIFIER = 'qualifier';
@@ -131,7 +131,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
       .catch(error => this.registerError = error);
   }
 
-  private readViewCapabilityFromUI(): WorkbenchViewCapability & { properties: { pinToStartPage: boolean } } {
+  private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToStartPage: boolean}} {
     const propertiesGroup = this.form.get(VIEW_PROPERTIES);
     return {
       type: WorkbenchCapabilities.View,

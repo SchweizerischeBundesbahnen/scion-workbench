@@ -8,13 +8,13 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { ManifestService, MessageClient, MicroApplicationConfig } from '@scion/microfrontend-platform';
-import { WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability } from '@scion/workbench-client';
+import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {ManifestService, MessageClient, MicroApplicationConfig} from '@scion/microfrontend-platform';
+import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 
-declare type TestingAppViewCapability = WorkbenchViewCapability & { properties: { pinToStartPage: boolean } };
+declare type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage: boolean}};
 
 @NgModule({
   providers: [],

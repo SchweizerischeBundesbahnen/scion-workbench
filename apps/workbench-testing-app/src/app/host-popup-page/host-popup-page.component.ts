@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding } from '@angular/core';
-import { UUID } from '@scion/toolkit/uuid';
-import { ActivatedRoute } from '@angular/router';
-import { WorkbenchPopup } from '@scion/workbench-client';
+import {Component, HostBinding} from '@angular/core';
+import {UUID} from '@scion/toolkit/uuid';
+import {ActivatedRoute} from '@angular/router';
+import {WorkbenchPopup} from '@scion/workbench-client';
 
 /**
  * Popup component provided by the host app via a popup capability.

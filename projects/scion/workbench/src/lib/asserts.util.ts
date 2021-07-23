@@ -1,5 +1,5 @@
-import { Type } from '@angular/core';
-import { Arrays } from '@scion/toolkit/util';
+import {Type} from '@angular/core';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Asserts the given object to be of the given type (and not simply a JavaScript object literal).
@@ -23,7 +23,7 @@ export function assertType(object: any, assert: {toBeOneOf: Type<any>[] | Type<a
 /**
  * Asserts the given object not to be `null` or `undefined.
  */
-export function assertNotNullish(value: any, options?: { orElseThrow: () => Error }): void {
+export function assertNotNullish(value: any, options?: {orElseThrow: () => Error}): void {
   if (value === null) {
     throw options?.orElseThrow() || Error('[AssertError] Value expected not to be `null`, but was `null`.');
   }

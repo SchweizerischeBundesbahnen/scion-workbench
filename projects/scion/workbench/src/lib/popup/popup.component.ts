@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, HostBinding, Injector } from '@angular/core';
-import { PopupConfig } from './popup.config';
-import { ComponentPortal } from '@angular/cdk/portal';
+import {Component, HostBinding, Injector} from '@angular/core';
+import {PopupConfig} from './popup.config';
+import {ComponentPortal} from '@angular/cdk/portal';
 
 /**
  * Displays the configured popup component in the popup overlay.

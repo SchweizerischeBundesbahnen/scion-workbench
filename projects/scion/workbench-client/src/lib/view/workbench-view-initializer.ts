@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Beans, Initializer } from '@scion/toolkit/bean-manager';
-import { ContextService } from '@scion/microfrontend-platform';
-import { WorkbenchView, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView } from './workbench-view';
+import {Beans, Initializer} from '@scion/toolkit/bean-manager';
+import {ContextService} from '@scion/microfrontend-platform';
+import {WorkbenchView, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './workbench-view';
 
 /**
  * Registers {@link WorkbenchView} in the bean manager if in the context of a workbench view.

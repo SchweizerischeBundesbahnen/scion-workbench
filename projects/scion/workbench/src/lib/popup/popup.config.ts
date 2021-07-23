@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ComponentFactoryResolver, ElementRef, Injector, StaticProvider, Type, ViewContainerRef } from '@angular/core';
-import { Observable } from 'rxjs';
+import {ComponentFactoryResolver, ElementRef, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
+import {Observable} from 'rxjs';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -200,7 +200,7 @@ export abstract class Popup<T = any> {
 /**
  * @internal
  */
-export class ɵPopup implements Popup { // tslint:disable-line:class-name
+export class ɵPopup implements Popup {
 
   private _closeResolveFn!: (result: any | undefined) => void;
 
@@ -227,7 +227,7 @@ export class ɵPopup implements Popup { // tslint:disable-line:class-name
 /**
  * @internal
  */
-export class ɵPopupError { // tslint:disable-line:class-name
+export class ɵPopupError {
 
   constructor(public error: string | Error) {
   }

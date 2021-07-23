@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, Inject, InjectionToken } from '@angular/core';
+import {Component, Inject, InjectionToken} from '@angular/core';
 
 export const TEXT = new InjectionToken<string[]>('TEXT');
 

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { InjectFlags, InjectionToken, Injector } from '@angular/core';
+import {InjectFlags, InjectionToken, Injector} from '@angular/core';
 
 /**
  * A DI token for providing one or more workbench startup initializers.

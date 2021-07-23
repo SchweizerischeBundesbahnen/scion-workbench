@@ -8,15 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, HostListener, Injector, Input, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { MessageBoxAction, MessageBox } from './message-box';
-import { ɵMessageBox } from './ɵmessage-box';
-import { asapScheduler, merge, Subject, timer } from 'rxjs';
-import { observeOn, takeUntil } from 'rxjs/operators';
-import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { MoveDelta } from './move.directive';
-import { coerceElement } from '@angular/cdk/coercion';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, HostListener, Injector, Input, OnDestroy, OnInit, QueryList, ViewChildren} from '@angular/core';
+import {MessageBox, MessageBoxAction} from './message-box';
+import {ɵMessageBox} from './ɵmessage-box';
+import {asapScheduler, merge, Subject, timer} from 'rxjs';
+import {observeOn, takeUntil} from 'rxjs/operators';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {MoveDelta} from './move.directive';
+import {coerceElement} from '@angular/cdk/coercion';
 
 /**
  * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text

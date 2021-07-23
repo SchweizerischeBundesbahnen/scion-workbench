@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
-import { Component, NgModule, NgModuleFactoryLoader } from '@angular/core';
-import { RouterTestingModule, SpyNgModuleFactoryLoader } from '@angular/router/testing';
-import { Router, RouterModule } from '@angular/router';
-import { WorkbenchRouter } from '../routing/workbench-router.service';
-import { CommonModule } from '@angular/common';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { advance, clickElement } from './util/util.spec';
-import { expect, jasmineCustomMatchers } from './util/jasmine-custom-matchers.spec';
-import { WorkbenchTestingModule } from './workbench-testing.module';
+import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
+import {Component, NgModule, NgModuleFactoryLoader} from '@angular/core';
+import {RouterTestingModule, SpyNgModuleFactoryLoader} from '@angular/router/testing';
+import {Router, RouterModule} from '@angular/router';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {CommonModule} from '@angular/common';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {advance, clickElement} from './util/util.spec';
+import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
+import {WorkbenchTestingModule} from './workbench-testing.module';
 
 /**
  * Testsetup:
@@ -54,7 +54,6 @@ import { WorkbenchTestingModule } from './workbench-testing.module';
  * +-------------------------------------+
  *
  */
-// tslint:disable class-name
 describe('Router', () => {
 
   beforeEach(waitForAsync(() => {
@@ -70,7 +69,6 @@ describe('Router', () => {
   // TODO [Angular 9]:
   // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
   // See Angular internal tests in `integration.spec.ts` file.
-  // tslint:disable-next-line:deprecation
   it('allows for relative and absolute navigation', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
     loader.stubbedModules = {
       './feature-a/feature-a.module': FeatureAModule,
@@ -251,7 +249,6 @@ describe('Router', () => {
   // TODO [Angular 9]:
   // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
   // See Angular internal tests in `integration.spec.ts` file.
-  // tslint:disable-next-line:deprecation
   it('allows to close views', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
     loader.stubbedModules = {
       './feature-a/feature-a.module': FeatureAModule,

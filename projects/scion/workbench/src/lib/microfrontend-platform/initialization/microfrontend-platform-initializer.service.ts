@@ -8,16 +8,16 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, Injector, NgZone, OnDestroy } from '@angular/core';
-import { ApplicationConfig, ApplicationManifest, IntentClient, Logger as MicrofrontendPlatformLogger, ManifestService, MessageClient, MicrofrontendPlatform, PlatformConfig, Runlevel } from '@scion/microfrontend-platform';
-import { WorkbenchModuleConfig } from '../../workbench-module-config';
-import { Beans } from '@scion/toolkit/bean-manager';
-import { WorkbenchCapabilities } from '@scion/workbench-client';
-import { Logger, LoggerNames } from '../../logging';
-import { NgZoneIntentClientDecorator, NgZoneMessageClientDecorator } from './ng-zone-decorators';
-import { POST_MICROFRONTEND_PLATFORM_CONNECT, runWorkbenchInitializers, WorkbenchInitializer } from '../../startup/workbench-initializer';
-import { MicrofrontendPlatformConfigLoader } from '../microfrontend-platform-config-loader';
-import { LogDelegate } from './log-delegate.service';
+import {Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
+import {ApplicationConfig, ApplicationManifest, IntentClient, Logger as MicrofrontendPlatformLogger, ManifestService, MessageClient, MicrofrontendPlatform, PlatformConfig, Runlevel} from '@scion/microfrontend-platform';
+import {WorkbenchModuleConfig} from '../../workbench-module-config';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {WorkbenchCapabilities} from '@scion/workbench-client';
+import {Logger, LoggerNames} from '../../logging';
+import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './ng-zone-decorators';
+import {POST_MICROFRONTEND_PLATFORM_CONNECT, runWorkbenchInitializers, WorkbenchInitializer} from '../../startup/workbench-initializer';
+import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
+import {LogDelegate} from './log-delegate.service';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.

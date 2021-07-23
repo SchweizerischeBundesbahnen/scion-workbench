@@ -8,9 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { WorkbenchViewCapability } from '../view/workbench-view-capability';
-import { WorkbenchNavigationExtras } from './workbench-router';
-import { Qualifier } from '@scion/microfrontend-platform';
+import {WorkbenchViewCapability} from '../view/workbench-view-capability';
+import {WorkbenchNavigationExtras} from './workbench-router';
+import {Qualifier} from '@scion/microfrontend-platform';
 
 /**
  * Command object for instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
@@ -18,7 +18,7 @@ import { Qualifier } from '@scion/microfrontend-platform';
  * @docs-private Not public API, intended for internal use only.
  * @ignore
  */
-export interface ɵWorkbenchRouterNavigateCommand { // tslint:disable-line:class-name
+export interface ɵWorkbenchRouterNavigateCommand {
   capabilities: WorkbenchViewCapability[];
   extras: WorkbenchNavigationExtras;
   qualifier: Qualifier;

@@ -1,5 +1,5 @@
-import { InjectionToken, Provider } from '@angular/core';
-import { UUID } from '@scion/toolkit/uuid';
+import {InjectionToken, Provider} from '@angular/core';
+import {UUID} from '@scion/toolkit/uuid';
 
 /**
  * DI token to get a unique token for this app instance. This token is different each time the app is reloaded.

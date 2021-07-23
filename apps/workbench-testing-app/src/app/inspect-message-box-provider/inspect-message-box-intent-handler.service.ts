@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { MessageBoxService } from '@scion/workbench';
-import { InspectMessageBoxComponent } from './inspect-message-box.component';
-import { WorkbenchCapabilities, WorkbenchMessageBoxConfig } from '@scion/workbench-client';
-import { IntentClient } from '@scion/microfrontend-platform';
-import { Maps } from '@scion/toolkit/util';
+import {Injectable} from '@angular/core';
+import {MessageBoxService} from '@scion/workbench';
+import {InspectMessageBoxComponent} from './inspect-message-box.component';
+import {WorkbenchCapabilities, WorkbenchMessageBoxConfig} from '@scion/workbench-client';
+import {IntentClient} from '@scion/microfrontend-platform';
+import {Maps} from '@scion/toolkit/util';
 
 /**
  * Displays a custom message box for microfrontends to inspect message box properties.

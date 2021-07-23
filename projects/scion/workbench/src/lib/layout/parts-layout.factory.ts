@@ -1,8 +1,8 @@
-import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
-import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
-import { UUID } from '@scion/toolkit/uuid';
-import { PartsLayout, PartsLayoutWorkbenchAccessor } from './parts-layout';
-import { MPartsLayout } from './parts-layout.model';
+import {Inject, Injectable, InjectionToken, Optional} from '@angular/core';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {UUID} from '@scion/toolkit/uuid';
+import {PartsLayout, PartsLayoutWorkbenchAccessor} from './parts-layout';
+import {MPartsLayout} from './parts-layout.model';
 
 /**
  * Factory for creating a parts layout instance.

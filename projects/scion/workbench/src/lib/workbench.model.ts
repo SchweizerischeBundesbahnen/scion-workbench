@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Observable } from 'rxjs';
-import { Injector, TemplateRef } from '@angular/core';
-import { ComponentPortal, ComponentType, TemplatePortal } from '@angular/cdk/portal';
-import { WorkbenchView } from './view/workbench-view.model';
+import {Observable} from 'rxjs';
+import {Injector, TemplateRef} from '@angular/core';
+import {ComponentPortal, ComponentType, TemplatePortal} from '@angular/cdk/portal';
+import {WorkbenchView} from './view/workbench-view.model';
 
 /**
  * Lifecycle hook that is called when a view component is to be destroyed, and which is called before 'ngOnDestroy'.
@@ -35,7 +35,7 @@ export interface WorkbenchAction {
   /**
    * Specifies either a template or a component to render this action.
    */
-  templateOrComponent: TemplateRef<void> | { component: ComponentType<any>; injector: Injector };
+  templateOrComponent: TemplateRef<void> | {component: ComponentType<any>; injector: Injector};
 
   /**
    * Specifies where to place this action.

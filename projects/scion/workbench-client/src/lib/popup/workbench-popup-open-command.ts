@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { CloseStrategy } from './workbench-popup.config';
-import { WorkbenchPopupCapability } from './workbench-popup-capability';
+import {CloseStrategy} from './workbench-popup.config';
+import {WorkbenchPopupCapability} from './workbench-popup-capability';
 
 /**
  * Command object for instructing the Workbench to open the microfrontend of given popup capability in a popup.
@@ -17,7 +17,7 @@ import { WorkbenchPopupCapability } from './workbench-popup-capability';
  * @docs-private Not public API, intended for internal use only.
  * @ignore
  */
-export interface ɵWorkbenchPopupCommand { // tslint:disable-line:class-name
+export interface ɵWorkbenchPopupCommand {
   popupId: string;
   capability: WorkbenchPopupCapability;
   params: Map<string, any>;

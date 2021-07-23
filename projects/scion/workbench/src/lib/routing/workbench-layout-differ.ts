@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Injectable, IterableChanges, IterableDiffer, IterableDiffers } from '@angular/core';
-import { UrlTree } from '@angular/router';
-import { POPUP_REF_PREFIX, VIEW_REF_PREFIX } from '../workbench.constants';
-import { PartsLayout } from '../layout/parts-layout';
+import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
+import {UrlTree} from '@angular/router';
+import {POPUP_REF_PREFIX, VIEW_REF_PREFIX} from '../workbench.constants';
+import {PartsLayout} from '../layout/parts-layout';
 
 /**
  * Stateful differ for finding workbench layout changes, e.g., to find parts or named outlets that were added or removed.
@@ -67,7 +67,7 @@ export class WorkbenchLayoutDiff {
     ({addedItems: this.addedParts, removedItems: this.removedParts} = this.collectChangedItems(partChanges));
   }
 
-  private collectChangedItems(changes: IterableChanges<string> | null): { addedItems: string[], removedItems: string[] } {
+  private collectChangedItems(changes: IterableChanges<string> | null): {addedItems: string[], removedItems: string[]} {
     const addedItems: string[] = [];
     const removedItems: string[] = [];
     changes?.forEachAddedItem(({item}) => addedItems.push(item));

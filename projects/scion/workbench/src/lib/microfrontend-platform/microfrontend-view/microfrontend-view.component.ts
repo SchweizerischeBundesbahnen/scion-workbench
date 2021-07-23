@@ -8,20 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
-import { combineLatest, Observable, of, Subject } from 'rxjs';
-import { catchError, first, map, pairwise, startWith, switchMap, take, takeUntil } from 'rxjs/operators';
-import { Application, ManifestService, mapToBody, MessageClient, OutletRouter, SciRouterOutletElement, takeUntilUnsubscribe } from '@scion/microfrontend-platform';
-import { WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchCommands } from '@scion/workbench-client';
-import { Maps } from '@scion/toolkit/util';
-import { Logger, LoggerNames } from '../../logging';
-import { WbBeforeDestroy } from '../../workbench.model';
-import { IFRAME_HOST, ViewContainerReference } from '../../content-projection/view-container.reference';
-import { serializeExecution } from '../../operators';
-import { ɵWorkbenchView } from '../../view/ɵworkbench-view.model';
-import { filterArray, mapArray } from '@scion/toolkit/operators';
-import { ViewMenuService } from '../../view-part/view-context-menu/view-menu.service';
+import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {ActivatedRoute, Params} from '@angular/router';
+import {combineLatest, Observable, of, Subject} from 'rxjs';
+import {catchError, first, map, pairwise, startWith, switchMap, take, takeUntil} from 'rxjs/operators';
+import {Application, ManifestService, mapToBody, MessageClient, OutletRouter, SciRouterOutletElement, takeUntilUnsubscribe} from '@scion/microfrontend-platform';
+import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchCommands} from '@scion/workbench-client';
+import {Maps} from '@scion/toolkit/util';
+import {Logger, LoggerNames} from '../../logging';
+import {WbBeforeDestroy} from '../../workbench.model';
+import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
+import {serializeExecution} from '../../operators';
+import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {filterArray, mapArray} from '@scion/toolkit/operators';
+import {ViewMenuService} from '../../view-part/view-context-menu/view-menu.service';
 
 /**
  * Embeds the microfrontend of a view capability.

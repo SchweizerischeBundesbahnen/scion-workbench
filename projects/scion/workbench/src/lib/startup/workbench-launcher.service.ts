@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { WorkbenchModuleConfig } from '../workbench-module-config';
-import { APP_INITIALIZER, ApplicationInitStatus, Injectable, Injector, Provider } from '@angular/core';
-import { runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP } from './workbench-initializer';
-import { Logger, LoggerNames } from '../logging';
+import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {APP_INITIALIZER, ApplicationInitStatus, Injectable, Injector, Provider} from '@angular/core';
+import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
+import {Logger, LoggerNames} from '../logging';
 
 /**
  * Provides API to launch the SCION Workbench.

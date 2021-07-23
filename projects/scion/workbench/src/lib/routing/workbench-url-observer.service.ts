@@ -8,28 +8,28 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import { ChildrenOutletContexts, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent } from '@angular/router';
-import { filter, takeUntil } from 'rxjs/operators';
-import { ComponentFactoryResolver, Injectable, Injector, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
-import { WorkbenchAuxiliaryRoutesRegistrator } from './workbench-auxiliary-routes-registrator.service';
-import { PARTS_LAYOUT_QUERY_PARAM, ROUTER_OUTLET_NAME } from '../workbench.constants';
-import { WorkbenchViewRegistry } from '../view/workbench-view.registry';
-import { WorkbenchViewPartRegistry } from '../view-part/workbench-view-part.registry';
-import { WorkbenchLayoutService } from '../layout/workbench-layout.service';
-import { ɵWorkbenchViewPart } from '../view-part/ɵworkbench-view-part.model';
-import { WbComponentPortal } from '../portal/wb-component-portal';
-import { ViewPartComponent } from '../view-part/view-part.component';
-import { WorkbenchViewPart } from '../view-part/workbench-view-part.model';
-import { ɵWorkbenchView } from '../view/ɵworkbench-view.model';
-import { ViewComponent } from '../view/view.component';
-import { WorkbenchView } from '../view/workbench-view.model';
-import { WorkbenchNavigationContext, WorkbenchRouter } from './workbench-router.service';
-import { PartsLayoutFactory } from '../layout/parts-layout.factory';
-import { WorkbenchLayoutDiffer } from './workbench-layout-differ';
-import { Logger, LoggerNames } from '../logging';
-import { WbAddViewToPartGuard } from './add-view-to-part.guard';
-import { WbBeforeDestroyGuard } from '../view/wb-before-destroy.guard';
+import {ChildrenOutletContexts, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
+import {filter, takeUntil} from 'rxjs/operators';
+import {ComponentFactoryResolver, Injectable, Injector, OnDestroy} from '@angular/core';
+import {Subject} from 'rxjs';
+import {WorkbenchAuxiliaryRoutesRegistrator} from './workbench-auxiliary-routes-registrator.service';
+import {PARTS_LAYOUT_QUERY_PARAM, ROUTER_OUTLET_NAME} from '../workbench.constants';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WorkbenchViewPartRegistry} from '../view-part/workbench-view-part.registry';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {ɵWorkbenchViewPart} from '../view-part/ɵworkbench-view-part.model';
+import {WbComponentPortal} from '../portal/wb-component-portal';
+import {ViewPartComponent} from '../view-part/view-part.component';
+import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
+import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
+import {ViewComponent} from '../view/view.component';
+import {WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchNavigationContext, WorkbenchRouter} from './workbench-router.service';
+import {PartsLayoutFactory} from '../layout/parts-layout.factory';
+import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
+import {Logger, LoggerNames} from '../logging';
+import {WbAddViewToPartGuard} from './add-view-to-part.guard';
+import {WbBeforeDestroyGuard} from '../view/wb-before-destroy.guard';
 
 /**
  * Tracks the browser URL for layout changes.
