@@ -146,7 +146,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Tests whether the sender provides the microfrontend displayed in the view.
    */
   private isMicrofrontendProvider(sender: string, view: WorkbenchView): boolean {
-    const viewCapabilityId = MicrofrontendViewRoutes.extractCapabilityId(view.urlSegments);
+    const viewCapabilityId = MicrofrontendViewRoutes.parseUrl(view.urlSegments).viewCapabilityId;
     const viewCapability = this._viewCapabilities.get(viewCapabilityId);
     if (!viewCapability) {
       this._logger.error(`Unexpected Error: [NullCapabilityError] No view capability for '${viewCapabilityId}' found.`);

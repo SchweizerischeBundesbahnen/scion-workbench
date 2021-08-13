@@ -25,6 +25,9 @@ import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 @Injectable()
 export class WorkbenchRouter {
 
+  /**
+   * Holds the current navigational context during a workbench navigation, or `null` if no navigation is in progress.
+   */
   private _currentNavigationContext$ = new BehaviorSubject<WorkbenchNavigationContext | null>(null);
 
   constructor(private _router: Router,
@@ -55,7 +58,7 @@ export class WorkbenchRouter {
    *
    * @see WbRouterLinkDirective
    */
-  public async navigate(commandList: Commands, extras: WbNavigationExtras = {}): Promise<boolean> {
+  public navigate(commandList: Commands, extras: WbNavigationExtras = {}): Promise<boolean> {
     const commands = this.normalizeCommands(commandList, extras.relativeTo);
 
     if (extras.closeIfPresent) {
@@ -98,7 +101,7 @@ export class WorkbenchRouter {
         const urlTree = this._router.parseUrl(this._router.url);
         const urlSegmentGroups = urlTree.root.children;
         if (!urlSegmentGroups[extras.selfViewId]) {
-          throw Error(`[WorkbenchRouterError] Target view outlet not found: ${extras.selfViewId}'`);
+          throw Error(`[WorkbenchRouterError] Target view outlet not found: ${extras.selfViewId}.`);
         }
 
         return this.ɵnavigate(layout => ({layout, viewOutlets: {[extras.selfViewId!]: commands}}), extras);
@@ -246,7 +249,7 @@ export class WorkbenchRouter {
   private async waitForNavigationToComplete(): Promise<void> {
     await this._currentNavigationContext$
       .pipe(
-        filter(() => !this.hasCurrentNavigation()),
+        filter(context => !context),
         take(1),
       )
       .toPromise();
@@ -259,13 +262,6 @@ export class WorkbenchRouter {
     await this._layoutService.layout$
       .pipe(take(1))
       .toPromise();
-  }
-
-  /**
-   * Tests if there is a current navigation in progress.
-   */
-  private hasCurrentNavigation(): boolean {
-    return this._currentNavigationContext$.value !== null;
   }
 
   /**

@@ -8,14 +8,14 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, EMPTY, merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
-import {distinctUntilChanged, filter, map, mapTo, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, mapTo, mergeMap, mergeMapTo, shareReplay, skip, skipWhile, switchMap, take, takeUntil, tap} from 'rxjs/operators';
 import {Observables} from '@scion/toolkit/util';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {ɵMicrofrontendRouteParams} from '../routing/workbench-router-navigate-command';
+import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 
 /**
  * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.
@@ -56,7 +56,12 @@ export abstract class WorkbenchView {
    * navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
    * another microfrontend.
    */
-  public abstract readonly params$: Observable<Map<string, any>>;
+  public abstract readonly params$: Observable<ReadonlyMap<string, any>>;
+
+  /**
+   * The current snapshot of this workbench view.
+   */
+  public abstract readonly snapshot: ViewSnapshot;
 
   /**
    * Indicates whether this is the active view in its view part.
@@ -121,6 +126,8 @@ export abstract class WorkbenchView {
   public abstract removeClosingListener(listener: ViewClosingListener): void;
 }
 
+const PARAMS_PENDING_GUARD = new Map();
+
 /**
  * @ignore
  */
@@ -143,19 +150,31 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
   public active$: Observable<boolean>;
   public capability$: Observable<WorkbenchViewCapability>;
-  public params$: Observable<Map<string, any>>;
+  public whenInitialParams: Promise<void>;
+  public params$ = new BehaviorSubject<Map<string, any>>(PARAMS_PENDING_GUARD);
 
   constructor(public viewId: string) {
     this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.viewId))
       .pipe(mapTo(undefined));
 
-    this.params$ = Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
+    Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
       .pipe(
         mapToBody(),
         coerceMap(),
-        shareReplay({refCount: true, bufferSize: 1}),
-        takeUntil(this._beforeUnload$),
-      );
+        takeUntil(merge(this._beforeUnload$, this._destroy$)),
+      )
+      .subscribe(this.params$);
+
+    /**
+     * Resolve promise once received initial params.
+     */
+    this.whenInitialParams = this.params$
+      .pipe(
+        skipWhile(params => params === PARAMS_PENDING_GUARD),
+        take(1),
+        mergeMapTo(EMPTY),
+      )
+      .toPromise();
 
     this.capability$ = this.params$
       .pipe(
@@ -182,6 +201,15 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
         this._closingListeners.clear();
         this._closingSubscription?.unsubscribe();
       });
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public get snapshot(): ViewSnapshot {
+    return {
+      params: this.params$.value,
+    };
   }
 
   /**
@@ -409,3 +437,11 @@ function lookupViewCapabilityAndShareReplay(): OperatorFunction<string, Workbenc
   );
 }
 
+/**
+ * Contains the information about a view displayed at a particular moment in time.
+ *
+ * @category View
+ */
+export interface ViewSnapshot {
+  params: ReadonlyMap<string, any>;
+}

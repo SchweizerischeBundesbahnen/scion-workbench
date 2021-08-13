@@ -1,6 +1,6 @@
 {
   "name": "SCION Microfrontend Platform Testing App",
-  "baseUrl": "https://scion-microfrontend-platform-testing-app1-v1-0-0-beta-8.vercel.app/#",
+  "baseUrl": "https://scion-microfrontend-platform-testing-app1-v1-0-0-beta-12.vercel.app/#",
   "capabilities": [
     {
       "type": "view",

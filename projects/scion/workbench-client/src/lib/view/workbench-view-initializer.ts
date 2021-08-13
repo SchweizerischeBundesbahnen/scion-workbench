@@ -22,7 +22,10 @@ export class WorkbenchViewInitializer implements Initializer {
   public async init(): Promise<void> {
     const viewId = await Beans.get(ContextService).lookup<string>(ɵVIEW_ID_CONTEXT_KEY);
     if (viewId !== null) {
-      Beans.register(WorkbenchView, {useValue: new ɵWorkbenchView(viewId)});
+      const workbenchView = new ɵWorkbenchView(viewId);
+      Beans.register(WorkbenchView, {useValue: workbenchView});
+      // Wait until the view received the initial params, allowing a microfrontend to access the snapshot params in its constructor.
+      await workbenchView.whenInitialParams;
     }
   }
 }

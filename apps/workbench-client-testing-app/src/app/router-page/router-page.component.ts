@@ -39,7 +39,7 @@ export class RouterPageComponent {
 
   public form: FormGroup;
   public navigateError: string;
-  public navigated: boolean;
+  public navigated = false;
 
   constructor(formBuilder: FormBuilder,
               private _router: WorkbenchRouter) {
@@ -56,7 +56,7 @@ export class RouterPageComponent {
 
   public async onNavigate(): Promise<void> {
     this.navigateError = undefined;
-    this.navigated = undefined;
+    this.navigated = false;
 
     const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray);
     const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as FormArray);
@@ -69,7 +69,7 @@ export class RouterPageComponent {
       params: params || undefined,
     };
     await this._router.navigate(qualifier, extras)
-      .then(() => this.navigated = true)
+      .then(success => this.navigated = success)
       .catch(error => this.navigateError = error);
   }
 }

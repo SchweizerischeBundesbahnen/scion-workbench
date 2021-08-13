@@ -10,11 +10,11 @@
 
 import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
-import {combineLatest, Observable, of, Subject} from 'rxjs';
+import {combineLatest, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, first, map, pairwise, startWith, switchMap, take, takeUntil} from 'rxjs/operators';
-import {Application, ManifestService, mapToBody, MessageClient, OutletRouter, SciRouterOutletElement, takeUntilUnsubscribe} from '@scion/microfrontend-platform';
-import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {Maps} from '@scion/toolkit/util';
+import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, takeUntilUnsubscribe, TopicMessage} from '@scion/microfrontend-platform';
+import {ɵViewParamsUpdateCommand, WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchCommands} from '@scion/workbench-client';
+import {Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {WbBeforeDestroy} from '../../workbench.model';
 import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
@@ -22,6 +22,9 @@ import {serializeExecution} from '../../operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {ViewMenuService} from '../../view-part/view-context-menu/view-menu.service';
+import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {stringifyError} from '../routing/router.util';
+import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -56,11 +59,13 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
               private _messageClient: MessageClient,
               private _logger: Logger,
               private _viewContextMenuService: ViewMenuService,
+              private _workbenchRouter: WorkbenchRouter,
               @Inject(IFRAME_HOST) iframeHost: ViewContainerReference) {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.viewId}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.iframeHost = iframeHost.get();
     this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
       .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
+    this.installParamsUpdater();
   }
 
   public ngOnInit(): void {
@@ -76,9 +81,9 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
 
     this._route.params
       .pipe(
-        switchMap(params => this.observeViewCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID])
-          .pipe(map<WorkbenchViewCapability | undefined, WorkbenchViewCapabilityWithParams>(capability => ({capability, params})))),
-        startWith(undefined! as WorkbenchViewCapabilityWithParams), // initialize 'pairwise' operator
+        this.readViewParamsFromUrl(),
+        this.lookupViewCapability(),
+        startWith(undefined! as WorkbenchViewCapabilityAndParams), // initialize 'pairwise' operator
         pairwise(),
         serializeExecution(([prev, curr]) => this.onNavigate(curr.params, prev?.capability, curr.capability)),
         catchError((error, caught) => {
@@ -140,6 +145,53 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
       relativeTo: application.baseUrl,
       params: params,
       pushStateToSessionHistoryStack: false,
+    });
+  }
+
+  /**
+   * Subscribes for self-navigation requests for updating this view's parameters.
+   */
+  private installParamsUpdater(): void {
+    this._messageClient.observe$<ɵViewParamsUpdateCommand>(ɵWorkbenchCommands.viewParamsUpdateTopic(this.viewId, ':viewCapabilityId'))
+      .pipe(
+        serializeExecution(request => this.updateParams(request.params!.get('viewCapabilityId')!, request)),
+        catchError((error, caught) => {
+          this._logger.error(() => '[MicrofrontendParamsUpdateError] An unexpected error occurred.', LoggerNames.MICROFRONTEND_ROUTING, error);
+          return caught; // re-subscribe to the params Observable
+        }),
+        takeUntil(this._destroy$),
+      )
+      .subscribe();
+  }
+
+  private async updateParams(viewCapabilityId: string, request: TopicMessage<ɵViewParamsUpdateCommand>): Promise<void> {
+    const {viewCapabilityId: currentViewCapabilityId, params: currentParams} = MicrofrontendViewRoutes.parseUrl(this._route.snapshot.url);
+
+    // Discard stale requests, i.e, requests that originate from a different microfrontend (view capability) than the current one.
+    if (currentViewCapabilityId !== viewCapabilityId) {
+      return;
+    }
+
+    const replyTo = request.headers.get(MessageHeaders.ReplyTo);
+    const {params: newParams, paramsHandling} = request.body!;
+    const mergedParams = Dictionaries.withoutUndefinedEntries({
+      ...(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams),
+    });
+
+    try {
+      const success = await this.navigateSelf(mergedParams);
+      await this._messageClient.publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
+    }
+    catch (error) {
+      await this._messageClient.publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
+    }
+  }
+
+  private navigateSelf(params: Params): Promise<boolean> {
+    return this._workbenchRouter.navigate([params], {
+      target: 'self',
+      selfViewId: this.viewId,
+      relativeTo: this._route,
     });
   }
 
@@ -247,6 +299,25 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
       );
   }
 
+  /**
+   * Read navigational params from the current URL.
+   */
+  private readViewParamsFromUrl(): OperatorFunction<any, Params> {
+    return map((): Params => {
+      const {params, qualifier, viewCapabilityId} = MicrofrontendViewRoutes.parseUrl(this._route.snapshot.url);
+      return {
+        ...params,
+        ...qualifier, // qualifier entries have a higher precedence than view parameters
+        [ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]: viewCapabilityId, // capability ID cannot be overwritten.
+      };
+    });
+  }
+
+  private lookupViewCapability(): OperatorFunction<Params, WorkbenchViewCapabilityAndParams> {
+    return switchMap(params => this.observeViewCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID])
+      .pipe(map(capability => ({capability, params}))));
+  }
+
   public ngOnDestroy(): void {
     // Instruct the message broker to delete retained messages to free resources.
     this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.viewId), undefined, {retain: true}).then();
@@ -255,7 +326,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
   }
 }
 
-interface WorkbenchViewCapabilityWithParams {
+interface WorkbenchViewCapabilityAndParams {
   capability?: WorkbenchViewCapability;
   params: Params;
 }
