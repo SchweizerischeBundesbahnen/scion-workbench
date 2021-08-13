@@ -592,8 +592,8 @@ describe('Workbench Router', () => {
     await expect(await viewPage2PO.isDisplayed()).toBe(true);
 
     // expect view microfrontends to have set their initial title
-    await expect(await viewPage1PO.viewTabPO.getTitle()).toBe('INITIAL TITLE 1');
-    await expect(await viewPage2PO.viewTabPO.getTitle()).toBe('INITIAL TITLE 2');
+    await expect(await viewPage1PO.viewTabPO.getTitle()).toEqual('INITIAL TITLE 1');
+    await expect(await viewPage2PO.viewTabPO.getTitle()).toEqual('INITIAL TITLE 2');
   });
 
   it('should set view properties upon initial view tab navigation', async () => {
@@ -1005,4 +1005,40 @@ describe('Workbench Router', () => {
     await browser.sleep(2000);
     await expect(await viewPagePO.getPath()).toEqual('/test-view/view2');
   }, 30000 /* simulateSlowCapabilityLookup */);
+
+  it('should propagate navigation error back to caller if navigation fails', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee view as public view in app 2
+    const registerCapabilityPagePO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app2');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'testee'},
+      private: false, // PUBLIC
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+        cssClass: 'testee',
+      },
+    });
+
+    // register view intention in app 1
+    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    await registerIntentionPagePO.registerIntention({type: 'view', qualifier: {component: 'testee'}});
+
+    // navigate to the testee view in app 1
+    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    await routerPagePO.enterQualifier({component: 'testee'});
+    await routerPagePO.selectTarget('self');
+    await routerPagePO.enterSelfViewId('view.99'); // view does not exist
+    await expectPromise(routerPagePO.clickNavigate()).toReject(/\[WorkbenchRouterError] Target view outlet not found: view\.99\./);
+
+    // expect testee view not to be opened
+    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
+    const testeeViewPO = appPO.findView({cssClass: 'testee'});
+    await expect(await appPO.getViewTabCount()).toEqual(3);
+    await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
+    await expect(await testeeViewTabPO.isPresent()).toBe(false);
+    await expect(await testeeViewPO.isPresent()).toBe(false);
+  });
 });

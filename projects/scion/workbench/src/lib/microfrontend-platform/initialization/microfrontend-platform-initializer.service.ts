@@ -9,7 +9,7 @@
  */
 
 import {Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
-import {ApplicationConfig, ApplicationManifest, IntentClient, Logger as MicrofrontendPlatformLogger, ManifestService, MessageClient, MicrofrontendPlatform, PlatformConfig, Runlevel} from '@scion/microfrontend-platform';
+import {ApplicationConfig, ApplicationManifest, IntentClient, IntentInterceptor, Logger as MicrofrontendPlatformLogger, ManifestService, MessageClient, MicrofrontendPlatform, PlatformConfig, Runlevel} from '@scion/microfrontend-platform';
 import {WorkbenchModuleConfig} from '../../workbench-module-config';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
@@ -18,6 +18,7 @@ import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './ng-zo
 import {POST_MICROFRONTEND_PLATFORM_CONNECT, runWorkbenchInitializers, WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
 import {LogDelegate} from './log-delegate.service';
+import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-intent-interceptor.service';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -32,6 +33,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
               private _ngZoneMessageClientDecorator: NgZoneMessageClientDecorator,
               private _ngZoneIntentClientDecorator: NgZoneIntentClientDecorator,
               private _microfrontendPlatformLogDelegate: LogDelegate,
+              private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
               private _injector: Injector,
               private _zone: NgZone,
               private _logger: Logger) {
@@ -64,6 +66,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Delegate log messages of the microfrontend platform to the workbench logger.
     Beans.register(MicrofrontendPlatformLogger, {useValue: this._microfrontendPlatformLogDelegate});
+
+    // Register view intent interceptor to translate view intents into workbench router commands.
+    Beans.register(IntentInterceptor, {useValue: this._microfrontendViewIntentInterceptor, multi: true});
 
     // Register initializer to instantiate services registered under {POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
     Beans.registerInitializer({

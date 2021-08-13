@@ -100,7 +100,7 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
         yes: 'Yes',
         no: 'No',
       },
-      cssClass: 'close-view'
+      cssClass: 'close-view',
     });
 
     if (action === 'no') {
@@ -162,18 +162,12 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
    * Sets the view's initial title if contained in its params.
    */
   private setInitialTitleFromParams(): void {
-    this.view.params$
-      .pipe(
-        take(1),
-        takeUntil(this._destroy$),
-      )
-      .subscribe(params => {
-        if (params.has('initialTitle')) {
-          this.view.setTitle(params.get('initialTitle'));
-          // Restore title observer
-          this.view.setTitle(this.form.get(TITLE).valueChanges);
-        }
-      });
+    const params = this.view.snapshot.params;
+    if (params.has('initialTitle')) {
+      this.view.setTitle(params.get('initialTitle'));
+      // Restore title observer
+      this.view.setTitle(this.form.get(TITLE).valueChanges);
+    }
   }
 
   private installViewActiveStateLogger(): void {

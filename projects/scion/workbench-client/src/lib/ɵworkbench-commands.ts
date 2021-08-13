@@ -16,11 +16,6 @@
 export namespace ɵWorkbenchCommands {
 
   /**
-   * Topic to initiate a workbench microfrontend navigation.
-   */
-  export const navigate = 'ɵworkbench/navigate';
-
-  /**
    * Topic to instruct the workbench to display a microfrontend in a popup.
    */
   export const popup = 'ɵworkbench/popup';
@@ -88,9 +83,16 @@ export namespace ɵWorkbenchCommands {
   }
 
   /**
+   * Computes the topic for updating params of a microfrontend view.
+   */
+  export function viewParamsUpdateTopic(viewId: string, viewCapabilityId: string): string {
+    return `ɵworkbench/views/${viewId}/capabilities/${viewCapabilityId}/params/update`;
+  }
+
+  /**
    * Computes the topic for providing params to a view microfrontend.
    *
-   * Params include the {@link ɵMicrofrontendRouteParams#ɵVIEW_CAPABILITY_ID capability id}, matrix params as passed in {@link WorkbenchNavigationExtras.params}
+   * Params include the {@link ɵMicrofrontendRouteParams#ɵVIEW_CAPABILITY_ID capability id}, params as passed in {@link WorkbenchNavigationExtras.params}
    * and the view qualifier.
    *
    * Params are published as a retained message.

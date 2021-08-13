@@ -8,19 +8,24 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {Routes, UrlSegment} from '@angular/router';
+import {Params, Routes, UrlSegment} from '@angular/router';
 import {MicrofrontendViewComponent} from '../microfrontend-view/microfrontend-view.component';
 import {ɵMicrofrontendRouteParams} from '@scion/workbench-client';
+import {Qualifier} from '@scion/microfrontend-platform';
 
 export namespace MicrofrontendViewRoutes {
 
   /**
    * Route prefix to identify routes of microfrontends.
    */
-  export const ROUTE_PREFIX = '~';
+  const ROUTE_PREFIX = '~';
 
   /**
    * Microfrontend routes config.
+   *
+   * Format: '~;{qualifier}/<viewCapabilityId>;{params}'
+   *  - '{qualifier}' as matrix params of first URL segment (~)
+   *  - '{params}' as matrix params of second URL segment (viewCapabilityId)
    */
   export const config: Routes = [
     {
@@ -30,12 +35,26 @@ export namespace MicrofrontendViewRoutes {
   ];
 
   /**
-   * Extracts the capability id from the given microfrontend route, or throws if not given a microfrontend route.
+   * Parses a given microfrontend route. Throws if not a valid microfrontend route.
    */
-  export function extractCapabilityId(segments: UrlSegment[]): string {
+  export function parseUrl(segments: UrlSegment[]): {viewCapabilityId: string; params: Params; qualifier: Params} {
     if (segments.length === 2 && segments[0].path === ROUTE_PREFIX) {
-      return segments[1].path;
+      return {
+        viewCapabilityId: segments[1].path,
+        qualifier: segments[0].parameters,
+        params: segments[1].parameters,
+      };
     }
     throw Error(`[NullMicrofrontendRouteError] Given URL segments do not match a microfrontend route. [segments=${segments.toString()}]`);
+  }
+
+  /**
+   * Builds the command array to be passed to the workbench router for navigating to a microfrontend view.
+   *
+   * Format: ['~', {qualifier}, '<viewCapabilityId>', {params}]
+   */
+  export function buildRouterNavigateCommand(viewCapabilityId: string, qualifier: Qualifier, params: Params): any[] {
+    const paramsCommand = Object.keys(params).length > 0 ? [params] : [];
+    return [ROUTE_PREFIX, qualifier, viewCapabilityId, ...paramsCommand];
   }
 }

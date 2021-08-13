@@ -381,7 +381,7 @@ describe('Workbench Router', () => {
       await expect(params).toEqual(jasmine.objectContaining({param1: 'PARAM 1', param2: 'null', param3: 'PARAM 3'}));
     });
 
-    it('should remove params having `null` as their value [paramsHandling=merge]', async () => {
+    it('should not remove params having `null` as their value [paramsHandling=merge]', async () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       const viewPagePO = await ViewPagePO.openInNewTab('app1');

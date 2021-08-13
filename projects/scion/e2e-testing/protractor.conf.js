@@ -26,9 +26,6 @@ require('tsconfig-paths/register');
  */
 exports.config = {
   allScriptsTimeout: 11000,
-  specs: [
-    './src/**/*.e2e-spec.ts',
-  ],
   suites: {
     'workbench::startup': [
       './src/workbench/**/startup.e2e-spec.ts',
