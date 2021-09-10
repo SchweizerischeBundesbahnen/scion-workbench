@@ -16,11 +16,6 @@
 export namespace ɵWorkbenchCommands {
 
   /**
-   * Topic to instruct the workbench to display a microfrontend in a popup.
-   */
-  export const popup = 'ɵworkbench/popup';
-
-  /**
    * Computes the topic via which the title of a workbench view tab can be set.
    */
   export function viewTitleTopic(viewId: string): string {

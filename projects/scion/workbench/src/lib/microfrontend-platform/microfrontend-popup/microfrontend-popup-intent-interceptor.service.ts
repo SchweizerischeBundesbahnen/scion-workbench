@@ -1,67 +1,103 @@
 /*
- * Copyright (c) 2018-2019 Swiss Federal Railways
+ * Copyright (c) 2018-2020 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- *  SPDX-License-Identifier: EPL-2.0
+ * SPDX-License-Identifier: EPL-2.0
  */
 
 import {Injectable, NgZone, StaticProvider} from '@angular/core';
-import {mapToBody, MessageClient, MicroApplicationConfig} from '@scion/microfrontend-platform';
-import {WorkbenchPopup, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
+import {Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, MicroApplicationConfig, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {WorkbenchCapabilities, WorkbenchPopup, WorkbenchPopupCapability, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
+import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
+import {WbRouterOutletComponent} from '../../routing/wb-router-outlet.component';
+import {ROUTER_OUTLET_NAME} from '../../workbench.constants';
 import {combineLatest, Observable, of} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
-import {Logger, LoggerNames} from '../../logging';
-import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {fromDimension$} from '@scion/toolkit/observable';
-import {Popup, PopupOrigin} from '../../popup/popup.config';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
-import {PopupService} from '../../popup/popup.service';
-import {ROUTER_OUTLET_NAME} from '../../workbench.constants';
-import {Router} from '@angular/router';
-import {WbRouterOutletComponent} from '../../routing/wb-router-outlet.component';
+import {fromDimension$} from '@scion/toolkit/observable';
 import {RouterUtils} from '../../routing/router.util';
 import {Commands} from '../../routing/workbench-router.service';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {Router} from '@angular/router';
+import {Logger, LoggerNames} from '../../logging';
+import {Beans} from '@scion/toolkit/bean-manager';
+import {stringifyError} from '../messaging.util';
+import {Maps} from '@scion/toolkit/util';
+import {PopupService} from '../../popup/popup.service';
+import {Popup, PopupOrigin} from '../../popup/popup.config';
 
 /**
- * Handles microfrontend popup commands, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
+ * Handles microfrontend popup intents, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
  *
- * This class is constructed before the Microfrontend Platform activates micro applications via {@link POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
+ * Popup intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench.
+ * Moreover, popup intents are not transported to the applications that provide the popup capability as swallowed by this interceptor.
  */
 @Injectable()
-export class MicrofrontendPopupCommandHandler {
+export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
 
-  constructor(private _messageClient: MessageClient,
-              private _popupService: PopupService,
+  private _openedPopups = new Set<string>();
+
+  constructor(private _popupService: PopupService,
               private _logger: Logger,
               private _viewRegistry: WorkbenchViewRegistry,
               private _router: Router,
-              private _zone: NgZone,
-              {symbolicName: hostAppSymbolicName}: MicroApplicationConfig) {
-    this._messageClient.onMessage<ɵWorkbenchPopupCommand>(ɵWorkbenchCommands.popup, async message => {
-      const command = message.body!;
-      this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
+              private _zone: NgZone) {
+  }
 
-      if (command.capability.metadata!.appSymbolicName === hostAppSymbolicName) {
-        return this.openHostComponentPopup(command);
-      }
-      else {
-        return this.openMicrofrontendPopup(command);
-      }
-    });
+  /**
+   * Popup intents are handled in this interceptor and then swallowed.
+   */
+  public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): void {
+    if (intentMessage.intent.type === WorkbenchCapabilities.Popup) {
+      this.consumePopupIntent(intentMessage).then();
+    }
+    else {
+      next.handle(intentMessage);
+    }
+  }
+
+  private async consumePopupIntent(message: IntentMessage<ɵWorkbenchPopupCommand>): Promise<void> {
+    const command = message.body!;
+
+    // Ignore subsequent intents if a popup is already open, as it would lead to the first popup being closed.
+    if (this._openedPopups.has(command.popupId)) {
+      this._logger.warn('Ignoring popup intent because multiple popup providers found that match the popup intent. Most likely this is not intended and may indicate an incorrect manifest configuration.', message.intent);
+      return;
+    }
+
+    const replyTo = message.headers.get(MessageHeaders.ReplyTo);
+    const params = new Map([
+      ...Maps.coerce(message.intent.params),
+      ...Maps.coerce(message.intent.qualifier),
+    ]);
+    this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
+
+    const capability = message.capability as WorkbenchPopupCapability;
+    const isHostPopup = capability.metadata!.appSymbolicName === Beans.get(MicroApplicationConfig).symbolicName;
+    this._openedPopups.add(command.popupId);
+    try {
+      const result = isHostPopup ? await this.openHostComponentPopup(capability, params, command) : await this.openMicrofrontendPopup(capability, params, command);
+      await Beans.get(MessageClient).publish(replyTo, result, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
+    }
+    catch (error) {
+      await Beans.get(MessageClient).publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
+    }
+    finally {
+      this._openedPopups.delete(command.popupId);
+    }
   }
 
   /**
    * Opens a popup for displaying a microfrontend provided by an application other than the host app.
    */
-  private async openMicrofrontendPopup(command: ɵWorkbenchPopupCommand): Promise<any> {
+  private async openMicrofrontendPopup(capability: WorkbenchPopupCapability, params: Map<string, any>, command: ɵWorkbenchPopupCommand): Promise<any> {
     const popupContext: ɵPopupContext = {
       popupId: command.popupId,
-      capability: command.capability,
-      params: coerceMap(command.params),
+      capability: capability,
+      params: params,
       closeOnFocusLost: command.closeStrategy?.onFocusLost ?? true,
     };
     return this._popupService.open({
@@ -70,12 +106,12 @@ export class MicrofrontendPopupCommandHandler {
       anchor: this.observePopupAnchor$(command),
       context: command.context,
       align: command.align,
-      size: command.capability.properties?.size,
+      size: capability.properties?.size,
       closeStrategy: {
         ...command.closeStrategy,
         onFocusLost: false, // Closing the popup on focus loss is handled in {MicrofrontendPopupComponent}
       },
-      cssClass: command.capability.properties?.cssClass,
+      cssClass: capability.properties?.cssClass,
     });
   }
 
@@ -83,15 +119,15 @@ export class MicrofrontendPopupCommandHandler {
    * Opens a popup for displaying a routed component of the host app. Unlike popups opened via {@link openMicrofrontendPopup},
    * this popup uses a `<router-outlet>` and not a `<sci-router-outlet>`, thus does not integrate the microfrontend via an iframe.
    */
-  private async openHostComponentPopup(command: ɵWorkbenchPopupCommand): Promise<any> {
+  private async openHostComponentPopup(capability: WorkbenchPopupCapability, params: Map<string, any>, command: ɵWorkbenchPopupCommand): Promise<any> {
     const popupOutletName = `popup.${command.popupId}`;
-    const path = command.capability.properties?.path;
+    const path = capability.properties?.path;
     if (!path) {
-      throw Error(`[PopupProviderError] Popup capability has no path to the microfrontend defined: ${JSON.stringify(command.capability)}`);
+      throw Error(`[PopupProviderError] Popup capability has no path to the microfrontend defined: ${JSON.stringify(capability)}`);
     }
 
     // Perform navigation in the named router outlet.
-    const navigateSuccess = await this.navigate(path, {outletName: popupOutletName, params: command.params});
+    const navigateSuccess = await this.navigate(path, {outletName: popupOutletName, params});
     if (!navigateSuccess) {
       throw Error('[PopupNavigateError] Navigation canceled, most likely by a route guard.');
     }
@@ -101,15 +137,15 @@ export class MicrofrontendPopupCommandHandler {
       componentConstructOptions: {
         providers: [
           {provide: ROUTER_OUTLET_NAME, useValue: popupOutletName},
-          provideWorkbenchPopup(command),
+          provideWorkbenchPopup(capability, params),
         ],
       },
       anchor: this.observePopupAnchor$(command),
       context: command.context,
       align: command.align,
-      size: command.capability.properties?.size,
+      size: capability.properties?.size,
       closeStrategy: command.closeStrategy,
-      cssClass: command.capability.properties?.cssClass,
+      cssClass: capability.properties?.cssClass,
     }).finally(() => this.navigate(null, {outletName: popupOutletName})); // Remove the outlet from the URL
   }
 
@@ -155,7 +191,7 @@ export class MicrofrontendPopupCommandHandler {
    * Observes the bounding box of the popup anchor in which the popup is opened.
    */
   private observeMicrofrontendPopupOrigin$(popupId: string): Observable<ClientRect> {
-    return this._messageClient.observe$<ClientRect>(ɵWorkbenchCommands.popupOriginTopic(popupId))
+    return Beans.get(MessageClient).observe$<ClientRect>(ɵWorkbenchCommands.popupOriginTopic(popupId))
       .pipe(mapToBody());
   }
 
@@ -172,22 +208,6 @@ export class MicrofrontendPopupCommandHandler {
   }
 }
 
-/**
- * Coerces the given Map-like object to a `Map`.
- *
- * Data sent from one JavaScript realm to another is serialized with the structured clone algorithm.
- * Altought the algorithm supports the `Map` data type, a deserialized map object cannot be checked to be instance of `Map`.
- * This is most likely because the serialization takes place in a different realm.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
- * @see http://man.hubwiz.com/docset/JavaScript.docset/Contents/Resources/Documents/developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm.html
- *
- * @ignore
- */
-function coerceMap<K, V>(mapLike: Map<K, V>): Map<K, V> {
-  return new Map(mapLike);
-}
-
 function isNullClientRect(clientRect: ClientRect): boolean {
   return clientRect.top === 0 && clientRect.right === 0 && clientRect.bottom === 0 && clientRect.left === 0;
 }
@@ -195,14 +215,14 @@ function isNullClientRect(clientRect: ClientRect): boolean {
 /**
  * Provides the {@link WorkbenchPopup} handle for interacting with the popup in a routed component of the host app.
  */
-function provideWorkbenchPopup(command: ɵWorkbenchPopupCommand): StaticProvider {
+function provideWorkbenchPopup(capability: WorkbenchPopupCapability, params: Map<string, any>): StaticProvider {
   return {
     provide: WorkbenchPopup,
     deps: [Popup],
     useFactory: (popup: Popup): WorkbenchPopup => {
       return new class implements WorkbenchPopup {
-        public readonly capability = command.capability;
-        public readonly params = coerceMap(command.params);
+        public readonly capability = capability;
+        public readonly params = params;
 
         public close<R = any>(result?: R | undefined): void {
           popup.close(result);

@@ -19,6 +19,7 @@ import {POST_MICROFRONTEND_PLATFORM_CONNECT, runWorkbenchInitializers, Workbench
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
 import {LogDelegate} from './log-delegate.service';
 import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-intent-interceptor.service';
+import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microfrontend-popup-intent-interceptor.service';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -33,6 +34,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
               private _ngZoneMessageClientDecorator: NgZoneMessageClientDecorator,
               private _ngZoneIntentClientDecorator: NgZoneIntentClientDecorator,
               private _microfrontendPlatformLogDelegate: LogDelegate,
+              private _microfrontendPopupIntentInterceptor: MicrofrontendPopupIntentInterceptor,
               private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
               private _injector: Injector,
               private _zone: NgZone,
@@ -69,6 +71,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Register view intent interceptor to translate view intents into workbench router commands.
     Beans.register(IntentInterceptor, {useValue: this._microfrontendViewIntentInterceptor, multi: true});
+
+    // Register popup intent interceptor to translate popup intents into workbench popup commands.
+    Beans.register(IntentInterceptor, {useValue: this._microfrontendPopupIntentInterceptor, multi: true});
 
     // Register initializer to instantiate services registered under {POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
     Beans.registerInitializer({

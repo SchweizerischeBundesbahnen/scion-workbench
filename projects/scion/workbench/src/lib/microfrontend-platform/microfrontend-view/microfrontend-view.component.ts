@@ -23,7 +23,7 @@ import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {ViewMenuService} from '../../view-part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
-import {stringifyError} from '../routing/router.util';
+import {stringifyError} from '../messaging.util';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 
 /**

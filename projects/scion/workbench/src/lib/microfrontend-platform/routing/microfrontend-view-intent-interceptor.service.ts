@@ -16,10 +16,10 @@ import {Dictionaries} from '@scion/toolkit/util';
 import {MicrofrontendViewRoutes} from './microfrontend-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {stringifyError} from './router.util';
 import {Subject} from 'rxjs';
 import {serializeExecution} from '../../operators';
 import {retry, takeUntil} from 'rxjs/operators';
+import {stringifyError} from '../messaging.util';
 
 /**
  * Handles microfrontend navigate intents, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
