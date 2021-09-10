@@ -8,20 +8,18 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {IntentClient, ManifestService, mapToBody, MessageClient, Qualifier, QualifierMatcher, RequestError} from '@scion/microfrontend-platform';
+import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {catchError, map, take} from 'rxjs/operators';
+import {catchError, map, takeUntil} from 'rxjs/operators';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Maps, Observables} from '@scion/toolkit/util';
 import {fromBoundingClientRect$} from '@scion/toolkit/observable';
-import {Observable, throwError} from 'rxjs';
-import {WorkbenchView} from '../view/workbench-view';
+import {NEVER, Observable, TeardownLogic, throwError} from 'rxjs';
+import {ViewClosingListener, WorkbenchView} from '../view/workbench-view';
 import {ɵWorkbenchPopupCommand} from './workbench-popup-open-command';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {UUID} from '@scion/toolkit/uuid';
-import {WorkbenchPopupCapability} from './workbench-popup-capability';
 import {PopupOrigin, WorkbenchPopupConfig} from './workbench-popup.config';
-import {filterArray} from '@scion/toolkit/operators';
 
 /**
  * Allows displaying a microfrontend in a workbench popup.
@@ -68,35 +66,32 @@ export class WorkbenchPopupService {
    *         provides the requested popup. The Promise also rejects when closing the popup with an error.
    */
   public async open<T>(qualifier: Qualifier, config: WorkbenchPopupConfig): Promise<T> {
-    // To be able to integrate popups from apps without workbench integration, we do not delegate the opening of the popup to
-    // the app that provides the requested popup, but interact with the workbench directly. Nevertheless, we issue an intent
-    // so that the platform throws an error in case of unqualified interaction.
-    await Beans.get(IntentClient).publish<WorkbenchPopupConfig>({type: WorkbenchCapabilities.Popup, qualifier, params: Maps.coerce(config.params)}, {...config, anchor: undefined!});
-
     const view = Beans.opt(WorkbenchView);
     const popupCommand: ɵWorkbenchPopupCommand = {
       popupId: UUID.randomUUID(),
-      capability: await this.lookupPopupCapabilityElseReject(qualifier),
       align: config.align,
       closeStrategy: config.closeStrategy,
-      params: new Map([
-        ...Maps.coerce(config.params),
-        ...Maps.coerce(qualifier),
-      ]),
       context: {
         viewId: view?.viewId,
-        capabilityId: await view?.capability$.pipe(map(capability => capability.metadata!.id), take(1)).toPromise(),
       },
     };
     const popupOriginPublisher = this.observePopupOrigin$(config).subscribe(origin => {
       Beans.get(MessageClient).publish<ClientRect>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), origin, {retain: true});
     });
 
+    const viewClosing$ = new Observable((observer): TeardownLogic => {
+      const closingListener: ViewClosingListener = {onClosing: () => observer.complete()};
+      view!.addClosingListener(closingListener);
+      return () => view!.removeClosingListener(closingListener);
+    });
+
     try {
-      return await Beans.get(MessageClient).request$<T>(ɵWorkbenchCommands.popup, popupCommand)
+      const params = Maps.coerce(config.params);
+      return await Beans.get(IntentClient).request$<T>({type: WorkbenchCapabilities.Popup, qualifier, params}, popupCommand)
         .pipe(
           mapToBody(),
           catchError(error => throwError(error instanceof RequestError ? error.message : error)),
+          takeUntil(view ? viewClosing$ : NEVER),
         )
         .toPromise();
     }
@@ -105,29 +100,6 @@ export class WorkbenchPopupService {
       // Instruct the message broker to delete retained messages to free resources.
       Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), undefined, {retain: true}).then();
     }
-  }
-
-  /**
-   * Looks up the requested popup capability.
-   *
-   * Returns a Promise that resolves to the requested capability, or that rejects if not found or if multiple providers match the qualifier.
-   * Only capabilities for which the requester is qualified are returned.
-   */
-  private async lookupPopupCapabilityElseReject(qualifier: Qualifier): Promise<WorkbenchPopupCapability> {
-    const popupCapabilities = await Beans.get(ManifestService).lookupCapabilities$<WorkbenchPopupCapability>({type: WorkbenchCapabilities.Popup})
-      .pipe(
-        filterArray(popupCapability => new QualifierMatcher(popupCapability.qualifier, {evalOptional: true, evalAsterisk: true}).matches(qualifier)),
-        take(1),
-      )
-      .toPromise();
-
-    if (popupCapabilities.length === 0) {
-      throw Error(`[NullProviderError] Qualifier matches no popup capability. Maybe, the requested popup capability is not public API or the providing application not available. [type=${WorkbenchCapabilities.Popup}, qualifier=${JSON.stringify(qualifier)}]`);
-    }
-    if (popupCapabilities.length > 1) {
-      throw Error(`[MultiProviderError] The popup capability cannot be uniquely identified. Multiple providers match the popup qualifier. [type=${WorkbenchCapabilities.Popup}, qualifier=${JSON.stringify(qualifier)}]`);
-    }
-    return popupCapabilities[0];
   }
 
   /**

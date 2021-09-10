@@ -19,10 +19,10 @@ import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './initi
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {LogDelegate} from './initialization/log-delegate.service';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
-import {MicrofrontendPopupCommandHandler} from './microfrontend-popup/microfrontend-popup-command-handler.service';
 import {MicrofrontendMessageBoxProvider} from './microfrontend-message-box/microfrontend-message-box-provider.service';
 import {MicrofrontendNotificationProvider} from './microfrontend-notification/microfrontend-notification-provider.service';
 import {MicrofrontendViewIntentInterceptor} from './routing/microfrontend-view-intent-interceptor.service';
+import {MicrofrontendPopupIntentInterceptor} from './microfrontend-popup/microfrontend-popup-intent-interceptor.service';
 
 /**
  * Registers a set of DI providers to set up microfrontend support in the workbench.
@@ -50,11 +50,6 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       },
       {
         provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
-        useClass: MicrofrontendPopupCommandHandler,
-        multi: true,
-      },
-      {
-        provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
         useClass: MicrofrontendMessageBoxProvider,
         multi: true,
       },
@@ -64,6 +59,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
         multi: true,
       },
       LogDelegate,
+      MicrofrontendPopupIntentInterceptor,
       MicrofrontendViewIntentInterceptor,
       WorkbenchRouter,
       WorkbenchPopupService,
