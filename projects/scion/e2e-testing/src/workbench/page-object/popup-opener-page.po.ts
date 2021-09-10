@@ -96,7 +96,7 @@ export class PopupOpenerPagePO {
     await enterText(coerceArray(cssClass).join(' '), this._pageFinder.$('input.e2e-class'));
   }
 
-  public async enterCloseStrategy(options: {closeOnFocusLost?: boolean, closeOnEscape?: boolean}): Promise<void> {
+  public async enterCloseStrategy(options: {closeOnFocusLost?: boolean; closeOnEscape?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
 

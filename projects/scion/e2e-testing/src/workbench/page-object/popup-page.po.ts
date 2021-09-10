@@ -59,7 +59,7 @@ export class PopupPagePO {
     await enterText(size.maxHeight, this._pageFinder.$('input.e2e-max-height'));
   }
 
-  public async clickClose(options?: {returnValue?: string, closeWithError?: boolean}): Promise<void> {
+  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
 

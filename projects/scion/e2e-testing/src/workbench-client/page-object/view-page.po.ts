@@ -211,7 +211,7 @@ export class ViewPagePO {
     // do not close the accordion as this action removes the iframe from the DOM.
   }
 
-  public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace', navigatePerParam?: boolean}): Promise<void> {
+  public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 

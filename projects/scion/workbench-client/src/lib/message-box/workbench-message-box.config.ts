@@ -61,7 +61,7 @@ export interface WorkbenchMessageBoxConfig {
    * actions. Then, provided actions will be ignored. Refer to the documentation of the message box capability provider for more information.
    */
   actions?: {
-    [key: string]: string
+    [key: string]: string;
   };
 
   /**

@@ -28,7 +28,7 @@ const EC = protractor.ExpectedConditions;
  *
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property with a string literal.
  */
-export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view', properties: {pinToStartPage?: boolean}};
+export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean}};
 export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'};
 
 /**

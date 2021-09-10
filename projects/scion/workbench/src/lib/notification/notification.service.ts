@@ -77,7 +77,7 @@ export class NotificationService implements OnDestroy {
   /**
    * Constructs the notification based on the given config and computes its insertion index.
    */
-  private constructNotification(config: NotificationConfig, notifications: ReadonlyArray<ɵNotification>): {notification: ɵNotification, insertionIndex: number} {
+  private constructNotification(config: NotificationConfig, notifications: ReadonlyArray<ɵNotification>): {notification: ɵNotification; insertionIndex: number} {
     config = {...config};
 
     // Check whether the notification belongs to a group. If so, replace any present notification of that group.
