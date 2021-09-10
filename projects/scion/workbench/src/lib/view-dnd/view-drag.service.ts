@@ -228,7 +228,7 @@ export interface ViewMoveEvent {
   source: {
     viewId: string;
     partId: string;
-    viewUrlSegments: UrlSegment[],
+    viewUrlSegments: UrlSegment[];
     appInstanceId: string;
   };
   target: {

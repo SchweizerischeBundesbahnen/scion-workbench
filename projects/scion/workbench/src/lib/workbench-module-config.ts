@@ -55,7 +55,7 @@ export abstract class WorkbenchModuleConfig {
      *
      * At runtime, you can change the minimum required log level by setting the `loglevel` query parameter.
      */
-    logLevel?: LogLevel,
+    logLevel?: LogLevel;
     /**
      * Registers log appenders to output log messages. Multiple appenders are allowed. By default, if not specified, log messages are written to the console.
      */
@@ -145,7 +145,7 @@ export interface WorkbenchMicrofrontendConfig {
      * The symbolic name of the platform host is used to link to its manifest, mandatory if you load the manifest from an URL.
      * If not specified, `workbench-host` is used as the symbolic name.
      */
-    symbolicName?: string
+    symbolicName?: string;
     /**
      * Manifests the capabilities and intentions of the platform host. Alternatively, you can provide its manifest from an URL by registering
      * the platform host application in the {@link platform} property.

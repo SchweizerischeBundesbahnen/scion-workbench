@@ -103,7 +103,7 @@ export class StartPageComponent implements OnDestroy {
   /**
    * Computes the URL to launch a new app instance with given startup options, preserving the current workbench layout.
    */
-  public computeAppUrl(options: {launcher: 'APP_INITIALIZER' | 'LAZY', standalone: boolean}): string {
+  public computeAppUrl(options: {launcher: 'APP_INITIALIZER' | 'LAZY'; standalone: boolean}): string {
     const href = new URL(location.href);
     href.searchParams.append(WorkbenchStartupQueryParams.LAUNCHER_QUERY_PARAM, options.launcher);
     href.searchParams.append(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM, `${options.standalone}`);

@@ -67,7 +67,7 @@ export class WorkbenchLayoutDiff {
     ({addedItems: this.addedParts, removedItems: this.removedParts} = this.collectChangedItems(partChanges));
   }
 
-  private collectChangedItems(changes: IterableChanges<string> | null): {addedItems: string[], removedItems: string[]} {
+  private collectChangedItems(changes: IterableChanges<string> | null): {addedItems: string[]; removedItems: string[]} {
     const addedItems: string[] = [];
     const removedItems: string[] = [];
     changes?.forEachAddedItem(({item}) => addedItems.push(item));

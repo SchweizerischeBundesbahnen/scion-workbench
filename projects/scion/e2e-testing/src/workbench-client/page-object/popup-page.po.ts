@@ -164,7 +164,7 @@ export class PopupPagePO {
     }
   }
 
-  public async clickClose(options?: {returnValue?: string, closeWithError?: boolean}): Promise<void> {
+  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(await this._popupId);
     await assertPageToDisplay(this._pageFinder);
 

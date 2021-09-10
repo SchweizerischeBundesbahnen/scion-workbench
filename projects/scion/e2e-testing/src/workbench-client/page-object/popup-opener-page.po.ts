@@ -95,7 +95,7 @@ export class PopupOpenerPagePO {
     await selectOption(align, this._pageFinder.$('select.e2e-align'));
   }
 
-  public async enterCloseStrategy(options: {closeOnFocusLost?: boolean, closeOnEscape?: boolean}): Promise<void> {
+  public async enterCloseStrategy(options: {closeOnFocusLost?: boolean; closeOnEscape?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     await assertPageToDisplay(this._pageFinder);
 

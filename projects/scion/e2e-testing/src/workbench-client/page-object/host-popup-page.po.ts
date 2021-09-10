@@ -121,7 +121,7 @@ export class HostPopupPagePO {
     }
   }
 
-  public async clickClose(options?: {returnValue?: string, closeWithError?: boolean}): Promise<void> {
+  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
     await WebdriverExecutionContexts.switchToDefault();
     await assertPageToDisplay(this._pageFinder);
 

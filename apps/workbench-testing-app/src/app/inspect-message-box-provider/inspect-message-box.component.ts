@@ -68,7 +68,7 @@ export class InspectMessageBoxComponent implements OnDestroy {
 
     this.form.get(ACTIONS).valueChanges
       .pipe(takeUntil(this._destroy$))
-      .subscribe((actions: Array<{paramName: string, paramValue: string}>) => {
+      .subscribe((actions: Array<{paramName: string; paramValue: string}>) => {
         this.messageBox.setActions(actions.map(action => ({
             key: action.paramName,
             label: action.paramValue,
