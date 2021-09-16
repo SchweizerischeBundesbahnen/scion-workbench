@@ -15,7 +15,7 @@ import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbenc
 import {ViewPagePO} from './page-object/view-page.po';
 import {Key, logging} from 'protractor';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
-import {confirmAlert, consumeBrowserLog, dismissAlert} from '../helper/testing.util';
+import {consumeBrowserLog} from '../helper/testing.util';
 import Level = logging.Level;
 
 export declare type HTMLElement = any;
@@ -234,6 +234,11 @@ describe('Workbench View', () => {
 
   it('should allow prevent the view from closing', async () => {
     await appPO.navigateTo({microfrontendSupport: true});
+
+    // register message box intention
+    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
+
     const viewPagePO = await ViewPagePO.openInNewTab('app1');
     const viewTabPO = viewPagePO.viewTabPO;
 
@@ -242,7 +247,8 @@ describe('Workbench View', () => {
 
     // try closing the view
     await viewTabPO.close();
-    await dismissAlert();
+    const msgboxPO = appPO.findMessageBox({cssClass: 'close-view'});
+    await msgboxPO.clickActionButton('no');
 
     // expect the view not to be closed
     await expect(await viewTabPO.isPresent()).toBe(true);
@@ -250,7 +256,7 @@ describe('Workbench View', () => {
 
     // try closing the view
     await viewPagePO.clickClose();
-    await dismissAlert();
+    await msgboxPO.clickActionButton('no');
 
     // expect the view not to be closed
     await expect(await viewTabPO.isPresent()).toBe(true);
@@ -258,7 +264,7 @@ describe('Workbench View', () => {
 
     // try closing the view
     await viewTabPO.close();
-    await confirmAlert();
+    await msgboxPO.clickActionButton('yes');
 
     // expect the view to be closed
     await expect(await viewTabPO.isPresent()).toBe(false);
