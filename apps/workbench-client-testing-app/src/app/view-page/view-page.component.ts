@@ -10,7 +10,7 @@
 
 import {Component, Inject, OnDestroy} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
-import {ViewClosingEvent, ViewClosingListener, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {ViewClosingEvent, ViewClosingListener, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {EMPTY, MonoTypeOperatorFunction, Subject} from 'rxjs';
@@ -54,7 +54,8 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
               public route: ActivatedRoute,
               @Inject(APP_INSTANCE_ID) public appInstanceId: string,
               private _router: WorkbenchRouter,
-              public location: Location) {
+              public location: Location,
+              private _messageBoxService: WorkbenchMessageBoxService) {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [HEADING]: formBuilder.control(''),
@@ -92,7 +93,17 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
       return;
     }
 
-    if (!confirm('Do you want to close this view?')) {
+    const action = await this._messageBoxService.open({
+      content: 'Do you want to close this view?',
+      severity: 'info',
+      actions: {
+        yes: 'Yes',
+        no: 'No',
+      },
+      cssClass: 'close-view'
+    });
+
+    if (action === 'no') {
       event.preventDefault();
     }
   }
