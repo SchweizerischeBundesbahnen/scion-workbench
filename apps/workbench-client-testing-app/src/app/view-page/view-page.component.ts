@@ -101,6 +101,7 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
         no: 'No',
       },
       cssClass: 'close-view',
+      modality: 'application',  // message box is displayed even if closing view is not active
     });
 
     if (action === 'no') {

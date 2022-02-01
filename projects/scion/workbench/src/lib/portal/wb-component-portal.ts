@@ -171,11 +171,11 @@ export interface PortalConfig {
    */
   injectorTokens: WeakMap<any, any>;
   /**
-   * Lifecycle hooks which is invoked when the portal is attached to the DOM.
+   * Lifecycle hook which is invoked when the portal is attached to the DOM.
    */
   onAttach?: () => void;
-  /*
-  * Lifecycle hooks which is invoked when the portal is detached from the DOM.
+  /**
+   * Lifecycle hook which is invoked when the portal is detached from the DOM.
    */
   onDetach?: () => void;
 }
