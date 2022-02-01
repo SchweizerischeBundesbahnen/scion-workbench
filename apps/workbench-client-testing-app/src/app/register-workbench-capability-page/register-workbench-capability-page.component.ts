@@ -19,6 +19,7 @@ const TYPE = 'type';
 const QUALIFIER = 'qualifier';
 const REQUIRED_PARAMS = 'requiredParams';
 const OPTIONAL_PARAMS = 'optionalParams';
+const TRANSIENT_PARAMS = 'transientParams';
 const VIEW_PROPERTIES = 'viewProperties';
 const POPUP_PROPERTIES = 'popupProperties';
 const PRIVATE = 'private';
@@ -50,6 +51,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
   public readonly QUALIFIER = QUALIFIER;
   public readonly REQUIRED_PARAMS = REQUIRED_PARAMS;
   public readonly OPTIONAL_PARAMS = OPTIONAL_PARAMS;
+  public readonly TRANSIENT_PARAMS = TRANSIENT_PARAMS;
   public readonly PRIVATE = PRIVATE;
   public readonly VIEW_PROPERTIES = VIEW_PROPERTIES;
   public readonly POPUP_PROPERTIES = POPUP_PROPERTIES;
@@ -82,6 +84,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
       [QUALIFIER]: formBuilder.array([]),
       [REQUIRED_PARAMS]: formBuilder.control(''),
       [OPTIONAL_PARAMS]: formBuilder.control(''),
+      [TRANSIENT_PARAMS]: formBuilder.control(''),
       [PRIVATE]: formBuilder.control(true),
       [VIEW_PROPERTIES]: formBuilder.group({
         [PATH]: formBuilder.control(''),
@@ -133,11 +136,17 @@ export class RegisterWorkbenchCapabilityPageComponent {
 
   private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToStartPage: boolean}} {
     const propertiesGroup = this.form.get(VIEW_PROPERTIES);
+    const requiredParams = this.form.get(REQUIRED_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams = this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
+    const transientParams = this.form.get(TRANSIENT_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
     return {
       type: WorkbenchCapabilities.View,
       qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray),
-      requiredParams: this.form.get(REQUIRED_PARAMS).value?.split(/,\s*/).filter(Boolean),
-      optionalParams: this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean),
+      params: [
+        ...requiredParams,
+        ...optionalParams,
+        ...transientParams,
+      ],
       private: this.form.get(PRIVATE).value,
       properties: {
         path: this.readPathFromUI(propertiesGroup),

@@ -16,11 +16,11 @@ import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
-import {Dictionary, Objects} from '@scion/toolkit/util';
 
 const PATH = 'path';
 const QUERY_PARAMS = 'queryParams';
 const MATRIX_PARAMS = 'matrixParams';
+const NAVIGATIONAL_STATE = 'navigationalState';
 const TARGET = 'target';
 const INSERTION_INDEX = 'insertionIndex';
 const SELF_VIEW_ID = 'selfViewId';
@@ -36,6 +36,7 @@ export class RouterPageComponent {
 
   public readonly PATH = PATH;
   public readonly MATRIX_PARAMS = MATRIX_PARAMS;
+  public readonly NAVIGATIONAL_STATE = NAVIGATIONAL_STATE;
   public readonly TARGET = TARGET;
   public readonly SELF_VIEW_ID = SELF_VIEW_ID;
   public readonly INSERTION_INDEX = INSERTION_INDEX;
@@ -62,6 +63,7 @@ export class RouterPageComponent {
     this.form = formBuilder.group({
       [PATH]: formBuilder.control(''),
       [MATRIX_PARAMS]: formBuilder.array([]),
+      [NAVIGATIONAL_STATE]: formBuilder.array([]),
       [TARGET]: formBuilder.control(''),
       [SELF_VIEW_ID]: formBuilder.control(view.viewId),
       [INSERTION_INDEX]: formBuilder.control(''),
@@ -97,7 +99,7 @@ export class RouterPageComponent {
   }
 
   private constructRouterLinkCommands(): any[] {
-    const matrixParams: Params | null = this.readMatrixParams();
+    const matrixParams: Params | null = SciParamsEnterComponent.toParamsDictionary(this.form.get(MATRIX_PARAMS) as FormArray);
     const commands: any[] = this.form.get(PATH).value.split('/');
 
     // Replace the first segment with a slash if empty
@@ -108,25 +110,6 @@ export class RouterPageComponent {
     return commands.concat(matrixParams ? matrixParams : []);
   }
 
-  private readMatrixParams(): Dictionary<string> | null {
-    const matrixParams = SciParamsEnterComponent.toParamsDictionary(this.form.get(MATRIX_PARAMS) as FormArray);
-    if (matrixParams === null) {
-      return null;
-    }
-
-    // remove empty entries
-    Object.entries(matrixParams).forEach(([key, value]) => {
-      if (!key || !value) {
-        delete matrixParams[key];
-      }
-    });
-
-    if (Objects.isEqual(matrixParams, {})) {
-      return null;
-    }
-    return matrixParams;
-  }
-
   private constructNavigationExtras(): WbNavigationExtras {
     return {
       queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUERY_PARAMS) as FormArray),
@@ -135,6 +118,7 @@ export class RouterPageComponent {
       target: this.form.get(TARGET).value || undefined,
       selfViewId: this.form.get(SELF_VIEW_ID).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
+      state: SciParamsEnterComponent.toParamsDictionary(this.form.get(NAVIGATIONAL_STATE) as FormArray),
     };
   }
 }

@@ -466,7 +466,7 @@ describe('PartsLayout', () => {
    */
   it('is immutable', () => {
     const partsLayout = createSimplePartsLayout();
-    const serializedPartsLayout = partsLayout.serialize();
+    const serializedPartsLayout = partsLayout.serialize({uuid: 'UUID'});
 
     // modify the layout; should not modify `partsLayout` instance
     partsLayout
@@ -475,7 +475,7 @@ describe('PartsLayout', () => {
       .addPart('Z', {relativeTo: 'Y', align: 'bottom'})
       .removePart('Z');
 
-    expect(partsLayout.serialize()).toEqual(serializedPartsLayout);
+    expect(partsLayout.serialize({uuid: 'UUID'})).toEqual(serializedPartsLayout);
   });
 
   /**

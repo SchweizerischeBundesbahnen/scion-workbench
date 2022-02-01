@@ -17,3 +17,8 @@ export const WB_VIEW_TITLE_PARAM = 'wb.title';
  * Specifies the name of the optional path or query parameter for the view heading.
  */
 export const WB_VIEW_HEADING_PARAM = 'wb.heading';
+
+/**
+ * Represents the key under which navigational state is associated in data params.
+ */
+export const WB_STATE_DATA = 'wb.state';
