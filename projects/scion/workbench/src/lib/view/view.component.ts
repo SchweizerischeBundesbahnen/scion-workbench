@@ -14,7 +14,7 @@ import {switchMap, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {SciViewportComponent} from '@scion/toolkit/viewport';
 import {WbRouterOutletComponent} from '../routing/wb-router-outlet.component';
-import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing-params.constants';
+import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing.constants';
 import {MessageBoxService} from '../message-box/message-box.service';
 import {ViewMenuService} from '../view-part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
@@ -76,7 +76,7 @@ export class ViewComponent implements OnDestroy {
               public workbenchStartup: WorkbenchStartup,
               messageBoxService: MessageBoxService,
               viewContextMenuService: ViewMenuService,
-              cd: ChangeDetectorRef,
+              private _cd: ChangeDetectorRef,
               @Inject(VIEW_LOCAL_MESSAGE_BOX_HOST) viewLocalMessageBoxHost: ViewContainerReference) {
 
     // IMPORTANT:
@@ -105,7 +105,7 @@ export class ViewComponent implements OnDestroy {
     if (!this._view.active) {
       workbenchStartup.whenStarted.then(() => {
         this._logger.debug(() => `Activating view router outlet after initial navigation. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
-        cd.detectChanges();
+        this._cd.detectChanges();
       });
     }
 
@@ -147,6 +147,9 @@ export class ViewComponent implements OnDestroy {
     }
     if (params[WB_VIEW_HEADING_PARAM] || data[WB_VIEW_HEADING_PARAM]) {
       this._view.heading = params[WB_VIEW_HEADING_PARAM] || data[WB_VIEW_HEADING_PARAM];
+    }
+    if (!this._view.active) {
+      this._cd.detectChanges();
     }
   }
 
