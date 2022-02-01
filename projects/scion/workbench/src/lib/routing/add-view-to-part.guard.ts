@@ -34,7 +34,7 @@ export class WbAddViewToPartGuard implements CanActivate {
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const viewId: string = route.outlet;
-    const viewTarget: ViewTarget = ((this._router.getCurrentNavigation()!.extras.state || {})[VIEW_TARGET] || {})[viewId] || {};
+    const viewTarget: ViewTarget | undefined = (this._workbenchRouter.getCurrentNavigationViewState(viewId) || {})[VIEW_TARGET];
 
     // Read the layout from the URL.
     const partsLayout = this._workbenchRouter.getCurrentNavigationContext().partsLayout;
@@ -45,8 +45,8 @@ export class WbAddViewToPartGuard implements CanActivate {
     }
 
     // Add the view to the part specified in the navigation state, or its preferred part, or to the currently active part.
-    const partId = viewTarget.partId || this.getPreferredPartId(route, partsLayout) || partsLayout.activePart.partId;
-    const viewInsertionIndex = this.coerceViewInsertionIndex(viewTarget.viewIndex, partId, partsLayout);
+    const partId = viewTarget?.partId || this.getPreferredPartId(route, partsLayout) || partsLayout.activePart.partId;
+    const viewInsertionIndex = this.coerceViewInsertionIndex(viewTarget?.viewIndex, partId, partsLayout);
     const partsLayoutSerialized = partsLayout
       .addView(partId, viewId, viewInsertionIndex)
       .serialize();

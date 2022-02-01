@@ -39,7 +39,17 @@ export class ActivatorModule {
         component: 'view',
         app,
       },
-      optionalParams: ['initialTitle'],
+      params: [
+        {
+          name: 'initialTitle',
+          required: false,
+        },
+        {
+          name: 'transientParam',
+          required: false,
+          transient: true,
+        },
+      ],
       description: '[e2e] Provides access to the workbench view object',
       private: false,
       properties: {

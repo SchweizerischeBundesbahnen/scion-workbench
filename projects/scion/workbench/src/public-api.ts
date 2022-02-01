@@ -27,7 +27,7 @@ export {WorkbenchActivityPartService} from './lib/activity-part/workbench-activi
 export {WbActivityActionDirective} from './lib/activity-part/wb-activity-action.directive';
 export * from './lib/message-box/public_api';
 export * from './lib/notification/public_api';
-export {WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM} from './lib/routing/routing-params.constants';
+export {WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM, WB_STATE_DATA} from './lib/routing/routing.constants';
 export {ROUTE_REUSE_PROVIDER, VIEW_TAB_CONTEXT, ViewTabContext} from './lib/workbench.constants';
 export {WorkbenchLauncher, WorkbenchStartup} from './lib/startup/workbench-launcher.service';
 export {WorkbenchInitializer, WORKBENCH_STARTUP, WORKBENCH_PRE_STARTUP, POST_MICROFRONTEND_PLATFORM_CONNECT, WORKBENCH_POST_STARTUP} from './lib/startup/workbench-initializer';

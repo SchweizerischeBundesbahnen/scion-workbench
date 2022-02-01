@@ -30,6 +30,15 @@
   </ng-template>
 </sci-accordion>
 
+<sci-accordion class="e2e-navigational-state" variant="solid" *ngIf="route.data | async | wbPluck:WB_STATE_DATA as state">
+  <ng-template sciAccordionItem [panel]="panel_navigational_state">
+    <header>Navigational State</header>
+  </ng-template>
+  <ng-template #panel_navigational_state>
+    <sci-property [properties]="state" class="e2e-navigational-state"></sci-property>
+  </ng-template>
+</sci-accordion>
+
 <section>
   <header>View Properties</header>
 

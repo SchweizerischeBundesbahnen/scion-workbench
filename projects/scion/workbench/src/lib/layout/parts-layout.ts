@@ -205,14 +205,17 @@ export class PartsLayout {
    *
    * @param options - Controls the serialization into a URL-safe base64 string.
    *                  - `nullIfEmpty`: if `true` (or if not specified), returns `null` if containing a single root part with no views added to it.
+   *                  - `uuid`: identity of the layout; if not specified, generates a new UUID.
    */
-  public serialize(options: {nullIfEmpty: false}): string;
-  public serialize(options?: {nullIfEmpty?: true} | {}): string | null;
-  public serialize(options?: {nullIfEmpty?: boolean}): string | null {
+  public serialize(options: {nullIfEmpty: false; uuid?: string}): string;
+  public serialize(options?: {nullIfEmpty?: true; uuid?: string} | {}): string | null;
+  public serialize(options?: {nullIfEmpty?: boolean; uuid?: string}): string | null {
     if ((options?.nullIfEmpty ?? true) && this._root instanceof MPart && this._root.isEmpty()) {
       return null;
     }
-    return serializeLayout({root: this._root, activePartId: this._activePartId});
+
+    // We assign a new UUID to force the layout query parameter to change, so that resolvers of routes configured with {@link Route#runGuardsAndResolvers} will evaluate, e.g. {@link NavigationStateResolver}.
+    return serializeLayout({root: this._root, activePartId: this._activePartId, uuid: options?.uuid || UUID.randomUUID()});
   }
 
   /**
@@ -480,7 +483,7 @@ function createRootLayout(workbenchAccessor: PartsLayoutWorkbenchAccessor): MPar
 /**
  * Serializes this layout into a URL-safe base64 string.
  */
-function serializeLayout(layout: MPartsLayout): string {
+function serializeLayout(layout: MPartsLayout & {uuid?: string}): string {
   return btoa(JSON.stringify(layout, (key, value) => {
     return (key === 'parent') ? undefined : value; // do not serialize node parents.
   }));

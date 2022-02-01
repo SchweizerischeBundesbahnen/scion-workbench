@@ -11,6 +11,10 @@
   <sci-form-field label="Matrix parameters">
     <sci-params-enter [paramsFormArray]="$any(form.get(MATRIX_PARAMS))" [addable]="true" [removable]="true" class="e2e-matrix-params"></sci-params-enter>
   </sci-form-field>
+
+  <sci-form-field label="Navigational state">
+    <sci-params-enter [paramsFormArray]="$any(form.get(NAVIGATIONAL_STATE))" [addable]="true" [removable]="true" class="e2e-navigational-state"></sci-params-enter>
+  </sci-form-field>
 </form>
 
 <form autocomplete="off" [formGroup]="form">

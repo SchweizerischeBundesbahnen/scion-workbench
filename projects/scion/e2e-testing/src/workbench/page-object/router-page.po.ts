@@ -14,6 +14,7 @@ import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {SciCheckboxPO, SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {Dictionary} from '@scion/toolkit/util';
 
 /**
  * Page object to interact {@link RouterPageComponent}.
@@ -61,6 +62,14 @@ export class RouterPagePO {
     const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-query-params'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(params);
+  }
+
+  public async enterNavigationalState(state: Dictionary): Promise<void> {
+    await WebdriverExecutionContexts.switchToDefault();
+    await assertPageToDisplay(this._pageFinder);
+    const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-navigational-state'));
+    await paramsEnterPO.clear();
+    await paramsEnterPO.enterParams(state);
   }
 
   public async checkActivateIfPresent(check: boolean): Promise<void> {

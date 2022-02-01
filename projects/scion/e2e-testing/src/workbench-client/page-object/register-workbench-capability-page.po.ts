@@ -80,11 +80,17 @@ export class RegisterWorkbenchCapabilityPagePO {
       await paramsEnterPO.clear();
       await paramsEnterPO.enterParams(capability.qualifier);
     }
-    if (capability.requiredParams) {
-      await enterText(capability.requiredParams.join(','), this._pageFinder.$('input.e2e-required-params'));
+    const requiredParams = [...(capability.requiredParams ?? []), ...(capability.params ?? []).filter(param => !param.transient && param.required).map(param => param.name)];
+    const optionalParams = [...(capability.optionalParams ?? []), ...(capability.params ?? []).filter(param => !param.transient && !param.required).map(param => param.name)];
+    const transientParams = (capability.params ?? []).filter(param => param.transient).map(param => param.name);
+    if (requiredParams.length) {
+      await enterText(requiredParams.join(','), this._pageFinder.$('input.e2e-required-params'));
     }
-    if (capability.optionalParams) {
-      await enterText(capability.optionalParams.join(','), this._pageFinder.$('input.e2e-optional-params'));
+    if (optionalParams.length) {
+      await enterText(optionalParams.join(','), this._pageFinder.$('input.e2e-optional-params'));
+    }
+    if (transientParams.length) {
+      await enterText(transientParams.join(','), this._pageFinder.$('input.e2e-transient-params'));
     }
     if (capability.private !== undefined) {
       await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-private')).toggle(capability.private);

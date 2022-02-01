@@ -9,7 +9,7 @@
  */
 
 import {Component, OnDestroy} from '@angular/core';
-import {WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {WB_STATE_DATA, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {merge, Observable, Subject} from 'rxjs';
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -30,6 +30,8 @@ export class ViewPageComponent implements OnDestroy {
   public viewpartActions$: Observable<ViewpartAction[]>;
   public viewpartActionsFormControl = new FormControl('');
 
+  public WB_STATE_DATA = WB_STATE_DATA;
+
   constructor(public view: WorkbenchView,
               public route: ActivatedRoute,
               workbenchStartup: WorkbenchStartup) {
@@ -48,6 +50,7 @@ export class ViewPageComponent implements OnDestroy {
       );
 
     this.installViewActiveStateLogger();
+    this.installNavigationalStateLogger();
   }
 
   /**
@@ -114,6 +117,14 @@ export class ViewPageComponent implements OnDestroy {
         else {
           console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
         }
+      });
+  }
+
+  private installNavigationalStateLogger(): void {
+    this.route.data
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(data => {
+        console.debug(`[ActivatedRouteDataChange] [viewId=${this.view.viewId}, state=${JSON.stringify(data[WB_STATE_DATA])}]`);
       });
   }
 

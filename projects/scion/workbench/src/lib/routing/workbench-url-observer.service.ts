@@ -30,6 +30,8 @@ import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
 import {Logger, LoggerNames} from '../logging';
 import {WbAddViewToPartGuard} from './add-view-to-part.guard';
 import {WbBeforeDestroyGuard} from '../view/wb-before-destroy.guard';
+import {NavigationStateResolver} from './navigation-state.resolver';
+import {WB_STATE_DATA} from './routing.constants';
 
 /**
  * Tracks the browser URL for layout changes.
@@ -119,7 +121,11 @@ export class WorkbenchUrlObserver implements OnDestroy {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
     const addedViewOutlets = navigationContext.layoutDiff.addedViews;
 
-    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewOutlets, {canActivate: [WbAddViewToPartGuard], canDeactivate: [WbBeforeDestroyGuard]});
+    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewOutlets, {
+      canActivate: [WbAddViewToPartGuard],
+      canDeactivate: [WbBeforeDestroyGuard],
+      resolve: {[WB_STATE_DATA]: NavigationStateResolver},
+    });
     if (newAuxiliaryRoutes.length) {
       this._logger.debug(() => `Registered auxiliary routes for view outlet(s): ${addedViewOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
     }
@@ -302,4 +308,3 @@ export class WorkbenchUrlObserver implements OnDestroy {
     this._destroy$.next();
   }
 }
-

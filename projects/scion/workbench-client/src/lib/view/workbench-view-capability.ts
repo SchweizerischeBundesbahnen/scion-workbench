@@ -10,6 +10,7 @@
 
 import {Capability} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {ParamDefinition} from '@scion/microfrontend-platform/lib/platform.model';
 
 /**
  * Represents a microfrontend for display in a workbench view.
@@ -21,6 +22,8 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 export interface WorkbenchViewCapability extends Capability {
 
   type: WorkbenchCapabilities.View;
+
+  params?: ViewParamDefinition[];
 
   properties: {
     /**
@@ -78,4 +81,22 @@ export interface WorkbenchViewCapability extends Capability {
      */
     cssClass?: string | string[];
   };
+}
+
+/**
+ * Describes a parameter to be passed along with a view intent.
+ */
+export interface ViewParamDefinition extends ParamDefinition {
+  /**
+   * Controls how the workbench router should pass the parameter to the workbench view that embeds the microfrontend.
+   *
+   * By default, the workbench router passes the parameter via the workbench URL as matrix parameter to the workbench view
+   * that embeds the microfrontend. By marking the parameter as "transient", you can instruct the workbench router to pass it
+   * via navigational state instead of the workbench URL, for example to pass large objects. Since a transient parameter is not
+   * included in the workbench URL, it does not survive a page reload, i.e., is only available during the initial navigation of
+   * the microfrontend. Consequently, the microfrontend must be able to restore its state without this parameter present.
+   */
+  transient?: boolean;
+
+  [property: string]: any;
 }

@@ -12,7 +12,7 @@ import {assertPageToDisplay, enterText, getInputValue} from '../../helper/testin
 import {Params} from '@angular/router';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {SciAccordionPO, SciCheckboxPO, SciPropertyPO} from '@scion/toolkit.internal/widgets.po';
-import {Arrays} from '@scion/toolkit/util';
+import {Arrays, Dictionary} from '@scion/toolkit/util';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 
@@ -82,6 +82,20 @@ export class ViewPagePO {
     await accordionPO.expand();
     try {
       return await new SciPropertyPO(this._pageFinder.$('sci-property.e2e-route-query-params')).readAsDictionary();
+    }
+    finally {
+      await accordionPO.collapse();
+    }
+  }
+
+  public async getNavigationalState(): Promise<Dictionary> {
+    await WebdriverExecutionContexts.switchToDefault();
+    await assertPageToDisplay(this._pageFinder);
+
+    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-navigational-state'));
+    await accordionPO.expand();
+    try {
+      return await new SciPropertyPO(this._pageFinder.$('sci-property.e2e-navigational-state')).readAsDictionary();
     }
     finally {
       await accordionPO.collapse();

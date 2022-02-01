@@ -12,6 +12,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NullIfEmptyPipe} from './null-if-empty.pipe';
 import {StringifyPipe} from './stringify.pipe';
+import {PluckPipe} from './pluck.pipe';
 
 @NgModule({
   imports: [
@@ -20,10 +21,12 @@ import {StringifyPipe} from './stringify.pipe';
   declarations: [
     NullIfEmptyPipe,
     StringifyPipe,
+    PluckPipe,
   ],
   exports: [
     NullIfEmptyPipe,
     StringifyPipe,
+    PluckPipe,
   ],
 })
 export class UtilModule {
