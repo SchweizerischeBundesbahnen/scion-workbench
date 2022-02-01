@@ -271,6 +271,139 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.isPresent()).toBe(false);
   });
 
+  it('should only close confirmed views, leaving other views open', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register message box intention
+    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
+    await registerIntentionPagePO.viewTabPO.close();
+
+    // open test view 1
+    const viewPagePO1 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO1 = viewPagePO1.viewTabPO;
+    await viewPagePO1.checkConfirmClosing(true); // prevent the view from closing
+
+    // open test view 2
+    const viewPagePO2 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO2 = viewPagePO2.viewTabPO;
+    await viewPagePO2.checkConfirmClosing(true); // prevent the view from closing
+
+    // open test view 3
+    const viewPagePO3 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO3 = viewPagePO3.viewTabPO;
+    await viewPagePO3.checkConfirmClosing(true); // prevent the view from closing
+
+    // open context menu of viewtab 3
+    const contextMenu = await viewTabPO3.openContextMenu();
+
+    // click to close all tabs
+    await contextMenu.closeAllTabs();
+
+    // expect all views being still open
+    await expect(await appPO.getViewTabCount()).toEqual(3);
+
+    // confirm closing view 1
+    const msgboxPO1 = appPO.findMessageBox({cssClass: 'close-view'});
+    await msgboxPO1.clickActionButton('yes');
+
+    // expect view 1 being closed
+    await expect(await appPO.getViewTabCount()).toEqual(2);
+
+    // prevent closing view 2
+    const msgboxPO2 = appPO.findMessageBox({cssClass: 'close-view'});
+    await msgboxPO2.clickActionButton('no');
+
+    // expect view 2 being still open
+    await expect(await appPO.getViewTabCount()).toEqual(2);
+
+    // confirm closing view 3
+    const msgboxPO3 = appPO.findMessageBox({cssClass: 'close-view'});
+    await msgboxPO3.clickActionButton('yes');
+
+    // expect view 3 to be closed
+    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await viewTabPO3.isPresent()).toBe(false);
+    await expect(await viewPagePO3.isPresent()).toBe(false);
+
+    // expect view 2 not to be closed and active
+    await expect(await viewTabPO2.isPresent()).toBe(true);
+    await expect(await viewTabPO2.isActive()).toBe(true);
+    await expect(await viewPagePO2.isPresent()).toBe(true);
+
+    // expect view 1 to be closed
+    await expect(await viewTabPO1.isPresent()).toBe(false);
+    await expect(await viewPagePO1.isPresent()).toBe(false);
+  });
+
+  it('should activate viewtab when switching between tabs', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // open test view 1
+    const viewPagePO1 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO1 = viewPagePO1.viewTabPO;
+
+    // expect view 1 to be present and active
+    expect(await viewTabPO1.isPresent()).toBe(true);
+    expect(await viewTabPO1.isActive()).toBe(true);
+    expect(await viewPagePO1.isDisplayed()).toBe(true);
+
+    // open test view 2
+    const viewPagePO2 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO2 = viewPagePO2.viewTabPO;
+
+    // expect view 1 not to be displayed and its viewtab being inactive
+    expect(await viewTabPO1.isPresent()).toBe(true);
+    expect(await viewTabPO1.isActive()).toBe(false);
+    expect(await viewPagePO1.isDisplayed()).toBe(false);
+
+    // expect view 2 to be present and active
+    expect(await viewTabPO2.isPresent()).toBe(true);
+    expect(await viewTabPO2.isActive()).toBe(true);
+    expect(await viewPagePO2.isDisplayed()).toBe(true);
+
+    // activate view 1
+    await viewTabPO1.activate();
+
+    // expect view 1 to be displayed and active
+    expect(await viewTabPO1.isPresent()).toBe(true);
+    expect(await viewTabPO1.isActive()).toBe(true);
+    expect(await viewPagePO1.isDisplayed()).toBe(true);
+
+    // expect view 2 not to be displayed and its viewtab being inactive
+    expect(await viewTabPO2.isPresent()).toBe(true);
+    expect(await viewTabPO2.isActive()).toBe(false);
+    expect(await viewPagePO2.isDisplayed()).toBe(false);
+  });
+
+  it('should not confirm closing when switching between viewtabs', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register message box intention
+    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    await registerIntentionPagePO.registerIntention({type: 'messagebox'});
+    await registerIntentionPagePO.viewTabPO.close();
+
+    // open test view 1
+    const viewPagePO1 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO1 = viewPagePO1.viewTabPO;
+    await viewPagePO1.checkConfirmClosing(true); // prevent the view from closing
+
+    // open test view 2
+    const viewPagePO2 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO2 = viewPagePO2.viewTabPO;
+    await viewPagePO2.checkConfirmClosing(true); // prevent the view from closing
+
+    // switch to view 1, should not ask for confirmation
+    const msgboxPO = appPO.findMessageBox({cssClass: 'close-view'});
+    await viewTabPO1.activate();
+    expect(await msgboxPO.isPresent()).toBe(false);
+
+    // switch to view 2, should not ask for confirmation
+    await viewTabPO2.activate();
+    expect(await msgboxPO.isPresent()).toBe(false);
+  });
+
   it('should emit when activating or deactivating a viewtab', async () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
