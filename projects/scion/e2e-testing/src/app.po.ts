@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {$, $$, browser, ElementFinder, Key, protractor} from 'protractor';
+import {$, $$, browser, Button, ElementFinder, Key, protractor} from 'protractor';
 import {getCssClasses, isActiveElement, isCssClassPresent, runOutsideAngularSynchronization} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {coerceArray, coerceBooleanProperty} from '@angular/cdk/coercion';
@@ -152,7 +152,19 @@ export class AppPO {
 
       public async getCssClasses(): Promise<string[]> {
         await WebdriverExecutionContexts.switchToDefault();
-        return await getCssClasses(viewTabFinder);
+        return getCssClasses(viewTabFinder);
+      }
+
+      public async openContextMenu(): Promise<ViewTabContextMenuPO> {
+        await WebdriverExecutionContexts.switchToDefault();
+        await browser.actions().click(viewTabFinder, Button.RIGHT).perform();
+        const viewTabContextMenuFinder = $('wb-view-menu');
+
+        return new class implements ViewTabContextMenuPO {
+          public async closeAllTabs(): Promise<void> {
+            return viewTabContextMenuFinder.$('.e2e-close-all-tabs').click();
+          }
+        };
       }
     };
   }
@@ -549,8 +561,6 @@ export class AppPO {
       public async clickActionButton(action: string): Promise<void> {
         await WebdriverExecutionContexts.switchToDefault();
         await msgboxFinder.$(`button.e2e-action.e2e-action-key-${action}`).click();
-        // wait until the animation completes
-        await browser.wait(protractor.ExpectedConditions.stalenessOf(msgboxFinder), 5000);
       }
 
       public async isActionActive(actionKey: string): Promise<boolean> {
@@ -746,6 +756,7 @@ enum WorkenchStartupQueryParams {
    * Query param if to display an alert dialog during workbench startup to pause the workbench startup until the user confirms the alert.
    */
   CONFIRM_STARTUP = 'confirmStartup',
+
   /**
    * Query param to throttle capability lookups to simulate slow capability retrievals.
    */
@@ -791,6 +802,12 @@ export interface ViewTabPO {
   isActive(): Promise<boolean>;
 
   getCssClasses(): Promise<string[]>;
+
+  openContextMenu(): Promise<ViewTabContextMenuPO>;
+}
+
+export interface ViewTabContextMenuPO {
+  closeAllTabs(): Promise<void>;
 }
 
 export interface PopupPO {

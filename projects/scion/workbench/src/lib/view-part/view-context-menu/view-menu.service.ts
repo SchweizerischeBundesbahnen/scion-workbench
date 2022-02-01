@@ -148,6 +148,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         onAction: (): void => void view.close('self').then(),
       });
     });
@@ -167,6 +168,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         isDisabled: (): boolean => view.first && view.last,
         onAction: (): void => void view.close('other-views').then(),
       });
@@ -174,7 +176,7 @@ export class ViewMenuService {
   }
 
   private registerCloseAllViewsMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close all tabs', group: 'close', accelerator: ['ctrl', 'shift', 'alt', 'k']};
+    const defaults: MenuItemConfig = {visible: true, text: 'Close all tabs', group: 'close', accelerator: ['ctrl', 'shift', 'alt', 'k'], cssClass: 'e2e-close-all-tabs'};
     const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeAll;
     const config = {...defaults, ...appConfig};
 
@@ -187,6 +189,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         onAction: (): void => void view.close('all-views').then(),
       });
     });
@@ -206,6 +209,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         isDisabled: (): boolean => view.last,
         onAction: (): void => void view.close('views-to-the-right').then(),
       };
@@ -226,6 +230,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         isDisabled: (): boolean => view.first,
         onAction: (): void => void view.close('views-to-the-left').then(),
       };
@@ -246,6 +251,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         isDisabled: (): boolean => view.first && view.last,
         onAction: (): void => void view.move('east').then(),
       };
@@ -266,6 +272,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         isDisabled: (): boolean => view.first && view.last,
         onAction: (): void => void view.move('west').then(),
       };
@@ -286,6 +293,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         isDisabled: (): boolean => view.first && view.last,
         onAction: (): void => void view.move('north').then(),
       };
@@ -306,6 +314,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         isDisabled: (): boolean => view.first && view.last,
         onAction: (): void => void view.move('south').then(),
       };
@@ -326,6 +335,7 @@ export class ViewMenuService {
         portal: new ComponentPortal(TextComponent, null, injector),
         accelerator: config.accelerator,
         group: config.group,
+        cssClass: config.cssClass,
         onAction: (): void => void view.move('blank-window').then(),
       };
     });
