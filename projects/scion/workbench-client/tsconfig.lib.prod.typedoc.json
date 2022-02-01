@@ -11,20 +11,6 @@
     "excludePrivate": true,
     "excludeExternals": true,
     "exclude": "**/ɵ*.ts",
-    "toc": [
-      "WorkbenchClient",
-      "WorkbenchRouter",
-      "WorkbenchPopupService",
-      "WorkbenchMessageBoxService",
-      "WorkbenchNotificationService",
-      "WorkbenchView",
-      "WorkbenchPopup",
-      "WorkbenchCapabilities",
-      "WorkbenchViewCapability",
-      "WorkbenchPopupCapability",
-      "WorkbenchMessageBoxCapability",
-      "WorkbenchNotificationCapability"
-    ],
     "categorizeByGroup": true
   }
 }
