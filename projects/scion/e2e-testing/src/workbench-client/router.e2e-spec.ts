@@ -13,6 +13,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
 import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {ViewPagePO as WorbenchViewPagePO} from '../workbench/page-object/view-page.po';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
 import {expectPromise} from '../helper/expect-promise-matcher';
 import {assertPageToDisplay, consumeBrowserLog} from '../helper/testing.util';
@@ -616,6 +617,41 @@ describe('Workbench Router', () => {
     const routerPagePO = await RouterPagePO.openInNewTab('app1');
     await routerPagePO.enterQualifier({component: 'testee'});
     await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigate();
+
+    // expect view properties to be set
+    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
+    await expect(await testeeViewTabPO.getTitle()).toEqual('VIEW TITLE');
+    await expect(await testeeViewTabPO.getHeading()).toEqual('VIEW HEADING');
+    await expect(await testeeViewTabPO.getCssClasses()).toEqual(jasmine.arrayContaining(['testee', 'class-1', 'class-2']));
+  });
+
+  it('should set view properties upon initial view tab navigation when replacing an existing workbench view', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee view
+    const registerCapabilityPagePO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-view',
+        title: 'VIEW TITLE',
+        heading: 'VIEW HEADING',
+        cssClass: ['testee', 'class-1', 'class-2'],
+      },
+    });
+
+    // open workbench view
+    const viewPagePO = await WorbenchViewPagePO.openInNewTab();
+    await viewPagePO.enterTitle('WORKBENCH VIEW TITLE');
+    await expect(await viewPagePO.viewTabPO.getTitle()).toEqual('WORKBENCH VIEW TITLE');
+
+    // navigate to the testee view
+    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    await routerPagePO.enterQualifier({component: 'testee'});
+    await routerPagePO.selectTarget('self');
+    await routerPagePO.enterSelfViewId(viewPagePO.viewId);
     await routerPagePO.clickNavigate();
 
     // expect view properties to be set
