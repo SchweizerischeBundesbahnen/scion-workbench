@@ -175,4 +175,5 @@ export interface MenuItemConfig {
   text?: string;
   accelerator?: string[];
   group?: string;
+  cssClass?: string | string[];
 }

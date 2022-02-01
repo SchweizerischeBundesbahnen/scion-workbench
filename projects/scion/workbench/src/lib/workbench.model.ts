@@ -86,5 +86,9 @@ export interface WorkbenchMenuItem {
    * Allows disabling the menu item based on a condition.
    */
   isDisabled?: () => boolean;
+  /**
+   * Specifies CSS class(es) added to the menu items, e.g. used for e2e testing.
+   */
+  cssClass?: string | string[];
 }
 

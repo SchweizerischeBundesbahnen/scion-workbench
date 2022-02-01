@@ -49,6 +49,12 @@ export class ViewMenuItemDirective implements OnDestroy {
   public disabled = false;
 
   /**
+   * Specifies CSS class(es) added to the menu items, e.g. used for e2e testing.
+   */
+  @Input()
+  public cssClass?: string | string[];
+
+  /**
    * Emits when the user performs the menu action, either by clicking the menu or via keyboard accelerator, if any.
    */
   @Output()
@@ -70,6 +76,7 @@ export class ViewMenuItemDirective implements OnDestroy {
       portal: new TemplatePortal<any>(this._template, null!, {$implicit: view}),
       accelerator: this.accelerator,
       group: this.group,
+      cssClass: this.cssClass,
       isDisabled: (): boolean => this.disabled,
       onAction: (): void => this.action.emit(view),
     });
