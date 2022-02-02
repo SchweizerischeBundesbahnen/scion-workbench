@@ -24,10 +24,11 @@ export class WbBeforeDestroyGuard implements CanDeactivate<any | WbBeforeDestroy
   }
 
   /**
-   * Microfrontend routes are configured to evaluate resolvers and guards on every query parameter change, see {@link MicrofrontendViewRoutes.config}.
+   * Routes can be configured to evaluate resolvers and guards on every query parameter change. See {@link Route.runGuardsAndResolvers}.
    *
-   * Since {@link WorkbenchRouter.closeViews} closes one view at a time and a new layout is created for every navigation in {@link PartsLayout.serialize}, this means that
-   * this guard will be called even for views that are not being closed. Therefore we need to make sure that we call `wbBeforeDestroy` only for the view to be actually closed.
+   * In particular, we configure the microfrontend routes that way to pass transient parameters to the view. See {@link MicrofrontendViewRoutes.config}.
+   * As a consequence, this guard will be called even if the component should not be destroyed. Therefore, we must make sure that we call `wbBeforeDestroy`
+   * only when the view is actually about to be closed.
    */
   public canDeactivate(component: any | WbBeforeDestroy,
                        currentRoute: ActivatedRouteSnapshot,
@@ -40,7 +41,7 @@ export class WbBeforeDestroyGuard implements CanDeactivate<any | WbBeforeDestroy
     return true;
   }
 
-  private isCurrentViewBeingClosed(currentView: string) {
+  private isCurrentViewBeingClosed(currentView: string): boolean {
     return this._wbRouter.getCurrentNavigationContext().layoutDiff.removedViews.indexOf(currentView) >= 0;
   }
 }

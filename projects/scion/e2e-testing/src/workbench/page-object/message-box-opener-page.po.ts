@@ -139,7 +139,7 @@ export class MessageBoxOpenerPagePO {
     }, 5000);
 
     if (await errorFinder.isPresent()) {
-      return Promise.reject(await errorFinder.getText());
+      throw Error(await errorFinder.getText());
     }
   }
 

@@ -138,6 +138,9 @@ export class ɵWorkbenchView implements WorkbenchView {
         const viewIds = this.part.viewIds;
         return this._workbench.destroyView(...viewIds.slice(0, viewIds.indexOf(this.viewId)));
       }
+      default: {
+        return Promise.resolve(false);
+      }
     }
   }
 

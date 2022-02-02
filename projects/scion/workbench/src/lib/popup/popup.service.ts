@@ -120,7 +120,7 @@ export class PopupService {
     }));
     const componentRef = overlayRef.attach(popupPortal);
     const popupElement: HTMLElement = componentRef.location.nativeElement;
-    const takeUntilClose = <T>() => takeUntil<T>(from(popupHandle.whenClose));
+    const takeUntilClose = <T>(): MonoTypeOperatorFunction<T> => takeUntil<T>(from(popupHandle.whenClose));
 
     // Make the popup focusable and request the focus.
     popupElement.setAttribute('tabindex', '-1');

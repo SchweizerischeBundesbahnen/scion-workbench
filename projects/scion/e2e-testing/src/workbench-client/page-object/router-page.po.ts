@@ -128,10 +128,10 @@ export class RouterPagePO {
     const errorFinder = this._pageFinder.$('output.e2e-navigate-error');
     await browser.wait(EC.or(EC.presenceOf(navigatedFinder), EC.presenceOf(errorFinder)), 5000);
     if (await navigatedFinder.isPresent()) {
-      return Promise.resolve();
+      return;
     }
     else {
-      return Promise.reject(await errorFinder.getText());
+      throw Error(await errorFinder.getText());
     }
   }
 

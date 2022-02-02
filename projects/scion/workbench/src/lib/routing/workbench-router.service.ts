@@ -341,7 +341,7 @@ export class WorkbenchRouter implements OnDestroy {
     // Use a separate navigate command to remove each view separately. Otherwise, if a view would reject destruction,
     // no view would be removed at all.
     return viewIds.reduce((prevNavigation, viewId) => {
-      const closeViewFn = () => this.ɵnavigate(layout => ({
+      const closeViewFn = (): Promise<boolean> => this.ɵnavigate(layout => ({
         layout: layout.removeView(viewId),
         viewOutlets: {[viewId]: null},
       }));

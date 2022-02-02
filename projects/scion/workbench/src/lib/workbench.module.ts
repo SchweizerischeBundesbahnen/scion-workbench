@@ -283,7 +283,7 @@ export function provideForRootGuard(workbench: WorkbenchService): any {
 export function installWorkbenchRouting(injector: Injector): () => void {
   // Angular is very strict when compiling module definitions ahead-of-time.
   // We cannot return the lamda directly as this would break the AOT build. Instead, we add a redundant assignment.
-  const fn = () => {
+  const fn = (): void => {
     injector.get(WorkbenchUrlObserver);
     injector.get(WorkbenchAuxiliaryRoutesRegistrator).registerOutletAuxiliaryRoutes(ACTIVITY_OUTLET_NAME, {
       resolve: {[ACTIVITY_DATA_KEY]: ActivityResolver},

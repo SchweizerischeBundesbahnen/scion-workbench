@@ -32,6 +32,12 @@
             }
           }
         ],
+        "@typescript-eslint/explicit-function-return-type": [
+          "error",
+          {
+            "allowExpressions": true
+          }
+        ],
         "@typescript-eslint/explicit-member-accessibility": [
           "error",
           {
@@ -87,6 +93,13 @@
           }
         ],
         "@typescript-eslint/semi": "error",
+        "@typescript-eslint/typedef": [
+          "error",
+          {
+            "parameter": true,
+            "propertyDeclaration": true
+          }
+        ],
         "array-bracket-spacing": [
           "error"
         ],
@@ -95,6 +108,8 @@
           "stroustrup"
         ],
         "deprecation/deprecation": "warn",
+        "consistent-return": "error",
+        "eqeqeq": "error",
         "object-curly-spacing": [
           "error"
         ],
