@@ -15,7 +15,7 @@ import {UtilModule} from '../util/util.module';
 import {SciViewportModule} from '@scion/toolkit/viewport';
 import {SciFormFieldModule, SciParamsEnterModule} from '@scion/toolkit.internal/widgets';
 import {ReactiveFormsModule} from '@angular/forms';
-import {POST_MICROFRONTEND_PLATFORM_CONNECT} from '@scion/workbench';
+import {MICROFRONTEND_PLATFORM_POST_STARTUP} from '@scion/workbench';
 import {InspectMessageBoxIntentHandler} from './inspect-message-box-intent-handler.service';
 
 @NgModule({
@@ -37,7 +37,7 @@ export class InspectMessageBoxModule {
     return {
       ngModule: InspectMessageBoxModule,
       providers: [
-        {provide: POST_MICROFRONTEND_PLATFORM_CONNECT, useClass: InspectMessageBoxIntentHandler, multi: true},
+        {provide: MICROFRONTEND_PLATFORM_POST_STARTUP, useClass: InspectMessageBoxIntentHandler, multi: true},
       ],
     };
   }

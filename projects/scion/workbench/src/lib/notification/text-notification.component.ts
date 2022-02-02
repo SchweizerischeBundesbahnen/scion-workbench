@@ -6,12 +6,12 @@ import {Notification} from './notification';
  */
 @Component({
   selector: 'wb-text-notification',
-  template: '{{text}}',
+  template: `{{text ?? ''}}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextNotificationComponent {
 
-  public text: string;
+  public text: string | undefined;
 
   constructor(notification: Notification) {
     this.text = notification.input;

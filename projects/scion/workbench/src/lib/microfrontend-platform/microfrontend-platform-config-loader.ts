@@ -8,15 +8,15 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {PlatformConfig} from '@scion/microfrontend-platform';
+import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 
 /**
- * Allows loading the platform config asynchronously, e.g., over the network or from a JSON file.
+ * Allows loading the configuration for the SCION Microfrontend Platform asynchronously, e.g., over the network or from a JSON file.
  */
 export abstract class MicrofrontendPlatformConfigLoader {
 
   /**
-   * Loads the platform config asynchronously.
+   * Loads the platform configuration asynchronously.
    */
-  public abstract load(): Promise<PlatformConfig>;
+  public abstract load(): Promise<MicrofrontendPlatformConfig>;
 }

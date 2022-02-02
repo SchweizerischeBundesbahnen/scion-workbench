@@ -70,27 +70,28 @@ export class WorkbenchLauncher {
    * Following DI tokens are available as hooks into the workbench's startup process, listed in the order in which they are injected and
    * executed.
    *
+   * - {@link WORKBENCH_PRE_STARTUP}
    * - {@link WORKBENCH_STARTUP}
-   * - {@link POST_MICROFRONTEND_PLATFORM_CONNECT}
    * - {@link WORKBENCH_POST_STARTUP}
+   * - {@link MICROFRONTEND_PLATFORM_POST_STARTUP}
    *
-   * ### Example of how to associate an initializer with the DI token {@link POST_MICROFRONTEND_PLATFORM_CONNECT}.
+   * ### Example of how to hook into the startup process.
    *
    * ```typescript
    * @NgModule({
    *   ...
    *   providers: [
    *     {
-   *       provide: POST_MICROFRONTEND_PLATFORM_CONNECT,
+   *       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
    *       multi: true,
-   *       useClass: AppInitializer,
+   *       useClass: SomeInitializer,
    *     }
    *   ]
    * })
    * export class AppModule {}
    *
    * @Injectable()
-   * export class AppInitializer implements WorkbenchInitializer {
+   * export class SomeInitializer implements WorkbenchInitializer {
    *
    *   public init(): Promise<void> {
    *     ...

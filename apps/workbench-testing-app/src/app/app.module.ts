@@ -26,7 +26,6 @@ import {CommonModule} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
 import {InspectNotificationModule} from './inspect-notification-provider/inspect-notification.module';
 import {InspectMessageBoxModule} from './inspect-message-box-provider/inspect-message-box.module';
-import {workbenchManifest} from './workbench-manifest';
 import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup-initializer.service';
 
 @NgModule({
@@ -43,13 +42,7 @@ import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-c
       startup: {
         launcher: WorkbenchStartupQueryParams.launcher(),
       },
-      microfrontends: WorkbenchStartupQueryParams.standalone() ? undefined : {
-        ...environment.microfrontendConfig,
-        platformHost: {
-          symbolicName: 'workbench-host-app',
-          manifest: workbenchManifest,
-        },
-      },
+      microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendPlatformConfig,
     }),
     ReactiveFormsModule,
     SciViewportModule,

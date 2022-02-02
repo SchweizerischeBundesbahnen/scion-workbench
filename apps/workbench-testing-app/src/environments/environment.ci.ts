@@ -8,30 +8,33 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchMicrofrontendConfig} from '@scion/workbench';
+import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
+import {workbenchManifest} from '../app/workbench-manifest';
 
 /**
  * Environment used when packaging the app for CI on GitHub.
  */
-const microfrontendConfig: WorkbenchMicrofrontendConfig = {
-  platform: {
-    properties: {
-      'workbench-client-testing-app1': {
-        color: '#314d8c',
-      },
-      'workbench-client-testing-app2': {
-        color: '#2c78f7',
-      },
+const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
+  host: {
+    symbolicName: 'workbench-host-app',
+    manifest: workbenchManifest,
+  },
+  applications: [
+    {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
+    {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
+  ],
+  properties: {
+    'workbench-client-testing-app1': {
+      color: '#314d8c',
     },
-    apps: [
-      {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
-      {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
-    ],
+    'workbench-client-testing-app2': {
+      color: '#2c78f7',
+    },
   },
 };
 
 export const environment = {
   production: true,
   animationEnabled: false,
-  microfrontendConfig,
+  microfrontendPlatformConfig,
 };

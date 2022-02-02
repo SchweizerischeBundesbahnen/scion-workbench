@@ -1,10 +1,10 @@
-import {ApplicationManifest} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
+import {Manifest} from '@scion/microfrontend-platform';
 
 /**
  * Represents the manifest of the Workbench Host App.
  */
-export const workbenchManifest: ApplicationManifest = {
+export const workbenchManifest: Manifest = {
   name: 'Workbench Host App',
   capabilities: [
     {

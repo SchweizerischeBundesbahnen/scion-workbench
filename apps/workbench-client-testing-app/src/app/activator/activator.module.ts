@@ -8,10 +8,10 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {NgModule} from '@angular/core';
+import {Inject, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {ManifestService, MessageClient, MicroApplicationConfig} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 
 declare type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage: boolean}};
@@ -24,8 +24,8 @@ declare type TestingAppViewCapability = WorkbenchViewCapability & {properties: {
 })
 export class ActivatorModule {
 
-  constructor(private _manifestService: ManifestService, config: MicroApplicationConfig) {
-    this.registerManifestObjects(config.symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
+  constructor(private _manifestService: ManifestService, @Inject(APP_IDENTITY) symbolicName: string) {
+    this.registerManifestObjects(symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
   }
 
   private async registerManifestObjects(appSymbolicName: string): Promise<void> {

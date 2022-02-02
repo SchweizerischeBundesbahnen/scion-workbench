@@ -6,12 +6,12 @@ import {MessageBox} from './message-box';
  */
 @Component({
   selector: 'wb-text-message',
-  template: '{{text}}',
+  template: `{{text ?? ''}}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextMessageComponent {
 
-  public text?: string;
+  public text: string | undefined;
 
   constructor(messageBox: MessageBox<string>) {
     this.text = messageBox.input;

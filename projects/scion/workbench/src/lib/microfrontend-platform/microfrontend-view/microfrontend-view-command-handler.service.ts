@@ -21,7 +21,7 @@ import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 /**
  * Handles commands of microfrontends loaded into workbench views, such as setting view tab properties or closing the view.
  *
- * This class is constructed before the Microfrontend Platform activates micro applications via {@link POST_MICROFRONTEND_PLATFORM_CONNECT} DI token.
+ * This class is constructed after connected to the SCION Microfrontend Platform via {@link MICROFRONTEND_PLATFORM_POST_STARTUP} DI token.
  */
 @Injectable()
 export class MicrofrontendViewCommandHandler implements OnDestroy {
