@@ -8,9 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {Capability} from '@scion/microfrontend-platform';
+import {Capability, ParamDefinition} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {ParamDefinition} from '@scion/microfrontend-platform/lib/platform.model';
 
 /**
  * Represents a microfrontend for display in a workbench view.

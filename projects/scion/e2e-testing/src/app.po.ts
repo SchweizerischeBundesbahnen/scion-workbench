@@ -42,7 +42,7 @@ export class AppPO {
       featureQueryParams.append('showNewTabAction', `${features.showNewTabAction}`);
     }
 
-    const browserNavigateFn = async () => {
+    const browserNavigateFn = async (): Promise<void> => {
       await browser.get(`/?${this._workbenchStartupQueryParams.toString()}#/${featureQueryParams.toString() ? `?${featureQueryParams.toString()}` : ''}`);
     };
 
@@ -69,7 +69,7 @@ export class AppPO {
     const reloadUrl = new URL(await browser.getCurrentUrl());
     this._workbenchStartupQueryParams.forEach((value, key) => reloadUrl.searchParams.append(key, value));
 
-    const browserNavigateFn = async () => {
+    const browserNavigateFn = async (): Promise<void> => {
       await browser.get(reloadUrl.toString());
     };
 

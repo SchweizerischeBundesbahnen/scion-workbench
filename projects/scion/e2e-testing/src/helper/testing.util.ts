@@ -49,7 +49,7 @@ export async function sendKeys(...keys: string[]): Promise<void> {
  * By default, the text is set directly as input to the field, because 'sendKeys' is very slow.
  */
 export async function enterText(text: string, elementFinder: ElementFinder, inputStrategy: 'sendKeys' | 'setValue' = 'setValue'): Promise<void> {
-  const enterTextFn = async () => {
+  const enterTextFn = async (): Promise<void> => {
     switch (inputStrategy) {
       case 'sendKeys': { // send keys is slow for long texts
         await elementFinder.clear();

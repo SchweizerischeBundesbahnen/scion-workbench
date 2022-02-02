@@ -158,7 +158,7 @@ export class PopupOpenerPagePO {
 
     await WebdriverExecutionContexts.switchToIframe(this.viewId);
     if (await errorFinder.isPresent()) {
-      return Promise.reject(await errorFinder.getText());
+      throw Error(await errorFinder.getText());
     }
   }
 
