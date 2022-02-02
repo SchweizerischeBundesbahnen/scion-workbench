@@ -18,10 +18,9 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../messaging.util';
 
 /**
- * Handles microfrontend navigate intents, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
+ * Handles microfrontend view intents, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
  *
- * Navigate intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench.
- * Moreover, view intents are not transported to the applications that provide the view capability as swallowed by this interceptor.
+ * View intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench. They are not transported to the providing application.
  */
 @Injectable()
 export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {

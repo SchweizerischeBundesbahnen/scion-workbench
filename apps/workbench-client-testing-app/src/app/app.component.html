@@ -1,4 +1,4 @@
-<sci-viewport *ngIf="workbenchContextActive; else workbench_context_note" cdkTrapFocus>
+<sci-viewport *ngIf="workbenchContextActive | async; else workbench_context_note" cdkTrapFocus>
   <router-outlet></router-outlet>
 </sci-viewport>
 

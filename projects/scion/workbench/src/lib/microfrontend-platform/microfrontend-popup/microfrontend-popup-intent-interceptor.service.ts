@@ -9,7 +9,7 @@
  */
 
 import {Injectable, NgZone, StaticProvider} from '@angular/core';
-import {Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, MicroApplicationConfig, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopup, WorkbenchPopupCapability, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
 import {WbRouterOutletComponent} from '../../routing/wb-router-outlet.component';
@@ -32,8 +32,7 @@ import {Popup, PopupOrigin} from '../../popup/popup.config';
 /**
  * Handles microfrontend popup intents, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
  *
- * Popup intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench.
- * Moreover, popup intents are not transported to the applications that provide the popup capability as swallowed by this interceptor.
+ * Popup intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench. They are not transported to the providing application.
  */
 @Injectable()
 export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
@@ -76,7 +75,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
     this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
 
     const capability = message.capability as WorkbenchPopupCapability;
-    const isHostPopup = capability.metadata!.appSymbolicName === Beans.get(MicroApplicationConfig).symbolicName;
+    const isHostPopup = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
     this._openedPopups.add(command.popupId);
     try {
       const result = isHostPopup ? await this.openHostComponentPopup(capability, params, command) : await this.openMicrofrontendPopup(capability, params, command);

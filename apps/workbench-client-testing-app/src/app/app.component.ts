@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Optional} from '@angular/core';
-import {MicroApplicationConfig, PlatformPropertyService} from '@scion/microfrontend-platform';
+import {Component, HostBinding, Inject, Optional} from '@angular/core';
+import {APP_IDENTITY, MicrofrontendPlatform, PlatformPropertyService} from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +18,7 @@ import {MicroApplicationConfig, PlatformPropertyService} from '@scion/microfront
 })
 export class AppComponent {
 
-  public readonly workbenchContextActive: boolean;
+  public readonly workbenchContextActive = MicrofrontendPlatform.isConnectedToHost();
 
   @HostBinding('attr.data-app-symbolic-name')
   public appSymbolicName: string;
@@ -26,13 +26,9 @@ export class AppComponent {
   @HostBinding('style.--app-color')
   public appColor: string;
 
-  constructor(@Optional() config: MicroApplicationConfig, // not available if not running in the workbench context
+  constructor(@Inject(APP_IDENTITY) @Optional() symbolicName: string, // not available if not running in the workbench context
               @Optional() propertyService: PlatformPropertyService) { // not available if not running in the workbench context
-    this.workbenchContextActive = config !== null;
-
-    if (this.workbenchContextActive) {
-      this.appSymbolicName = config.symbolicName;
-      this.appColor = propertyService.get<any>(config.symbolicName).color;
-    }
+    this.appSymbolicName = symbolicName;
+    this.appColor = propertyService?.get<any>(symbolicName).color;
   }
 }

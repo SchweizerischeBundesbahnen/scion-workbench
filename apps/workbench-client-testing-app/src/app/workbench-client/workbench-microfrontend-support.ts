@@ -9,7 +9,7 @@
  */
 
 import {APP_INITIALIZER, NgZone, Provider} from '@angular/core';
-import {ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, MicroApplicationConfig, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
 import {WorkbenchClient, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './ng-zone-decorators';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -32,7 +32,7 @@ export function provideWorkbenchClientInitializer(): Provider[] {
     },
     NgZoneMessageClientDecorator,
     NgZoneIntentClientDecorator,
-    {provide: MicroApplicationConfig, useFactory: () => Beans.get(MicroApplicationConfig)},
+    {provide: APP_IDENTITY, useFactory: () => Beans.get(APP_IDENTITY)},
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
     {provide: OutletRouter, useFactory: () => Beans.get(OutletRouter)},
@@ -57,11 +57,8 @@ export function connectToWorkbenchFn(ngZoneMessageClientDecorator: NgZoneMessage
   return (): Promise<void> => {
     Beans.registerDecorator(MessageClient, {useValue: ngZoneMessageClientDecorator});
     Beans.registerDecorator(IntentClient, {useValue: ngZoneIntentClientDecorator});
-    // It is important to start the platform outside the Angular zone as the platform subscribes to keyboard and mouse
-    // events at the document level. Otherwise, excessive change detection cycles would be triggered for irrelevant events.
-    return zone.runOutsideAngular(() => {
-      return WorkbenchClient.connect({symbolicName: determineAppSymbolicName()});
-    });
+    // We connect to the host outside the Angular zone in order to avoid excessive change detection cycles of platform-internal subscriptions to global DOM events.
+    return zone.runOutsideAngular(() => WorkbenchClient.connect(determineAppSymbolicName()));
   };
 }
 

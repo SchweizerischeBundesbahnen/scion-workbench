@@ -10,12 +10,13 @@
 
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchViewInitializer} from './view/workbench-view-initializer';
-import {MicroApplicationConfig, MicrofrontendPlatform} from '@scion/microfrontend-platform';
+import {MicrofrontendPlatform} from '@scion/microfrontend-platform';
 import {WorkbenchRouter} from './routing/workbench-router';
 import {WorkbenchPopupService} from './popup/workbench-popup-service';
 import {WorkbenchPopupInitializer} from './popup/workbench-popup-initializer';
 import {WorkbenchMessageBoxService} from './message-box/workbench-message-box-service';
 import {WorkbenchNotificationService} from './notification/workbench-notification-service';
+import {ConnectOptions} from '@scion/microfrontend-platform';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -36,7 +37,6 @@ import {WorkbenchNotificationService} from './notification/workbench-notificatio
  * - `ContextService` for looking up contextual data set on a router outlet.
  * - `PreferredSizeService` for a microfrontend to report its preferred size.
  * - `FocusMonitor` for observing if the microfrontend has received focus or contains embedded web content that has received focus.
- * - `Activator` for initializing and connecting to the platform when the user loads the workbench into his browser.
  *
  * For example, you can obtain the workbench router as follows:
  *
@@ -59,7 +59,7 @@ import {WorkbenchNotificationService} from './notification/workbench-notificatio
  * of the SCION Microfrontend Platform Developer's Guide.
  *
  * #### Embedding of Microfrontends
- * You can embed microfrontends using the `<sci-router-outlet>` web component. Web content displayed in the web component is controlled by the `OutletRouter`.
+ * You can embed microfrontends using the `<sci-router-outlet>` web component. Web content displayed in the web component is controlled via the `OutletRouter`.
  *
  * For more information, see the chapter [Embedding Microfrontends](https://scion-microfrontend-platform-developer-guide.vercel.app/#chapter:embedding-microfrontends)
  * of the SCION Microfrontend Platform Developer's Guide.
@@ -88,24 +88,26 @@ export class WorkbenchClient {
   }
 
   /**
-   * Connects a registered micro application to the SCION Workbench and SCION Microfrontend Platform.
+   * Connects the micro application to the SCION Workbench and SCION Microfrontend Platform.
    *
-   * When connected to the platform, the micro application can interact with the workbench and other micro applications. Typically, the
-   * micro application connects to the workbench during bootstrapping, that is, before displaying content to the user. In Angular, for
-   * example, this can be done in an app initializer.
+   * After connected, the micro application can interact with the workbench and other micro applications. Typically, the
+   * micro application connects to the workbench during the bootstrapping. In Angular, for example, this can be done in
+   * an app initializer.
    *
-   * See `MicrofrontendPlatform` for more information about connecting to the platform host.
+   * See {@link MicrofrontendPlatform.connectToHost} for more information about connecting to the platform host.
    *
-   * @param  config - Identity of the micro application. The app must be registered in the workbench as micro app.
-   * @return A Promise that resolves when connected successfully to the workbench, or that rejects otherwise.
+   * @param  symbolicName - Specifies the symbolic name of the micro application. The micro application needs to be registered
+   *         in the workbench under that identity.
+   * @param  connectOptions - Controls how to connect to the workbench.
+   * @return A Promise that resolves once connected to the workbench, or that rejects otherwise.
    */
-  public static async connect(config: MicroApplicationConfig): Promise<void> {
+  public static async connect(symbolicName: string, connectOptions?: ConnectOptions): Promise<void> {
     Beans.register(WorkbenchRouter);
     Beans.register(WorkbenchPopupService);
     Beans.register(WorkbenchMessageBoxService);
     Beans.register(WorkbenchNotificationService);
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
-    await MicrofrontendPlatform.connectToHost(config);
+    await MicrofrontendPlatform.connectToHost(symbolicName, connectOptions);
   }
 }

@@ -9,10 +9,10 @@
  */
 
 import {ComponentType} from '@angular/cdk/portal';
-import {ApplicationManifest, PlatformConfig} from '@scion/microfrontend-platform';
 import {Type} from '@angular/core';
-import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
 import {LogAppender, LogLevel} from './logging';
+import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
+import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
 
 /**
  * Configures the SCION Workbench module.
@@ -98,60 +98,28 @@ export abstract class WorkbenchModuleConfig {
   };
 
   /**
-   * Enables microfrontend support in the workbench, allowing the integration of microfrontends as workbench views.
+   * Configures microfrontend support in the workbench, allowing the integration of microfrontends as workbench views or
+   * workbench popups.
    *
-   * The workbench uses the SCION Microfrontend Platform for providing microfrontend support. To learn more about the
-   * SCION Microfrontend Platform, refer to https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform.
+   * The workbench uses the "SCION Microfrontend Platform" for providing microfrontend support. To learn more about the
+   * "SCION Microfrontend Platform", refer to https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform.
    *
-   * The workbench allows any web page to be embedded as a workbench view. The web app has to provide a manifest in which it
-   * describes its views. If integrating a third-party app where customization is not possible, it is conceivable to provide
-   * its manifest in this app (also called the host app) as a surrogate. If embedded content needs to interact with the
-   * workbench, the web app can use the library `@scion/workbench-client`, a pure TypeScript library based on the web
-   * stack-agnostic `@scion/microfrontend-platform` library.
+   * The workbench allows any web page to be embedded as a workbench view or workbench popup. The web app has to provide
+   * a manifest in which it describes its views and popups. To integrate a third-party application where customization is not
+   * possible, the host application can provide a manifest for that application. If embedded content needs to interact with
+   * the workbench, the web app can use the library `@scion/workbench-client`, a pure TypeScript library based on the
+   * web stack-agnostic `@scion/microfrontend-platform` library.
    *
    * The workbench integrates microfrontends through so-called intents, a mechanism known from Android development, enabling
-   * controlled collaboration across application boundaries. SCION DevTools can help to inspect integrated applications and
-   * dependencies. They are available in the form of a microfrontend that can be embed like any other microfrontend.
+   * controlled collaboration across application boundaries. "SCION Microfrontend Platform DevTools" can help to inspect
+   * integrated applications and dependencies. The DevTools are available in the form of a microfrontend that can be embedded
+   * like any other microfrontend. Refer to the documentation for detailed instructions on how to integrate
+   * "SCION Microfrontend Platform DevTools".
    *
-   * Typically, the host app provides functionality to integrated micro apps over messaging. Consider registering message
-   * and intent handlers under the DI token {@link POST_MICROFRONTEND_PLATFORM_CONNECT}. See {@link WorkbenchInitializer}
-   * to learn more about workbench initialization.
+   * Typically, the host app provides API to integrated micro apps via the intent mechanism. Consider registering intent handlers
+   * under the DI token {@link MICROFRONTEND_PLATFORM_POST_STARTUP}.
    */
-  public abstract microfrontends?: WorkbenchMicrofrontendConfig;
-}
-
-/**
- * Enables microfrontend support in the workbench, allowing the integration of microfrontends as workbench views.
- */
-export interface WorkbenchMicrofrontendConfig {
-  /**
-   * Configures applications, so-called micro applications, to contribute workbench views and interact with the workbench using the SCION Microfrontent Platform.
-   *
-   * You can pass the configuration statically in the form of a {@link PlatformConfig} object or load it asynchronously using a loader,
-   * e.g., for loading the config over the network.
-   */
-  platform: PlatformConfig | Type<MicrofrontendPlatformConfigLoader>;
-  /**
-   * Specifies how the workbench host app should register with the SCION Microfrontend Platform.
-   *
-   * Configuring the platform host is optional. The platform host is the app that starts the SCION Workbench and SCION Microfrontend Platform,
-   * i.e., where you call `WorkbenchModule.forRoot(...)`. If the host wants to interact or communicate with integrated applications, configuring
-   * the platform host is required. You can either provide its manifest programmatically via the host config or have it loaded from an URL.
-   * If loading it from an URL, you have to register the platform host application as a micro application in the {@link platform} property and
-   * set its symbolic name accordingly.
-   */
-  platformHost?: {
-    /**
-     * The symbolic name of the platform host is used to link to its manifest, mandatory if you load the manifest from an URL.
-     * If not specified, `workbench-host` is used as the symbolic name.
-     */
-    symbolicName?: string;
-    /**
-     * Manifests the capabilities and intentions of the platform host. Alternatively, you can provide its manifest from an URL by registering
-     * the platform host application in the {@link platform} property.
-     */
-    manifest?: ApplicationManifest;
-  };
+  public abstract microfrontendPlatform?: MicrofrontendPlatformConfig | Type<MicrofrontendPlatformConfigLoader>;
 }
 
 /**

@@ -8,31 +8,34 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchMicrofrontendConfig} from '@scion/workbench';
+import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
+import {workbenchManifest} from '../app/workbench-manifest';
 
 /**
  * Environment used when packaging the app for Vercel.
  */
-const microfrontendConfig: WorkbenchMicrofrontendConfig = {
-  platform: {
-    properties: {
-      'workbench-client-testing-app1': {
-        color: '#314d8c',
-      },
-      'workbench-client-testing-app2': {
-        color: '#2c78f7',
-      },
+const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
+  host: {
+    symbolicName: 'workbench-host-app',
+    manifest: workbenchManifest,
+  },
+  applications: [
+    {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'https://scion-workbench-client-testing-app1.vercel.app/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
+    {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'https://scion-workbench-client-testing-app2.vercel.app/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
+    {symbolicName: 'devtools', manifestUrl: '/assets/manifest-devtools.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
+  ],
+  properties: {
+    'workbench-client-testing-app1': {
+      color: '#314d8c',
     },
-    apps: [
-      {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'https://scion-workbench-client-testing-app1.vercel.app/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
-      {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'https://scion-workbench-client-testing-app2.vercel.app/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
-      {symbolicName: 'devtools', manifestUrl: '/assets/manifest-devtools.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
-    ],
+    'workbench-client-testing-app2': {
+      color: '#2c78f7',
+    },
   },
 };
 
 export const environment = {
   production: true,
   animationEnabled: true,
-  microfrontendConfig,
+  microfrontendPlatformConfig,
 };

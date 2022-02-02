@@ -30,7 +30,7 @@ export * from './lib/notification/public_api';
 export {WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM, WB_STATE_DATA} from './lib/routing/routing.constants';
 export {ROUTE_REUSE_PROVIDER, VIEW_TAB_CONTEXT, ViewTabContext} from './lib/workbench.constants';
 export {WorkbenchLauncher, WorkbenchStartup} from './lib/startup/workbench-launcher.service';
-export {WorkbenchInitializer, WORKBENCH_STARTUP, WORKBENCH_PRE_STARTUP, POST_MICROFRONTEND_PLATFORM_CONNECT, WORKBENCH_POST_STARTUP} from './lib/startup/workbench-initializer';
+export {WorkbenchInitializer, WORKBENCH_STARTUP, WORKBENCH_PRE_STARTUP, MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_POST_STARTUP} from './lib/startup/workbench-initializer';
 export {WbRouteReuseProvider, WbRouteReuseStrategy} from './lib/routing/wb-route-reuse-strategy.service';
 export {Disposable} from './lib/disposable';
 export {ContentAsOverlayComponent} from './lib/content-projection/content-as-overlay.component';

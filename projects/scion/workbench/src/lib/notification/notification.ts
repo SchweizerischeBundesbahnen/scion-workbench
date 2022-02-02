@@ -20,7 +20,7 @@ import {Observable} from 'rxjs';
 export abstract class Notification<T = any> {
 
   /**
-   * Input data as passed by the notification reporter, or `undefined` if not passed.
+   * Input data as passed by the notification opener, or `undefined` if not passed.
    */
   public readonly input: T | undefined;
 

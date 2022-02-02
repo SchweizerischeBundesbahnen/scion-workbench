@@ -61,7 +61,7 @@ export class StartPageComponent implements OnDestroy {
       );
 
     // Read microfrontend views to be pinned to the start page.
-    if (workbenchModuleConfig.microfrontends) {
+    if (workbenchModuleConfig.microfrontendPlatform) {
       this.microfrontendViewCapabilities$ = this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
           filterArray(viewCapability => viewCapability?.properties['pinToStartPage'] === true),
@@ -72,7 +72,7 @@ export class StartPageComponent implements OnDestroy {
     }
 
     // Set configured app colors as CSS variables.
-    if (workbenchModuleConfig.microfrontends) {
+    if (workbenchModuleConfig.microfrontendPlatform) {
       this.setAppColorCssVariables();
     }
 
@@ -131,7 +131,7 @@ export class StartPageComponent implements OnDestroy {
    * --workbench-client-testing-app1-color
    * --workbench-client-testing-app2-color
    *
-   * Colors are defined in platform properties in {@link environment.microfrontendConfig}.
+   * Colors are defined in platform properties in {@link environment.microfrontendPlatformConfig}.
    */
   private setAppColorCssVariables(): void {
     this._manifestService.applications.forEach(app => {
