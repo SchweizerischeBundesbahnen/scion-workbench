@@ -19,22 +19,21 @@ This page gives you an overview of existing and planned workbench features. Deve
 |Multi-Window|layout|[![][done]](#)|Views can be opened in new browser windows.
 |Viewpart Actions|layout|[![][done]](#)|Actions that are displayed in the tabbar of a viewpart after the last visible viewtab. Actions can stick to a view, so they are only visible when the view is active.
 |View Context Menu|layout|[![][done]](#)|A viewtab has a context menu. By default, the workbench adds some workbench-specific menu items to the context menu, such as for closing other views. Custom menu items can be added to the context menu as well.
-|Perspective|layout|[![][planned]](#)|A perspective defines the initial arrangement of border panes. Multiple perspectives are possible, useful if having different application contexts. 
-|Border Pane|layout|[![][planned]](#)|Border panes allow the display of auxiliary content or context-sensitive assistance. Border panes are located at the edges of the view area.
+|Perspective|layout|[![][planned]](#)|A perspective defines the arrangement of views. Multiple perspectives are possible, useful if having different application contexts. [#305](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/305).
 |Persistent Navigation|navigation|[![][done]](#)|The arrangement of the views and displayed routes are added to the browser URL; thus, a page refresh restores the workbench layout.
 |Default Page|layout|[![][done]](#)|The workbench adds a primary router outlet when no view is opened, displaying the empty path route.
-|Microfrontend Support|microfrontend|[![][progress]](#)|Microfrontends can be opened in views. Embedded microfrontends can interact with the workbench using a framework-angostic workbench API.
-|Theming|customization|[![][planned]](#)|A custom theme can be applied to change the look of the workbench.
-|Responsive Design|layout|[![][planned]](#)|The workbench adapts its layout to the current display size and device. 
-|Electron Support|env|[![][planned]](#)|The workbench can be used in desktop applications built with [Electron](https://www.electronjs.org/) and supports window arrangements.
-|Localization (l10n)|env|[![][planned]](#)|The workbench allows the localization of built-in texts such as texts in context menus.
-|Browser Support|env|[![][planned]](#)|The workbench works with most modern browsers. As of now, the workbench is optimized and tested on browsers based on the Chromium rendering engine (Google Chrome, Microsoft Edge). However, the workbench should work fine on other modern browsers as well.
+|Microfrontend Support|microfrontend|[![][done]](#)|Microfrontends can be opened in views. Embedded microfrontends can interact with the workbench using a framework-angostic workbench API. The documentation is still missing. [#304](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/304).
+|Theming|customization|[![][planned]](#)|A custom theme can be applied to change the look of the workbench. [#110](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/110)
+|Responsive Design|layout|[![][planned]](#)|The workbench adapts its layout to the current display size and device. [#112](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/112) 
+|Electron/Edge Webview 2|env|[![][planned]](#)|The workbench can be used in desktop applications built with [Electron](https://www.electronjs.org/) and/or [Microsoft Edge WebView2](https://docs.microsoft.com/en-us/microsoft-edge/webview2/) to support window arrangements. [#306](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/306)
+|Localization (l10n)|env|[![][planned]](#)|The workbench allows the localization of built-in texts such as texts in context menus and manifest entries. [#255](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/255)
+|Browser Support|env|[![][planned]](#)|The workbench works with most modern browsers. As of now, the workbench is optimized and tested on browsers based on the Chromium rendering engine (Google Chrome, Microsoft Edge). However, the workbench should work fine on other modern browsers as well. [#111](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/111)
 |Message Box|control|[![][done]](#)|The workbench allows displaying content in a message box. The message box can be either view or application modal.
 |Notification Ribbon|control|[![][done]](#)|The workbench allows showing content in notifications ribbons. Notifications slide in at the top right corner. Multiple notifications are displayed one below the other.
 |Popup|control|[![][done]](#)|The workbench allows displaying content in a popup overlay.
-|Activity|layout|[![][done]](#)&nbsp;&nbsp;[![][deprecated]](#)|Visual workbench element on the left side of the workbench layout. (We will drop support for activities once supporting border panes) 
-|Activity Actions|layout|[![][done]](#)&nbsp;&nbsp;[![][deprecated]](#)|Actions in the header of an activity. (We will drop support for activities once supporting border panes)
-|Developer guide|doc|[![][planned]](#)|Guide describing the workbench layout, its concepts and fundamental APIs.
+|Activity|layout|[![][done]](#)&nbsp;&nbsp;[![][deprecated]](#)|Visual workbench element on the left side of the workbench layout. (We will drop support for activities once supporting perspectives) 
+|Activity Actions|layout|[![][done]](#)&nbsp;&nbsp;[![][deprecated]](#)|Actions in the header of an activity. (We will drop support for activities once supporting perspectives)
+|Developer guide|doc|[![][planned]](#)|Developer Guide describing the workbench layout, its conceptsm fundamental APIs and built-in microfrontend support. [#304](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/304)
 |Viewtab|customization|[![][done]](#)|The built-in viewtab can be replaced with a custom viewtab implementation, e.g., to add additional functionality. 
 
 [done]: /docs/site/images/icon-done.svg
