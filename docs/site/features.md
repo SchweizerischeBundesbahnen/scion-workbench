@@ -5,7 +5,7 @@
 
 ## [SCION Workbench][menu-home] > Feature Overview
 
-This page gives you an overview of existing and planned workbench features. Development is mainly driven by requirements of projects at [SBB][link-company-sbb] building a revolutionary traffic management system on behalf of the [SmartRail 4.0 project][link-project-sr40]. Many other features are imaginable. If a feature you need is not listed here or needs to be prioritized, please [file a GitHub issue](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/new?template=feature_request.md).
+This page gives you an overview of existing and planned workbench features. Development is mainly driven by requirements of projects at [SBB][link-company-sbb] building a revolutionary traffic management system. Many other features are imaginable. If a feature you need is not listed here or needs to be prioritized, please [file a GitHub issue](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/new?template=feature_request.md).
 
 [![][done]](#) Done&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 [![][progress]](#) In Progress&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -42,7 +42,6 @@ This page gives you an overview of existing and planned workbench features. Deve
 [deprecated]: /docs/site/images/icon-deprecated.svg
 
 [link-company-sbb]: http://www.sbb.ch
-[link-project-sr40]: https://smartrail40.ch
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
