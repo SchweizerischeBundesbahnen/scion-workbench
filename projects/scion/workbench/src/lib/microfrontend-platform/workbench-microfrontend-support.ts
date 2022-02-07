@@ -14,7 +14,7 @@ import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-p
 import {APP_IDENTITY, IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchMessageBoxService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {WorkbenchMessageBoxService, WorkbenchPopupService, WorkbenchRouter, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
 import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './initialization/ng-zone-decorators';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {LogDelegate} from './initialization/log-delegate.service';
@@ -24,6 +24,9 @@ import {MicrofrontendNotificationIntentHandler} from './microfrontend-notificati
 import {MicrofrontendViewIntentInterceptor} from './routing/microfrontend-view-intent-interceptor.service';
 import {MicrofrontendPopupIntentInterceptor} from './microfrontend-popup/microfrontend-popup-intent-interceptor.service';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
+import {Route, ROUTES} from '@angular/router';
+import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
+import {MicrofrontendViewRoutes} from './routing/microfrontend-routes';
 
 /**
  * Registers a set of DI providers to set up microfrontend support in the workbench.
@@ -68,6 +71,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       NgZoneMessageClientDecorator,
       NgZoneIntentClientDecorator,
       WorkbenchHostManifestInterceptor,
+      provideMicrofrontendRoutes(),
       provideMicrofrontendPlatformBeans(),
     ] : [],
   ];
@@ -98,5 +102,37 @@ function provideMicrofrontendPlatformBeans(): Provider[] {
     {provide: OutletRouter, useFactory: () => Beans.get(OutletRouter)},
     {provide: ManifestService, useFactory: () => Beans.get(ManifestService)},
     {provide: PlatformPropertyService, useFactory: () => Beans.get(PlatformPropertyService)},
+  ];
+}
+
+/**
+ * Provides routes of the microfrontend integration.
+ */
+function provideMicrofrontendRoutes(): Provider[] {
+  /**
+   * Route for embedding the microfrontend of a view capability.
+   */
+  const viewMicrofrontendRoute: Route = {
+    /**
+     * Format: '~;{qualifier}/<viewCapabilityId>;{params}'
+     *  - '{qualifier}' as matrix params of the first URL segment (~)
+     *  - '{params}' as matrix params of the second URL segment (viewCapabilityId)
+     */
+    path: `${MicrofrontendViewRoutes.ROUTE_PREFIX}/:${ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID}`,
+    component: MicrofrontendViewComponent,
+    /**
+     * In the microfrontend view integration, parameters can be marked as 'transient'. Transient parameters are not added as matrix
+     * parameters to the URL but passed via navigational state to the component by {@link NavigationStateResolver}. The component can
+     * access them as resolved data via {@link ActivatedRouteSnapshot#data[WB_STATE_DATA]} under the {@link MicrofrontendViewRoutes.TRANSIENT_PARAMS_STATE_KEY} key.
+     *
+     * However, by default, the Angular router resolves data only when matrix or URL parameters of the route change. For this reason,
+     * we configure the microfrontend route to evaluate resolvers also on query parameter change, which allows updating transient parameters
+     * without changed matrix or URL parameters.
+     */
+    runGuardsAndResolvers: 'paramsOrQueryParamsChange',
+  };
+
+  return [
+    {provide: ROUTES, multi: true, useValue: viewMicrofrontendRoute},
   ];
 }

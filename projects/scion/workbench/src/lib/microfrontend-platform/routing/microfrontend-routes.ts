@@ -8,9 +8,8 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRouteSnapshot, Params, Routes, UrlSegment} from '@angular/router';
-import {MicrofrontendViewComponent} from '../microfrontend-view/microfrontend-view.component';
-import {WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
+import {ActivatedRouteSnapshot, Params, UrlSegment} from '@angular/router';
+import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {WB_STATE_DATA} from '../../routing/routing.constants';
 import {Dictionaries, Dictionary} from '@scion/toolkit/util';
@@ -20,36 +19,12 @@ export namespace MicrofrontendViewRoutes {
   /**
    * Route prefix to identify routes of microfrontends.
    */
-  const ROUTE_PREFIX = '~';
+  export const ROUTE_PREFIX = '~';
 
   /**
    * Key for accessing transient params from the navigational state.
    */
   export const TRANSIENT_PARAMS_STATE_KEY = 'transientParams';
-
-  /**
-   * Microfrontend routes config.
-   *
-   * Format: '~;{qualifier}/<viewCapabilityId>;{params}'
-   *  - '{qualifier}' as matrix params of first URL segment (~)
-   *  - '{params}' as matrix params of second URL segment (viewCapabilityId)
-   */
-  export const config: Routes = [
-    {
-      path: `${ROUTE_PREFIX}/:${ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID}`,
-      component: MicrofrontendViewComponent,
-      /**
-       * In the microfrontend view integration, parameters can be marked as 'transient'. Transient parameters are not added as matrix
-       * parameters to the URL but passed via navigational state to the component by {@link NavigationStateResolver}. The component can
-       * access them as resolved data via {@link ActivatedRouteSnapshot#data[WB_STATE_DATA]} under the {@link MicrofrontendViewRoutes.TRANSIENT_PARAMS_STATE_KEY} key.
-       *
-       * However, by default, the Angular router resolves data only when matrix or URL parameters of the route change. For this reason,
-       * we configure the microfrontend route to evaluate resolvers also on query parameter change, which allows updating transient parameters
-       * without changed matrix or URL parameters.
-       */
-      runGuardsAndResolvers: 'paramsOrQueryParamsChange',
-    },
-  ];
 
   /**
    * Parses the params of a given microfrontend route. Throws if not a valid microfrontend route.

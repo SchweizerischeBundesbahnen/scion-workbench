@@ -26,7 +26,7 @@ export class WbBeforeDestroyGuard implements CanDeactivate<any | WbBeforeDestroy
   /**
    * Routes can be configured to evaluate resolvers and guards on every query parameter change. See {@link Route.runGuardsAndResolvers}.
    *
-   * In particular, we configure the microfrontend routes that way to pass transient parameters to the view. See {@link MicrofrontendViewRoutes.config}.
+   * In particular, we configure the microfrontend routes that way to pass transient parameters to the view. See {@link provideMicrofrontendRoutes}.
    * As a consequence, this guard will be called even if the component should not be destroyed. Therefore, we must make sure that we call `wbBeforeDestroy`
    * only when the view is actually about to be closed.
    */
