@@ -10,7 +10,8 @@
 
 import {Beans, Initializer} from '@scion/toolkit/bean-manager';
 import {ContextService} from '@scion/microfrontend-platform';
-import {WorkbenchView, ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './workbench-view';
+import {WorkbenchView} from './workbench-view';
+import {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './ɵworkbench-view';
 
 /**
  * Registers {@link WorkbenchView} in the bean manager if in the context of a workbench view.
