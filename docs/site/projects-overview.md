@@ -11,13 +11,13 @@ SCION provides fundamental building blocks for implementing a microfrontend arch
 - [**SCION Microfrontend Platform**][link-scion-microfrontend-platform]\
   SCION Microfrontend Platform enables you to successfully implement a framework-agnostic microfrontend architecture by providing you with fundamental APIs for client-side communication, embedding microfrontends, and navigating between the microfrontends. It is a lightweight, web stack agnostic library that has no user-facing components and does not dictate any form of application structure.
   
-- [**SCION Workbench** <img src="/docs/logo/angular.svg" alt="Angular agnostic" title="Angular agnostic">][link-scion-workench]\
+- [**SCION Workbench** <img src="/docs/logo/angular.svg" alt="Angular-specific" title="Angular-specific">][link-scion-workench]\
   SCION Workbench facilitates the development of Angular web applications that require a complex workbench layout of multiple views and windows. Views are shown within tabs which can be flexibly arranged and dragged around by the user.
    
 - [**SCION Toolkit**][link-scion-toolkit]\
   SCION Toolkit is a collection of UI components and utilities designed primarily for use in SCION libraries and their demo and test applications. 
 
-- [<del>**SCION Application Platform**</del> <img src="/docs/logo/angular.svg" alt="Angular agnostic" title="Angular agnostic">][link-scion-application-platform] **(END-OF-LIFE)**\
+- [<del>**SCION Application Platform**</del> <img src="/docs/logo/angular.svg" alt="Angular-specific" title="Angular-specific">][link-scion-application-platform] **(END-OF-LIFE)**\
   SCION Workbench Application Platform is an extension of SCION Workbench to integrate content from multiple web applications in a coherent way, thus enabling a micro frontend architecture for allowing different front-end frameworks to co-exist and independent delivery.
   
   > The development of the SCION Application Platform was discontinued in favor of the new SCION Microfrontend Platform. SCION Microfrontend Platform is extremely lightweight and does not depend on SCION Workbench and Angular.
