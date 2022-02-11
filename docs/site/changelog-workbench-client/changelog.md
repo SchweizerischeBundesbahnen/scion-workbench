@@ -6,6 +6,46 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.7...workbench-client-1.0.0-beta.8) (2022-02-11)
+
+
+### Code Refactoring
+
+* **workbench/popup:** open popups from within an interceptor ([a11fd9d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a11fd9dc96cd7265f3372ecff0723584dea7b7fd)), closes [#276](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/276)
+* **workbench/view:** open views from within an interceptor ([137b8d0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/137b8d073e5d0a9dc183cbed7451ceba852fc1e5))
+
+
+### Features
+
+* **workbench:** allow controlling which view params to persist in the URL ([dcb5ee1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/dcb5ee163ebb05b2881725e9291d36b5e2c49f07)), closes [#278](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/278)
+* **workbench:** migrate to @scion/microfrontend-platform v1.0.0-beta.20 ([24dfec2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/24dfec2251b85a1a380ee2299b26cb4452883097)), closes [SchweizerischeBundesbahnen/scion-microfrontend-platform/#96](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/issues/96)
+
+
+### BREAKING CHANGES
+
+* **workbench:** Supporting `@scion/microfrontend-platform v1.0.0-beta.20` introduced a breaking change in the configuration of the host application and the host/client communication protocol.
+
+  SCION Microfrontend Platform consolidated the API for configuring the platform, eliminating the different ways to configure the platform. Consequently, SCION Workbench could also simplify its API for enabling microfrontend support.
+
+  Related issue of the SCION Microfrontend Platform: [SchweizerischeBundesbahnen/scion-microfrontend-platform/#96](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/issues/96)
+
+  #### Client App Migration
+  - the micro application must now pass its identity (symbolic name) directly as the first argument, rather than via the options object;
+  - the options object passed to `WorkbenchClient.connect` has been renamed from ` MicroApplicationConfig` to `ConnectOptions` and messaging options are now top-level options;
+  - the bean `MicroApplicationConfig` has been removed; you can now obtain the application's symbolic name as following: `Beans.get<string>(APP_IDENTITY)`;
+
+  For further instructions on how to migrate the client, refer to https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/docs/site/changelog/changelog.md#client-app-migration
+
+* **workbench/popup:** Opening popups from within an interceptor introduced a breaking change in the host/client communication protocol.
+
+  The communication protocol between host and client HAS CHANGED for opening a popup. You need to update host and affected clients to the new version simultaneously. The API has not changed; the breaking change applies only to the version of @scion/workbench and @scion/workbench-client. To migrate, upgrade to @scion/workbench@12.0.0-beta.2 and @scion/workbench-client@1.0.0-beta.8, respectively.
+
+* **workbench/view:** Opening views from within an interceptor introduced a breaking change in the host/client communication protocol.
+
+  The communication protocol between host and client HAS CHANGED for opening a view. You need to update host and affected clients to the new version simultaneously. The API has not changed; the breaking change applies only to the version of @scion/workbench and @scion/workbench-client. To migrate, upgrade to @scion/workbench@12.0.0-beta.2 and @scion/workbench-client@1.0.0-beta.8, respectively.
+
+
+
 # [1.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.6...workbench-client-1.0.0-beta.7) (2021-07-09)
 
 
