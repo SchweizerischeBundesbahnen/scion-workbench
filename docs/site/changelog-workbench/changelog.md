@@ -6,6 +6,62 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [12.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/12.0.0-beta.1...12.0.0-beta.2) (2022-02-11)
+
+
+### Bug Fixes
+
+* **workbench:** ensure calling `wbBeforeDestroy` only for the view to be closed ([e25cefb](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e25cefbf411862b36953e94728c9f8ade75736c2))
+* **workbench:** set view properties of inactive views upon initial view tab navigation ([30d573f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/30d573f7d7017d79cdf4ef8d474ac30d10c372b4))
+* **workbench:** use transparent backdrop in the view's context menu ([236a41a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/236a41ad07f5be0227179eaa596d7ec44fb98ba4))
+
+
+### Code Refactoring
+
+* **workbench/popup:** open popups from within an interceptor ([a11fd9d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a11fd9dc96cd7265f3372ecff0723584dea7b7fd)), closes [#276](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/276)
+* **workbench/view:** open views from within an interceptor ([137b8d0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/137b8d073e5d0a9dc183cbed7451ceba852fc1e5))
+
+
+### Features
+
+* **workbench:** allow adding css classes to menu items ([791485a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/791485a8d13a8ee2b19b009c81e5937cf7e4a60f))
+* **workbench:** allow controlling which view params to persist in the URL ([dcb5ee1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/dcb5ee163ebb05b2881725e9291d36b5e2c49f07)), closes [#278](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/278)
+* **workbench:** migrate to @scion/microfrontend-platform v1.0.0-beta.20 ([24dfec2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/24dfec2251b85a1a380ee2299b26cb4452883097)), closes [SchweizerischeBundesbahnen/scion-microfrontend-platform/#96](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/issues/96)
+
+
+### BREAKING CHANGES
+
+* **workbench:** Supporting `@scion/microfrontend-platform v1.0.0-beta.20` introduced a breaking change in the configuration of the host application and the host/client communication protocol.
+
+  SCION Microfrontend Platform consolidated the API for configuring the platform, eliminating the different ways to configure the platform. Consequently, SCION Workbench could also simplify its API for enabling microfrontend support.
+
+  Related issue of the SCION Microfrontend Platform: [SchweizerischeBundesbahnen/scion-microfrontend-platform/#96](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/issues/96)
+
+  #### Host App Migration
+  - property `WorkbenchModuleConfig.microfrontends` has been renamed to `WorkbenchModuleConfig.microfrontendPlatform` and its type changed from `WorkbenchMicrofrontendConfig` to `MicrofrontendPlatformConfig` (provided by @scion/microfrontend-platform);
+  - `MicrofrontendPlatformConfigLoader` has been changed to return an instance of `MicrofrontendPlatformConfig` instead of the `PlatformConfig`;
+  - DI token `POST_MICROFRONTEND_PLATFORM_CONNECT` has been renamed to `MICROFRONTEND_PLATFORM_POST_STARTUP` in order to be consistent with other workbench DI tokens;
+  - provide the host's manifest, if any, via `MicrofrontendPlatformConfig.host.manifest` instead of `WorkbenchMicrofrontendConfig.platformHost.manifest`; either as URL or object literal
+  - register applications in `MicrofrontendPlatformConfig.applications` instead of `WorkbenchMicrofrontendConfig.platform.apps`;
+  - specify the symbolic name of the host in `MicrofrontendPlatformConfig.host.symbolicName` instead of `WorkbenchMicrofrontendConfig.platformHost.symbolicName`;
+  - configure properties in `MicrofrontendPlatformConfig.properties` instead of `WorkbenchMicrofrontendConfig.platform.properties`;
+  - specify global `manifestLoadTimeout` in `MicrofrontendPlatformConfig.manifestLoadTimeout` instead of `WorkbenchMicrofrontendConfig.platform.manifestLoadTimeout`;
+  - specify global `activatorLoadTimeout` in `MicrofrontendPlatformConfig.activatorLoadTimeout` instead of `WorkbenchMicrofrontendConfig.platform.activatorLoadTimeout`;
+  - the bean `MicroApplicationConfig` has been removed; you can now obtain the application's symbolic name as following: `Beans.get<string>(APP_IDENTITY)`;
+  - the interface `ApplicationManifest` has been renamed to `Manifest`;
+
+  For further instructions on how to migrate the host, refer to https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/docs/site/changelog/changelog.md#host-app-migration
+
+* **workbench/popup:** Opening popups from within an interceptor introduced a breaking change in the host/client communication protocol.
+
+  The communication protocol between host and client HAS CHANGED for opening a popup. You need to update host and affected clients to the new version simultaneously. The API has not changed; the breaking change applies only to the version of @scion/workbench and @scion/workbench-client. To migrate, upgrade to @scion/workbench@12.0.0-beta.2 and @scion/workbench-client@1.0.0-beta.8, respectively.
+
+* **workbench/view:** Opening views from within an interceptor introduced a breaking change in the host/client communication protocol.
+
+  The communication protocol between host and client HAS CHANGED for opening a view. You need to update host and affected clients to the new version simultaneously. The API has not changed; the breaking change applies only to the version of @scion/workbench and @scion/workbench-client. To migrate, upgrade to @scion/workbench@12.0.0-beta.2 and @scion/workbench-client@1.0.0-beta.8, respectively.
+
+
+
 # [12.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/11.0.0-beta.8...12.0.0-beta.1) (2021-07-12)
 
 
