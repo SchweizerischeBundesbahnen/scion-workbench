@@ -63,14 +63,25 @@ jobs:
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: 'Building @scion/workbench-client'
         run: npm run workbench-client:build
+      - name: 'Uploading dist/scion/workbench-client'
+        uses: actions/upload-artifact@v2
+        with:
+          name: workbench-client-dist
+          path: dist/scion/workbench-client
       - name: 'Building @scion/workbench'
         run: npm run workbench:build
+      - name: 'Uploading dist/scion/workbench'
+        uses: actions/upload-artifact@v2
+        with:
+          name: workbench-dist
+          path: dist/scion/workbench
       - name: 'Building TypeDoc for @scion/workbench-client'
         run: npm run workbench-client:typedoc
-      - uses: actions/upload-artifact@v2
+      - name: 'Uploading dist/workbench-client-api'
+        uses: actions/upload-artifact@v2
         with:
-          name: dist
-          path: dist
+          name: workbench-client-api
+          path: dist/workbench-client-api
   build-apps:
     name: 'Building Apps'
     needs: build-libs
@@ -96,11 +107,16 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - name: 'Downloading dist/workbench and dist/workbench-client'
+      - name: 'Downloading dist/scion/workbench'
         uses: actions/download-artifact@v2
         with:
-          name: dist
-          path: dist
+          name: workbench-dist
+          path: dist/scion/workbench
+      - name: 'Downloading dist/scion/workbench-client'
+        uses: actions/download-artifact@v2
+        with:
+          name: workbench-client-dist
+          path: dist/scion/workbench-client
       - name: 'Building ${{ matrix.app.name }}'
         run: ${{ matrix.app.cmd }}
       - uses: actions/upload-artifact@v2
@@ -116,11 +132,16 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: 'Downloading dist/workbench and dist/workbench-client'
+      - name: 'Downloading dist/scion/workbench'
         uses: actions/download-artifact@v2
         with:
-          name: dist
-          path: dist
+          name: workbench-dist
+          path: dist/scion/workbench
+      - name: 'Downloading dist/scion/workbench-client'
+        uses: actions/download-artifact@v2
+        with:
+          name: workbench-client-dist
+          path: dist/scion/workbench-client
       - name: 'Restoring NPM modules from cache'
         uses: actions/cache@v2
         with:
@@ -181,11 +202,16 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: 'Downloading dist/workbench and dist/workbench-client'
+      - name: 'Downloading dist/scion/workbench'
         uses: actions/download-artifact@v2
         with:
-          name: dist
-          path: dist
+          name: workbench-dist
+          path: dist/scion/workbench
+      - name: 'Downloading dist/scion/workbench-client'
+        uses: actions/download-artifact@v2
+        with:
+          name: workbench-client-dist
+          path: dist/scion/workbench-client
       - name: 'Downloading app: workbench-testing-app-ci (dist)'
         uses: actions/download-artifact@v2
         with:
@@ -285,11 +311,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: 'Downloading dist/workbench'
+      - name: 'Downloading dist/scion/workbench'
         uses: actions/download-artifact@v2
         with:
-          name: dist
-          path: dist
+          name: workbench-dist
+          path: dist/scion/workbench
       - name: 'Publishing @scion/workbench to NPM'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/npm-publish@master
         with:
@@ -303,11 +329,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: 'Downloading dist/workbench-client'
+      - name: 'Downloading dist/scion/workbench-client'
         uses: actions/download-artifact@v2
         with:
-          name: dist
-          path: dist
+          name: workbench-client-dist
+          path: dist/scion/workbench-client
+      - name: 'Downloading dist/workbench-client-api'
+        uses: actions/download-artifact@v2
+        with:
+          name: workbench-client-api
+          path: dist/workbench-client-api
       - name: 'Deploying API Documentation (TypeDoc) to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
