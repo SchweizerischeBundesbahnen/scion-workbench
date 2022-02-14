@@ -17,7 +17,7 @@
     <sci-form-field label="Optional Params">
       <input [formControlName]="OPTIONAL_PARAMS" class="e2e-optional-params" placeholder="param1,param2,...">
     </sci-form-field>
-    <sci-form-field label="Transient Params">
+    <sci-form-field label="Transient Params" *ngIf="form.get(TYPE).value === WorkbenchCapabilities.View">
       <input [formControlName]="TRANSIENT_PARAMS" class="e2e-transient-params" placeholder="param1,param2,...">
     </sci-form-field>
 
