@@ -11,16 +11,20 @@ export const workbenchManifest: Manifest = {
       type: WorkbenchCapabilities.MessageBox,
       qualifier: {component: 'inspector'},
       private: false,
-      requiredParams: ['param1'],
-      optionalParams: ['param2'],
+      params: [
+        {name: 'param1', required: true},
+        {name: 'param2', required: false},
+      ],
       description: 'Allows inspecting a message box.',
     },
     {
       type: WorkbenchCapabilities.Notification,
       qualifier: {component: 'inspector'},
       private: false,
-      requiredParams: ['param1'],
-      optionalParams: ['param2'],
+      params: [
+        {name: 'param1', required: true},
+        {name: 'param2', required: false},
+      ],
       description: 'Allows inspecting a notification.',
     },
     // TODO [#271]: Remove this popup capability when implemented the issue #271
@@ -31,7 +35,9 @@ export const workbenchManifest: Manifest = {
       },
       private: false,
       description: 'Represents a popup provided by the host app.',
-      optionalParams: ['param1'],
+      params: [
+        {name: 'param1', required: false},
+      ],
       properties: {
         path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
         cssClass: 'host-popup',
