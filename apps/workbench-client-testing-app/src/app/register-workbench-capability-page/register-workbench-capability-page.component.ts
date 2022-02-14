@@ -11,8 +11,8 @@
 import {Component} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
-import {Capability, ManifestService} from '@scion/microfrontend-platform';
-import {PopupSize, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
+import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {undefinedIfEmpty} from '../util/util';
 
 const TYPE = 'type';
@@ -136,9 +136,9 @@ export class RegisterWorkbenchCapabilityPageComponent {
 
   private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToStartPage: boolean}} {
     const propertiesGroup = this.form.get(VIEW_PROPERTIES);
-    const requiredParams = this.form.get(REQUIRED_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
-    const optionalParams = this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
-    const transientParams = this.form.get(TRANSIENT_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
+    const requiredParams: ViewParamDefinition[] = this.form.get(REQUIRED_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams: ViewParamDefinition[] = this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
+    const transientParams: ViewParamDefinition[] = this.form.get(TRANSIENT_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
     return {
       type: WorkbenchCapabilities.View,
       qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray),
@@ -161,11 +161,15 @@ export class RegisterWorkbenchCapabilityPageComponent {
 
   private readPopupCapabilityFromUI(): WorkbenchPopupCapability {
     const propertiesGroup = this.form.get(POPUP_PROPERTIES);
+    const requiredParams: ParamDefinition[] = this.form.get(REQUIRED_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams: ParamDefinition[] = this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     return {
       type: WorkbenchCapabilities.Popup,
       qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray),
-      requiredParams: this.form.get(REQUIRED_PARAMS).value?.split(/,\s*/).filter(Boolean),
-      optionalParams: this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean),
+      params: [
+        ...requiredParams,
+        ...optionalParams,
+      ],
       private: this.form.get(PRIVATE).value,
       properties: {
         path: this.readPathFromUI(propertiesGroup),
