@@ -165,7 +165,8 @@ Each commit message consists of a **header**, a **summary** and a **footer**.  T
 - `refactor`: changes that neither fixes a bug nor adds a feature
 - `perf`: changes that improve performance
 - `test`: adding missing tests, refactoring tests; no production code change
-- `chore`: other changes like formatting, updating the license, updating dependencies, removal of deprecations, etc
+- `chore`: other changes like formatting, updating the license, removal of deprecations, etc
+- `deps`: changes related to updating dependencies
 - `ci`: changes to our CI configuration files and scripts
 - `revert`: revert of a previous commit
 - `release`: publish a new release
