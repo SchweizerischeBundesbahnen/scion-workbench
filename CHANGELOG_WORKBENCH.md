@@ -1,3 +1,15 @@
+# [12.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/12.0.0-beta.2...12.0.0-beta.3) (2022-03-17)
+
+
+### Bug Fixes
+
+* **workbench/microfrontend-support:** do not delegate log messages from @scion/microfrontend-platform to the workbench logger ([f514a13](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f514a139ad9b0d3a9e6c27d16d33ec761479ba78))
+
+### Dependencies
+
+* **workbench/microfrontend-support:** upgrade @scion/microfrontend-platform to v1.0.0-rc.1 ([048fabf](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/048fabf7315fad84855f5eae6ddc4b706de42fa4))
+
+
 # [12.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/12.0.0-beta.1...12.0.0-beta.2) (2022-02-11)
 
 
