@@ -16,7 +16,7 @@ import {WorkbenchCapabilities, WorkbenchRouter, WorkbenchViewCapability} from '@
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {ActivatedRoute, NavigationEnd, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
-import {expand, filter, mapTo, take, takeUntil} from 'rxjs/operators';
+import {expand, filter, map, take, takeUntil} from 'rxjs/operators';
 import {FormControl} from '@angular/forms';
 import {SciFilterFieldComponent, toFilterRegExp} from '@scion/toolkit.internal/widgets';
 
@@ -56,7 +56,7 @@ export class StartPageComponent implements OnDestroy {
     this.workbenchViewRoutes$ = of(router.config)
       .pipe(
         filterArray(it => (!it.outlet || it.outlet === PRIMARY_OUTLET) && it.data && it.data['pinToStartPage'] === true),
-        expand(it => this.filterControl.valueChanges.pipe(take(1), mapTo(it))),
+        expand(it => this.filterControl.valueChanges.pipe(take(1), map(() => it))),
         filterArray(it => !this.filterControl.value || it.data['title'].match(toFilterRegExp(this.filterControl.value)) !== null),
       );
 
@@ -65,7 +65,7 @@ export class StartPageComponent implements OnDestroy {
       this.microfrontendViewCapabilities$ = this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
           filterArray(viewCapability => viewCapability?.properties['pinToStartPage'] === true),
-          expand(viewCapabilities => this.filterControl.valueChanges.pipe(take(1), mapTo(viewCapabilities))),
+          expand(viewCapabilities => this.filterControl.valueChanges.pipe(take(1), map(() => viewCapabilities))),
           filterArray(viewCapability => !this.filterControl.value || viewCapability?.properties.title?.match(toFilterRegExp(this.filterControl.value)) !== null),
           sortArray((a, b) => a.metadata.appSymbolicName.localeCompare(b.metadata.appSymbolicName)),
         );

@@ -10,6 +10,7 @@
 
 import {browser, ElementFinder, Key, logging, protractor} from 'protractor';
 import Level = logging.Level;
+import {noop} from 'rxjs';
 
 const EC = protractor.ExpectedConditions;
 
@@ -115,9 +116,10 @@ export async function pressModifierThenClick(elementFinder: ElementFinder, modif
  */
 export async function consumeBrowserLog(severity: Level = Level.SEVERE, filter?: RegExp): Promise<string[]> {
   return (await browser.manage().logs().get('browser'))
-    .filter(log => log.level === severity)
+    .filter(log => log.level === severity || Level.ALL === severity)
     .map(log => log.message)
-    .map(message => message.match(/"(.+)"/)[1]) // log message is contained in double quotes
+    .map(message => message.match(/"(.+)"/)?.[1]) // log message is contained in double quotes, if any
+    .filter(Boolean)
     .filter(log => filter ? log.match(filter) : true);
 }
 
@@ -180,9 +182,7 @@ export async function setAttribute(elementFinder: ElementFinder, name: string, v
  * Asserts the given page to be displayed in the current Webdriver execution context.
  */
 export async function assertPageToDisplay(pageFinder: ElementFinder): Promise<void> {
-  if (!await pageFinder.isPresent()) {
-    throw Error(`[TestingError] Expected page '${pageFinder.locator()}' to be present, but was not. Did you forget to switch the WebDriver execution context?`);
-  }
+  await browser.wait(EC.presenceOf(pageFinder), 1000, `[TestingError] Expected page '${pageFinder.locator()}' to be present, but was not. Did you forget to switch the WebDriver execution context?`);
   if (!await pageFinder.isDisplayed()) {
     throw Error(`[TestingError] Expected page '${pageFinder.locator()}' to be displayed, but was not. Did you forget to activate the view tab?`);
   }
@@ -195,4 +195,27 @@ export async function isActiveElement(testee: ElementFinder): Promise<boolean> {
   const activeElementOpaqueId = await browser.driver.switchTo().activeElement().getId();
   const testeeOpaqueId = await testee.getId();
   return activeElementOpaqueId === testeeOpaqueId;
+}
+
+/**
+ * Creates a {@link DOMRect} from given rectangle.
+ *
+ * Similar to {@link DOMRect#fromRect} but can be used in e2e-tests executed in NodeJS.
+ */
+export function fromRect(other: DOMRectInit): DOMRect {
+  const width = other.width ?? 0;
+  const height = other.height ?? 0;
+  const x = other.x ?? 0;
+  const y = other.y ?? 0;
+  return {
+    x,
+    y,
+    width,
+    height,
+    top: y,
+    bottom: y + height,
+    left: x,
+    right: x + width,
+    toJSON: noop,
+  };
 }

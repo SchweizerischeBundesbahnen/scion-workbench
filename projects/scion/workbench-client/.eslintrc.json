@@ -16,9 +16,7 @@
           "projects/scion/workbench-client/tsconfig.spec.json"
         ]
       },
-      "rules": {
-        "@typescript-eslint/no-non-null-assertion": "off"
-      }
+      "rules": {}
     },
     {
       "files": [

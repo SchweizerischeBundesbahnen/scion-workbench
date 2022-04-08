@@ -11,11 +11,10 @@
 import {IntentClient, mapToBody, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {WorkbenchMessageBoxConfig} from './workbench-message-box.config';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Maps} from '@scion/toolkit/util';
-import {catchError} from 'rxjs/operators';
-import {throwError} from 'rxjs';
 import {WorkbenchView} from '../view/workbench-view';
+import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
+import {lastValueFrom} from 'rxjs';
 
 /**
  * Allows displaying a message to the user in a workbench message box.
@@ -72,7 +71,7 @@ export class WorkbenchMessageBoxService {
    *         enter data. The Promise rejects if opening the message box failed, e.g., if missing the message box intention, or because
    *         no message box provider could be found that provides a message box under the specified qualifier.
    */
-  public open<R = string>(message: string | WorkbenchMessageBoxConfig, qualifier?: Qualifier): Promise<R> {
+  public async open<R = string>(message: string | WorkbenchMessageBoxConfig, qualifier?: Qualifier): Promise<R> {
     const config: WorkbenchMessageBoxConfig = typeof message === 'string' ? {content: message} : message;
     const params = Maps.coerce(config.params);
 
@@ -80,12 +79,12 @@ export class WorkbenchMessageBoxService {
       ...config.context,
       viewId: config.context?.viewId ?? Beans.opt(WorkbenchView)?.viewId,
     };
-
-    return Beans.get(IntentClient).request$<R>({type: WorkbenchCapabilities.MessageBox, qualifier, params}, config)
-      .pipe(
-        mapToBody(),
-        catchError(error => throwError(error instanceof RequestError ? error.message : error)),
-      )
-      .toPromise();
+    const openMessageBox$ = Beans.get(IntentClient).request$<R>({type: WorkbenchCapabilities.MessageBox, qualifier, params}, config);
+    try {
+      return await lastValueFrom(openMessageBox$.pipe(mapToBody()));
+    }
+    catch (error) {
+      throw (error instanceof RequestError ? error.message : error);
+    }
   }
 }

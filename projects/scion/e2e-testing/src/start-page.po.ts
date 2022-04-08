@@ -9,10 +9,10 @@
  */
 
 import {ElementFinder} from 'protractor';
-import {SciTabbarPO} from '@scion/toolkit.internal/widgets.po';
 import {AppPO, ViewPO, ViewTabPO} from './app.po';
 import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
-import {Arrays} from '@scion/toolkit/util';
+import {SciTabbarPO} from '../deps/scion/toolkit.internal/tabbar/tabbar.po';
+import {Arrays} from '../deps/scion/toolkit/arrays.util';
 
 /**
  * Page object to interact {@link StartPageComponent}.

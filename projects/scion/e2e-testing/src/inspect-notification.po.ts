@@ -12,7 +12,7 @@ import {AppPO, NotificationPO} from './app.po';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
 import {assertPageToDisplay, enterText, selectOption} from './helper/testing.util';
-import {Arrays} from '@scion/toolkit/util';
+import {Arrays} from '../deps/scion/toolkit/arrays.util';
 
 /**
  * Page object to interact {@link InspectNotificationComponent}.

@@ -74,7 +74,7 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   }
 
   private stickContentToHostBoundingBox(): void {
-    const hostPosition: ClientRect = this._boundingBoxElement.getBoundingClientRect();
+    const hostPosition: DOMRect = this._boundingBoxElement.getBoundingClientRect();
     this.styleContent({
       position: 'fixed',
       top: `${hostPosition.top}px`,

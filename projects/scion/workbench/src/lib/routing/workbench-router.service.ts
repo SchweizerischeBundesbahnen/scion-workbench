@@ -15,9 +15,9 @@ import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ACTIVITY_OUTLET_NAME, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX, VIEW_TARGET} from '../workbench.constants';
 import {PartsLayout} from '../layout/parts-layout';
-import {take} from 'rxjs/operators';
 import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 import {SingleTaskExecutor} from '../executor/single-task-executor';
+import {firstValueFrom} from 'rxjs';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -308,9 +308,7 @@ export class WorkbenchRouter implements OnDestroy {
    * Blocks until the initial layout is available, i.e. after completion of Angular's initial navigation.
    */
   private async waitForInitialLayout(): Promise<void> {
-    await this._layoutService.layout$
-      .pipe(take(1))
-      .toPromise();
+    await firstValueFrom(this._layoutService.layout$);
   }
 
   /**

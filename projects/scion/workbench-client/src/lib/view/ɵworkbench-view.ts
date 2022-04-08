@@ -9,11 +9,11 @@
  */
 
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
-import {BehaviorSubject, EMPTY, merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, firstValueFrom, merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
-import {ManifestService, mapToBody, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
+import {ManifestService, mapToBody, Message, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {distinctUntilChanged, filter, map, mapTo, mergeMap, mergeMapTo, shareReplay, skip, skipWhile, switchMap, take, takeUntil, tap} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, skipWhile, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 import {Observables} from '@scion/toolkit/util';
 import {ViewClosingEvent, ViewClosingListener, ViewSnapshot, WorkbenchView} from './workbench-view';
@@ -42,7 +42,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
   constructor(public viewId: string) {
     this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.viewId))
-      .pipe(mapTo(undefined));
+      .pipe(map(() => undefined));
 
     Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
       .pipe(
@@ -52,16 +52,11 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       )
       .subscribe(this.params$);
 
-    /**
-     * Resolve promise once received initial params.
-     */
-    this.whenInitialParams = this.params$
-      .pipe(
-        skipWhile(params => params === PARAMS_PENDING_GUARD),
-        take(1),
-        mergeMapTo(EMPTY),
-      )
-      .toPromise();
+    // Create Promise to wait for initial params.
+    this.whenInitialParams = (async () => {
+      const params$ = this.params$.pipe(skipWhile(params => params === PARAMS_PENDING_GUARD));
+      await firstValueFrom(params$, {defaultValue: undefined});
+    })();
 
     this.capability$ = this.params$
       .pipe(
@@ -189,35 +184,33 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   private installClosingHandler(): Subscription {
     return Beans.get(MessageClient).observe$(ɵWorkbenchCommands.viewClosingTopic(this.viewId))
       .pipe(
-        switchMap(async closeRequest => {
-          const event = new ViewClosingEvent();
-          await this.dispatchClosingEvent(event);
-          return ({
-            replyTo: closeRequest.headers.get(MessageHeaders.ReplyTo),
-            preventDefault: event.isDefaultPrevented(),
-          });
+        switchMap(async (closeRequest: Message) => {
+          // Do not move the publishing of the response to a subsequent handler, because the subscription gets canceled when the last closing listener unsubscribes.
+          // See {@link removeClosingListener}. For example, if the listener unsubscribes immediately after handled prevention, subsequent handlers of this Observable
+          // chain would not be called, and neither would the subscribe handler.
+          const preventViewClosing = await this.isViewClosingPrevented();
+          const replyTo = closeRequest.headers.get(MessageHeaders.ReplyTo);
+          await Beans.get(MessageClient).publish(replyTo, !preventViewClosing, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
         }),
         takeUntil(merge(this._beforeUnload$, this._destroy$)),
       )
-      .subscribe(({replyTo, preventDefault}) => {
-        Beans.get(MessageClient).publish(replyTo, !preventDefault);
-      });
+      .subscribe();
   }
 
   /**
-   * Dispatches the closing event to registered event handlers.
-   * The closing event is cancelable, i.e, handlers can prevent closing by calling {@link ViewClosingEvent.preventDefault}.
+   * Lets registered listeners prevent this view from closing.
    *
-   * @return `false` if at least one of the event handlers cancelled the event. Otherwise it returns `true`.
+   * @return Promise that resolves to `true` if at least one listener prevents closing, or that resolves to `false` otherwise.
    */
-  private async dispatchClosingEvent(event: ViewClosingEvent): Promise<boolean> {
+  private async isViewClosingPrevented(): Promise<boolean> {
     for (const listener of this._closingListeners) {
+      const event = new ViewClosingEvent();
       await listener.onClosing(event);
       if (event.isDefaultPrevented()) {
-        return false;
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   public preDestroy(): void {

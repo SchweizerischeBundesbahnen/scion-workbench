@@ -13,7 +13,7 @@ import {ManifestService, Message, MessageClient, MessageHeaders} from '@scion/mi
 import {Logger} from '../../logging';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {map, mapTo, switchMap, takeUntil} from 'rxjs/operators';
+import {map, switchMap, takeUntil} from 'rxjs/operators';
 import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {merge, Subject} from 'rxjs';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
@@ -50,7 +50,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
     this._viewRegistry.viewIds$
       .pipe(
         map(viewIds => viewIds.map(viewId => this._viewRegistry.getElseThrow(viewId))),
-        switchMap(views => merge(...views.map(view => view.active$.pipe(mapTo(view))))),
+        switchMap(views => merge(...views.map(view => view.active$.pipe(map(() => view))))),
         takeUntil(this._destroy$),
       )
       .subscribe((view: WorkbenchView) => {

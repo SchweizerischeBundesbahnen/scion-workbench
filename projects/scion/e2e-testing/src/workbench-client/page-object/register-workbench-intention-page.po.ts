@@ -9,11 +9,11 @@
  */
 
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
 import {$, browser, ElementFinder, protractor} from 'protractor';
 import {Intention, Qualifier} from '@scion/microfrontend-platform';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {assertPageToDisplay, selectOption} from '../../helper/testing.util';
+import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
 
 const EC = protractor.ExpectedConditions;
 

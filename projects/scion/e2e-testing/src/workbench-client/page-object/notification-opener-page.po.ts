@@ -10,11 +10,12 @@
 
 import {assertPageToDisplay, enterText, selectOption, sendKeys} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
 import {$, browser, ElementFinder, Key} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {Qualifier} from '@scion/microfrontend-platform';
-import {Arrays, Dictionary} from '@scion/toolkit/util';
+import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
+import {Dictionary} from '../../../deps/scion/toolkit/dictionaries.util';
+import {Arrays} from '../../../deps/scion/toolkit/arrays.util';
 
 /**
  * Page object to interact {@link NotificationOpenerPageComponent}.

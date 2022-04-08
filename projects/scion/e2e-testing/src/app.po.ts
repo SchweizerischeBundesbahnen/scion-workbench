@@ -9,11 +9,14 @@
  */
 
 import {$, $$, browser, Button, ElementFinder, Key, protractor} from 'protractor';
-import {getCssClasses, isActiveElement, isCssClassPresent, runOutsideAngularSynchronization} from './helper/testing.util';
+import {fromRect, getCssClasses, isActiveElement, isCssClassPresent, runOutsideAngularSynchronization} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
-import {coerceArray, coerceBooleanProperty} from '@angular/cdk/coercion';
 import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
-import {Dictionary} from '@scion/toolkit/util';
+import {Dictionary} from '../deps/scion/toolkit/dictionaries.util';
+import {coerceBooleanProperty} from '../deps/angular/cdk/coercion/boolean-property';
+import {coerceArray} from '../deps/angular/cdk/coercion/array';
+
+const EC = protractor.ExpectedConditions;
 
 export class AppPO {
 
@@ -300,7 +303,15 @@ export class AppPO {
 
       public async isPresent(): Promise<boolean> {
         await WebdriverExecutionContexts.switchToDefault();
-        return await popupOverlayFinder.isPresent() && await popupComponentFinder.isPresent();
+        try {
+          const popupOverlayPresent = EC.presenceOf(popupOverlayFinder);
+          const popupComponentPresent = EC.presenceOf(popupComponentFinder);
+          await browser.wait(EC.and(popupOverlayPresent, popupComponentPresent), 1000);
+          return true;
+        }
+        catch (error) {
+          return false;
+        }
       }
 
       public async isDisplayed(): Promise<boolean> {
@@ -311,19 +322,13 @@ export class AppPO {
         return await popupOverlayFinder.isDisplayed() && await popupComponentFinder.isDisplayed();
       }
 
-      public async getClientRect(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<ClientRect> {
+      public async getClientRect(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<DOMRect> {
         await WebdriverExecutionContexts.switchToDefault();
         const finder = selector === 'cdk-overlay' ? popupOverlayFinder : popupComponentFinder;
+        await browser.wait(EC.presenceOf(finder), 1000);
         const {width, height} = await finder.getSize();
         const {x, y} = await finder.getLocation();
-        return {
-          top: y,
-          left: x,
-          right: x + width,
-          bottom: y + height,
-          width,
-          height,
-        };
+        return fromRect({height, width, x, y});
       }
 
       public async getAlign(): Promise<'east' | 'west' | 'north' | 'south'> {
@@ -405,18 +410,11 @@ export class AppPO {
         return notificationFinder.isDisplayed();
       }
 
-      public async getClientRect(): Promise<ClientRect> {
+      public async getClientRect(): Promise<DOMRect> {
         await WebdriverExecutionContexts.switchToDefault();
         const {width, height} = await notificationFinder.getSize();
         const {x, y} = await notificationFinder.getLocation();
-        return {
-          top: y,
-          left: x,
-          right: x + width,
-          bottom: y + height,
-          width,
-          height,
-        };
+        return fromRect({height, width, x, y});
       }
 
       public async getTitle(): Promise<string> {
@@ -496,18 +494,11 @@ export class AppPO {
         return await msgboxFinder.isDisplayed() && await msgboxComponentFinder.isDisplayed();
       }
 
-      public async getClientRect(): Promise<ClientRect> {
+      public async getClientRect(): Promise<DOMRect> {
         await WebdriverExecutionContexts.switchToDefault();
         const {width, height} = await msgboxFinder.getSize();
         const {x, y} = await msgboxFinder.getLocation();
-        return {
-          top: y,
-          left: x,
-          right: x + width,
-          bottom: y + height,
-          width,
-          height,
-        };
+        return fromRect({height, width, x, y});
       }
 
       public async getTitle(): Promise<string> {
@@ -552,7 +543,7 @@ export class AppPO {
           const action: ElementFinder = await actionsFinder.get(i);
           const cssClasses = await getCssClasses(action);
           const actionKey = cssClasses.find(candidate => candidate.startsWith('e2e-action-key-'));
-          actions[actionKey.substr('e2e-action-key-'.length)] = await action.getText();
+          actions[actionKey.substring('e2e-action-key-'.length)] = await action.getText();
         }
 
         return actions;
@@ -816,7 +807,7 @@ export interface PopupPO {
 
   isDisplayed(): Promise<boolean>;
 
-  getClientRect(selector?: 'cdk-overlay' | 'wb-popup'): Promise<ClientRect>;
+  getClientRect(selector?: 'cdk-overlay' | 'wb-popup'): Promise<DOMRect>;
 
   hasVerticalOverflow(): Promise<boolean>;
 
@@ -832,7 +823,7 @@ export interface NotificationPO {
 
   isPresent(): Promise<boolean>;
 
-  getClientRect(): Promise<ClientRect>;
+  getClientRect(): Promise<DOMRect>;
 
   getTitle(): Promise<string>;
 
@@ -852,7 +843,7 @@ export interface MessageBoxPO {
 
   isDisplayed(): Promise<boolean>;
 
-  getClientRect(): Promise<ClientRect>;
+  getClientRect(): Promise<DOMRect>;
 
   getTitle(): Promise<string>;
 

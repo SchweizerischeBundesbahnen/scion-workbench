@@ -38,7 +38,7 @@ export class WbComponentPortal<T> {
   }
 
   /**
-   * Attaches this portal to the specified {ViewContainerRef}, if any, or to its previous oulet if detached.
+   * Attaches this portal to the specified {ViewContainerRef}, if any, or to its previous outlet if detached.
    *
    * @see detach
    */
@@ -129,7 +129,7 @@ export class WbComponentPortal<T> {
    * Destroys the component instance and all of the data structures associated with it.
    */
   public destroy(): void {
-    this.componentRef.destroy();
+    this._componentRef?.destroy();
   }
 
   public get componentRef(): ComponentRef<T> {

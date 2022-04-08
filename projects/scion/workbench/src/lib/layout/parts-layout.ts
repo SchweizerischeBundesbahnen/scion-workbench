@@ -484,7 +484,7 @@ function createRootLayout(workbenchAccessor: PartsLayoutWorkbenchAccessor): MPar
  * Serializes this layout into a URL-safe base64 string.
  */
 function serializeLayout(layout: MPartsLayout & {uuid?: string}): string {
-  return btoa(JSON.stringify(layout, (key, value) => {
+  return window.btoa(JSON.stringify(layout, (key, value) => {
     return (key === 'parent') ? undefined : value; // do not serialize node parents.
   }));
 }
@@ -493,7 +493,7 @@ function serializeLayout(layout: MPartsLayout & {uuid?: string}): string {
  * Deserializes the given serialized layout.
  */
 function deserializeLayout(serializedLayout: string): MPartsLayout {
-  const layout: MPartsLayout = JSON.parse(atob(serializedLayout), (key, value) => {
+  const layout: MPartsLayout = JSON.parse(window.atob(serializedLayout), (key, value) => {
     if (MPart.isPartLike(value)) {
       return new MPart(value); // create a class object from the object literal
     }

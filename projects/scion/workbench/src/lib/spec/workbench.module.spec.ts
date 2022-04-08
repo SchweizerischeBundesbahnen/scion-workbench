@@ -9,8 +9,8 @@
  */
 
 import {fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
-import {NgModule, NgModuleFactoryLoader} from '@angular/core';
-import {RouterTestingModule, SpyNgModuleFactoryLoader} from '@angular/router/testing';
+import {NgModule} from '@angular/core';
+import {RouterTestingModule} from '@angular/router/testing';
 import {Router} from '@angular/router';
 import {WorkbenchModule} from '../workbench.module';
 
@@ -20,39 +20,13 @@ describe('WorkbenchModule', () => {
     TestBed.configureTestingModule({
       imports: [
         WorkbenchModule.forRoot(),
-        RouterTestingModule.withRoutes([{path: 'lazy-module-forroot', loadChildren: './lazy-forroot.module'}]),
-        RouterTestingModule.withRoutes([{path: 'lazy-module-forchild', loadChildren: './lazy-forchild.module'}]),
+        RouterTestingModule.withRoutes([{path: 'lazy-module-forroot', loadChildren: () => LazyForRootModule}]),
+        RouterTestingModule.withRoutes([{path: 'lazy-module-forchild', loadChildren: () => LazyForChildModule}]),
       ],
     });
   });
 
-  // TODO [Angular 9]:
-  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
-  // See Angular internal tests in `integration.spec.ts` file.
-  it('throws an error when forRoot() is used in a lazy context', fakeAsync(inject([Router, NgModuleFactoryLoader], async (router: Router, loader: SpyNgModuleFactoryLoader) => {
-    // Use forRoot() in a lazy context (illegal)
-    @NgModule({
-      imports: [
-        WorkbenchModule.forRoot(),
-      ],
-    })
-    class LazyForRootModule {
-    }
-
-    // Use forChild() in a lazy context
-    @NgModule({
-      imports: [
-        WorkbenchModule.forChild(),
-      ],
-    })
-    class LazyForChildModule {
-    }
-
-    loader.stubbedModules = {
-      './lazy-forroot.module': LazyForRootModule,
-      './lazy-forchild.module': LazyForChildModule,
-    };
-
+  it('throws an error when forRoot() is used in a lazy context', fakeAsync(inject([Router], async (router: Router) => {
     // Navigate to LazyForRootModule
     expect(() => {
       router.navigate(['lazy-module-forroot']).then();
@@ -66,3 +40,25 @@ describe('WorkbenchModule', () => {
     }).not.toThrowError(/ModuleForRootError/);
   })));
 });
+
+/****************************************************************************************************
+ * Definition of lazy loaded module calling `forRoot()`                                             *
+ ****************************************************************************************************/
+@NgModule({
+  imports: [
+    WorkbenchModule.forRoot(),  // Use forRoot() in a lazy context (illegal)
+  ],
+})
+class LazyForRootModule {
+}
+
+/****************************************************************************************************
+ * Definition of lazy loaded module calling `forChild()                                             *
+ ****************************************************************************************************/
+@NgModule({
+  imports: [
+    WorkbenchModule.forChild(),  // Use forChild() in a lazy context
+  ],
+})
+class LazyForChildModule {
+}

@@ -18,9 +18,9 @@
     "tslib": "^2.0.0"
   },
   "peerDependencies": {
-    "rxjs": "^6.0.0",
-    "@scion/toolkit": ">=11.0.0-beta.12",
-    "@scion/microfrontend-platform": ">=1.0.0-rc.1"
+    "rxjs": "^7.5.0",
+    "@scion/toolkit": ">=13.0.0-beta.2",
+    "@scion/microfrontend-platform": ">=1.0.0-rc.3"
   },
   "keywords": [
     "scion",

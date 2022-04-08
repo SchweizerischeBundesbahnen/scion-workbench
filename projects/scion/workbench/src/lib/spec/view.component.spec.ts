@@ -49,16 +49,16 @@ describe('ViewComponent', () => {
     const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'dirty': true}), '(A)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).withContext('(A)').toEqual(jasmine.objectContaining({'dirty': true}));
 
     // Clear dirty flag
     viewDebugElement.view.dirty = false;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).not.toEqual(jasmine.objectContaining({'dirty': true}), '(B)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).not.withContext('(B)').toEqual(jasmine.objectContaining({'dirty': true}));
 
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).toEqual(jasmine.objectContaining({'dirty': true}), '(C)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).withContext('(C)').toEqual(jasmine.objectContaining({'dirty': true}));
 
     discardPeriodicTasks();
   })));
@@ -76,12 +76,12 @@ describe('ViewComponent', () => {
     const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
     viewDebugElement.view.heading = 'Foo';
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.heading')).nativeElement.innerText).toEqual('Foo', '(A)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.heading')).nativeElement.innerText).withContext('(A)').toEqual('Foo');
 
     // Set heading
     viewDebugElement.view.heading = 'Bar';
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.heading')).nativeElement.innerText).toEqual('Bar', '(B)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.heading')).nativeElement.innerText).withContext('(B)').toEqual('Bar');
 
     discardPeriodicTasks();
   })));
@@ -99,12 +99,12 @@ describe('ViewComponent', () => {
     const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
     viewDebugElement.view.title = 'Foo';
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.title')).nativeElement.innerText).toEqual('Foo', '(A)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.title')).nativeElement.innerText).withContext('(A)').toEqual('Foo');
 
     // Set heading
     viewDebugElement.view.title = 'Bar';
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.title')).nativeElement.innerText).toEqual('Bar', '(B)');
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).query(By.css('.title')).nativeElement.innerText).withContext('(B)').toEqual('Bar');
 
     discardPeriodicTasks();
   })));
@@ -122,8 +122,8 @@ describe('ViewComponent', () => {
 
     view1DebugElement.component.checked = false;
     fixture.detectChanges();
-    expect(view1DebugElement.component.checked).toBeTruthy('(A)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(B)');
+    expect(view1DebugElement.component.checked).withContext('(A)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(B)').toBeTruthy();
 
     // Add View 2
     wbRouter.navigate(['view-2']).then();
@@ -134,14 +134,14 @@ describe('ViewComponent', () => {
     view1DebugElement.component.checked = false;
     view2DebugElement.component.checked = false;
     fixture.detectChanges();
-    expect(view1DebugElement.component.checked).toBeFalsy('(C)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(D)');
-    expect(view2DebugElement.component.checked).toBeTruthy('(E)');
-    expect(fixture.debugElement.query(By.css('spec-view-2'))).toBeTruthy('(F)');
+    expect(view1DebugElement.component.checked).withContext('(C)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(D)').toBeFalsy();
+    expect(view2DebugElement.component.checked).withContext('(E)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(F)').toBeTruthy();
 
     // Ensure View 1 not to be destroyed
-    expect(getViewDebugElement<SpecView1Component>('view.1').component).toBe(component1, '(G)');
-    expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).toBeFalsy('(H)');
+    expect(getViewDebugElement<SpecView1Component>('view.1').component).withContext('(G)').toBe(component1);
+    expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).withContext('(H)').toBeFalsy();
 
     // Switch to View 1
     TestBed.inject(WorkbenchService).activateView('view.1').then();
@@ -150,14 +150,14 @@ describe('ViewComponent', () => {
     view1DebugElement.component.checked = false;
     view2DebugElement.component.checked = false;
     fixture.detectChanges();
-    expect(view1DebugElement.component.checked).toBeTruthy('(I)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(J)');
-    expect(view2DebugElement.component.checked).toBeFalsy('(K)');
-    expect(fixture.debugElement.query(By.css('spec-view-2'))).toBeFalsy('(L)');
+    expect(view1DebugElement.component.checked).withContext('(I)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(J)').toBeTruthy();
+    expect(view2DebugElement.component.checked).withContext('(K)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(L)').toBeFalsy();
 
     // Ensure View 2 not to be destroyed
-    expect(getViewDebugElement<SpecView1Component>('view.2').component).toBe(component2, '(M)');
-    expect(getViewDebugElement<SpecView1Component>('view.2').component.destroyed).toBeFalsy('(N)');
+    expect(getViewDebugElement<SpecView1Component>('view.2').component).withContext('(M)').toBe(component2);
+    expect(getViewDebugElement<SpecView1Component>('view.2').component.destroyed).withContext('(N)').toBeFalsy();
 
     // Switch to View 2
     TestBed.inject(WorkbenchService).activateView('view.2').then();
@@ -166,14 +166,14 @@ describe('ViewComponent', () => {
     view1DebugElement.component.checked = false;
     view2DebugElement.component.checked = false;
     fixture.detectChanges();
-    expect(view1DebugElement.component.checked).toBeFalsy('(O)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(P)');
-    expect(view2DebugElement.component.checked).toBeTruthy('(Q)');
-    expect(fixture.debugElement.query(By.css('spec-view-2'))).toBeTruthy('(R)');
+    expect(view1DebugElement.component.checked).withContext('(O)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(P)').toBeFalsy();
+    expect(view2DebugElement.component.checked).withContext('(Q)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(R)').toBeTruthy();
 
     // Ensure View 1 not to be destroyed
-    expect(getViewDebugElement<SpecView1Component>('view.1').component).toBe(component1, '(S)');
-    expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).toBeFalsy('(T)');
+    expect(getViewDebugElement<SpecView1Component>('view.1').component).withContext('(S)').toBe(component1);
+    expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).withContext('(T)').toBeFalsy();
 
     discardPeriodicTasks();
   })));
@@ -187,35 +187,35 @@ describe('ViewComponent', () => {
     wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
-    expect(view1DebugElement.view.active).toBeTruthy('(A)');
-    expect(view1DebugElement.component.activated).toBeTruthy('(B)');
+    expect(view1DebugElement.view.active).withContext('(A)').toBeTruthy();
+    expect(view1DebugElement.component.activated).withContext('(B)').toBeTruthy();
 
     // Add View 2
     wbRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView1Component>('view.2');
-    expect(view1DebugElement.view.active).toBeFalsy('(C)');
-    expect(view1DebugElement.component.activated).toBeFalsy('(D)');
-    expect(view2DebugElement.view.active).toBeTruthy('(E)');
-    expect(view2DebugElement.component.activated).toBeTruthy('(F)');
+    expect(view1DebugElement.view.active).withContext('(C)').toBeFalsy();
+    expect(view1DebugElement.component.activated).withContext('(D)').toBeFalsy();
+    expect(view2DebugElement.view.active).withContext('(E)').toBeTruthy();
+    expect(view2DebugElement.component.activated).withContext('(F)').toBeTruthy();
 
     // Switch to View 1
     TestBed.inject(WorkbenchService).activateView('view.1').then();
     advance(fixture);
 
-    expect(view1DebugElement.view.active).toBeTruthy('(G)');
-    expect(view1DebugElement.component.activated).toBeTruthy('(H)');
-    expect(view2DebugElement.view.active).toBeFalsy('(I)');
-    expect(view2DebugElement.component.activated).toBeFalsy('(J)');
+    expect(view1DebugElement.view.active).withContext('(G)').toBeTruthy();
+    expect(view1DebugElement.component.activated).withContext('(H)').toBeTruthy();
+    expect(view2DebugElement.view.active).withContext('(I)').toBeFalsy();
+    expect(view2DebugElement.component.activated).withContext('(J)').toBeFalsy();
 
     // Switch to View 2
     TestBed.inject(WorkbenchService).activateView('view.2').then();
     advance(fixture);
 
-    expect(view1DebugElement.view.active).toBeFalsy('(K)');
-    expect(view1DebugElement.component.activated).toBeFalsy('(L)');
-    expect(view2DebugElement.view.active).toBeTruthy('(M)');
-    expect(view2DebugElement.component.activated).toBeTruthy('(N)');
+    expect(view1DebugElement.view.active).withContext('(K)').toBeFalsy();
+    expect(view1DebugElement.component.activated).withContext('(L)').toBeFalsy();
+    expect(view2DebugElement.view.active).withContext('(M)').toBeTruthy();
+    expect(view2DebugElement.component.activated).withContext('(N)').toBeTruthy();
 
     discardPeriodicTasks();
   })));
@@ -229,36 +229,36 @@ describe('ViewComponent', () => {
     wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
-    expect(view1DebugElement.view.destroyed).toBeFalsy('(A)');
-    expect(view1DebugElement.component.destroyed).toBeFalsy('(B)');
+    expect(view1DebugElement.view.destroyed).withContext('(A)').toBeFalsy();
+    expect(view1DebugElement.component.destroyed).withContext('(B)').toBeFalsy();
 
     // Add View 2
     wbRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView1Component>('view.2');
-    expect(view1DebugElement.view.destroyed).toBeFalsy('(C)');
-    expect(view1DebugElement.component.destroyed).toBeFalsy('(D)');
-    expect(view2DebugElement.view.destroyed).toBeFalsy('(E)');
-    expect(view2DebugElement.component.destroyed).toBeFalsy('(F)');
+    expect(view1DebugElement.view.destroyed).withContext('(C)').toBeFalsy();
+    expect(view1DebugElement.component.destroyed).withContext('(D)').toBeFalsy();
+    expect(view2DebugElement.view.destroyed).withContext('(E)').toBeFalsy();
+    expect(view2DebugElement.component.destroyed).withContext('(F)').toBeFalsy();
 
     // Destroy to View 2
     TestBed.inject(WorkbenchService).destroyView('view.2').then();
     advance(fixture);
-    expect(view1DebugElement.view.destroyed).toBeFalsy('(G)');
-    expect(view1DebugElement.component.destroyed).toBeFalsy('(H)');
-    expect(view2DebugElement.view.destroyed).toBeTruthy('(I)');
-    expect(view2DebugElement.component.destroyed).toBeTruthy('(J)');
+    expect(view1DebugElement.view.destroyed).withContext('(G)').toBeFalsy();
+    expect(view1DebugElement.component.destroyed).withContext('(H)').toBeFalsy();
+    expect(view2DebugElement.view.destroyed).withContext('(I)').toBeTruthy();
+    expect(view2DebugElement.component.destroyed).withContext('(J)').toBeTruthy();
 
     // Destroy to View 1
     TestBed.inject(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
-    expect(view1DebugElement.view.destroyed).toBeTruthy('(K)');
-    expect(view1DebugElement.component.destroyed).toBeTruthy('(L)');
-    expect(view2DebugElement.view.destroyed).toBeTruthy('(M)');
-    expect(view2DebugElement.component.destroyed).toBeTruthy('(N)');
+    expect(view1DebugElement.view.destroyed).withContext('(K)').toBeTruthy();
+    expect(view1DebugElement.component.destroyed).withContext('(L)').toBeTruthy();
+    expect(view2DebugElement.view.destroyed).withContext('(M)').toBeTruthy();
+    expect(view2DebugElement.component.destroyed).withContext('(N)').toBeTruthy();
 
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(O)');
-    expect(fixture.debugElement.query(By.css('spec-view-2'))).toBeFalsy('(P)');
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(O)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(P)').toBeFalsy();
 
     discardPeriodicTasks();
   })));
@@ -278,18 +278,18 @@ describe('ViewComponent', () => {
     TestBed.inject(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
 
-    expect(view1DebugElement.view.destroyed).toBeFalsy('(A)');
-    expect(view1DebugElement.component.destroyed).toBeFalsy('(B)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(C)');
+    expect(view1DebugElement.view.destroyed).withContext('(A)').toBeFalsy();
+    expect(view1DebugElement.component.destroyed).withContext('(B)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(C)').toBeTruthy();
 
     // Try destroy to View 1 (accept)
     view1DebugElement.component.preventDestroy = false;
     TestBed.inject(WorkbenchService).destroyView('view.1').then();
     advance(fixture);
 
-    expect(view1DebugElement.view.destroyed).toBeTruthy('(D)');
-    expect(view1DebugElement.component.destroyed).toBeTruthy('(E)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(F)');
+    expect(view1DebugElement.view.destroyed).withContext('(D)').toBeTruthy();
+    expect(view1DebugElement.component.destroyed).withContext('(E)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(F)').toBeFalsy();
 
     discardPeriodicTasks();
   })));
@@ -303,24 +303,24 @@ describe('ViewComponent', () => {
     wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
-    expect(viewDebugElement1.component.destroyed).toBeFalsy('(A)');
-    expect(viewDebugElement1.view.destroyed).toBeFalsy('(B)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(C)');
+    expect(viewDebugElement1.component.destroyed).withContext('(A)').toBeFalsy();
+    expect(viewDebugElement1.view.destroyed).withContext('(B)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(C)').toBeTruthy();
 
     // Route to View 2
     wbRouter.navigate(['view-2'], {target: 'self', selfViewId: 'view.1'}).then();
     advance(fixture);
 
     const viewDebugElement2 = getViewDebugElement<SpecView2Component>('view.1');
-    expect(viewDebugElement2.component.destroyed).toBeFalsy('(C)');
-    expect(viewDebugElement2.view.destroyed).toBeFalsy('(D)');
-    expect(fixture.debugElement.query(By.css('spec-view-2'))).toBeTruthy('(E)');
+    expect(viewDebugElement2.component.destroyed).withContext('(C)').toBeFalsy();
+    expect(viewDebugElement2.view.destroyed).withContext('(D)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(E)').toBeTruthy();
 
-    expect(viewDebugElement1.component.destroyed).toBeTruthy('(F)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(G)');
+    expect(viewDebugElement1.component.destroyed).withContext('(F)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(G)').toBeFalsy();
 
-    expect(viewDebugElement1.view.destroyed).toBeFalsy('(H)');
-    expect(viewDebugElement1.view).toBe(viewDebugElement2.view, '(I)');
+    expect(viewDebugElement1.view.destroyed).withContext('(H)').toBeFalsy();
+    expect(viewDebugElement1.view).withContext('(I)').toBe(viewDebugElement2.view);
 
     discardPeriodicTasks();
   })));
@@ -334,31 +334,31 @@ describe('ViewComponent', () => {
     wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
-    expect(viewDebugElement1.component.destroyed).toBeFalsy('(A)');
-    expect(viewDebugElement1.view.destroyed).toBeFalsy('(B)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(C)');
+    expect(viewDebugElement1.component.destroyed).withContext('(A)').toBeFalsy();
+    expect(viewDebugElement1.view.destroyed).withContext('(B)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(C)').toBeTruthy();
 
     // Remove View 1
     viewDebugElement1.view.close().then();
     advance(fixture);
-    expect(viewDebugElement1.component.destroyed).toBeTruthy('(D)');
-    expect(viewDebugElement1.view.destroyed).toBeTruthy('(E)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(F)');
+    expect(viewDebugElement1.component.destroyed).withContext('(D)').toBeTruthy();
+    expect(viewDebugElement1.view.destroyed).withContext('(E)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(F)').toBeFalsy();
 
     // Remove View 1 again
     wbRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement2 = getViewDebugElement<SpecView1Component>('view.1');
-    expect(viewDebugElement2.component.destroyed).toBeFalsy('(G)');
-    expect(viewDebugElement2.view.destroyed).toBeFalsy('(H)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeTruthy('(I)');
+    expect(viewDebugElement2.component.destroyed).withContext('(G)').toBeFalsy();
+    expect(viewDebugElement2.view.destroyed).withContext('(H)').toBeFalsy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(I)').toBeTruthy();
 
     // Remove View 1
     viewDebugElement2.view.close().then();
     advance(fixture);
-    expect(viewDebugElement2.component.destroyed).toBeTruthy('(D)');
-    expect(viewDebugElement2.view.destroyed).toBeTruthy('(E)');
-    expect(fixture.debugElement.query(By.css('spec-view-1'))).toBeFalsy('(F)');
+    expect(viewDebugElement2.component.destroyed).withContext('(D)').toBeTruthy();
+    expect(viewDebugElement2.view.destroyed).withContext('(E)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(F)').toBeFalsy();
 
     discardPeriodicTasks();
   })));

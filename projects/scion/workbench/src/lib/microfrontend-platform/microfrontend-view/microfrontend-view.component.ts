@@ -10,8 +10,8 @@
 
 import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
-import {asapScheduler, combineLatest, merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
-import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, take, takeUntil} from 'rxjs/operators';
+import {asapScheduler, combineLatest, defaultIfEmpty, firstValueFrom, merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
+import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
 import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, takeUntilUnsubscribe} from '@scion/microfrontend-platform';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Dictionaries, Maps} from '@scion/toolkit/util';
@@ -232,12 +232,12 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * Promise that resolves once params contain the given capability id.
    */
   private async waitForCapabilityParam(viewCapabilityId: string): Promise<void> {
-    await this._messageClient.observe$<Map<string, string>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
+    const viewParams$ = this._messageClient.observe$<Map<string, string>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
       .pipe(
         mapToBody(),
         first(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) === viewCapabilityId),
-      )
-      .toPromise();
+      );
+    await firstValueFrom(viewParams$);
   }
 
   /**
@@ -246,30 +246,16 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * If the embedded microfrontend has a listener installed to be notified when closing this view,
    * initiates a request-reply communication, allowing the microfrontend to prevent this view from closing.
    */
-  public async wbBeforeDestroy(): Promise<boolean> {
+  public wbBeforeDestroy(): Observable<boolean> {
     const closingTopic = ɵWorkbenchCommands.viewClosingTopic(this.viewId);
-
-    // Check if the microfrontend wants to be notified when closing this view.
-    const closingSubscriberCount = await this._messageClient.subscriberCount$(closingTopic)
-      .pipe(
-        take(1),
-        takeUntil(this._destroy$),
-      )
-      .toPromise();
-    if ((closingSubscriberCount ?? 0) === 0) {
-      return true; // continue closing
-    }
 
     // Allow the microfrontend to prevent this view from closing.
     return this._messageClient.request$<boolean>(closingTopic)
       .pipe(
-        take(1),
         mapToBody(),
-        takeUntilUnsubscribe(closingTopic),
-        takeUntil(this._destroy$),
-      )
-      .toPromise()
-      .then(close => close ?? true);
+        takeUntilUnsubscribe(closingTopic), // will complete the request immediately if no subscriber is subscribed
+        defaultIfEmpty(true),
+      );
   }
 
   /**

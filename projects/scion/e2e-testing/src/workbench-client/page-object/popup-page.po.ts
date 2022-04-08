@@ -13,11 +13,13 @@ import {AppPO, PopupPO} from '../../app.po';
 import {$, ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {PopupSize} from '@scion/workbench';
-import {SciAccordionPO, SciPropertyPO} from '@scion/toolkit.internal/widgets.po';
 import {ISize} from 'selenium-webdriver';
 import {Params} from '@angular/router';
 import {WorkbenchPopupCapability} from '@scion/workbench-client';
 import {RouterOutletPO} from './router-outlet.po';
+import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
+import {SciPropertyPO} from '../../../deps/scion/toolkit.internal/property/property.po';
+import {RouterOutletSelector} from '../../helper/element-finders';
 
 /**
  * Page object to interact {@link PopupPageComponent}.
@@ -26,14 +28,14 @@ export class PopupPagePO {
 
   private _appPO = new AppPO();
   private _pageFinder: ElementFinder;
-  private _popupId: Promise<string>;
+  private _routerOutletSelector: RouterOutletSelector;
 
   public readonly popupPO: PopupPO;
 
-  constructor(public cssClass: string) {
-    this.popupPO = this._appPO.findPopup({cssClass: cssClass});
+  constructor(cssClass: string) {
+    this.popupPO = this._appPO.findPopup({cssClass});
     this._pageFinder = $('app-popup-page');
-    this._popupId = new RouterOutletPO().resolveRouterOutletName('e2e-popup', cssClass);
+    this._routerOutletSelector = {cssClass: ['e2e-popup'].concat(cssClass)};
   }
 
   public async isPresent(): Promise<boolean> {
@@ -41,11 +43,11 @@ export class PopupPagePO {
       return false;
     }
 
-    if (!await new RouterOutletPO().isPresent(await this._popupId)) {
+    if (!await new RouterOutletPO().isPresent(this._routerOutletSelector)) {
       return false;
     }
 
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     return this._pageFinder.isPresent();
   }
 
@@ -54,22 +56,22 @@ export class PopupPagePO {
       return false;
     }
 
-    if (!await new RouterOutletPO().isDisplayed(await this._popupId)) {
+    if (!await new RouterOutletPO().isDisplayed(this._routerOutletSelector)) {
       return false;
     }
 
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     return await this._pageFinder.isPresent() && await this._pageFinder.isDisplayed();
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
     return this._pageFinder.$('span.e2e-component-instance-id').getText();
   }
 
   public async getPopupCapability(): Promise<WorkbenchPopupCapability> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
 
     const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-popup-capability'));
@@ -83,7 +85,7 @@ export class PopupPagePO {
   }
 
   public async getPopupParams(): Promise<Params> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
 
     const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-popup-params'));
@@ -97,7 +99,7 @@ export class PopupPagePO {
   }
 
   public async getRouteParams(): Promise<Params> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
 
     const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-route-params'));
@@ -111,7 +113,7 @@ export class PopupPagePO {
   }
 
   public async getRouteQueryParams(): Promise<Params> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
 
     const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-route-query-params'));
@@ -125,7 +127,7 @@ export class PopupPagePO {
   }
 
   public async getRouteFragment(): Promise<string> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
 
     const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-route-fragment'));
@@ -139,7 +141,7 @@ export class PopupPagePO {
   }
 
   public async enterComponentSize(size: PopupSize): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
 
     await enterText(size.width, this._pageFinder.$('input.e2e-width'));
@@ -151,7 +153,7 @@ export class PopupPagePO {
   }
 
   public async enterReturnValue(returnValue: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
 
     const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-return-value'));
@@ -165,7 +167,7 @@ export class PopupPagePO {
   }
 
   public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
 
     if (options?.returnValue !== undefined) {
@@ -181,7 +183,7 @@ export class PopupPagePO {
   }
 
   public async getSize(): Promise<ISize> {
-    await WebdriverExecutionContexts.switchToIframe(await this._popupId);
+    await WebdriverExecutionContexts.switchToIframe(this._routerOutletSelector);
     await assertPageToDisplay(this._pageFinder);
     const {width, height} = await this._pageFinder.getSize();
     return {width, height};

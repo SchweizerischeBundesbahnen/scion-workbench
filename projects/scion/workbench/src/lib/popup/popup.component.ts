@@ -62,7 +62,6 @@ export class PopupComponent {
       this._popupConfig.component,
       this._popupConfig.componentConstructOptions?.viewContainerRef || null,
       injector,
-      this._popupConfig.componentConstructOptions?.componentFactoryResolver || null,
     );
   }
 }

@@ -23,7 +23,7 @@ import {WorkbenchTestingModule} from './workbench-testing.module';
 
 /**
  *
- * Testsetup:
+ * Test setup:
  *
  * +--------------------------------------------+
  * | Test Module                                |
@@ -58,30 +58,30 @@ describe('Activity part', () => {
     // Open 'activity-1'
     clickElement(fixture, ActivityPartComponent, 'a.activity-1', '(1a)');
     expect(fixture).toShow(Activity1Component, '(1b)');
-    expect(fixture.debugElement.query(By.css('header > h1')).nativeElement.textContent).toEqual('Activity 1', '(1c)');
+    expect(fixture.debugElement.query(By.css('header > h1')).nativeElement.textContent).withContext('(1c)').toEqual('Activity 1');
 
     // Try open 'activity-2' (guard prevents activation)
     Activity2CanActivate.CAN_ACTIVATE = false;
     clickElement(fixture, ActivityPartComponent, 'a.activity-2', '(2a)');
     expect(fixture).toShow(Activity1Component, '(2b)'); // {Activity1Component} should still be showing
-    expect(fixture.debugElement.query(By.css('header > h1')).nativeElement.textContent).toEqual('Activity 1', '(2c)');
+    expect(fixture.debugElement.query(By.css('header > h1')).nativeElement.textContent).withContext('(2c)').toEqual('Activity 1');
 
     // Open 'activity-3'
     clickElement(fixture, ActivityPartComponent, 'a.activity-3', '(3a)');
     expect(fixture).toShow(Activity3Component, '(3b)');
-    expect(fixture.debugElement.query(By.css('header > h1')).nativeElement.textContent).toEqual('Activity 3', '(3c)');
+    expect(fixture.debugElement.query(By.css('header > h1')).nativeElement.textContent).withContext('(3c)').toEqual('Activity 3');
 
     // Try open 'activity-2' (guard prevents activation)
     Activity2CanActivate.CAN_ACTIVATE = false;
     clickElement(fixture, ActivityPartComponent, 'a.activity-2', '(4a)');
     expect(fixture).toShow(Activity3Component, '(4b)');  // {Activity3Component} should still be showing
-    expect(fixture.debugElement.query(By.css('header > h1')).nativeElement.textContent).toEqual('Activity 3', '(4c)');
+    expect(fixture.debugElement.query(By.css('header > h1')).nativeElement.textContent).withContext('(4c)').toEqual('Activity 3');
 
     // Open 'activity-2' (guard allows activation)
     Activity2CanActivate.CAN_ACTIVATE = true;
     clickElement(fixture, ActivityPartComponent, 'a.activity-2', '(5a)');
     expect(fixture).toShow(Activity2Component, '(5b)');
-    expect(fixture.debugElement.query(By.css('header>h1')).nativeElement.textContent).toEqual('Activity 2', '(5c)');
+    expect(fixture.debugElement.query(By.css('header>h1')).nativeElement.textContent).withContext('(5c)').toEqual('Activity 2');
 
     discardPeriodicTasks();
   })));

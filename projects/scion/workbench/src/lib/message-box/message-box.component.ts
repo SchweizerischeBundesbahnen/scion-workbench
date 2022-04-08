@@ -112,7 +112,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
       providers: [
         {provide: MessageBox, useValue: messageBox},
       ],
-    }), componentConstructOptions?.componentFactoryResolver || null);
+    }));
   }
 
   private close(action: MessageBoxAction): void {

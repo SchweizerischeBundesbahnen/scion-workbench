@@ -10,12 +10,13 @@
 
 import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {SciCheckboxPO, SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
 import {$, browser, ElementFinder, protractor} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {coerceArray} from '@angular/cdk/coercion';
 import {RouterOutletPO} from './router-outlet.po';
 import {WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
+import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
+import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
+import {coerceArray} from '../../../deps/angular/cdk/coercion/array';
 
 const EC = protractor.ExpectedConditions;
 
@@ -80,9 +81,9 @@ export class RegisterWorkbenchCapabilityPagePO {
       await paramsEnterPO.clear();
       await paramsEnterPO.enterParams(capability.qualifier);
     }
-    const requiredParams = [...(capability.requiredParams ?? []), ...(capability.params ?? []).filter(param => !param.transient && param.required).map(param => param.name)];
-    const optionalParams = [...(capability.optionalParams ?? []), ...(capability.params ?? []).filter(param => !param.transient && !param.required).map(param => param.name)];
-    const transientParams = (capability.params ?? []).filter(param => param.transient).map(param => param.name);
+    const requiredParams = [...(capability.requiredParams ?? []), ...(capability.params ?? []).filter(param => !param['transient'] && param.required).map(param => param.name)];
+    const optionalParams = [...(capability.optionalParams ?? []), ...(capability.params ?? []).filter(param => !param['transient'] && !param.required).map(param => param.name)];
+    const transientParams = (capability.params ?? []).filter(param => param['transient']).map(param => param.name);
     if (requiredParams.length) {
       await enterText(requiredParams.join(','), this._pageFinder.$('input.e2e-required-params'));
     }

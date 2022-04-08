@@ -9,9 +9,9 @@
  */
 
 import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
-import {Component, NgModule, NgModuleFactoryLoader} from '@angular/core';
+import {Component, NgModule} from '@angular/core';
 import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
-import {RouterTestingModule, SpyNgModuleFactoryLoader} from '@angular/router/testing';
+import {RouterTestingModule} from '@angular/router/testing';
 import {Router, RouterModule} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {CommonModule} from '@angular/common';
@@ -21,7 +21,7 @@ import {WorkbenchTestingModule} from './workbench-testing.module';
 
 /**
  *
- * Testsetup:
+ * Test setup:
  *
  *                                    +--------------+
  *                                    | Test Module  |
@@ -54,15 +54,7 @@ describe('Views', () => {
     TestBed.inject(Router).initialNavigation();
   }));
 
-  // TODO [Angular 9]:
-  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
-  // See Angular internal tests in `integration.spec.ts` file.
-  it('can be loaded from lazy feature modules', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
-    loader.stubbedModules = {
-      './feature-a/feature-a.module': FeatureAModule,
-      './feature-b/feature-b.module': FeatureBModule,
-    };
-
+  it('can be loaded from lazy feature modules', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
@@ -102,8 +94,8 @@ class AppComponent {
     WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
-      {path: 'feature-a', loadChildren: './feature-a/feature-a.module'},
-      {path: 'feature-b', loadChildren: './feature-b/feature-b.module'},
+      {path: 'feature-a', loadChildren: () => FeatureAModule},
+      {path: 'feature-b', loadChildren: () => FeatureBModule},
     ]),
   ],
   declarations: [AppComponent],

@@ -22,7 +22,7 @@ import {WorkbenchTestingModule} from './workbench-testing.module';
 
 /**
  *
- * Testsetup:
+ * Test setup:
  *
  * +------------------------------------+
  * | Test Module                        |
@@ -58,24 +58,24 @@ describe('Activity part', () => {
     clickElement(fixture, ActivityPartComponent, 'a.activity-1', '(1a)');
     advance(fixture);
     expect(fixture).toShow(Activity1Component, '(1b)');
-    expect(fixture.debugElement.queryAll(By.css('span.action')).length).toBe(2, '(1c)');
-    expect(fixture.debugElement.query(By.css('.activity-1.action-a'))).toBeTruthy('(1d)');
-    expect(fixture.debugElement.query(By.css('.activity-1.action-b'))).toBeTruthy('(1e)');
+    expect(fixture.debugElement.queryAll(By.css('span.action')).length).withContext('(1c)').toBe(2);
+    expect(fixture.debugElement.query(By.css('.activity-1.action-a'))).withContext('(1d)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('.activity-1.action-b'))).withContext('(1e)').toBeTruthy();
 
     // Open 'activity-2'
     clickElement(fixture, ActivityPartComponent, 'a.activity-2', '(2a)');
     advance(fixture);
     expect(fixture).toShow(Activity2Component, '(2b)');
-    expect(fixture.debugElement.queryAll(By.css('span.action')).length).toBe(3, '(2c)');
-    expect(fixture.debugElement.query(By.css('.activity-2.action-a'))).toBeTruthy('(2d)');
-    expect(fixture.debugElement.query(By.css('.activity-2.action-b'))).toBeTruthy('(2e)');
-    expect(fixture.debugElement.query(By.css('.activity-2.action-c'))).toBeTruthy('(2f)');
+    expect(fixture.debugElement.queryAll(By.css('span.action')).length).withContext('(2c)').toBe(3);
+    expect(fixture.debugElement.query(By.css('.activity-2.action-a'))).withContext('(2d)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('.activity-2.action-b'))).withContext('(2e)').toBeTruthy();
+    expect(fixture.debugElement.query(By.css('.activity-2.action-c'))).withContext('(2f)').toBeTruthy();
 
     // Open 'activity-3'
     clickElement(fixture, ActivityPartComponent, 'a.activity-3', '(3a)');
     advance(fixture);
     expect(fixture).toShow(Activity3Component, '(3b)');
-    expect(fixture.debugElement.queryAll(By.css('span.action')).length).toBe(0, '(3c)');
+    expect(fixture.debugElement.queryAll(By.css('span.action')).length).withContext('(3c)').toBe(0);
 
     discardPeriodicTasks();
   })));

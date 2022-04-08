@@ -13,8 +13,8 @@ import {AppPO, PopupPO} from '../../app.po';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {PopupSize} from '@scion/workbench';
-import {SciAccordionPO} from '@scion/toolkit.internal/widgets.po';
 import {ISize} from 'selenium-webdriver';
+import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
 
 /**
  * Page object to interact {@link PopupPageComponent}.

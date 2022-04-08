@@ -1,7 +1,7 @@
 name: Continuous Integration and Delivery
 on: [ push, pull_request ]
 env:
-  NODE_VERSION: 14.17.0
+  NODE_VERSION: 16.14.0
 jobs:
   install:
     name: 'Installing NPM modules'
