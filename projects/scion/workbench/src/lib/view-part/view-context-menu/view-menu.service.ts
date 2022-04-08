@@ -14,8 +14,8 @@ import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {filter, mapTo, switchMap, take, takeUntil, tap} from 'rxjs/operators';
-import {fromEvent, merge, Observable, Subject, TeardownLogic} from 'rxjs';
+import {filter, map, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {firstValueFrom, fromEvent, merge, Observable, Subject, TeardownLogic} from 'rxjs';
 import {coerceElement} from '@angular/cdk/coercion';
 import {TEXT, TextComponent} from '../view-context-menu/text.component';
 import {MenuItemConfig, WorkbenchModuleConfig} from '../../workbench-module-config';
@@ -61,7 +61,7 @@ export class ViewMenuService {
    */
   public async showMenu(location: Point, viewId: string): Promise<boolean> {
     const view = this._viewRegistry.getElseThrow(viewId);
-    const menuItems = await view.menuItems$.pipe(take(1)).toPromise();
+    const menuItems = await firstValueFrom(view.menuItems$);
 
     // Do not show the menu if there are no menu items registered.
     if (menuItems.length === 0) {
@@ -118,7 +118,7 @@ export class ViewMenuService {
                     event.preventDefault();
                     event.stopPropagation();
                   }),
-                  mapTo(menuItem),
+                  map(() => menuItem),
                 );
             });
             return merge(...accelerators$);

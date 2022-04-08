@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AsyncSubject, Subject} from 'rxjs';
+import {AsyncSubject, lastValueFrom, Subject} from 'rxjs';
 import {serializeExecution} from '../operators';
 import {catchError, takeUntil} from 'rxjs/operators';
 
@@ -71,6 +71,6 @@ class Task<T = any> {
   }
 
   public await(): Promise<T> {
-    return this._done$.toPromise();
+    return lastValueFrom(this._done$);
   }
 }

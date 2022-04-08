@@ -10,7 +10,6 @@
 
 import CustomMatcher = jasmine.CustomMatcher;
 import MatchersUtil = jasmine.MatchersUtil;
-import CustomEqualityTester = jasmine.CustomEqualityTester;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
 import {ComponentFixture} from '@angular/core/testing';
@@ -22,6 +21,7 @@ import {MPart, MTreeNode} from '../../layout/parts-layout.model';
 /**
  * Extends the Jasmine expect API to support chaining with project specific custom matchers.
  *
+ * See https://jasmine.github.io/tutorials/custom_matcher.
  * See https://blog.thoughtram.io/angular/2016/12/27/angular-2-advance-testing-with-custom-matchers.html
  */
 declare const global: any;
@@ -53,11 +53,11 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
  * Provides the implementation of project specific custom matchers.
  */
 export const jasmineCustomMatchers: jasmine.CustomMatcherFactories = {
-  toEqualPartsLayout: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToEqualPartsLayoutMatcher(util, customEqualityTesters),
-  toShow: (util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher => createToShowMatcher(util, customEqualityTesters),
+  toEqualPartsLayout: (util: MatchersUtil): CustomMatcher => createToEqualPartsLayoutMatcher(util),
+  toShow: (util: MatchersUtil): CustomMatcher => createToShowMatcher(util),
 };
 
-function createToShowMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
+function createToShowMatcher(util: MatchersUtil): CustomMatcher {
   return {
     compare(actualFixture: any, expectedComponentType: Type<any>, ...args: any[]): CustomMatcherResult {
       const failOutput = args[0];
@@ -79,7 +79,7 @@ function createToShowMatcher(util: MatchersUtil, customEqualityTesters: CustomEq
   };
 }
 
-function createToEqualPartsLayoutMatcher(util: MatchersUtil, customEqualityTesters: CustomEqualityTester[]): CustomMatcher {
+function createToEqualPartsLayoutMatcher(util: MatchersUtil): CustomMatcher {
   return {
     compare(actual: MTreeNode | MPart | ComponentFixture<PartsLayoutComponent>, expectedLayout: MTreeNode | MPart, ...args: any[]): CustomMatcherResult {
       try {
@@ -113,7 +113,7 @@ function createToEqualPartsLayoutMatcher(util: MatchersUtil, customEqualityTeste
    * Asserts the actual model to equal the expected model. Only properties declared on the expected object are compared ().
    */
   function assertPartsLayoutModel(expectedLayout: MTreeNode | MPart, actualLayout: MTreeNode | MPart): void {
-    const result = toEqual(actualLayout, objectContainingRecursive(expectedLayout), util, customEqualityTesters);
+    const result = toEqual(actualLayout, objectContainingRecursive(expectedLayout), util);
     if (!result.pass) {
       throw new PartsLayoutAssertError(result.message);
     }
@@ -156,8 +156,8 @@ function createToEqualPartsLayoutMatcher(util: MatchersUtil, customEqualityTeste
 }
 
 // Jasmine: Use equals matcher in a custom matcher
-function toEqual(actual: any, expected: any, util: MatchersUtil, customEqualityTesters: CustomEqualityTester[], expectationFailOutput?: string): CustomMatcherResult {
-  const toEqualMatcher: CustomMatcher = (jasmine as any).matchers.toEqual(util, customEqualityTesters);
+function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFailOutput?: string): CustomMatcherResult {
+  const toEqualMatcher: CustomMatcher = (jasmine as any).matchers.toEqual(util);
   const result = toEqualMatcher.compare(actual, expected);
   if (!result.pass && expectationFailOutput) {
     result.message = `${result.message} [${expectationFailOutput}]`;

@@ -11,10 +11,13 @@
 import {assertPageToDisplay, enterText, getInputValue} from '../../helper/testing.util';
 import {Params} from '@angular/router';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {SciAccordionPO, SciCheckboxPO, SciPropertyPO} from '@scion/toolkit.internal/widgets.po';
-import {Arrays, Dictionary} from '@scion/toolkit/util';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
+import {SciPropertyPO} from '../../../deps/scion/toolkit.internal/property/property.po';
+import {Dictionary} from '../../../deps/scion/toolkit/dictionaries.util';
+import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
+import {Arrays} from '../../../deps/scion/toolkit/arrays.util';
 
 /**
  * Page object to interact {@link ViewPageComponent}.

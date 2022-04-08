@@ -11,10 +11,11 @@
 import {assertPageToDisplay, enterText, pressModifierThenClick, selectOption} from '../../helper/testing.util';
 import {Params} from '@angular/router';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {SciCheckboxPO, SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {Dictionary} from '@scion/toolkit/util';
+import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
+import {Dictionary} from '../../../deps/scion/toolkit/dictionaries.util';
+import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
 
 /**
  * Page object to interact {@link RouterPageComponent}.

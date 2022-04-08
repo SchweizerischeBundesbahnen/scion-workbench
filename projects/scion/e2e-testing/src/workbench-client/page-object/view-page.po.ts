@@ -10,12 +10,15 @@
 
 import {assertPageToDisplay, enterText, selectOption, sendKeys} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {SciAccordionPO, SciCheckboxPO, SciParamsEnterPO, SciPropertyPO} from '@scion/toolkit.internal/widgets.po';
 import {$, browser, ElementFinder, protractor} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {Params} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {RouterOutletPO} from './router-outlet.po';
+import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
+import {SciPropertyPO} from '../../../deps/scion/toolkit.internal/property/property.po';
+import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
+import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
 
 const EC = protractor.ExpectedConditions;
 

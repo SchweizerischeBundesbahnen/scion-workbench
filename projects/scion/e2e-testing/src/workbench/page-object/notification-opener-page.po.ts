@@ -12,8 +12,8 @@ import {assertPageToDisplay, enterText, selectOption, sendKeys} from '../../help
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {browser, ElementFinder, Key} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {Arrays} from '@scion/toolkit/util';
-import {SciCheckboxPO} from '@scion/toolkit.internal/widgets.po';
+import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
+import {Arrays} from '../../../deps/scion/toolkit/arrays.util';
 
 /**
  * Page object to interact {@link NotificationPageComponent}.

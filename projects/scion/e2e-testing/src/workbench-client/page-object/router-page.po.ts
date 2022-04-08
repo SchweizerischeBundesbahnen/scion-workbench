@@ -10,12 +10,13 @@
 
 import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {SciCheckboxPO, SciParamsEnterPO} from '@scion/toolkit.internal/widgets.po';
 import {$, browser, ElementFinder, protractor} from 'protractor';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {RouterOutletPO} from './router-outlet.po';
-import {Dictionary} from '@scion/toolkit/util';
+import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
+import {Dictionary} from '../../../deps/scion/toolkit/dictionaries.util';
+import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
 
 const EC = protractor.ExpectedConditions;
 

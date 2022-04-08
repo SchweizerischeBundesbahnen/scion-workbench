@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {IntentClient, mapToBody, Qualifier, RequestError} from '@scion/microfrontend-platform';
+import {IntentClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {WorkbenchNotificationConfig} from './workbench-notification.config';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Maps} from '@scion/toolkit/util';
-import {catchError} from 'rxjs/operators';
-import {throwError} from 'rxjs';
+import {lastValueFrom} from 'rxjs';
 
 /**
  * Allows displaying a notification to the user.
@@ -57,15 +56,16 @@ export class WorkbenchNotificationService {
    *         the notification intention, or because no notification provider could be found that provides a notification under the specified
    *         qualifier.
    */
-  public show(notification: string | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void> {
+  public async show(notification: string | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void> {
     const config: WorkbenchNotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
     const params = Maps.coerce(config.params);
 
-    return Beans.get(IntentClient).request$<void>({type: WorkbenchCapabilities.Notification, qualifier, params}, config)
-      .pipe(
-        mapToBody(),
-        catchError(error => throwError(error instanceof RequestError ? error.message : error)),
-      )
-      .toPromise();
+    const showNotification$ = Beans.get(IntentClient).request$<void>({type: WorkbenchCapabilities.Notification, qualifier, params}, config);
+    try {
+      await lastValueFrom(showNotification$, {defaultValue: undefined});
+    }
+    catch (error) {
+      throw (error instanceof RequestError ? error.message : error);
+    }
   }
 }

@@ -164,7 +164,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
           // when activating it again.
           return (!viewBoundingBox || !isNullClientRect(viewBoundingBox)) && !isNullClientRect(popupOrigin);
         }),
-        map(([viewBoundingBox, popupOrigin]: [ClientRect | undefined, ClientRect]) => {
+        map(([viewBoundingBox, popupOrigin]: [DOMRect | undefined, DOMRect]) => {
           return {
             x: (viewBoundingBox?.left ?? 0) + popupOrigin.left,
             y: (viewBoundingBox?.top ?? 0) + popupOrigin.top,
@@ -180,7 +180,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
   /**
    * Observes the bounding box of the view in which the popup is opened.
    */
-  private observeViewBoundingBox$(viewId: string): Observable<ClientRect> {
+  private observeViewBoundingBox$(viewId: string): Observable<DOMRect> {
     const view = this._viewRegistry.getElseThrow(viewId);
     return fromDimension$(view.portal.componentRef.location.nativeElement)
       .pipe(map(dimension => dimension.element.getBoundingClientRect()));
@@ -189,8 +189,8 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
   /**
    * Observes the bounding box of the popup anchor in which the popup is opened.
    */
-  private observeMicrofrontendPopupOrigin$(popupId: string): Observable<ClientRect> {
-    return Beans.get(MessageClient).observe$<ClientRect>(ɵWorkbenchCommands.popupOriginTopic(popupId))
+  private observeMicrofrontendPopupOrigin$(popupId: string): Observable<DOMRect> {
+    return Beans.get(MessageClient).observe$<DOMRect>(ɵWorkbenchCommands.popupOriginTopic(popupId))
       .pipe(mapToBody());
   }
 
@@ -207,7 +207,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
   }
 }
 
-function isNullClientRect(clientRect: ClientRect): boolean {
+function isNullClientRect(clientRect: DOMRect): boolean {
   return clientRect.top === 0 && clientRect.right === 0 && clientRect.bottom === 0 && clientRect.left === 0;
 }
 

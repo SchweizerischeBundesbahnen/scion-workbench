@@ -10,6 +10,7 @@
 
 import {$, browser, protractor, WebElement} from 'protractor';
 import {runOutsideAngularSynchronization, setAttribute} from './testing.util';
+import {ElementFinders, RouterOutletSelector} from './element-finders';
 
 const EC = protractor.ExpectedConditions;
 
@@ -47,11 +48,14 @@ export namespace WebdriverExecutionContexts {
    * Elements contained within iframes can not be accessed from inside the root execution context.
    * Instead, the execution context must first be switched to the iframe.
    */
-  export async function switchToIframe(outletName: string): Promise<void> {
+  export async function switchToIframe(outletNameOrSelector: string | RouterOutletSelector): Promise<void> {
+    const routerOutletFinder = ElementFinders.routerOutlet(outletNameOrSelector);
+    const contextName = `${routerOutletFinder.locator()}`;
+
     // Do not wait for Angular as the page must not necessarily be an Angular page.
     await runOutsideAngularSynchronization(async () => {
       // Check if the WebDriver execution context for this document is already active.
-      if (await isExecutionContextActive(outletName)) {
+      if (await isExecutionContextActive(contextName)) {
         return;
       }
 
@@ -59,20 +63,19 @@ export namespace WebdriverExecutionContexts {
       await switchToDefault();
 
       // Get the iframe from the <sci-router-outlet> custom element (inside shadow DOM)
-      const routerOutletFinder = $(`sci-router-outlet[name="${outletName}"]`);
       await browser.wait(EC.presenceOf(routerOutletFinder), 5000);
       const iframe = await browser.executeScript<WebElement>('return arguments[0].iframe', routerOutletFinder.getWebElement());
 
       // Activate the iframe's WebDriver execution context.
       await browser.switchTo().frame(iframe);
-      await setDocumentContextMarkerIfAbsent(outletName);
+      await setDocumentContextMarkerIfAbsent(contextName);
 
       // Since Angular 9, Protractor may not recognize a launching Angular application if it is embedded in an iframe and uses app initializers.
       // This can lead to the following error: 'Both AngularJS testability and Angular testability are undefined'.
       // For this reason, we wait until Angular completes initialization.
       await browser.wait(protractor.ExpectedConditions.presenceOf($('*[ng-version]')));
 
-      console.log(`Switched WebDriver execution context to the iframe of the outlet ${outletName}.`);
+      console.log(`Switched WebDriver execution context to the iframe of the outlet ${contextName}.`);
     });
   }
 

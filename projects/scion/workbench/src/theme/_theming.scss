@@ -1,4 +1,4 @@
-/*!
+/**
  * Copyright (c) 2018-2022 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
@@ -7,9 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-// This files contains all all the theming functionality.
-@use '~@angular/cdk/a11y' as cdk-a11y;
-@use '~@angular/cdk/overlay' as cdk-overlay;
+// This files contains all the theming functionality.
+@use '@angular/cdk';
 @import 'font-theme';
 @import 'popup-theme';
 @import 'view-drag-theme';
@@ -18,8 +17,8 @@
  * Invoke from `index.scss' to style the SCION workbench frame.
  */
 @mixin wb-theme($theme: ()) {
-  @include cdk-a11y.a11y-visually-hidden();
-  @include cdk-overlay.overlay();
+  @include cdk.a11y-visually-hidden();
+  @include cdk.overlay();
 
   @include wb-font-theme($theme);
   @include wb-popup-theme($theme);

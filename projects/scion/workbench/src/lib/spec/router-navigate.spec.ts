@@ -9,8 +9,8 @@
  */
 
 import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
-import {Component, NgModule, NgModuleFactoryLoader} from '@angular/core';
-import {RouterTestingModule, SpyNgModuleFactoryLoader} from '@angular/router/testing';
+import {Component, NgModule} from '@angular/core';
+import {RouterTestingModule} from '@angular/router/testing';
 import {Router, RouterModule} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {CommonModule} from '@angular/common';
@@ -20,7 +20,7 @@ import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec
 import {WorkbenchTestingModule} from './workbench-testing.module';
 
 /**
- * Testsetup:
+ * Test setup:
  *
  *
  *           +--------------+
@@ -66,15 +66,7 @@ describe('Router', () => {
     TestBed.inject(Router).initialNavigation();
   }));
 
-  // TODO [Angular 9]:
-  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
-  // See Angular internal tests in `integration.spec.ts` file.
-  it('allows for relative and absolute navigation', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
-    loader.stubbedModules = {
-      './feature-a/feature-a.module': FeatureAModule,
-      './feature-b/feature-b.module': FeatureBModule,
-    };
-
+  it('allows for relative and absolute navigation', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
@@ -246,15 +238,7 @@ describe('Router', () => {
     discardPeriodicTasks();
   })));
 
-  // TODO [Angular 9]:
-  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
-  // See Angular internal tests in `integration.spec.ts` file.
-  it('allows to close views', fakeAsync(inject([WorkbenchRouter, NgModuleFactoryLoader], (wbRouter: WorkbenchRouter, loader: SpyNgModuleFactoryLoader) => {
-    loader.stubbedModules = {
-      './feature-a/feature-a.module': FeatureAModule,
-      './feature-b/feature-b.module': FeatureBModule,
-    };
-
+  it('allows to close views', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
@@ -307,7 +291,7 @@ class AppComponent {
     WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     NoopAnimationsModule,
     RouterTestingModule.withRoutes([
-      {path: 'feature-a', loadChildren: './feature-a/feature-a.module'},
+      {path: 'feature-a', loadChildren: () => FeatureAModule},
     ]),
   ],
   declarations: [AppComponent],
@@ -379,7 +363,7 @@ class FeatureA_View2Component {
       {path: '', component: FeatureA_EntryComponent},
       {path: 'view-1', component: FeatureA_View1Component},
       {path: 'view-2', component: FeatureA_View2Component},
-      {path: 'feature-b', loadChildren: './feature-b/feature-b.module'},
+      {path: 'feature-b', loadChildren: () => FeatureBModule},
     ]),
   ],
   declarations: [FeatureA_EntryComponent, FeatureA_View1Component, FeatureA_View2Component],

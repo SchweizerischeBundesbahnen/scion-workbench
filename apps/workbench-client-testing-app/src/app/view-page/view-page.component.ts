@@ -13,8 +13,8 @@ import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {ViewClosingEvent, ViewClosingListener, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {EMPTY, MonoTypeOperatorFunction, Subject} from 'rxjs';
-import {finalize, mergeMapTo, startWith, take, takeUntil} from 'rxjs/operators';
+import {MonoTypeOperatorFunction, NEVER, Subject} from 'rxjs';
+import {finalize, startWith, take, takeUntil} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
 import {Location} from '@angular/common';
@@ -70,7 +70,7 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
 
     this.view.setTitle(this.form.get(TITLE).valueChanges.pipe(this.logCompletion('TitleObservableComplete')));
     this.view.setHeading(this.form.get(HEADING).valueChanges.pipe(this.logCompletion('HeadingObservableComplete')));
-    this.view.markDirty(new Subject<void>().pipe(mergeMapTo(EMPTY), this.logCompletion('DirtyObservableComplete')));
+    this.view.markDirty(NEVER.pipe(this.logCompletion('DirtyObservableComplete')));
     this.view.setClosable(this.form.get(CLOSABLE).valueChanges.pipe(this.logCompletion('ClosableObservableComplete')));
 
     this.installClosingListener();

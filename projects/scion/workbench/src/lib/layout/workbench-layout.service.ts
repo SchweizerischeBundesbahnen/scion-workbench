@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {asapScheduler, BehaviorSubject, merge, Observable, Subject} from 'rxjs';
+import {asapScheduler, BehaviorSubject, firstValueFrom, merge, Observable, Subject} from 'rxjs';
 import {Injectable, NgZone} from '@angular/core';
-import {debounce, filter, map, mapTo, observeOn, startWith, take} from 'rxjs/operators';
+import {debounce, filter, map, observeOn, startWith} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {PartsLayout} from './parts-layout';
 
@@ -54,8 +54,8 @@ export class WorkbenchLayoutService {
 
   constructor(viewDragService: ViewDragService, private _zone: NgZone) {
     this.dragging$ = merge(
-      merge(this._dragStart$, viewDragService.viewDragStart$).pipe(mapTo<void, 'start'>('start')),
-      merge(this._dragEnd$, viewDragService.viewDragEnd$).pipe(mapTo<void, 'end'>('end')),
+      merge(this._dragStart$, viewDragService.viewDragStart$).pipe(map<void, 'start'>(() => 'start')),
+      merge(this._dragEnd$, viewDragService.viewDragEnd$).pipe(map<void, 'end'>(() => 'end')),
     );
   }
 
@@ -78,9 +78,7 @@ export class WorkbenchLayoutService {
    * the layout is already flushed to the DOM.
    */
   public async whenLayoutChange(): Promise<void> {
-    return this.afterLayoutChange$
-      .pipe(take(1))
-      .toPromise();
+    return firstValueFrom(this.afterLayoutChange$);
   }
 
   /**

@@ -36,7 +36,7 @@ This section explains how to submit a pull request.
   <summary><strong>Development</strong></summary>
   <br>
 
-Make sure to use Node.js version 14.17.0 for contributing to SCION. We suggest using [Node Version Manager](https://github.com/nvm-sh/nvm) if you need different Node.js versions for other projects.
+Make sure to use Node.js version 16.14.0 for contributing to SCION. We suggest using [Node Version Manager](https://github.com/nvm-sh/nvm) if you need different Node.js versions for other projects.
 
 For development, you can uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json`. This allows running tests or serving applications without having to build dependent modules first.
 
@@ -269,21 +269,21 @@ We have the following workbench related packages:
 </details>
 
 <details>
-  <summary><strong>Releasing Policy</strong></summary>
-  <br>
-  
-SCION follows the semantic versioning scheme (SemVer) for its releases. In this scheme, a release is represented by three numbers: `MAJOR.MINOR.PATCH`. For example, version `1.5.3` indicates major version `1`, minor version `5`, and patch level `3`.
+  <summary><strong>Versioning</strong></summary>
+  <br>  
+
+We follow the same SemVer (Semantic Versioning) philosophy as Angular, with major versions being released at the same time as major versions of the Angular framework.
+
+### Semantic Versioning Scheme (SemVer)
 
 **Major Version:**\
-The major version number is incremented when introducing any backwards incompatible changes to the API.
+Major versions contain breaking changes.
 
 **Minor Version**\
-The minor version number is incremented when introducting some new, backwards compatible functionality.
+Minor versions add new features or deprecate existing features without breaking changes.
 
 **Patch Level**\
-The patch or maintenance level is incremented when fixing bugs.
-
-In the development of a new major release, we usually release pre-releases and tag them with the beta tag (`-beta.x`). A beta pre-release is a snapshot of current development, so it is potentially unstable and incomplete. Before releasing the major version, we start releasing one or more release candidates, which we tag with the rc tag (`-rc.x`). We will publish the official and stable major release if the platform is working as expected and we do not find any critical problems.  
+Patch versions fix bugs or optimize existing features without breaking changes. 
   
 </details>
 

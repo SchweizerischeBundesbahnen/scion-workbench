@@ -10,8 +10,8 @@
 
 import {ElementRef, Inject, Injectable, Injector, NgZone, Optional} from '@angular/core';
 import {ConnectedOverlayPositionChange, ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
-import {from, fromEvent, MonoTypeOperatorFunction, Observable} from 'rxjs';
-import {filter, map, shareReplay, take, takeUntil} from 'rxjs/operators';
+import {firstValueFrom, from, fromEvent, MonoTypeOperatorFunction, Observable} from 'rxjs';
+import {filter, map, shareReplay, takeUntil} from 'rxjs/operators';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {Popup, PopupConfig, PopupOrigin, ɵPopup, ɵPopupError} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
@@ -76,7 +76,7 @@ export class PopupService {
 
     // Set up the popup positioning strategy.
     const overlayPositionStrategy = this._overlay.position()
-      .flexibleConnectedTo(await anchor$.pipe(take(1)).toPromise())
+      .flexibleConnectedTo(await firstValueFrom(anchor$))
       .withFlexibleDimensions(false)
       .withLockedPosition(false) // If locked, the popup won't attempt to reposition itself if not enough space available.
       .withPositions(((): ConnectedPosition[] => {
@@ -232,7 +232,7 @@ export class PopupService {
   private observePopupAnchor$(config: PopupConfig): Observable<PopupOrigin> {
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
       return fromBoundingClientRect$(coerceElement<HTMLElement>(config.anchor as HTMLElement))
-        .pipe(map<ClientRect, PopupOrigin>(clientRect => ({
+        .pipe(map<DOMRect, PopupOrigin>(clientRect => ({
             x: clientRect.left,
             y: clientRect.top,
             width: clientRect.width,

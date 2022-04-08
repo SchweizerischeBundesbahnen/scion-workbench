@@ -63,7 +63,7 @@ export class NotificationComponent implements OnChanges, OnDestroy {
       providers: [
         {provide: Notification, useValue: notification},
       ],
-    }), componentConstructOptions?.componentFactoryResolver || null);
+    }));
   }
 
   /**

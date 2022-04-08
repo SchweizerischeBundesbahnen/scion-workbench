@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ComponentFactoryResolver, ElementRef, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
+import {ElementRef, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
 import {Observable} from 'rxjs';
 
 /**
@@ -67,10 +67,6 @@ export abstract class PopupConfig {
      * in the component tree.
      */
     viewContainerRef?: ViewContainerRef;
-    /**
-     * Sets the component factory for Angular to resolve the component for construction. Must be set if Angular cannot resolve the component.
-     */
-    componentFactoryResolver?: ComponentFactoryResolver | null;
   };
   /**
    * Hint where to align the popup relative to the popup anchor, unless there is not enough space available in that area. By default,

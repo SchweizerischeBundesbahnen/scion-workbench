@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ComponentFactoryResolver, Injector, ViewContainerRef} from '@angular/core';
+import {Injector, ViewContainerRef} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal/portal';
 import {Dictionary} from '@scion/toolkit/util';
 import {Observable} from 'rxjs';
@@ -76,11 +76,6 @@ export interface MessageBoxConfig {
      * in the component tree.
      */
     viewContainerRef?: ViewContainerRef;
-
-    /**
-     * Sets the component factory for Angular to resolve the component for construction. Must be set if Angular cannot resolve the component.
-     */
-    componentFactoryResolver?: ComponentFactoryResolver | null;
   };
 
   /**

@@ -14,8 +14,7 @@ import {WorkbenchView} from '../view/workbench-view';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Dictionary, Maps} from '@scion/toolkit/util';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {throwError} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {lastValueFrom} from 'rxjs';
 
 /**
  * Allows navigating to a microfrontend in a workbench view.
@@ -62,19 +61,20 @@ export class WorkbenchRouter {
     }
   }
 
-  private issueViewIntent(qualifier: Qualifier | {}, extras?: WorkbenchNavigationExtras): Promise<boolean> {
+  private async issueViewIntent(qualifier: Qualifier | {}, extras?: WorkbenchNavigationExtras): Promise<boolean> {
     const navigationExtras: WorkbenchNavigationExtras = {
       ...extras,
       selfViewId: extras?.selfViewId ?? Beans.opt(WorkbenchView)?.viewId,
       params: undefined,         // included in the intent
       paramsHandling: undefined, // only applicable for self-navigation
     };
-    return Beans.get(IntentClient).request$<boolean>({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras?.params)}, navigationExtras)
-      .pipe(
-        mapToBody(),
-        catchError(error => throwError(error instanceof RequestError ? error.message : error)),
-      )
-      .toPromise();
+    const navigate$ = Beans.get(IntentClient).request$<boolean>({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras?.params)}, navigationExtras);
+    try {
+      return await lastValueFrom(navigate$.pipe(mapToBody()));
+    }
+    catch (error) {
+      throw (error instanceof RequestError ? error.message : error);
+    }
   }
 
   private async updateViewParams(extras?: WorkbenchNavigationExtras): Promise<boolean> {
@@ -87,12 +87,13 @@ export class WorkbenchRouter {
       params: extras?.params || {},
       paramsHandling: extras?.paramsHandling,
     };
-    return Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.viewParamsUpdateTopic(Beans.get(WorkbenchView).viewId, viewCapabilityId), command)
-      .pipe(
-        mapToBody(),
-        catchError(error => throwError(error instanceof RequestError ? error.message : error)),
-      )
-      .toPromise();
+    const updateParams$ = Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.viewParamsUpdateTopic(Beans.get(WorkbenchView).viewId, viewCapabilityId), command);
+    try {
+      return await lastValueFrom(updateParams$.pipe(mapToBody()));
+    }
+    catch (error) {
+      throw (error instanceof RequestError ? error.message : error);
+    }
   }
 
   private isSelfNavigation(qualifier: Qualifier | {}): boolean {

@@ -9,9 +9,9 @@
  */
 
 import {discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
-import {Component, NgModule, NgModuleFactoryLoader} from '@angular/core';
+import {Component, NgModule} from '@angular/core';
 import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
-import {RouterTestingModule, SpyNgModuleFactoryLoader} from '@angular/router/testing';
+import {RouterTestingModule} from '@angular/router/testing';
 import {Router, RouteReuseStrategy, RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
@@ -22,7 +22,7 @@ import {WorkbenchTestingModule} from './workbench-testing.module';
 
 /**
  *
- * Testsetup:
+ * Test setup:
  *
  *                        +----------------------------------+
  *                        | App Module                       |
@@ -60,15 +60,7 @@ describe('WbRouteReuseStrategy', () => {
     TestBed.inject(Router).initialNavigation();
   }));
 
-  // TODO [Angular 9]:
-  // As of Angular 8.0 there is no workaround to configure lazily loaded routes without using `NgModuleFactoryLoader`.
-  // See Angular internal tests in `integration.spec.ts` file.
-  it('reuses activity routes', fakeAsync(inject([Router, NgModuleFactoryLoader, RouteReuseStrategy], (router: Router, loader: SpyNgModuleFactoryLoader, routeReuseStrategy: RouteReuseStrategy) => {
-    loader.stubbedModules = {
-      './feature-a/feature-a.module': FeatureAModule,
-      './feature-b/feature-b.module': FeatureBModule,
-    };
-
+  it('reuses activity routes', fakeAsync(inject([Router, RouteReuseStrategy], (router: Router, routeReuseStrategy: RouteReuseStrategy) => {
     // Configure to use reuse strategy
     router.routeReuseStrategy = routeReuseStrategy;
 
@@ -108,32 +100,32 @@ describe('WbRouteReuseStrategy', () => {
     // Goto 'app/activity-1'
     clickElement(fixture, ActivityPartComponent, 'a.app_activity-1', '(7a)');
     expect(fixture).toShow(App_Activity1_Component, '(7b)');
-    expect(fixture.debugElement.query(By.directive(App_Activity1_Component)).componentInstance).toBe(appActivity1Component, '(7c)');
+    expect(fixture.debugElement.query(By.directive(App_Activity1_Component)).componentInstance).withContext('(7c)').toBe(appActivity1Component);
 
     // Goto 'app/activity-2'
     clickElement(fixture, ActivityPartComponent, 'a.app_activity-2', '(8a)');
     expect(fixture).toShow(App_Activity2_Component, '(8b)');
-    expect(fixture.debugElement.query(By.directive(App_Activity2_Component)).componentInstance).toBe(appActivity2Component, '(8c)');
+    expect(fixture.debugElement.query(By.directive(App_Activity2_Component)).componentInstance).withContext('(8c)').toBe(appActivity2Component);
 
     // Goto 'feature-a/activity-1'
     clickElement(fixture, ActivityPartComponent, 'a.feature-a_activity-1', '(9a)');
     expect(fixture).toShow(FeatureA_Activity1_Component, '(9b)');
-    expect(fixture.debugElement.query(By.directive(FeatureA_Activity1_Component)).componentInstance).toBe(featureAActivity1, '(9c)');
+    expect(fixture.debugElement.query(By.directive(FeatureA_Activity1_Component)).componentInstance).withContext('(9c)').toBe(featureAActivity1);
 
     // Goto 'feature-a/activity-2'
     clickElement(fixture, ActivityPartComponent, 'a.feature-a_activity-2', '(10a)');
     expect(fixture).toShow(FeatureA_Activity2_Component, '(10b)');
-    expect(fixture.debugElement.query(By.directive(FeatureA_Activity2_Component)).componentInstance).toBe(featureAActivity2, '(10c)');
+    expect(fixture.debugElement.query(By.directive(FeatureA_Activity2_Component)).componentInstance).withContext('(10c)').toBe(featureAActivity2);
 
     // Goto 'feature-b/activity-1'
     clickElement(fixture, ActivityPartComponent, 'a.feature-b_activity-1', '(11a)');
     expect(fixture).toShow(FeatureB_Activity1_Component, '(11b)');
-    expect(fixture.debugElement.query(By.directive(FeatureB_Activity1_Component)).componentInstance).toBe(featureBActivity1, '(11c)');
+    expect(fixture.debugElement.query(By.directive(FeatureB_Activity1_Component)).componentInstance).withContext('(11c)').toBe(featureBActivity1);
 
     // Goto 'feature-b/activity-2'
     clickElement(fixture, ActivityPartComponent, 'a.feature-b_activity-2', '(12a)');
     expect(fixture).toShow(FeatureB_Activity2_Component, '(12b)');
-    expect(fixture.debugElement.query(By.directive(FeatureB_Activity2_Component)).componentInstance).toBe(featureBActivity2, '(12c)');
+    expect(fixture.debugElement.query(By.directive(FeatureB_Activity2_Component)).componentInstance).withContext('(12c)').toBe(featureBActivity2);
 
     discardPeriodicTasks();
   })));
@@ -177,8 +169,8 @@ class App_Activity2_Component {
     RouterTestingModule.withRoutes([
       {path: 'app/activity-1', component: App_Activity1_Component},
       {path: 'app/activity-2', component: App_Activity2_Component},
-      {path: 'feature-a', loadChildren: './feature-a/feature-a.module'},
-      {path: 'feature-b', loadChildren: './feature-b/feature-b.module'},
+      {path: 'feature-a', loadChildren: () => FeatureAModule},
+      {path: 'feature-b', loadChildren: () => FeatureBModule},
     ]),
   ],
   declarations: [AppComponent, App_Activity1_Component, App_Activity2_Component],

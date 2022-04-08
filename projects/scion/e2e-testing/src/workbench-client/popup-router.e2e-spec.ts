@@ -18,7 +18,6 @@ import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {PopupPagePO} from './page-object/popup-page.po';
 import {WebdriverExecutionContexts} from '../helper/webdriver-execution-context';
 import {$, logging} from 'protractor';
-import {RouterOutletPO} from './page-object/router-outlet.po';
 import Level = logging.Level;
 
 export declare type HTMLElement = any;
@@ -288,8 +287,7 @@ describe('Popup Router', () => {
     // expect popup to display
     await expect(await new PopupPagePO('testee').isPresent()).toBe(false);
 
-    const popupId = await new RouterOutletPO().resolveRouterOutletName('e2e-popup', 'testee');
-    await WebdriverExecutionContexts.switchToIframe(popupId);
+    await WebdriverExecutionContexts.switchToIframe({cssClass: ['e2e-popup', 'testee']});
     await assertPageToDisplay($('app-root'));
   });
 
@@ -468,18 +466,17 @@ describe('Popup Router', () => {
     const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
     await popupOpenerPagePO.clickOpen();
+    const popupPagePO = new PopupPagePO('testee');
 
     // expect popup to display
-    const popupPagePO1 = new PopupPagePO('testee');
-    await expect(await popupPagePO1.isDisplayed()).toBe(true);
+    await expect(await popupPagePO.isDisplayed()).toBe(true);
 
     // close the popup
-    await popupPagePO1.clickClose();
-    await expect(await popupPagePO1.isDisplayed()).toBe(false);
+    await popupPagePO.clickClose();
+    await expect(await popupPagePO.isDisplayed()).toBe(false);
 
     // open the popup for the second time
     await popupOpenerPagePO.clickOpen();
-    const popupPagePO2 = new PopupPagePO('testee');
-    await expect(await popupPagePO2.isDisplayed()).toBe(true);
+    await expect(await popupPagePO.isDisplayed()).toBe(true);
   });
 });

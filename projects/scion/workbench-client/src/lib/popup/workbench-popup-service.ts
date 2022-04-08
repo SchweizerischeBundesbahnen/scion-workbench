@@ -10,11 +10,11 @@
 
 import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {catchError, map, takeUntil} from 'rxjs/operators';
+import {map, takeUntil} from 'rxjs/operators';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Maps, Observables} from '@scion/toolkit/util';
 import {fromBoundingClientRect$} from '@scion/toolkit/observable';
-import {NEVER, Observable, TeardownLogic, throwError} from 'rxjs';
+import {firstValueFrom, NEVER, Observable, TeardownLogic} from 'rxjs';
 import {ViewClosingListener, WorkbenchView} from '../view/workbench-view';
 import {ɵWorkbenchPopupCommand} from './workbench-popup-open-command';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
@@ -65,7 +65,7 @@ export class WorkbenchPopupService {
    *         The Promise rejects if opening the popup failed, e.g., if missing the popup intention, or because no application
    *         provides the requested popup. The Promise also rejects when closing the popup with an error.
    */
-  public async open<T>(qualifier: Qualifier, config: WorkbenchPopupConfig): Promise<T> {
+  public async open<T>(qualifier: Qualifier, config: WorkbenchPopupConfig): Promise<T | undefined> {
     const view = Beans.opt(WorkbenchView);
     const popupCommand: ɵWorkbenchPopupCommand = {
       popupId: UUID.randomUUID(),
@@ -76,24 +76,26 @@ export class WorkbenchPopupService {
       },
     };
     const popupOriginPublisher = this.observePopupOrigin$(config).subscribe(origin => {
-      Beans.get(MessageClient).publish<ClientRect>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), origin, {retain: true});
+      Beans.get(MessageClient).publish<DOMRect>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), origin, {retain: true});
     });
 
     const viewClosing$ = new Observable((observer): TeardownLogic => {
-      const closingListener: ViewClosingListener = {onClosing: () => observer.complete()};
+      const closingListener: ViewClosingListener = {onClosing: () => observer.next()};
       view!.addClosingListener(closingListener);
       return () => view!.removeClosingListener(closingListener);
     });
 
     try {
       const params = Maps.coerce(config.params);
-      return await Beans.get(IntentClient).request$<T>({type: WorkbenchCapabilities.Popup, qualifier, params}, popupCommand)
+      const openPopup$ = Beans.get(IntentClient).request$<T>({type: WorkbenchCapabilities.Popup, qualifier, params}, popupCommand)
         .pipe(
           mapToBody(),
-          catchError(error => throwError(error instanceof RequestError ? error.message : error)),
           takeUntil(view ? viewClosing$ : NEVER),
-        )
-        .toPromise();
+        );
+      return await firstValueFrom(openPopup$, {defaultValue: undefined});
+    }
+    catch (error) {
+      throw (error instanceof RequestError ? error.message : error);
     }
     finally {
       popupOriginPublisher.unsubscribe();
@@ -107,20 +109,13 @@ export class WorkbenchPopupService {
    *
    * The Observable emits the anchor's initial position, and each time its position changes.
    */
-  private observePopupOrigin$(config: WorkbenchPopupConfig): Observable<ClientRect> {
+  private observePopupOrigin$(config: WorkbenchPopupConfig): Observable<DOMRect> {
     if (config.anchor instanceof Element) {
       return fromBoundingClientRect$(config.anchor as HTMLElement);
     }
     else {
       return Observables.coerce(config.anchor)
-        .pipe(map<PopupOrigin, ClientRect>(origin => ({
-          top: origin.y,
-          left: origin.x,
-          bottom: origin.y + (origin.height || 0),
-          right: origin.x + (origin.width || 0),
-          width: origin.width || 0,
-          height: origin.height || 0,
-        })));
+        .pipe(map<PopupOrigin, DOMRect>(({width, height, x, y}) => DOMRectReadOnly.fromRect({height, width, x, y})));
     }
   }
 }
