@@ -15,6 +15,7 @@ import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-conte
 import {Params} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {RouterOutletPO} from './router-outlet.po';
+import {ISize} from 'selenium-webdriver';
 import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
 import {SciPropertyPO} from '../../../deps/scion/toolkit.internal/property/property.po';
 import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
@@ -212,6 +213,12 @@ export class ViewPagePO {
     await accordionPO.expand();
     await this._pageFinder.$('button.e2e-close').click();
     // do not close the accordion as this action removes the iframe from the DOM.
+  }
+
+  public async getSize(): Promise<ISize> {
+    await WebdriverExecutionContexts.switchToIframe(this.viewId);
+    const {width, height} = await this._pageFinder.getSize();
+    return {width, height};
   }
 
   public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean}): Promise<void> {

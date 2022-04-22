@@ -376,6 +376,38 @@ describe('Workbench View', () => {
     expect(await viewPagePO2.isDisplayed()).toBe(false);
   });
 
+  it('should preserve the size of inactive views', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // open test view 1
+    const viewPagePO1 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO1 = viewPagePO1.viewTabPO;
+    const activeViewSize = await viewPagePO1.getSize();
+
+    // expect view 1 to be present and active
+    expect(await viewTabPO1.isPresent()).toBe(true);
+    expect(await viewTabPO1.isActive()).toBe(true);
+    expect(await viewPagePO1.isDisplayed()).toBe(true);
+
+    // open test view 2
+    const viewPagePO2 = await ViewPagePO.openInNewTab('app1');
+    const viewTabPO2 = viewPagePO2.viewTabPO;
+    const inactiveViewSize = await viewPagePO1.getSize();
+
+    // expect view 1 not to be displayed and its viewtab to be inactive
+    expect(await viewTabPO1.isPresent()).toBe(true);
+    expect(await viewTabPO1.isActive()).toBe(false);
+    expect(await viewPagePO1.isDisplayed()).toBe(false);
+
+    // expect view 2 to be present and active
+    expect(await viewTabPO2.isPresent()).toBe(true);
+    expect(await viewTabPO2.isActive()).toBe(true);
+    expect(await viewPagePO2.isDisplayed()).toBe(true);
+
+    // expect view size of inactive view not to have changed
+    expect(activeViewSize).toEqual(inactiveViewSize);
+  });
+
   it('should not confirm closing when switching between viewtabs', async () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
