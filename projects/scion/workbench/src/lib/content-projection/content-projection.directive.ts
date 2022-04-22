@@ -12,7 +12,7 @@ import {Directive, ElementRef, EmbeddedViewRef, Input, OnDestroy, OnInit, Option
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {WorkbenchView} from '../view/workbench-view.model';
-import {fromDimension$} from '@scion/toolkit/observable';
+import {Dimension, fromDimension$} from '@scion/toolkit/observable';
 import {setStyle} from '../dom.util';
 
 /**
@@ -58,10 +58,20 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
     this._contentViewRef = (await this.overlayHost).createEmbeddedView(this.contentTemplateRef, null);
     this._contentViewRef.detectChanges();
 
-    // (Re-)position content each time the bounding box element changes its size.
+    // Position projected content out of the document flow relative to the page viewport.
+    this.styleContent({position: 'fixed'});
+
+    // (Re-)position visible content each time the bounding box element changes its size.
     fromDimension$(this._boundingBoxElement)
       .pipe(takeUntil(this._destroy$))
-      .subscribe(() => {
+      .subscribe(dimension => {
+        if (isNullDimension(dimension)) {
+          // When removing the bounding box element (this directive's host) from the DOM, its dimension drops to 0.
+          // We ignore this event to preserve the dimension of projected content, crucial, for example, if projected
+          // content implements virtual scrolling. Otherwise, its content would reload when adding the host to the DOM again.
+          // For example, inactive views are removed from the DOM.
+          return;
+        }
         this.stickContentToHostBoundingBox();
       });
 
@@ -76,7 +86,6 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   private stickContentToHostBoundingBox(): void {
     const hostPosition: DOMRect = this._boundingBoxElement.getBoundingClientRect();
     this.styleContent({
-      position: 'fixed',
       top: `${hostPosition.top}px`,
       left: `${hostPosition.left}px`,
       width: `${hostPosition.width}px`,
@@ -85,7 +94,10 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   }
 
   private setVisible(visible: boolean): void {
-    this.styleContent({display: visible ? null : 'none'});
+    // We use `visibility: hidden` over `display: none` to preserve the dimension of projected content, crucial,
+    // for example, if projected content implements virtual scrolling. This is because "display:none" sets width
+    // and height to 0.
+    this.styleContent({visibility: visible ? null : 'hidden'});
   }
 
   private styleContent(style: {[style: string]: any}): void {
@@ -96,4 +108,8 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
     this._destroy$.next();
     this._contentViewRef?.destroy();
   }
+}
+
+function isNullDimension(dimension: Dimension): boolean {
+  return dimension.offsetWidth === 0 && dimension.offsetHeight === 0;
 }
