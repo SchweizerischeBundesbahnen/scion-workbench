@@ -16,6 +16,7 @@ import {MicrofrontendViewRoutes} from './microfrontend-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../messaging.util';
+import {Dictionaries} from '@scion/toolkit/util';
 
 /**
  * Handles microfrontend view intents, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
@@ -53,9 +54,11 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
   }
 
   private navigate(viewCapability: WorkbenchViewCapability, intent: Intent, extras: WorkbenchNavigationExtras): Promise<boolean> {
-    const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intent.params, viewCapability);
-    const routerNavigateCommand = MicrofrontendViewRoutes.buildRouterNavigateCommand(viewCapability.metadata!.id, intent.qualifier!, urlParams);
+    const intentParams = Dictionaries.withoutUndefinedEntries(Dictionaries.coerce(intent.params));
+    const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
+    const qualifier = Dictionaries.withoutUndefinedEntries(intent.qualifier!);
 
+    const routerNavigateCommand = MicrofrontendViewRoutes.buildRouterNavigateCommand(viewCapability.metadata!.id, qualifier, urlParams);
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, routerNavigateCommand, viewCapability, transientParams);
 
     return this._workbenchRouter.navigate(routerNavigateCommand, {

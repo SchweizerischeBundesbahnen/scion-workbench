@@ -12,7 +12,7 @@ import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContain
 import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
 import {asapScheduler, combineLatest, defaultIfEmpty, firstValueFrom, merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
-import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, takeUntilUnsubscribe} from '@scion/microfrontend-platform';
+import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, takeUntilUnsubscribe, TopicMessage} from '@scion/microfrontend-platform';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
@@ -158,9 +158,9 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     this._unsubscribeParamsUpdater$.next();
     const subscription = this._messageClient.observe$<ɵViewParamsUpdateCommand>(ɵWorkbenchCommands.viewParamsUpdateTopic(this.viewId, viewCapability.metadata!.id))
       .pipe(takeUntil(merge(this._unsubscribeParamsUpdater$, this._destroy$)))
-      .subscribe(async command => { // eslint-disable-line rxjs/no-async-subscribe
+      .subscribe(async (request: TopicMessage<ɵViewParamsUpdateCommand>) => { // eslint-disable-line rxjs/no-async-subscribe
         // We DO NOT navigate if the subscription was closed, e.g., because closed the view or navigated to another capability.
-        const replyTo = command.headers.get(MessageHeaders.ReplyTo);
+        const replyTo = request.headers.get(MessageHeaders.ReplyTo);
 
         try {
           const success = await this._workbenchRouter.ɵnavigate(layout => {
@@ -172,12 +172,11 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
             const currentMicrofrontendParams = MicrofrontendViewRoutes.parseParams(this._route.snapshot);
             const currentParams = {...currentMicrofrontendParams.urlParams, ...currentMicrofrontendParams.transientParams};
 
-            const {params: newParams, paramsHandling} = command.body!;
-            const mergedParams = Dictionaries.withoutUndefinedEntries({
-              ...(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams),
-            });
+            const paramsUpdateCommand: ɵViewParamsUpdateCommand = request.body!;
+            const newParams = Dictionaries.coerce(paramsUpdateCommand.params); // coerce params for backward compatibility
+            const mergedParams = Dictionaries.withoutUndefinedEntries(paramsUpdateCommand.paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
+            const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(mergedParams, viewCapability);
 
-            const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(mergedParams, viewCapability!);
             return {
               layout,
               viewOutlets: {[this.viewId]: [urlParams]},
