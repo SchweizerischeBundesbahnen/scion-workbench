@@ -12,7 +12,7 @@ import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchView} from '../view/workbench-view';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Dictionary, Maps} from '@scion/toolkit/util';
+import {Dictionaries, Dictionary, Maps} from '@scion/toolkit/util';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {lastValueFrom} from 'rxjs';
 
@@ -84,7 +84,7 @@ export class WorkbenchRouter {
     }
 
     const command: ɵViewParamsUpdateCommand = {
-      params: extras?.params || {},
+      params: Dictionaries.coerce(extras?.params),
       paramsHandling: extras?.paramsHandling,
     };
     const updateParams$ = Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.viewParamsUpdateTopic(Beans.get(WorkbenchView).viewId, viewCapabilityId), command);
@@ -173,7 +173,7 @@ export interface ɵViewParamsUpdateCommand {
   /**
    * @see WorkbenchNavigationExtras#params
    */
-  params: Map<string, any> | Dictionary;
+  params: Dictionary;
   /**
    * @see WorkbenchNavigationExtras#paramsHandling
    */

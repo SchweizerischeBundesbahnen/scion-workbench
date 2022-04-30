@@ -219,6 +219,90 @@ describe('Workbench Router', () => {
     await expect(await testeeViewPagePO.getComponentInstanceId()).toEqual(testeeComponentInstanceId);
   });
 
+  it('should contain the provided param with value `null` in view params', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee view
+    const registerCapabilityPagePO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'view',
+      qualifier: {entity: 'product'},
+      params: [
+        {
+          name: 'id',
+          required: true,
+        },
+      ],
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+        cssClass: 'testee',
+      },
+    });
+
+    // navigate
+    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    await routerPagePO.enterQualifier({entity: 'product'});
+    await routerPagePO.enterParams({id: '<null>'});
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigate();
+
+    // expect the qualifier and the optional parameter with value `null` to be contained in view params
+    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
+    const testeeViewPagePO = new ViewPagePO(await testeeViewTabPO.getViewId());
+
+    await expect(await testeeViewPagePO.getViewParams()).toEqual(
+      jasmine.objectContaining({
+        entity: 'product [string]',
+        id: 'null [string]',
+      }));
+  });
+
+  it('should not contain the provided param with value `undefined` in view params', async () => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee view
+    const registerCapabilityPagePO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'view',
+      qualifier: {entity: 'product'},
+      params: [
+        {
+          name: 'id',
+          required: true,
+        },
+        {
+          name: 'param1',
+          required: false,
+        },
+      ],
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+        cssClass: 'testee',
+      },
+    });
+
+    // navigate
+    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    await routerPagePO.enterQualifier({entity: 'product'});
+    await routerPagePO.enterParams({id: '123', param1: '<undefined>'});
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigate();
+
+    // expect qualifier to be contained in view params, but the optional parameter with value `undefined` should not be contained
+    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
+    const testeeViewPagePO = new ViewPagePO(await testeeViewTabPO.getViewId());
+
+    const params = await testeeViewPagePO.getViewParams();
+    await expect(params).toEqual(
+      jasmine.objectContaining({
+        entity: 'product [string]',
+        id: '123 [string]',
+      }));
+    await expect(params).not.toEqual(jasmine.objectContaining({param1: jasmine.anything()}));
+  });
+
   describe('Self-Navigation', () => {
 
     it('should, by default, replace params', async () => {
