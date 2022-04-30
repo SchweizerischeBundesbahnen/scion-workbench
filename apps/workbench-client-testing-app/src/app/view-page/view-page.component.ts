@@ -18,6 +18,7 @@ import {finalize, startWith, take, takeUntil} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
 import {Location} from '@angular/common';
+import {convertValueFromUI} from '../util/util';
 
 const TITLE = 'title';
 const HEADING = 'heading';
@@ -123,15 +124,8 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
     const params = SciParamsEnterComponent.toParamsDictionary(selfNavigationGroup.get(PARAMS) as FormArray, false);
     const paramsHandling = selfNavigationGroup.get(PARAMS_HANDLING).value;
 
-    // Replace `<undefined>` with `undefined`, and `<null>` with `null`.
-    Object.entries(params).forEach(([paramName, paramValue]) => {
-      if ('<undefined>' === paramValue) {
-        params[paramName] = undefined;
-      }
-      else if ('<null>' === paramValue) {
-        params[paramName] = null;
-      }
-    });
+    // Convert entered params to their actual values.
+    Object.entries(params).forEach(([paramName, paramValue]) => params[paramName] = convertValueFromUI(paramValue));
 
     if (selfNavigationGroup.get(NAVIGATE_PER_PARAM).value) {
       Object.entries(params).forEach(([paramName, paramValue]) => {

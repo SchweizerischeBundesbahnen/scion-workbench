@@ -13,6 +13,7 @@ import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
 import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
+import {convertValueFromUI} from '../util/util';
 
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';
@@ -60,6 +61,10 @@ export class RouterPageComponent {
 
     const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray);
     const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as FormArray);
+
+    // Convert entered params to their actual values.
+    params && Object.entries(params).forEach(([paramName, paramValue]) => params[paramName] = convertValueFromUI(paramValue));
+
     const extras: WorkbenchNavigationExtras = {
       activateIfPresent: this.form.get(ACTIVATE_IF_PRESENT).value,
       closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,

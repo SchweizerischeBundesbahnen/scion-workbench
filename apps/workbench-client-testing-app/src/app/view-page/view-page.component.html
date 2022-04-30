@@ -32,7 +32,7 @@
     <header>View Params</header>
   </ng-template>
   <ng-template #panel_view_params>
-    <sci-property [properties]="params" class="e2e-view-params"></sci-property>
+    <sci-property [properties]="params | wbAppendParamDataType" class="e2e-view-params"></sci-property>
   </ng-template>
 </sci-accordion>
 

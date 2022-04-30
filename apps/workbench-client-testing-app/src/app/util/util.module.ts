@@ -11,6 +11,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NullIfEmptyPipe} from './null-if-empty.pipe';
+import {AppendParamDataTypePipe} from './append-param-data-type.pipe';
 
 @NgModule({
   imports: [
@@ -18,9 +19,11 @@ import {NullIfEmptyPipe} from './null-if-empty.pipe';
   ],
   declarations: [
     NullIfEmptyPipe,
+    AppendParamDataTypePipe,
   ],
   exports: [
     NullIfEmptyPipe,
+    AppendParamDataTypePipe,
   ],
 })
 export class UtilModule {
