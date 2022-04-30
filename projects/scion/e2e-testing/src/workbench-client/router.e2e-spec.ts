@@ -395,7 +395,7 @@ describe('Workbench Router', () => {
     await testeeViewPagePO.viewTabPO.activate();
 
     // expect the correct view to display
-    await expect(await testeeViewPagePO.getViewParams()).toEqual(jasmine.objectContaining({component: 'testee-2'}));
+    await expect(await testeeViewPagePO.getViewParams()).toEqual(jasmine.objectContaining({component: 'testee-2 [string]'}));
     // expect no new view instance to be constructed
     await expect(await testeeViewPagePO.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
@@ -411,7 +411,7 @@ describe('Workbench Router', () => {
     await testeeViewPagePO.viewTabPO.activate();
 
     // expect the correct view to display
-    await expect(await testeeViewPagePO.getViewParams()).toEqual(jasmine.objectContaining({component: 'testee-1'}));
+    await expect(await testeeViewPagePO.getViewParams()).toEqual(jasmine.objectContaining({component: 'testee-1 [string]'}));
     // expect no new view instance to be constructed
     await expect(await testeeViewPagePO.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
@@ -427,7 +427,7 @@ describe('Workbench Router', () => {
     await testeeViewPagePO.viewTabPO.activate();
 
     // expect the correct view to display
-    await expect(await testeeViewPagePO.getViewParams()).toEqual(jasmine.objectContaining({component: 'testee-2'}));
+    await expect(await testeeViewPagePO.getViewParams()).toEqual(jasmine.objectContaining({component: 'testee-2 [string]'}));
     // expect no new view instance to be constructed
     await expect(await testeeViewPagePO.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
@@ -770,7 +770,7 @@ describe('Workbench Router', () => {
     await expect(await testeeViewTabPO.getTitle()).toEqual('UPDATED VIEW TITLE');
     await expect(await testeeViewTabPO.getHeading()).toEqual('UPDATED VIEW HEADING');
     await expect(await testeeViewTabPO.getCssClasses()).toEqual(jasmine.arrayContaining(['testee', 'class-1']));
-    await expect(await viewPagePO.getViewParams()).toEqual(jasmine.objectContaining({param1: 'PARAM 1'}));
+    await expect(await viewPagePO.getViewParams()).toEqual(jasmine.objectContaining({param1: 'PARAM 1 [string]'}));
   });
 
   it('should not unset the dirty state when performing self navigation, e.g., when updating view params', async () => {
