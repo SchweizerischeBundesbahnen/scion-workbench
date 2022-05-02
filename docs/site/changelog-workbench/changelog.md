@@ -6,6 +6,33 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [12.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/12.0.0-beta.3...12.0.0-beta.4) (2022-05-02)
+
+
+### Bug Fixes
+
+* **workbench/view:** discard parameter if set to `undefined` ([b3b6a14](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/b3b6a1465c277f139bb7f2676deadab5970d5dd7)), closes [#325](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/325)
+* **workbench/view:** preserve position and size of inactive views ([c0f869b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c0f869bf25b34c9ca249f1bca91f2c974c81a75f))
+
+
+### Dependencies
+
+* **workbench:** update @scion/workbench to Angular 13 and migrate to RxJS 7.5 ([e666841](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e666841593fafbf276cd5cb1e18c8dc3317b8929)), closes [#298](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/298)
+
+
+### BREAKING CHANGES
+
+* **workbench:** Updating `@scion/workbench` to Angular 13 and RxJS 7.5 introduced a breaking change.
+
+  To migrate:
+  - update your application to Angular 13; for detailed migration instructions, refer to https://github.com/angular/angular/blob/master/CHANGELOG.md;
+  - migrate your application to RxJS 7.5; for detailed migration instructions, refer to https://rxjs.dev/6-to-7-change-summary;
+  - update @scion/toolkit to version 13; for detailed migration instructions, refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG.md;
+  - removed option in `MessageBoxConfig` to configure a custom `componentFactoryResolver` as not needed in Angular 13 anymore;
+  - removed option in `NotificationConfig` to configure a custom `componentFactoryResolver` as not needed in Angular 13 anymore;
+  - removed option in `PopupConfig` to configure a custom `componentFactoryResolver` as not needed in Angular 13 anymore;
+
+
 # [12.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/12.0.0-beta.2...12.0.0-beta.3) (2022-03-17)
 
 
