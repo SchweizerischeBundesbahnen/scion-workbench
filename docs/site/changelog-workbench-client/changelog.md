@@ -12,22 +12,21 @@
 ### Bug Fixes
 
 * **workbench/view:** discard parameter if set to `undefined` ([b3b6a14](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/b3b6a1465c277f139bb7f2676deadab5970d5dd7)), closes [#325](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/325)
-
-* **workbench/view:** preserve position and size of inactive views ([c81a75f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c0f869bf25b34c9ca249f1bca91f2c974c81a75f))
+* **workbench/view:** preserve position and size of inactive views ([c0f869b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c0f869bf25b34c9ca249f1bca91f2c974c81a75f))
 
 
 ### Dependencies
 
-* **workbench/client:** migrate @scion/workbench-client to RxJS 7.5 ([e666841](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e666841593fafbf276cd5cb1e18c8dc3317b8929)), closes [#298](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/298)
+* **workbench-client:** migrate @scion/workbench-client to RxJS 7.5 ([e666841](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e666841593fafbf276cd5cb1e18c8dc3317b8929)), closes [#298](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/298)
 
 
 ### BREAKING CHANGES
 
-* **workbench/client:** Migrating `@scion/workbench-client` to RxJS 7.5 introduced a breaking change.
+* **workbench-client:** Migrating `@scion/workbench-client` to RxJS 7.5 introduced a breaking change.
 
-To migrate:
-- migrate your application to RxJS 7.5; for detailed migration instructions, refer to https://rxjs.dev/6-to-7-change-summary;
-- update @scion/toolkit to version 13; for detailed migration instructions, refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG.md;
+  To migrate:
+  - migrate your application to RxJS 7.5; for detailed migration instructions, refer to https://rxjs.dev/6-to-7-change-summary;
+  - update @scion/toolkit to version 13; for detailed migration instructions, refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG.md;
 
 
 # [1.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.7...workbench-client-1.0.0-beta.8) (2022-02-11)
