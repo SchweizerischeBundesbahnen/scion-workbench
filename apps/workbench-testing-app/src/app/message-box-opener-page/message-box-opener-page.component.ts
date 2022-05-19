@@ -12,7 +12,7 @@ import {Component, Injectable, Injector, OnDestroy, Type} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {MessageBoxService, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute} from '@angular/router';
-import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {InspectMessageBoxComponent} from '../inspect-message-box-provider/inspect-message-box.component';
 import {startWith, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';

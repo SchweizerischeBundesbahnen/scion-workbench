@@ -10,7 +10,9 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule} from '@scion/toolkit.internal/widgets';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MessageBoxOpenerPageComponent} from './message-box-opener-page.component';
 import {RouterModule, Routes} from '@angular/router';

@@ -11,8 +11,8 @@
 import {ElementFinder} from 'protractor';
 import {AppPO, ViewPO, ViewTabPO} from './app.po';
 import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
-import {SciTabbarPO} from '../deps/scion/toolkit.internal/tabbar/tabbar.po';
-import {Arrays} from '../deps/scion/toolkit/arrays.util';
+import {SciTabbarPO} from '../deps/scion/components.internal/tabbar.po';
+import {Arrays} from '../deps/scion/toolkit/util';
 
 /**
  * Page object to interact {@link StartPageComponent}.

@@ -12,10 +12,10 @@ import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {browser, ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
-import {Dictionary} from '../../../deps/scion/toolkit/dictionaries.util';
-import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
-import {coerceArray} from '../../../deps/angular/cdk/coercion/array';
+import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
+import {Dictionary} from '../../../deps/scion/toolkit/util';
+import {SciParamsEnterPO} from '../../../deps/scion/components.internal/params-enter.po';
+import {coerceArray} from '../../../deps/angular/cdk/coercion';
 
 /**
  * Page object to interact {@link MessageBoxOpenerPageComponent}.

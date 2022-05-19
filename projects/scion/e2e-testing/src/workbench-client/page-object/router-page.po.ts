@@ -14,9 +14,9 @@ import {$, browser, ElementFinder, protractor} from 'protractor';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {RouterOutletPO} from './router-outlet.po';
-import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
-import {Dictionary} from '../../../deps/scion/toolkit/dictionaries.util';
-import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
+import {SciParamsEnterPO} from '../../../deps/scion/components.internal/params-enter.po';
+import {Dictionary} from '../../../deps/scion/toolkit/util';
+import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
 
 const EC = protractor.ExpectedConditions;
 

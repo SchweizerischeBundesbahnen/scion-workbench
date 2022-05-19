@@ -9,7 +9,7 @@
  */
 
 import {ElementFinder} from 'protractor';
-import {Dictionary} from '../../toolkit/dictionaries.util';
+import {Dictionary} from '../../toolkit/util';
 
 /**
  * Page object for {@link SciPropertyComponent}.

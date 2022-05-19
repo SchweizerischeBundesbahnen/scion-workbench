@@ -10,12 +10,14 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SciAccordionModule, SciCheckboxModule, SciFormFieldModule} from '@scion/toolkit.internal/widgets';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {PopupOpenerPageComponent} from './popup-opener-page.component';
 import {WorkbenchModule} from '@scion/workbench';
-import {SciViewportModule} from '@scion/toolkit/viewport';
+import {SciViewportModule} from '@scion/components/viewport';
 import {A11yModule} from '@angular/cdk/a11y';
 import {PopupPageModule} from '../popup-page/popup-page.module';
 import {PopupFocusPageModule} from '../popup-focus-page/popup-focus-page.module';

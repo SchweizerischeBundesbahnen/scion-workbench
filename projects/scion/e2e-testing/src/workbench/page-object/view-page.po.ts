@@ -13,11 +13,11 @@ import {Params} from '@angular/router';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
-import {SciPropertyPO} from '../../../deps/scion/toolkit.internal/property/property.po';
-import {Dictionary} from '../../../deps/scion/toolkit/dictionaries.util';
-import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
-import {Arrays} from '../../../deps/scion/toolkit/arrays.util';
+import {SciAccordionPO} from '../../../deps/scion/components.internal/accordion.po';
+import {SciPropertyPO} from '../../../deps/scion/components.internal/property.po';
+import {Dictionary} from '../../../deps/scion/toolkit/util';
+import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
+import {Arrays} from '../../../deps/scion/toolkit/util';
 
 /**
  * Page object to interact {@link ViewPageComponent}.

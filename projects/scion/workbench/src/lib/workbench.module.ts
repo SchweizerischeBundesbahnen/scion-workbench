@@ -43,10 +43,10 @@ import {ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME, ROUTE_REUSE_PROVIDER, WORKBENCH
 import {EmptyOutletComponent} from './routing/empty-outlet.component';
 import {WbActivityRouteReuseProvider} from './routing/wb-activity-route-reuse-provider.service';
 import {WbRouteReuseStrategy} from './routing/wb-route-reuse-strategy.service';
-import {SciViewportModule} from '@scion/toolkit/viewport';
-import {SciDimensionModule} from '@scion/toolkit/dimension';
-import {SciSashboxModule} from '@scion/toolkit/sashbox';
-import {SciThrobberModule} from '@scion/toolkit/throbber';
+import {SciViewportModule} from '@scion/components/viewport';
+import {SciDimensionModule} from '@scion/components/dimension';
+import {SciSashboxModule} from '@scion/components/sashbox';
+import {SciThrobberModule} from '@scion/components/throbber';
 import {ActivityResolver} from './routing/activity.resolver';
 import {WorkbenchAuxiliaryRoutesRegistrator} from './routing/workbench-auxiliary-routes-registrator.service';
 import {OverlayModule} from '@angular/cdk/overlay';

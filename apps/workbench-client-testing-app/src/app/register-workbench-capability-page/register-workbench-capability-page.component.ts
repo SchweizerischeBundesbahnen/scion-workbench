@@ -10,7 +10,7 @@
 
 import {Component} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
 import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {undefinedIfEmpty} from '../util/util';

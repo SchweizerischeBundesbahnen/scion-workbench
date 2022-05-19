@@ -67,9 +67,10 @@
     "@angular/platform-browser": "13.3.4",
     "@angular/platform-browser-dynamic": "13.3.4",
     "@angular/router": "13.3.4",
-    "@scion/microfrontend-platform": "1.0.0-rc.3",
-    "@scion/toolkit": "13.0.0-beta.2",
-    "@scion/toolkit.internal": "13.0.0-beta.2",
+    "@scion/components": "13.0.0",
+    "@scion/components.internal": "13.0.1",
+    "@scion/microfrontend-platform": "1.0.0-rc.5",
+    "@scion/toolkit": "1.0.0",
     "rxjs": "7.5.5",
     "tslib": "2.4.0",
     "zone.js": "0.11.5"

@@ -13,9 +13,9 @@ import {Params} from '@angular/router';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
-import {Dictionary} from '../../../deps/scion/toolkit/dictionaries.util';
-import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
+import {SciParamsEnterPO} from '../../../deps/scion/components.internal/params-enter.po';
+import {Dictionary} from '../../../deps/scion/toolkit/util';
+import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
 
 /**
  * Page object to interact {@link RouterPageComponent}.

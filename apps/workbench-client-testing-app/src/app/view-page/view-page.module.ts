@@ -11,11 +11,15 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
-import {SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciParamsEnterModule, SciPropertyModule} from '@scion/toolkit.internal/widgets';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {SciPropertyModule} from '@scion/components.internal/property';
 import {ReactiveFormsModule} from '@angular/forms';
 import {ViewPageComponent} from './view-page.component';
 import {UtilModule} from '../util/util.module';
-import {SciViewportModule} from '@scion/toolkit/viewport';
+import {SciViewportModule} from '@scion/components/viewport';
 
 const routes: Routes = [
   {path: '', component: ViewPageComponent},

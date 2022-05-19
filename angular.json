@@ -49,6 +49,46 @@
         }
       }
     },
+    "@scion/workbench-client": {
+      "projectType": "library",
+      "root": "projects/scion/workbench-client",
+      "sourceRoot": "projects/scion/workbench-client/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/scion/workbench-client/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/scion/workbench-client/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/scion/workbench-client/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/scion/workbench-client/src/test.ts",
+            "tsConfig": "projects/scion/workbench-client/tsconfig.spec.json",
+            "karmaConfig": "projects/scion/workbench-client/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/scion/workbench-client/**/*.ts",
+              "projects/scion/workbench-client/**/*.html"
+            ]
+          }
+        }
+      }
+    },
     "workbench-testing-app": {
       "projectType": "application",
       "root": "apps/workbench-testing-app",
@@ -147,46 +187,6 @@
         },
         "@schematics/angular:application": {
           "strict": true
-        }
-      }
-    },
-    "@scion/workbench-client": {
-      "projectType": "library",
-      "root": "projects/scion/workbench-client",
-      "sourceRoot": "projects/scion/workbench-client/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/scion/workbench-client/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/scion/workbench-client/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/scion/workbench-client/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/scion/workbench-client/src/test.ts",
-            "tsConfig": "projects/scion/workbench-client/tsconfig.spec.json",
-            "karmaConfig": "projects/scion/workbench-client/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "projects/scion/workbench-client/**/*.ts",
-              "projects/scion/workbench-client/**/*.html"
-            ]
-          }
         }
       }
     },

@@ -13,7 +13,7 @@ import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {switchMap, takeUntil, tap} from 'rxjs/operators';
 import {EMPTY, Observable, Subject, timer} from 'rxjs';
-import {SciViewportComponent} from '@scion/toolkit/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {WorkbenchService} from '../../workbench.service';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';

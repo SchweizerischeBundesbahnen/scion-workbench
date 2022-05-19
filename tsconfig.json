@@ -54,45 +54,72 @@
     //      "@scion/toolkit/*": [
     //        "./node_modules/@scion/toolkit/*"
     //      ],
-    //      "@scion/toolkit.internal/*": [
-    //        "./node_modules/@scion/toolkit.internal/*"
+    //      "@scion/components/*": [
+    //        "./node_modules/@scion/components/*"
     //      ],
-    //      //      "@scion/microfrontend-platform": [
-    //      //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public-api"
-    //      //      ],
-    //      //      "@scion/toolkit/util": [
-    //      //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
-    //      //      ],
-    //      //      "@scion/toolkit/operators": [
-    //      //        "../scion-toolkit/projects/scion/toolkit/operators/src/public_api"
-    //      //      ],
-    //      //      "@scion/toolkit/dimension": [
-    //      //        "../scion-toolkit/projects/scion/toolkit/dimension/src/public_api"
-    //      //      ],
-    //      //      "@scion/toolkit/viewport": [
-    //      //        "../scion-toolkit/projects/scion/toolkit/viewport/src/public_api"
+    //      "@scion/components.internal/*": [
+    //        "./node_modules/@scion/components.internal/*"
+    //      ],
+    //      //      "@scion/toolkit/bean-manager": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/bean-manager/src/public_api"
     //      //      ],
     //      //      "@scion/toolkit/observable": [
     //      //        "../scion-toolkit/projects/scion/toolkit/observable/src/public_api"
     //      //      ],
-    //      //      "@scion/toolkit/sashbox": [
-    //      //        "../scion-toolkit/projects/scion/toolkit/sashbox/src/public_api"
+    //      //      "@scion/toolkit/operators": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/operators/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/storage": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/storage/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/util": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
     //      //      ],
     //      //      "@scion/toolkit/uuid": [
     //      //        "../scion-toolkit/projects/scion/toolkit/uuid/src/public_api"
     //      //      ],
-    //      //      "@scion/toolkit/throbber": [
-    //      //        "../scion-toolkit/projects/scion/toolkit/throbber/src/public_api"
+    //      //      "@scion/components/dimension": [
+    //      //        "../scion-toolkit/projects/scion/components/dimension/src/public_api"
     //      //      ],
-    //      //      "@scion/toolkit/bean-manager": [
-    //      //        "../scion-toolkit/projects/scion/toolkit/bean-manager/src/public_api"
+    //      //      "@scion/components/sashbox": [
+    //      //        "../scion-toolkit/projects/scion/components/sashbox/src/public_api"
     //      //      ],
-    //      //      "@scion/toolkit.internal/widgets": [
-    //      //        "../scion-toolkit/projects/scion/toolkit.internal/widgets/src/public_api"
+    //      //      "@scion/components/splitter": [
+    //      //        "../scion-toolkit/projects/scion/components/splitter/src/public_api"
     //      //      ],
-    //      //      "@scion/toolkit.internal/widgets.po": [
-    //      //        "../scion-toolkit/projects/scion/toolkit.internal/widgets.po/src/public_api"
+    //      //      "@scion/components/throbber": [
+    //      //        "../scion-toolkit/projects/scion/components/throbber/src/public_api"
     //      //      ],
+    //      //      "@scion/components/viewport": [
+    //      //        "../scion-toolkit/projects/scion/components/viewport/src/public_api"
+    //      //      ]
+    //      //      "@scion/components.internal/accordion": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/accordion/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/checkbox": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/checkbox/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/filter-field": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/filter-field/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/form-field": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/form-field/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/list": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/list/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/params-enter": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/params-enter/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/property": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/property/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/qualifier-chip-list": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/qualifier-chip-list/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/tabbar": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/tabbar/src/public_api"
+    //      //      ]
     //      "@angular/*": [
     //        "./node_modules/@angular/*"
     //      ],

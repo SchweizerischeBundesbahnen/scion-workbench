@@ -13,9 +13,9 @@ import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {PopupOrigin, PopupSize} from '@scion/workbench';
-import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
-import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
-import {coerceArray} from '../../../deps/angular/cdk/coercion/array';
+import {SciAccordionPO} from '../../../deps/scion/components.internal/accordion.po';
+import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
+import {coerceArray} from '../../../deps/angular/cdk/coercion';
 
 /**
  * Page object to interact {@link PopupOpenerPageComponent}.

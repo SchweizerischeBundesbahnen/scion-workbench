@@ -16,7 +16,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {MonoTypeOperatorFunction, NEVER, Subject} from 'rxjs';
 import {finalize, startWith, take, takeUntil} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
-import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Location} from '@angular/common';
 import {convertValueFromUI} from '../util/util';
 

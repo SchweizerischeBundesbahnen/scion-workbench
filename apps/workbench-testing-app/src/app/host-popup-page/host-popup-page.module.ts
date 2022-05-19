@@ -13,8 +13,10 @@ import {CommonModule} from '@angular/common';
 import {HostPopupPageComponent} from './host-popup-page.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule} from '@angular/forms';
-import {SciAccordionModule, SciFormFieldModule, SciPropertyModule} from '@scion/toolkit.internal/widgets';
-import {SciViewportModule} from '@scion/toolkit/viewport';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciPropertyModule} from '@scion/components.internal/property';
+import {SciViewportModule} from '@scion/components/viewport';
 import {UtilModule} from '../util/util.module';
 import {A11yModule} from '@angular/cdk/a11y';
 

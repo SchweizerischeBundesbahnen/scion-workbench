@@ -29,9 +29,10 @@
     "@angular/animations": "^13.0.0",
     "@angular/forms": "^13.0.0",
     "@angular/router": "^13.0.0",
-    "@scion/toolkit": ">=13.0.0-beta.2",
-    "@scion/microfrontend-platform": ">=1.0.0-rc.3",
-    "@scion/workbench-client": ">=1.0.0-beta.9",
+    "@scion/components": "^13.0.0-0",
+    "@scion/toolkit": "^1.0.0-0",
+    "@scion/microfrontend-platform": "^1.0.0-0",
+    "@scion/workbench-client": "^1.0.0-0",
     "rxjs": "^7.5.0"
   },
   "keywords": [

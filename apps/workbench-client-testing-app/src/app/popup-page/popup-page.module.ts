@@ -11,11 +11,13 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
-import {SciAccordionModule, SciFormFieldModule, SciPropertyModule} from '@scion/toolkit.internal/widgets';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciPropertyModule} from '@scion/components.internal/property';
 import {FormsModule} from '@angular/forms';
 import {PopupPageComponent} from './popup-page.component';
 import {UtilModule} from '../util/util.module';
-import {SciViewportModule} from '@scion/toolkit/viewport';
+import {SciViewportModule} from '@scion/components/viewport';
 import {A11yModule} from '@angular/cdk/a11y';
 
 const routes: Routes = [
