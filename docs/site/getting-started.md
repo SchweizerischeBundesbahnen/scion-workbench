@@ -56,41 +56,51 @@ If used in a feature module, use `WorkbenchModule.forChild()` instead.
 </details>
 
 <details>
-    <summary><strong>Include the workbench in application bootstrap component</strong></summary>
+    <summary><strong>Insert the workbench component</strong></summary>
     <br>
     
-Open your `app.component.html` and replace its content as following:
+Open your `app.component.html` and replace its content as follows:
 
 ```html 
 <wb-workbench></wb-workbench>
 ```
-This includes the workbench layout, with the activity panel to the left, and the view grid to the right.
+
+The workbench itself does not position nor lay out the `<wb-workbench>` component. Depending on your requirements, you may want the workbench to fill the entire page viewport or only parts of it, for example, if you have a header bar, navigation or side panel.
+
+For a quick start, the easiest would be to position the workbench absolutely and align it with the page viewport, as follows:
+
+```scss
+  wb-workbench {
+    position: absolute;
+    inset: 0 0 0 0;
+  }
+
+```
+
+The workbench requires some global styles to be imported into `styles.scss`, as follows:
+
+```scss
+@use '@scion/workbench';
+
+``` 
+
+Also, download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/wb-font/fonts.zip" download>here</a>, unzip it and put it into the folder `assets/fonts`.
     
 </details>
 
 <details>
-    <summary><strong>Add icons and typography</strong></summary>
+    <summary><strong>Optional: Add icons and typography</strong></summary>
     <br>
-
-- Download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/wb-font/fonts.zip" download>here</a>, unzip it and put it into the `assets/fonts` folder.
-
-- Import the workbench theme in the file `styles.scss` and include the `wb-theme()` SASS mixin.
-
-```sass
-@import '~@scion/workbench/theming';
-
-@include wb-theme();
-``` 
 
 - Use an icon font to provide activity icons:
 
-  - If you want to reference activity icons from Material Design, load it in `index.html` as following.
+  - If you want to reference activity icons from Material Design, load it in `index.html`, as follows:
 
     ```html
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     ```
 
-  - If you want to reference activity icons from Font Awesome, load it in `index.html` as following.
+  - If you want to reference activity icons from Font Awesome, load it in `index.html`, as follows:
 
     ```html
     <link href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous" rel="stylesheet">

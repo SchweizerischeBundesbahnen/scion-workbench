@@ -1,4 +1,4 @@
-@import '../../workbench.constants';
+@use '__workbench' as workbench;
 
 :host {
   display: grid; // stretches the portal to be full width and full height
@@ -12,24 +12,24 @@
 
   &.active {
     cursor: default;
-    color: $viewpart_tab-active-fgcolor;
+    color: workbench.$colors-viewpart_tab-active-fgcolor;
   }
 
   &[context="tabbar"] {
-    border-right: 1px solid $viewpart_tabbar_separator-color;
-    min-width: $viewtab-min-width;
-    max-width: $viewtab-max-width;
-    height: $viewtab-height;
+    border-right: 1px solid workbench.$colors-viewpart_tabbar_separator-color;
+    min-width: workbench.$styles-viewtab-min-width;
+    max-width: workbench.$styles-viewtab-max-width;
+    height: workbench.$styles-viewtab-height;
 
     &.active {
-      background-color: $viewpart_tab-active-bgcolor;
+      background-color: workbench.$colors-viewpart_tab-active-bgcolor;
       box-shadow: -7px 0 10px 0 rgba(0, 0, 0, 0.4);
     }
   }
 
   &[context="tabbar-dropdown"]:hover {
     background-color: rgba(239, 239, 239, .5);
-    box-shadow: 0 0 0 1px $viewlistitem-border-color;
+    box-shadow: 0 0 0 1px workbench.$colors-viewlistitem-border-color;
   }
 
   // disable pointer events on direct children if the view is blocked (not on the host element to allow dragging the viewtab)

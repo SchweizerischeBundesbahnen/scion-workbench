@@ -1,34 +1,34 @@
-@use '../workbench.constants' as constants;
+@use '__workbench' as workbench;
 
 $severity-border-size: 6px;
 $border-radius: 4px;
 
 :host {
   display: grid;
-  background-color: constants.$notification-bgcolor;
-  color: constants.$notification-fgcolor;
+  background-color: workbench.$colors-notification-bgcolor;
+  color: workbench.$colors-notification-fgcolor;
   font-size: 1rem;
   border-radius: $border-radius;
-  box-shadow: constants.$popup-box-shadow;
-  width: constants.$notification-width;
-  max-width: calc(100vw - #{2*constants.$notification-margin});
+  box-shadow: workbench.$styles-popup-box-shadow;
+  width: workbench.$styles-notification-width;
+  max-width: calc(100vw - #{2*workbench.$styles-notification-margin});
   border-left: $severity-border-size solid transparent;
   position: relative; // positioning context
 
   &.info {
-    border-left-color: constants.$info-color;
+    border-left-color: workbench.$colors-info-color;
   }
 
   &.warn {
-    border-left-color: constants.$warn-color;
+    border-left-color: workbench.$colors-warn-color;
   }
 
   &.error {
-    border-left-color: constants.$error-color;
+    border-left-color: workbench.$colors-error-color;
   }
 
   > div.outline {
-    border: 1px solid constants.$notification-border-color;
+    border: 1px solid workbench.$colors-notification-border-color;
     border-left: none;
     padding: 1em 1.5em;
     border-top-right-radius: $border-radius;

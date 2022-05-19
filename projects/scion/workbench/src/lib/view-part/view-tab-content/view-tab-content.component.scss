@@ -1,6 +1,4 @@
-@import '../../workbench.constants';
-
-@mixin showEllipsisIfOverflowing {
+@mixin show-ellipsis-on-overflow {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -30,7 +28,7 @@
   padding: .5em 1em;
 
   > div.title {
-    @include showEllipsisIfOverflowing;
+    @include show-ellipsis-on-overflow;
     font-size: 16px;
     font-weight: 400;
 
@@ -40,7 +38,7 @@
   }
 
   > div.heading {
-    @include showEllipsisIfOverflowing;
+    @include show-ellipsis-on-overflow;
     font-size: 13px;
     font-weight: 300;
   }

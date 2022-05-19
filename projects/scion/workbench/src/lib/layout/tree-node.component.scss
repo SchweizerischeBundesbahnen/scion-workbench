@@ -1,5 +1,4 @@
-@use '../workbench.constants' as constants;
-@use '../mixin';
+@use '__workbench' as workbench;
 
 :host {
   display: block;
@@ -7,7 +6,7 @@
 
   > sci-sashbox {
     position: absolute;
-    @include mixin.inset(0, 0, 0, 0);
+    inset: 0 0 0 0;
 
     /*
      * Unset stacking context formed by <sci-sashbox> so that sash splitters can overlap microfrontends (iframes).
@@ -29,7 +28,7 @@
     --sci-sashbox-splitter-touch-target-size: 5px;
     --sci-sashbox-splitter-size_hover: 9px;
     --sci-sashbox-splitter-size: 1px;
-    --sci-sashbox-splitter-bgcolor: #{constants.$viewpart_sash-bgcolor};
+    --sci-sashbox-splitter-bgcolor: #{workbench.$colors-viewpart_sash-bgcolor};
     --sci-sashbox-splitter-opacity_active: .25;
     --sci-sashbox-splitter-opacity_hover: .125;
   }

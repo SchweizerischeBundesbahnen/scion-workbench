@@ -1,7 +1,7 @@
-@import '../../workbench.constants';
+@use '__workbench' as workbench;
 
-$fgcolor: $viewpart_tab-fgcolor;
-$bgcolor: $viewpart_tabbar-bgcolor;
+$fgcolor: workbench.$colors-viewpart_tab-fgcolor;
+$bgcolor: workbench.$colors-viewpart_tabbar-bgcolor;
 $size: 14px;
 
 :host {
@@ -11,7 +11,7 @@ $size: 14px;
   padding-left: .8em;
   cursor: pointer;
   user-select: none;
-  border-left: 1px solid $viewpart_tabbar_separator-color;
+  border-left: 1px solid workbench.$colors-viewpart_tabbar_separator-color;
 
   > div.view-list-icon {
     display: flex;

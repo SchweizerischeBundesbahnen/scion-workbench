@@ -6,7 +6,7 @@ $popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
 /**
  * Provides SCION workbench popup styles.
  */
-@mixin wb-popup-theme($theme) {
+@mixin popup($theme) {
   .wb-popup {
     background-color: $background-color;
     border-radius: 2px;

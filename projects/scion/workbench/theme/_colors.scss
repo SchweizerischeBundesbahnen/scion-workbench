@@ -1,23 +1,15 @@
 $background-color: #FEFEFE;
 
-$topbar-height: 55px;
-$viewtab-height: $topbar-height;
-$viewtab-min-width: 100px;
-$viewtab-max-width: 200px;
 $viewlistitem-border-color: rgba(102, 102, 102, .3);
-$text-padding: .5em 1em;
 
 $error-color: rgba(255, 55, 55, 1);
 $info-color: rgba(19, 138, 203, 1);
 $warn-color: rgba(240, 173, 78, 1);
 
-$popup-box-shadow: 3px 10px 20px -5px rgba(0, 0, 0, 0.5);
-
 /**
  * Activity Part
  */
 $activitypart_toolbar-bgcolor: #333333;
-$activitypart_toolbar-width: 50;
 $activitypart_toolitem-fgcolor: rgba(255, 255, 255, .4);
 $activitypart_toolitem-active-fgcolor: #EFEFEF;
 $activitypart_panel-title-fgcolor: #252526;
@@ -37,9 +29,7 @@ $viewpart_sash-bgcolor: #333333;
  */
 $notification-fgcolor: #333333;
 $notification-bgcolor: $background-color;
-$notification-margin: .5em;
 $notification-border-color: rgb(204, 204, 204);
-$notification-width: 350px;
 
 /*
  * Message Box
@@ -47,4 +37,3 @@ $notification-width: 350px;
 $messagebox-fgcolor: #333333;
 $messagebox-bgcolor: $background-color;
 $messagebox-border-color: rgb(204, 204, 204);
-$messagebox-max-width: 400px;

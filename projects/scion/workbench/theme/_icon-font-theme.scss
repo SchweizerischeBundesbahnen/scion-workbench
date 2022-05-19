@@ -11,7 +11,7 @@
 /**
  * Provides SCION workbench icon font.
  */
-@mixin wb-font-theme($theme) {
+@mixin icon-font($theme) {
   $font-path: map-get($theme, font-path);
   $font-path: '/assets/fonts/' !default;
 
