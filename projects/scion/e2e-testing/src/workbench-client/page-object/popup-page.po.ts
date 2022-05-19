@@ -17,8 +17,8 @@ import {ISize} from 'selenium-webdriver';
 import {Params} from '@angular/router';
 import {WorkbenchPopupCapability} from '@scion/workbench-client';
 import {RouterOutletPO} from './router-outlet.po';
-import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
-import {SciPropertyPO} from '../../../deps/scion/toolkit.internal/property/property.po';
+import {SciAccordionPO} from '../../../deps/scion/components.internal/accordion.po';
+import {SciPropertyPO} from '../../../deps/scion/components.internal/property.po';
 import {RouterOutletSelector} from '../../helper/element-finders';
 
 /**

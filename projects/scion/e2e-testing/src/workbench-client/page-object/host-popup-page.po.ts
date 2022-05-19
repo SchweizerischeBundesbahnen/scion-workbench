@@ -16,8 +16,8 @@ import {PopupSize} from '@scion/workbench';
 import {ISize} from 'selenium-webdriver';
 import {Params} from '@angular/router';
 import {WorkbenchPopupCapability} from '@scion/workbench-client';
-import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
-import {SciPropertyPO} from '../../../deps/scion/toolkit.internal/property/property.po';
+import {SciAccordionPO} from '../../../deps/scion/components.internal/accordion.po';
+import {SciPropertyPO} from '../../../deps/scion/components.internal/property.po';
 
 /**
  * Page object to interact with {@link HostPopupPageComponent}.

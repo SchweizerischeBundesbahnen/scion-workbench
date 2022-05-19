@@ -11,7 +11,7 @@
 import {Component} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
-import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Beans} from '@scion/toolkit/bean-manager';
 
 const QUALIFIER = 'qualifier';

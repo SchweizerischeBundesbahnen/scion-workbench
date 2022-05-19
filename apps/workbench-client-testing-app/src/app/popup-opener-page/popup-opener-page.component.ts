@@ -11,10 +11,10 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CloseStrategy, WorkbenchPopupService} from '@scion/workbench-client';
-import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {undefinedIfEmpty} from '../util/util';
 import {defer, Observable} from 'rxjs';
-import {PopupOrigin} from '@scion/workbench';
+import {PopupOrigin} from '@scion/workbench-client';
 import {map, startWith} from 'rxjs/operators';
 
 const QUALIFIER = 'qualifier';

@@ -14,7 +14,7 @@ import {CommonModule} from '@angular/common';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {provideWorkbenchClientInitializer} from './workbench-client/workbench-microfrontend-support';
-import {SciViewportModule} from '@scion/toolkit/viewport';
+import {SciViewportModule} from '@scion/components/viewport';
 import {provideAppInstanceId} from './app-instance-id';
 import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {environment} from '../environments/environment';

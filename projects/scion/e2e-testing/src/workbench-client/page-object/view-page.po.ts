@@ -16,10 +16,10 @@ import {Params} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {RouterOutletPO} from './router-outlet.po';
 import {ISize} from 'selenium-webdriver';
-import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
-import {SciPropertyPO} from '../../../deps/scion/toolkit.internal/property/property.po';
-import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
-import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
+import {SciAccordionPO} from '../../../deps/scion/components.internal/accordion.po';
+import {SciPropertyPO} from '../../../deps/scion/components.internal/property.po';
+import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
+import {SciParamsEnterPO} from '../../../deps/scion/components.internal/params-enter.po';
 
 const EC = protractor.ExpectedConditions;
 

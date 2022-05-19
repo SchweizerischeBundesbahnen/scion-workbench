@@ -13,7 +13,7 @@ import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {WbNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute, Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
-import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 

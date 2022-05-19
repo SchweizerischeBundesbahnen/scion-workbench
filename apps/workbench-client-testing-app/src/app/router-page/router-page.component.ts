@@ -11,7 +11,7 @@
 import {Component} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
-import {SciParamsEnterComponent} from '@scion/toolkit.internal/widgets';
+import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {convertValueFromUI} from '../util/util';
 

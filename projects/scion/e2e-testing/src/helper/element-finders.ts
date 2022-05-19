@@ -10,7 +10,7 @@
 
 import {ElementFinder} from 'protractor/built/element';
 import {$} from 'protractor';
-import {coerceArray} from '../../deps/angular/cdk/coercion/array';
+import {coerceArray} from '../../deps/angular/cdk/coercion';
 
 /**
  * Provides element finders for SCION Workbench e2e tests.

@@ -10,7 +10,8 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SciFormFieldModule, SciParamsEnterModule} from '@scion/toolkit.internal/widgets';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {ReactiveFormsModule} from '@angular/forms';
 import {RegisterWorkbenchIntentionPageComponent} from './register-workbench-intention-page.component';
 import {RouterModule, Routes} from '@angular/router';

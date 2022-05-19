@@ -12,9 +12,9 @@ import {$, $$, browser, Button, ElementFinder, Key, protractor} from 'protractor
 import {fromRect, getCssClasses, isActiveElement, isCssClassPresent, runOutsideAngularSynchronization} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
-import {Dictionary} from '../deps/scion/toolkit/dictionaries.util';
-import {coerceBooleanProperty} from '../deps/angular/cdk/coercion/boolean-property';
-import {coerceArray} from '../deps/angular/cdk/coercion/array';
+import {Dictionary} from '../deps/scion/toolkit/util';
+import {coerceBooleanProperty} from '../deps/angular/cdk/coercion';
+import {coerceArray} from '../deps/angular/cdk/coercion';
 
 const EC = protractor.ExpectedConditions;
 

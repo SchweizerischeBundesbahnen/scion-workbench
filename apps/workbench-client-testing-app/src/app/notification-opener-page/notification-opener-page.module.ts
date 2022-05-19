@@ -10,7 +10,8 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SciFormFieldModule, SciParamsEnterModule} from '@scion/toolkit.internal/widgets';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {NotificationOpenerPageComponent} from './notification-opener-page.component';

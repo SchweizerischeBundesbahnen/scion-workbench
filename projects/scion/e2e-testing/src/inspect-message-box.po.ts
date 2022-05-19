@@ -12,9 +12,9 @@ import {AppPO, MessageBoxPO} from './app.po';
 import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
 import {assertPageToDisplay, enterText, selectOption} from './helper/testing.util';
-import {Dictionary} from '../deps/scion/toolkit/dictionaries.util';
-import {Arrays} from '../deps/scion/toolkit/arrays.util';
-import {SciParamsEnterPO} from '../deps/scion/toolkit.internal/params-enter/params-enter.po';
+import {Dictionary} from '../deps/scion/toolkit/util';
+import {Arrays} from '../deps/scion/toolkit/util';
+import {SciParamsEnterPO} from '../deps/scion/components.internal/params-enter.po';
 
 /**
  * Page object to interact {@link InspectMessageBoxComponent}.

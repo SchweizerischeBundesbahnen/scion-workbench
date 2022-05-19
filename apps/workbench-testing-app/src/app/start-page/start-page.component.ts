@@ -18,7 +18,7 @@ import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-
 import {ActivatedRoute, NavigationEnd, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {expand, filter, map, take, takeUntil} from 'rxjs/operators';
 import {FormControl} from '@angular/forms';
-import {SciFilterFieldComponent, toFilterRegExp} from '@scion/toolkit.internal/widgets';
+import {SciFilterFieldComponent, toFilterRegExp} from '@scion/components.internal/filter-field';
 
 @Component({
   selector: 'app-start-page',

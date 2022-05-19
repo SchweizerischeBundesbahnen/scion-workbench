@@ -10,7 +10,7 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SciFormFieldModule} from '@scion/toolkit.internal/widgets';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {PopupFocusPageComponent} from './popup-focus-page.component';
 
 @NgModule({

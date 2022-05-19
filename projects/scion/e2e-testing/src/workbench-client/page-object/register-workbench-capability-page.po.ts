@@ -14,9 +14,9 @@ import {$, browser, ElementFinder, protractor} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {RouterOutletPO} from './router-outlet.po';
 import {WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
-import {SciParamsEnterPO} from '../../../deps/scion/toolkit.internal/params-enter/params-enter.po';
-import {SciCheckboxPO} from '../../../deps/scion/toolkit.internal/checkbox/checkbox.po';
-import {coerceArray} from '../../../deps/angular/cdk/coercion/array';
+import {SciParamsEnterPO} from '../../../deps/scion/components.internal/params-enter.po';
+import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
+import {coerceArray} from '../../../deps/angular/cdk/coercion';
 
 const EC = protractor.ExpectedConditions;
 

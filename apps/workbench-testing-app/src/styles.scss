@@ -1,5 +1,5 @@
 @use '@scion/workbench';
-@use 'sci-toolkit-theme' with (
+@use '@scion/components.internal/theme' with (
     $theme: (
       accent: (
         50: #E8F5E9,

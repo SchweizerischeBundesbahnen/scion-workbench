@@ -10,7 +10,7 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SciFormFieldModule} from '@scion/toolkit.internal/widgets';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {ReactiveFormsModule} from '@angular/forms';
 import {UnregisterWorkbenchCapabilityPageComponent} from './unregister-workbench-capability-page.component';
 import {RouterModule, Routes} from '@angular/router';

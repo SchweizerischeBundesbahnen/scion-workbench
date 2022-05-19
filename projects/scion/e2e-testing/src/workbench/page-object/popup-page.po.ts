@@ -14,7 +14,7 @@ import {ElementFinder} from 'protractor';
 import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
 import {PopupSize} from '@scion/workbench';
 import {ISize} from 'selenium-webdriver';
-import {SciAccordionPO} from '../../../deps/scion/toolkit.internal/accordion/accordion.po';
+import {SciAccordionPO} from '../../../deps/scion/components.internal/accordion.po';
 
 /**
  * Page object to interact {@link PopupPageComponent}.

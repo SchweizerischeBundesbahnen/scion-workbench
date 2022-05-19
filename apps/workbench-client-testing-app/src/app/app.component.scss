@@ -1,4 +1,4 @@
-@use 'sci-toolkit-styles' as sci-toolkit-styles;
+@use '@scion/components.internal' as sci-ɵcomponents;
 
 :host {
   display: grid;
@@ -17,7 +17,7 @@
     position: absolute;
     right: 5px;
     top: 5px;
-    @include sci-toolkit-styles.chip(var(--app-color), var(--app-color), white);
+    @include sci-ɵcomponents.theme-chip(var(--app-color), var(--app-color), white);
   }
 
   > span.workbench-context-note {

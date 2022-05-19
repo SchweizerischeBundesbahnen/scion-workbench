@@ -12,7 +12,7 @@ import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy
 import {AsyncSubject, combineLatest, EMPTY, fromEvent, Subject} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
-import {SciViewportComponent} from '@scion/toolkit/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {WbRouterOutletComponent} from '../routing/wb-router-outlet.component';
 import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing.constants';
 import {MessageBoxService} from '../message-box/message-box.service';

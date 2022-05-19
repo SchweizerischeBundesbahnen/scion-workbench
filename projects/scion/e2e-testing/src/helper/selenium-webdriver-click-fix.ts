@@ -9,7 +9,7 @@
  */
 
 import {browser, ElementFinder, WebElement} from 'protractor';
-import {SciListItemPO} from '../../deps/scion/toolkit.internal/list/list-item.po';
+import {SciListItemPO} from '../../deps/scion/components.internal/list.po';
 
 /**
  * Repairs clicking DOM elements contained in an iframe part of a shadow DOM.

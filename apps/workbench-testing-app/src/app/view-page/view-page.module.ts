@@ -10,7 +10,10 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SciAccordionModule, SciCheckboxModule, SciFormFieldModule, SciPropertyModule} from '@scion/toolkit.internal/widgets';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciPropertyModule} from '@scion/components.internal/property';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {ViewPageComponent} from './view-page.component';
