@@ -1,4 +1,4 @@
-@use 'projects/scion/workbench/src/theme/theming' as wb-theme;
+@use '@scion/workbench';
 @use 'sci-toolkit-theme' with (
     $theme: (
       accent: (
@@ -18,8 +18,6 @@
       ),
    )
  );
-
-@include wb-theme.wb-theme();
 
 * {
   box-sizing: border-box;

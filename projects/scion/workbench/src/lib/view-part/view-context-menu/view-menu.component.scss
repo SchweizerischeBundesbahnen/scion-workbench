@@ -1,6 +1,6 @@
-@import '../../workbench.constants';
+@use '__workbench' as workbench;
 
-@mixin showEllipsisIfOverflowing {
+@mixin show-ellipsis-on-overflow {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -10,13 +10,13 @@
   display: flex;
   flex-direction: column;
   width: 250px;
-  border: 1px solid $viewlistitem-border-color;
-  background-color: $viewpart_tab-active-bgcolor;
+  border: 1px solid workbench.$colors-viewlistitem-border-color;
+  background-color: workbench.$colors-viewpart_tab-active-bgcolor;
   box-shadow: 8px 8px 9px -9px rgba(0, 0, 0, 0.2);
 
   > div.menu-item-group {
     &:not(:last-child) {
-      border-bottom: 1px solid $viewlistitem-border-color;
+      border-bottom: 1px solid workbench.$colors-viewlistitem-border-color;
     }
 
     > div.menu-item {
@@ -28,7 +28,7 @@
 
       > div.text {
         flex: auto;
-        @include showEllipsisIfOverflowing;
+        @include show-ellipsis-on-overflow;
       }
 
       > div.accelerator {
@@ -38,7 +38,7 @@
 
       &:hover {
         background-color: rgba(239, 239, 239, .5);
-        box-shadow: 0 0 0 1px $viewlistitem-border-color;
+        box-shadow: 0 0 0 1px workbench.$colors-viewlistitem-border-color;
       }
 
       &.disabled {

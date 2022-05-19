@@ -1,4 +1,4 @@
-@use '../workbench.constants' as constants;
+@use '__workbench' as workbench;
 
 $severity-border-size: 6px;
 $border-radius: 4px;
@@ -19,9 +19,9 @@ $border-radius: 4px;
   display: block;
   font-size: 1rem;
   border-radius: $border-radius;
-  color: constants.$messagebox-fgcolor;
-  box-shadow: constants.$popup-box-shadow;
-  background-color: constants.$messagebox-bgcolor;
+  color: workbench.$colors-messagebox-fgcolor;
+  box-shadow: workbench.$styles-popup-box-shadow;
+  background-color: workbench.$colors-messagebox-bgcolor;
   outline: none;
 
   > header.move-handle {
@@ -35,7 +35,7 @@ $border-radius: 4px;
   > div.outline {
     display: flex;
     flex-direction: column;
-    border: 1px solid constants.$messagebox-border-color;
+    border: 1px solid workbench.$colors-messagebox-border-color;
     border-top: none;
     border-bottom-left-radius: $border-radius;
     border-bottom-right-radius: $border-radius;
@@ -44,7 +44,7 @@ $border-radius: 4px;
     > div.body {
       flex: auto;
       padding: 1.5em;
-      max-width: constants.$messagebox-max-width;
+      max-width: workbench.$styles-messagebox-max-width;
       user-select: none;
       white-space: pre-line;
 
@@ -64,11 +64,11 @@ $border-radius: 4px;
         flex: 1 1 0;
         display: grid;
         background-color: rgb(250, 250, 250);
-        border-top: 1px solid constants.$messagebox-border-color;
+        border-top: 1px solid workbench.$colors-messagebox-border-color;
         min-width: 7.5em;
 
         &:not(:first-child) {
-          border-left: 1px solid constants.$messagebox-border-color;
+          border-left: 1px solid workbench.$colors-messagebox-border-color;
         }
 
         > button.action {
@@ -91,15 +91,15 @@ $border-radius: 4px;
   }
 
   &.info {
-    @include message-box-theme(constants.$info-color);
+    @include message-box-theme(workbench.$colors-info-color);
   }
 
   &.warn {
-    @include message-box-theme(constants.$warn-color);
+    @include message-box-theme(workbench.$colors-warn-color);
   }
 
   &.error {
-    @include message-box-theme(constants.$error-color);
+    @include message-box-theme(workbench.$colors-error-color);
   }
 
   &.blinking {
@@ -109,7 +109,7 @@ $border-radius: 4px;
 
     @keyframes blink-animation {
       from {
-        box-shadow: constants.$popup-box-shadow;
+        box-shadow: workbench.$styles-popup-box-shadow;
       }
       to {
         box-shadow: none;

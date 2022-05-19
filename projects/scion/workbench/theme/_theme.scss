@@ -1,0 +1,26 @@
+/**
+ * Copyright (c) 2018-2022 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+/**
+ * Import from `index.scss' to style the SCION workbench.
+ */
+
+@use '@angular/cdk';
+@use 'icon-font-theme' as wb-icon-font-theme;
+@use 'popup-theme' as wb-popup-theme;
+@use 'view-drag-theme' as wb-drag-theme;
+
+$theme: () !default; // use default theme if not provided a theme
+
+@include cdk.a11y-visually-hidden();
+@include cdk.overlay();
+@include wb-icon-font-theme.icon-font($theme);
+@include wb-popup-theme.popup($theme);
+@include wb-drag-theme.view-tab-drag-image($theme);

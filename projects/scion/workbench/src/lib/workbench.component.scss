@@ -1,11 +1,10 @@
-@use './workbench.constants' as constants;
-@use './mixin';
+@use '__workbench' as workbench;
 
 :host {
   display: grid;
   position: relative; // positioning context
   overflow: hidden;
-  background-color: constants.$background-color;
+  background-color: workbench.$colors-background-color;
 
   > div.stacking-context-barrier {
     display: flex;
@@ -35,12 +34,12 @@
 
   > wb-message-box-stack {
     position: absolute;
-    @include mixin.inset(0, 0, 0, 0);
+    inset: 0 0 0 0;
   }
 
   > wb-notification-list {
     position: absolute;
-    @include mixin.inset(0, 0, 0, 0);
+    inset: 0 0 0 0;
   }
 
   // For iframe-based microfrontend integration, `<wb-parts-layout>` forms a new stacking context during a workbench drag & drop operation such

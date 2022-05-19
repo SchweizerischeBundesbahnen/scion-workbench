@@ -1,10 +1,10 @@
-@import '../../workbench.constants';
+@use '__workbench' as workbench;
 
 :host {
   display: grid;
-  width: $viewtab-max-width + 75px;
-  border: 1px solid $viewlistitem-border-color;
-  background-color: $viewpart_tab-active-bgcolor;
+  width: workbench.$styles-viewtab-max-width + 75px;
+  border: 1px solid workbench.$colors-viewlistitem-border-color;
+  background-color: workbench.$colors-viewpart_tab-active-bgcolor;
 
   > sci-viewport {
     max-height: 350px;

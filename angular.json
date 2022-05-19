@@ -30,7 +30,12 @@
             "main": "projects/scion/workbench/src/test.ts",
             "tsConfig": "projects/scion/workbench/tsconfig.spec.json",
             "karmaConfig": "projects/scion/workbench/karma.conf.js",
-            "inlineStyleLanguage": "scss"
+            "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/scion/workbench"
+              ]
+            }
           }
         },
         "lint": {
@@ -77,7 +82,7 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "node_modules/@scion/toolkit.internal/widgets"
+                "projects/scion/workbench"
               ]
             },
             "scripts": []
@@ -216,11 +221,6 @@
             "styles": [
               "apps/workbench-client-testing-app/src/styles.scss"
             ],
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "node_modules/@scion/toolkit.internal/widgets"
-              ]
-            },
             "scripts": []
           },
           "configurations": {
