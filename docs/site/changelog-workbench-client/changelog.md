@@ -6,6 +6,26 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.9...workbench-client-1.0.0-beta.10) (2022-05-20)
+
+
+### Dependencies
+
+* **workbench-client:** migrate to the framework-agnostic package `@scion/toolkit` ([38368e9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/38368e93fffb7ecf3bcf0338f6f43ee2a760de9a))
+
+
+### BREAKING CHANGES
+
+* **workbench-client:** Migrating to the framework-agnostic package `@scion/toolkit` introduced a breaking change.
+
+  Previously, framework-agnostic and Angular-specific tools were published in the same NPM package `@scion/toolkit`, which often led to confusion and prevented framework-agnostic tools from having a release cycle independent of the Angular project. Therefore, Angular-specific tools have been moved to the NPM package `@scion/components`. Framework-agnostic tools continue to be released under `@scion/toolkit`, but now starting with version `1.0.0` instead of pre-release versions.
+
+  To migrate:
+  - Install the NPM package `@scion/toolkit` in version `1.0.0` using the following command: `npm install @scion/toolkit@latest --save`. Note that the toolkit was previously released as pre-releases of version `13.0.0` or older.
+  - If you are using Angular components from the toolkit in your project, for example the `<sci-viewport>` component, please follow the migration instructions of the [SCION Toolkit Changelog](https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/docs/site/changelog-components/changelog.md#migration-of-angular-specific-components-and-directives). Components of the toolkit have been moved to the NPM package `@scion/components`.
+
+
+
 # [1.0.0-beta.9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.8...workbench-client-1.0.0-beta.9) (2022-05-02)
 
 
