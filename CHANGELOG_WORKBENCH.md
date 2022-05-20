@@ -1,3 +1,48 @@
+# [13.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/13.0.0-beta.1...13.0.0-beta.2) (2022-05-20)
+
+
+### Bug Fixes
+
+* **workbench:** support importing the workbench theme without using the tilde as `node_modules` alias ([a4556ac](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a4556ac4bb631756110a4e9ff1fb9a52427f665d))
+
+
+### Dependencies
+
+* **workbench:** migrate to the framework-agnostic package `@scion/toolkit` ([38368e9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/38368e93fffb7ecf3bcf0338f6f43ee2a760de9a))
+
+
+### BREAKING CHANGES
+
+* **workbench:** Migrating to the framework-agnostic package `@scion/toolkit` introduced a breaking change.
+
+  Previously, framework-agnostic and Angular-specific tools were published in the same NPM package `@scion/toolkit`, which often led to confusion and prevented framework-agnostic tools from having a release cycle independent of the Angular project. Therefore, Angular-specific tools have been moved to the NPM package `@scion/components`. Framework-agnostic tools continue to be released under `@scion/toolkit`, but now starting with version `1.0.0` instead of pre-release versions.
+
+  To migrate:
+  - Install the NPM package `@scion/toolkit` in version `1.0.0` using the following command: `npm install @scion/toolkit@latest --save`. Note that the toolkit was previously released as pre-releases of version `13.0.0` or older.
+  - Install the NPM module `@scion/components` in version `13.0.0` using the following command: `npm install @scion/components@latest --save`
+  - If you are using Angular components from the toolkit in your project, for example the `<sci-viewport>` component, please follow the migration instructions of the [SCION Toolkit Changelog](https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/docs/site/changelog-components/changelog.md#migration-of-angular-specific-components-and-directives). Components of the toolkit have been moved to the NPM package `@scion/components`.
+
+* **workbench:** Adding support to import the workbench theme without using the tilde introduced a breaking change.
+
+  Angular 13 has dropped the tilde support (`~`) for resolving Sass files located in the `node_modules` folder. For more information, refer to the Angular migration commit https://github.com/angular/components/commit/f2ff9e3.
+
+  To migrate:
+  - In `styles.scss`, import the SASS module `@scion/workbench` as follows: `@use '@scion/workbench'`.
+    It is no longer necessary to include the "theme" mixin because applied as a side effect when importing the module.
+  
+    Before the migration:
+    ```scss
+    @import '~@scion/workbench/theming';
+    @include wb-theme();
+    ```
+  
+    After the migration:
+    ```scss
+    @use '@scion/workbench';
+    ```
+
+
+
 # [13.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/12.0.0-beta.3...13.0.0-beta.1) (2022-05-02)
 
 
