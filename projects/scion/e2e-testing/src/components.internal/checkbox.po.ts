@@ -8,28 +8,28 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementFinder} from 'protractor';
+import {Locator} from '@playwright/test';
 
 /**
  * Page object for {@link SciCheckboxComponent}.
  */
 export class SciCheckboxPO {
 
-  private _checkboxFinder: ElementFinder;
+  private _locator: Locator;
 
-  constructor(private _sciCheckboxFinder: ElementFinder) {
-    this._checkboxFinder = this._sciCheckboxFinder.$('input[type="checkbox"]');
+  constructor(private _sciCheckboxLocator: Locator) {
+    this._locator = this._sciCheckboxLocator.locator('input[type="checkbox"]');
   }
 
   public async toggle(check: boolean): Promise<void> {
     const isChecked = await this.isChecked();
 
     if (check !== isChecked) {
-      await this._checkboxFinder.click();
+      await this._locator.click();
     }
   }
 
   public async isChecked(): Promise<boolean> {
-    return this._checkboxFinder.isSelected();
+    return this._locator.isChecked();
   }
 }

@@ -8,105 +8,71 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing.util';
+import {assertElementVisible} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {$, browser, ElementFinder, protractor} from 'protractor';
 import {Qualifier} from '@scion/microfrontend-platform';
-import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {RouterOutletPO} from './router-outlet.po';
-import {SciParamsEnterPO} from '../../../deps/scion/components.internal/params-enter.po';
-import {Dictionary} from '../../../deps/scion/toolkit/util';
-import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
-
-const EC = protractor.ExpectedConditions;
+import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
+import {SciCheckboxPO} from '../../components.internal/checkbox.po';
+import {Locator} from '@playwright/test';
+import {ElementSelectors} from '../../helper/element-selectors';
 
 /**
  * Page object to interact {@link RouterPageComponent} of workbench-client testing app.
  */
 export class RouterPagePO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _locator: Locator;
+  private readonly _viewPO: ViewPO;
 
-  public readonly viewPO: ViewPO;
   public readonly viewTabPO: ViewTabPO;
 
-  constructor(public viewId: string) {
-    this.viewPO = this._appPO.findView({viewId: viewId});
-    this.viewTabPO = this._appPO.findViewTab({viewId: viewId});
-    this._pageFinder = $('app-router-page');
+  constructor(appPO: AppPO, public viewId: string) {
+    this._viewPO = appPO.findView({viewId: viewId});
+    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-router-page');
   }
 
-  public async isPresent(): Promise<boolean> {
-    if (!await this.viewTabPO.isPresent()) {
-      return false;
-    }
-
-    if (!await new RouterOutletPO().isPresent(this.viewId)) {
-      return false;
-    }
-
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    return this._pageFinder.isPresent();
-  }
-
-  public async isDisplayed(): Promise<boolean> {
-    if (!await this.viewPO.isPresent()) {
-      return false;
-    }
-
-    if (!await new RouterOutletPO().isDisplayed(this.viewId)) {
-      return false;
-    }
-
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    return await this._pageFinder.isPresent() && await this._pageFinder.isDisplayed();
+  public async isVisible(): Promise<boolean> {
+    return await this._viewPO.isVisible() && await this._locator.isVisible();
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-qualifier'));
+    await assertElementVisible(this._locator);
+    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(qualifier);
   }
 
-  public async enterParams(params: Dictionary): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-params'));
+  public async enterParams(params: Record<string, string>): Promise<void> {
+    await assertElementVisible(this._locator);
+    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-params'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(params);
   }
 
   public async selectTarget(target: 'self' | 'blank'): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await selectOption(target, this._pageFinder.$('select.e2e-target'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('select.e2e-target').selectOption(target);
   }
 
   public async enterSelfViewId(selfViewId: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(selfViewId, this._pageFinder.$('input.e2e-self-view-id'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-self-view-id').fill(selfViewId);
   }
 
   public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(`${insertionIndex}`, this._pageFinder.$('input.e2e-insertion-index'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
   }
 
   public async checkActivateIfPresent(check: boolean): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-activate-if-present')).toggle(check);
+    await assertElementVisible(this._locator);
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate-if-present')).toggle(check);
   }
 
   public async checkCloseIfPresent(check: boolean): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-close-if-present')).toggle(check);
+    await assertElementVisible(this._locator);
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-close-if-present')).toggle(check);
   }
 
   /**
@@ -116,34 +82,19 @@ export class RouterPagePO {
    * as this unloads the current router page.
    */
   public async clickNavigate(options?: {evalNavigateResponse?: boolean}): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await this._pageFinder.$('button.e2e-navigate').click();
+    await assertElementVisible(this._locator);
+    await this._locator.locator('button.e2e-navigate').click();
 
     if (!(options?.evalNavigateResponse ?? true)) {
       return;
     }
 
-    // Evaluate the response: resolves the promise on success, or rejects it on error.
-    const navigatedFinder = this._pageFinder.$('output.e2e-navigated');
-    const errorFinder = this._pageFinder.$('output.e2e-navigate-error');
-    await browser.wait(EC.or(EC.presenceOf(navigatedFinder), EC.presenceOf(errorFinder)), 5000);
-    if (await navigatedFinder.isPresent()) {
-      return;
-    }
-    else {
-      throw Error(await errorFinder.getText());
-    }
-  }
-
-  /**
-   * Opens the page in a new view tab.
-   */
-  public static async openInNewTab(app: 'app1' | 'app2'): Promise<RouterPagePO> {
-    const appPO = new AppPO();
-    const startPO = await appPO.openNewViewTab();
-    await startPO.openMicrofrontendView('e2e-test-router', `workbench-client-testing-${app}`);
-    const viewId = await appPO.findActiveView().getViewId();
-    return new RouterPagePO(viewId);
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    const navigatedLocator = this._locator.locator('output.e2e-navigated');
+    const errorLocator = this._locator.locator('output.e2e-navigate-error');
+    await Promise.race([
+      navigatedLocator.waitFor({state: 'attached'}),
+      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+    ]);
   }
 }

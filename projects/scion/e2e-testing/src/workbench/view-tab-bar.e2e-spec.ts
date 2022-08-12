@@ -8,24 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
 import {StartPagePO} from '../start-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
-import {consumeBrowserLog} from '../helper/testing.util';
 
-describe('View Tabbar', () => {
+test.describe('View Tabbar', () => {
 
-  const appPO = new AppPO();
-
-  beforeEach(async () => consumeBrowserLog());
-
-  it('should not show if no views are open and no viewpart actions present', async () => {
+  test('should not show if no views are open and no viewpart actions present', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false, showNewTabAction: false});
+    const startPagePO = new StartPagePO(appPO);
 
     await expect(await appPO.getViewTabCount()).toEqual(0);
     await expect(await appPO.isViewTabBarShowing()).toBe(false);
 
-    await new StartPagePO().openWorkbenchView('e2e-test-view');
+    await startPagePO.openWorkbenchView('e2e-test-view');
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await appPO.isViewTabBarShowing()).toBe(true);
 
@@ -38,7 +35,7 @@ describe('View Tabbar', () => {
     await expect(await appPO.getViewTabCount()).toEqual(0);
     await expect(await appPO.isViewTabBarShowing()).toBe(true);
 
-    await new StartPagePO().openWorkbenchView('e2e-test-view');
+    await startPagePO.openWorkbenchView('e2e-test-view');
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await appPO.isViewTabBarShowing()).toBe(true);
 
@@ -47,9 +44,9 @@ describe('View Tabbar', () => {
     await expect(await appPO.isViewTabBarShowing()).toBe(true);
   });
 
-  it('should activate the most recent view when closing a view', async () => {
+  test('should activate the most recent view when closing a view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.getViewTabCount()).toEqual(1);
 
@@ -111,9 +108,9 @@ describe('View Tabbar', () => {
     await expect(await appPO.findViewTab({cssClass: 'e2e-test-view-2'}).isActive()).toBe(true);
   });
 
-  it('should insert a new view tab into the tabbar after the active view tab by default', async () => {
+  test('should insert a new view tab into the tabbar after the active view tab by default', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await appPO.getViewTabs()).toEqual(['view.1']);
@@ -145,9 +142,9 @@ describe('View Tabbar', () => {
     await expect(await appPO.getViewTabs()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
   });
 
-  it('should insert a new view tab into the tabbar at the end', async () => {
+  test('should insert a new view tab into the tabbar at the end', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await appPO.getViewTabs()).toEqual(['view.1']);
@@ -182,9 +179,9 @@ describe('View Tabbar', () => {
     await expect(await appPO.getViewTabs()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
   });
 
-  it('should insert a new view tab into the tabbar at the start', async () => {
+  test('should insert a new view tab into the tabbar at the start', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await appPO.getViewTabs()).toEqual(['view.1']);
@@ -219,9 +216,9 @@ describe('View Tabbar', () => {
     await expect(await appPO.getViewTabs()).toEqual(['view.4', 'view.3', 'view.2', 'view.1']);
   });
 
-  it('should insert a new view tab into the tabbar at a custom position', async () => {
+  test('should insert a new view tab into the tabbar at a custom position', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await appPO.getViewTabs()).toEqual(['view.1']);
@@ -256,13 +253,14 @@ describe('View Tabbar', () => {
     await expect(await appPO.getViewTabs()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
   });
 
-  it('should allow to have a sticky view tab', async () => {
+  test('should allow to have a sticky view tab', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false, stickyStartViewTab: true});
+    const startPagePO = new StartPagePO(appPO);
 
     // expect the sticky view to be opened
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await appPO.findViewTab({cssClass: 'e2e-start-page'}).isPresent()).toBe(true);
-    await expect(await new StartPagePO().isPresent());
+    await expect(await startPagePO.isPresent()).toBe(true);
 
     // close the sticky view
     await appPO.findViewTab({cssClass: 'e2e-start-page'}).close();
@@ -270,6 +268,6 @@ describe('View Tabbar', () => {
     // expect the sticky view to be opened
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await appPO.findViewTab({cssClass: 'e2e-start-page'}).isPresent()).toBe(true);
-    await expect(await new StartPagePO().isPresent());
+    await expect(await startPagePO.isPresent()).toBe(true);
   });
 });

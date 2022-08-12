@@ -8,83 +8,75 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
-import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
-import {consumeBrowserLog, sendKeys} from '../helper/testing.util';
-import {Key} from 'protractor';
-import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
 import {HostPopupPagePO} from './page-object/host-popup-page.po';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
+import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 
-describe('Workbench Popup', () => {
+test.describe('Workbench Popup', () => {
 
-  const appPO = new AppPO();
-
-  installSeleniumWebDriverClickFix();
-
-  beforeEach(async () => consumeBrowserLog());
-
-  it('should allow opening a popup contributed by the host app', async () => {
+  test('should allow opening a popup contributed by the host app', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
     // register intention
-    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
-    const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
     await popupOpenerPagePO.clickOpen();
 
     const popupPO = await appPO.findPopup({cssClass: 'host-popup'});
-    await expect(await popupPO.isDisplayed()).toBe(true);
+    await expect(await popupPO.isVisible()).toBe(true);
   });
 
-  it('should allow closing the popup and returning a value to the popup opener', async () => {
+  test('should allow closing the popup and returning a value to the popup opener', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
     // register intention
-    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
-    const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
     await popupOpenerPagePO.clickOpen();
 
-    const popupPagePO = new HostPopupPagePO('host-popup');
-    await popupPagePO.clickClose({returnValue: 'RETURN VALUE'});
+    const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+    await hostPopupPagePO.clickClose({returnValue: 'RETURN VALUE'});
     await expect(await popupOpenerPagePO.getPopupCloseAction()).toEqual({type: 'closed-with-value', value: 'RETURN VALUE'});
   });
 
-  it('should allow closing the popup with an error', async () => {
+  test('should allow closing the popup with an error', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
     // register intention
-    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
-    const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
     await popupOpenerPagePO.clickOpen();
 
-    const popupPagePO = new HostPopupPagePO('host-popup');
-    await popupPagePO.clickClose({returnValue: 'ERROR', closeWithError: true});
+    const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+    await hostPopupPagePO.clickClose({returnValue: 'ERROR', closeWithError: true});
 
     await expect(await popupOpenerPagePO.getPopupCloseAction()).toEqual({type: 'closed-with-error', value: 'ERROR'});
   });
 
-  it('should stick the popup to the HTMLElement anchor when moving the anchor element', async () => {
+  test('should stick the popup to the HTMLElement anchor when moving the anchor element', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -92,11 +84,11 @@ describe('Workbench Popup', () => {
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
     // register intention
-    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
-    const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
     await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
     await popupOpenerPagePO.selectAlign('north');
@@ -105,7 +97,8 @@ describe('Workbench Popup', () => {
     // TODO [#271]: Specify the preferred size via popup capability when implemented the issue #271
     // Also consider merging this specs with popup.e2e-spec.ts.
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
-    await new HostPopupPagePO('host-popup').enterComponentSize({height: '100px', width: '100px'});
+    const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+    await hostPopupPagePO.enterComponentSize({height: '100px', width: '100px'});
 
     const popupPO = appPO.findPopup({cssClass: 'host-popup'});
 
@@ -138,7 +131,7 @@ describe('Workbench Popup', () => {
     await expect(popupClientRect3.left).toEqual(popupClientRect1.left);
   });
 
-  it('should allow repositioning the popup if using a coordinate anchor', async () => {
+  test('should allow repositioning the popup if using a coordinate anchor', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -146,11 +139,11 @@ describe('Workbench Popup', () => {
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
     // register intention
-    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
-    const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
     await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
     await popupOpenerPagePO.selectAnchor('coordinate');
@@ -160,7 +153,8 @@ describe('Workbench Popup', () => {
 
     // TODO [#271]: Specify the preferred size via popup capability when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
-    await new HostPopupPagePO('host-popup').enterComponentSize({height: '100px', width: '100px'});
+    const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+    await hostPopupPagePO.enterComponentSize({height: '100px', width: '100px'});
 
     const popupPO = appPO.findPopup({cssClass: 'host-popup'});
 
@@ -171,7 +165,7 @@ describe('Workbench Popup', () => {
     await popupOpenerPagePO.enterAnchorCoordinate({x: 200, y: 300, width: 2, height: 0});
 
     // assert the popup location
-    await expect(await popupPO.getClientRect()).toEqual(jasmine.objectContaining({
+    await expect(await popupPO.getClientRect()).toEqual(expect.objectContaining({
       left: popupClientRectInitial.left + 50,
       top: popupClientRectInitial.top + 150,
     }));
@@ -183,9 +177,9 @@ describe('Workbench Popup', () => {
     await expect(await popupPO.getClientRect()).toEqual(popupClientRectInitial);
   });
 
-  describe('view context', () => {
+  test.describe('view context', () => {
 
-    it('should hide the popup when its contextual view (if any) is deactivated, and then display the popup again when activating it', async () => {
+    test('should hide the popup when its contextual view (if any) is deactivated, and then display the popup again when activating it', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -193,31 +187,31 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
       const popupPO = appPO.findPopup({cssClass: 'host-popup'});
       await expect(await popupPO.isPresent()).toBe(true);
-      await expect(await popupPO.isDisplayed()).toBe(true);
+      await expect(await popupPO.isVisible()).toBe(true);
 
       // activate another view
       await appPO.openNewViewTab();
       await expect(await popupPO.isPresent()).toBe(true);
-      await expect(await popupPO.isDisplayed()).toBe(false);
+      await expect(await popupPO.isVisible()).toBe(false);
 
       // re-activate the view
       await popupOpenerPagePO.viewTabPO.activate();
       await expect(await popupPO.isPresent()).toBe(true);
-      await expect(await popupPO.isDisplayed()).toBe(true);
+      await expect(await popupPO.isVisible()).toBe(true);
     });
 
-    it('should not destroy the popup when its contextual view (if any) is deactivated', async () => {
+    test('should not destroy the popup when its contextual view (if any) is deactivated', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -225,35 +219,35 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPagePO = new HostPopupPagePO('host-popup');
-      const componentInstanceId = await popupPagePO.getComponentInstanceId();
-      await expect(await popupPagePO.isPresent()).toBe(true);
-      await expect(await popupPagePO.isDisplayed()).toBe(true);
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const componentInstanceId = await hostPopupPagePO.getComponentInstanceId();
+      await expect(await hostPopupPagePO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.isVisible()).toBe(true);
 
       // activate another view
       await appPO.openNewViewTab();
-      await expect(await popupPagePO.isPresent()).toBe(true);
-      await expect(await popupPagePO.isDisplayed()).toBe(false);
+      await expect(await hostPopupPagePO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.isVisible()).toBe(false);
 
       // re-activate the view
       await popupOpenerPagePO.viewTabPO.activate();
-      await expect(await popupPagePO.isPresent()).toBe(true);
-      await expect(await popupPagePO.isDisplayed()).toBe(true);
+      await expect(await hostPopupPagePO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.isVisible()).toBe(true);
 
       // expect the component not to be constructed anew
-      await expect(await popupPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect(await hostPopupPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
-    it('should bind the popup to the current view, if opened in the context of a view', async () => {
+    test('should bind the popup to the current view, if opened in the context of a view', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -261,39 +255,43 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
       const popupPO = appPO.findPopup({cssClass: 'host-popup'});
       await expect(await popupPO.isPresent()).toBe(true);
-      await expect(await popupPO.isDisplayed()).toBe(true);
+      await expect(await popupPO.isVisible()).toBe(true);
 
       // deactivate the view
       await appPO.openNewViewTab();
       await expect(await popupPO.isPresent()).toBe(true);
-      await expect(await popupPO.isDisplayed()).toBe(false);
+      await expect(await popupPO.isVisible()).toBe(false);
 
       // activate the view again
       await popupOpenerPagePO.viewTabPO.activate();
       await expect(await popupPO.isPresent()).toBe(true);
-      await expect(await popupPO.isDisplayed()).toBe(true);
+      await expect(await popupPO.isVisible()).toBe(true);
 
       // close the view
       await popupOpenerPagePO.viewTabPO.close();
+
+      // popup should be closed when view is closed
+      await popupPO.waitUntilClosed();
+
       await expect(await popupPO.isPresent()).toBe(false);
-      await expect(await popupPO.isDisplayed()).toBe(false);
+      await expect(await popupPO.isVisible()).toBe(false);
     });
   });
 
-  describe('popup closing', () => {
+  test.describe('popup closing', () => {
 
-    it('should close the popup on focus lost ', async () => {
+    test('should close the popup on focus lost', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -301,26 +299,29 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: true});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPagePO = new HostPopupPagePO('host-popup');
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPagePO.popupPO.isDisplayed()).toBe(true);
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
       await popupOpenerPagePO.viewTabPO.activate();
 
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(false);
-      await expect(await popupPagePO.popupPO.isDisplayed()).toBe(false);
+      // popup should be closed on focus lost
+      await hostPopupPagePO.popupPO.waitUntilClosed();
+
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(false);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(false);
     });
 
-    it('should not close the popup on focus lost ', async () => {
+    test('should not close the popup on focus lost', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -328,26 +329,26 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPagePO = new HostPopupPagePO('host-popup');
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPagePO.popupPO.isDisplayed()).toBe(true);
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
       await popupOpenerPagePO.viewTabPO.activate();
 
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPagePO.popupPO.isDisplayed()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
     });
 
-    it('should close the popup on escape keystroke ', async () => {
+    test('should close the popup on escape keystroke', async ({page, appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -355,41 +356,43 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnEscape: true});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPage1PO = new HostPopupPagePO('host-popup');
-      await expect(await popupPage1PO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPage1PO.popupPO.isDisplayed()).toBe(true);
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
-      await sendKeys(Key.ESCAPE);
+      await page.keyboard.press('Escape');
 
-      await expect(await popupPage1PO.popupPO.isPresent()).toBe(false);
-      await expect(await popupPage1PO.popupPO.isDisplayed()).toBe(false);
+      // popup should be closed on escape keystroke
+      await hostPopupPagePO.popupPO.waitUntilClosed();
+
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(false);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(false);
 
       // open the popup
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnEscape: true});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPage2PO = new HostPopupPagePO('host-popup');
-      await expect(await popupPage2PO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPage2PO.popupPO.isDisplayed()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
-      await popupPage2PO.enterReturnValue('explicitly request the focus');
-      await sendKeys(Key.ESCAPE);
+      await hostPopupPagePO.enterReturnValue('explicitly request the focus');
+      await page.keyboard.press('Escape');
 
-      await expect(await popupPage2PO.popupPO.isPresent()).toBe(false);
-      await expect(await popupPage2PO.popupPO.isDisplayed()).toBe(false);
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(false);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(false);
     });
 
-    it('should not close the popup on escape keystroke ', async () => {
+    test('should not close the popup on escape keystroke', async ({page, appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -397,26 +400,26 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnEscape: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPagePO = new HostPopupPagePO('host-popup');
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPagePO.popupPO.isDisplayed()).toBe(true);
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
-      await sendKeys(Key.ESCAPE);
+      await page.keyboard.press('Escape');
 
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPagePO.popupPO.isDisplayed()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
+      await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
     });
 
-    it('should provide the popup\'s capability', async () => {
+    test('should provide the popup\'s capability', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -424,27 +427,27 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.clickOpen();
 
       // expect the popup of this app to display
-      const popupPagePO = new HostPopupPagePO('host-popup');
-      await expect(await popupPagePO.getPopupCapability()).toEqual(jasmine.objectContaining({
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await hostPopupPagePO.getPopupCapability()).toEqual(expect.objectContaining({
         qualifier: {component: 'host-popup'},
         type: 'popup',
-        properties: jasmine.objectContaining({
+        properties: expect.objectContaining({
           path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
           cssClass: 'host-popup',
         }),
       }));
     });
 
-    it('should allow passing a value to the popup component', async () => {
+    test('should allow passing a value to the popup component', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -452,21 +455,21 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterParams({param1: 'PARAM1'});
       await popupOpenerPagePO.clickOpen();
 
       // expect values to be contained in popup params
-      const popupPagePO = new HostPopupPagePO('host-popup');
-      await expect(await popupPagePO.getPopupParams()).toEqual(jasmine.objectContaining({param1: 'PARAM1'}));
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await hostPopupPagePO.getPopupParams()).toEqual(expect.objectContaining({param1: 'PARAM1'}));
     });
 
-    it('should contain the qualifier in popup params', async () => {
+    test('should contain the qualifier in popup params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -474,20 +477,20 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.clickOpen();
 
       // expect qualifier to be contained in popup params
-      const popupPagePO = new HostPopupPagePO('host-popup');
-      await expect(await popupPagePO.getPopupParams()).toEqual(jasmine.objectContaining({component: 'host-popup'}));
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await hostPopupPagePO.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup'}));
     });
 
-    it('should substitute named URL params with values of the qualifier and params', async () => {
+    test('should substitute named URL params with values of the qualifier and params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -495,19 +498,19 @@ describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
       await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
-      const popupOpenerPagePO = await PopupOpenerPagePO.openInNewTab('app1');
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterParams({param1: 'PARAM1'});
       await popupOpenerPagePO.clickOpen();
 
       // expect named params to be substituted
-      const popupPagePO = new HostPopupPagePO('host-popup');
-      await expect(await popupPagePO.getPopupParams()).toEqual(jasmine.objectContaining({component: 'host-popup', param1: 'PARAM1'}));
-      await expect(await popupPagePO.getRouteParams()).toEqual({matrixParam1: 'PARAM1', matrixParam2: 'host-popup'});
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await hostPopupPagePO.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup', param1: 'PARAM1'}));
+      await expect(await hostPopupPagePO.getRouteParams()).toEqual({matrixParam1: 'PARAM1', matrixParam2: 'host-popup'});
     });
   });
 });

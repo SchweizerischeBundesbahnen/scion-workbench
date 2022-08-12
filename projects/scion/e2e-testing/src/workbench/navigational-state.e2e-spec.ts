@@ -8,77 +8,71 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
-import {consumeBrowserLog} from '../helper/testing.util';
-import {logging} from 'protractor';
-import Level = logging.Level;
 
-describe('Navigational State', () => {
+test.describe('Navigational State', () => {
 
-  const appPO = new AppPO();
+  test.describe('ActivatedRoute.data', () => {
 
-  beforeEach(async () => consumeBrowserLog());
-
-  describe('ActivatedRoute.data', () => {
-
-    it('should emit `undefined` when not passing state to the view navigation', async () => {
+    test('should emit `undefined` when not passing state to the view navigation', async ({appPO, workbenchNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // navigate to the test view
-      const routerPagePO = await RouterPagePO.openInNewTab();
+      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath('test-view');
       await routerPagePO.clickNavigateViaRouter();
 
       // expect ActivatedRoute.data emitted undefined as state
-      const testeeViewId = await appPO.findActiveView().getViewId();
-      await expect(await consumeBrowserLog(Level.DEBUG, /ActivatedRouteDataChange/)).toEqual(jasmine.arrayWithExactContents([
+      const testeeViewId = await appPO.getActiveView().getViewId();
+      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
-      ]));
+      ]);
     });
 
-    it('should emit the state as passed to the view navigation', async () => {
+    test('should emit the state as passed to the view navigation', async ({appPO, workbenchNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // navigate to the test view
-      const routerPagePO = await RouterPagePO.openInNewTab();
+      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath('test-view');
       await routerPagePO.enterNavigationalState({'some': 'state'});
       await routerPagePO.clickNavigateViaRouter();
 
       // expect ActivatedRoute.data emitted the passed state
-      const testeeViewId = await appPO.findActiveView().getViewId();
-      await expect(await consumeBrowserLog(Level.DEBUG, /ActivatedRouteDataChange/)).toEqual(jasmine.arrayWithExactContents([
-        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={\\"some\\":\\"state\\"}]`,
-      ]));
+      const testeeViewId = await appPO.getActiveView().getViewId();
+      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
+        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
+      ]);
     });
 
-    it('should not restore navigational state after page reload', async () => {
+    test('should not restore navigational state after page reload', async ({appPO, workbenchNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // navigate to the test view
-      const routerPagePO = await RouterPagePO.openInNewTab();
+      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath('test-view');
       await routerPagePO.enterNavigationalState({'some': 'state'});
       await routerPagePO.clickNavigateViaRouter();
 
       // expect ActivatedRoute.data emitted the passed state
-      const testeeViewId = await appPO.findActiveView().getViewId();
-      await expect(await consumeBrowserLog(Level.DEBUG, /ActivatedRouteDataChange/)).toEqual(jasmine.arrayWithExactContents([
-        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={\\"some\\":\\"state\\"}]`,
-      ]));
+      const testeeViewId = await appPO.getActiveView().getViewId();
+      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
+        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
+      ]);
 
       await appPO.reload();
       // expect ActivatedRoute.data emitting undefined as state after page reload
-      await expect(await consumeBrowserLog(Level.DEBUG, /ActivatedRouteDataChange/)).toEqual(jasmine.arrayWithExactContents([
+      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
-      ]));
+      ]);
     });
 
-    it('should not emit when updating matrix params of a view ', async () => {
+    test('should not emit when updating matrix params of a view ', async ({appPO, workbenchNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const routerPagePO = await RouterPagePO.openInNewTab();
+      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
       // navigate to the test view
       await routerPagePO.enterPath('test-view');
@@ -86,12 +80,12 @@ describe('Navigational State', () => {
       await routerPagePO.enterMatrixParams({'param': 'value 1'});
       await routerPagePO.clickNavigateViaRouter();
 
-      const testeeViewId = await appPO.findActiveView().getViewId();
+      const testeeViewId = await appPO.getActiveView().getViewId();
 
       // expect ActivatedRoute.data emitted undefined as state
-      await expect(await consumeBrowserLog(Level.DEBUG, /ActivatedRouteDataChange/)).toEqual(jasmine.arrayWithExactContents([
+      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
-      ]));
+      ]);
 
       // update matrix param
       await routerPagePO.viewTabPO.activate();
@@ -101,7 +95,7 @@ describe('Navigational State', () => {
       await routerPagePO.clickNavigateViaRouter();
 
       // expect ActivatedRoute.data not to emit
-      await expect(await consumeBrowserLog(Level.DEBUG, /ActivatedRouteDataChange/)).toEqual([]);
+      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([]);
     });
   });
 });

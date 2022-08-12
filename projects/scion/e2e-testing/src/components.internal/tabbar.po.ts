@@ -8,20 +8,20 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementFinder} from 'protractor';
+import {Locator} from '@playwright/test';
 
 /**
  * Page object for {@link SciTabbarComponent}.
  */
 export class SciTabbarPO {
 
-  constructor(private _sciTabbarFinder: ElementFinder) {
+  constructor(private _sciTabbarLocator: Locator) {
   }
 
   /**
    * Selects the tab that has the given CSS class set.
    */
   public async selectTab(tabCssClass: string): Promise<void> {
-    await this._sciTabbarFinder.$(`.e2e-tab.${tabCssClass}`).click();
+    await this._sciTabbarLocator.locator(`.e2e-tab.${tabCssClass}`).click();
   }
 }

@@ -8,58 +8,54 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementFinder} from 'protractor';
 import {AppPO, ViewPO, ViewTabPO} from './app.po';
-import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
-import {SciTabbarPO} from '../deps/scion/components.internal/tabbar.po';
-import {Arrays} from '../deps/scion/toolkit/util';
+import {Locator} from '@playwright/test';
+import {SciTabbarPO} from './components.internal/tabbar.po';
 
 /**
  * Page object to interact {@link StartPageComponent}.
  */
 export class StartPagePO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
-  private _tabbarFinder: ElementFinder;
-  private _tabbarPO: SciTabbarPO;
+  private readonly _locator: Locator;
+  private readonly _tabbarLocator: Locator;
+  private readonly _tabbarPO: SciTabbarPO;
 
   public readonly viewPO?: ViewPO;
   public readonly viewTabPO?: ViewTabPO;
 
-  constructor(public viewId?: string | undefined) {
+  constructor(private _appPO: AppPO, public viewId?: string | undefined) {
     if (viewId) {
-      this.viewPO = this._appPO.findView({viewId: viewId});
-      this.viewTabPO = this._appPO.findViewTab({viewId: viewId});
-      this._pageFinder = this._appPO.findView({viewId}).$('app-start-page');
+      this.viewPO = _appPO.findView({viewId: viewId});
+      this.viewTabPO = _appPO.findViewTab({viewId: viewId});
+      this._locator = _appPO.findView({viewId}).locator('app-start-page');
     }
     else {
-      this._pageFinder = this._appPO.findActivePart().$('app-start-page');
+      this._locator = _appPO.getActivePart().locator('app-start-page');
     }
-    this._tabbarFinder = this._pageFinder.$('sci-tabbar');
-    this._tabbarPO = new SciTabbarPO(this._tabbarFinder);
+    this._tabbarLocator = this._locator.locator('sci-tabbar');
+    this._tabbarPO = new SciTabbarPO(this._tabbarLocator);
   }
 
   /**
    * Clicks the workbench view tile with specified CSS class set.
    */
   public async openWorkbenchView(viewCssClass: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
     await this._tabbarPO.selectTab('e2e-workbench-views');
-    await this._tabbarFinder.$(`.e2e-workbench-view-tiles a.${viewCssClass}`).click();
+    await this._tabbarLocator.locator(`.e2e-workbench-view-tiles a.${viewCssClass}`).click();
+    await this._appPO.findView({cssClass: viewCssClass}).waitUntilPresent();
   }
 
   /**
    * Clicks the microfrontend view tile with specified CSS classes set.
    */
-  public async openMicrofrontendView(...viewCssClass: string[]): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
+  public async openMicrofrontendView(viewCssClass: string, app: string): Promise<void> {
     await this._tabbarPO.selectTab('e2e-microfrontend-views');
-    await this._tabbarFinder.$(`.e2e-microfrontend-view-tiles a.${Arrays.coerce(viewCssClass).join('.')}`).click();
+    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles a.${viewCssClass}.workbench-client-testing-${app}`).click();
+    await this._appPO.findView({cssClass: viewCssClass}).waitUntilPresent();
   }
 
   public async isPresent(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return this._pageFinder.isPresent();
+    return this._locator.isVisible();
   }
 }

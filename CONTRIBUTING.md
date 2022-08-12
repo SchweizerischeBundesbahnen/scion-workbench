@@ -54,10 +54,7 @@ The following is a summary of commands useful for development of `scion-workbenc
 
 - `npm run workbench:test`\
   Runs unit tests of the workbench.
-  
-- `npm run workbench:e2e`\
-  Runs end-to-end tests of the workbench. Prior to test execution, starts the testing app `workbench-testing-app` using the Angular CLI.
-  
+
 ### Commands for working on the @scion/workbench-client library
  
 - `npm run workbench-client:lint`\
@@ -69,29 +66,25 @@ The following is a summary of commands useful for development of `scion-workbenc
 - `npm run workbench-client:test`\
   Runs unit tests of the workbench-client.
   
-- `npm run workbench-client:e2e`\
-  Runs end-to-end tests of the workbench-client. Prior to test execution, starts the testing app `workbench-testing-app` and two instances of the `workbench-client-testing-app` using the Angular CLI.
-  
-### Commands for working on the workbench testing application
-  
-- `npm run workbench-testing-app:serve`\
-  Serves the `workbench-testing-app` on http://localhost:4200 using the Angular CLI.\
-  Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support. 
-  
-- `npm run workbench-testing-app:ci:build`\
-  Builds the `workbench-testing-app` into `dist` folder using the productive config.
+### Commands for running end-to-end tests
+
+- `npm run e2e:run`\
+  Runs end-to-end tests of the workbench and workbench-client. Prior to test execution, starts the testing app `workbench-testing-app` and two instances of the `workbench-client-testing-app`.
+
+- `npm run e2e:debug`\
+  Runs end-to-end tests of the workbench and workbench-client in debug mode. Prior to test execution, starts the testing app `workbench-testing-app` and two instances of the `workbench-client-testing-app`.
+
+- `npm run e2e:lint`\
+  Lints end-to-end tests.
+
+### Commands for working on the testing application
+
+- `npm run start`\
+  Serves the `workbench-testing-app` and two instances of the `workbench-client-testing-app`. Open the page http://localhost:4200 to load the workbench host app into your browser.\
+  Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support.
 
 - `npm run workbench-testing-app:lint`\
   Lints the `workbench-testing-app`.
-  
-### Commands for working on the workbench testing application with microfrontend support enabled
-  
-- `npm run workbench-testing-app-fixture:serve`\
-  Serves the `workbench-testing-app` and an instance of the `workbench-client-testing-app` using the Angular CLI. Open the page http://localhost:4200 to load the workbench host app into your browser.\
-  Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support. 
-  
-- `npm run workbench-client-testing-app:ci:build`\
-  Builds the `workbench-client-testing-app` into `dist` folder using the productive config.
 
 - `npm run workbench-client-testing-app:lint`\
   Lints the `workbench-client-testing-app`.
@@ -100,9 +93,9 @@ The following is a summary of commands useful for development of `scion-workbenc
 
 We generate separate changelogs for the packages `@scion/workbench` and `@scion/workbench-client` because of their independent release cycles.
 
-- `npm run changelog-workbench`\
+- `npm run workbench:changelog`\
   Use to generate the changelog for `@scion/workbench` based on the commit history. Only commits that involve files under `projects/scion/workbench` are included in the changelog. The output is written to `CHANGELOG_WORKBENCH.md`, which will be included in `docs/site/changelog-workbench/changelog.md` using the template `docs/site/changelog-workbench/changelog.template.md`. 
-- `npm run changelog-workbench-client`\
+- `npm run workbench-client:changelog`\
   Use to generate the changelog for `@scion/workbench-client` based on the commit history. Only commits that involve files under `projects/scion/workbench-client` are included in the changelog. The output is written to `CHANGELOG_WORKBENCH_CLIENT.md`, which will be included in `docs/site/changelog-workbench-client/changelog.md` using the template `docs/site/changelog-workbench-client/changelog.template.md`. 
 
 </details>

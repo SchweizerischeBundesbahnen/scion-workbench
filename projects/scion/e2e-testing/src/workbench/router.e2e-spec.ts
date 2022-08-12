@@ -8,23 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
-import {consumeBrowserLog} from '../helper/testing.util';
 import {ViewPagePO} from './page-object/view-page.po';
-import {logging} from 'protractor';
-import Level = logging.Level;
 
-describe('Workbench Router', () => {
+test.describe('Workbench Router', () => {
 
-  const appPO = new AppPO();
-
-  beforeEach(async () => consumeBrowserLog());
-
-  it('should match matrix params when resolving views for activation or closing', async () => {
+  test('should match matrix params when resolving views for activation or closing', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     await expect(await appPO.getViewTabCount()).toEqual(1);
 
     // open test view 1
@@ -120,10 +114,10 @@ describe('Workbench Router', () => {
     await expect(await appPO.getViewTabCount()).toEqual(1);
   });
 
-  it('should show title of inactive views when reloading the application', async () => {
+  test('should show title of inactive views when reloading the application', async ({appPO, workbenchNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open test view 1
     await routerPagePO.enterPath('test-view');
@@ -151,10 +145,10 @@ describe('Workbench Router', () => {
     await expect(await viewTab2.getTitle()).toEqual('view-2-title');
     await expect(await viewTab2.getHeading()).toEqual('view-2-heading');
 
-    await expect(await consumeBrowserLog(Level.SEVERE)).toEqual([]);
+    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
   });
 
-  it('should not throw outlet activation error when opening a new view tab once a view tab was closed', async () => {
+  test('should not throw outlet activation error when opening a new view tab once a view tab was closed', async ({appPO, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // open view tab
@@ -169,29 +163,29 @@ describe('Workbench Router', () => {
     await appPO.openNewViewTab();
     await expect(await appPO.getViewTabCount({viewCssClass: 'e2e-start-page'})).toEqual(1);
     // expect no error to be thrown
-    await expect(await consumeBrowserLog(Level.SEVERE)).toEqual([]);
+    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
 
     // open view tab
     await appPO.openNewViewTab();
     await expect(await appPO.getViewTabCount({viewCssClass: 'e2e-start-page'})).toEqual(2);
 
     // expect no error to be thrown
-    await expect(await consumeBrowserLog(Level.SEVERE)).toEqual([]);
+    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
   });
 
-  it('should allow closing all views by pressing CTRL+ALT+SHIFT+K keystroke', async () => {
+  test('should allow closing all views by pressing CTRL+ALT+SHIFT+K keystroke', async ({appPO, workbenchNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // open multiple test view tabs
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // close all view tabs
     await appPO.closeAllViewTabs();
@@ -199,24 +193,24 @@ describe('Workbench Router', () => {
     await expect(await appPO.getViewTabCount()).toEqual(0);
 
     // expect no error to be thrown
-    await expect(await consumeBrowserLog(Level.SEVERE)).toEqual([]);
+    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
   });
 
-  it('should allow closing multiple views via router', async () => {
+  test('should allow closing multiple views via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open multiple test view tabs
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
-    await ViewPagePO.openInNewTab();
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+    await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // expect the test views to be opened
     await expect(await appPO.getViewTabCount()).toEqual(10);
@@ -230,10 +224,10 @@ describe('Workbench Router', () => {
     await expect(await appPO.getViewTabCount()).toEqual(1);
   });
 
-  it('should allow closing a specific view via router', async () => {
+  test('should allow closing a specific view via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.activate();
@@ -273,10 +267,10 @@ describe('Workbench Router', () => {
     expect(await appPO.findViewTab({cssClass: 'testee-3'}).isPresent()).toBe(true);
   });
 
-  it('should allow opening a view in a new view tab [target=blank]', async () => {
+  test('should allow opening a view in a new view tab [target=blank]', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
@@ -298,13 +292,13 @@ describe('Workbench Router', () => {
 
     // expect the test view to be the active view
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await appPO.findActiveView().getViewId()).toEqual(testeeViewId);
+    await expect(await appPO.getActiveView().getViewId()).toEqual(testeeViewId);
   });
 
-  it('should allow opening a view in the current view tab [target=self]', async () => {
+  test('should allow opening a view in the current view tab [target=self]', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
@@ -326,15 +320,14 @@ describe('Workbench Router', () => {
 
     // expect the test view to be the active view
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await appPO.findActiveView().getViewId()).toEqual(testeeViewId);
+    await expect(await appPO.getActiveView().getViewId()).toEqual(testeeViewId);
   });
 
-  it('should, by default, not activate a present view ', async () => {
+  test('should, by default, not activate a present view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     const routerViewId = await routerPagePO.viewPO.getViewId();
-    const activeViewTabPO = appPO.findActiveViewTab();
 
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
@@ -342,12 +335,12 @@ describe('Workbench Router', () => {
     await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
-    const testee1ViewId = await activeViewTabPO.getViewId();
+    const testee1ViewId = await appPO.getActiveView().getViewId();
     const testee1ViewTabPO = appPO.findViewTab({viewId: testee1ViewId});
     const testee1ViewPO = appPO.findView({viewId: testee1ViewId});
 
     // expect the test view to be opened as new tab
-    await expect(await testee1ViewTabPO.getViewId()).not.toEqual(routerViewId);
+    await expect(testee1ViewId).not.toEqual(routerViewId);
     await expect(await appPO.getViewTabCount()).toEqual(2);
 
     // expect the test view to be opened
@@ -356,7 +349,6 @@ describe('Workbench Router', () => {
 
     // expect the test view to be the active view
     await expect(await testee1ViewTabPO.isActive()).toBe(true);
-    await expect(await activeViewTabPO.getViewId()).toEqual(testee1ViewId);
 
     // activate the router test view
     await routerPagePO.viewTabPO.activate();
@@ -369,14 +361,13 @@ describe('Workbench Router', () => {
     await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
-    const testee2ViewId = await activeViewTabPO.getViewId();
+    const testee2ViewId = await appPO.getActiveView().getViewId();
     const testee2ViewTabPO = appPO.findViewTab({viewId: testee2ViewId});
     const testee2ViewPO = appPO.findView({viewId: testee2ViewId});
 
     // expect a new test view to be opened
     await expect(testee1ViewId).not.toEqual(testee2ViewId);
     await expect(await appPO.getViewTabCount()).toEqual(3);
-    await expect(await activeViewTabPO.getViewId()).toEqual(testee2ViewId);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(false);
     await expect(await testee1ViewTabPO.isActive()).toBe(false);
     await expect(await testee1ViewPO.isPresent()).toBe(false);
@@ -384,10 +375,10 @@ describe('Workbench Router', () => {
     await expect(await testee2ViewPO.isPresent()).toBe(true);
   });
 
-  it('should activate a present view if setting  `checkActivateIfPresent` to `true`', async () => {
+  test('should activate a present view if setting `checkActivateIfPresent` to `true`', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
@@ -409,7 +400,7 @@ describe('Workbench Router', () => {
 
     // expect the view to be the active view
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await appPO.findActiveView().getViewId()).toEqual(testeeViewId);
+    await expect(await appPO.getActiveView().getViewId()).toEqual(testeeViewId);
 
     // activate the router view
     await routerPagePO.viewTabPO.activate();
@@ -430,12 +421,11 @@ describe('Workbench Router', () => {
     await expect(await testeeViewPO.isPresent()).toBe(true);
   });
 
-  it('should not activate a present view if setting  `checkActivateIfPresent` to `false`', async () => {
+  test('should not activate a present view if setting `checkActivateIfPresent` to `false`', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     const routerViewId = await routerPagePO.viewPO.getViewId();
-    const activeViewTabPO = appPO.findActiveViewTab();
 
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
@@ -443,7 +433,7 @@ describe('Workbench Router', () => {
     await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
-    const testee1ViewId = await activeViewTabPO.getViewId();
+    const testee1ViewId = await appPO.getActiveView().getViewId();
     const testee1ViewTabPO = appPO.findViewTab({viewId: testee1ViewId});
     const testee1ViewPO = appPO.findView({viewId: testee1ViewId});
 
@@ -457,7 +447,6 @@ describe('Workbench Router', () => {
 
     // expect the test view to be the active view
     await expect(await testee1ViewTabPO.isActive()).toBe(true);
-    await expect(await activeViewTabPO.getViewId()).toEqual(testee1ViewId);
 
     // activate the router test view
     await routerPagePO.viewTabPO.activate();
@@ -471,14 +460,13 @@ describe('Workbench Router', () => {
     await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
-    const testee2ViewId = await activeViewTabPO.getViewId();
+    const testee2ViewId = await appPO.getActiveView().getViewId();
     const testee2ViewTabPO = appPO.findViewTab({viewId: testee2ViewId});
     const testee2ViewPO = appPO.findView({viewId: testee2ViewId});
 
     // expect a new test view to be opened
     await expect(testee1ViewId).not.toEqual(testee2ViewId);
     await expect(await appPO.getViewTabCount()).toEqual(3);
-    await expect(await activeViewTabPO.getViewId()).toEqual(testee2ViewId);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(false);
     await expect(await testee1ViewTabPO.isActive()).toBe(false);
     await expect(await testee1ViewPO.isPresent()).toBe(false);
@@ -486,11 +474,11 @@ describe('Workbench Router', () => {
     await expect(await testee2ViewPO.isPresent()).toBe(true);
   });
 
-  it('should not destroy the component of the view when it is inactivated', async () => {
+  test('should not destroy the component of the view when it is inactivated', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPagePO = await RouterPagePO.openInNewTab();
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     const componentInstanceId = await viewPagePO.getComponentInstanceId();
 

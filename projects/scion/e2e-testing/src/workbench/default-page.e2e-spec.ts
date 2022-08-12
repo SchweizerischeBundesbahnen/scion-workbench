@@ -8,24 +8,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
 import {StartPagePO} from '../start-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
-import {consumeBrowserLog} from '../helper/testing.util';
 
-describe('Default Page', () => {
+test.describe('Default Page', () => {
 
-  const appPO = new AppPO();
-
-  beforeEach(async () => consumeBrowserLog());
-
-  it('should display the default page when no view is opened', async () => {
+  test('should display the default page when no view is opened', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
+    const startPagePO = new StartPagePO(appPO);
+
     await expect(await appPO.isDefaultPageShowing('app-start-page')).toBe(true);
-    await expect(await new StartPagePO().isPresent()).toBe(true);
+    await expect(await startPagePO.isPresent()).toBe(true);
 
     // Open a view
-    const viewPO = await ViewPagePO.openInNewTab();
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewId = await viewPO.getViewId();
     await expect(await appPO.isDefaultPageShowing('app-start-page')).toBe(false);
     await expect(await appPO.findViewTab({viewId}).isPresent()).toBe(true);

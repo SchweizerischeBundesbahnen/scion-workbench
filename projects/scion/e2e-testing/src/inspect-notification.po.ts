@@ -9,57 +9,45 @@
  */
 
 import {AppPO, NotificationPO} from './app.po';
-import {ElementFinder} from 'protractor';
-import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
-import {assertPageToDisplay, enterText, selectOption} from './helper/testing.util';
-import {Arrays} from '../deps/scion/toolkit/util';
+import {assertElementVisible, coerceArray, isPresent} from './helper/testing.util';
+import {Locator} from '@playwright/test';
 
 /**
  * Page object to interact {@link InspectNotificationComponent}.
  */
 export class InspectNotificationPO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _locator: Locator;
 
   public readonly notificationPO: NotificationPO;
 
-  constructor(public cssClass: string) {
-    this.notificationPO = this._appPO.findNotification({cssClass: cssClass});
-    this._pageFinder = this.notificationPO.$('app-inspect-notification');
+  constructor(appPO: AppPO, public cssClass: string) {
+    this.notificationPO = appPO.findNotification({cssClass: cssClass});
+    this._locator = this.notificationPO.locator('app-inspect-notification');
   }
 
   public async isPresent(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return await this.notificationPO.isPresent() && await this._pageFinder.isPresent();
+    return isPresent(this._locator);
   }
 
-  public async isDisplayed(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-
-    if (!await this.isPresent()) {
-      return false;
-    }
-    return await this.notificationPO.isDisplayed() && await this._pageFinder.isDisplayed();
+  public async isVisible(): Promise<boolean> {
+    return this._locator.isVisible();
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return this._pageFinder.$('span.e2e-component-instance-id').getText();
+    await assertElementVisible(this._locator);
+    return this._locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getInput(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return this._pageFinder.$('output.e2e-input').getText();
+    return this._locator.locator('output.e2e-input').innerText();
   }
 
-  public async getInputAsMap(): Promise<Map<string, any>> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
+  public async getInputAsKeyValueObject(): Promise<Record<string, any>> {
+    await assertElementVisible(this._locator);
 
     const rawContent = await this.getInput();
-    const map = new Map();
+    const map = {};
 
     // Sample Map content:
     // {"$implicit" => undefined}
@@ -75,32 +63,37 @@ export class InspectNotificationPO {
     while (match = mapEntryRegex.exec(rawContent)) {
       const key = match.groups['key'];
       const value = match.groups['value'];
-      map.set(key, value === 'undefined' ? undefined : JSON.parse(value));
+      map[key] = value === 'undefined' ? undefined : JSON.parse(value);
     }
     return map;
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(title, this._pageFinder.$('input.e2e-title'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-title').fill(title);
   }
 
   public async selectSeverity(severity: 'info' | 'warn' | 'error' | ''): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await selectOption(severity, this._pageFinder.$('select.e2e-severity'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('select.e2e-severity').selectOption(severity);
   }
 
   public async selectDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | '' | number): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(`${duration}`, this._pageFinder.$('input.e2e-duration'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-duration').fill(`${duration}`);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(Arrays.coerce(cssClass).join(' '), this._pageFinder.$('input.e2e-class'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
+  }
+
+  /**
+   * Waits for the notification to be closed.
+   * Throws an error if not closed after `duration` milliseconds.
+   */
+  public async waitUntilClosed(duration: number): Promise<void> {
+    await this._locator.waitFor({state: 'detached', timeout: duration});
   }
 }
+

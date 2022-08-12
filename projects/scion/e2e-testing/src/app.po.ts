@@ -8,19 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {$, $$, browser, Button, ElementFinder, Key, protractor} from 'protractor';
-import {fromRect, getCssClasses, isActiveElement, isCssClassPresent, runOutsideAngularSynchronization} from './helper/testing.util';
+import {coerceArray, fromRect, getCssClasses, isActiveElement, isCssClassPresent, isPresent, waitUntilBoundingBoxStable, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
-import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
-import {Dictionary} from '../deps/scion/toolkit/util';
-import {coerceBooleanProperty} from '../deps/angular/cdk/coercion';
-import {coerceArray} from '../deps/angular/cdk/coercion';
-
-const EC = protractor.ExpectedConditions;
+import {Locator, Page} from '@playwright/test';
 
 export class AppPO {
 
   private _workbenchStartupQueryParams: URLSearchParams;
+
+  constructor(public readonly page: Page) {
+  }
 
   /**
    * Navigates to the testing app.
@@ -28,8 +25,6 @@ export class AppPO {
    * By passing a features object, you can control how to start the workbench and which app features to enable.
    */
   public async navigateTo(features?: Features): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-
     this._workbenchStartupQueryParams = new URLSearchParams();
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, features?.launcher ?? 'LAZY');
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(features?.microfrontendSupport ?? true) === false}`);
@@ -45,127 +40,93 @@ export class AppPO {
       featureQueryParams.append('showNewTabAction', `${features.showNewTabAction}`);
     }
 
-    const browserNavigateFn = async (): Promise<void> => {
-      await browser.get(`/?${this._workbenchStartupQueryParams.toString()}#/${featureQueryParams.toString() ? `?${featureQueryParams.toString()}` : ''}`);
-    };
-
-    // We need to navigate outside of Protractor's Angular sync if displaying an alert dialog to pause the workbench startup.
-    const confirmStartup = coerceBooleanProperty(this._workbenchStartupQueryParams.get(WorkenchStartupQueryParams.CONFIRM_STARTUP));
-    if (confirmStartup) {
-      await runOutsideAngularSynchronization(browserNavigateFn);
-    }
-    else {
-      await browserNavigateFn();
-      // Wait until the workbench completed startup.
-      await this.waitUntilWorkbenchStarted();
-    }
+    await this.page.goto(`/?${this._workbenchStartupQueryParams.toString()}#/${featureQueryParams.toString() ? `?${featureQueryParams.toString()}` : ''}`);
+    // Wait until the workbench completed startup.
+    await this.waitUntilWorkbenchStarted();
   }
 
   /**
    * Reloads the app with current features preserved.
    */
   public async reload(): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-
-    // We cannot call `browser.refresh()` because workbench startup options are not part of the hash-based URL
+    // We cannot call `this._page.reload()` because workbench startup options are not part of the hash-based URL
     // and would therefore be lost on a reload.
-    const reloadUrl = new URL(await browser.getCurrentUrl());
+    const reloadUrl = new URL(this.page.url());
     this._workbenchStartupQueryParams.forEach((value, key) => reloadUrl.searchParams.append(key, value));
 
-    const browserNavigateFn = async (): Promise<void> => {
-      await browser.get(reloadUrl.toString());
-    };
-
-    // We need to navigate outside of Protractor's Angular sync if displaying an alert dialog to pause the workbench startup.
-    const confirmStartup = coerceBooleanProperty(this._workbenchStartupQueryParams.get(WorkenchStartupQueryParams.CONFIRM_STARTUP));
-    if (confirmStartup) {
-      await runOutsideAngularSynchronization(browserNavigateFn);
-    }
-    else {
-      await browserNavigateFn();
-      // Wait until the workbench completed startup.
-      await this.waitUntilWorkbenchStarted();
-    }
+    await this.page.goto(reloadUrl.toString());
+    // Wait until the workbench completed startup.
+    await this.waitUntilWorkbenchStarted();
   }
 
   /**
    * Returns a handle representing the view tab of given `viewId`, or which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    *
-   * @param findBy - Specifies how to find the view tab. If both `viewId` and `cssClass` are not set, then the finder refers to the active view tab.
+   * @param findBy - Specifies how to locate the view tab. If both `viewId` and `cssClass` are not set, then the locator refers to the active view tab.
    *        <ul>
    *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
    *          <li>viewId?: Identifies the view by its id</li>
    *          <li>cssClass?: Identifies the view by its CSS class</li>
    *        </ul>
    */
-  public findViewTab(findBy: {partId?: string; viewId?: string; cssClass?: string}): ViewTabPO {
-    const viewTabFinder = createViewTabFinder(findBy);
+  public findViewTab(findBy?: {partId?: string; viewId?: string; cssClass?: string}): ViewTabPO {
+    const page = this.page;
+    const viewTabLocator = this.locateViewTab(findBy);
 
     return new class implements ViewTabPO {
       public async isPresent(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return viewTabFinder.isPresent();
+        return isPresent(viewTabLocator);
       }
 
       public async getViewId(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return viewTabFinder.getAttribute('data-viewid');
+        return viewTabLocator.getAttribute('data-viewid');
       }
 
       public async activate(): Promise<void> {
-        await WebdriverExecutionContexts.switchToDefault();
-        await viewTabFinder.click();
+        await viewTabLocator.click();
       }
 
       public async close(): Promise<void> {
-        await WebdriverExecutionContexts.switchToDefault();
         // hover the view-tab to make the close button visible
-        await browser.actions().mouseMove(viewTabFinder).perform();
-        await viewTabFinder.$('.e2e-close').click();
+        await viewTabLocator.hover();
+        await viewTabLocator.locator('.e2e-close').click();
       }
 
       public async getTitle(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return viewTabFinder.$('.e2e-title').getText();
+        return viewTabLocator.locator('.e2e-title').innerText();
       }
 
       public async getHeading(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return viewTabFinder.$('.e2e-heading').getText();
+        return viewTabLocator.locator('.e2e-heading').innerText();
       }
 
       public async isDirty(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const cssClasses = await getCssClasses(viewTabFinder);
+        const cssClasses = await getCssClasses(viewTabLocator);
         return cssClasses.includes('dirty');
       }
 
       public async isClosable(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const element = viewTabFinder.$('.e2e-close');
-        return await element.isPresent() && await element.isDisplayed();
+        const closeButtonLocator = viewTabLocator.locator('.e2e-close');
+        return await isPresent(closeButtonLocator) && await closeButtonLocator.isVisible();
       }
 
       public async isActive(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const cssClasses = await getCssClasses(viewTabFinder);
+        const cssClasses = await getCssClasses(viewTabLocator);
         return cssClasses.includes('active');
       }
 
       public async getCssClasses(): Promise<string[]> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return getCssClasses(viewTabFinder);
+        return getCssClasses(viewTabLocator);
       }
 
       public async openContextMenu(): Promise<ViewTabContextMenuPO> {
-        await WebdriverExecutionContexts.switchToDefault();
-        await browser.actions().click(viewTabFinder, Button.RIGHT).perform();
-        const viewTabContextMenuFinder = $('wb-view-menu');
+        await viewTabLocator.click({button: 'right'});
+        const viewTabContextMenuLocator = page.locator('wb-view-menu');
 
         return new class implements ViewTabContextMenuPO {
           public async closeAllTabs(): Promise<void> {
-            return viewTabContextMenuFinder.$('.e2e-close-all-tabs').click();
+            return viewTabContextMenuLocator.locator('.e2e-close-all-tabs').click();
           }
         };
       }
@@ -173,18 +134,10 @@ export class AppPO {
   }
 
   /**
-   * Returns a handle representing the active view tab.
-   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
-   */
-  public findActiveViewTab(partId?: string): ViewTabPO {
-    return this.findViewTab({partId});
-  }
-
-  /**
    * Returns a handle representing the view tab of given `viewId`, or which has given CSS class set.
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    *
-   * @param findBy - Specifies how to find the view. If both `viewId` and `cssClass` are not set, then the finder refers to the active view.
+   * @param findBy - Specifies how to locate the view. If both `viewId` and `cssClass` are not set, then the locator refers to the active view.
    *        <ul>
    *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
    *          <li>viewId?: Identifies the view by its id</li>
@@ -192,7 +145,7 @@ export class AppPO {
    *        </ul>
    */
   public findView(findBy: {partId?: string; viewId?: string; cssClass?: string}): ViewPO {
-    const viewFinder = createViewFinder(findBy);
+    const viewLocator = this.locateView(findBy);
     const viewTabPO = this.findViewTab(findBy);
 
     return new class implements ViewPO {
@@ -200,46 +153,46 @@ export class AppPO {
       public viewTabPO = viewTabPO;
 
       public async isPresent(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return viewFinder.isPresent();
+        return isPresent(viewLocator);
+      }
+
+      public async isVisible(): Promise<boolean> {
+        return viewLocator.isVisible();
       }
 
       public async getViewId(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return viewFinder.getAttribute('data-viewid');
+        return viewLocator.getAttribute('data-viewid');
       }
 
-      public $(selector: string): ElementFinder {
-        return viewFinder.$(selector);
+      public waitUntilPresent(): Promise<void> {
+        return viewLocator.waitFor({state: 'attached'});
+      }
+
+      public locator(selector: string): Locator {
+        return viewLocator.locator(selector);
       }
     };
   }
 
-  /**
-   * Returns a handle representing the active view.
-   * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
-   */
-  public findActiveView(partId?: string): ViewPO {
+  public getActiveView(partId?: string): ViewPO {
     return this.findView({partId});
   }
 
-  public findActivePart(): PartPO {
-    const partFinder = createViewPartFinder();
+  public getActivePart(): PartPO {
+    const partLocator = this.locateViewPart();
 
     return new class implements PartPO {
 
       public async isPresent(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return partFinder.isPresent();
+        return isPresent(partLocator);
       }
 
       public async getPartId(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return partFinder.getAttribute('data-partid');
+        return partLocator.getAttribute('data-partid');
       }
 
-      public $(selector: string): ElementFinder {
-        return partFinder.$(selector);
+      public locator(selector: string): Locator {
+        return partLocator.locator(selector);
       }
     };
   }
@@ -251,25 +204,26 @@ export class AppPO {
    */
   public async getViewTabCount(findBy?: {partId?: string; viewCssClass?: string}): Promise<number> {
     const {partId, viewCssClass} = findBy || {};
-    await WebdriverExecutionContexts.switchToDefault();
 
-    const viewpartFinder = createViewPartBarFinder(partId);
-    if (!viewCssClass) {
-      return viewpartFinder.$$('wb-view-tab').count();
-    }
-    return viewpartFinder.$$(`wb-view-tab.${viewCssClass}`).count();
+    const viewpartLocator = this.locateViewPartBar(partId);
+    const viewTabLocator = viewCssClass ? viewpartLocator.locator(`wb-view-tab.${viewCssClass}`) : viewpartLocator.locator('wb-view-tab');
+    // It may take some time to insert or remove a view tab from the DOM.
+    // In order to return the correct view tab count, we wait for it to become stable.
+    return waitUntilStable(() => viewTabLocator.count());
   }
 
   /**
-   * Returns the view tab view references in the order as displayed in the view tab bar.
+   * Returns the view ids in the order as displayed in the view tab bar.
    */
   public async getViewTabs(partId?: string): Promise<string[]> {
-    await WebdriverExecutionContexts.switchToDefault();
+    const viewTabsLocator = this.locateViewPartBar(partId).locator('wb-view-tab');
+    const viewReferences = [];
 
-    const viewTabsFinder = createViewPartBarFinder(partId).$$('wb-view-tab');
-    return viewTabsFinder.reduce((acc: string[], viewTabFinder: ElementFinder) => {
-      return viewTabFinder.getAttribute('data-viewid').then(viewId => acc.concat(viewId));
-    }, []);
+    for (let i = 0; i < await viewTabsLocator.count(); i++) {
+      viewReferences.push(await viewTabsLocator.nth(i).getAttribute('data-viewid'));
+    }
+
+    return viewReferences;
   }
 
   /**
@@ -277,9 +231,8 @@ export class AppPO {
    * The default page is displayed if there are no open tabs in the part.
    */
   public async isDefaultPageShowing(componentSelector: string): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    const activePart = createViewPartFinder();
-    return activePart.$('sci-viewport.views-absent-outlet').$(componentSelector).isPresent();
+    const activePart = this.locateViewPart();
+    return isPresent(activePart.locator('sci-viewport.views-absent-outlet').locator(componentSelector));
   }
 
   /**
@@ -287,8 +240,7 @@ export class AppPO {
    * The tab bar is displayed when at least one view is open or part actions are displayed.
    */
   public async isViewTabBarShowing(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return createViewPartBarFinder().isPresent();
+    return isPresent(this.locateViewPartBar());
   }
 
   /**
@@ -296,44 +248,27 @@ export class AppPO {
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
   public findPopup(findBy: {cssClass: string | string[]}): PopupPO {
-    const popupOverlayFinder = $(`.wb-popup.${coerceArray(findBy.cssClass).join('.')}`);
-    const popupComponentFinder = popupOverlayFinder.$('wb-popup');
+    const popupOverlayLocator = this.page.locator(`.wb-popup.${coerceArray(findBy.cssClass).join('.')}`);
+    const popupComponentLocator = popupOverlayLocator.locator('wb-popup');
 
     return new class implements PopupPO {
 
       public async isPresent(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        try {
-          const popupOverlayPresent = EC.presenceOf(popupOverlayFinder);
-          const popupComponentPresent = EC.presenceOf(popupComponentFinder);
-          await browser.wait(EC.and(popupOverlayPresent, popupComponentPresent), 1000);
-          return true;
-        }
-        catch (error) {
-          return false;
-        }
+        return isPresent(popupComponentLocator);
       }
 
-      public async isDisplayed(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        if (!await this.isPresent()) {
-          return false;
-        }
-        return await popupOverlayFinder.isDisplayed() && await popupComponentFinder.isDisplayed();
+      public async isVisible(): Promise<boolean> {
+        return popupComponentLocator.isVisible();
       }
 
       public async getClientRect(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<DOMRect> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const finder = selector === 'cdk-overlay' ? popupOverlayFinder : popupComponentFinder;
-        await browser.wait(EC.presenceOf(finder), 1000);
-        const {width, height} = await finder.getSize();
-        const {x, y} = await finder.getLocation();
-        return fromRect({height, width, x, y});
+        const locator = selector === 'cdk-overlay' ? popupOverlayLocator : popupComponentLocator;
+        await locator.waitFor({state: 'visible'});
+        return waitUntilBoundingBoxStable(locator);
       }
 
       public async getAlign(): Promise<'east' | 'west' | 'north' | 'south'> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const cssClasses = await getCssClasses(popupOverlayFinder);
+        const cssClasses = await getCssClasses(popupOverlayLocator);
         if (cssClasses.includes('wb-east')) {
           return 'east';
         }
@@ -350,43 +285,49 @@ export class AppPO {
       }
 
       public async hasVerticalOverflow(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return isCssClassPresent(popupComponentFinder.$('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
+        return isCssClassPresent(popupComponentLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
       }
 
       public async hasHorizontalOverflow(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return isCssClassPresent(popupComponentFinder.$('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
+        return isCssClassPresent(popupComponentLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
       }
 
-      public $(selector: string): ElementFinder {
-        return popupComponentFinder.$(selector);
+      public locator(selector: string): Locator {
+        return popupComponentLocator.locator(selector);
+      }
+
+      public async waitUntilClosed(): Promise<void> {
+        await popupComponentLocator.waitFor({state: 'detached'});
       }
     };
   }
 
   /**
-   * Returns the number of opened popups.
+   * Returns the locator of opened popups.
    */
-  public async getPopupCount(): Promise<number> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return $$('.wb-popup').count();
+  public popupLocator(): Locator {
+    return this.page.locator('wb-popup');
+  }
+
+  /**
+   * Returns the locator of opened message boxes.
+   */
+  public messageBoxLocator(): Locator {
+    return this.page.locator('wb-workbench').locator('wb-message-box');
   }
 
   /**
    * Returns the number of opened message boxes.
    */
   public async getMessageBoxCount(): Promise<number> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return $('wb-workbench').$$('wb-message-box').count();
+    return this.page.locator('wb-workbench').locator('wb-message-box').count();
   }
 
   /**
    * Returns the number of displayed notifications.
    */
   public async getNotificationCount(): Promise<number> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return $('wb-workbench').$$('wb-notification').count();
+    return this.page.locator('wb-workbench').locator('wb-notification').count();
   }
 
   /**
@@ -394,37 +335,27 @@ export class AppPO {
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
   public findNotification(findBy: {cssClass: string | string[]}): NotificationPO {
-    const notificationFinder = $('wb-workbench').$(`wb-notification.${coerceArray(findBy.cssClass).join('.')}`);
+    const notificationLocator = this.page.locator('wb-workbench').locator(`wb-notification.${coerceArray(findBy.cssClass).join('.')}`);
 
     return new class implements NotificationPO {
       public async isPresent(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return notificationFinder.isPresent();
+        return isPresent(notificationLocator);
       }
 
-      public async isDisplayed(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        if (!await this.isPresent()) {
-          return false;
-        }
-        return notificationFinder.isDisplayed();
+      public async isVisible(): Promise<boolean> {
+        return notificationLocator.isVisible();
       }
 
       public async getClientRect(): Promise<DOMRect> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const {width, height} = await notificationFinder.getSize();
-        const {x, y} = await notificationFinder.getLocation();
-        return fromRect({height, width, x, y});
+        return fromRect(await notificationLocator.boundingBox());
       }
 
       public async getTitle(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return notificationFinder.$('.e2e-title').getText();
+        return notificationLocator.locator('header.e2e-title').innerText();
       }
 
       public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const cssClasses = await getCssClasses(notificationFinder);
+        const cssClasses = await getCssClasses(notificationLocator);
         if (cssClasses.includes('e2e-severity-info')) {
           return 'info';
         }
@@ -438,8 +369,7 @@ export class AppPO {
       }
 
       public async getDuration(): Promise<'short' | 'medium' | 'long' | 'infinite'> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const cssClasses = await getCssClasses(notificationFinder);
+        const cssClasses = await getCssClasses(notificationLocator);
         if (cssClasses.includes('e2e-duration-short')) {
           return 'short';
         }
@@ -456,18 +386,15 @@ export class AppPO {
       }
 
       public async clickClose(): Promise<void> {
-        await WebdriverExecutionContexts.switchToDefault();
-        await notificationFinder.$('.e2e-close').click();
-        // wait until the animation completes
-        await browser.wait(protractor.ExpectedConditions.stalenessOf(notificationFinder), 5000);
+        await notificationLocator.locator('.e2e-close').click();
       }
 
       public getCssClasses(): Promise<string[]> {
-        return getCssClasses(notificationFinder);
+        return getCssClasses(notificationLocator);
       }
 
-      public $(selector: string): ElementFinder {
-        return notificationFinder.$(selector);
+      public locator(selector?: string): Locator {
+        return selector ? notificationLocator.locator(selector) : notificationLocator;
       }
     };
   }
@@ -477,38 +404,29 @@ export class AppPO {
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
   public findMessageBox(findBy: {cssClass: string | string[]}): MessageBoxPO {
-    const msgboxFinder = $(`wb-message-box.${coerceArray(findBy.cssClass).join('.')}`);
-    const msgboxComponentFinder = msgboxFinder.$('.e2e-body');
+    const page = this.page;
+    const msgboxLocator = page.locator(`wb-message-box.${coerceArray(findBy.cssClass).join('.')}`);
+    const msgboxComponentLocator = msgboxLocator.locator('.e2e-body');
 
     return new class implements MessageBoxPO {
       public async isPresent(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return await msgboxFinder.isPresent() && await msgboxComponentFinder.isPresent();
+        return isPresent(msgboxComponentLocator);
       }
 
-      public async isDisplayed(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        if (!await this.isPresent()) {
-          return false;
-        }
-        return await msgboxFinder.isDisplayed() && await msgboxComponentFinder.isDisplayed();
+      public async isVisible(): Promise<boolean> {
+        return msgboxComponentLocator.isVisible();
       }
 
       public async getClientRect(): Promise<DOMRect> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const {width, height} = await msgboxFinder.getSize();
-        const {x, y} = await msgboxFinder.getLocation();
-        return fromRect({height, width, x, y});
+        return fromRect(await msgboxLocator.boundingBox());
       }
 
       public async getTitle(): Promise<string> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return msgboxFinder.$('.e2e-title').getText();
+        return msgboxLocator.locator('header.e2e-title').innerText();
       }
 
       public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const cssClasses = await getCssClasses(msgboxFinder);
+        const cssClasses = await getCssClasses(msgboxLocator);
         if (cssClasses.includes('e2e-severity-info')) {
           return 'info';
         }
@@ -522,49 +440,45 @@ export class AppPO {
       }
 
       public async getModality(): Promise<'application' | 'view'> {
-        await WebdriverExecutionContexts.switchToDefault();
-
-        if (await $(`wb-message-box-stack.e2e-view-modal ${msgboxFinder.locator().value}`).isPresent()) {
+        if (await isPresent(page.locator('wb-message-box-stack.e2e-view-modal', {has: msgboxLocator}))) {
           return 'view';
         }
-        if (await $(`wb-message-box-stack.e2e-application-modal ${msgboxFinder.locator().value}`).isPresent()) {
+        if (await isPresent(page.locator('wb-message-box-stack.e2e-application-modal', {has: msgboxLocator}))) {
           return 'application';
         }
         throw Error('Message box not found in the view-modal nor in the application-modal message box stack.');
       }
 
-      public async getActions(): Promise<Dictionary<string>> {
-        await WebdriverExecutionContexts.switchToDefault();
-        const actions: Dictionary<string> = {};
+      public async getActions(): Promise<Record<string, string>> {
+        const actions: Record<string, string> = {};
 
-        const actionsFinder = msgboxFinder.$$('button.e2e-action');
-        const count = await actionsFinder.count();
+        const actionsLocator = msgboxLocator.locator('button.e2e-action');
+        const count = await actionsLocator.count();
         for (let i = 0; i < count; i++) {
-          const action: ElementFinder = await actionsFinder.get(i);
+          const action = await actionsLocator.nth(i);
           const cssClasses = await getCssClasses(action);
           const actionKey = cssClasses.find(candidate => candidate.startsWith('e2e-action-key-'));
-          actions[actionKey.substring('e2e-action-key-'.length)] = await action.getText();
+          actions[actionKey.substring('e2e-action-key-'.length)] = await action.innerText();
         }
 
         return actions;
       }
 
       public async clickActionButton(action: string): Promise<void> {
-        await WebdriverExecutionContexts.switchToDefault();
-        await msgboxFinder.$(`button.e2e-action.e2e-action-key-${action}`).click();
+        await msgboxLocator.locator(`button.e2e-action.e2e-action-key-${action}`).click();
+        await msgboxLocator.waitFor({state: 'detached'});
       }
 
       public async isActionActive(actionKey: string): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return isActiveElement(msgboxFinder.$('.e2e-button-bar').$(`button.e2e-action.e2e-action-key-${actionKey}`));
+        return isActiveElement(msgboxLocator.locator('.e2e-button-bar').locator(`button.e2e-action.e2e-action-key-${actionKey}`));
       }
 
       public getCssClasses(): Promise<string[]> {
-        return getCssClasses(msgboxFinder);
+        return getCssClasses(msgboxLocator);
       }
 
-      public $(selector: string): ElementFinder {
-        return msgboxComponentFinder.$(selector);
+      public locator(selector: string): Locator {
+        return msgboxComponentLocator.locator(selector);
       }
     };
   }
@@ -573,25 +487,21 @@ export class AppPO {
    * Opens a new view tab.
    */
   public async openNewViewTab(): Promise<StartPagePO> {
-    await WebdriverExecutionContexts.switchToDefault();
-
     const newTabViewPartActionPO = this.findViewPartAction({buttonCssClass: 'e2e-open-new-tab'});
     if (!await newTabViewPartActionPO.isPresent()) {
       throw Error('Opening a new view tab requires the part action \'e2e-open-new-tab\' to be present, but it could not be found. Have you disabled the \'showNewTabAction\' feature?');
     }
     await newTabViewPartActionPO.click();
-    const viewId = await this.findActiveView().getViewId();
-    return new StartPagePO(viewId);
+    const viewId = await this.getActiveView().getViewId();
+    return new StartPagePO(this, viewId);
   }
 
   /**
    * Closes all views of all viewparts.
    */
   public async closeAllViewTabs(partId?: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-
-    const viewPartBarFinder = createViewPartBarFinder(partId);
-    return viewPartBarFinder.$('wb-view-tab').sendKeys(Key.chord(Key.CONTROL, Key.ALT, Key.SHIFT, 'k'));
+    const viewPartBarLocator = this.locateViewPartBar(partId);
+    await viewPartBarLocator.locator('wb-view-tab').first().press('Control+Alt+Shift+K');
   }
 
   /**
@@ -599,17 +509,15 @@ export class AppPO {
    * This call does not send a command to the browser. Use 'isPresent()' to test its presence.
    */
   public findViewPartAction(findBy: {partId?: string; buttonCssClass: string}): ViewPartActionPO {
-    const actionFinder = createViewPartActionBarFinder(findBy.partId).$(`button.${findBy.buttonCssClass}`);
+    const actionLocator = this.locateViewPartActionBar(findBy.partId).locator(`button.${findBy.buttonCssClass}`);
 
     return new class implements ViewPartActionPO {
       public async isPresent(): Promise<boolean> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return actionFinder.isPresent();
+        return isPresent(actionLocator);
       }
 
       public async click(): Promise<void> {
-        await WebdriverExecutionContexts.switchToDefault();
-        return actionFinder.click();
+        return actionLocator.click();
       }
     };
   }
@@ -618,82 +526,81 @@ export class AppPO {
    * Waits until the workbench finished startup.
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await browser.wait(protractor.ExpectedConditions.presenceOf($('wb-workbench:not(.starting)')));
+    await this.page.locator('wb-workbench:not(.starting)').waitFor({state: 'visible'});
   }
-}
 
-/**
- * Allows finding the given part, or the active part if not specifying a part.
- */
-function createViewPartFinder(partId?: string): ElementFinder {
-  if (partId) {
-    return $('wb-workbench').$(`wb-view-part[data-partid="${partId}"]`);
+  /**
+   * Locates the given part, or the active part if not specifying a part.
+   */
+  private locateViewPart(partId?: string): Locator {
+    if (partId) {
+      return this.page.locator('wb-workbench').locator(`wb-view-part[data-partid="${partId}"]`);
+    }
+    else {
+      return this.page.locator('wb-workbench').locator('wb-view-part.active');
+    }
   }
-  else {
-    return $('wb-workbench').$('wb-view-part.active');
-  }
-}
 
-/**
- * Allows finding the tabbar in the given part, or in the active part if not specifying a part.
- */
-function createViewPartBarFinder(partId?: string): ElementFinder {
-  return createViewPartFinder(partId).$('wb-view-part-bar');
-}
-
-/**
- * Allows finding the action bar in the given part, or in the active part if not specifying a part.
- */
-function createViewPartActionBarFinder(partId?: string): ElementFinder {
-  return createViewPartBarFinder(partId).$('wb-view-part-action-bar');
-}
-
-/**
- * Allows finding a view tab.
- *
- * @param findBy - Specifies how to find the view tab. If both `viewId` and `cssClass` are not set, then the finder refers to the active view tab.
- *        <ul>
- *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
- *          <li>viewId?: Identifies the view by its id</li>
- *          <li>cssClass?: Identifies the view by its CSS class</li>
- *        </ul>
- */
-function createViewTabFinder(findBy: {partId?: string; viewId?: string; cssClass?: string}): ElementFinder {
-  const viewPartBarFinder = createViewPartBarFinder(findBy.partId);
-
-  if (findBy.viewId !== undefined) {
-    return viewPartBarFinder.$(`wb-view-tab[data-viewid="${findBy.viewId}"]`);
+  /**
+   * Locates the tab bar in the given part, or in the active part if not specifying a part.
+   */
+  private locateViewPartBar(partId?: string): Locator {
+    return this.locateViewPart(partId).locator('wb-view-part-bar');
   }
-  else if (findBy.cssClass !== undefined) {
-    return viewPartBarFinder.$(`wb-view-tab.${findBy.cssClass}`);
-  }
-  else {
-    return viewPartBarFinder.$(`wb-view-tab.active`);
-  }
-}
 
-/**
- * Allows finding a view.
- *
- * @param findBy - Specifies how to find the view. If both `viewId` and `cssClass` are not set, then the finder refers to the active view.
- *        <ul>
- *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
- *          <li>viewId?: Identifies the view by its id</li>
- *          <li>cssClass?: Identifies the view by its CSS class</li>
- *        </ul>
- */
-function createViewFinder(findBy: {partId?: string; viewId?: string; cssClass?: string}): ElementFinder {
-  const viewPartFinder = createViewPartFinder(findBy.partId);
+  /**
+   * Locates the action bar in the given part, or in the active part if not specifying a part.
+   */
+  private locateViewPartActionBar(partId?: string): Locator {
+    return this.locateViewPartBar(partId).locator('wb-view-part-action-bar');
+  }
 
-  if (findBy.viewId !== undefined) {
-    return viewPartFinder.$(`wb-view[data-viewid="${findBy.viewId}"]`);
+  /**
+   * Locates a view tab based on given options.
+   *
+   * @param findBy - Specifies how to locate the view tab. If both `viewId` and `cssClass` are not set, then the locator refers to the active view tab.
+   *        <ul>
+   *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
+   *          <li>viewId?: Identifies the view by its id</li>
+   *          <li>cssClass?: Identifies the view by its CSS class</li>
+   *        </ul>
+   */
+  private locateViewTab(findBy?: {partId?: string; viewId?: string; cssClass?: string}): Locator {
+    const viewPartBarLocator = this.locateViewPartBar(findBy?.partId);
+
+    if (findBy?.viewId !== undefined) {
+      return viewPartBarLocator.locator(`wb-view-tab[data-viewid="${findBy.viewId}"]`);
+    }
+    else if (findBy?.cssClass !== undefined) {
+      return viewPartBarLocator.locator(`wb-view-tab.${findBy.cssClass}`);
+    }
+    else {
+      return viewPartBarLocator.locator(`wb-view-tab.active`);
+    }
   }
-  else if (findBy.cssClass !== undefined) {
-    return viewPartFinder.$(`wb-view.${findBy.cssClass}`);
-  }
-  else {
-    return viewPartFinder.$(`wb-view`);
+
+  /**
+   * Locates a view based on given options.
+   *
+   * @param findBy - Specifies how to locate the view. If both `viewId` and `cssClass` are not set, then the locator refers to the active view.
+   *        <ul>
+   *          <li>partId?: Identifies the part containing the view. If not set, uses the active part to find the view.</li>
+   *          <li>viewId?: Identifies the view by its id</li>
+   *          <li>cssClass?: Identifies the view by its CSS class</li>
+   *        </ul>
+   */
+  private locateView(findBy: {partId?: string; viewId?: string; cssClass?: string}): Locator {
+    const viewPartLocator = this.locateViewPart(findBy.partId);
+
+    if (findBy.viewId !== undefined) {
+      return viewPartLocator.locator(`wb-view[data-viewid="${findBy.viewId}"]`);
+    }
+    else if (findBy.cssClass !== undefined) {
+      return viewPartLocator.locator(`wb-view.${findBy.cssClass}`);
+    }
+    else {
+      return viewPartLocator.locator(`wb-view`);
+    }
   }
 }
 
@@ -760,7 +667,7 @@ export interface PartPO {
 
   isPresent(): Promise<boolean>;
 
-  $(selector: string): ElementFinder;
+  locator(selector: string): Locator;
 }
 
 export interface ViewPO {
@@ -770,7 +677,11 @@ export interface ViewPO {
 
   isPresent(): Promise<boolean>;
 
-  $(selector: string): ElementFinder;
+  isVisible(): Promise<boolean>;
+
+  waitUntilPresent(): Promise<void>;
+
+  locator(selector: string): Locator;
 }
 
 export interface ViewTabPO {
@@ -802,10 +713,9 @@ export interface ViewTabContextMenuPO {
 }
 
 export interface PopupPO {
-
   isPresent(): Promise<boolean>;
 
-  isDisplayed(): Promise<boolean>;
+  isVisible(): Promise<boolean>;
 
   getClientRect(selector?: 'cdk-overlay' | 'wb-popup'): Promise<DOMRect>;
 
@@ -815,13 +725,15 @@ export interface PopupPO {
 
   getAlign(): Promise<'east' | 'west' | 'north' | 'south'>;
 
-  $(selector: string): ElementFinder;
+  locator(selector: string): Locator;
+
+  waitUntilClosed(): Promise<void>;
 }
 
 export interface NotificationPO {
-  isDisplayed(): Promise<boolean>;
-
   isPresent(): Promise<boolean>;
+
+  isVisible(): Promise<boolean>;
 
   getClientRect(): Promise<DOMRect>;
 
@@ -835,13 +747,13 @@ export interface NotificationPO {
 
   getCssClasses(): Promise<string[]>;
 
-  $(selector: string): ElementFinder;
+  locator(selector?: string): Locator;
 }
 
 export interface MessageBoxPO {
   isPresent(): Promise<boolean>;
 
-  isDisplayed(): Promise<boolean>;
+  isVisible(): Promise<boolean>;
 
   getClientRect(): Promise<DOMRect>;
 
@@ -851,7 +763,7 @@ export interface MessageBoxPO {
 
   getModality(): Promise<'view' | 'application' | null>;
 
-  getActions(): Promise<Dictionary<string>>;
+  getActions(): Promise<Record<string, string>>;
 
   clickActionButton(action: string): Promise<void>;
 
@@ -859,7 +771,7 @@ export interface MessageBoxPO {
 
   getCssClasses(): Promise<string[]>;
 
-  $(selector: string): ElementFinder;
+  locator(selector: string): Locator;
 }
 
 export interface ViewPartActionPO {

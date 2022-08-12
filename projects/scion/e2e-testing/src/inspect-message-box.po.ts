@@ -9,59 +9,46 @@
  */
 
 import {AppPO, MessageBoxPO} from './app.po';
-import {ElementFinder} from 'protractor';
-import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
-import {assertPageToDisplay, enterText, selectOption} from './helper/testing.util';
-import {Dictionary} from '../deps/scion/toolkit/util';
-import {Arrays} from '../deps/scion/toolkit/util';
-import {SciParamsEnterPO} from '../deps/scion/components.internal/params-enter.po';
+import {assertElementVisible, coerceArray, isPresent} from './helper/testing.util';
+import {SciParamsEnterPO} from './components.internal/params-enter.po';
+import {Locator} from '@playwright/test';
 
 /**
  * Page object to interact {@link InspectMessageBoxComponent}.
  */
 export class InspectMessageBoxPO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _locator: Locator;
 
   public readonly msgboxPO: MessageBoxPO;
 
-  constructor(public cssClass: string) {
-    this.msgboxPO = this._appPO.findMessageBox({cssClass: cssClass});
-    this._pageFinder = this.msgboxPO.$('app-inspect-message-box');
+  constructor(appPO: AppPO, public cssClass: string) {
+    this.msgboxPO = appPO.findMessageBox({cssClass: cssClass});
+    this._locator = this.msgboxPO.locator('app-inspect-message-box');
   }
 
   public async isPresent(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return await this.msgboxPO.isPresent() && await this._pageFinder.isPresent();
+    return isPresent(this._locator);
   }
 
-  public async isDisplayed(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-
-    if (!await this.isPresent()) {
-      return false;
-    }
-    return await this.msgboxPO.isDisplayed() && await this._pageFinder.isDisplayed();
+  public async isVisible(): Promise<boolean> {
+    return this._locator.isVisible();
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return this._pageFinder.$('span.e2e-component-instance-id').getText();
+    await assertElementVisible(this._locator);
+    return this._locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getInput(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return this._pageFinder.$('output.e2e-input').getText();
+    return this._locator.locator('output.e2e-input').innerText();
   }
 
-  public async getInputAsMap(): Promise<Map<string, any>> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
+  public async getInputAsKeyValueObject(): Promise<Record<string, any>> {
+    await assertElementVisible(this._locator);
 
     const rawContent = await this.getInput();
-    const map = new Map();
+    const map = {};
 
     // Sample Map content:
     // {"$implicit" => undefined}
@@ -77,40 +64,35 @@ export class InspectMessageBoxPO {
     while (match = mapEntryRegex.exec(rawContent)) {
       const key = match.groups['key'];
       const value = match.groups['value'];
-      map.set(key, value === 'undefined' ? undefined : JSON.parse(value));
+      map[key] = value === 'undefined' ? undefined : JSON.parse(value);
     }
     return map;
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(title, this._pageFinder.$('input.e2e-title'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-title').fill(title);
   }
 
   public async selectSeverity(severity: 'info' | 'warn' | 'error' | ''): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await selectOption(severity, this._pageFinder.$('select.e2e-severity'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('select.e2e-severity').selectOption(severity);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(Arrays.coerce(cssClass).join(' '), this._pageFinder.$('input.e2e-class'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
-  public async enterActions(actions: Dictionary<string>): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-actions'));
+  public async enterActions(actions: Record<string, string>): Promise<void> {
+    await assertElementVisible(this._locator);
+    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-actions'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(actions);
   }
 
   public async enterReturnValue(returnValue: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(returnValue, this._pageFinder.$('input.e2e-return-value'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-return-value').fill(returnValue);
   }
 }

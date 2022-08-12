@@ -8,40 +8,34 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
-import {confirmAlert, consumeBrowserLog} from '../helper/testing.util';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
-import {logging} from 'protractor';
-import Level = logging.Level;
 
-describe('Startup', () => {
+test.describe('Startup', () => {
 
-  const appPO = new AppPO();
-
-  beforeEach(async () => consumeBrowserLog());
-
-  it('should construct routed components contained in the URL only after the workbench has completed startup [#1]', async () => {
+  test('should construct routed components contained in the URL only after the workbench has completed startup [#1]', async ({appPO, workbenchNavigator, consoleLogs, browserDialogs}) => {
     // Start the workbench, but delay the startup by showing a confirmation dialog.
     await appPO.navigateTo({microfrontendSupport: false, confirmStartup: true, launcher: 'LAZY'});
-
-    // Confirm the alert dialog.
-    await confirmAlert();
 
     // Wait until the startup of the Workbench has completed.
     await appPO.waitUntilWorkbenchStarted();
 
     // Open the test view. This view would error when constructed before the workbench startup completed.
-    await ViewPagePO.openInNewTab();
+    await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Reload the app with the current layout to simulate views being instantiated right at startup.
     await appPO.reload();
-
-    // Confirm the alert dialog.
-    await confirmAlert({confirmDelay: 1000});
     await appPO.waitUntilWorkbenchStarted();
 
+    // Expect two browser dialogs having been accepted.
+    await expect(browserDialogs.get()).toEqual([
+      {type: 'alert', message: 'Click to continue Workbench Startup.'},
+      {type: 'alert', message: 'Click to continue Workbench Startup.'},
+    ]);
+
     // Expect the test view not to error.
-    await expect(await consumeBrowserLog(Level.SEVERE)).toEqual([]);
+    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
 
     // Expect the test view to show.
     const testingViewPO = appPO.findView({cssClass: 'e2e-test-view'});
