@@ -8,26 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertPageToDisplay, enterText, selectOption} from '../../helper/testing.util';
-import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {$, browser, ElementFinder, protractor} from 'protractor';
-import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {RouterOutletPO} from './router-outlet.po';
+import {assertElementVisible, coerceArray} from '../../helper/testing.util';
+import {AppPO, ViewTabPO} from '../../app.po';
+import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
+import {SciCheckboxPO} from '../../components.internal/checkbox.po';
+import {Locator} from '@playwright/test';
+import {ElementSelectors} from '../../helper/element-selectors';
 import {WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
-import {SciParamsEnterPO} from '../../../deps/scion/components.internal/params-enter.po';
-import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
-import {coerceArray} from '../../../deps/angular/cdk/coercion';
-
-const EC = protractor.ExpectedConditions;
 
 /**
- * Protractor runs as node application that fails to start when importing runtime types from `@scion/microfrontend-platform` since
- * it requires the DOM API like HTMLElement not present in node. Unlike classes or enums, interfaces can be referenced
- * because they do not exist at runtime. But importing runtime constructs in PO's or spec's such as the enum `WorkbenchCapabilities`
- * would cause the lib to be bundled as well, resulting in the following runtime error: `E/launcher - Error: ReferenceError:
- * HTMLElement is not defined.`
+ * Playwright's test runner fails to compile when importing runtime types from `@scion/workbench` or `@scion/microfrontend-platform`, because
+ * it requires ESM to be configured to run the E2E tests. We wait for better IDE support before configuring ESM for this project.
  *
- * For that reason, we re-declare workbench capability interfaces and replace their `type` property with a string literal.
+ * Unlike classes or enums, interfaces can be referenced because they do not exist at runtime.
+ * For that reason, we re-declare workbench capability interfaces and replace their `type` property (enum) with a string literal.
  */
 export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean}};
 export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'};
@@ -37,29 +31,13 @@ export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> &
  */
 export class RegisterWorkbenchCapabilityPagePO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _locator: Locator;
 
-  public readonly viewPO: ViewPO;
   public readonly viewTabPO: ViewTabPO;
 
-  constructor(public viewId: string) {
-    this.viewPO = this._appPO.findView({viewId: viewId});
-    this.viewTabPO = this._appPO.findViewTab({viewId: viewId});
-    this._pageFinder = $('app-register-workbench-capability-page');
-  }
-
-  public async isPresent(): Promise<boolean> {
-    if (!await this.viewTabPO.isPresent()) {
-      return false;
-    }
-
-    if (!await new RouterOutletPO().isPresent(this.viewId)) {
-      return false;
-    }
-
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    return this._pageFinder.isPresent();
+  constructor(appPO: AppPO, public viewId: string) {
+    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-register-workbench-capability-page');
   }
 
   /**
@@ -70,14 +48,13 @@ export class RegisterWorkbenchCapabilityPagePO {
    * Returns a Promise that resolves to the capability ID upon successful registration, or that rejects on registration error.
    */
   public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(capability: T): Promise<string> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
+    await assertElementVisible(this._locator);
 
     if (capability.type !== undefined) {
-      await selectOption(capability.type, this._pageFinder.$('select.e2e-type'));
+      await this._locator.locator('select.e2e-type').selectOption(capability.type);
     }
     if (capability.qualifier !== undefined) {
-      const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-qualifier'));
+      const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
       await paramsEnterPO.clear();
       await paramsEnterPO.enterParams(capability.qualifier);
     }
@@ -85,22 +62,22 @@ export class RegisterWorkbenchCapabilityPagePO {
     const optionalParams = [...(capability.optionalParams ?? []), ...(capability.params ?? []).filter(param => !param['transient'] && !param.required).map(param => param.name)];
     const transientParams = (capability.params ?? []).filter(param => param['transient']).map(param => param.name);
     if (requiredParams.length) {
-      await enterText(requiredParams.join(','), this._pageFinder.$('input.e2e-required-params'));
+      await this._locator.locator('input.e2e-required-params').fill(requiredParams.join(','));
     }
     if (optionalParams.length) {
-      await enterText(optionalParams.join(','), this._pageFinder.$('input.e2e-optional-params'));
+      await this._locator.locator('input.e2e-optional-params').fill(optionalParams.join(','));
     }
     if (transientParams.length) {
-      await enterText(transientParams.join(','), this._pageFinder.$('input.e2e-transient-params'));
+      await this._locator.locator('input.e2e-transient-params').fill(transientParams.join(','));
     }
     if (capability.private !== undefined) {
-      await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-private')).toggle(capability.private);
+      await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-private')).toggle(capability.private);
     }
     if (capability.properties.path !== undefined) {
-      await enterText(capability.properties.path, this._pageFinder.$('input.e2e-path'));
+      await this._locator.locator('input.e2e-path').fill(capability.properties.path);
     }
     if (capability.properties.cssClass !== undefined) {
-      await enterText(coerceArray(capability.properties.cssClass).join(' '), this._pageFinder.$('input.e2e-class'));
+      await this._locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
     }
 
     if (capability.type === 'view') {
@@ -112,30 +89,27 @@ export class RegisterWorkbenchCapabilityPagePO {
 
     await this.clickRegister();
 
-    // Evaluate the response: resolves the promise on success, or rejects it on error.
-    const responseFinder = this._pageFinder.$('output.e2e-register-response');
-    const errorFinder = this._pageFinder.$('output.e2e-register-error');
-    await browser.wait(EC.or(EC.presenceOf(responseFinder), EC.presenceOf(errorFinder)), 5000);
-    if (await responseFinder.isPresent()) {
-      return responseFinder.$('span.e2e-capability-id').getText();
-    }
-    else {
-      return Promise.reject(await errorFinder.getText());
-    }
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    const responseLocator = this._locator.locator('output.e2e-register-response');
+    const errorLocator = this._locator.locator('output.e2e-register-error');
+    return Promise.race([
+      responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-capability-id').innerText()),
+      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+    ]);
   }
 
   private async enterViewCapabilityProperties(capability: WorkbenchViewCapability): Promise<void> {
     if (capability.properties.title !== undefined) {
-      await enterText(capability.properties.title, this._pageFinder.$('input.e2e-title'));
+      await this._locator.locator('input.e2e-title').fill(capability.properties.title);
     }
     if (capability.properties.heading !== undefined) {
-      await enterText(capability.properties.heading, this._pageFinder.$('input.e2e-heading'));
+      await this._locator.locator('input.e2e-heading').fill(capability.properties.heading);
     }
     if (capability.properties.closable !== undefined) {
-      await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-closable')).toggle(capability.properties.closable);
+      await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-closable')).toggle(capability.properties.closable);
     }
     if (capability.properties.pinToStartPage !== undefined) {
-      await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
+      await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
     }
   }
 
@@ -143,39 +117,27 @@ export class RegisterWorkbenchCapabilityPagePO {
     const size = capability.properties.size;
 
     if (size?.width !== undefined) {
-      await enterText(size.width, this._pageFinder.$('input.e2e-width'));
+      await this._locator.locator('input.e2e-width').fill(size.width);
     }
     if (size?.height) {
-      await enterText(size.height, this._pageFinder.$('input.e2e-height'));
+      await this._locator.locator('input.e2e-height').fill(size.height);
     }
     if (size?.minWidth) {
-      await enterText(size.minWidth, this._pageFinder.$('input.e2e-min-width'));
+      await this._locator.locator('input.e2e-min-width').fill(size.minWidth);
     }
     if (size?.maxWidth) {
-      await enterText(size.maxWidth, this._pageFinder.$('input.e2e-max-width'));
+      await this._locator.locator('input.e2e-max-width').fill(size.maxWidth);
     }
     if (size?.minHeight) {
-      await enterText(size.minHeight, this._pageFinder.$('input.e2e-min-height'));
+      await this._locator.locator('input.e2e-min-height').fill(size.minHeight);
     }
     if (size?.maxHeight) {
-      await enterText(size.maxHeight, this._pageFinder.$('input.e2e-max-height'));
+      await this._locator.locator('input.e2e-max-height').fill(size.maxHeight);
     }
   }
 
   public async clickRegister(): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await this._pageFinder.$('button.e2e-register').click();
-  }
-
-  /**
-   * Opens the page in a new view tab.
-   */
-  public static async openInNewTab(app: 'app1' | 'app2'): Promise<RegisterWorkbenchCapabilityPagePO> {
-    const appPO = new AppPO();
-    const startPO = await appPO.openNewViewTab();
-    await startPO.openMicrofrontendView('e2e-register-workbench-capability', `workbench-client-testing-${app}`);
-    const viewId = await appPO.findActiveView().getViewId();
-    return new RegisterWorkbenchCapabilityPagePO(viewId);
+    await assertElementVisible(this._locator);
+    await this._locator.locator('button.e2e-register').click();
   }
 }

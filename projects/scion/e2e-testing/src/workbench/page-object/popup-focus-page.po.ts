@@ -8,45 +8,36 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertPageToDisplay, isActiveElement} from '../../helper/testing.util';
-import {AppPO, PopupPO} from '../../app.po';
-import {ElementFinder} from 'protractor';
-import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
+import {assertElementVisible, isActiveElement, isPresent} from '../../helper/testing.util';
+import {AppPO} from '../../app.po';
+import {Locator} from '@playwright/test';
 
 /**
  * Page object to interact {@link PopupFocusPageComponent}.
  */
 export class PopupFocusPagePO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _locator: Locator;
 
-  public readonly popupPO: PopupPO;
-
-  constructor(public cssClass: string) {
-    this.popupPO = this._appPO.findPopup({cssClass: cssClass});
-    this._pageFinder = this.popupPO.$('app-popup-focus-page');
+  constructor(appPO: AppPO, cssClass: string) {
+    this._locator = appPO.findPopup({cssClass}).locator('app-popup-focus-page');
   }
 
   public async isPresent(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return this._pageFinder.isPresent();
+    return isPresent(this._locator);
   }
 
-  public async isDisplayed(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return this._pageFinder.isDisplayed();
+  public async isVisible(): Promise<boolean> {
+    return this._locator.isVisible();
   }
 
   public async isActiveElement(field: 'first-field' | 'middle-field' | 'last-field'): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return isActiveElement(this._pageFinder.$(`input.e2e-${field}`));
+    await assertElementVisible(this._locator);
+    return isActiveElement(this._locator.locator(`input.e2e-${field}`));
   }
 
   public async clickField(field: 'first-field' | 'middle-field' | 'last-field'): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await this._pageFinder.$(`input.e2e-${field}`).click();
+    await assertElementVisible(this._locator);
+    await this._locator.locator(`input.e2e-${field}`).click();
   }
 }

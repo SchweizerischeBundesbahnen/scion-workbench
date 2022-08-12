@@ -8,47 +8,35 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO, MessageBoxPO} from './app.po';
-import {browser, ElementFinder} from 'protractor';
-import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
+import {AppPO} from './app.po';
+import {Locator, Page} from '@playwright/test';
 
 /**
  * Page object to interact {@link TextMessageComponent}.
  */
 export class TextMessagePO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _page: Page;
+  private readonly _locator: Locator;
 
-  public readonly msgboxPO: MessageBoxPO;
-
-  constructor(public cssClass: string) {
-    this.msgboxPO = this._appPO.findMessageBox({cssClass: cssClass});
-    this._pageFinder = this.msgboxPO.$('wb-text-message');
+  constructor(appPO: AppPO, cssClass: string) {
+    this._page = appPO.page;
+    this._locator = appPO.findMessageBox({cssClass}).locator('wb-text-message');
   }
 
-  public async isPresent(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return await this.msgboxPO.isPresent() && await this._pageFinder.isPresent();
-  }
-
-  public async isDisplayed(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return await this.msgboxPO.isDisplayed() && await this._pageFinder.isDisplayed();
+  public async isVisible(): Promise<boolean> {
+    return this._locator.isVisible();
   }
 
   public async getText(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return this._pageFinder.getText();
+    return this._locator.innerText();
   }
 
   public async isContentSelectable(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    const text = await this._pageFinder.getText();
+    const text = await this._locator.innerText();
 
-    await browser.actions().mouseMove(this._pageFinder).perform();
-    await browser.actions().doubleClick().perform();
-    const selection: string = await browser.executeScript('return window.getSelection().toString();') as string;
+    await this._locator.dblclick();
+    const selection: string = await this._page.evaluate(() => window.getSelection().toString());
 
     return selection && selection.length && text.includes(selection);
   }

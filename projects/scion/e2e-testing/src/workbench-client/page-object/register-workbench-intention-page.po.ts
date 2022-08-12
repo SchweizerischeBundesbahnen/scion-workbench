@@ -8,30 +8,25 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {$, browser, ElementFinder, protractor} from 'protractor';
+import {AppPO, ViewTabPO} from '../../app.po';
 import {Intention, Qualifier} from '@scion/microfrontend-platform';
-import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {assertPageToDisplay, selectOption} from '../../helper/testing.util';
-import {SciParamsEnterPO} from '../../../deps/scion/components.internal/params-enter.po';
-
-const EC = protractor.ExpectedConditions;
+import {assertElementVisible} from '../../helper/testing.util';
+import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
+import {Locator} from '@playwright/test';
+import {ElementSelectors} from '../../helper/element-selectors';
 
 /**
  * Page object to interact {@link RegisterWorkbenchIntentionPageComponent}.
  */
 export class RegisterWorkbenchIntentionPagePO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _locator: Locator;
 
-  public readonly viewPO: ViewPO;
   public readonly viewTabPO: ViewTabPO;
 
-  constructor(public viewId: string) {
-    this.viewPO = this._appPO.findView({viewId: viewId});
-    this.viewTabPO = this._appPO.findViewTab({viewId: viewId});
-    this._pageFinder = $('app-register-workbench-intention-page');
+  constructor(appPO: AppPO, public viewId: string) {
+    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-register-workbench-intention-page');
   }
 
   /**
@@ -42,35 +37,29 @@ export class RegisterWorkbenchIntentionPagePO {
    * Returns a Promise that resolves to the intention ID upon successful registration, or that rejects on registration error.
    */
   public async registerIntention(intention: Intention & {type: 'view' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
+    await assertElementVisible(this._locator);
 
     await this.selectType(intention.type);
     await this.enterQualifier(intention.qualifier);
     await this.clickRegister();
 
-    // Evaluate the response: resolves the promise on success, or rejects it on error.
-    const responseFinder = this._pageFinder.$('output.e2e-register-response');
-    const errorFinder = this._pageFinder.$('output.e2e-register-error');
-    await browser.wait(EC.or(EC.presenceOf(responseFinder), EC.presenceOf(errorFinder)), 5000);
-    if (await responseFinder.isPresent()) {
-      return responseFinder.$('span.e2e-intention-id').getText();
-    }
-    else {
-      return Promise.reject(await errorFinder.getText());
-    }
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    const responseLocator = this._locator.locator('output.e2e-register-response');
+    const errorLocator = this._locator.locator('output.e2e-register-error');
+    return Promise.race([
+      responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-intention-id').innerText()),
+      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+    ]);
   }
 
   public async selectType(type: 'view' | 'popup' | 'messagebox' | 'notification'): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await selectOption(type, this._pageFinder.$('select.e2e-type'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('select.e2e-type').selectOption(type);
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    const paramsEnterPO = new SciParamsEnterPO(this._pageFinder.$('sci-params-enter.e2e-qualifier'));
+    await assertElementVisible(this._locator);
+    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
     await paramsEnterPO.clear();
     if (qualifier && Object.keys(qualifier).length) {
       await paramsEnterPO.enterParams(qualifier);
@@ -78,19 +67,8 @@ export class RegisterWorkbenchIntentionPagePO {
   }
 
   public async clickRegister(): Promise<void> {
-    await WebdriverExecutionContexts.switchToIframe(this.viewId);
-    await assertPageToDisplay(this._pageFinder);
-    await this._pageFinder.$('button.e2e-register').click();
-  }
-
-  /**
-   * Opens the page in a new view tab.
-   */
-  public static async openInNewTab(app: 'app1' | 'app2'): Promise<RegisterWorkbenchIntentionPagePO> {
-    const appPO = new AppPO();
-    const startPO = await appPO.openNewViewTab();
-    await startPO.openMicrofrontendView('e2e-register-workbench-intention', `workbench-client-testing-${app}`);
-    const viewId = await appPO.findActiveView().getViewId();
-    return new RegisterWorkbenchIntentionPagePO(viewId);
+    await assertElementVisible(this._locator);
+    await this._locator.locator('button.e2e-register').click();
   }
 }
+

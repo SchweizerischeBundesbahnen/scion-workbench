@@ -8,207 +8,103 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertPageToDisplay, enterText, getInputValue} from '../../helper/testing.util';
-import {Params} from '@angular/router';
+import {assertElementVisible, coerceArray, isPresent} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
-import {ElementFinder} from 'protractor';
-import {WebdriverExecutionContexts} from '../../helper/webdriver-execution-context';
-import {SciAccordionPO} from '../../../deps/scion/components.internal/accordion.po';
-import {SciPropertyPO} from '../../../deps/scion/components.internal/property.po';
-import {Dictionary} from '../../../deps/scion/toolkit/util';
-import {SciCheckboxPO} from '../../../deps/scion/components.internal/checkbox.po';
-import {Arrays} from '../../../deps/scion/toolkit/util';
+import {Locator} from '@playwright/test';
+import {SciCheckboxPO} from '../../components.internal/checkbox.po';
+import {SciAccordionPO} from '../../components.internal/accordion.po';
+import {SciPropertyPO} from '../../components.internal/property.po';
+import {Params} from '@angular/router';
 
 /**
  * Page object to interact {@link ViewPageComponent}.
  */
 export class ViewPagePO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _locator: Locator;
 
   public readonly viewPO: ViewPO;
   public readonly viewTabPO: ViewTabPO;
 
-  constructor(public viewId: string) {
-    this.viewPO = this._appPO.findView({viewId: viewId});
-    this.viewTabPO = this._appPO.findViewTab({viewId: viewId});
-    this._pageFinder = this.viewPO.$('app-view-page');
+  constructor(appPO: AppPO, public viewId: string) {
+    this.viewPO = appPO.findView({viewId: viewId});
+    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this._locator = this.viewPO.locator('app-view-page');
   }
 
   public async isPresent(): Promise<boolean> {
-    if (!await this.viewTabPO.isPresent()) {
-      return false;
-    }
-
-    await WebdriverExecutionContexts.switchToDefault();
-    return this._pageFinder.isPresent();
+    return await this.viewTabPO.isPresent() && await isPresent(this._locator);
   }
 
   public async getViewId(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return this._pageFinder.$('span.e2e-view-id').getText();
-  }
-
-  public async getPartId(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return this._pageFinder.$('span.e2e-part-id').getText();
+    await assertElementVisible(this._locator);
+    return this._locator.locator('span.e2e-view-id').innerText();
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return this._pageFinder.$('span.e2e-component-instance-id').getText();
+    await assertElementVisible(this._locator);
+    return this._locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getRouteParams(): Promise<Params> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
+    await assertElementVisible(this._locator);
 
-    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-route-params'));
+    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(this._pageFinder.$('sci-property.e2e-route-params')).readAsDictionary();
+      return await new SciPropertyPO(this._locator.locator('sci-property.e2e-route-params')).readProperties();
     }
     finally {
       await accordionPO.collapse();
     }
-  }
-
-  public async getRouteQueryParams(): Promise<Params> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-
-    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-route-query-params'));
-    await accordionPO.expand();
-    try {
-      return await new SciPropertyPO(this._pageFinder.$('sci-property.e2e-route-query-params')).readAsDictionary();
-    }
-    finally {
-      await accordionPO.collapse();
-    }
-  }
-
-  public async getNavigationalState(): Promise<Dictionary> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-
-    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-navigational-state'));
-    await accordionPO.expand();
-    try {
-      return await new SciPropertyPO(this._pageFinder.$('sci-property.e2e-navigational-state')).readAsDictionary();
-    }
-    finally {
-      await accordionPO.collapse();
-    }
-  }
-
-  public async getTitle(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return getInputValue(this._pageFinder.$('input.e2e-title'));
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(title, this._pageFinder.$('input.e2e-title'));
-  }
-
-  public async getHeading(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return getInputValue(this._pageFinder.$('input.e2e-heading'));
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-title').fill(title);
   }
 
   public async enterHeading(heading: string): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await enterText(heading, this._pageFinder.$('input.e2e-heading'));
-  }
-
-  public async isDirty(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-dirty')).isChecked();
+    await assertElementVisible(this._locator);
+    await this._locator.locator('input.e2e-heading').fill(heading);
   }
 
   public async checkDirty(check: boolean): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-dirty')).toggle(check);
-  }
-
-  public async isClosable(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-closable')).isChecked();
+    await assertElementVisible(this._locator);
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-dirty')).toggle(check);
   }
 
   public async checkClosable(check: boolean): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-closable')).toggle(check);
-  }
-
-  public async isBlocked(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    return new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-blocked')).isChecked();
-  }
-
-  public async checkBlocked(check: boolean): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
-    await new SciCheckboxPO(this._pageFinder.$('sci-checkbox.e2e-blocked')).toggle(check);
+    await assertElementVisible(this._locator);
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-closable')).toggle(check);
   }
 
   public async clickClose(): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
+    await assertElementVisible(this._locator);
 
-    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-view-actions'));
+    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-view-actions'));
     await accordionPO.expand();
-    try {
-      await this._pageFinder.$('button.e2e-close').click();
-    }
-    finally {
-      await accordionPO.collapse();
-    }
+    await this._locator.locator('button.e2e-close').click();
   }
 
   public async addViewAction(viewpartAction: ViewpartAction | null, options?: {append?: boolean}): Promise<void> {
-    await WebdriverExecutionContexts.switchToDefault();
-    await assertPageToDisplay(this._pageFinder);
+    await assertElementVisible(this._locator);
 
-    const accordionPO = new SciAccordionPO(this._pageFinder.$('sci-accordion.e2e-viewpart-actions'));
+    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-viewpart-actions'));
     await accordionPO.expand();
     try {
-      const inputFinder = this._pageFinder.$('input.e2e-viewpart-actions');
+      const inputLocator = this._locator.locator('input.e2e-viewpart-actions');
       if (options?.append ?? true) {
-        const presentActions: ViewpartAction[] = Arrays.coerce(JSON.parse(await getInputValue(inputFinder) || null));
-        await enterText(JSON.stringify(presentActions.concat(viewpartAction || [])), inputFinder, 'setValue');
+        const presentActions: ViewpartAction[] = coerceArray(JSON.parse(await inputLocator.inputValue() || null));
+        await inputLocator.fill(JSON.stringify(presentActions.concat(viewpartAction || [])));
       }
       else {
-        await enterText(JSON.stringify([].concat(viewpartAction || [])), inputFinder, 'setValue');
+        await inputLocator.fill(JSON.stringify([].concat(viewpartAction || [])));
       }
     }
     finally {
       await accordionPO.collapse();
     }
-  }
-
-  /**
-   * Opens the page to test the workbench view in a new view tab.
-   */
-  public static async openInNewTab(): Promise<ViewPagePO> {
-    const appPO = new AppPO();
-    const startPO = await appPO.openNewViewTab();
-    await startPO.openWorkbenchView('e2e-test-view');
-    const viewId = await appPO.findActiveView().getViewId();
-    return new ViewPagePO(viewId);
   }
 }
 

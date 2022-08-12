@@ -92,7 +92,7 @@
     //      //      ],
     //      //      "@scion/components/viewport": [
     //      //        "../scion-toolkit/projects/scion/components/viewport/src/public_api"
-    //      //      ]
+    //      //      ],
     //      //      "@scion/components.internal/accordion": [
     //      //        "../scion-toolkit/projects/scion/components.internal/accordion/src/public_api"
     //      //      ],
@@ -119,7 +119,7 @@
     //      //      ],
     //      //      "@scion/components.internal/tabbar": [
     //      //        "../scion-toolkit/projects/scion/components.internal/tabbar/src/public_api"
-    //      //      ]
+    //      //      ],
     //      "@angular/*": [
     //        "./node_modules/@angular/*"
     //      ],

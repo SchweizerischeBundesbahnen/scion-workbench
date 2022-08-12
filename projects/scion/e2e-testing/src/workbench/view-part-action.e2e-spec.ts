@@ -8,17 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
-import {consumeBrowserLog} from '../helper/testing.util';
 
-describe('Viewpart Action', () => {
+test.describe('Viewpart Action', () => {
 
-  const appPO = new AppPO();
-
-  beforeEach(async () => consumeBrowserLog());
-
-  it('should be added to all viewparts (global action)', async () => {
+  test('should be added to all viewparts (global action)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const openNewTabActionButtonPO = appPO.findViewPartAction({buttonCssClass: 'e2e-open-new-tab'});
 
@@ -27,14 +23,14 @@ describe('Viewpart Action', () => {
     await expect(await appPO.getViewTabCount()).toEqual(0);
 
     // Global action should show in the context of view-1
-    const viewPagePO1 = await ViewPagePO.openInNewTab();
+    const viewPagePO1 = await workbenchNavigator.openInNewTab(ViewPagePO);
     await expect(await viewPagePO1.viewTabPO.isActive()).toBe(true);
     await expect(await viewPagePO1.viewPO.isPresent()).toBe(true);
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
 
     // Global action should show in the context of view-2
-    const viewPagePO2 = await ViewPagePO.openInNewTab();
+    const viewPagePO2 = await workbenchNavigator.openInNewTab(ViewPagePO);
     await expect(await viewPagePO2.viewTabPO.isActive()).toBe(true);
     await expect(await viewPagePO2.viewPO.isPresent()).toBe(true);
     await expect(await appPO.getViewTabCount()).toEqual(2);
@@ -52,17 +48,17 @@ describe('Viewpart Action', () => {
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
   });
 
-  it('should stick to a view if registered in the context of a view (view-local action)', async () => {
+  test('should stick to a view if registered in the context of a view (view-local action)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const testeeActionButtonPO = appPO.findViewPartAction({buttonCssClass: 'e2e-testee'});
 
     // Open view-1 and register a view-local viewpart action
-    const viewPagePO1 = await ViewPagePO.openInNewTab();
+    const viewPagePO1 = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPagePO1.addViewAction({icon: 'open_in_new', cssClass: 'e2e-testee'});
     await expect(await testeeActionButtonPO.isPresent()).toBe(true);
 
     // Open view-2, expect the action not to show
-    const viewPagePO2 = await ViewPagePO.openInNewTab();
+    const viewPagePO2 = await workbenchNavigator.openInNewTab(ViewPagePO);
     await expect(await testeeActionButtonPO.isPresent()).toBe(false);
 
     // Activate view-1, expect the action to show

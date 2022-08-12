@@ -290,20 +290,11 @@
       "projectType": "application",
       "root": "projects/scion/e2e-testing",
       "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/scion/e2e-testing/protractor.conf.js",
-            "webdriverUpdate": false
-          },
-          "configurations": {}
-        },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": [
-              "projects/scion/e2e-testing/**/*.ts",
-              "projects/scion/e2e-testing/**/*.html"
+              "projects/scion/e2e-testing/**/*.ts"
             ]
           }
         }

@@ -154,49 +154,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        suite:
-          - name: startup
-            project: workbench
-          - name: router
-            project: workbench
-          - name: routerlink
-            project: workbench
-          - name: default-page
-            project: workbench
-          - name: viewpart-action
-            project: workbench
-          - name: view-tabbar
-            project: workbench
-          - name: view
-            project: workbench
-          - name: popup
-            project: workbench
-          - name: popup-size
-            project: workbench
-          - name: message-box
-            project: workbench
-          - name: notification
-            project: workbench
-          - name: router
-            project: workbench-client
-          - name: router-params
-            project: workbench-client
-          - name: view
-            project: workbench-client
-          - name: popup
-            project: workbench-client
-          - name: popup-params
-            project: workbench-client
-          - name: popup-router
-            project: workbench-client
-          - name: host-popup
-            project: workbench-client
-          - name: popup-size
-            project: workbench-client
-          - name: message-box
-            project: workbench-client
-          - name: notification
-            project: workbench-client
+        shard: [ 1/10, 2/10, 3/10, 4/10, 5/10, 6/10, 7/10, 8/10, 9/10, 10/10 ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -227,7 +185,7 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - run: npm run e2e-testing:e2e-ci -- --suite ${{ matrix.suite.project }}::${{ matrix.suite.name }}
+      - run: npm run e2e:headless -- --shard=${{ matrix.shard }}
   workbench-release-guard:
     name: 'Should release @scion/workbench?'
     if: github.ref == 'refs/heads/master'

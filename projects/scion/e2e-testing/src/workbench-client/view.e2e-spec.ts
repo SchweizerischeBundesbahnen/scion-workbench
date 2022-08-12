@@ -8,34 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
-import {RouterPagePO} from './page-object/router-page.po';
-import {installSeleniumWebDriverClickFix} from '../helper/selenium-webdriver-click-fix';
+import {waitUntilAttached} from '../helper/testing.util';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
+import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
 import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
-import {Key, logging} from 'protractor';
-import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
-import {consumeBrowserLog} from '../helper/testing.util';
-import Level = logging.Level;
+import {RouterPagePO} from './page-object/router-page.po';
 
-export declare type HTMLElement = any;
+test.describe('Workbench View', () => {
 
-describe('Workbench View', () => {
-
-  const appPO = new AppPO();
-
-  installSeleniumWebDriverClickFix();
-
-  beforeEach(async () => consumeBrowserLog());
-
-  it('should complete view Observables on navigation', async () => {
+  test('should complete view Observables on navigation', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     // Observable completion expectations:
     // - should complete params$, capability$, active$ observables only when navigating to a view capability of a different app
     // - should complete title$, heading$, dirty$ and closable$ observables when navigating to a different view capability
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee-1 view in app1
-    const registerCapabilityPage1PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPage1PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
@@ -58,7 +48,7 @@ describe('Workbench View', () => {
     });
 
     // register testee-3 view in app2
-    const registerCapabilityPage2PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app2');
+    const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
     await registerCapabilityPage2PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-3'},
@@ -71,18 +61,18 @@ describe('Workbench View', () => {
     });
 
     // allow app1 to open testee-3 view
-    const registerIntentionPage2PO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPage2PO.registerIntention({type: 'view', qualifier: {component: 'testee-3'}});
 
     // navigate to testee-1 view (app1)
-    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testeeViewId = await appPO.findViewTab({cssClass: 'testee-1'}).getViewId();
     const testeeViewTabPO = appPO.findViewTab({viewId: testeeViewId});
-    const testeeViewPagePO = new ViewPagePO(testeeViewId);
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     // expect testee-1 to show
     await expect(await testeeViewTabPO.getTitle()).toEqual('Testee 1');
@@ -101,18 +91,18 @@ describe('Workbench View', () => {
     const testee2ComponentInstanceId = await testeeViewPagePO.getComponentInstanceId();
 
     // expect following Observables to complete
-    await expect(await consumeBrowserLog(Level.DEBUG, /ObservableComplete/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqualIgnoreOrder([
       `[TitleObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[HeadingObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[DirtyObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ClosableObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // update params (no microfrontend change)
     await testeeViewPagePO.navigateSelf({param1: 'param-1'});
 
     // expect following Observables to complete
-    await expect(await consumeBrowserLog(Level.DEBUG, /ObservableComplete/)).toEqual([]);
+    await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqual([]);
 
     // navigate to testee-3 view (app3)
     await routerPagePO.viewTabPO.activate();
@@ -127,7 +117,7 @@ describe('Workbench View', () => {
     const testee3ComponentInstanceId = await testeeViewPagePO.getComponentInstanceId();
 
     // expect following Observables to complete
-    await expect(await consumeBrowserLog(Level.DEBUG, /ObservableComplete/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqualIgnoreOrder([
       `[ParamsObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[CapabilityObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
@@ -140,7 +130,7 @@ describe('Workbench View', () => {
       `[HeadingObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[DirtyObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ClosableObservableComplete] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // expect the component instances to be different
     expect(new Set([testee1ComponentInstanceId, testee2ComponentInstanceId, testee3ComponentInstanceId]).size).toEqual(3);
@@ -153,7 +143,7 @@ describe('Workbench View', () => {
     await routerPagePO.clickNavigate();
 
     // expect following Observables to complete
-    await expect(await consumeBrowserLog(Level.DEBUG, /ObservableComplete/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqualIgnoreOrder([
       `[ParamsObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[CapabilityObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
@@ -162,12 +152,12 @@ describe('Workbench View', () => {
       `[HeadingObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[DirtyObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ClosableObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
-    ]));
+    ]);
   });
 
-  it('should allow updating the viewtab title', async () => {
+  test('should allow updating the viewtab title', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
-    const viewPagePO = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO = viewPagePO.viewTabPO;
 
     await viewPagePO.enterTitle('UPDATED TITLE');
@@ -177,9 +167,9 @@ describe('Workbench View', () => {
     await expect(await viewTabPO.getTitle()).toEqual('updated title');
   });
 
-  it('should allow updating the viewtab heading', async () => {
+  test('should allow updating the viewtab heading', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
-    const viewPagePO = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO = viewPagePO.viewTabPO;
 
     await viewPagePO.enterHeading('UPDATED HEADING');
@@ -189,9 +179,9 @@ describe('Workbench View', () => {
     await expect(await viewTabPO.getHeading()).toEqual('updated heading');
   });
 
-  it('should allow updating the viewtab dirty state', async () => {
+  test('should allow updating the viewtab dirty state', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
-    const viewPagePO = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO = viewPagePO.viewTabPO;
 
     await viewPagePO.markDirty(true);
@@ -204,9 +194,9 @@ describe('Workbench View', () => {
     await expect(await viewTabPO.isDirty()).toBe(true);
   });
 
-  it('should allow updating the viewtab closable flag', async () => {
+  test('should allow updating the viewtab closable flag', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
-    const viewPagePO = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO = viewPagePO.viewTabPO;
 
     await viewPagePO.checkClosable(true);
@@ -216,11 +206,12 @@ describe('Workbench View', () => {
     await expect(await viewTabPO.isClosable()).toBe(false);
   });
 
-  it('should allow closing the view', async () => {
+  test('should allow closing the view', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
-    const viewPagePO = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO = viewPagePO.viewTabPO;
 
+    await waitUntilAttached(viewPagePO.locator);
     await expect(await viewTabPO.isPresent()).toBe(true);
     await expect(await viewPagePO.isPresent()).toBe(true);
 
@@ -232,14 +223,14 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.isPresent()).toBe(false);
   });
 
-  it('should allow prevent the view from closing', async () => {
+  test('should allow prevent the view from closing', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register message box intention
-    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
-    const viewPagePO = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO = viewPagePO.viewTabPO;
 
     // prevent the view from closing
@@ -271,26 +262,26 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.isPresent()).toBe(false);
   });
 
-  it('should only close confirmed views, leaving other views open', async () => {
+  test('should only close confirmed views, leaving other views open', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register message box intention
-    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPagePO.registerIntention({type: 'messagebox'});
     await registerIntentionPagePO.viewTabPO.close();
 
     // open test view 1
-    const viewPagePO1 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO1 = viewPagePO1.viewTabPO;
     await viewPagePO1.checkConfirmClosing(true); // prevent the view from closing
 
     // open test view 2
-    const viewPagePO2 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO2 = viewPagePO2.viewTabPO;
     await viewPagePO2.checkConfirmClosing(true); // prevent the view from closing
 
     // open test view 3
-    const viewPagePO3 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO3 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO3 = viewPagePO3.viewTabPO;
     await viewPagePO3.checkConfirmClosing(true); // prevent the view from closing
 
@@ -336,31 +327,33 @@ describe('Workbench View', () => {
     await expect(await viewPagePO1.isPresent()).toBe(false);
   });
 
-  it('should activate viewtab when switching between tabs', async () => {
+  test('should activate viewtab when switching between tabs', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // open test view 1
-    const viewPagePO1 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO1 = viewPagePO1.viewTabPO;
+    await waitUntilAttached(viewPagePO1.locator);
 
     // expect view 1 to be present and active
     expect(await viewTabPO1.isPresent()).toBe(true);
     expect(await viewTabPO1.isActive()).toBe(true);
-    expect(await viewPagePO1.isDisplayed()).toBe(true);
+    expect(await viewPagePO1.isVisible()).toBe(true);
 
     // open test view 2
-    const viewPagePO2 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO2 = viewPagePO2.viewTabPO;
+    await waitUntilAttached(viewPagePO2.locator);
 
     // expect view 1 not to be displayed and its viewtab being inactive
     expect(await viewTabPO1.isPresent()).toBe(true);
     expect(await viewTabPO1.isActive()).toBe(false);
-    expect(await viewPagePO1.isDisplayed()).toBe(false);
+    expect(await viewPagePO1.isVisible()).toBe(false);
 
     // expect view 2 to be present and active
     expect(await viewTabPO2.isPresent()).toBe(true);
     expect(await viewTabPO2.isActive()).toBe(true);
-    expect(await viewPagePO2.isDisplayed()).toBe(true);
+    expect(await viewPagePO2.isVisible()).toBe(true);
 
     // activate view 1
     await viewTabPO1.activate();
@@ -368,61 +361,61 @@ describe('Workbench View', () => {
     // expect view 1 to be displayed and active
     expect(await viewTabPO1.isPresent()).toBe(true);
     expect(await viewTabPO1.isActive()).toBe(true);
-    expect(await viewPagePO1.isDisplayed()).toBe(true);
+    expect(await viewPagePO1.isVisible()).toBe(true);
 
     // expect view 2 not to be displayed and its viewtab being inactive
     expect(await viewTabPO2.isPresent()).toBe(true);
     expect(await viewTabPO2.isActive()).toBe(false);
-    expect(await viewPagePO2.isDisplayed()).toBe(false);
+    expect(await viewPagePO2.isVisible()).toBe(false);
   });
 
-  it('should preserve the size of inactive views', async () => {
+  test('should preserve the size of inactive views', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // open test view 1
-    const viewPagePO1 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO1 = viewPagePO1.viewTabPO;
     const activeViewSize = await viewPagePO1.getSize();
 
     // expect view 1 to be present and active
     expect(await viewTabPO1.isPresent()).toBe(true);
     expect(await viewTabPO1.isActive()).toBe(true);
-    expect(await viewPagePO1.isDisplayed()).toBe(true);
+    expect(await viewPagePO1.isVisible()).toBe(true);
 
     // open test view 2
-    const viewPagePO2 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO2 = viewPagePO2.viewTabPO;
     const inactiveViewSize = await viewPagePO1.getSize();
 
     // expect view 1 not to be displayed and its viewtab to be inactive
     expect(await viewTabPO1.isPresent()).toBe(true);
     expect(await viewTabPO1.isActive()).toBe(false);
-    expect(await viewPagePO1.isDisplayed()).toBe(false);
+    expect(await viewPagePO1.isVisible()).toBe(false);
 
     // expect view 2 to be present and active
     expect(await viewTabPO2.isPresent()).toBe(true);
     expect(await viewTabPO2.isActive()).toBe(true);
-    expect(await viewPagePO2.isDisplayed()).toBe(true);
+    expect(await viewPagePO2.isVisible()).toBe(true);
 
     // expect view size of inactive view not to have changed
     expect(activeViewSize).toEqual(inactiveViewSize);
   });
 
-  it('should not confirm closing when switching between viewtabs', async () => {
+  test('should not confirm closing when switching between viewtabs', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register message box intention
-    const registerIntentionPagePO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPagePO.registerIntention({type: 'messagebox'});
     await registerIntentionPagePO.viewTabPO.close();
 
     // open test view 1
-    const viewPagePO1 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO1 = viewPagePO1.viewTabPO;
     await viewPagePO1.checkConfirmClosing(true); // prevent the view from closing
 
     // open test view 2
-    const viewPagePO2 = await ViewPagePO.openInNewTab('app1');
+    const viewPagePO2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO2 = viewPagePO2.viewTabPO;
     await viewPagePO2.checkConfirmClosing(true); // prevent the view from closing
 
@@ -436,11 +429,11 @@ describe('Workbench View', () => {
     expect(await msgboxPO.isPresent()).toBe(false);
   });
 
-  it('should emit when activating or deactivating a viewtab', async () => {
+  test('should emit when activating or deactivating a viewtab', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee-1 view
-    const registerCapabilityPagePO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
@@ -463,18 +456,18 @@ describe('Workbench View', () => {
     });
 
     // navigate to testee-1 view
-    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
     const testee1ViewTabPO = appPO.findViewTab({cssClass: 'testee-1'});
-    const testee1ViewPagePO = new ViewPagePO(await testee1ViewTabPO.getViewId());
+    const testee1ViewPagePO = new ViewPagePO(appPO, await testee1ViewTabPO.getViewId());
     const testee1ComponentInstanceId = await testee1ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // navigate to testee-2 view
     await routerPagePO.viewTabPO.activate();
@@ -482,43 +475,42 @@ describe('Workbench View', () => {
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
     const testee2ViewTabPO = appPO.findViewTab({cssClass: 'testee-2'});
-    const testee2ViewPagePO = new ViewPagePO(await testee2ViewTabPO.getViewId());
+    const testee2ViewPagePO = new ViewPagePO(appPO, await testee2ViewTabPO.getViewId());
     const testee2ComponentInstanceId = await testee2ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // activate testee-1 view
     await testee1ViewTabPO.activate();
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // activate testee-2 view
     await testee2ViewTabPO.activate();
     await testee2ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // register testee-3 view
     await registerCapabilityPagePO.viewTabPO.activate();
-    await registerCapabilityPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
-    ]));
+    ]);
 
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
@@ -536,30 +528,30 @@ describe('Workbench View', () => {
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
     const testee3ViewTabPO = appPO.findViewTab({cssClass: 'testee-3'});
-    const testee3ViewPagePO = new ViewPagePO(await testee3ViewTabPO.getViewId());
+    const testee3ViewPagePO = new ViewPagePO(appPO, await testee3ViewTabPO.getViewId());
     const testee3ComponentInstanceId = await testee3ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewActivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // activate testee-1 view
     await testee1ViewTabPO.activate();
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
-    ]));
+    ]);
   });
 
-  it('should provide the view\'s capability', async () => {
+  test('should provide the view\'s capability', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee-1 view in app1
-    const registerCapabilityPage1PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPage1PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
@@ -582,7 +574,7 @@ describe('Workbench View', () => {
     });
 
     // register testee-3 view in app2
-    const registerCapabilityPage2PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app2');
+    const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
     await registerCapabilityPage2PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-3'},
@@ -595,22 +587,22 @@ describe('Workbench View', () => {
     });
 
     // allow app1 to open testee-3 view
-    const registerIntentionPage2PO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPage2PO.registerIntention({type: 'view', qualifier: {component: 'testee-3'}});
 
     // navigate to testee-1 view (app1)
-    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testeeViewId = await appPO.findViewTab({cssClass: 'testee-1'}).getViewId();
-    const testeeViewPagePO = new ViewPagePO(testeeViewId);
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
-    await expect(await testeeViewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({
+    await expect(await testeeViewPagePO.getViewCapability()).toEqual(expect.objectContaining({
       qualifier: {component: 'testee-1'},
       type: 'view',
-      properties: jasmine.objectContaining({
+      properties: expect.objectContaining({
         path: 'test-view',
         title: 'Testee 1',
         cssClass: ['testee-1'],
@@ -625,10 +617,10 @@ describe('Workbench View', () => {
     await routerPagePO.clickNavigate();
 
     await testeeViewPagePO.viewTabPO.activate();
-    await expect(await testeeViewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({
+    await expect(await testeeViewPagePO.getViewCapability()).toEqual(expect.objectContaining({
       qualifier: {component: 'testee-2'},
       type: 'view',
-      properties: jasmine.objectContaining({
+      properties: expect.objectContaining({
         path: 'test-view',
         title: 'Testee 2',
         cssClass: ['testee-2'],
@@ -642,10 +634,10 @@ describe('Workbench View', () => {
     await routerPagePO.clickNavigate();
 
     await testeeViewPagePO.viewTabPO.activate();
-    await expect(await testeeViewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({
+    await expect(await testeeViewPagePO.getViewCapability()).toEqual(expect.objectContaining({
       qualifier: {component: 'testee-3'},
       type: 'view',
-      properties: jasmine.objectContaining({
+      properties: expect.objectContaining({
         path: 'test-view',
         title: 'Testee 3',
         cssClass: ['testee-3'],
@@ -657,11 +649,11 @@ describe('Workbench View', () => {
    * When having loaded a microfrontend of an app, and when then navigating to another microfrontend of the same app,
    * the new microfrontend should get its own capability and not the capability of the previous loaded microfrontend.
    */
-  it('should emit the navigation\'s effective capability when navigating to another microfrontend of the same app', async () => {
+  test('should emit the navigation\'s effective capability when navigating to another microfrontend of the same app', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true, simulateSlowCapabilityLookup: true});
 
     // register testee-1 view in app1
-    const registerCapabilityApp1PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    const registerCapabilityApp1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     const capability1Id = await registerCapabilityApp1PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
@@ -686,7 +678,7 @@ describe('Workbench View', () => {
     });
 
     // register testee-3 view in app2
-    const registerCapabilityApp2PO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app2');
+    const registerCapabilityApp2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
     const capability3Id = await registerCapabilityApp2PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-3'},
@@ -700,25 +692,25 @@ describe('Workbench View', () => {
     });
 
     // allow app1 to open testee-3 view of app2
-    const registerIntentionPage2PO = await RegisterWorkbenchIntentionPagePO.openInNewTab('app1');
+    const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
     await registerIntentionPage2PO.registerIntention({type: 'view', qualifier: {component: 'testee-3'}});
 
     // navigate to testee-1 view (app1)
-    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
     // Construct the PO to interact with the opened view
-    const viewId = await appPO.findActiveViewTab().getViewId();
+    const viewId = await appPO.getActiveView().getViewId();
     const viewTabPO = appPO.findViewTab({viewId});
-    const viewPagePO = new ViewPagePO(viewId);
+    const viewPagePO = new ViewPagePO(appPO, viewId);
 
     // Assert the correct capability to be loaded
-    await expect(await viewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewCapability\$::first/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability1Id}]`,
-    ]));
+    ]);
 
     // navigate to testee-2 view (app1)
     await routerPagePO.viewTabPO.activate();
@@ -729,10 +721,10 @@ describe('Workbench View', () => {
 
     // Assert the correct capability to be loaded
     await viewTabPO.activate();
-    await expect(await viewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({metadata: {id: capability2Id, appSymbolicName: 'workbench-client-testing-app1'}}));
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewCapability\$::first/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability2Id, appSymbolicName: 'workbench-client-testing-app1'}}));
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability2Id}]`,
-    ]));
+    ]);
 
     // navigate to testee-1 view (app1)
     await routerPagePO.viewTabPO.activate();
@@ -743,10 +735,10 @@ describe('Workbench View', () => {
 
     // Assert the correct capability to be loaded
     await viewTabPO.activate();
-    await expect(await viewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewCapability\$::first/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability1Id}]`,
-    ]));
+    ]);
 
     // navigate to testee-3 view (app2)
     await routerPagePO.viewTabPO.activate();
@@ -756,17 +748,17 @@ describe('Workbench View', () => {
 
     // Assert the correct capability to be loaded
     await viewTabPO.activate();
-    await expect(await viewPagePO.getViewCapability()).toEqual(jasmine.objectContaining({metadata: {id: capability3Id, appSymbolicName: 'workbench-client-testing-app2'}}));
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewCapability\$::first/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability3Id, appSymbolicName: 'workbench-client-testing-app2'}}));
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability3Id}]`,
-    ]));
-  }, 60000 /* simulateSlowCapabilityLookup */);
+    ]);
+  });
 
-  it('should provide the view\'s identity', async () => {
+  test('should provide the view\'s identity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee-1 view
-    const registerCapabilityPagePO = await RegisterWorkbenchCapabilityPagePO.openInNewTab('app1');
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
@@ -800,13 +792,13 @@ describe('Workbench View', () => {
     });
 
     // navigate to testee-1 view
-    const routerPagePO = await RouterPagePO.openInNewTab('app1');
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testee1ViewId = await appPO.findViewTab({cssClass: 'testee-1'}).getViewId();
-    await expect(await new ViewPagePO(testee1ViewId).getViewId()).toEqual(testee1ViewId);
+    await expect(await new ViewPagePO(appPO, testee1ViewId).getViewId()).toEqual(testee1ViewId);
 
     // navigate to testee-2 view
     await routerPagePO.viewTabPO.activate();
@@ -815,7 +807,7 @@ describe('Workbench View', () => {
     await routerPagePO.clickNavigate();
 
     const testee2ViewId = await appPO.findViewTab({cssClass: 'testee-2'}).getViewId();
-    await expect(await new ViewPagePO(testee2ViewId).getViewId()).toEqual(testee2ViewId);
+    await expect(await new ViewPagePO(appPO, testee2ViewId).getViewId()).toEqual(testee2ViewId);
 
     // navigate to testee-3 view
     await routerPagePO.viewTabPO.activate();
@@ -824,22 +816,22 @@ describe('Workbench View', () => {
     await routerPagePO.clickNavigate();
 
     const testee3ViewId = await appPO.findViewTab({cssClass: 'testee-3'}).getViewId();
-    await expect(await new ViewPagePO(testee3ViewId).getViewId()).toEqual(testee3ViewId);
+    await expect(await new ViewPagePO(appPO, testee3ViewId).getViewId()).toEqual(testee3ViewId);
   });
 
-  describe('keystroke bubbling of view context menu items', () => {
+  test.describe('keystroke bubbling of view context menu items', () => {
 
-    it('should propagate `ctrl+k` for closing the current view', async () => {
+    test('should propagate `ctrl+k` for closing the current view', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
-      const viewPage1PO = await ViewPagePO.openInNewTab('app1');
-      const viewPage2PO = await ViewPagePO.openInNewTab('app1');
-      const viewPage3PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage1PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
       await expect(await appPO.getViewTabCount()).toEqual(3);
 
       // Press 'ctrl+k' in view 2
       await viewPage2PO.viewTabPO.activate();
-      await viewPage2PO.sendKeys(Key.chord(Key.CONTROL, 'k'));
+      await viewPage2PO.sendKeys('Control+K');
 
       await expect(await appPO.getViewTabCount()).toEqual(2);
       await expect(await viewPage1PO.isPresent()).toBe(true);
@@ -847,17 +839,17 @@ describe('Workbench View', () => {
       await expect(await viewPage3PO.isPresent()).toBe(true);
     });
 
-    it('should propagate `ctrl+shift+k` for closing other views', async () => {
+    test('should propagate `ctrl+shift+k` for closing other views', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
-      const viewPage1PO = await ViewPagePO.openInNewTab('app1');
-      const viewPage2PO = await ViewPagePO.openInNewTab('app1');
-      const viewPage3PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage1PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
       await expect(await appPO.getViewTabCount()).toEqual(3);
 
       // Press 'ctrl+shift+k' in view 2
       await viewPage2PO.viewTabPO.activate();
-      await viewPage2PO.sendKeys(Key.chord(Key.CONTROL, Key.SHIFT, 'k'));
+      await viewPage2PO.sendKeys('Control+Shift+K');
 
       await expect(await appPO.getViewTabCount()).toEqual(1);
       await expect(await viewPage1PO.isPresent()).toBe(false);
@@ -865,17 +857,17 @@ describe('Workbench View', () => {
       await expect(await viewPage3PO.isPresent()).toBe(false);
     });
 
-    it('should propagate `ctrl+shift+alt+k` for closing all views', async () => {
+    test('should propagate `ctrl+shift+alt+k` for closing all views', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
-      const viewPage1PO = await ViewPagePO.openInNewTab('app1');
-      const viewPage2PO = await ViewPagePO.openInNewTab('app1');
-      const viewPage3PO = await ViewPagePO.openInNewTab('app1');
+      const viewPage1PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
       await expect(await appPO.getViewTabCount()).toEqual(3);
 
       // Press 'ctrl+shift+alt+k' in view 2
       await viewPage2PO.viewTabPO.activate();
-      await viewPage2PO.sendKeys(Key.chord(Key.CONTROL, Key.SHIFT, Key.ALT, 'k'));
+      await viewPage2PO.sendKeys('Control+Shift+Alt+K');
 
       await expect(await appPO.getViewTabCount()).toEqual(0);
       await expect(await viewPage1PO.isPresent()).toBe(false);

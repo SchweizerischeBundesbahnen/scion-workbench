@@ -8,32 +8,38 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO, NotificationPO} from './app.po';
-import {ElementFinder} from 'protractor';
-import {WebdriverExecutionContexts} from './helper/webdriver-execution-context';
+import {AppPO} from './app.po';
+import {Locator} from '@playwright/test';
+import {isPresent} from './helper/testing.util';
 
 /**
  * Page object to interact {@link TextNotificationComponent}.
  */
 export class TextNotificationPO {
 
-  private _appPO = new AppPO();
-  private _pageFinder: ElementFinder;
+  private readonly _locator: Locator;
 
-  public readonly notificationPO: NotificationPO;
-
-  constructor(public cssClass: string) {
-    this.notificationPO = this._appPO.findNotification({cssClass: cssClass});
-    this._pageFinder = this.notificationPO.$('wb-text-notification');
+  constructor(appPO: AppPO, cssClass: string) {
+    this._locator = appPO.findNotification({cssClass}).locator('wb-text-notification');
   }
 
-  public async isDisplayed(): Promise<boolean> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return await this.notificationPO.isDisplayed() && await this._pageFinder.isDisplayed();
+  public async isVisible(): Promise<boolean> {
+    return this._locator.isVisible();
+  }
+
+  public async isPresent(): Promise<boolean> {
+    return isPresent(this._locator);
   }
 
   public async getText(): Promise<string> {
-    await WebdriverExecutionContexts.switchToDefault();
-    return this._pageFinder.getText();
+    return this._locator.innerText();
+  }
+
+  /**
+   * Waits for the notification to be closed.
+   * Throws an error if not closed after `duration` milliseconds.
+   */
+  public async waitUntilClosed(duration: number): Promise<void> {
+    await this._locator.waitFor({state: 'detached', timeout: duration});
   }
 }

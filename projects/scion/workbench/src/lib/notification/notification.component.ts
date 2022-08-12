@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
 import {asapScheduler, EMPTY, merge, Subject, timer} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {Notification} from './notification';
-import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 
 /**
  * A notification is a closable message that appears in the top right corner and disappears automatically after a few seconds.
@@ -39,7 +38,7 @@ export class NotificationComponent implements OnChanges, OnDestroy {
   @Output()
   public closeNotification = new EventEmitter<void>();
 
-  constructor(private _injector: Injector, private _zone: NgZone, private _cd: ChangeDetectorRef) {
+  constructor(private _injector: Injector, private _cd: ChangeDetectorRef) {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -73,9 +72,6 @@ export class NotificationComponent implements OnChanges, OnDestroy {
   private installAutoCloseTimer(): void {
     this._closeTimerChange$.next();
 
-    // Run the timer outside of Angular to allow Protractor tests to continue interacting with the browser.
-    // Otherwise, we would urge tests to call 'browser.waitForAngularEnabled(false)', which can lead to flaky
-    // tests.
     this.notification.duration$
       .pipe(
         switchMap(duration => {
@@ -95,8 +91,6 @@ export class NotificationComponent implements OnChanges, OnDestroy {
               return EMPTY;
           }
         }),
-        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
-        observeInside(continueFn => this._zone.run(continueFn)),
         takeUntil(merge(this._closeTimerChange$, this._destroy$)),
       )
       .subscribe(() => {

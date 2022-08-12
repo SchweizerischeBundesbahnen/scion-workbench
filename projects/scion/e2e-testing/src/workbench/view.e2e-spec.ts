@@ -8,22 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../app.po';
-import {ViewPagePO} from './page-object/view-page.po';
+import {expect} from '@playwright/test';
+import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
-import {consumeBrowserLog} from '../helper/testing.util';
-import {logging} from 'protractor';
-import Level = logging.Level;
+import {ViewPagePO} from './page-object/view-page.po';
 
-describe('Workbench View', () => {
+test.describe('Workbench View', () => {
 
-  const appPO = new AppPO();
-
-  beforeEach(async () => consumeBrowserLog());
-
-  it('should allow updating the view tab title', async () => {
+  test('should allow updating the view tab title', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     await viewPagePO.enterTitle('TITLE');
     await expect(await viewPagePO.viewTabPO.getTitle()).toEqual('TITLE');
@@ -32,9 +26,9 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.viewTabPO.getTitle()).toEqual('title');
   });
 
-  it('should allow updating the view tab heading', async () => {
+  test('should allow updating the view tab heading', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     await viewPagePO.enterHeading('HEADING');
     await expect(await viewPagePO.viewTabPO.getHeading()).toEqual('HEADING');
@@ -43,9 +37,9 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.viewTabPO.getHeading()).toEqual('heading');
   });
 
-  it('should allow to mark the view dirty', async () => {
+  test('should allow to mark the view dirty', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // View tab expected to be pristine for new views
     await expect(await viewPagePO.viewTabPO.isDirty()).toBe(false);
@@ -59,10 +53,10 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.viewTabPO.isDirty()).toBe(false);
   });
 
-  it('should unset the dirty state when navigating to a different route', async () => {
+  test('should unset the dirty state when navigating to a different route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewTabPO = viewPagePO.viewTabPO;
     const viewId = await viewTabPO.getViewId();
 
@@ -81,10 +75,10 @@ describe('Workbench View', () => {
     await expect(await viewTabPO.isDirty()).toBe(false);
   });
 
-  it('should not unset the dirty state when the navigation resolves to the same route, e.g., when updating matrix params or route params', async () => {
+  test('should not unset the dirty state when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewTabPO = viewPagePO.viewTabPO;
     const viewId = await viewTabPO.getViewId();
 
@@ -108,10 +102,10 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
-  it('should not unset the title when the navigation resolves to the same route, e.g., when updating matrix params or route params', async () => {
+  test('should not unset the title when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewTabPO = viewPagePO.viewTabPO;
     const viewId = await viewTabPO.getViewId();
 
@@ -134,10 +128,10 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
-  it('should not unset the heading when the navigation resolves to the same route, e.g., when updating matrix params or route params', async () => {
+  test('should not unset the heading when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await RouterPagePO.openInNewTab();
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewTabPO = viewPagePO.viewTabPO;
     const viewId = await viewTabPO.getViewId();
 
@@ -161,9 +155,9 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
-  it('should remove the closing handle from the view tab', async () => {
+  test('should remove the closing handle from the view tab', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // View tab expected to be pristine for new views
     await expect(await viewPagePO.viewTabPO.isClosable()).toBe(true);
@@ -177,76 +171,76 @@ describe('Workbench View', () => {
     await expect(await viewPagePO.viewTabPO.isClosable()).toBe(true);
   });
 
-  it('should emit when activating or deactivating a viewtab', async () => {
+  test('should emit when activating or deactivating a viewtab', async ({appPO, workbenchNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // navigate to testee-1 view
-    const testee1ViewPagePO = await ViewPagePO.openInNewTab();
+    const testee1ViewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const testee1ComponentInstanceId = await testee1ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // navigate to testee-2 view
-    const testee2ViewPagePO = await ViewPagePO.openInNewTab();
+    const testee2ViewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const testee2ComponentInstanceId = await testee2ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // activate testee-1 view
     await testee1ViewPagePO.viewTabPO.activate();
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // activate testee-2 view
     await testee2ViewPagePO.viewTabPO.activate();
     await testee2ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // navigate to testee-3 view
-    const testee3ViewPagePO = await ViewPagePO.openInNewTab();
+    const testee3ViewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const testee3ComponentInstanceId = await testee3ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
-    ]));
+    ]);
 
     // activate testee-1 view
     await testee1ViewPagePO.viewTabPO.activate();
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(await consumeBrowserLog(Level.DEBUG, /ViewActivate|ViewDeactivate/)).toEqual(jasmine.arrayWithExactContents([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
       `[ViewDeactivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
-    ]));
+    ]);
   });
 
-  it('should allow to register view actions', async () => {
+  test('should allow to register view actions', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO1 = await ViewPagePO.openInNewTab();
+    const viewPagePO1 = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewTabPO1 = viewPagePO1.viewTabPO;
     await viewPagePO1.addViewAction({icon: 'search', cssClass: 'view-1-search-action'});
 
-    const viewPagePO2 = await ViewPagePO.openInNewTab();
+    const viewPagePO2 = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewTabPO2 = viewPagePO2.viewTabPO;
     await viewPagePO2.addViewAction({icon: 'settings', cssClass: 'view-2-settings-action'});
     await viewPagePO2.addViewAction({icon: 'launch', cssClass: 'view-2-launch-action'});
@@ -267,9 +261,9 @@ describe('Workbench View', () => {
     await expect(await appPO.findViewPartAction({buttonCssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
   });
 
-  it('should allow to close the view', async () => {
+  test('should allow to close the view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await ViewPagePO.openInNewTab();
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     await expect(await appPO.getViewTabCount()).toEqual(1);
     await expect(await viewPagePO.viewTabPO.isPresent()).toBe(true);
     await expect(await viewPagePO.viewPO.isPresent()).toBe(true);

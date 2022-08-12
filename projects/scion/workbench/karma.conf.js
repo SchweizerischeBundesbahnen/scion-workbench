@@ -10,7 +10,11 @@
 
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
-process.env.CHROME_BIN = require('puppeteer').executablePath();
+
+// By setting `PLAYWRIGHT_BROWSERS_PATH=0`, chromium binaries are found in `node_modules`
+// https://playwright.dev/docs/ci#caching-browsers
+process.env.PLAYWRIGHT_BROWSERS_PATH = 0;
+process.env.CHROME_BIN = require('playwright-core').chromium.executablePath();
 
 module.exports = function (config) {
   config.set({
@@ -33,7 +37,7 @@ module.exports = function (config) {
       clearContext: false, // leave Jasmine Spec Runner output visible in browser
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, '../../../coverage/scion/toolkit'),
+      dir: require('path').join(__dirname, '../../../coverage/scion/workbench'),
       subdir: '.',
       reporters: [
         {type: 'html'},
