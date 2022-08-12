@@ -26,6 +26,7 @@ const MODALITY = 'modality';
 const CONTEXTUAL_VIEW_ID = 'contextualViewId';
 const CONTENT_SELECTABLE = 'contentSelectable';
 const CSS_CLASS = 'cssClass';
+const COUNT = 'count';
 const ACTIONS = 'actions';
 const VIEW_CONTEXT = 'viewContext';
 
@@ -45,6 +46,7 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
   public readonly CONTEXTUAL_VIEW_ID = CONTEXTUAL_VIEW_ID;
   public readonly CONTENT_SELECTABLE = CONTENT_SELECTABLE;
   public readonly CSS_CLASS = CSS_CLASS;
+  public readonly COUNT = COUNT;
   public readonly ACTIONS = ACTIONS;
   public readonly VIEW_CONTEXT = VIEW_CONTEXT;
 
@@ -74,6 +76,7 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
       [CONTEXTUAL_VIEW_ID]: formBuilder.control(''),
       [CONTENT_SELECTABLE]: formBuilder.control(false),
       [CSS_CLASS]: formBuilder.control(''),
+      [COUNT]: formBuilder.control(''),
       [ACTIONS]: formBuilder.array([]),
       [VIEW_CONTEXT]: formBuilder.control(true),
     });
@@ -88,7 +91,15 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
 
     const messageBoxService = unsetViewContext ? this._rootService.rootInjector.get(MessageBoxService) : this._messageBoxService;
 
-    await messageBoxService.open({
+    const messageBoxes = [];
+    for (let index = 0; index < Number(this.form.get(COUNT).value || 1); index++) {
+      messageBoxes.push(this.openMessageBox(messageBoxService, index));
+    }
+    await Promise.all(messageBoxes);
+  }
+
+  private openMessageBox(messageBoxService: MessageBoxService, index: number): Promise<any> {
+    return messageBoxService.open({
       title: this.restoreLineBreaks(this.form.get(TITLE).value) || undefined,
       content: (this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.get(CONTENT).value)) || undefined,
       componentInput: (this.isUseComponent() ? this.form.get(COMPONENT_INPUT).value : undefined) || undefined,
@@ -98,7 +109,7 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
         viewId: this.form.get(CONTEXTUAL_VIEW_ID).value || undefined,
       },
       contentSelectable: this.form.get(CONTENT_SELECTABLE).value || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
+      cssClass: [`index-${index}`, ...(this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || [])],
       actions: SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as FormArray) || undefined,
     })
       .then(closeAction => this.closeAction = closeAction)
