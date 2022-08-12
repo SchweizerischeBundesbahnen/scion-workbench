@@ -53,6 +53,11 @@
     <sci-form-field label="CSS Class(es)">
       <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
     </sci-form-field>
+
+    <sci-form-field label="Count">
+      <input [formControlName]="COUNT" class="e2e-count"
+             placeholder="Number of message boxes to open (1 by default). For every message box, an 'index-$1' CSS class is added, where $1 is the index of the message box, starting with 0.">
+    </sci-form-field>
   </section>
 
   <section>
