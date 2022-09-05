@@ -1,34 +1,35 @@
-@use '__workbench' as workbench;
+@use '../../../theme/colors';
+@use '../../../theme/styles';
 
 $severity-border-size: 6px;
 $border-radius: 4px;
 
 :host {
   display: grid;
-  background-color: workbench.$colors-notification-bgcolor;
-  color: workbench.$colors-notification-fgcolor;
+  background-color: colors.$notification-bgcolor;
+  color: colors.$notification-fgcolor;
   font-size: 1rem;
   border-radius: $border-radius;
-  box-shadow: workbench.$styles-popup-box-shadow;
-  width: workbench.$styles-notification-width;
-  max-width: calc(100vw - #{2*workbench.$styles-notification-margin});
+  box-shadow: styles.$popup-box-shadow;
+  width: styles.$notification-width;
+  max-width: calc(100vw - #{2*styles.$notification-margin});
   border-left: $severity-border-size solid transparent;
   position: relative; // positioning context
 
   &.info {
-    border-left-color: workbench.$colors-info-color;
+    border-left-color: colors.$info-color;
   }
 
   &.warn {
-    border-left-color: workbench.$colors-warn-color;
+    border-left-color: colors.$warn-color;
   }
 
   &.error {
-    border-left-color: workbench.$colors-error-color;
+    border-left-color: colors.$error-color;
   }
 
   > div.outline {
-    border: 1px solid workbench.$colors-notification-border-color;
+    border: 1px solid colors.$notification-border-color;
     border-left: none;
     padding: 1em 1.5em;
     border-top-right-radius: $border-radius;

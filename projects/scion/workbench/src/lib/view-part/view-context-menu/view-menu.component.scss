@@ -1,4 +1,4 @@
-@use '__workbench' as workbench;
+@use '../../../../theme/colors';
 
 @mixin show-ellipsis-on-overflow {
   text-overflow: ellipsis;
@@ -10,13 +10,13 @@
   display: flex;
   flex-direction: column;
   width: 250px;
-  border: 1px solid workbench.$colors-viewlistitem-border-color;
-  background-color: workbench.$colors-viewpart_tab-active-bgcolor;
+  border: 1px solid colors.$viewlistitem-border-color;
+  background-color: colors.$viewpart_tab-active-bgcolor;
   box-shadow: 8px 8px 9px -9px rgba(0, 0, 0, 0.2);
 
   > div.menu-item-group {
     &:not(:last-child) {
-      border-bottom: 1px solid workbench.$colors-viewlistitem-border-color;
+      border-bottom: 1px solid colors.$viewlistitem-border-color;
     }
 
     > div.menu-item {
@@ -38,7 +38,7 @@
 
       &:hover {
         background-color: rgba(239, 239, 239, .5);
-        box-shadow: 0 0 0 1px workbench.$colors-viewlistitem-border-color;
+        box-shadow: 0 0 0 1px colors.$viewlistitem-border-color;
       }
 
       &.disabled {

@@ -1,4 +1,5 @@
-@use '__workbench' as workbench;
+@use '../../../theme/colors';
+@use '../../../theme/styles';
 
 $diamond-height: 8;
 
@@ -7,10 +8,10 @@ $diamond-height: 8;
 
   > ul.activity-bar {
     flex: none;
-    background-color: workbench.$colors-activitypart_toolbar-bgcolor;
+    background-color: colors.$activitypart_toolbar-bgcolor;
     margin: 0;
-    padding: workbench.$styles-topbar-height 0 0;
-    width: #{workbench.$styles-activitypart_toolbar-width}px;
+    padding: styles.$topbar-height 0 0;
+    width: #{styles.$activitypart_toolbar-width}px;
 
     > li {
       position: relative; // positioned anchor for diamond
@@ -23,11 +24,11 @@ $diamond-height: 8;
 
       > a {
         text-decoration: none;
-        color: workbench.$colors-activitypart_toolitem-fgcolor;
+        color: colors.$activitypart_toolitem-fgcolor;
         outline: none;
 
         &:hover, &:active, &.active {
-          color: workbench.$colors-activitypart_toolitem-active-fgcolor;
+          color: colors.$activitypart_toolitem-active-fgcolor;
         }
       }
 
@@ -37,7 +38,7 @@ $diamond-height: 8;
         top: calc(50% - #{$diamond-height}px);
         border: #{$diamond-height}px solid transparent;
         border-left-width: 0;
-        border-right-color: workbench.$colors-background-color;
+        border-right-color: colors.$background-color;
       }
     }
   }
@@ -47,7 +48,7 @@ $diamond-height: 8;
     flex-direction: column;
     display: flex;
     position: relative; // positioned anchor for sash
-    max-width: calc(100vw - #{workbench.$styles-activitypart_toolbar-width}px);
+    max-width: calc(100vw - #{styles.$activitypart_toolbar-width}px);
     overflow: hidden;
 
     > header {
@@ -55,10 +56,10 @@ $diamond-height: 8;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: workbench.$colors-activitypart_toolitem-active-fgcolor;
-      background-color: workbench.$colors-activitypart_panel-title-fgcolor;
-      height: workbench.$styles-topbar-height;
-      line-height: workbench.$styles-topbar-height;
+      color: colors.$activitypart_toolitem-active-fgcolor;
+      background-color: colors.$activitypart_panel-title-fgcolor;
+      height: styles.$topbar-height;
+      line-height: styles.$topbar-height;
       padding: 0 1em;
 
       > h1 {

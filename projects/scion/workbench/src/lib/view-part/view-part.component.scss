@@ -1,4 +1,4 @@
-@use '__workbench' as workbench;
+@use '../../../theme/styles';
 
 :host {
   position: absolute; // absolutely positioned anchor so that '<wb-view-part-bar>' does not overflow horizontally
@@ -10,7 +10,7 @@
 
   > wb-view-part-bar {
     flex: none;
-    height: workbench.$styles-viewtab-height;
+    height: styles.$viewtab-height;
   }
 
   > wb-portal-outlet {

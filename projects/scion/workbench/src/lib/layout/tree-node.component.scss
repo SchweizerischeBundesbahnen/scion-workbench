@@ -1,4 +1,4 @@
-@use '__workbench' as workbench;
+@use '../../../theme/colors';
 
 :host {
   display: block;
@@ -28,7 +28,7 @@
     --sci-sashbox-splitter-touch-target-size: 5px;
     --sci-sashbox-splitter-size_hover: 9px;
     --sci-sashbox-splitter-size: 1px;
-    --sci-sashbox-splitter-bgcolor: #{workbench.$colors-viewpart_sash-bgcolor};
+    --sci-sashbox-splitter-bgcolor: #{colors.$viewpart_sash-bgcolor};
     --sci-sashbox-splitter-opacity_active: .25;
     --sci-sashbox-splitter-opacity_hover: .125;
   }

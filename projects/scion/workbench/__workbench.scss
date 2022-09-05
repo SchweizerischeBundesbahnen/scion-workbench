@@ -1,8 +1,0 @@
-/**
- * Internal entry point for the @scion/workbench to access SASS modules.
- *
- * This entry point is excluded from the library build and not published to NPM.
- * See included assets in `@scion/workbench/ng-package.json`.
- */
-@forward './theme/colors' as colors-*;
-@forward './theme/styles' as styles-*;

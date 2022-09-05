@@ -1,9 +1,9 @@
-@use '__workbench' as workbench;
+@use '../../../../theme/colors';
 
 :host {
   display: flex;
-  background-color: workbench.$colors-viewpart_tabbar-bgcolor;
-  color: workbench.$colors-viewpart_tab-fgcolor;
+  background-color: colors.$viewpart_tabbar-bgcolor;
+  color: colors.$viewpart_tab-fgcolor;
   --drag-source-width: 0;
 
   > sci-viewport.tabbar {
