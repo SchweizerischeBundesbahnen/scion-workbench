@@ -1,4 +1,4 @@
-@use '__workbench' as workbench;
+@use '../../../theme/styles';
 
 :host {
   display: flex;
@@ -11,6 +11,6 @@
   > wb-notification {
     position: relative; // for slide-in notification
     pointer-events: auto;
-    margin: workbench.$styles-notification-margin;
+    margin: styles.$notification-margin;
   }
 }

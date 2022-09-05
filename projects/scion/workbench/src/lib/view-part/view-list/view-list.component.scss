@@ -1,10 +1,11 @@
-@use '__workbench' as workbench;
+@use '../../../../theme/colors';
+@use '../../../../theme/styles';
 
 :host {
   display: grid;
-  width: workbench.$styles-viewtab-max-width + 75px;
-  border: 1px solid workbench.$colors-viewlistitem-border-color;
-  background-color: workbench.$colors-viewpart_tab-active-bgcolor;
+  width: styles.$viewtab-max-width + 75px;
+  border: 1px solid colors.$viewlistitem-border-color;
+  background-color: colors.$viewpart_tab-active-bgcolor;
 
   > sci-viewport {
     max-height: 350px;
