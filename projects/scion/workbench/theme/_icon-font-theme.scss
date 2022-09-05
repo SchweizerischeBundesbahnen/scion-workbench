@@ -8,11 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+@use 'sass:map';
+
 /**
  * Provides SCION workbench icon font.
  */
 @mixin icon-font($theme) {
-  $font-path: map-get($theme, font-path);
+  $font-path: map.get($theme, font-path);
   $font-path: '/assets/fonts/' !default;
 
   @font-face {
