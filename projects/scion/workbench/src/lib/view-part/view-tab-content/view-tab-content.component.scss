@@ -23,14 +23,18 @@
 
 :host {
   display: grid;
-  grid-template-columns: 1fr; // the header grabs excess horizontal space
-  grid-template-rows: 1fr; // the header grabs excess vertical space
+  grid-template-columns: 1fr;
+  grid-template-rows: 1.5em auto;
   padding: .5em 1em;
+
+  &:not(.heading) {
+    grid-template-rows: 1fr;
+  }
 
   > div.title {
     @include show-ellipsis-on-overflow;
-    font-size: 16px;
     font-weight: 400;
+    font-size: 1em;
 
     > span.wb-icon-edit {
       padding-right: .2em;
@@ -39,7 +43,7 @@
 
   > div.heading {
     @include show-ellipsis-on-overflow;
-    font-size: 13px;
+    font-size: .9em;
     font-weight: 300;
   }
 
@@ -48,7 +52,6 @@
 
     cursor: pointer;
     visibility: hidden;
-    font-size: 16px;
     opacity: .75;
 
     &:hover {
@@ -75,7 +78,7 @@
 
     > button.close {
       grid-column: 2/3;
-      grid-row: 1/2;
+      grid-row: 1/-1;
       justify-self: end;
       align-self: start;
       position: relative;
@@ -86,7 +89,6 @@
 
   &[context="tabbar-dropdown"] {
     column-gap: 1.5em;
-    row-gap: .3em;
 
     > div.title {
       grid-column: 1/2;
@@ -100,7 +102,7 @@
 
     > button.close {
       grid-column: 2/3;
-      grid-row: 1/3;
+      grid-row: 1/-1;
       justify-self: end;
       align-self: center;
     }
