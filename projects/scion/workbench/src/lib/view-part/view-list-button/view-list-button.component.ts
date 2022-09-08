@@ -44,7 +44,7 @@ export class ViewListButtonComponent {
     const config = new OverlayConfig({
       scrollStrategy: this._overlay.scrollStrategies.noop(),
       hasBackdrop: true,
-      backdropClass: undefined,
+      backdropClass: 'cdk-overlay-transparent-backdrop',
       disposeOnNavigation: true,
       positionStrategy: this._overlay.position()
         .flexibleConnectedTo(this._host)
