@@ -22,6 +22,11 @@ export class ViewTabContentComponent {
   @HostBinding('attr.context')
   public context: ViewTabContext;
 
+  @HostBinding('class.heading')
+  public get hasHeading(): boolean {
+    return !!this.view.heading;
+  }
+
   constructor(public view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {
     this.context = context;
   }
