@@ -27,6 +27,8 @@ import {WorkbenchActivityPartService} from './workbench-activity-part.service';
  *                routerLink="user-account">
  *   </wb-activity>
  * </wb-workbench>
+ *
+ * @deprecated since version 14; API will be removed in version 16; no replacement
  */
 @Directive({selector: 'wb-activity', exportAs: 'activity'}) // eslint-disable-line @angular-eslint/directive-selector
 export class WbActivityDirective implements OnInit, OnDestroy {

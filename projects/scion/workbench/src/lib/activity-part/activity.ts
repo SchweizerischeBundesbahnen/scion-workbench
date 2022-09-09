@@ -8,6 +8,8 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
  * Represents an activity in the activity panel.
  *
  * Register this activity in {WorkbenchActivityPartService} and its route as primary Angular route.
+ *
+ * @deprecated since version 14; API will be removed in version 16; no replacement
  */
 export abstract class Activity {
 
