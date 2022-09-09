@@ -87,7 +87,7 @@ export class ViewPagePO {
     await this._locator.locator('button.e2e-close').click();
   }
 
-  public async addViewAction(viewpartAction: ViewpartAction | null, options?: {append?: boolean}): Promise<void> {
+  public async addViewAction(viewpartAction: ViewpartAction, options?: {append?: boolean}): Promise<void> {
     await assertElementVisible(this._locator);
 
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-viewpart-actions'));
@@ -95,11 +95,12 @@ export class ViewPagePO {
     try {
       const inputLocator = this._locator.locator('input.e2e-viewpart-actions');
       if (options?.append ?? true) {
-        const presentActions: ViewpartAction[] = coerceArray(JSON.parse(await inputLocator.inputValue() || null));
-        await inputLocator.fill(JSON.stringify(presentActions.concat(viewpartAction || [])));
+        const input = await inputLocator.inputValue() || null;
+        const presentActions: ViewpartAction[] = coerceArray(input ? JSON.parse(input) : null);
+        await inputLocator.fill(JSON.stringify(presentActions.concat(viewpartAction)));
       }
       else {
-        await inputLocator.fill(JSON.stringify([].concat(viewpartAction || [])));
+        await inputLocator.fill(JSON.stringify(new Array<ViewpartAction>().concat(viewpartAction)));
       }
     }
     finally {

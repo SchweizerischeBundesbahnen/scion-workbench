@@ -23,8 +23,7 @@ export async function isCssClassPresent(element: Locator, cssClass: string): Pro
  * Returns CSS classes on given element.
  */
 export async function getCssClasses(element: Locator): Promise<string[]> {
-  const classAttr: string = await element.getAttribute('class');
-  return classAttr.split(/\s+/);
+  return (await element.getAttribute('class'))?.split(/\s+/) || [];
 }
 
 /**
@@ -59,7 +58,7 @@ export async function isPresent(element: Locator): Promise<boolean> {
  * This function returns the bounding box if it hasn't changed for 100ms.
  */
 export async function waitUntilBoundingBoxStable(element: Locator): Promise<DOMRect> {
-  const isStable = (first, second): boolean => first.x === second.x && first.y === second.y && first.width === second.width && first.height === second.height;
+  const isStable = (first: DOMRect, second: DOMRect): boolean => first.x === second.x && first.y === second.y && first.width === second.width && first.height === second.height;
   return waitUntilStable(async () => fromRect(await element.boundingBox()), {isStable});
 }
 

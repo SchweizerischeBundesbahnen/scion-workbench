@@ -35,9 +35,9 @@ export class ConsoleLogs {
       this._messages = [];
     }
     return messages
-      .filter(message => options.severity === undefined || message.type() === options.severity)
+      .filter(message => options?.severity === undefined || message.type() === options.severity)
       .map(message => message.text())
-      .filter(message => options.filter === undefined || message.match(options.filter));
+      .filter(message => options?.filter === undefined || message.match(options.filter));
   }
 }
 

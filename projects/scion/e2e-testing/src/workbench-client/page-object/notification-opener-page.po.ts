@@ -21,7 +21,7 @@ import {ElementSelectors} from '../../helper/element-selectors';
 export class NotificationOpenerPagePO {
 
   private readonly _locator: Locator;
-  private _cssClasses: string[];
+  private _cssClasses = new Array<string>();
 
   constructor(private _appPO: AppPO, public viewId: string) {
     this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-notification-opener-page');
@@ -75,7 +75,7 @@ export class NotificationOpenerPagePO {
   public async clickShow(): Promise<void> {
     await assertElementVisible(this._locator);
 
-    if (!this._cssClasses || !this._cssClasses.length) {
+    if (!this._cssClasses.length) {
       throw Error('Missing required CSS class to wait for the notification to display.');
     }
 

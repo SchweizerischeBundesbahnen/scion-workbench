@@ -398,7 +398,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.enterContextualViewId(startPagePO.viewId);
+      await popupOpenerPagePO.enterContextualViewId(startPagePO.viewId!);
       await popupOpenerPagePO.selectAnchor('coordinate');
       await popupOpenerPagePO.clickOpen();
 
@@ -408,7 +408,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPO.isVisible()).toBe(false);
 
       // activate the view to which the popup is bound to
-      await startPagePO.viewTabPO.activate();
+      await startPagePO.viewTabPO!.activate();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 

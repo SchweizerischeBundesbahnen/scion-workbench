@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible} from '../../helper/testing.util';
+import {assertElementVisible, fromRect} from '../../helper/testing.util';
 import {AppPO, PopupPO} from '../../app.po';
 import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
@@ -143,7 +143,7 @@ export class PopupPagePO {
 
   public async getSize(): Promise<Size> {
     await assertElementVisible(this._locator);
-    const {width, height} = await this._locator.boundingBox();
+    const {width, height} = fromRect(await this._locator.boundingBox());
     return {width, height};
   }
 }

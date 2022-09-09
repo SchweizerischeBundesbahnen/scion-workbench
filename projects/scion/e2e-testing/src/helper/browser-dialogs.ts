@@ -17,7 +17,7 @@ import {firstValueFrom, timer} from 'rxjs';
 export function installDialogAutoAcceptHandler(page: Page, options?: {confirmDelay?: number}): BrowserDialogs {
   const browserDialogCollector: BrowserDialogs = new BrowserDialogs();
   page.on('dialog', async dialog => {
-    if (options.confirmDelay) {
+    if (options?.confirmDelay) {
       await firstValueFrom(timer(options.confirmDelay));
     }
 

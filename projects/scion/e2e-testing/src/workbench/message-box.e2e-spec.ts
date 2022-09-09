@@ -223,9 +223,9 @@ test.describe('Workbench Message Box', () => {
   test('should allow opening a message box in any view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const viewTab1PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
-    const viewTab2PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
-    const viewTab3PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
+    const viewTab1PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
+    const viewTab2PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
+    const viewTab3PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
 
     // open the message box in view 2
     const msgboxOpenerPagePO = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
@@ -262,9 +262,9 @@ test.describe('Workbench Message Box', () => {
     // FIXME: this test will run as soon as https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/344 is fixed
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const viewTab1PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
-    const viewTab2PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
-    const viewTab3PO = (await appPO.openNewViewTab()).viewPO.viewTabPO;
+    const viewTab1PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
+    const viewTab2PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
+    const viewTab3PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
 
     // open the message box in view 2
     const msgboxOpenerPagePO = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);

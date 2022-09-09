@@ -36,8 +36,8 @@ export class TextMessagePO {
     const text = await this._locator.innerText();
 
     await this._locator.dblclick();
-    const selection: string = await this._page.evaluate(() => window.getSelection().toString());
+    const selection: string | undefined = await this._page.evaluate(() => window.getSelection()?.toString());
 
-    return selection && selection.length && text.includes(selection);
+    return selection?.length && text.includes(selection) || false;
   }
 }

@@ -7,6 +7,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "target": "es2020",
+    "strict": true,
     "types": [
       "node"
     ],

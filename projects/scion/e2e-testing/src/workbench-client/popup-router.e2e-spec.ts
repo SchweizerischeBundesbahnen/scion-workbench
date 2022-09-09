@@ -193,7 +193,7 @@ test.describe('Popup Router', () => {
     await expect(await popupPageApp1aPO.popupPO.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPageApp1aPO.getPopupCapability()).metadata.appSymbolicName).toEqual('workbench-client-testing-app1');
+    await expect((await popupPageApp1aPO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
 
     // open the second popup for app-1
     const popupOpenerApp1bPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
@@ -206,7 +206,7 @@ test.describe('Popup Router', () => {
     await expect(await popupPageApp1bPO.popupPO.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPageApp1bPO.getPopupCapability()).metadata.appSymbolicName).toEqual('workbench-client-testing-app1');
+    await expect((await popupPageApp1bPO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
 
     // open the popup for app-2
     const popupOpenerApp2PagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app2');
@@ -219,7 +219,7 @@ test.describe('Popup Router', () => {
     await expect(await popupPageApp2PO.popupPO.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPageApp2PO.getPopupCapability()).metadata.appSymbolicName).toEqual('workbench-client-testing-app2');
+    await expect((await popupPageApp2PO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app2');
   });
 
   test('should throw when the requested popup has no microfrontend path declared', async ({page, appPO, microfrontendNavigator}) => {
@@ -317,7 +317,7 @@ test.describe('Popup Router', () => {
     await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPagePO.getPopupCapability()).metadata.appSymbolicName).toEqual('workbench-client-testing-app1');
+    await expect((await popupPagePO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
   });
 
   test('should not throw if another app provides an equivalent public popup capability if not declared an intention', async ({appPO, microfrontendNavigator}) => {
@@ -354,7 +354,7 @@ test.describe('Popup Router', () => {
     await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPagePO.getPopupCapability()).metadata.appSymbolicName).toEqual('workbench-client-testing-app1');
+    await expect((await popupPagePO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
   });
 
   test('should log warning if another app provides an equivalent public popup capability', async ({appPO, microfrontendNavigator, consoleLogs}) => {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, isPresent} from '../../helper/testing.util';
+import {assertElementVisible, fromRect, isPresent} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {Params} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
@@ -177,7 +177,7 @@ export class ViewPagePO {
   }
 
   public async getSize(): Promise<Size> {
-    const {width, height} = await this.locator.boundingBox();
+    const {width, height} = fromRect(await this.locator.boundingBox());
     return {width, height};
   }
 
