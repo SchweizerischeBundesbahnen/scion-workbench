@@ -26,6 +26,8 @@ import {Disposable} from '../disposable';
  *     <mat-icon>add</mat-icon>
  *   </button>
  * </ng-template>
+ *
+ * @deprecated since version 14; API will be removed in version 16; no replacement
  */
 @Directive({
   selector: 'ng-template[wbActivityAction]',
