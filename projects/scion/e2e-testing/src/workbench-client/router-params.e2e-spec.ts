@@ -56,7 +56,9 @@ test.describe('Workbench Router', () => {
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {entity: 'product', id: '*'},
-      requiredParams: ['readonly'],
+      params: [
+        {name: 'readonly', required: true},
+      ],
       properties: {
         path: 'test-view',
         title: 'testee',
@@ -91,7 +93,9 @@ test.describe('Workbench Router', () => {
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {entity: 'product', id: '*'},
-      requiredParams: ['id'],
+      params: [
+        {name: 'id', required: true},
+      ],
       properties: {
         path: 'test-view',
         title: 'testee',
@@ -125,7 +129,12 @@ test.describe('Workbench Router', () => {
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee', seg1: '*', mp1: '*', qp1: '*'},
-      requiredParams: ['seg3', 'mp2', 'qp2', 'fragment'],
+      params: [
+        {name: 'seg3', required: true},
+        {name: 'mp2', required: true},
+        {name: 'qp2', required: true},
+        {name: 'fragment', required: true},
+      ],
       properties: {
         path: 'test-view/:seg1/segment2/:seg3;mp1=:mp1;mp2=:mp2?qp1=:qp1&qp2=:qp2#:fragment',
         title: 'testee',
@@ -168,7 +177,9 @@ test.describe('Workbench Router', () => {
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {entity: 'product', id: '*'},
-      requiredParams: ['readonly'],
+      params: [
+        {name: 'readonly', required: true},
+      ],
       properties: {
         path: 'test-view',
         title: 'testee',
