@@ -57,7 +57,7 @@ export class RegisterWorkbenchIntentionPagePO {
     await this._locator.locator('select.e2e-type').selectOption(type);
   }
 
-  public async enterQualifier(qualifier: Qualifier): Promise<void> {
+  public async enterQualifier(qualifier: Qualifier | undefined): Promise<void> {
     await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
     await paramsEnterPO.clear();

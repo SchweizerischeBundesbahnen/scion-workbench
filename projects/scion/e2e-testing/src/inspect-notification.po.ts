@@ -47,7 +47,7 @@ export class InspectNotificationPO {
     await assertElementVisible(this._locator);
 
     const rawContent = await this.getInput();
-    const map = {};
+    const dictionary: Record<string, any> = {};
 
     // Sample Map content:
     // {"$implicit" => undefined}
@@ -59,13 +59,13 @@ export class InspectNotificationPO {
     // {"ɵTIMESTAMP" => 1611329911731}
     const mapEntryRegex = /{"(?<key>.+)" => (?<value>.+)}/g;
 
-    let match: RegExpExecArray;
+    let match: RegExpExecArray | null;
     while (match = mapEntryRegex.exec(rawContent)) {
-      const key = match.groups['key'];
-      const value = match.groups['value'];
-      map[key] = value === 'undefined' ? undefined : JSON.parse(value);
+      const key = match.groups!['key'];
+      const value = match.groups!['value'];
+      dictionary[key] = value === 'undefined' ? undefined : JSON.parse(value);
     }
-    return map;
+    return dictionary;
   }
 
   public async enterTitle(title: string): Promise<void> {

@@ -14,7 +14,7 @@ import {Locator, Page} from '@playwright/test';
 
 export class AppPO {
 
-  private _workbenchStartupQueryParams: URLSearchParams;
+  private _workbenchStartupQueryParams!: URLSearchParams;
 
   constructor(public readonly page: Page) {
   }
@@ -80,7 +80,7 @@ export class AppPO {
       }
 
       public async getViewId(): Promise<string> {
-        return viewTabLocator.getAttribute('data-viewid');
+        return (await viewTabLocator.getAttribute('data-viewid'))!;
       }
 
       public async activate(): Promise<void> {
@@ -161,7 +161,7 @@ export class AppPO {
       }
 
       public async getViewId(): Promise<string> {
-        return viewLocator.getAttribute('data-viewid');
+        return (await viewLocator.getAttribute('data-viewid'))!;
       }
 
       public waitUntilPresent(): Promise<void> {
@@ -188,7 +188,7 @@ export class AppPO {
       }
 
       public async getPartId(): Promise<string> {
-        return partLocator.getAttribute('data-partid');
+        return (await partLocator.getAttribute('data-partid'))!;
       }
 
       public locator(selector: string): Locator {
@@ -220,7 +220,7 @@ export class AppPO {
     const viewReferences = [];
 
     for (let i = 0; i < await viewTabsLocator.count(); i++) {
-      viewReferences.push(await viewTabsLocator.nth(i).getAttribute('data-viewid'));
+      viewReferences.push((await viewTabsLocator.nth(i).getAttribute('data-viewid'))!);
     }
 
     return viewReferences;
@@ -354,7 +354,7 @@ export class AppPO {
         return notificationLocator.locator('header.e2e-title').innerText();
       }
 
-      public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
+      public async getSeverity(): Promise<'info' | 'warn' | 'error' |  null> {
         const cssClasses = await getCssClasses(notificationLocator);
         if (cssClasses.includes('e2e-severity-info')) {
           return 'info';
@@ -368,7 +368,7 @@ export class AppPO {
         return null;
       }
 
-      public async getDuration(): Promise<'short' | 'medium' | 'long' | 'infinite'> {
+      public async getDuration(): Promise<'short' | 'medium' | 'long' | 'infinite' | null> {
         const cssClasses = await getCssClasses(notificationLocator);
         if (cssClasses.includes('e2e-duration-short')) {
           return 'short';
@@ -457,7 +457,7 @@ export class AppPO {
         for (let i = 0; i < count; i++) {
           const action = await actionsLocator.nth(i);
           const cssClasses = await getCssClasses(action);
-          const actionKey = cssClasses.find(candidate => candidate.startsWith('e2e-action-key-'));
+          const actionKey = cssClasses.find(candidate => candidate.startsWith('e2e-action-key-'))!;
           actions[actionKey.substring('e2e-action-key-'.length)] = await action.innerText();
         }
 
