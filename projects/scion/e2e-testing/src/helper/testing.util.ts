@@ -64,10 +64,10 @@ export async function waitUntilBoundingBoxStable(element: Locator): Promise<DOMR
 
 /**
  * Waits for a value to become stable.
- * This function returns the value if it hasn't changed for 100ms.
+ * This function returns the value if it hasn't changed during `probeInterval` (defaults to 100ms).
  */
-export async function waitUntilStable<A>(value: () => Promise<A>, options?: {isStable?: (previous: A, current: A) => boolean}): Promise<A> {
-  const value$ = timer(0, 100)
+export async function waitUntilStable<A>(value: () => Promise<A>, options?: {isStable?: (previous: A, current: A) => boolean; probeInterval?: number}): Promise<A> {
+  const value$ = timer(0, options?.probeInterval ?? 100)
     .pipe(
       switchMap(() => value()),
       pairwise(),

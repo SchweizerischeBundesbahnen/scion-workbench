@@ -136,7 +136,7 @@ export class RegisterWorkbenchCapabilityPagePO {
     }
   }
 
-  public async clickRegister(): Promise<void> {
+  private async clickRegister(): Promise<void> {
     await assertElementVisible(this._locator);
     await this._locator.locator('button.e2e-register').click();
   }
