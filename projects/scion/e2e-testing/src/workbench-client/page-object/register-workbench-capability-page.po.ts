@@ -58,16 +58,16 @@ export class RegisterWorkbenchCapabilityPagePO {
       await paramsEnterPO.clear();
       await paramsEnterPO.enterParams(capability.qualifier);
     }
-    const requiredParams = [...(capability.requiredParams ?? []), ...(capability.params ?? []).filter(param => !param['transient'] && param.required).map(param => param.name)];
-    const optionalParams = [...(capability.optionalParams ?? []), ...(capability.params ?? []).filter(param => !param['transient'] && !param.required).map(param => param.name)];
-    const transientParams = (capability.params ?? []).filter(param => param['transient']).map(param => param.name);
-    if (requiredParams.length) {
+    const requiredParams = capability.params?.filter(param => param.required && !param.transient).map(param => param.name);
+    const optionalParams = capability.params?.filter(param => !param.required && !param.transient).map(param => param.name);
+    const transientParams = capability.params?.filter(param => param.transient).map(param => param.name);
+    if (requiredParams?.length) {
       await this._locator.locator('input.e2e-required-params').fill(requiredParams.join(','));
     }
-    if (optionalParams.length) {
+    if (optionalParams?.length) {
       await this._locator.locator('input.e2e-optional-params').fill(optionalParams.join(','));
     }
-    if (transientParams.length) {
+    if (transientParams?.length) {
       await this._locator.locator('input.e2e-transient-params').fill(transientParams.join(','));
     }
     if (capability.private !== undefined) {

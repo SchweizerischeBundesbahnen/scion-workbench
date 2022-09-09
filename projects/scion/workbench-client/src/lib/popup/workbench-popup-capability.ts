@@ -41,13 +41,12 @@ export interface WorkbenchPopupCapability extends Capability {
      * ```json
      * {
      *   "type": "popup",
-     *   "qualifier": {
-     *     "entity": "product",
-     *     "id": "*",
-     *   },
-     *   "requiredParams": ["readonly"],
+     *   "qualifier": {"entity": "product"},
+     *   "params": [
+     *     {"name": "id", "required":  true, "description": "Identifies the product."}
+     *   ],
      *   "properties": {
-     *     "path": "product/:id?readonly=:readonly",
+     *     "path": "product/:id",
      *     ...
      *   }
      * }

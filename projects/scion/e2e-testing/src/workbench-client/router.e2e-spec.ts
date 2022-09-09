@@ -716,7 +716,9 @@ test.describe('Workbench Router', () => {
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee'},
-      optionalParams: ['param1'],
+      params: [
+        {name: 'param1', required: false},
+      ],
       properties: {
         path: 'test-view',
         title: 'VIEW TITLE',
@@ -768,7 +770,9 @@ test.describe('Workbench Router', () => {
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee'},
-      optionalParams: ['param1'],
+      params: [
+        {name: 'param1', required: false},
+      ],
       properties: {
         path: 'test-view',
         title: 'testee',
