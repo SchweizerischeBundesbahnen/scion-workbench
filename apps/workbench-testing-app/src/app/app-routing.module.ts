@@ -49,6 +49,11 @@ const routes: Routes = [
     path: 'host-popup',
     loadChildren: (): any => import('./host-popup-page/host-popup-page.module').then(m => m.HostPopupPageModule),
   },
+  {
+    path: 'test-bulk-navigation',
+    loadChildren: (): any => import('./bulk-navigation-page/bulk-navigation-page.module').then(m => m.BulkNavigationPageModule),
+    data: {title: 'Bulk Navigation', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-bulk-navigation'},
+  },
 ];
 
 @NgModule({

@@ -1,0 +1,8 @@
+<form autocomplete="off" [formGroup]="form">
+  <sci-form-field label="View Count">
+    <input [formControlName]="VIEW_COUNT" type="number" class="e2e-view-count">
+  </sci-form-field>
+</form>
+
+<button (click)="onNavigate()" [disabled]="form.invalid" class="e2e-navigate">Navigate</button>
+<button (click)="onNavigateAwait()" [disabled]="form.invalid" class="e2e-navigate-await">Navigate (with await)</button>

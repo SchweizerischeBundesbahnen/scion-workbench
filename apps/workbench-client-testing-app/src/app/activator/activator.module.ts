@@ -201,5 +201,23 @@ export class ActivatorModule {
         cssClass: 'e2e-test-notification',
       },
     });
+
+    // Register view to test bulk navigation, i.e. navigating to multiple views very quickly.
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
+      type: WorkbenchCapabilities.View,
+      qualifier: {
+        component: 'bulk-navigation',
+        app,
+      },
+      description: '[e2e] Allows testing bulk navigation',
+      private: false,
+      properties: {
+        path: 'test-bulk-navigation',
+        pinToStartPage: false,
+        title: 'Bulk Navigation',
+        heading,
+        cssClass: 'e2e-test-bulk-navigation',
+      },
+    });
   }
 }

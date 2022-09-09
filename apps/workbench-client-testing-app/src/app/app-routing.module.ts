@@ -52,6 +52,10 @@ const routes: Routes = [
     path: 'register-workbench-intention',
     loadChildren: (): any => import('./register-workbench-intention-page/register-workbench-intention-page.module').then(m => m.RegisterWorkbenchIntentionPageModule),
   },
+  {
+    path: 'test-bulk-navigation',
+    loadChildren: (): any => import('./bulk-navigation-page/bulk-navigation-page.module').then(m => m.BulkNavigationPageModule),
+  },
 ];
 
 @NgModule({
