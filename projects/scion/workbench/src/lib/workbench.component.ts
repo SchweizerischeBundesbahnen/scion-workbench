@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Inject, Injector, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, HostBinding, Inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {IFRAME_HOST, VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference} from './content-projection/view-container.reference';
 import {map, takeUntil} from 'rxjs/operators';
@@ -56,10 +56,8 @@ export class WorkbenchComponent implements OnDestroy {
   constructor(private _workbenchLayout: WorkbenchLayoutService,
               @Inject(IFRAME_HOST) private _iframeHost: ViewContainerReference,
               @Inject(VIEW_LOCAL_MESSAGE_BOX_HOST) private _viewLocalMessageBoxHost: ViewContainerReference,
-              public injector: Injector,
               workbenchModuleConfig: WorkbenchModuleConfig,
               workbenchLauncher: WorkbenchLauncher,
-              layoutService: WorkbenchLayoutService,
               activityPartService: WorkbenchActivityPartService,
               logger: Logger) {
     logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
@@ -72,7 +70,7 @@ export class WorkbenchComponent implements OnDestroy {
         map(activities => activities.length > 0),
       );
 
-    layoutService.dragging$
+    this._workbenchLayout.dragging$
       .pipe(takeUntil(this._destroy$))
       .subscribe(event => {
         this.dragging = (event === 'start');

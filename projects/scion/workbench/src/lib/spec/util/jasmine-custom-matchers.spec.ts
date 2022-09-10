@@ -12,11 +12,13 @@ import CustomMatcher = jasmine.CustomMatcher;
 import MatchersUtil = jasmine.MatchersUtil;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
-import {ComponentFixture} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {PartsLayoutComponent} from '../../layout/parts-layout.component';
 import {DebugElement, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {MPart, MTreeNode} from '../../layout/parts-layout.model';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WorkbenchViewPartRegistry} from '../../view-part/workbench-view-part.registry';
 
 /**
  * Extends the Jasmine expect API to support chaining with project specific custom matchers.
@@ -47,6 +49,11 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
    * Expects a component of the given type to show.
    */
   toShow(expectedComponentType: Type<any>, expectationFailOutput?: any): boolean;
+
+  /**
+   * Expects a view to be registered in the view and viewpart registry.
+   */
+  toBeRegistered(expected: {partId: string; active: boolean; transientState: string}, expectationFailOutput?: any): boolean;
 }
 
 /**
@@ -55,6 +62,7 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
 export const jasmineCustomMatchers: jasmine.CustomMatcherFactories = {
   toEqualPartsLayout: (util: MatchersUtil): CustomMatcher => createToEqualPartsLayoutMatcher(util),
   toShow: (util: MatchersUtil): CustomMatcher => createToShowMatcher(util),
+  toBeRegistered: (util: MatchersUtil): CustomMatcher => toBeRegisteredMatcher(util),
 };
 
 function createToShowMatcher(util: MatchersUtil): CustomMatcher {
@@ -153,6 +161,53 @@ function createToEqualPartsLayoutMatcher(util: MatchersUtil): CustomMatcher {
       throw Error('[IllegalArgumentError] Layout must be of type \'TreeNode\' or \'Part\'');
     }
   }
+}
+
+function toBeRegisteredMatcher(util: MatchersUtil): CustomMatcher {
+  return {
+    compare(viewId: string, expected: {partId: string; active: boolean; transientState: string}, ...args: any[]): CustomMatcherResult {
+      const failOutput = args[0];
+      const msgFn = (msg: string): string => [msg, failOutput].filter(Boolean).join(', ');
+
+      const view = TestBed.inject(WorkbenchViewRegistry).getElseNull(viewId);
+      // Check the view to be registered.
+      if (!view) {
+        return {pass: false, message: msgFn(`Expected view '${viewId}' to be registered in 'WorkbenchViewRegistry'.`)};
+      }
+      // Check the view's expected part.
+      if (view.part.partId !== expected.partId) {
+        return {pass: false, message: msgFn(`Expected view '${viewId}' to reference part '${expected.partId}', but instead referencing part '${view.part.partId}'.`)};
+      }
+      // Check the expected part to contain the view.
+      if (!TestBed.inject(WorkbenchViewPartRegistry).getElseNull(expected.partId)?.viewIds.includes(viewId)) {
+        return {pass: false, message: msgFn(`Expected view '${viewId}' to be contained in part '${expected.partId}'. But, part '${expected.partId}' contains the following views: '${TestBed.inject(WorkbenchViewPartRegistry).getElseNull(expected.partId)?.viewIds}'.`)};
+      }
+      // Check the view's active state.
+      if (expected.active) {
+        if (!view.active) {
+          return {pass: false, message: msgFn(`Expected view '${viewId}' to be active.`)};
+        }
+        if (view.part.activeViewId !== view.viewId) {
+          return {pass: false, message: msgFn(`Expected view '${viewId}' to be the active view in its part '${view.part.partId}', But, view '${view.part.activeViewId}' is the active view.`)};
+        }
+      }
+      else {
+        if (view.active) {
+          return {pass: false, message: msgFn(`Expected view '${viewId}' to be inactive.`)};
+        }
+        if (view.part.activeViewId === view.viewId) {
+          return {pass: false, message: msgFn(`Expected view '${viewId}' to be inactive, but is the active view in its part '${view.part.partId}'.`)};
+        }
+      }
+      // Check the components transient state.
+      const actualTransientState = view.portal.componentRef.location.nativeElement.querySelector('input.transient-state').value;
+      if (actualTransientState !== expected.transientState) {
+        return {pass: false, message: msgFn(`Expected transient state '${actualTransientState}' to equal '${expected.transientState}'. It looks like the component was not detached and therefore was re-created.`)};
+      }
+
+      return {pass: true};
+    },
+  };
 }
 
 // Jasmine: Use equals matcher in a custom matcher

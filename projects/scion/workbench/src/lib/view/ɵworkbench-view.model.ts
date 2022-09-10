@@ -9,31 +9,27 @@
  */
 
 import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
-import {WbComponentPortal} from '../portal/wb-component-portal';
 import {ViewActivationInstantProvider} from './view-activation-instant-provider.service';
-import {Router, UrlSegment} from '@angular/router';
+import {ChildrenOutletContexts, Router, UrlSegment} from '@angular/router';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WorkbenchViewPartRegistry} from '../view-part/workbench-view-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Arrays} from '@scion/toolkit/util';
-import {Injector, Type} from '@angular/core';
 import {Disposable} from '../disposable';
 import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
 import {WorkbenchView} from './workbench-view.model';
 import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
+import {ComponentType} from '@angular/cdk/portal';
+import {WbComponentPortal} from '../portal/wb-component-portal';
+import {ROUTER_OUTLET_NAME} from '../workbench.constants';
+import {inject} from '@angular/core';
 
 export class ɵWorkbenchView implements WorkbenchView {
 
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
-  private readonly _workbench: ɵWorkbenchService;
-  private readonly _layoutService: WorkbenchLayoutService;
-  private readonly _viewPartRegistry: WorkbenchViewPartRegistry;
-  private readonly _viewDragService: ViewDragService;
-  private readonly _router: Router;
-  private readonly _viewActivationInstantProvider: ViewActivationInstantProvider;
 
   public title: string | null = null;
   public heading: string | null = null;
@@ -48,19 +44,17 @@ export class ɵWorkbenchView implements WorkbenchView {
   public readonly cssClasses$: BehaviorSubject<string[]>;
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
   public readonly blocked$ = new BehaviorSubject(false);
+  public readonly portal: WbComponentPortal<any>;
 
   constructor(public readonly viewId: string,
-              public readonly portal: WbComponentPortal<any>, // do not reference `ViewComponent` to avoid import cycles
-              active: boolean,
-              injector: Injector) {
-    this._workbench = injector.get(ɵWorkbenchService);
-    this._layoutService = injector.get(WorkbenchLayoutService);
-    this._viewPartRegistry = injector.get(WorkbenchViewPartRegistry);
-    this._viewDragService = injector.get(ViewDragService);
-    this._router = injector.get(Router);
-    this._viewActivationInstantProvider = injector.get(ViewActivationInstantProvider);
-
-    this.active$ = new BehaviorSubject<boolean>(active);
+              viewComponent: ComponentType<any>, // do not reference `ViewComponent` to avoid import cycles
+              private _workbench: ɵWorkbenchService = inject(ɵWorkbenchService),
+              private _layoutService: WorkbenchLayoutService = inject(WorkbenchLayoutService),
+              private _viewPartRegistry: WorkbenchViewPartRegistry = inject(WorkbenchViewPartRegistry),
+              private _viewDragService: ViewDragService = inject(ViewDragService),
+              private _router: Router = inject(Router),
+              private _viewActivationInstantProvider: ViewActivationInstantProvider = inject(ViewActivationInstantProvider)) {
+    this.active$ = new BehaviorSubject<boolean>(false);
     this.cssClasses$ = new BehaviorSubject<string[]>([]);
     this.dirty = false;
     this.closable = true;
@@ -71,6 +65,21 @@ export class ɵWorkbenchView implements WorkbenchView {
         mapArray<WorkbenchMenuItemFactoryFn, WorkbenchMenuItem>(menuItemFactoryFn => menuItemFactoryFn(this)),
         filterArray<WorkbenchMenuItem>(Boolean),
       );
+
+    this.portal = this.createPortal(viewComponent);
+  }
+
+  private createPortal(viewComponent: ComponentType<any>): WbComponentPortal<any> {
+    return new WbComponentPortal(viewComponent, {
+      providers: [
+        {provide: ROUTER_OUTLET_NAME, useValue: this.viewId},
+        {provide: ɵWorkbenchView, useValue: this},
+        {provide: WorkbenchView, useExisting: ɵWorkbenchView},
+        // Provide the root parent outlet context, crucial if the outlet is not instantiated at the time the route gets activated (e.g., if inside a `ngIf`, as it is in {ViewComponent}).
+        // Otherwise, the outlet would not render the activated route.
+        {provide: ChildrenOutletContexts, useValue: inject(ChildrenOutletContexts)},
+      ],
+    });
   }
 
   public get first(): boolean {
@@ -98,6 +107,9 @@ export class ɵWorkbenchView implements WorkbenchView {
   }
 
   public activate(activate: boolean): void {
+    if (activate === this.active) {
+      return;
+    }
     if (activate) {
       this.activationInstant = this._viewActivationInstantProvider.instant;
     }
@@ -106,15 +118,6 @@ export class ɵWorkbenchView implements WorkbenchView {
 
   public get part(): WorkbenchViewPart {
     // DO NOT resolve the part at construction time because it can change, e.g. when this view is moved to another part.
-
-    // Lookup the part from the element injector.
-    // The element injector is only available for the currently active view. Inactive views are removed
-    // from the Angular component tree and have, therefore, no element injector.
-    const viewPart = this.portal.injector.get(WorkbenchViewPart as Type<WorkbenchViewPart>, null);
-    if (viewPart !== null) {
-      return viewPart;
-    }
-
     const part = this._layoutService.layout!.findPartByViewId(this.viewId, {orElseThrow: true});
     return this._viewPartRegistry.getElseThrow(part.partId);
   }

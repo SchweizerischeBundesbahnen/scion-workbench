@@ -31,10 +31,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   constructor(private _wbRouter: WorkbenchRouter,
               private _viewRegistry: WorkbenchViewRegistry,
               private _layoutService: WorkbenchLayoutService) {
-    this.views$ = this._layoutService.layout$.pipe(map(layout => layout.parts.reduce(
-      (viewIds, part) => viewIds.concat(part.viewIds),
-      new Array<string>())),
-    );
+    this.views$ = this._layoutService.layout$.pipe(map(layout => layout.viewsIds));
   }
 
   public destroyView(...viewIds: string[]): Promise<boolean> {
