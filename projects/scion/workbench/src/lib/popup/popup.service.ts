@@ -46,7 +46,7 @@ export class PopupService {
               private _focusManager: FocusMonitor,
               private _viewRegistry: WorkbenchViewRegistry,
               private _zone: NgZone,
-              @Inject(DOCUMENT) private _document: any,
+              @Inject(DOCUMENT) private _document: Document,
               @Optional() private _view: WorkbenchView) {
   }
 

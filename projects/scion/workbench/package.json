@@ -20,20 +20,28 @@
     }
   },
   "dependencies": {
-    "tslib": "^2.0.0"
+    "tslib": "^2.3.0"
   },
   "peerDependencies": {
-    "@angular/common": "^13.0.0",
-    "@angular/core": "^13.0.0",
-    "@angular/cdk": "^13.0.0",
-    "@angular/animations": "^13.0.0",
-    "@angular/forms": "^13.0.0",
-    "@angular/router": "^13.0.0",
-    "@scion/components": "^13.0.0-0",
+    "@angular/common": "^14.0.0",
+    "@angular/core": "^14.0.0",
+    "@angular/cdk": "^14.0.0",
+    "@angular/animations": "^14.0.0",
+    "@angular/forms": "^14.0.0",
+    "@angular/router": "^14.0.0",
+    "@scion/components": "^14.0.0-0",
     "@scion/toolkit": "^1.0.0-0",
     "@scion/microfrontend-platform": "^1.0.0-0",
     "@scion/workbench-client": "^1.0.0-0",
     "rxjs": "^7.5.0"
+  },
+  "peerDependenciesMeta": {
+    "@scion/microfrontend-platform": {
+      "optional": true
+    },
+    "@scion/workbench-client": {
+      "optional": true
+    }
   },
   "keywords": [
     "scion",

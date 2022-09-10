@@ -9,7 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {WorkbenchNotificationService} from '@scion/workbench-client';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 
@@ -38,11 +38,11 @@ export class NotificationOpenerPageComponent {
   public readonly GROUP = GROUP;
   public readonly CSS_CLASS = CSS_CLASS;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
   public error: string;
 
-  constructor(formBuilder: FormBuilder, private _notificationService: WorkbenchNotificationService) {
+  constructor(formBuilder: UntypedFormBuilder, private _notificationService: WorkbenchNotificationService) {
     this.form = formBuilder.group({
       [QUALIFIER]: formBuilder.array([]),
       [PARAMS]: formBuilder.array([]),
@@ -56,8 +56,8 @@ export class NotificationOpenerPageComponent {
   }
 
   public onNotificationShow(): void {
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray);
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as FormArray);
+    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray);
+    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as UntypedFormArray);
 
     this.error = null;
     this._notificationService.show({

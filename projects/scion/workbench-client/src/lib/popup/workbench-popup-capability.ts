@@ -66,7 +66,7 @@ export interface WorkbenchPopupCapability extends Capability {
     /**
      * Specifies the preferred popup size.
      *
-     * If not set, the popup will adjust its size to the content size reported by the embedded content using {@link PreferredSizeService}.
+     * If not set, the popup will adjust its size to the content size reported by the embedded content using {@link @scion/microfrontend-platform!PreferredSizeService}.
      * Note that the microfrontend may take some time to load, causing the popup to flicker when opened. Therefore, for fixed-sized popups,
      * consider declaring the popup size in the popup capability.
      */

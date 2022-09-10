@@ -9,7 +9,7 @@
  */
 
 import {Component, Inject, OnDestroy} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {ViewClosingEvent, ViewClosingListener, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
@@ -45,12 +45,12 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
   public readonly PARAMS_HANDLING = PARAMS_HANDLING;
   public readonly NAVIGATE_PER_PARAM = NAVIGATE_PER_PARAM;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
   public uuid = UUID.randomUUID();
 
   private _destroy$ = new Subject<void>();
 
-  constructor(formBuilder: FormBuilder,
+  constructor(formBuilder: UntypedFormBuilder,
               public view: WorkbenchView,
               public route: ActivatedRoute,
               @Inject(APP_INSTANCE_ID) public appInstanceId: string,
@@ -121,7 +121,7 @@ export class ViewPageComponent implements ViewClosingListener, OnDestroy {
 
   public onSelfNavigate(): void {
     const selfNavigationGroup = this.form.get(SELF_NAVIGATION);
-    const params = SciParamsEnterComponent.toParamsDictionary(selfNavigationGroup.get(PARAMS) as FormArray, false);
+    const params = SciParamsEnterComponent.toParamsDictionary(selfNavigationGroup.get(PARAMS) as UntypedFormArray, false);
     const paramsHandling = selfNavigationGroup.get(PARAMS_HANDLING).value;
 
     // Convert entered params to their actual values.

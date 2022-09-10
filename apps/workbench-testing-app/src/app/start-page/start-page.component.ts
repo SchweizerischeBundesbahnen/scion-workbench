@@ -17,7 +17,7 @@ import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {ActivatedRoute, NavigationEnd, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {expand, filter, map, take, takeUntil} from 'rxjs/operators';
-import {FormControl} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 import {SciFilterFieldComponent, toFilterRegExp} from '@scion/components.internal/filter-field';
 
 @Component({
@@ -29,7 +29,7 @@ import {SciFilterFieldComponent, toFilterRegExp} from '@scion/components.interna
 export class StartPageComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  public filterControl = new FormControl('');
+  public filterControl = new UntypedFormControl('');
 
   public workbenchViewRoutes$: Observable<Routes>;
   public microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]>;

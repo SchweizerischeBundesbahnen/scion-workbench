@@ -9,7 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -43,12 +43,12 @@ export class MessageBoxOpenerPageComponent {
   public readonly CSS_CLASS = CSS_CLASS;
   public readonly VIEW_CONTEXT = VIEW_CONTEXT;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
   public openError: string;
   public closeAction: string;
 
-  constructor(formBuilder: FormBuilder, private _messageBoxService: WorkbenchMessageBoxService) {
+  constructor(formBuilder: UntypedFormBuilder, private _messageBoxService: WorkbenchMessageBoxService) {
     this.form = formBuilder.group({
       [QUALIFIER]: formBuilder.array([]),
       [PARAMS]: formBuilder.array([]),
@@ -64,9 +64,9 @@ export class MessageBoxOpenerPageComponent {
   }
 
   public onMessageBoxOpen(): void {
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray);
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as FormArray);
-    const actions = SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as FormArray);
+    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray);
+    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as UntypedFormArray);
+    const actions = SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as UntypedFormArray);
 
     this.openError = null;
     this.closeAction = null;

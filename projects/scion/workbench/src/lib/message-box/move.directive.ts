@@ -35,7 +35,7 @@ export class MoveDirective implements OnDestroy {
   @HostBinding('style.cursor')
   public cursor = 'move';
 
-  constructor(@Inject(DOCUMENT) private _document: any) {
+  constructor(@Inject(DOCUMENT) private _document: Document) {
   }
 
   @HostListener('mousedown', ['$event'])

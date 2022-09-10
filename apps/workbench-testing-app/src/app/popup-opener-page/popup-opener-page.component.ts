@@ -9,7 +9,7 @@
  */
 
 import {AfterViewInit, Component, ElementRef, OnDestroy, Type, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {CloseStrategy, PopupOrigin, PopupService, PopupSize, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute} from '@angular/router';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
@@ -74,7 +74,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
   private _destroy$ = new Subject<void>();
   private _coordinateAnchor$: Observable<PopupOrigin>;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
   public popupError: string;
   public returnValue: string;
@@ -84,7 +84,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
 
   constructor(private _host: ElementRef<HTMLElement>,
               private _popupService: PopupService,
-              formBuilder: FormBuilder,
+              formBuilder: UntypedFormBuilder,
               route: ActivatedRoute,
               view: WorkbenchView) {
     view.title = route.snapshot.data['title'];

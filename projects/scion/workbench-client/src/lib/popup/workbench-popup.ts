@@ -21,12 +21,8 @@ import {ɵPopupContext} from './workbench-popup-context';
  * of this class to interact with the workbench popup, such as reading passed parameters or closing the popup.
  *
  * #### Preferred Size
- * The workbench popup grows and shrinks with its content unless declaring a size constraint in the popup's capability.
- * Unfortunately, the iframe, the content of the popup, does not natively adapt its size to its content, the microfrontend.
- * Instead, an iframe has a fixed size of 300x150 pixels.
- *
- * To our help, you can use the {@link PreferredSizeService} to control the iframe size from inside the embedded microfrontend.
- * Typically, you would subscribe to size changes of the microfrontend's primary content. As a convenience, {@link PreferredSizeService}
+ * You can report preferred popup size using {@link @scion/microfrontend-platform!PreferredSizeService}. Typically, you would
+ * subscribe to size changes of the microfrontend's primary content and report it. As a convenience, {@link @scion/microfrontend-platform!PreferredSizeService}
  * provides API to pass an element for automatic dimension monitoring. If your content can grow and shrink, e.g., if using expandable
  * panels, consider positioning primary content out of the document flow, that is, setting its position to `absolute`. This way,
  * you give it infinite space so that it can always be rendered at its preferred size.

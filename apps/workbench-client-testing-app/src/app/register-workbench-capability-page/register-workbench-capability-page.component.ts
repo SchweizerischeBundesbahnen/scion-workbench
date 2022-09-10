@@ -9,7 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {AbstractControl, FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
 import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
@@ -69,7 +69,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
   public readonly WIDTH = WIDTH;
   public readonly MAX_WIDTH = MAX_WIDTH;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
   public capabilityId: string;
   public registerError: string;
@@ -77,7 +77,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
 
   private _formInitialValue: any;
 
-  constructor(formBuilder: FormBuilder,
+  constructor(formBuilder: UntypedFormBuilder,
               private _manifestService: ManifestService) {
     this.form = formBuilder.group({
       [TYPE]: formBuilder.control('', Validators.required),
@@ -129,7 +129,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
       .then(id => {
         this.capabilityId = id;
         this.form.reset(this._formInitialValue);
-        this.form.setControl(QUALIFIER, new FormArray([]));
+        this.form.setControl(QUALIFIER, new UntypedFormArray([]));
       })
       .catch(error => this.registerError = error);
   }
@@ -141,7 +141,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
     const transientParams: ViewParamDefinition[] = this.form.get(TRANSIENT_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
     return {
       type: WorkbenchCapabilities.View,
-      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray),
+      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray),
       params: [
         ...requiredParams,
         ...optionalParams,
@@ -165,7 +165,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
     const optionalParams: ParamDefinition[] = this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     return {
       type: WorkbenchCapabilities.Popup,
-      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray),
+      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray),
       params: [
         ...requiredParams,
         ...optionalParams,

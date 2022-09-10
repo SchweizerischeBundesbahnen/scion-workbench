@@ -11,8 +11,6 @@
       "parserOptions": {
         "project": [
           "projects/scion/workbench-client/tsconfig.lib.json",
-          "projects/scion/workbench-client/tsconfig.lib.prod.json",
-          "projects/scion/workbench-client/tsconfig.lib.prod.typedoc.json",
           "projects/scion/workbench-client/tsconfig.spec.json"
         ]
       },

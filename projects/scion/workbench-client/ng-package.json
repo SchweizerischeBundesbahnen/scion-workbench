@@ -3,7 +3,5 @@
   "dest": "../../../dist/scion/workbench-client",
   "lib": {
     "entryFile": "src/public-api.ts"
-  },
-  "allowedNonPeerDependencies": [
-  ]
+  }
 }

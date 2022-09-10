@@ -40,6 +40,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
 
   constructor(private _viewDragService: ViewDragService,
               private _workbenchModuleConfig: WorkbenchModuleConfig,
+              // TODO [Angular 15][https://github.com/angular/components/issues/24334] Alternative constructor (ComponentFactoryResolver is deprecated)
               private _componentFactoryResolver: ComponentFactoryResolver,
               private _applicationRef: ApplicationRef,
               private _injector: Injector,

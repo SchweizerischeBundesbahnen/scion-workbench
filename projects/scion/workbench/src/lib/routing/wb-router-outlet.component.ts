@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ComponentFactoryResolver, Inject, ViewContainerRef} from '@angular/core';
+import {ChangeDetectorRef, Component, EnvironmentInjector, inject, ViewContainerRef} from '@angular/core';
 import {ChildrenOutletContexts, RouterOutlet} from '@angular/router';
 import {ROUTER_OUTLET_NAME} from '../workbench.constants';
 
@@ -18,12 +18,13 @@ import {ROUTER_OUTLET_NAME} from '../workbench.constants';
 @Component({selector: 'wb-router-outlet', template: '', exportAs: 'outlet'})
 export class WbRouterOutletComponent extends RouterOutlet {
 
-  constructor(
-    @Inject(ROUTER_OUTLET_NAME) outlet: string,
-    parentContexts: ChildrenOutletContexts,
-    location: ViewContainerRef,
-    resolver: ComponentFactoryResolver,
-    changeDetector: ChangeDetectorRef) {
-    super(parentContexts, location, resolver, outlet, changeDetector);
+  constructor() {
+    super(
+      inject(ChildrenOutletContexts),
+      inject(ViewContainerRef),
+      inject(ROUTER_OUTLET_NAME),
+      inject(ChangeDetectorRef),
+      inject(EnvironmentInjector),
+    );
   }
 }

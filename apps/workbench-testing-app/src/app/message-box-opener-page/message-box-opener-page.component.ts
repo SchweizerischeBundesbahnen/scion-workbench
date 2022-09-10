@@ -9,7 +9,7 @@
  */
 
 import {Component, Injectable, Injector, OnDestroy, Type} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {MessageBoxService, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute} from '@angular/router';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
@@ -52,12 +52,12 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
   public openError: string;
   public closeAction: string;
 
-  constructor(formBuilder: FormBuilder,
+  constructor(formBuilder: UntypedFormBuilder,
               route: ActivatedRoute,
               view: WorkbenchView,
               private _messageBoxService: MessageBoxService,
@@ -110,7 +110,7 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
       },
       contentSelectable: this.form.get(CONTENT_SELECTABLE).value || undefined,
       cssClass: [`index-${index}`, ...(this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || [])],
-      actions: SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as FormArray) || undefined,
+      actions: SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as UntypedFormArray) || undefined,
     })
       .then(closeAction => this.closeAction = closeAction)
       .catch(error => this.openError = error);

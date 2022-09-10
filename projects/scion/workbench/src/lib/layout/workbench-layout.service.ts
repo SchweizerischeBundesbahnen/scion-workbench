@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {asapScheduler, BehaviorSubject, firstValueFrom, merge, Observable, Subject} from 'rxjs';
-import {Injectable, NgZone} from '@angular/core';
-import {debounce, filter, map, observeOn, startWith} from 'rxjs/operators';
+import {animationFrameScheduler, BehaviorSubject, firstValueFrom, merge, Observable, Subject, timer} from 'rxjs';
+import {Injectable} from '@angular/core';
+import {debounce, filter, map, startWith} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {PartsLayout} from './parts-layout';
 
@@ -36,7 +36,7 @@ export class WorkbenchLayoutService {
    * Notifies upon a workbench layout change. When this Observable emits, the layout is already flushed to the DOM.
    */
   public readonly afterLayoutChange$: Observable<void> = this._layoutChange$
-    .pipe(debounce(() => this._zone.onStable), observeOn(asapScheduler));
+    .pipe(debounce(() => timer(0, animationFrameScheduler)));
 
   /**
    * Emits the current {@link PartsLayout}.
@@ -52,7 +52,7 @@ export class WorkbenchLayoutService {
       filter((layout: PartsLayout | null): layout is PartsLayout => layout !== null),
     );
 
-  constructor(viewDragService: ViewDragService, private _zone: NgZone) {
+  constructor(viewDragService: ViewDragService) {
     this.dragging$ = merge(
       merge(this._dragStart$, viewDragService.viewDragStart$).pipe(map<void, 'start'>(() => 'start')),
       merge(this._dragEnd$, viewDragService.viewDragEnd$).pipe(map<void, 'end'>(() => 'end')),

@@ -111,9 +111,9 @@
         "deprecation/deprecation": "warn",
         "consistent-return": "error",
         "eqeqeq": "error",
-        "object-curly-spacing": [
-          "error"
-        ],
+        "implicit-arrow-linebreak": "error",
+        "object-curly-spacing": "error",
+        "nonblock-statement-body-position": "error",
         "rxjs/no-implicit-any-catch": "off"
       }
     },

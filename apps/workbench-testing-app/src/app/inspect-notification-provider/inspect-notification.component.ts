@@ -12,7 +12,7 @@ import {Component, OnDestroy} from '@angular/core';
 import {Notification} from '@scion/workbench';
 import {Subject} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {takeUntil} from 'rxjs/operators';
 
 const TITLE = 'title';
@@ -35,9 +35,9 @@ export class InspectNotificationComponent implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   public uuid = UUID.randomUUID();
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
-  constructor(public notification: Notification<Map<string, any>>, formBuilder: FormBuilder) {
+  constructor(public notification: Notification<Map<string, any>>, formBuilder: UntypedFormBuilder) {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [SEVERITY]: formBuilder.control(''),

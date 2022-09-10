@@ -40,9 +40,9 @@ export class SashDirective implements OnDestroy, OnChanges {
   public wbSashReset = new EventEmitter<void>(false);
 
   @HostBinding('style.cursor')
-  public cursor: string | undefined;
+  public cursor!: string;
 
-  constructor(@Inject(DOCUMENT) private _document: any) {
+  constructor(@Inject(DOCUMENT) private _document: Document) {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {

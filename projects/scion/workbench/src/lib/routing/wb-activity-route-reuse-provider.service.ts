@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRouteSnapshot} from '@angular/router';
-import {EmptyOutletComponent} from './empty-outlet.component';
+import {ActivatedRouteSnapshot, ɵEmptyOutletComponent} from '@angular/router';
 import {ACTIVITY_OUTLET_NAME} from '../workbench.constants';
 import {WbRouteReuseProvider} from './wb-route-reuse-strategy.service';
 import {Injectable} from '@angular/core';
@@ -42,7 +41,7 @@ export class WbActivityRouteReuseProvider implements WbRouteReuseProvider {
     }
 
     // Used to workaround Angular issues #13869 and #20114.
-    if (hierarchy[hierarchy.length - 1].component === EmptyOutletComponent) {
+    if (hierarchy[hierarchy.length - 1].component === ɵEmptyOutletComponent) {
       return null;
     }
 

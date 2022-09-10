@@ -15,14 +15,13 @@ import {takeUntil} from 'rxjs/operators';
 import {WorkbenchView} from '../view/workbench-view.model';
 
 @Component({})
-export abstract class AbstractSpecViewComponent implements OnDestroy, WbBeforeDestroy {
+abstract class AbstractSpecViewComponent implements OnDestroy, WbBeforeDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  public destroyed: boolean;
+  public destroyed = false;
   public activated: boolean;
-  public dirty: boolean;
-  public checked: boolean;
+  public checked = false;
   public preventDestroy = false;
 
   constructor(public view: WorkbenchView) {
