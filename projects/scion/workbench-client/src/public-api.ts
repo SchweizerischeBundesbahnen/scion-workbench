@@ -14,7 +14,7 @@
 export {WorkbenchClient} from './lib/workbench-client';
 export {WorkbenchRouter, WorkbenchNavigationExtras, ɵMicrofrontendRouteParams, ɵViewParamsUpdateCommand} from './lib/routing/workbench-router';
 export {WorkbenchViewCapability, ViewParamDefinition} from './lib/view/workbench-view-capability';
-export {WorkbenchView, ViewClosingListener, ViewClosingEvent} from './lib/view/workbench-view';
+export {WorkbenchView, ViewClosingListener, ViewClosingEvent, ViewSnapshot} from './lib/view/workbench-view';
 export {ɵVIEW_ID_CONTEXT_KEY} from './lib/view/ɵworkbench-view';
 export {WorkbenchCapabilities} from './lib/workbench-capabilities.enum';
 export {ɵWorkbenchCommands} from './lib/ɵworkbench-commands';

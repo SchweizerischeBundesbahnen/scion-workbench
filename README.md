@@ -51,12 +51,13 @@ Although SCION Workbench is designed for use in Angular applications, its workbe
 ***
 
 ### Versions
-- `v13.0.0-beta.1` and newer are only compatible with Angular version 13.x.
-- `v12.0.0-beta.1` and newer are only compatible with Angular version 12.x.
+- `v14.0.0-beta.1` and newer are compatible with Angular version 14.x.
+- `v13.0.0-beta.1` and newer are compatible with Angular version 13.x.
+- `v12.0.0-beta.1` and newer are compatible with Angular version 12.x.
 - `v11.0.0-beta.3` provides built-in microfrontend support from the [SCION Microfrontend Platform][link-scion-microfrontend-platform].
-- `v11.0.0-beta.1` and newer are only compatible with Angular version 11.x.
-- `v0.0.0-beta.35` and newer are only compatible with Angular version 10.x.
-- `v0.0.0-beta.33` and newer are only compatible with Angular version 9.x.
+- `v11.0.0-beta.1` and newer are compatible with Angular version 11.x.
+- `v0.0.0-beta.35` and newer are compatible with Angular version 10.x.
+- `v0.0.0-beta.33` and newer are compatible with Angular version 9.x.
 - `v0.0.0-beta.23` to `v0.0.0-beta.32` is only compatible with Angular version 8.x.
 
 [![Project version](https://img.shields.io/npm/v/@scion/workbench.svg)][link-download]

@@ -9,7 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {ManifestService} from '@scion/microfrontend-platform';
 
 const ID = 'id';
@@ -26,11 +26,11 @@ export class UnregisterWorkbenchCapabilityPageComponent {
 
   public readonly ID = ID;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
   public unregisterError: string;
   public unregistered: boolean;
 
-  constructor(formBuilder: FormBuilder,
+  constructor(formBuilder: UntypedFormBuilder,
               private _manifestService: ManifestService) {
     this.form = formBuilder.group({
       [ID]: formBuilder.control('', Validators.required),

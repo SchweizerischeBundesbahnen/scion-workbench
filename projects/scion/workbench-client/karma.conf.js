@@ -36,6 +36,9 @@ module.exports = function (config) {
       },
       clearContext: false, // leave Jasmine Spec Runner output visible in browser
     },
+    jasmineHtmlReporter: {
+      suppressAll: true, // removes the duplicated traces
+    },
     coverageReporter: {
       dir: require('path').join(__dirname, '../../../coverage/scion/workbench-client'),
       subdir: '.',

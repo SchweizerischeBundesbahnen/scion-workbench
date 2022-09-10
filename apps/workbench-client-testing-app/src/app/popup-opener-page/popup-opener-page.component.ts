@@ -9,7 +9,7 @@
  */
 
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
 import {CloseStrategy, WorkbenchPopupService} from '@scion/workbench-client';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {undefinedIfEmpty} from '../util/util';
@@ -59,7 +59,7 @@ export class PopupOpenerPageComponent implements AfterViewInit {
 
   private _coordinateAnchor$: Observable<PopupOrigin>;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
   public popupError: string;
   public returnValue: string;
@@ -69,16 +69,16 @@ export class PopupOpenerPageComponent implements AfterViewInit {
 
   constructor(private _host: ElementRef<HTMLElement>,
               private _popupService: WorkbenchPopupService,
-              formBuilder: FormBuilder) {
+              formBuilder: UntypedFormBuilder) {
     this.form = formBuilder.group({
       [QUALIFIER]: formBuilder.array([
-        new FormGroup({
-          paramName: new FormControl('component'),
-          paramValue: new FormControl('popup'),
+        new UntypedFormGroup({
+          paramName: new UntypedFormControl('component'),
+          paramValue: new UntypedFormControl('popup'),
         }),
-        new FormGroup({
-            paramName: new FormControl('app'),
-            paramValue: new FormControl('app1'),
+        new UntypedFormGroup({
+            paramName: new UntypedFormControl('app'),
+            paramValue: new UntypedFormControl('app1'),
           },
         )], Validators.required),
       [PARAMS]: formBuilder.array([]),
@@ -119,8 +119,8 @@ export class PopupOpenerPageComponent implements AfterViewInit {
   }
 
   public async onPopupOpen(): Promise<void> {
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray);
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as FormArray);
+    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray);
+    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as UntypedFormArray);
 
     this.popupError = null;
     this.returnValue = null;

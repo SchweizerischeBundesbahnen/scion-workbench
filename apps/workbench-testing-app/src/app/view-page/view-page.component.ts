@@ -14,7 +14,7 @@ import {merge, Observable, Subject} from 'rxjs';
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {FormControl} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
 
 @Component({
@@ -28,7 +28,7 @@ export class ViewPageComponent implements OnDestroy {
 
   public uuid = UUID.randomUUID();
   public viewpartActions$: Observable<ViewpartAction[]>;
-  public viewpartActionsFormControl = new FormControl('');
+  public viewpartActionsFormControl = new UntypedFormControl('');
 
   public WB_STATE_DATA = WB_STATE_DATA;
 

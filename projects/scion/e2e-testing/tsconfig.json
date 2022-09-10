@@ -1,10 +1,22 @@
 {
-  "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../../out-tsc/e2e-testing",
+    "baseUrl": "../../../",
+    "outDir": "../../../out-tsc",
     "module": "commonjs",
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "target": "es2020",
     "types": [
       "node"
-    ]
+    ],
+    "paths": {
+      "@scion/workbench": [
+        "projects/scion/workbench/src/public-api"
+      ],
+      "@scion/workbench-client": [
+        "projects/scion/workbench-client/src/public-api"
+      ]
+    }
   }
 }

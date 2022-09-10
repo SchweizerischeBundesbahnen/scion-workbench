@@ -117,6 +117,7 @@ export interface WorkbenchInitializer {
  * Runs workbench initializers associated with the given DI token.
  */
 export async function runWorkbenchInitializers(token: InjectionToken<any>, injector: Injector): Promise<void> {
+  // TODO [Angular 15][https://github.com/angular/angular/issues/46943] Object-based flags for `Injector.get` will be added in v15
   const initializers: WorkbenchInitializer[] = injector.get(token, undefined, InjectFlags.Optional) as WorkbenchInitializer[];
   if (!initializers || !initializers.length) {
     return;

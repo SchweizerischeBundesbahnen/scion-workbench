@@ -8,8 +8,11 @@
 
   > sci-viewport {
     flex: auto;
-    --sci-viewport-content-grid-gap: 1em;
-    --sci-viewport-content-grid-auto-rows: min-content;
+
+    &::part(content) {
+      gap: 1em;
+      grid-auto-rows: min-content;
+    }
 
     section, form {
       display: grid;

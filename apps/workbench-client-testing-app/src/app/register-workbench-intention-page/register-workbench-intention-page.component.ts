@@ -9,7 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
@@ -27,13 +27,13 @@ export class RegisterWorkbenchIntentionPageComponent {
   public readonly TYPE = TYPE;
   public readonly QUALIFIER = QUALIFIER;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
   public intentionId: string;
   public registerError: string;
   public WorkbenchCapabilities = WorkbenchCapabilities;
 
-  constructor(formBuilder: FormBuilder, private _manifestService: ManifestService) {
+  constructor(formBuilder: UntypedFormBuilder, private _manifestService: ManifestService) {
     this.form = formBuilder.group({
       [TYPE]: formBuilder.control('', Validators.required),
       [QUALIFIER]: formBuilder.array([]),
@@ -43,7 +43,7 @@ export class RegisterWorkbenchIntentionPageComponent {
   public async onRegister(): Promise<void> {
     const intention: Intention = {
       type: this.form.get(TYPE).value,
-      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as FormArray),
+      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray),
     };
 
     this.intentionId = null;
@@ -53,7 +53,7 @@ export class RegisterWorkbenchIntentionPageComponent {
       .then(id => {
         this.intentionId = id;
         this.form.reset();
-        this.form.setControl(QUALIFIER, new FormArray([]));
+        this.form.setControl(QUALIFIER, new UntypedFormArray([]));
       })
       .catch(error => this.registerError = error);
   }

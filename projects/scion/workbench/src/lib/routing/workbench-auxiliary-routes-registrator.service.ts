@@ -1,6 +1,5 @@
 import {Injectable, Type} from '@angular/core';
-import {CanActivate, CanDeactivate, Data, PRIMARY_OUTLET, ResolveData, Router, Routes} from '@angular/router';
-import {EmptyOutletComponent} from './empty-outlet.component';
+import {CanActivate, CanDeactivate, Data, ɵEmptyOutletComponent, PRIMARY_OUTLET, ResolveData, Router, Routes} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
 
 /**
@@ -33,7 +32,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
         outletAuxRoutes.push({
           ...primaryRoute,
           outlet: outlet,
-          component: primaryRoute.component || EmptyOutletComponent, // EmptyOutletComponent is used for lazy loading of aux routes; see 'router/src/utils/config.ts#standardizeConfig' and Angular PR #23459.
+          component: primaryRoute.component || ɵEmptyOutletComponent, // EmptyOutletComponent is used for lazy loading of aux routes; see 'router/src/utils/config.ts#standardizeConfig' and Angular PR #23459.
           canActivate: [...(config.canActivate || []), ...(primaryRoute.canActivate || [])],
           canDeactivate: [...(config.canDeactivate || []), ...(primaryRoute.canDeactivate || [])],
           data: {...primaryRoute.data, ...config.data},

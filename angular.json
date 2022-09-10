@@ -53,7 +53,7 @@
       "projectType": "library",
       "root": "projects/scion/workbench-client",
       "sourceRoot": "projects/scion/workbench-client/src",
-      "prefix": "lib",
+      "prefix": "wb",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
@@ -91,6 +91,11 @@
     },
     "workbench-testing-app": {
       "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "apps/workbench-testing-app",
       "sourceRoot": "apps/workbench-testing-app/src",
       "prefix": "app",
@@ -112,6 +117,11 @@
                 "output": "/"
               },
               {
+                "glob": "wb-icon.*",
+                "input": "resources/wb-font/icomoon_generated/fonts",
+                "output": "/assets/fonts"
+              },
+              {
                 "glob": "scion-workbench-banner.svg",
                 "input": "resources/branding",
                 "output": "/assets"
@@ -129,6 +139,18 @@
           },
           "configurations": {
             "production-vercel": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "apps/workbench-testing-app/src/environments/environment.ts",
@@ -139,6 +161,18 @@
               "outputPath": "dist/workbench-testing-app-vercel"
             },
             "production-ci": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "apps/workbench-testing-app/src/environments/environment.ts",
@@ -180,18 +214,15 @@
             ]
           }
         }
-      },
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        },
-        "@schematics/angular:application": {
-          "strict": true
-        }
       }
     },
     "workbench-client-testing-app": {
       "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "apps/workbench-client-testing-app",
       "sourceRoot": "apps/workbench-client-testing-app/src",
       "prefix": "app",
@@ -225,6 +256,18 @@
           },
           "configurations": {
             "production-vercel": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "apps/workbench-client-testing-app/src/environments/environment.ts",
@@ -235,6 +278,18 @@
               "outputPath": "dist/workbench-client-testing-app-vercel"
             },
             "production-ci": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "apps/workbench-client-testing-app/src/environments/environment.ts",
@@ -276,14 +331,6 @@
             ]
           }
         }
-      },
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        },
-        "@schematics/angular:application": {
-          "strict": true
-        }
       }
     },
     "e2e-testing": {
@@ -300,9 +347,5 @@
         }
       }
     }
-  },
-  "defaultProject": "@scion/workbench",
-  "cli": {
-    "defaultCollection": "@angular-eslint/schematics"
   }
 }

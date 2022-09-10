@@ -12,7 +12,7 @@ import {Component, OnDestroy} from '@angular/core';
 import {MessageBox} from '@scion/workbench';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 
 const TITLE = 'title';
@@ -37,9 +37,9 @@ export class InspectMessageBoxComponent implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   public uuid = UUID.randomUUID();
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
-  constructor(public messageBox: MessageBox<Map<string, any>>, formBuilder: FormBuilder) {
+  constructor(public messageBox: MessageBox<Map<string, any>>, formBuilder: UntypedFormBuilder) {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [SEVERITY]: formBuilder.control(''),

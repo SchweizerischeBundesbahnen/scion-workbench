@@ -35,7 +35,7 @@ export class NotificationService implements OnDestroy {
   private _notifications$ = new BehaviorSubject<ɵNotification[]>([]);
   private _destroy$ = new Subject<void>();
 
-  constructor(private _zone: NgZone, @Inject(DOCUMENT) private _document: any) {
+  constructor(private _zone: NgZone, @Inject(DOCUMENT) private _document: Document) {
     this.installEscapeHandler();
   }
 

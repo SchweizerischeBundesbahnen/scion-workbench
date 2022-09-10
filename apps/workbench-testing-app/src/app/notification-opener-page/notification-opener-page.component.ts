@@ -9,7 +9,7 @@
  */
 
 import {Component, Type} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {NotificationService, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute} from '@angular/router';
 import {InspectNotificationComponent} from '../inspect-notification-provider/inspect-notification.component';
@@ -41,9 +41,9 @@ export class NotificationOpenerPageComponent {
   public readonly USE_GROUP_INPUT_REDUCER = USE_GROUP_INPUT_REDUCER;
   public readonly CSS_CLASS = CSS_CLASS;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
 
-  constructor(formBuilder: FormBuilder,
+  constructor(formBuilder: UntypedFormBuilder,
               route: ActivatedRoute,
               view: WorkbenchView,
               private _notificationService: NotificationService) {

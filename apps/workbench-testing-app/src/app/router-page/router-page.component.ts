@@ -9,7 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {WbNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute, Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
@@ -44,14 +44,14 @@ export class RouterPageComponent {
   public readonly ACTIVATE_IF_PRESENT = ACTIVATE_IF_PRESENT;
   public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
 
-  public form: FormGroup;
+  public form: UntypedFormGroup;
   public navigateError: string;
 
   public routerLinkCommands$: Observable<any[]>;
   public navigationExtras$: Observable<WbNavigationExtras>;
   public routes: Routes;
 
-  constructor(formBuilder: FormBuilder,
+  constructor(formBuilder: UntypedFormBuilder,
               route: ActivatedRoute,
               view: WorkbenchView,
               private _router: Router,
@@ -99,7 +99,7 @@ export class RouterPageComponent {
   }
 
   private constructRouterLinkCommands(): any[] {
-    const matrixParams: Params | null = SciParamsEnterComponent.toParamsDictionary(this.form.get(MATRIX_PARAMS) as FormArray);
+    const matrixParams: Params | null = SciParamsEnterComponent.toParamsDictionary(this.form.get(MATRIX_PARAMS) as UntypedFormArray);
     const commands: any[] = this.form.get(PATH).value.split('/');
 
     // Replace the first segment with a slash if empty
@@ -112,13 +112,13 @@ export class RouterPageComponent {
 
   private constructNavigationExtras(): WbNavigationExtras {
     return {
-      queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUERY_PARAMS) as FormArray),
+      queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUERY_PARAMS) as UntypedFormArray),
       activateIfPresent: this.form.get(ACTIVATE_IF_PRESENT).value,
       closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
       target: this.form.get(TARGET).value || undefined,
       selfViewId: this.form.get(SELF_VIEW_ID).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
-      state: SciParamsEnterComponent.toParamsDictionary(this.form.get(NAVIGATIONAL_STATE) as FormArray),
+      state: SciParamsEnterComponent.toParamsDictionary(this.form.get(NAVIGATIONAL_STATE) as UntypedFormArray),
     };
   }
 }

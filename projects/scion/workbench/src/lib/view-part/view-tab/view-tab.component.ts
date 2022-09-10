@@ -165,6 +165,13 @@ export class ViewTabComponent implements OnDestroy {
   }
 
   /**
+   * Indicates whether this view tab is the drag source of a current view drag operation.
+   */
+  public isDragSource(): boolean {
+    return this._viewDragService.getViewDragData()?.viewId === this.viewId;
+  }
+
+  /**
    * Returns 'true' if this viewtab is fully scrolled into the viewport.
    */
   public isVisibleInViewport(): boolean {

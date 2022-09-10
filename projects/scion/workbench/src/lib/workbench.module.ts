@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, Inject, Injector, ModuleWithProviders, NgModule, Optional, SkipSelf} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, ENVIRONMENT_INITIALIZER, inject, Inject, ModuleWithProviders, NgModule, Optional, SkipSelf} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {WorkbenchComponent} from './workbench.component';
 import {ActivityPartComponent} from './activity-part/activity-part.component';
@@ -40,7 +40,6 @@ import {WorkbenchModuleConfig} from './workbench-module-config';
 import {ContentProjectionDirective} from './content-projection/content-projection.directive';
 import {ContentAsOverlayComponent} from './content-projection/content-as-overlay.component';
 import {ACTIVITY_DATA_KEY, ACTIVITY_OUTLET_NAME, ROUTE_REUSE_PROVIDER, WORKBENCH_FORROOT_GUARD} from './workbench.constants';
-import {EmptyOutletComponent} from './routing/empty-outlet.component';
 import {WbActivityRouteReuseProvider} from './routing/wb-activity-route-reuse-provider.service';
 import {WbRouteReuseStrategy} from './routing/wb-route-reuse-strategy.service';
 import {SciViewportModule} from '@scion/components/viewport';
@@ -122,7 +121,6 @@ import {WORKBENCH_POST_STARTUP} from './startup/workbench-initializer';
     WbRouterLinkDirective,
     WbRouterLinkWithHrefDirective,
     ContentProjectionDirective,
-    EmptyOutletComponent,
     ContentAsOverlayComponent,
     ViewPartActionDirective,
     ViewPartActionBarComponent,
@@ -234,15 +232,14 @@ export class WorkbenchModule {
           useClass: ViewContainerReference,
         },
         {
-          provide: APP_INITIALIZER,
-          useFactory: installWorkbenchRouting,
-          multi: true,
-          deps: [Injector],
-        },
-        {
           provide: WORKBENCH_POST_STARTUP,
           useExisting: ViewMoveHandler,
           multi: true,
+        },
+        {
+          provide: ENVIRONMENT_INITIALIZER,
+          multi: true,
+          useValue: installWorkbenchRouting,
         },
         provideWorkbenchLauncher(config),
         provideWorkbenchMicrofrontendSupport(config),
@@ -277,14 +274,9 @@ export function provideForRootGuard(workbench: WorkbenchService): any {
  *
  * @docs-private Not public API, intended for internal use only.
  */
-export function installWorkbenchRouting(injector: Injector): () => void {
-  // Angular is very strict when compiling module definitions ahead-of-time.
-  // We cannot return the lamda directly as this would break the AOT build. Instead, we add a redundant assignment.
-  const fn = (): void => {
-    injector.get(WorkbenchUrlObserver);
-    injector.get(WorkbenchAuxiliaryRoutesRegistrator).registerOutletAuxiliaryRoutes(ACTIVITY_OUTLET_NAME, {
-      resolve: {[ACTIVITY_DATA_KEY]: ActivityResolver},
-    });
-  };
-  return fn;
+export function installWorkbenchRouting(): void {
+  inject(WorkbenchUrlObserver);
+  inject(WorkbenchAuxiliaryRoutesRegistrator).registerOutletAuxiliaryRoutes(ACTIVITY_OUTLET_NAME, {
+    resolve: {[ACTIVITY_DATA_KEY]: ActivityResolver},
+  });
 }

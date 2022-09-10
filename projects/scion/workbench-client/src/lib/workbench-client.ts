@@ -94,7 +94,7 @@ export class WorkbenchClient {
    * micro application connects to the workbench during the bootstrapping. In Angular, for example, this can be done in
    * an app initializer.
    *
-   * See {@link MicrofrontendPlatform.connectToHost} for more information about connecting to the platform host.
+   * See {@link @scion/microfrontend-platform!MicrofrontendPlatform.connectToHost} for more information about connecting to the platform host.
    *
    * @param  symbolicName - Specifies the symbolic name of the micro application. The micro application needs to be registered
    *         in the workbench under that identity.

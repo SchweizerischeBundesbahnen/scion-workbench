@@ -9,7 +9,7 @@
  */
 
 import {Injector, ViewContainerRef} from '@angular/core';
-import {ComponentType} from '@angular/cdk/portal/portal';
+import {ComponentType} from '@angular/cdk/portal';
 import {Observable} from 'rxjs';
 
 /**

@@ -15,7 +15,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "es2017",
+    "target": "es2020",
     "module": "es2020",
     "noUnusedLocals": true,
     "lib": [
@@ -71,6 +71,9 @@
     //      //      ],
     //      //      "@scion/toolkit/storage": [
     //      //        "../scion-toolkit/projects/scion/toolkit/storage/src/public_api"
+    //      //      ],
+    //      //      "@scion/toolkit/testing": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/testing/src/public_api"
     //      //      ],
     //      //      "@scion/toolkit/util": [
     //      //        "../scion-toolkit/projects/scion/toolkit/util/src/public_api"
