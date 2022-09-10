@@ -27,18 +27,6 @@ export class WorkbenchLayoutService {
   private _dragEnd$ = new Subject<void>();
 
   /**
-   * Notifies when the user starts or ends modifying the parts layout using drag and drop, e.g., moving the splitter between parts,
-   * moving a message box, or moving a view.
-   */
-  public readonly dragging$: Observable<'start' | 'end'>;
-
-  /**
-   * Notifies upon a workbench layout change. When this Observable emits, the layout is already flushed to the DOM.
-   */
-  public readonly afterLayoutChange$: Observable<void> = this._layoutChange$
-    .pipe(debounce(() => timer(0, animationFrameScheduler)));
-
-  /**
    * Emits the current {@link PartsLayout}.
    *
    * Upon subscription, the current layout is emitted, and then emits continuously when the layout changes.
@@ -51,6 +39,18 @@ export class WorkbenchLayoutService {
       map<void, PartsLayout | null>(() => this.layout),
       filter((layout: PartsLayout | null): layout is PartsLayout => layout !== null),
     );
+
+  /**
+   * Notifies upon a workbench layout change. When this Observable emits, the layout has already been flushed to the DOM.
+   */
+  public readonly onLayoutChange$: Observable<void> = this._layoutChange$
+    .pipe(debounce(() => timer(0, animationFrameScheduler)));
+
+  /**
+   * Notifies when the user starts or ends modifying the parts layout using drag and drop, e.g., moving the splitter between parts,
+   * moving a message box, or moving a view.
+   */
+  public readonly dragging$: Observable<'start' | 'end'>;
 
   constructor(viewDragService: ViewDragService) {
     this.dragging$ = merge(
@@ -75,10 +75,10 @@ export class WorkbenchLayoutService {
 
   /**
    * Returns a Promise that resolves on the next layout change. When this Promise resolves,
-   * the layout is already flushed to the DOM.
+   * the layout has already been flushed to the DOM.
    */
   public async whenLayoutChange(): Promise<void> {
-    return firstValueFrom(this.afterLayoutChange$);
+    return firstValueFrom(this.onLayoutChange$);
   }
 
   /**

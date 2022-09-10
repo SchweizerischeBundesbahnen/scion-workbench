@@ -142,7 +142,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   private computeHiddenViewTabs(): void {
     this._viewTabs && this._viewPart.setHiddenViewTabs(this._viewTabs
       .filter(viewTab => !viewTab.isDragSource())
-      .filter(viewTab =>  !viewTab.isVisibleInViewport())
+      .filter(viewTab => !viewTab.isVisibleInViewport())
       .map(viewTab => viewTab.viewId));
   }
 
@@ -257,7 +257,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   }
 
   private installLayoutChangeListener(): void {
-    this._workbenchLayout.afterLayoutChange$
+    this._workbenchLayout.onLayoutChange$
       .pipe(takeUntil(this._destroy$))
       .subscribe(() => this.scrollActiveViewTabIntoViewport());
   }

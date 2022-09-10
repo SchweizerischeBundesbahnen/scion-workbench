@@ -3,7 +3,6 @@
                   [wbPortal]="activeViewId$ | async | wbViewPortal"
                   wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)">
 </wb-portal-outlet>
-
 <ng-template #views_absent_template>
   <sci-viewport class="views-absent-outlet"
                 wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)"

@@ -18,7 +18,6 @@ import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing.con
 import {MessageBoxService} from '../message-box/message-box.service';
 import {ViewMenuService} from '../view-part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
-import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {Logger, LoggerNames} from '../logging';
 import {VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference} from '../content-projection/view-container.reference';
 import {PopupService} from '../popup/popup.service';
@@ -73,41 +72,12 @@ export class ViewComponent implements OnDestroy {
   constructor(private _view: ɵWorkbenchView,
               private _logger: Logger,
               private _host: ElementRef<HTMLElement>,
-              public workbenchStartup: WorkbenchStartup,
               messageBoxService: MessageBoxService,
               viewContextMenuService: ViewMenuService,
               private _cd: ChangeDetectorRef,
               @Inject(VIEW_LOCAL_MESSAGE_BOX_HOST) viewLocalMessageBoxHost: ViewContainerReference) {
-
-    // IMPORTANT:
-    // Wait mounting this view's named router outlet until the workbench startup has completed.
-    //
-    // This component is constructed when the workbench detects view outlets in the browser URL, e.g., when workbench navigation
-    // occurs or when Angular triggers the initial navigation for an URL that contains view outlets. See {WorkbenchUrlObserver}.
-    // Depending on the used workbench launcher, this may happen before starting the workbench or before it completed the startup.
-    // In any case, we must not mount the view's named router outlet until the workbench startup is completed. Otherwise, the
-    // outlet's routed component would be constructed as well, leading to unexpected or wrong behavior, e.g., because the
-    // Microfrontend Platform may not be fully initialized yet, or because the workbench should not be started since the user is
-    // not authorized.
-    //
-    // It would be simplest to install a route guard to protect routed components from being loaded before workbench startup completed.
-    // However, this does not work in a situation where the `<wb-workbench>` component is displayed in a router outlet. Then, we
-    // would end up in a deadlock, as the view outlet guard would wait until the workbench startup completes, but the workbench component
-    // never gets mounted because the navigation never ends, thus cannot initiate the workbench startup.
-
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
     this.viewLocalMessageBoxHost = viewLocalMessageBoxHost.get();
-
-    // Trigger a manual change detection cycle if this view is not the active view in the tabbar. Otherwise, since inactive views are not added
-    // to the Angular component tree, their routed component would not be activated until activating the view. But, view components typically
-    // initialize their view in the constructor, setting a title, for example. This requires eagerly activating the routed components of inactive views
-    // by triggering a manual change detection cycle, but only after workbench startup completed.
-    if (!this._view.active) {
-      workbenchStartup.whenStarted.then(() => {
-        this._logger.debug(() => `Activating view router outlet after initial navigation. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
-        this._cd.detectChanges();
-      });
-    }
 
     messageBoxService.messageBoxes$({includeParents: true})
       .pipe(takeUntil(this._destroy$))

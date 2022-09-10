@@ -25,24 +25,22 @@ export class WbPortalOutletComponent implements OnDestroy {
 
   @Input('wbPortal') // eslint-disable-line @angular-eslint/no-input-rename
   public set portal(portal: WbComponentPortal<any> | null) {
-    this.detachPortal();
+    this.detach();
     this._portal = portal;
-    this.attachPortal();
+    this.attach();
+  }
+
+  private attach(): void {
+    this._portal?.attach(this._viewContainerRef);
+  }
+
+  private detach(): void {
+    if (this._portal?.isAttachedTo(this._viewContainerRef)) {
+      this._portal.detach();
+    }
   }
 
   public ngOnDestroy(): void {
-    this.detachPortal();
-  }
-
-  private attachPortal(): void {
-    if (this._portal) {
-      this._portal.attach(this._viewContainerRef);
-    }
-  }
-
-  private detachPortal(): void {
-    if (this._portal && this._portal.viewContainerRef === this._viewContainerRef) {
-      this._portal.detach();
-    }
+    this.detach();
   }
 }

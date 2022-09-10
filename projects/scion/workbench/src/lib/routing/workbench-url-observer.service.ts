@@ -8,22 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChildrenOutletContexts, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
+import {GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
 import {filter, takeUntil} from 'rxjs/operators';
-import {ComponentFactoryResolver, Injectable, Injector, OnDestroy} from '@angular/core';
+import {EnvironmentInjector, Injectable, OnDestroy} from '@angular/core';
 import {Subject} from 'rxjs';
 import {WorkbenchAuxiliaryRoutesRegistrator} from './workbench-auxiliary-routes-registrator.service';
-import {PARTS_LAYOUT_QUERY_PARAM, ROUTER_OUTLET_NAME} from '../workbench.constants';
+import {PARTS_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchViewPartRegistry} from '../view-part/workbench-view-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ɵWorkbenchViewPart} from '../view-part/ɵworkbench-view-part.model';
-import {WbComponentPortal} from '../portal/wb-component-portal';
 import {ViewPartComponent} from '../view-part/view-part.component';
-import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {ViewComponent} from '../view/view.component';
-import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchNavigationContext, WorkbenchRouter} from './workbench-router.service';
 import {PartsLayoutFactory} from '../layout/parts-layout.factory';
 import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
@@ -52,8 +49,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
               private _layoutService: WorkbenchLayoutService,
-              private _componentFactoryResolver: ComponentFactoryResolver,
-              private _injector: Injector,
+              private _environmentInjector: EnvironmentInjector,
               private _workbenchRouter: WorkbenchRouter,
               private _partsLayoutFactory: PartsLayoutFactory,
               private _workbenchLayoutDiffer: WorkbenchLayoutDiffer,
@@ -197,12 +193,11 @@ export class WorkbenchUrlObserver implements OnDestroy {
    * - For each removed view, destroys the {@link WorkbenchView} and unregisters it in {@link WorkbenchViewRegistry}
    */
   private updateViewRegistry(): void {
-    const {layoutDiff, partsLayout} = this._workbenchRouter.getCurrentNavigationContext();
+    const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();
 
     layoutDiff.addedViews.forEach(viewId => {
       this._logger.debug(() => `Constructing ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
-      this._viewRegistry.register(this.createWorkbenchView(viewId, partsLayout.isViewActive(viewId)));
-
+      this._viewRegistry.register(this.createWorkbenchView(viewId));
     });
     layoutDiff.removedViews.forEach(viewId => {
       this._logger.debug(() => `Destroying ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
@@ -218,28 +213,14 @@ export class WorkbenchUrlObserver implements OnDestroy {
   private updateViewPartRegistry(): void {
     const {layoutDiff, partsLayout} = this._workbenchRouter.getCurrentNavigationContext();
 
-    // Register new parts.
     layoutDiff.addedParts.forEach(partId => {
       this._logger.debug(() => `Constructing ɵWorkbenchViewPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
       this._viewPartRegistry.register(this.createWorkbenchViewPart(partId));
     });
-
-    // Destroy parts which are no longer used.
-    if (layoutDiff.removedParts.length) {
-      // Invoke `preDestroy` lifecycle hook.
-      layoutDiff.removedParts.forEach(partId => {
-        this._logger.debug(() => `Pre-Destroying ɵWorkbenchViewPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
-        this._viewPartRegistry.getElseThrow(partId).preDestroy();
-      });
-
-      // Invoke `destroy` lifecycle hook.
-      // IMPORTANT: Destroy parts after notifying about the layout change. Otherwise, moving of the last view to another part
-      // would fail because the view would already be destroyed.
-      this._layoutService.whenLayoutChange().then(() => layoutDiff.removedParts.forEach(partId => {
-        this._logger.debug(() => `Destroying ɵWorkbenchViewPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
-        this._viewPartRegistry.remove(partId);
-      }));
-    }
+    layoutDiff.removedParts.forEach(partId => {
+      this._logger.debug(() => `Destroying ɵWorkbenchViewPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
+      this._viewPartRegistry.remove(partId);
+    });
 
     // Update part properties.
     partsLayout.parts.forEach(mPart => {
@@ -248,35 +229,11 @@ export class WorkbenchUrlObserver implements OnDestroy {
   }
 
   private createWorkbenchViewPart(partId: string): ɵWorkbenchViewPart {
-    const portal = new WbComponentPortal(this._componentFactoryResolver, ViewPartComponent);
-    const viewPart = new ɵWorkbenchViewPart(partId, portal, this._injector);
-
-    portal.init({
-      injectorTokens: new WeakMap()
-        .set(WorkbenchViewPart, viewPart)
-        .set(ɵWorkbenchViewPart, viewPart),
-    });
-
-    return viewPart;
+    return this._environmentInjector.runInContext(() => new ɵWorkbenchViewPart(partId, ViewPartComponent));
   }
 
-  private createWorkbenchView(viewId: string, active: boolean): ɵWorkbenchView {
-    const portal = new WbComponentPortal(this._componentFactoryResolver, ViewComponent);
-    const view = new ɵWorkbenchView(viewId, portal, active, this._injector);
-
-    portal.init({
-      injectorTokens: new WeakMap()
-        .set(ROUTER_OUTLET_NAME, viewId)
-        .set(WorkbenchView, view)
-        .set(ɵWorkbenchView, view)
-        // Provide the root parent outlet context, crucial if the outlet is not instantiated at the time the route gets activated (e.g., if inside a `ngIf`, as it is in {ViewComponent}).
-        // Otherwise, the outlet would not render the activated route.
-        .set(ChildrenOutletContexts, this._injector.get(ChildrenOutletContexts)),
-      onAttach: (): void => view.activate(true),
-      onDetach: (): void => view.activate(false),
-    });
-
-    return view;
+  private createWorkbenchView(viewId: string): ɵWorkbenchView {
+    return this._environmentInjector.runInContext(() => new ɵWorkbenchView(viewId, ViewComponent));
   }
 
   private installRouterEventListeners(): void {

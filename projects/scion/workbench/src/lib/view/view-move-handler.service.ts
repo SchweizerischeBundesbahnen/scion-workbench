@@ -98,8 +98,7 @@ export class ViewMoveHandler implements OnDestroy {
   private async moveViewToNewWindow(event: ViewMoveEvent): Promise<void> {
     const urlTree = await this._wbRouter.createUrlTree(layout => ({
       layout: layout.clear(),
-      viewOutlets: layout.parts
-        .reduce((viewIds, part) => viewIds.concat(part.viewIds), new Array<string>())
+      viewOutlets: layout.viewsIds
         .filter(viewId => viewId !== event.source.viewId)
         .reduce((acc, viewId) => ({...acc, [viewId]: null}), {}),
     }));

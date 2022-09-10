@@ -140,14 +140,6 @@ export class PartsLayout {
   }
 
   /**
-   * Tests if the given view is the active view of its part.
-   */
-  public isViewActive(viewId: string): boolean {
-    const part = this._findPartByViewId(viewId, {orElseThrow: false});
-    return part && part.activeViewId === viewId || false;
-  }
-
-  /**
    * Sets the split ratio of the parts of a {@link MTreeNode}.
    *
    * @param  treeNodeId
@@ -171,8 +163,15 @@ export class PartsLayout {
   /**
    * Returns all parts of the layout.
    */
-  public get parts(): Readonly<MPart>[] {
+  public get parts(): ReadonlyArray<MPart> {
     return this._findTreeElements(element => element instanceof MPart) as MPart[];
+  }
+
+  /**
+   * Returns all views of the layout.
+   */
+  public get viewsIds(): string[] {
+    return this.parts.reduce((viewIds, part) => viewIds.concat(part.viewIds), new Array<string>());
   }
 
   /**

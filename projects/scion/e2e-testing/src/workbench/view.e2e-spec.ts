@@ -179,7 +179,7 @@ test.describe('Workbench View', () => {
     const testee1ComponentInstanceId = await testee1ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
 
@@ -188,7 +188,7 @@ test.describe('Workbench View', () => {
     const testee2ComponentInstanceId = await testee2ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
     ]);
@@ -198,7 +198,7 @@ test.describe('Workbench View', () => {
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
@@ -208,7 +208,7 @@ test.describe('Workbench View', () => {
     await testee2ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
     ]);
@@ -218,7 +218,7 @@ test.describe('Workbench View', () => {
     const testee3ComponentInstanceId = await testee3ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
     ]);
@@ -228,7 +228,7 @@ test.describe('Workbench View', () => {
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);

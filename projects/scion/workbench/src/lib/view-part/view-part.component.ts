@@ -16,6 +16,7 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchViewPart} from './ɵworkbench-view-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {Logger, LoggerNames} from '../logging';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 
 @Component({
   selector: 'wb-view-part',
@@ -43,6 +44,7 @@ export class ViewPartComponent implements OnDestroy {
   }
 
   constructor(private _workbench: ɵWorkbenchService,
+              private _viewRegistry: WorkbenchViewRegistry,
               private _viewDragService: ViewDragService,
               private _part: ɵWorkbenchViewPart,
               private _logger: Logger) {
@@ -53,6 +55,10 @@ export class ViewPartComponent implements OnDestroy {
         this.hasViews = viewIds.length > 0;
         this.hasActions = globalActions.length > 0 || localActions.length > 0;
       });
+
+    // Construct view components of inactive views so they can initialize, e.g., to set the view tab title,
+    // important when loading an existing layout into the workbench.
+    this.constructInactiveViewComponents();
   }
 
   @HostListener('focusin')
@@ -81,6 +87,21 @@ export class ViewPartComponent implements OnDestroy {
 
   public get activeViewId$(): Observable<string | null> {
     return this._part.activeViewId$;
+  }
+
+  /**
+   * Constructs view components of inactive views so they can initialize, e.g., to set the view tab title.
+   */
+  private constructInactiveViewComponents(): void {
+    this._part.viewIds
+      .map(viewId => this._viewRegistry.getElseThrow(viewId))
+      .filter(view => !view.active)
+      .forEach(inactiveView => {
+        inactiveView.portal.createComponentFromInjectionContext();
+        this._logger.debug(() => `Constructing view after initial navigation. [viewId=${inactiveView.viewId}]`, LoggerNames.LIFECYCLE);
+        // Trigger manual change detection cycle because the view is not yet added to the Angular component tree. Otherwise, routed content would not be attached.
+        inactiveView.portal.componentRef.changeDetectorRef.detectChanges();
+      });
   }
 
   public ngOnDestroy(): void {
