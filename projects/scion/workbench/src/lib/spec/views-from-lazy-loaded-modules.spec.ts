@@ -54,27 +54,27 @@ describe('Views', () => {
     TestBed.inject(Router).initialNavigation();
   }));
 
-  it('can be loaded from lazy feature modules', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('can be loaded from lazy feature modules', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
     // Navigate to view 'feature-a/view-1'
-    wbRouter.navigate(['feature-a', 'view-1']).then();
+    workbenchRouter.navigate(['feature-a', 'view-1']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureA_View1_Component, '(1)');
 
     // Navigate to view 'feature-a/view-2'
-    wbRouter.navigate(['feature-a', 'view-2']).then();
+    workbenchRouter.navigate(['feature-a', 'view-2']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureA_View2_Component, '(2)');
 
     // Navigate to view 'feature-b/view-1'
-    wbRouter.navigate(['feature-b', 'view-1']).then();
+    workbenchRouter.navigate(['feature-b', 'view-1']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureB_View1_Component, '(3)');
 
     // Navigate to view 'feature-b/view-2'
-    wbRouter.navigate(['feature-b', 'view-2']).then();
+    workbenchRouter.navigate(['feature-b', 'view-2']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureB_View2_Component, '(4)');
 

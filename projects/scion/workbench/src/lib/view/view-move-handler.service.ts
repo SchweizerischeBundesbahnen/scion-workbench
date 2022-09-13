@@ -23,7 +23,7 @@ export class ViewMoveHandler implements OnDestroy {
               private _viewDragService: ViewDragService,
               private _locationStrategy: LocationStrategy,
               private _router: Router,
-              private _wbRouter: WorkbenchRouter) {
+              private _workbenchRouter: WorkbenchRouter) {
     this.installViewMoveListener();
   }
 
@@ -68,7 +68,7 @@ export class ViewMoveHandler implements OnDestroy {
   }
 
   private activateView(viewId: string): void {
-    this._wbRouter.ɵnavigate(layout => layout.activateView(viewId)).then();
+    this._workbenchRouter.ɵnavigate(layout => layout.activateView(viewId)).then();
   }
 
   private addView(event: ViewMoveEvent): void {
@@ -79,7 +79,7 @@ export class ViewMoveHandler implements OnDestroy {
     if (addToNewViewPart) {
       const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
       const newPartId = event.target.newPartId || UUID.randomUUID();
-      this._wbRouter.ɵnavigate(layout => ({
+      this._workbenchRouter.ɵnavigate(layout => ({
         layout: layout
           .addPart(newPartId, {relativeTo: event.target.partId ?? undefined, align: coerceLayoutAlignment(region)})
           .addView(newPartId, newViewId),
@@ -88,7 +88,7 @@ export class ViewMoveHandler implements OnDestroy {
     }
     else {
       const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
-      this._wbRouter.ɵnavigate(layout => ({
+      this._workbenchRouter.ɵnavigate(layout => ({
         layout: layout.addView(event.target.partId!, newViewId, event.target.insertionIndex),
         viewOutlets: {[newViewId]: commands},
       })).then();
@@ -96,7 +96,7 @@ export class ViewMoveHandler implements OnDestroy {
   }
 
   private async moveViewToNewWindow(event: ViewMoveEvent): Promise<void> {
-    const urlTree = await this._wbRouter.createUrlTree(layout => ({
+    const urlTree = await this._workbenchRouter.createUrlTree(layout => ({
       layout: layout.clear(),
       viewOutlets: layout.viewsIds
         .filter(viewId => viewId !== event.source.viewId)
@@ -115,13 +115,13 @@ export class ViewMoveHandler implements OnDestroy {
     const addToNewPart = (event.target.region || 'center') !== 'center';
     if (addToNewPart) {
       const newPartId = event.target.newPartId || UUID.randomUUID();
-      this._wbRouter.ɵnavigate(layout => layout
+      this._workbenchRouter.ɵnavigate(layout => layout
         .addPart(newPartId, {relativeTo: event.target.partId!, align: coerceLayoutAlignment(event.target.region!)})
         .moveView(event.source.viewId, newPartId),
       ).then();
     }
     else {
-      this._wbRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, event.target.partId!, event.target.insertionIndex)).then();
+      this._workbenchRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, event.target.partId!, event.target.insertionIndex)).then();
     }
   }
 

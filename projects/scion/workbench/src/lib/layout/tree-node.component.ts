@@ -40,9 +40,9 @@ export class TreeNodeComponent {
     this.sash2 = this.createSash(treeNode.child2, size2);
   }
 
-  constructor(private _wbRouter: WorkbenchRouter,
+  constructor(private _workbenchRouter: WorkbenchRouter,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _workbenchLayout: WorkbenchLayoutService) {
+              private _workbenchLayoutService: WorkbenchLayoutService) {
   }
 
   public get nodeId(): string {
@@ -54,13 +54,13 @@ export class TreeNodeComponent {
   }
 
   public onSashStart(): void {
-    this._workbenchLayout.notifyDragStarting();
+    this._workbenchLayoutService.notifyDragStarting();
   }
 
   public onSashEnd([sashSize1, sashSize2]: number[]): void {
     const ratio = sashSize1 / (sashSize1 + sashSize2);
-    this._workbenchLayout.notifyDragEnding();
-    this._wbRouter.ɵnavigate(layout => layout.setSplitRatio(this._treeNode.nodeId, ratio)).then();
+    this._workbenchLayoutService.notifyDragEnding();
+    this._workbenchRouter.ɵnavigate(layout => layout.setSplitRatio(this._treeNode.nodeId, ratio)).then();
   }
 
   private createSash(content: MTreeNode | MPart, proportion: string): Sash {

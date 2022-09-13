@@ -65,7 +65,7 @@ export class ViewTabComponent implements OnDestroy {
               private _workbench: ɵWorkbenchService,
               private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _workbenchLayout: WorkbenchLayoutService,
+              private _workbenchLayoutService: WorkbenchLayoutService,
               private _viewport: SciViewportComponent,
               private _viewPart: ɵWorkbenchViewPart,
               private _viewDragService: ViewDragService,
@@ -206,7 +206,7 @@ export class ViewTabComponent implements OnDestroy {
         .subscribe((event: Event) => {
           event.stopPropagation(); // prevent `ViewPartBarComponent` handling the dblclick event which would undo maximization/minimization
           if (enabled) {
-            zone.run(() => this._workbenchLayout.toggleMaximized());
+            zone.run(() => this._workbenchLayoutService.toggleMaximized());
           }
         });
     });

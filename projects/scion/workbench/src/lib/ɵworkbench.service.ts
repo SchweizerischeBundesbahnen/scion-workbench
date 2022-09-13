@@ -28,22 +28,22 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly views$: Observable<string[]>;
   public readonly appInstanceId = UUID.randomUUID();
 
-  constructor(private _wbRouter: WorkbenchRouter,
+  constructor(private _workbenchRouter: WorkbenchRouter,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _layoutService: WorkbenchLayoutService) {
-    this.views$ = this._layoutService.layout$.pipe(map(layout => layout.viewsIds));
+              private _workbenchLayoutService: WorkbenchLayoutService) {
+    this.views$ = this._workbenchLayoutService.layout$.pipe(map(layout => layout.viewsIds));
   }
 
   public destroyView(...viewIds: string[]): Promise<boolean> {
-    return this._wbRouter.closeViews(...viewIds);
+    return this._workbenchRouter.closeViews(...viewIds);
   }
 
   public activateView(viewId: string): Promise<boolean> {
-    return this._wbRouter.ɵnavigate(layout => layout.activateView(viewId));
+    return this._workbenchRouter.ɵnavigate(layout => layout.activateView(viewId));
   }
 
   public resolveViewPart(viewId: string): string {
-    return this._layoutService.layout!.findPartByViewId(viewId, {orElseThrow: true}).partId;
+    return this._workbenchLayoutService.layout!.findPartByViewId(viewId, {orElseThrow: true}).partId;
   }
 
   public getView(viewId: string): WorkbenchView | null {

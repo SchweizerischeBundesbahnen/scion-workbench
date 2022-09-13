@@ -48,7 +48,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
               private _auxRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _layoutService: WorkbenchLayoutService,
+              private _workbenchLayoutService: WorkbenchLayoutService,
               private _environmentInjector: EnvironmentInjector,
               private _workbenchRouter: WorkbenchRouter,
               private _partsLayoutFactory: PartsLayoutFactory,
@@ -147,7 +147,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
    */
   private undoWorkbenchLayoutDiffer(): void {
     const prevNavigateUrl = this._router.url; // Browser URL is only updated after successful navigation
-    const prevNavigateLayout = this._layoutService.layout; // Layout in `LayoutService` is only updated after successful navigation
+    const prevNavigateLayout = this._workbenchLayoutService.layout; // Layout in `LayoutService` is only updated after successful navigation
     this._workbenchLayoutDiffer.diff(this._router.parseUrl(prevNavigateUrl), prevNavigateLayout ?? undefined);
   }
 
@@ -173,7 +173,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
   private applyPartsLayout(): void {
     const currentNavigation = this._workbenchRouter.getCurrentNavigationContext();
     this._logger.debug(() => 'Applying workbench layout', LoggerNames.ROUTING, currentNavigation.partsLayout);
-    this._layoutService.setLayout(currentNavigation.partsLayout);
+    this._workbenchLayoutService.setLayout(currentNavigation.partsLayout);
   }
 
   /**

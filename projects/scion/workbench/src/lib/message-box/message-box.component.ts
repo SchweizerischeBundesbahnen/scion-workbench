@@ -63,7 +63,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
 
   constructor(private _injector: Injector,
               private _cd: ChangeDetectorRef,
-              private _workbenchLayout: WorkbenchLayoutService) {
+              private _workbenchLayoutService: WorkbenchLayoutService) {
   }
 
   public ngOnInit(): void {
@@ -92,7 +92,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
   }
 
   public onMoveStart(): void {
-    this._workbenchLayout.notifyDragStarting();
+    this._workbenchLayoutService.notifyDragStarting();
   }
 
   public onMove(delta: MoveDelta): void {
@@ -102,7 +102,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
   }
 
   public onMoveEnd(): void {
-    this._workbenchLayout.notifyDragEnding();
+    this._workbenchLayoutService.notifyDragEnding();
   }
 
   private createPortal(messageBox: ɵMessageBox): ComponentPortal<any> {

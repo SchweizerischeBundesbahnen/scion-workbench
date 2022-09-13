@@ -35,13 +35,13 @@ describe('ViewComponent', () => {
     TestBed.inject(Router).initialNavigation();
   }));
 
-  it('should render dirty state', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('should render dirty state', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set dirty flag
@@ -62,13 +62,13 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('should render heading text', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('should render heading text', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set heading
@@ -85,13 +85,13 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('should render title', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('should render title', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
 
     // Set heading
@@ -108,13 +108,13 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('should detach inactive views from Angular component tree and DOM', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('should detach inactive views from Angular component tree and DOM', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     const component1: SpecView1Component = view1DebugElement.component;
@@ -125,7 +125,7 @@ describe('ViewComponent', () => {
     expect(querySelector(fixture, 'spec-view-1')).withContext('(B)').toBeDefined();
 
     // Add View 2
-    wbRouter.navigate(['view-2']).then();
+    workbenchRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView2Component>('view.2');
     const component2: SpecView2Component = view2DebugElement.component;
@@ -177,20 +177,20 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('invokes activate and deactivate lifecycle hooks', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('invokes activate and deactivate lifecycle hooks', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     expect(view1DebugElement.view.active).withContext('(A)').toBeTrue();
     expect(view1DebugElement.component.activated).withContext('(B)').toBeTrue();
 
     // Add View 2
-    wbRouter.navigate(['view-2']).then();
+    workbenchRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView1Component>('view.2');
     expect(view1DebugElement.view.active).withContext('(C)').toBeFalse();
@@ -219,20 +219,20 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('invokes destroy lifecycle hook', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('invokes destroy lifecycle hook', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
     expect(view1DebugElement.view.destroyed).withContext('(A)').toBeFalse();
     expect(view1DebugElement.component.destroyed).withContext('(B)').toBeFalse();
 
     // Add View 2
-    wbRouter.navigate(['view-2']).then();
+    workbenchRouter.navigate(['view-2']).then();
     advance(fixture);
     const view2DebugElement = getViewDebugElement<SpecView1Component>('view.2');
     expect(view1DebugElement.view.destroyed).withContext('(C)').toBeFalse();
@@ -262,13 +262,13 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('prevents the view from being destroyed', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('prevents the view from being destroyed', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
     const view1DebugElement = getViewDebugElement<SpecView1Component>('view.1');
 
@@ -293,13 +293,13 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('allows component routing', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows component routing', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement1.component.destroyed).withContext('(A)').toBeFalse();
@@ -307,7 +307,7 @@ describe('ViewComponent', () => {
     expect(querySelector(fixture, 'spec-view-1')).withContext('(C)').toBeDefined();
 
     // Route to View 2
-    wbRouter.navigate(['view-2'], {target: 'self', selfViewId: 'view.1'}).then();
+    workbenchRouter.navigate(['view-2'], {target: 'self', selfViewId: 'view.1'}).then();
     advance(fixture);
 
     const viewDebugElement2 = getViewDebugElement<SpecView2Component>('view.1');
@@ -324,13 +324,13 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('allows a view to be added, removed and to be added again', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows a view to be added, removed and to be added again', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View 1
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement1.component.destroyed).withContext('(A)').toBeFalse();
@@ -345,7 +345,7 @@ describe('ViewComponent', () => {
     expect(querySelector(fixture, 'spec-view-1')).withContext('(F)').toBeUndefined();
 
     // Add View 1 again
-    wbRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-1']).then();
     advance(fixture);
     const viewDebugElement2 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement2.component.destroyed).withContext('(G)').toBeFalse();
