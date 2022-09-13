@@ -57,7 +57,7 @@ export class ActivityPartComponent {
 
   constructor(public host: ElementRef<HTMLElement>,
               public activityPartService: WorkbenchActivityPartService,
-              private _workbenchLayout: WorkbenchLayoutService,
+              private _workbenchLayoutService: WorkbenchLayoutService,
               private _animationBuilder: AnimationBuilder,
               private _cd: ChangeDetectorRef) {
   }
@@ -90,7 +90,7 @@ export class ActivityPartComponent {
   }
 
   public onSashStart(): void {
-    this._workbenchLayout.notifyDragStarting();
+    this._workbenchLayoutService.notifyDragStarting();
   }
 
   public onSash(deltaX: number): void {
@@ -98,7 +98,7 @@ export class ActivityPartComponent {
   }
 
   public onSashEnd(): void {
-    this._workbenchLayout.notifyDragEnding();
+    this._workbenchLayoutService.notifyDragEnding();
     this.ensureMinimalPanelWidth();
   }
 

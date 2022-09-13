@@ -101,7 +101,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   // eslint-disable-next-line @typescript-eslint/member-ordering
   constructor(host: ElementRef<HTMLElement>,
               private _workbench: WorkbenchService,
-              private _workbenchLayout: WorkbenchLayoutService,
+              private _workbenchLayoutService: WorkbenchLayoutService,
               private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
               private _viewPart: ɵWorkbenchViewPart,
               private _viewDragService: ViewDragService) {
@@ -116,7 +116,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
 
   @HostListener('dblclick', ['$event'])
   public onDoubleClick(event: MouseEvent): void {
-    this._workbenchLayout.toggleMaximized(false);
+    this._workbenchLayoutService.toggleMaximized(false);
     event.stopPropagation();
   }
 
@@ -240,7 +240,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     // Wait undoing the drag state until flushed tab changes to the DOM, i.e., after the layout routing cycle completes.
     // If we were to undo the drag state immediately during the course of the drop event, the tab layout would temporarily
     // revert to the state before the drag operation, resulting in an ugly flicker.
-    this._workbenchLayout.whenLayoutChange().then(() => {
+    this._workbenchLayoutService.whenLayoutChange().then(() => {
       this.unsetDragState({unsetDragSource: !!this.dragSourceViewTab});
     });
   }
@@ -257,7 +257,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   }
 
   private installLayoutChangeListener(): void {
-    this._workbenchLayout.onLayoutChange$
+    this._workbenchLayoutService.onLayoutChange$
       .pipe(takeUntil(this._destroy$))
       .subscribe(() => this.scrollActiveViewTabIntoViewport());
   }

@@ -21,7 +21,7 @@ export class WorkbenchActivityPartService {
   private _activities$ = new BehaviorSubject<Activity[]>([]);
 
   constructor(private _router: Router,
-              private _wbRouter: WorkbenchRouter,
+              private _workbenchRouter: WorkbenchRouter,
               private _injector: Injector) {
   }
 
@@ -43,7 +43,7 @@ export class WorkbenchActivityPartService {
    * Creates an activity to be added to this service.
    */
   public createActivity(): Activity {
-    return new InternalActivity(this._wbRouter, this._injector);
+    return new InternalActivity(this._workbenchRouter, this._injector);
   }
 
   /**
@@ -65,7 +65,7 @@ export class WorkbenchActivityPartService {
       });
     }
     else if (activity.target === 'view') {
-      return this._wbRouter.navigate(activity.commands, {activateIfPresent: false});
+      return this._workbenchRouter.navigate(activity.commands, {activateIfPresent: false});
     }
     throw Error('[IllegalActivityTargetError] Target must be \'activity-panel\' or \'view\'');
   }

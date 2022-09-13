@@ -54,7 +54,7 @@ describe('Lazily loaded view', () => {
     TestBed.inject(Router).initialNavigation();
   }));
 
-  it('should get services injected from its child injector', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('should get services injected from its child injector', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
@@ -67,7 +67,7 @@ describe('Lazily loaded view', () => {
     expect(activityComponent.featureService).not.withContext('(2)').toBeUndefined();
 
     // Open 'feature/view'
-    wbRouter.navigate(['/feature/view']).then();
+    workbenchRouter.navigate(['/feature/view']).then();
     advance(fixture);
 
     // Verify injection token
@@ -81,7 +81,7 @@ describe('Lazily loaded view', () => {
   /**
    * Verifies that a service provided in the lazily loaded module should be preferred over the service provided in the root module.
    */
-  it('should get services injected from its child injector prior to from the root injector', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('should get services injected from its child injector prior to from the root injector', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
@@ -93,7 +93,7 @@ describe('Lazily loaded view', () => {
     expect(activityComponent.injectedValue).withContext('(1)').toEqual('child-injector-value');
 
     // Open 'feature/view'
-    wbRouter.navigate(['/feature/view']).then();
+    workbenchRouter.navigate(['/feature/view']).then();
     advance(fixture);
 
     // Verify injection token

@@ -111,11 +111,11 @@ export class InternalActivity implements Activity {
   public visible = true;
   public position: number | undefined;
 
-  constructor(private _wbRouter: WorkbenchRouter, private _injector: Injector) {
+  constructor(private _workbenchRouter: WorkbenchRouter, private _injector: Injector) {
   }
 
   public set routerLink(routerLink: any[] | string) {
-    this._commands = this._wbRouter.normalizeCommands(routerLink ? (Array.isArray(routerLink) ? routerLink : [routerLink]) : []);
+    this._commands = this._workbenchRouter.normalizeCommands(routerLink ? (Array.isArray(routerLink) ? routerLink : [routerLink]) : []);
     this._path = this.commands.filter(it => typeof it === 'string').join('/');
   }
 

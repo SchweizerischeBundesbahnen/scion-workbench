@@ -45,7 +45,7 @@ export class WorkbenchComponent implements OnDestroy {
 
   @HostBinding('class.maximized')
   public get maximized(): boolean {
-    return this._workbenchLayout.maximized;
+    return this._workbenchLayoutService.maximized;
   }
 
   @HostBinding('class.dragging')
@@ -53,7 +53,7 @@ export class WorkbenchComponent implements OnDestroy {
 
   public splash: ComponentType<any>;
 
-  constructor(private _workbenchLayout: WorkbenchLayoutService,
+  constructor(private _workbenchLayoutService: WorkbenchLayoutService,
               @Inject(IFRAME_HOST) private _iframeHost: ViewContainerReference,
               @Inject(VIEW_LOCAL_MESSAGE_BOX_HOST) private _viewLocalMessageBoxHost: ViewContainerReference,
               workbenchModuleConfig: WorkbenchModuleConfig,
@@ -70,7 +70,7 @@ export class WorkbenchComponent implements OnDestroy {
         map(activities => activities.length > 0),
       );
 
-    this._workbenchLayout.dragging$
+    this._workbenchLayoutService.dragging$
       .pipe(takeUntil(this._destroy$))
       .subscribe(event => {
         this.dragging = (event === 'start');

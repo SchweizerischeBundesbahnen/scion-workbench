@@ -20,7 +20,7 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 @Injectable()
 export class WbBeforeDestroyGuard implements CanDeactivate<any | WbBeforeDestroy> {
 
-  constructor(private _wbRouter: WorkbenchRouter) {
+  constructor(private _workbenchRouter: WorkbenchRouter) {
   }
 
   /**
@@ -42,6 +42,6 @@ export class WbBeforeDestroyGuard implements CanDeactivate<any | WbBeforeDestroy
   }
 
   private isCurrentViewBeingClosed(currentView: string): boolean {
-    return this._wbRouter.getCurrentNavigationContext().layoutDiff.removedViews.indexOf(currentView) >= 0;
+    return this._workbenchRouter.getCurrentNavigationContext().layoutDiff.removedViews.indexOf(currentView) >= 0;
   }
 }

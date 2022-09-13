@@ -33,8 +33,8 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart {
 
   constructor(public readonly partId: string,
               viewPartComponent: ComponentType<any>, // do not reference `ViewPartComponent` to avoid import cycles
-              private _layoutService: WorkbenchLayoutService = inject(WorkbenchLayoutService),
-              private _wbRouter: WorkbenchRouter = inject(WorkbenchRouter),
+              private _workbenchLayoutService: WorkbenchLayoutService = inject(WorkbenchLayoutService),
+              private _workbenchRouter: WorkbenchRouter = inject(WorkbenchRouter),
               private _viewRegistry: WorkbenchViewRegistry = inject(WorkbenchViewRegistry)) {
     this.portal = this.createPortal(viewPartComponent);
   }
@@ -92,7 +92,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart {
       return true;
     }
 
-    return this._wbRouter.ɵnavigate(layout => layout.activatePart(this.partId));
+    return this._workbenchRouter.ɵnavigate(layout => layout.activatePart(this.partId));
   }
 
   public containsView(viewId: string): boolean {
@@ -109,7 +109,7 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart {
       return true;
     }
 
-    return this._wbRouter.ɵnavigate(layout => layout.activateView(viewId));
+    return this._workbenchRouter.ɵnavigate(layout => layout.activateView(viewId));
   }
 
   /**
@@ -122,11 +122,11 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart {
       return false;
     }
 
-    return this._wbRouter.ɵnavigate(layout => layout.activateAdjacentView(this.activeViewId!));
+    return this._workbenchRouter.ɵnavigate(layout => layout.activateAdjacentView(this.activeViewId!));
   }
 
   public isActive(): boolean {
-    return (this._layoutService.layout?.activePart.partId === this.partId);
+    return (this._workbenchLayoutService.layout?.activePart.partId === this.partId);
   }
 
   public setHiddenViewTabs(viewIds: string[]): void {

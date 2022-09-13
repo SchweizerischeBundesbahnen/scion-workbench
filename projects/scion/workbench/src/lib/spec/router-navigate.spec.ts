@@ -66,12 +66,12 @@ describe('Router', () => {
     TestBed.inject(Router).initialNavigation();
   }));
 
-  it('allows for relative and absolute navigation', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows for relative and absolute navigation', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
     // Navigate to entry component of feature module A
-    wbRouter.navigate(['feature-a']).then();
+    workbenchRouter.navigate(['feature-a']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureA_EntryComponent, '(1)');
 
@@ -238,42 +238,42 @@ describe('Router', () => {
     discardPeriodicTasks();
   })));
 
-  it('allows to close views', fakeAsync(inject([WorkbenchRouter], (wbRouter: WorkbenchRouter) => {
+  it('allows to close views', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(AppComponent);
     advance(fixture);
 
     // Open /feature-a/view-1
-    wbRouter.navigate(['feature-a']).then();
+    workbenchRouter.navigate(['feature-a']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureA_EntryComponent, '(1a)');
 
     // Close /feature-a/view-1
-    wbRouter.navigate(['feature-a'], {closeIfPresent: true}).then();
+    workbenchRouter.navigate(['feature-a'], {closeIfPresent: true}).then();
     advance(fixture);
     expect(fixture).not.toShow(FeatureA_View1Component, '(1b)');
 
     // Open /feature-a/view-1
-    wbRouter.navigate(['feature-a/view-1']).then();
+    workbenchRouter.navigate(['feature-a/view-1']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureA_View1Component, '(2a)');
 
     // Close /feature-a/view-1
-    wbRouter.navigate(['feature-a/view-1'], {closeIfPresent: true}).then();
+    workbenchRouter.navigate(['feature-a/view-1'], {closeIfPresent: true}).then();
     advance(fixture);
     expect(fixture).not.toShow(FeatureA_View1Component, '(2b)');
 
     // Open /feature-a/feature-b/view-1
-    wbRouter.navigate(['feature-a/feature-b/view-1']).then();
+    workbenchRouter.navigate(['feature-a/feature-b/view-1']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureB_View1Component, '(3a)');
 
     // Close /feature-a/feature-b/view-1
-    wbRouter.navigate(['feature-a/feature-b/view-1'], {closeIfPresent: true}).then();
+    workbenchRouter.navigate(['feature-a/feature-b/view-1'], {closeIfPresent: true}).then();
     advance(fixture);
     expect(fixture).not.toShow(FeatureB_View1Component, '(3b)');
 
     // Close not present view
-    wbRouter.navigate(['a/b/c'], {closeIfPresent: true}).then();
+    workbenchRouter.navigate(['a/b/c'], {closeIfPresent: true}).then();
 
     discardPeriodicTasks();
   })));

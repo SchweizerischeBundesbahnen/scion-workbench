@@ -62,12 +62,12 @@ export class PartsLayoutComponent implements OnInit, OnDestroy {
   public rootNode: MTreeNode | null = null;
 
   constructor(private _viewPartRegistry: WorkbenchViewPartRegistry,
-              private _layoutService: WorkbenchLayoutService,
+              private _workbenchLayoutService: WorkbenchLayoutService,
               private _cd: ChangeDetectorRef) {
   }
 
   public ngOnInit(): void {
-    this._layoutService.layout$
+    this._workbenchLayoutService.layout$
       .pipe(
         startWith(null! as PartsLayout), // start with a null layout to initialize the 'pairwise' operator, so it emits once the layout is set.
         pairwise(),

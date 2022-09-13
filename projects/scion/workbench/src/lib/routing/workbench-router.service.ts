@@ -42,7 +42,7 @@ export class WorkbenchRouter implements OnDestroy {
 
   constructor(private _router: Router,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _layoutService: WorkbenchLayoutService,
+              private _workbenchLayoutService: WorkbenchLayoutService,
               private _zone: NgZone) {
   }
 
@@ -135,12 +135,12 @@ export class WorkbenchRouter implements OnDestroy {
     return this._singleTaskExecutor.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, this navigation would override the initial layout as given in the URL.
-      if (!this._layoutService.layout) {
+      if (!this._workbenchLayoutService.layout) {
         await this.waitForInitialLayout();
       }
 
       // Pass control to the navigator to compute the new workbench layout.
-      const navigation: WorkbenchNavigation | null = coerceNavigation(await onNavigate(this._layoutService.layout!));
+      const navigation: WorkbenchNavigation | null = coerceNavigation(await onNavigate(this._workbenchLayoutService.layout!));
       if (!navigation) {
         return false;
       }
@@ -177,12 +177,12 @@ export class WorkbenchRouter implements OnDestroy {
     return this._singleTaskExecutor.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, would override the initial layout as given in the URL.
-      if (!this._layoutService.layout) {
+      if (!this._workbenchLayoutService.layout) {
         await this.waitForInitialLayout();
       }
 
       // Pass control to the navigator to compute the new workbench layout.
-      const navigation: WorkbenchNavigation = coerceNavigation(await onNavigate(this._layoutService.layout!))!;
+      const navigation: WorkbenchNavigation = coerceNavigation(await onNavigate(this._workbenchLayoutService.layout!))!;
 
       // create the URL tree.
       return this.createUrlTreeUnsafe(navigation, extras);
@@ -308,7 +308,7 @@ export class WorkbenchRouter implements OnDestroy {
    * Blocks until the initial layout is available, i.e. after completion of Angular's initial navigation.
    */
   private async waitForInitialLayout(): Promise<void> {
-    await firstValueFrom(this._layoutService.layout$);
+    await firstValueFrom(this._workbenchLayoutService.layout$);
   }
 
   /**

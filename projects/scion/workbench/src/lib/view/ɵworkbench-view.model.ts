@@ -49,7 +49,7 @@ export class ɵWorkbenchView implements WorkbenchView {
   constructor(public readonly viewId: string,
               viewComponent: ComponentType<any>, // do not reference `ViewComponent` to avoid import cycles
               private _workbench: ɵWorkbenchService = inject(ɵWorkbenchService),
-              private _layoutService: WorkbenchLayoutService = inject(WorkbenchLayoutService),
+              private _workbenchLayoutService: WorkbenchLayoutService = inject(WorkbenchLayoutService),
               private _viewPartRegistry: WorkbenchViewPartRegistry = inject(WorkbenchViewPartRegistry),
               private _viewDragService: ViewDragService = inject(ViewDragService),
               private _router: Router = inject(Router),
@@ -118,7 +118,7 @@ export class ɵWorkbenchView implements WorkbenchView {
 
   public get part(): WorkbenchViewPart {
     // DO NOT resolve the part at construction time because it can change, e.g. when this view is moved to another part.
-    const part = this._layoutService.layout!.findPartByViewId(this.viewId, {orElseThrow: true});
+    const part = this._workbenchLayoutService.layout!.findPartByViewId(this.viewId, {orElseThrow: true});
     return this._viewPartRegistry.getElseThrow(part.partId);
   }
 
