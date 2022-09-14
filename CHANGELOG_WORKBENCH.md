@@ -1,3 +1,28 @@
+# [14.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/13.0.0-beta.2...14.0.0-beta.1) (2022-09-14)
+
+
+### Bug Fixes
+
+* **workbench:** do not display backdrop when opening the view list menu ([d80582f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d80582f1fa1e3077999e6bf85c2d671ca698e1e5))
+* **workbench:** fix resolution of SASS modules when linking the library via `tsconfig` path overrides ([213d58b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/213d58b8b70e88acfc0619a9d7468c19ca390acd))
+* **workbench:** render view tabs smaller ([8d2b66e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/8d2b66e14e812b2ba3c1b49018367edc49cfa9c1))
+
+
+### Dependencies
+
+* **workbench:** update @scion/workbench to Angular 14 ([bd4bcd7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/bd4bcd749969065799ae42f71e7383f2f65d73c7)), closes [#340](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/340)
+
+
+### BREAKING CHANGES
+
+* **workbench:** Updating `@scion/workbench` to Angular 14 introduced a breaking change.
+
+  To migrate:
+  - update your application to Angular 14.x; for detailed migration instructions, refer to https://v14.angular.io/guide/update-to-latest-version;
+  - update @scion/components to version 14; for detailed migration instructions, refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG_COMPONENTS.md;
+
+
+
 # [13.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/13.0.0-beta.1...13.0.0-beta.2) (2022-05-20)
 
 
