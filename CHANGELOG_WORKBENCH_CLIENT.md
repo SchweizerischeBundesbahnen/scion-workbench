@@ -1,3 +1,14 @@
+# [1.0.0-beta.11](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.10...workbench-client-1.0.0-beta.11) (2022-09-14)
+
+
+### Documentation
+
+* **workbench-client:** change example to new parameter declaration API ([e83bd74](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e83bd744abd0c9f37dd5ec3a88aeaa6f9fa98593))
+ 
+* **workbench-client:** fix TypeDoc links ([bd4bcd7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/bd4bcd749969065799ae42f71e7383f2f65d73c7))
+
+
+
 # [1.0.0-beta.10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.9...workbench-client-1.0.0-beta.10) (2022-05-20)
 
 
