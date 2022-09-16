@@ -28,7 +28,7 @@ export class RouterPagePO {
   constructor(appPO: AppPO, public viewId: string) {
     this._viewPO = appPO.findView({viewId: viewId});
     this.viewTabPO = appPO.findViewTab({viewId: viewId});
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-router-page');
+    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-router-page');
   }
 
   public async isVisible(): Promise<boolean> {

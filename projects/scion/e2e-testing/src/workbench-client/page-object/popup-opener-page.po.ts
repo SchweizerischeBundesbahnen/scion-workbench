@@ -29,7 +29,7 @@ export class PopupOpenerPagePO {
 
   constructor(private _appPO: AppPO, public viewId: string) {
     this.viewTabPO = _appPO.findViewTab({viewId: viewId});
-    this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-popup-opener-page');
+    this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-popup-opener-page');
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {

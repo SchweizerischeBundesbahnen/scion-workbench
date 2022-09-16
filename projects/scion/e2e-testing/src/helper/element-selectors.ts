@@ -18,7 +18,7 @@ export namespace ElementSelectors {
   /**
    * Returns the selector for the <iframe> contained within the <sci-router-outlet> element with the given name or that has set the given CSS class(es).
    */
-  export function routerOutlet(outletNameOrSelector: string | RouterOutletSelector): string {
+  export function routerOutletFrame(outletNameOrSelector: string | RouterOutletSelector): string {
     if (typeof outletNameOrSelector === 'string') {
       return `sci-router-outlet[name="${outletNameOrSelector}"] iframe`;
     }

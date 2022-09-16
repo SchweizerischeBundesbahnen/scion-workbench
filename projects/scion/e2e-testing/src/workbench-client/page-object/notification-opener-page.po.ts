@@ -24,7 +24,7 @@ export class NotificationOpenerPagePO {
   private _cssClasses = new Array<string>();
 
   constructor(private _appPO: AppPO, public viewId: string) {
-    this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-notification-opener-page');
+    this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-notification-opener-page');
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {

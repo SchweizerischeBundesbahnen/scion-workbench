@@ -32,7 +32,7 @@ export class ViewPagePO {
   constructor(appPO: AppPO, public viewId: string) {
     this.viewPO = appPO.findView({viewId: viewId});
     this.viewTabPO = appPO.findViewTab({viewId: viewId});
-    this.locator = appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-view-page');
+    this.locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-view-page');
   }
 
   public async isPresent(): Promise<boolean> {

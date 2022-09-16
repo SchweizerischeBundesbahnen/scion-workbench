@@ -23,7 +23,7 @@ export class UnregisterWorkbenchCapabilityPagePO {
 
   constructor(appPO: AppPO, public viewId: string) {
     this.viewTabPO = appPO.findViewTab({viewId: viewId});
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-unregister-workbench-capability-page');
+    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-unregister-workbench-capability-page');
   }
 
   /**
