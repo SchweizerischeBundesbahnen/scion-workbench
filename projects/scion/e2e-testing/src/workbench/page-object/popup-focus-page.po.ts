@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, isActiveElement, isPresent} from '../../helper/testing.util';
+import {isActiveElement, isPresent} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {Locator} from '@playwright/test';
 
@@ -32,12 +32,10 @@ export class PopupFocusPagePO {
   }
 
   public async isActiveElement(field: 'first-field' | 'middle-field' | 'last-field'): Promise<boolean> {
-    await assertElementVisible(this._locator);
     return isActiveElement(this._locator.locator(`input.e2e-${field}`));
   }
 
   public async clickField(field: 'first-field' | 'middle-field' | 'last-field'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator(`input.e2e-${field}`).click();
   }
 }

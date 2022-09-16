@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, coerceArray} from '../../helper/testing.util';
+import {coerceArray} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
@@ -28,53 +28,43 @@ export class NotificationOpenerPagePO {
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(qualifier);
   }
 
   public async enterParams(params: Record<string, string>): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-params'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(params);
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-title').fill(title);
   }
 
   public async enterContent(content: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-content').fill(content);
   }
 
   public async selectSeverity(severity: 'info' | 'warn' | 'error'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-severity').selectOption(severity);
   }
 
   public async selectDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-duration').fill(`${duration}`);
   }
 
   public async enterGroup(group: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-group').fill(group);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await assertElementVisible(this._locator);
     this._cssClasses = coerceArray(cssClass);
     await this._locator.locator('input.e2e-class').fill(this._cssClasses.join(' '));
   }
 
   public async clickShow(): Promise<void> {
-    await assertElementVisible(this._locator);
-
     if (!this._cssClasses.length) {
       throw Error('Missing required CSS class to wait for the notification to display.');
     }
@@ -90,7 +80,6 @@ export class NotificationOpenerPagePO {
   }
 
   public async pressEscape(): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.click();
     await this._locator.press('Escape');
   }

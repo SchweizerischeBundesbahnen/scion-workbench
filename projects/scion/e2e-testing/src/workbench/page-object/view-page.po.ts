@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, coerceArray, isPresent} from '../../helper/testing.util';
+import {coerceArray, isPresent} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {Locator} from '@playwright/test';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
@@ -37,18 +37,14 @@ export class ViewPagePO {
   }
 
   public async getViewId(): Promise<string> {
-    await assertElementVisible(this._locator);
     return this._locator.locator('span.e2e-view-id').innerText();
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await assertElementVisible(this._locator);
     return this._locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getRouteParams(): Promise<Params> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
@@ -60,36 +56,28 @@ export class ViewPagePO {
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-title').fill(title);
   }
 
   public async enterHeading(heading: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-heading').fill(heading);
   }
 
   public async checkDirty(check: boolean): Promise<void> {
-    await assertElementVisible(this._locator);
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-dirty')).toggle(check);
   }
 
   public async checkClosable(check: boolean): Promise<void> {
-    await assertElementVisible(this._locator);
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-closable')).toggle(check);
   }
 
   public async clickClose(): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-view-actions'));
     await accordionPO.expand();
     await this._locator.locator('button.e2e-close').click();
   }
 
   public async addViewAction(viewpartAction: ViewpartAction, options?: {append?: boolean}): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-viewpart-actions'));
     await accordionPO.expand();
     try {

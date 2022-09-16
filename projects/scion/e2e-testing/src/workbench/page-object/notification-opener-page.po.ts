@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, coerceArray} from '../../helper/testing.util';
+import {coerceArray} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
@@ -26,54 +26,43 @@ export class NotificationOpenerPagePO {
   }
 
   public async selectComponent(component: 'inspect-notification' | 'default'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-component').selectOption(component);
   }
 
   public async enterContent(content: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-content').fill(content);
   }
 
   public async enterComponentInput(componentInput: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-component-input').fill(componentInput);
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-title').fill(title);
   }
 
   public async selectSeverity(severity: 'info' | 'warn' | 'error'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-severity').selectOption(severity);
   }
 
   public async selectDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-duration').fill(`${duration}`);
   }
 
   public async enterGroup(group: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-group').fill(group);
   }
 
   public async checkUseGroupInputReduceFn(check: boolean): Promise<void> {
-    await assertElementVisible(this._locator);
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-use-group-input-reducer')).toggle(check);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await assertElementVisible(this._locator);
     this._cssClasses = coerceArray(cssClass);
     await this._locator.locator('input.e2e-class').fill(this._cssClasses.join(' '));
   }
 
   public async clickShow(): Promise<void> {
-    await assertElementVisible(this._locator);
-
     if (!this._cssClasses.length) {
       throw Error('Missing required CSS class to wait for the notification to display.');
     }
@@ -83,7 +72,6 @@ export class NotificationOpenerPagePO {
   }
 
   public async pressEscape(): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.click();
     await this._locator.press('Escape');
   }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, fromRect, isPresent} from '../../helper/testing.util';
+import {fromRect, isPresent} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {Params} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
@@ -44,28 +44,22 @@ export class ViewPagePO {
   }
 
   public async getViewId(): Promise<string> {
-    await assertElementVisible(this.locator);
     return this.locator.locator('span.e2e-view-id').innerText();
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await assertElementVisible(this.locator);
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getPath(): Promise<string> {
-    await assertElementVisible(this.locator);
     return this.locator.locator('span.e2e-path').innerText();
   }
 
   public async getAppInstanceId(): Promise<string> {
-    await assertElementVisible(this.locator);
     return this.locator.locator('span.e2e-app-instance-id').innerText();
   }
 
   public async getViewCapability(): Promise<WorkbenchViewCapability> {
-    await assertElementVisible(this.locator);
-
     const capabilityAccordionLocator = this.locator.locator('sci-accordion.e2e-view-capability');
     const accordionPO = new SciAccordionPO(capabilityAccordionLocator);
     await accordionPO.expand();
@@ -78,8 +72,6 @@ export class ViewPagePO {
   }
 
   public async getViewParams(): Promise<Params> {
-    await assertElementVisible(this.locator);
-
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-params'));
     await accordionPO.expand();
     try {
@@ -91,8 +83,6 @@ export class ViewPagePO {
   }
 
   public async getRouteParams(): Promise<Params> {
-    await assertElementVisible(this.locator);
-
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
@@ -104,8 +94,6 @@ export class ViewPagePO {
   }
 
   public async getRouteQueryParams(): Promise<Params> {
-    await assertElementVisible(this.locator);
-
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-query-params'));
     await accordionPO.expand();
     try {
@@ -117,8 +105,6 @@ export class ViewPagePO {
   }
 
   public async getRouteFragment(): Promise<string> {
-    await assertElementVisible(this.locator);
-
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
     await accordionPO.expand();
     try {
@@ -130,17 +116,14 @@ export class ViewPagePO {
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await assertElementVisible(this.locator);
     await this.locator.locator('input.e2e-title').fill(title);
   }
 
   public async enterHeading(heading: string): Promise<void> {
-    await assertElementVisible(this.locator);
     await this.locator.locator('input.e2e-heading').fill(heading);
   }
 
   public async markDirty(dirty?: boolean): Promise<void> {
-    await assertElementVisible(this.locator);
     switch (dirty) {
       case true: {
         await this.locator.locator('button.e2e-mark-dirty').click();
@@ -158,18 +141,14 @@ export class ViewPagePO {
   }
 
   public async checkClosable(check: boolean): Promise<void> {
-    await assertElementVisible(this.locator);
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-closable')).toggle(check);
   }
 
   public async checkConfirmClosing(check: boolean): Promise<void> {
-    await assertElementVisible(this.locator);
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-confirm-closing')).toggle(check);
   }
 
   public async clickClose(): Promise<void> {
-    await assertElementVisible(this.locator);
-
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-actions'));
     await accordionPO.expand();
     await this.locator.locator('button.e2e-close').click();
@@ -182,8 +161,6 @@ export class ViewPagePO {
   }
 
   public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean}): Promise<void> {
-    await assertElementVisible(this.locator);
-
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-self-navigation'));
     await accordionPO.expand();
     try {
@@ -200,7 +177,6 @@ export class ViewPagePO {
   }
 
   public async sendKeys(key: string): Promise<void> {
-    await assertElementVisible(this.locator);
     await this.locator.locator('input.e2e-title').press(key);
   }
 }

@@ -9,7 +9,7 @@
  */
 
 import {AppPO, MessageBoxPO} from './app.po';
-import {assertElementVisible, coerceArray, isPresent} from './helper/testing.util';
+import {coerceArray, isPresent} from './helper/testing.util';
 import {SciParamsEnterPO} from './components.internal/params-enter.po';
 import {Locator} from '@playwright/test';
 
@@ -36,7 +36,6 @@ export class InspectMessageBoxPO {
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await assertElementVisible(this._locator);
     return this._locator.locator('span.e2e-component-instance-id').innerText();
   }
 
@@ -45,8 +44,6 @@ export class InspectMessageBoxPO {
   }
 
   public async getInputAsKeyValueObject(): Promise<Record<string, any>> {
-    await assertElementVisible(this._locator);
-
     const rawContent = await this.getInput();
     const dictionary: Record<string, any> = {};
 
@@ -70,29 +67,24 @@ export class InspectMessageBoxPO {
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-title').fill(title);
   }
 
   public async selectSeverity(severity: 'info' | 'warn' | 'error' | ''): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-severity').selectOption(severity);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
   public async enterActions(actions: Record<string, string>): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-actions'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(actions);
   }
 
   public async enterReturnValue(returnValue: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-return-value').fill(returnValue);
   }
 }

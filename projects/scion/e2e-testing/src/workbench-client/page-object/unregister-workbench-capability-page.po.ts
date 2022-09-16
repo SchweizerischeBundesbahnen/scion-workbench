@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible} from '../../helper/testing.util';
 import {AppPO, ViewTabPO} from '../../app.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
@@ -35,8 +34,6 @@ export class UnregisterWorkbenchCapabilityPagePO {
    * Returns a Promise that resolves upon successful unregistration, or that rejects on error.
    */
   public async unregisterCapability(id: string): Promise<void> {
-    await assertElementVisible(this._locator);
-
     await this.enterId(id);
     await this.clickUnregister();
 
@@ -50,12 +47,10 @@ export class UnregisterWorkbenchCapabilityPagePO {
   }
 
   public async enterId(id: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-id').fill(id);
   }
 
   public async clickUnregister(): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('button.e2e-unregister').click();
   }
 }

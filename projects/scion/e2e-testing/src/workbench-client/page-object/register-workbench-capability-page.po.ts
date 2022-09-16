@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, coerceArray} from '../../helper/testing.util';
+import {coerceArray} from '../../helper/testing.util';
 import {AppPO, ViewTabPO} from '../../app.po';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
@@ -48,8 +48,6 @@ export class RegisterWorkbenchCapabilityPagePO {
    * Returns a Promise that resolves to the capability ID upon successful registration, or that rejects on registration error.
    */
   public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(capability: T): Promise<string> {
-    await assertElementVisible(this._locator);
-
     if (capability.type !== undefined) {
       await this._locator.locator('select.e2e-type').selectOption(capability.type);
     }
@@ -137,7 +135,6 @@ export class RegisterWorkbenchCapabilityPagePO {
   }
 
   private async clickRegister(): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('button.e2e-register').click();
   }
 }
