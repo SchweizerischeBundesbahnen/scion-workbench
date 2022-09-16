@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
@@ -37,41 +36,34 @@ export class RouterPagePO {
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(qualifier);
   }
 
   public async enterParams(params: Record<string, string>): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-params'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(params);
   }
 
   public async selectTarget(target: 'self' | 'blank'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-target').selectOption(target);
   }
 
   public async enterSelfViewId(selfViewId: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-self-view-id').fill(selfViewId);
   }
 
   public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
   }
 
   public async checkActivateIfPresent(check: boolean): Promise<void> {
-    await assertElementVisible(this._locator);
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate-if-present')).toggle(check);
   }
 
   public async checkCloseIfPresent(check: boolean): Promise<void> {
-    await assertElementVisible(this._locator);
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-close-if-present')).toggle(check);
   }
 
@@ -82,7 +74,6 @@ export class RouterPagePO {
    * as this unloads the current router page.
    */
   public async clickNavigate(options?: {evalNavigateResponse?: boolean}): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('button.e2e-navigate').click();
 
     if (!(options?.evalNavigateResponse ?? true)) {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, waitUntilStable} from '../../helper/testing.util';
+import {waitUntilStable} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
@@ -34,58 +34,48 @@ export class RouterPagePO {
   }
 
   public async enterPath(path: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-path').fill(path);
   }
 
   public async enterMatrixParams(params: Params): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-matrix-params'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(params);
   }
 
   public async enterQueryParams(params: Params): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-query-params'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(params);
   }
 
   public async enterNavigationalState(state: Record<string, string>): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-navigational-state'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(state);
   }
 
   public async checkActivateIfPresent(check: boolean): Promise<void> {
-    await assertElementVisible(this._locator);
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate-if-present')).toggle(check);
   }
 
   public async checkCloseIfPresent(check: boolean): Promise<void> {
-    await assertElementVisible(this._locator);
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-close-if-present')).toggle(check);
   }
 
   public async selectTarget(target: 'self' | 'blank'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-target').selectOption(target);
   }
 
   public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
   }
 
   public async enterSelfViewId(selfViewId: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-self-view-id').fill(selfViewId);
   }
 
   public async clickNavigateViaRouter(): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('button.e2e-router-navigate').click();
     // Wait until navigation completed.
     await waitUntilStable(async () => this._page.url());
@@ -95,7 +85,6 @@ export class RouterPagePO {
    * Clicks on the router link, optionally pressing the specified modifier key.
    */
   public async clickNavigateViaRouterLink(modifiers?: Array<'Alt' | 'Control' | 'Meta' | 'Shift'>): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('a.e2e-router-link-navigate').click({modifiers});
     // Wait until navigation completed.
     await waitUntilStable(async () => this._page.url());

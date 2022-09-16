@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, coerceArray, fromRect, isPresent} from '../../helper/testing.util';
+import {coerceArray, fromRect, isPresent} from '../../helper/testing.util';
 import {AppPO, ViewTabPO} from '../../app.po';
 import {PopupOrigin, PopupSize} from '@scion/workbench';
 import {SciAccordionPO} from '../../components.internal/accordion.po';
@@ -29,13 +29,10 @@ export class PopupOpenerPagePO {
   }
 
   public async selectPopupComponent(component: 'popup-page' | 'popup-focus-page'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-popup-component').selectOption(component);
   }
 
   public async selectAnchor(anchor: 'element' | 'coordinate'): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-anchor'));
     await accordionPO.expand();
     try {
@@ -47,8 +44,6 @@ export class PopupOpenerPagePO {
   }
 
   public async enterAnchorCoordinate(coordinate: PopupOrigin): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-anchor'));
     await accordionPO.expand();
     try {
@@ -71,18 +66,14 @@ export class PopupOpenerPagePO {
   }
 
   public async selectAlign(align: 'east' | 'west' | 'north' | 'south'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-align').selectOption(align);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
   public async enterCloseStrategy(options: {closeOnFocusLost?: boolean; closeOnEscape?: boolean}): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-close-strategy'));
     await accordionPO.expand();
     try {
@@ -99,20 +90,16 @@ export class PopupOpenerPagePO {
   }
 
   public async expandSizePanel(): Promise<void> {
-    await assertElementVisible(this._locator);
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-preferred-overlay-size'));
     await accordionPO.expand();
   }
 
   public async collapseSizePanel(): Promise<void> {
-    await assertElementVisible(this._locator);
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-preferred-overlay-size'));
     await accordionPO.collapse();
   }
 
   public async enterPreferredOverlaySize(size: PopupSize): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-preferred-overlay-size'));
     await accordionPO.expand();
     try {
@@ -129,8 +116,6 @@ export class PopupOpenerPagePO {
   }
 
   public async enterPopupInput(input: string): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-input'));
     await accordionPO.expand();
     try {
@@ -142,12 +127,10 @@ export class PopupOpenerPagePO {
   }
 
   public async enterContextualViewId(viewId: string | '<null>'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-contextual-view-id').fill(viewId);
   }
 
   public async clickOpen(): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('button.e2e-open').click();
     // The popup is expected to be opened, but not necessarily in the active view.
     // Therefore, we only wait for it to be attached to the DOM.
@@ -155,8 +138,6 @@ export class PopupOpenerPagePO {
   }
 
   public async getPopupCloseAction(): Promise<PopupCloseAction> {
-    await assertElementVisible(this._locator);
-
     if (await isPresent(this._locator.locator('output.e2e-return-value'))) {
       return {
         type: 'closed-with-value',
@@ -175,8 +156,6 @@ export class PopupOpenerPagePO {
   }
 
   public async getAnchorElementClientRect(): Promise<DOMRect> {
-    await assertElementVisible(this._locator);
-
     const buttonLocator = this._locator.locator('button.e2e-open');
     return fromRect(await buttonLocator.boundingBox());
   }

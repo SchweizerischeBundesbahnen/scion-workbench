@@ -27,18 +27,6 @@ export async function getCssClasses(element: Locator): Promise<string[]> {
 }
 
 /**
- * Asserts the given element to be visible.
- */
-export async function assertElementVisible(element: Locator): Promise<void> {
-  try {
-    await element.waitFor({state: 'visible'});
-  }
-  catch (e) {
-    throw Error(`[TestingError] Expected element '${element}' to be visible, but was not.`);
-  }
-}
-
-/**
  * Returns if given element is the active element.
  */
 export async function isActiveElement(element: Locator): Promise<boolean> {

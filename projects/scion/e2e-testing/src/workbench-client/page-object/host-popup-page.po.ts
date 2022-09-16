@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, isPresent} from '../../helper/testing.util';
+import {isPresent} from '../../helper/testing.util';
 import {AppPO, PopupPO} from '../../app.po';
 import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
@@ -43,13 +43,10 @@ export class HostPopupPagePO {
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await assertElementVisible(this._locator);
     return this._locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getPopupCapability(): Promise<WorkbenchPopupCapability> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-capability'));
     await accordionPO.expand();
     try {
@@ -61,8 +58,6 @@ export class HostPopupPagePO {
   }
 
   public async getPopupParams(): Promise<Params> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-params'));
     await accordionPO.expand();
     try {
@@ -74,8 +69,6 @@ export class HostPopupPagePO {
   }
 
   public async getRouteParams(): Promise<Params> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
@@ -87,8 +80,6 @@ export class HostPopupPagePO {
   }
 
   public async enterComponentSize(size: PopupSize): Promise<void> {
-    await assertElementVisible(this._locator);
-
     await this._locator.locator('input.e2e-width').fill(size.width ?? '');
     await this._locator.locator('input.e2e-height').fill(size.height ?? '');
     await this._locator.locator('input.e2e-min-width').fill(size.minWidth ?? '');
@@ -98,8 +89,6 @@ export class HostPopupPagePO {
   }
 
   public async enterReturnValue(returnValue: string): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-return-value'));
     await accordionPO.expand();
     try {
@@ -111,8 +100,6 @@ export class HostPopupPagePO {
   }
 
   public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
-    await assertElementVisible(this._locator);
-
     if (options?.returnValue !== undefined) {
       await this.enterReturnValue(options.returnValue);
     }

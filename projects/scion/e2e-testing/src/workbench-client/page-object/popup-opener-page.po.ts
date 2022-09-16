@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertElementVisible, isPresent, waitUntilBoundingBoxStable} from '../../helper/testing.util';
+import {isPresent, waitUntilBoundingBoxStable} from '../../helper/testing.util';
 import {AppPO, ViewTabPO} from '../../app.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {PopupOrigin} from '@scion/workbench';
@@ -33,22 +33,18 @@ export class PopupOpenerPagePO {
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(qualifier);
   }
 
   public async enterParams(params: Record<string, string>): Promise<void> {
-    await assertElementVisible(this._locator);
     const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-params'));
     await paramsEnterPO.clear();
     await paramsEnterPO.enterParams(params);
   }
 
   public async selectAnchor(anchor: 'element' | 'coordinate'): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-anchor'));
     await accordionPO.expand();
     try {
@@ -60,8 +56,6 @@ export class PopupOpenerPagePO {
   }
 
   public async enterAnchorCoordinate(coordinate: PopupOrigin): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-anchor'));
     await accordionPO.expand();
     try {
@@ -84,13 +78,10 @@ export class PopupOpenerPagePO {
   }
 
   public async selectAlign(align: 'east' | 'west' | 'north' | 'south'): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-align').selectOption(align);
   }
 
   public async enterCloseStrategy(options: {closeOnFocusLost?: boolean; closeOnEscape?: boolean}): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-close-strategy'));
     await accordionPO.expand();
     try {
@@ -107,20 +98,16 @@ export class PopupOpenerPagePO {
   }
 
   public async expandAnchorPanel(): Promise<void> {
-    await assertElementVisible(this._locator);
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-anchor'));
     await accordionPO.expand();
   }
 
   public async collapseAnchorPanel(): Promise<void> {
-    await assertElementVisible(this._locator);
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-anchor'));
     await accordionPO.collapse();
   }
 
   public async clickOpen(): Promise<void> {
-    await assertElementVisible(this._locator);
-
     const expectedPopupIndex = await this._appPO.popupLocator().count();
 
     await this._locator.locator('button.e2e-open').click();
@@ -134,8 +121,6 @@ export class PopupOpenerPagePO {
   }
 
   public async getPopupCloseAction(): Promise<PopupCloseAction> {
-    await assertElementVisible(this._locator);
-
     if (await isPresent(this._locator.locator('output.e2e-return-value'))) {
       return {
         type: 'closed-with-value',
@@ -154,8 +139,6 @@ export class PopupOpenerPagePO {
   }
 
   public async getAnchorElementClientRect(): Promise<DOMRect> {
-    await assertElementVisible(this._locator);
-
     const buttonLocator = this._locator.locator('button.e2e-open');
     return waitUntilBoundingBoxStable(buttonLocator);
   }

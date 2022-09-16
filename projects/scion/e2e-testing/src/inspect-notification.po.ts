@@ -9,7 +9,7 @@
  */
 
 import {AppPO, NotificationPO} from './app.po';
-import {assertElementVisible, coerceArray, isPresent} from './helper/testing.util';
+import {coerceArray, isPresent} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 
 /**
@@ -35,7 +35,6 @@ export class InspectNotificationPO {
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    await assertElementVisible(this._locator);
     return this._locator.locator('span.e2e-component-instance-id').innerText();
   }
 
@@ -44,8 +43,6 @@ export class InspectNotificationPO {
   }
 
   public async getInputAsKeyValueObject(): Promise<Record<string, any>> {
-    await assertElementVisible(this._locator);
-
     const rawContent = await this.getInput();
     const dictionary: Record<string, any> = {};
 
@@ -69,22 +66,18 @@ export class InspectNotificationPO {
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-title').fill(title);
   }
 
   public async selectSeverity(severity: 'info' | 'warn' | 'error' | ''): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('select.e2e-severity').selectOption(severity);
   }
 
   public async selectDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | '' | number): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-duration').fill(`${duration}`);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await assertElementVisible(this._locator);
     await this._locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
