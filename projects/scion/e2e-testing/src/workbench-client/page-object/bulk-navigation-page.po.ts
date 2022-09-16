@@ -20,7 +20,7 @@ export class BulkNavigationPagePO {
   private readonly _locator: Locator;
 
   constructor(private _appPO: AppPO, viewId: string) {
-    this._locator = this._appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-bulk-navigation-page');
+    this._locator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-bulk-navigation-page');
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {

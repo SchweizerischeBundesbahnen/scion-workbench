@@ -29,7 +29,7 @@ export class PopupPagePO {
 
   constructor(appPO: AppPO, cssClass: string) {
     this.popupPO = appPO.findPopup({cssClass});
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutlet({cssClass: ['e2e-popup'].concat(cssClass)})).locator('app-popup-page');
+    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame({cssClass: ['e2e-popup'].concat(cssClass)})).locator('app-popup-page');
   }
 
   public async getComponentInstanceId(): Promise<string> {

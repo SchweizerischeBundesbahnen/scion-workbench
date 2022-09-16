@@ -25,7 +25,7 @@ export class RegisterWorkbenchIntentionPagePO {
 
   constructor(appPO: AppPO, public viewId: string) {
     this.viewTabPO = appPO.findViewTab({viewId: viewId});
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutlet(viewId)).locator('app-register-workbench-intention-page');
+    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-register-workbench-intention-page');
   }
 
   /**
