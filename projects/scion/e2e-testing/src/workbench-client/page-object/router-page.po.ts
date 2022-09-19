@@ -14,6 +14,7 @@ import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
+import {coerceArray, waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact {@link RouterPageComponent} of workbench-client testing app.
@@ -67,6 +68,10 @@ export class RouterPagePO {
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-close-if-present')).toggle(check);
   }
 
+  public async enterCssClass(cssClass: string | string[]): Promise<void> {
+    await this._locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
+  }
+
   /**
    * Clicks navigate.
    *
@@ -75,6 +80,8 @@ export class RouterPagePO {
    */
   public async clickNavigate(options?: {evalNavigateResponse?: boolean}): Promise<void> {
     await this._locator.locator('button.e2e-navigate').click();
+    // Wait until navigation completed.
+    await waitUntilStable(async () => this._locator.page().url());
 
     if (!(options?.evalNavigateResponse ?? true)) {
       return;

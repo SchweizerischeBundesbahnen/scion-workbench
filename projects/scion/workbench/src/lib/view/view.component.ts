@@ -21,6 +21,9 @@ import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
 import {VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference} from '../content-projection/view-container.reference';
 import {PopupService} from '../popup/popup.service';
+import {Arrays} from '@scion/toolkit/util';
+import {WorkbenchRouteData} from '../routing/workbench-route-data';
+import {WorkbenchNavigationalStates} from '../routing/workbench-navigational-states';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -118,6 +121,9 @@ export class ViewComponent implements OnDestroy {
     if (params[WB_VIEW_HEADING_PARAM] || data[WB_VIEW_HEADING_PARAM]) {
       this._view.heading = params[WB_VIEW_HEADING_PARAM] || data[WB_VIEW_HEADING_PARAM];
     }
+    this._view.cssClass = new Array<string>()
+      .concat(Arrays.coerce(data[WorkbenchRouteData.cssClass]))
+      .concat(Arrays.coerce(data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));
     if (!this._view.active) {
       this._cd.detectChanges();
     }
@@ -126,6 +132,7 @@ export class ViewComponent implements OnDestroy {
   public onDeactivateRoute(): void {
     this._view.heading = null;
     this._view.title = null;
+    this._view.cssClass = [];
     this._view.dirty = false;
   }
 

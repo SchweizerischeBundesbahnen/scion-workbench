@@ -27,6 +27,10 @@ export class BulkNavigationTestPagePO {
     await this._locator.locator('input.e2e-view-count').fill(`${viewCount}`);
   }
 
+  public async enterCssClass(cssClass: string): Promise<void> {
+    await this._locator.locator('input.e2e-css-class').fill(cssClass);
+  }
+
   public async clickNavigateNoAwait(): Promise<void> {
     await this._locator.locator('button.e2e-navigate').click();
     // Wait for the URL to become stable after navigating.

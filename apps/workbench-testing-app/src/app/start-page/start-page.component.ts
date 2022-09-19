@@ -29,13 +29,14 @@ import {SciFilterFieldComponent, toFilterRegExp} from '@scion/components.interna
 export class StartPageComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
-  public filterControl = new UntypedFormControl('');
+  @ViewChild(SciFilterFieldComponent)
+  private _filterField: SciFilterFieldComponent;
 
+  public filterControl = new UntypedFormControl('');
   public workbenchViewRoutes$: Observable<Routes>;
   public microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]>;
 
-  @ViewChild(SciFilterFieldComponent)
-  private _filterField: SciFilterFieldComponent;
+  public WorkbenchRouteData = WorkbenchRouteData;
 
   constructor(@Optional() private _view: WorkbenchView, // not available on entry point page
               @Optional() private _workbenchClientRouter: WorkbenchRouter, // not available when starting the workbench standalone
@@ -49,7 +50,6 @@ export class StartPageComponent implements OnDestroy {
     if (this._view) {
       this._view.title = route.snapshot.data['title'];
       this._view.heading = route.snapshot.data['heading'];
-      this._view.cssClass = route.snapshot.data['cssClass'];
     }
 
     // Read workbench views to be pinned to the start page.

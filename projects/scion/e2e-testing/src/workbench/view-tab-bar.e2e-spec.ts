@@ -52,8 +52,8 @@ test.describe('View Tabbar', () => {
 
     // open view-1
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1'});
-    await routerPagePO.checkActivateIfPresent(true);
+    await routerPagePO.enterCssClass('e2e-test-view-1');
+    await routerPagePO.checkActivateIfPresent(false);
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigateViaRouter();
 
@@ -63,8 +63,8 @@ test.describe('View Tabbar', () => {
     // open view-2
     await routerPagePO.viewTabPO.activate();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2'});
-    await routerPagePO.checkActivateIfPresent(true);
+    await routerPagePO.enterCssClass('e2e-test-view-2');
+    await routerPagePO.checkActivateIfPresent(false);
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigateViaRouter();
 
@@ -74,8 +74,8 @@ test.describe('View Tabbar', () => {
     // open view-3
     await routerPagePO.viewTabPO.activate();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-3'});
-    await routerPagePO.checkActivateIfPresent(true);
+    await routerPagePO.enterCssClass('e2e-test-view-3');
+    await routerPagePO.checkActivateIfPresent(false);
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigateViaRouter();
 

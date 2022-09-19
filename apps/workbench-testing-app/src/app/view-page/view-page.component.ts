@@ -9,7 +9,7 @@
  */
 
 import {Component, OnDestroy} from '@angular/core';
-import {WB_STATE_DATA, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {merge, Observable, Subject} from 'rxjs';
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -30,7 +30,7 @@ export class ViewPageComponent implements OnDestroy {
   public viewpartActions$: Observable<ViewpartAction[]>;
   public viewpartActionsFormControl = new UntypedFormControl('');
 
-  public WB_STATE_DATA = WB_STATE_DATA;
+  public WorkbenchRouteData = WorkbenchRouteData;
 
   constructor(public view: WorkbenchView,
               public route: ActivatedRoute,
@@ -41,7 +41,6 @@ export class ViewPageComponent implements OnDestroy {
 
     this.applyConfiguredViewTitle();
     this.applyConfiguredViewHeading();
-    this.applyConfiguredViewCssClass();
 
     this.viewpartActions$ = this.viewpartActionsFormControl.valueChanges
       .pipe(
@@ -83,17 +82,6 @@ export class ViewPageComponent implements OnDestroy {
       });
   }
 
-  /**
-   * Merges and sets CSS classes from the route's data and matrix param.
-   */
-  private applyConfiguredViewCssClass(): void {
-    this.route.paramMap
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(params => {
-        this.view.cssClass = [this.route.snapshot.data['cssClass']].concat(params.get('cssClass') ?? []);
-      });
-  }
-
   private parseViewpartActions(): ViewpartAction[] {
     if (!this.viewpartActionsFormControl.value) {
       return [];
@@ -124,7 +112,7 @@ export class ViewPageComponent implements OnDestroy {
     this.route.data
       .pipe(takeUntil(this._destroy$))
       .subscribe(data => {
-        console.debug(`[ActivatedRouteDataChange] [viewId=${this.view.viewId}, state=${JSON.stringify(data[WB_STATE_DATA])}]`);
+        console.debug(`[ActivatedRouteDataChange] [viewId=${this.view.viewId}, state=${JSON.stringify(data[WorkbenchRouteData.state])}]`);
       });
   }
 

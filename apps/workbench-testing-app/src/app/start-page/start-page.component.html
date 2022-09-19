@@ -11,7 +11,7 @@ We use this app to run our e2e tests and experiment with features.
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
       <a *ngFor="let route of workbenchViewRoutes$ | async"
          [wbRouterLink]="route.path"
-         [ngClass]="route.data['cssClass']"
+         [ngClass]="route.data[WorkbenchRouteData.cssClass]"
          [wbRouterLinkExtras]="{relativeTo: null, activateIfPresent: false}">
         {{route.data['title']}}
         <span class="description" *ngIf="route.data['heading']">

@@ -121,7 +121,7 @@ function provideMicrofrontendRoutes(): Provider[] {
     /**
      * In the microfrontend view integration, parameters can be marked as 'transient'. Transient parameters are not added as matrix
      * parameters to the URL but passed via navigational state to the component by {@link NavigationStateResolver}. The component can
-     * access them as resolved data via {@link ActivatedRouteSnapshot#data[WB_STATE_DATA]} under the {@link MicrofrontendViewRoutes.TRANSIENT_PARAMS_STATE_KEY} key.
+     * access transient params as resolved data via `ActivatedRoute.data[WorkbenchRouteData.state][MicrofrontendNavigationalStates.transientParams]`.
      *
      * However, by default, the Angular router resolves data only when matrix or URL parameters of the route change. For this reason,
      * we configure the microfrontend route to evaluate resolvers also on query parameter change, which allows updating transient parameters

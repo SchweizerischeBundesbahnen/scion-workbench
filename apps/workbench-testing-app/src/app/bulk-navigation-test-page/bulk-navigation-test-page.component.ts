@@ -32,7 +32,6 @@ export class BulkNavigationTestPageComponent {
               view: WorkbenchView, private _router: WorkbenchRouter) {
     view.title = route.snapshot.data['title'];
     view.heading = route.snapshot.data['heading'];
-    view.cssClass = route.snapshot.data['cssClass'];
     this.form = formBuilder.group({
       [VIEW_COUNT]: formBuilder.control(1, Validators.required),
       [CSS_CLASS]: formBuilder.control('', Validators.required),
@@ -54,7 +53,10 @@ export class BulkNavigationTestPageComponent {
   }
 
   private navigateToViewPage(): Promise<boolean> {
-    const cssClass = this.form.get(CSS_CLASS).value;
-    return this._router.navigate(['test-view', {cssClass}], {target: 'blank', activateIfPresent: false});
+    return this._router.navigate(['test-view'], {
+      target: 'blank',
+      activateIfPresent: false,
+      cssClass: this.form.get(CSS_CLASS).value,
+    });
   }
 }

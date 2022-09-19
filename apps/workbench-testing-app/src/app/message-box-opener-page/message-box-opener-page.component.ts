@@ -64,7 +64,6 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
               private _rootService: RootService) {
     view.title = route.snapshot.data['title'];
     view.heading = route.snapshot.data['heading'];
-    view.cssClass = route.snapshot.data['cssClass'];
 
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),

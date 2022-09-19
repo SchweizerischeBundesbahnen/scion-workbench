@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {waitUntilStable} from '../../helper/testing.util';
+import {coerceArray, waitUntilStable} from '../../helper/testing.util';
 import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
@@ -73,6 +73,10 @@ export class RouterPagePO {
 
   public async enterSelfViewId(selfViewId: string): Promise<void> {
     await this._locator.locator('input.e2e-self-view-id').fill(selfViewId);
+  }
+
+  public async enterCssClass(cssClass: string | string[]): Promise<void> {
+    await this._locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
   }
 
   public async clickNavigateViaRouter(): Promise<void> {
