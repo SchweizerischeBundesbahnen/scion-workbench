@@ -42,3 +42,4 @@ export {WorkbenchView} from './lib/view/workbench-view.model';
 export {WorkbenchViewPart} from './lib/view-part/workbench-view-part.model';
 export {MicrofrontendPlatformConfigLoader} from './lib/microfrontend-platform/microfrontend-platform-config-loader';
 export {LogAppender, LogEvent, LogLevel, LoggerName, Logger, ConsoleAppender} from './lib/logging';
+export {WorkbenchRouteData} from './lib/routing/workbench-route-data';

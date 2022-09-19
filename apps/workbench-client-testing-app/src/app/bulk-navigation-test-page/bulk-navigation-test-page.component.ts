@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
-import {WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
+import {Component, Inject} from '@angular/core';
+import {WorkbenchRouter} from '@scion/workbench-client';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {APP_IDENTITY} from '@scion/microfrontend-platform';
 
-const VIEW_QUALIFIER = {component: 'bulk-navigation-test-target'};
-const NAVIGATION_EXTRAS: WorkbenchNavigationExtras = {target: 'blank', activateIfPresent: false};
 const VIEW_COUNT = 'viewCount';
+const CSS_CLASS = 'cssClass';
 
 @Component({
   selector: 'app-bulk-navigation-test-page',
@@ -24,12 +24,16 @@ const VIEW_COUNT = 'viewCount';
 export class BulkNavigationTestPageComponent {
 
   public readonly VIEW_COUNT = VIEW_COUNT;
+  public readonly CSS_CLASS = CSS_CLASS;
 
   public form: FormGroup;
 
-  constructor(formBuilder: FormBuilder, private _router: WorkbenchRouter) {
+  constructor(formBuilder: FormBuilder,
+              private _router: WorkbenchRouter,
+              @Inject(APP_IDENTITY) private _appSymbolicName: string) {
     this.form = formBuilder.group({
       [VIEW_COUNT]: formBuilder.control(1, Validators.required),
+      [CSS_CLASS]: formBuilder.control('', Validators.required),
     });
   }
 
@@ -48,6 +52,10 @@ export class BulkNavigationTestPageComponent {
   }
 
   private navigateToViewPage(): Promise<boolean> {
-    return this._router.navigate(VIEW_QUALIFIER, NAVIGATION_EXTRAS);
+    return this._router.navigate({component: 'view', app: this._appSymbolicName.split('-').pop()}, {
+      target: 'blank',
+      activateIfPresent: false,
+      cssClass: this.form.get(CSS_CLASS).value,
+    });
   }
 }

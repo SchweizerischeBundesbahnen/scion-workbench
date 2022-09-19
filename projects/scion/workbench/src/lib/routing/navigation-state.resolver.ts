@@ -12,10 +12,10 @@ import {ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot} from '@ang
 import {Injectable} from '@angular/core';
 import {Dictionary} from '@scion/toolkit/util';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {WB_STATE_DATA} from '../routing/routing.constants';
+import {WorkbenchRouteData} from './workbench-route-data';
 
 /**
- * Makes navigational state available to the activated route via {@link ActivatedRouteSnapshot#data} under the key {@link WB_STATE_DATA}.
+ * Makes navigational state available to the activated route via {@link ActivatedRoute#data} under the key {@link WorkbenchRouteData.state}.
  *
  * We read the navigation state from {@link WorkbenchRouter#getCurrentNavigationViewState} instead of {@link Router#getCurrentNavigation#extras}
  * because the Angular router discards passed state if a guard performs a redirect. See Angular issue https://github.com/angular/angular/issues/27148.
@@ -34,7 +34,7 @@ export class NavigationStateResolver implements Resolve<Dictionary | undefined |
 
   public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Dictionary | undefined | null {
     const outletName = route.outlet;
-    const outletState = this._workbenchRouter.getCurrentNavigationViewState(outletName) || this.findActivatedRoute(outletName)?.data?.[WB_STATE_DATA];
+    const outletState = this._workbenchRouter.getCurrentNavigationViewState(outletName) || this.findActivatedRoute(outletName)?.data?.[WorkbenchRouteData.state];
 
     return undefinedIfEmpty(outletState);
   }

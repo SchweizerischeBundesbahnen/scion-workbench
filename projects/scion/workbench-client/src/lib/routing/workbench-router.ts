@@ -161,6 +161,11 @@ export interface WorkbenchNavigationExtras {
    * the view at the beginning or at the end.
    */
   blankInsertionIndex?: number | 'start' | 'end';
+  /**
+   * Associates CSS class(es) with a view, useful in end-to-end tests for locating views and view tabs.
+   * CSS class(es) will not be added to the browser URL, consequently will not survive a page reload.
+   */
+  cssClass?: string | string[];
 }
 
 /**

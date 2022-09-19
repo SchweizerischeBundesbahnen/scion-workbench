@@ -2,6 +2,10 @@
   <sci-form-field label="View Count">
     <input [formControlName]="VIEW_COUNT" type="number" class="e2e-view-count">
   </sci-form-field>
+
+  <sci-form-field label="CSS Class">
+    <input [formControlName]="CSS_CLASS" class="e2e-css-class">
+  </sci-form-field>
 </form>
 
 <button (click)="onNavigate()" [disabled]="form.invalid" class="e2e-navigate">Navigate</button>

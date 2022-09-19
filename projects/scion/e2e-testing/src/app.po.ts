@@ -116,7 +116,7 @@ export class AppPO {
         return cssClasses.includes('active');
       }
 
-      public async getCssClasses(): Promise<string[]> {
+      public getCssClasses(): Promise<string[]> {
         return getCssClasses(viewTabLocator);
       }
 
@@ -166,6 +166,10 @@ export class AppPO {
 
       public waitUntilPresent(): Promise<void> {
         return viewLocator.waitFor({state: 'attached'});
+      }
+
+      public getCssClasses(): Promise<string[]> {
+        return getCssClasses(viewLocator);
       }
 
       public locator(selector: string): Locator {
@@ -680,6 +684,8 @@ export interface ViewPO {
   isVisible(): Promise<boolean>;
 
   waitUntilPresent(): Promise<void>;
+
+  getCssClasses(): Promise<string[]>;
 
   locator(selector: string): Locator;
 }

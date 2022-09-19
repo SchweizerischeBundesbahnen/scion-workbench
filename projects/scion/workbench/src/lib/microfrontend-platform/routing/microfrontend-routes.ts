@@ -11,8 +11,9 @@
 import {ActivatedRouteSnapshot, Params, UrlSegment} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {Qualifier} from '@scion/microfrontend-platform';
-import {WB_STATE_DATA} from '../../routing/routing.constants';
 import {Dictionaries, Dictionary} from '@scion/toolkit/util';
+import {WorkbenchRouteData} from '../../routing/workbench-route-data';
+import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
 
 export namespace MicrofrontendViewRoutes {
 
@@ -20,11 +21,6 @@ export namespace MicrofrontendViewRoutes {
    * Route prefix to identify routes of microfrontends.
    */
   export const ROUTE_PREFIX = '~';
-
-  /**
-   * Key for accessing transient params from the navigational state.
-   */
-  export const TRANSIENT_PARAMS_STATE_KEY = 'transientParams';
 
   /**
    * Parses the params of a given microfrontend route. Throws if not a valid microfrontend route.
@@ -38,7 +34,7 @@ export namespace MicrofrontendViewRoutes {
         viewCapabilityId: segments[1].path,
         qualifier: segments[0].parameters,
         urlParams: segments[1].parameters,
-        transientParams: Array.isArray(route) ? {} : route.data[WB_STATE_DATA]?.[MicrofrontendViewRoutes.TRANSIENT_PARAMS_STATE_KEY] || {},
+        transientParams: Array.isArray(route) ? {} : route.data[WorkbenchRouteData.state]?.[MicrofrontendNavigationalStates.transientParams] || {},
       };
     }
     throw Error(`[NullMicrofrontendRouteError] Given URL segments do not match a microfrontend route. [segments=${segments.toString()}]`);

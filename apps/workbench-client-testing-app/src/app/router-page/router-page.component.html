@@ -40,6 +40,10 @@
   <sci-form-field label="CloseIfPresent">
     <sci-checkbox [formControlName]="CLOSE_IF_PRESENT" class="e2e-close-if-present"></sci-checkbox>
   </sci-form-field>
+
+  <sci-form-field label="CSS Class(es)">
+    <input [formControlName]="CSS_CLASS" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
+  </sci-form-field>
 </form>
 
 <button (click)="onNavigate()" class="e2e-navigate">Navigate</button>

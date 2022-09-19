@@ -12,6 +12,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {StartPageComponent} from './start-page/start-page.component';
 import {WorkbenchComponent} from './workbench/workbench.component';
+import {WorkbenchRouteData} from '@scion/workbench';
 
 const routes: Routes = [
   {
@@ -19,40 +20,45 @@ const routes: Routes = [
       {path: '', component: StartPageComponent}, // default page displayed when all views are closed
     ],
   },
-  {path: 'start-page', component: StartPageComponent, data: {title: 'New Tab', cssClass: 'e2e-start-page'}},
+  {path: 'start-page', component: StartPageComponent, data: {title: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'}},
   {
     path: 'test-router',
     loadChildren: (): any => import('./router-page/router-page.module').then(m => m.RouterPageModule),
-    data: {title: 'Workbench Router', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-router', pinToStartPage: true},
+    data: {title: 'Workbench Router', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-router', pinToStartPage: true},
   },
   {
     path: 'test-view',
     loadChildren: (): any => import('./view-page/view-page.module').then(m => m.ViewPageModule),
-    data: {title: 'Workbench View', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-view', pinToStartPage: true},
+    data: {title: 'Workbench View', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view', pinToStartPage: true},
   },
   {
     path: 'test-message-box',
     loadChildren: (): any => import('./message-box-opener-page/message-box-opener-page.module').then(m => m.MessageBoxOpenerPageModule),
-    data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-message-box', pinToStartPage: true},
+    data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-message-box', pinToStartPage: true},
   },
   {
     path: 'test-notification',
     loadChildren: (): any => import('./notification-opener-page/notification-opener-page.module').then(m => m.NotificationOpenerPageModule),
-    data: {title: 'Workbench Notification', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-notification', pinToStartPage: true},
+    data: {title: 'Workbench Notification', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-notification', pinToStartPage: true},
   },
   {
     path: 'test-popup',
     loadChildren: (): any => import('./popup-opener-page/popup-opener-page.module').then(m => m.PopupOpenerPageModule),
-    data: {title: 'Workbench Popup', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-popup', pinToStartPage: true},
+    data: {title: 'Workbench Popup', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-popup', pinToStartPage: true},
   },
   {
     path: 'host-popup',
     loadChildren: (): any => import('./host-popup-page/host-popup-page.module').then(m => m.HostPopupPageModule),
   },
   {
+    path: 'test-navigation',
+    loadChildren: (): any => import('./navigation-test-page/navigation-test-page.module').then(m => m.NavigationTestPageModule),
+    data: {title: 'Navigation Test', heading: 'Workbench E2E Testpage'},
+  },
+  {
     path: 'test-bulk-navigation',
     loadChildren: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.module').then(m => m.BulkNavigationTestPageModule),
-    data: {title: 'Bulk Navigation Test', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-bulk-navigation'},
+    data: {title: 'Bulk Navigation Test', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-bulk-navigation'},
   },
 ];
 

@@ -1067,4 +1067,18 @@ test.describe('Workbench Router', () => {
     await expect(await testeeViewTabPO.isPresent()).toBe(false);
     await expect(await testeeViewPO.isPresent()).toBe(false);
   });
+
+  test('should allow setting CSS class(es) via router', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    const activeViewPO = await appPO.getActiveView();
+
+    await routerPagePO.enterQualifier({component: 'view', app: 'app1'});
+    await routerPagePO.enterCssClass('e2e-test-view');
+    await routerPagePO.clickNavigate({evalNavigateResponse: false});
+
+    await expect(await activeViewPO.getCssClasses()).toEqual(expect.arrayContaining(['e2e-test-view']));
+    await expect(await activeViewPO.viewTabPO.getCssClasses()).toEqual(expect.arrayContaining(['e2e-test-view']));
+  });
 });

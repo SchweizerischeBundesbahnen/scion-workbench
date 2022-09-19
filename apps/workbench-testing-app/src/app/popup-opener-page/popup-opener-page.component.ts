@@ -89,7 +89,6 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
               view: WorkbenchView) {
     view.title = route.snapshot.data['title'];
     view.heading = route.snapshot.data['heading'];
-    view.cssClass = route.snapshot.data['cssClass'];
 
     this.form = formBuilder.group({
       [POPUP_COMPONENT]: formBuilder.control('popup-page', Validators.required),

@@ -22,7 +22,7 @@ test.describe('Workbench Router', () => {
     await expect(await appPO.getViewTabCount()).toEqual(1);
 
     // open test view 1
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1'});
     await routerPagePO.checkActivateIfPresent(true);
     await routerPagePO.selectTarget('blank');
@@ -33,7 +33,7 @@ test.describe('Workbench Router', () => {
 
     // open test view 2
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2'});
     await routerPagePO.checkActivateIfPresent(true);
     await routerPagePO.selectTarget('blank');
@@ -44,7 +44,7 @@ test.describe('Workbench Router', () => {
 
     // open test view 3
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-3'});
     await routerPagePO.checkActivateIfPresent(true);
     await routerPagePO.selectTarget('blank');
@@ -55,7 +55,7 @@ test.describe('Workbench Router', () => {
 
     // activate test view 1
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1'});
     await routerPagePO.checkActivateIfPresent(true);
     await routerPagePO.clickNavigateViaRouter();
@@ -65,7 +65,7 @@ test.describe('Workbench Router', () => {
 
     // activate test view 2
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2'});
     await routerPagePO.checkActivateIfPresent(true);
     await routerPagePO.clickNavigateViaRouter();
@@ -75,7 +75,7 @@ test.describe('Workbench Router', () => {
 
     // activate test view 3
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-3'});
     await routerPagePO.checkActivateIfPresent(true);
     await routerPagePO.clickNavigateViaRouter();
@@ -85,7 +85,7 @@ test.describe('Workbench Router', () => {
 
     // close test view 1
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1'});
     await routerPagePO.checkCloseIfPresent(true);
     await routerPagePO.clickNavigateViaRouter();
@@ -95,7 +95,7 @@ test.describe('Workbench Router', () => {
 
     // close test view 2
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2'});
     await routerPagePO.checkCloseIfPresent(true);
     await routerPagePO.clickNavigateViaRouter();
@@ -105,7 +105,7 @@ test.describe('Workbench Router', () => {
 
     // close test view 3
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-3'});
     await routerPagePO.checkCloseIfPresent(true);
     await routerPagePO.clickNavigateViaRouter();
@@ -120,14 +120,14 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open test view 1
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1', title: 'view-1-title', heading: 'view-1-heading'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigateViaRouter();
 
     // open test view 2
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2', title: 'view-2-title', heading: 'view-2-heading'});
     await routerPagePO.clickNavigateViaRouter();
@@ -135,7 +135,7 @@ test.describe('Workbench Router', () => {
     // reload the application
     await appPO.reload();
 
-    const viewTab1 = await appPO.findViewTab({cssClass: 'e2e-test-view-1'});
+    const viewTab1 = appPO.findViewTab({cssClass: 'e2e-test-view-1'});
     await expect(await viewTab1.isActive()).toBe(false);
     await expect(await viewTab1.getTitle()).toEqual('view-1-title');
     await expect(await viewTab1.getHeading()).toEqual('view-1-heading');
@@ -224,28 +224,28 @@ test.describe('Workbench Router', () => {
     await expect(await appPO.getViewTabCount()).toEqual(1);
   });
 
-  test('should allow closing a specific view via router', async ({appPO, workbenchNavigator}) => {
+  test('should allow closing a view matching specified matrix params via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterMatrixParams({cssClass: 'testee-1'});
     await routerPagePO.clickNavigateViaRouter();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterMatrixParams({cssClass: 'testee-2'});
     await routerPagePO.clickNavigateViaRouter();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterMatrixParams({cssClass: 'testee-3'});
     await routerPagePO.clickNavigateViaRouter();
@@ -255,7 +255,7 @@ test.describe('Workbench Router', () => {
 
     // close the view with CSS class 'testee-2'
     await routerPagePO.viewTabPO.activate();
-    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterPath('test-navigation');
     await routerPagePO.enterMatrixParams({cssClass: 'testee-2'});
     await routerPagePO.checkCloseIfPresent(true);
     await routerPagePO.clickNavigateViaRouter();
@@ -275,7 +275,7 @@ test.describe('Workbench Router', () => {
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.enterMatrixParams({cssClass: 'testee'});
+    await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouter();
 
     const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
@@ -303,7 +303,7 @@ test.describe('Workbench Router', () => {
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('self');
-    await routerPagePO.enterMatrixParams({cssClass: 'testee'});
+    await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouter();
 
     const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
@@ -332,7 +332,6 @@ test.describe('Workbench Router', () => {
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
     const testee1ViewId = await appPO.getActiveView().getViewId();
@@ -358,7 +357,6 @@ test.describe('Workbench Router', () => {
     // navigate to a new test view
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
     const testee2ViewId = await appPO.getActiveView().getViewId();
@@ -383,7 +381,7 @@ test.describe('Workbench Router', () => {
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.enterMatrixParams({cssClass: 'testee'});
+    await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouter();
 
     const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
@@ -411,7 +409,6 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.checkActivateIfPresent(true); // activate the view if present
-    await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
     // expect the view to be activated and no new view to be opened
@@ -430,7 +427,6 @@ test.describe('Workbench Router', () => {
     // navigate to the test view
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
     const testee1ViewId = await appPO.getActiveView().getViewId();
@@ -457,7 +453,6 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.checkActivateIfPresent(false); // do not activate the view if present
-    await routerPagePO.enterMatrixParams({cssClass: 'testee'});
     await routerPagePO.clickNavigateViaRouter();
 
     const testee2ViewId = await appPO.getActiveView().getViewId();
@@ -494,5 +489,19 @@ test.describe('Workbench Router', () => {
 
     // expect the component not to be constructed anew
     await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
+  });
+
+  test('should allow setting CSS class(es) via router', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const activeViewPO = await appPO.getActiveView();
+
+    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterCssClass('e2e-test-view');
+    await routerPagePO.clickNavigateViaRouter();
+
+    await expect(await activeViewPO.getCssClasses()).toEqual(expect.arrayContaining(['e2e-test-view']));
+    await expect(await activeViewPO.viewTabPO.getCssClasses()).toEqual(expect.arrayContaining(['e2e-test-view']));
   });
 });

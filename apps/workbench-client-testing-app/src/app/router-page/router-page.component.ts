@@ -22,6 +22,7 @@ const CLOSE_IF_PRESENT = 'closeIfPresent';
 const TARGET = 'target';
 const SELF_VIEW_ID = 'selfViewId';
 const INSERTION_INDEX = 'insertionIndex';
+const CSS_CLASS = 'cssClass';
 
 @Component({
   selector: 'app-router-page',
@@ -37,6 +38,7 @@ export class RouterPageComponent {
   public readonly INSERTION_INDEX = INSERTION_INDEX;
   public readonly ACTIVATE_IF_PRESENT = ACTIVATE_IF_PRESENT;
   public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
+  public readonly CSS_CLASS = CSS_CLASS;
 
   public form: UntypedFormGroup;
   public navigateError: string;
@@ -52,6 +54,7 @@ export class RouterPageComponent {
       [INSERTION_INDEX]: formBuilder.control(''),
       [ACTIVATE_IF_PRESENT]: formBuilder.control(undefined),
       [CLOSE_IF_PRESENT]: formBuilder.control(undefined),
+      [CSS_CLASS]: formBuilder.control(undefined),
     });
   }
 
@@ -72,6 +75,7 @@ export class RouterPageComponent {
       selfViewId: this.form.get(SELF_VIEW_ID).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
       params: params || undefined,
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
     };
     await this._router.navigate(qualifier, extras)
       .then(success => this.navigated = success)

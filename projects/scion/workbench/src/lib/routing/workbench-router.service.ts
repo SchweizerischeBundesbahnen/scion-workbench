@@ -18,6 +18,7 @@ import {PartsLayout} from '../layout/parts-layout';
 import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 import {SingleTaskExecutor} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
+import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -84,6 +85,12 @@ export class WorkbenchRouter implements OnDestroy {
         }
       }
 
+      // Add CSS classes to navigational state in order to be added to view and view tab when activating the route.
+      extras.state = {
+        ...extras.state,
+        ...(extras.cssClass ? {[WorkbenchNavigationalStates.cssClass]: extras.cssClass} : null),
+      };
+
       switch (extras.target || (extras.selfViewId ? 'self' : 'blank')) {
         case 'blank': {
           const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
@@ -128,6 +135,7 @@ export class WorkbenchRouter implements OnDestroy {
    * @param onNavigate - Computes the new workbench layout.
    *        The callback is passed the current workbench layout which the caller can modify and return.
    *        In the callback, it is safe to access currently activated routes or the current router url.
+   * @param extras - Modifies the navigation strategy.
    * @internal
    */
   public ɵnavigate(onNavigate: (layout: PartsLayout) => PartsLayout | WorkbenchNavigation | null, extras?: NavigationExtras): Promise<boolean> {
@@ -397,10 +405,15 @@ export interface WbNavigationExtras extends NavigationExtras {
    *
    * See {@link NavigationExtras#state} for detailed instructions on how to access passed state during and after the navigation.
    *
-   * In addition, the workbench router makes state available to the routed component as resolved data under the key {@link WB_STATE_DATA}
+   * In addition, the workbench router makes state available to the routed component as resolved data under the key {@link WorkbenchRouteData.state}
    * and state is not discarded if guards perform a redirect.
    */
   state?: Dictionary;
+  /**
+   * Associates CSS class(es) with a view, useful in end-to-end tests for locating views and view tabs.
+   * CSS class(es) will not be added to the browser URL, consequently will not survive a page reload.
+   */
+  cssClass?: string | string[];
 }
 
 /**
@@ -468,7 +481,7 @@ export interface WorkbenchNavigation {
    */
   viewOutlets?: {[outlet: string]: Commands | null};
   /**
-   * State to be passed to the routed component as resolved data under the key {@link WB_STATE_DATA}.
+   * State to be passed to the routed component as resolved data under the key {@link WorkbenchRouteData.state}.
    */
   viewState?: {[outlet: string]: Dictionary | undefined};
 }

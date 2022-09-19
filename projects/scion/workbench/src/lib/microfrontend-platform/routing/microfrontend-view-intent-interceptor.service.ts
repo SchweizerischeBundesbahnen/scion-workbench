@@ -17,6 +17,7 @@ import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../messaging.util';
 import {Dictionaries} from '@scion/toolkit/util';
+import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
 
 /**
  * Handles microfrontend view intents, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
@@ -67,8 +68,9 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
       target: extras.target,
       blankInsertionIndex: extras.blankInsertionIndex,
       selfViewId: extras.selfViewId,
+      cssClass: extras.cssClass,
       state: {
-        [MicrofrontendViewRoutes.TRANSIENT_PARAMS_STATE_KEY]: transientParams,
+        [MicrofrontendNavigationalStates.transientParams]: transientParams,
       },
     });
   }

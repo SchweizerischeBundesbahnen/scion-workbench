@@ -49,7 +49,6 @@ export class NotificationOpenerPageComponent {
               private _notificationService: NotificationService) {
     view.title = route.snapshot.data['title'];
     view.heading = route.snapshot.data['heading'];
-    view.cssClass = route.snapshot.data['cssClass'];
 
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),

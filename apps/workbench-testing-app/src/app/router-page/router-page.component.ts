@@ -26,6 +26,7 @@ const INSERTION_INDEX = 'insertionIndex';
 const SELF_VIEW_ID = 'selfViewId';
 const ACTIVATE_IF_PRESENT = 'activateIfPresent';
 const CLOSE_IF_PRESENT = 'closeIfPresent';
+const CSS_CLASS = 'cssClass';
 
 @Component({
   selector: 'app-router-page',
@@ -43,6 +44,7 @@ export class RouterPageComponent {
   public readonly QUERY_PARAMS = QUERY_PARAMS;
   public readonly ACTIVATE_IF_PRESENT = ACTIVATE_IF_PRESENT;
   public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
+  public readonly CSS_CLASS = CSS_CLASS;
 
   public form: UntypedFormGroup;
   public navigateError: string;
@@ -58,7 +60,6 @@ export class RouterPageComponent {
               private _wbRouter: WorkbenchRouter) {
     view.title = route.snapshot.data['title'];
     view.heading = route.snapshot.data['heading'];
-    view.cssClass = route.snapshot.data['cssClass'];
 
     this.form = formBuilder.group({
       [PATH]: formBuilder.control(''),
@@ -70,6 +71,7 @@ export class RouterPageComponent {
       [QUERY_PARAMS]: formBuilder.array([]),
       [ACTIVATE_IF_PRESENT]: formBuilder.control(undefined),
       [CLOSE_IF_PRESENT]: formBuilder.control(undefined),
+      [CSS_CLASS]: formBuilder.control(undefined),
     });
 
     this.routerLinkCommands$ = this.form.valueChanges
@@ -119,6 +121,7 @@ export class RouterPageComponent {
       selfViewId: this.form.get(SELF_VIEW_ID).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
       state: SciParamsEnterComponent.toParamsDictionary(this.form.get(NAVIGATIONAL_STATE) as UntypedFormArray),
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
     };
   }
 }
