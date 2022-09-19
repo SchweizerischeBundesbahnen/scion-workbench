@@ -17,11 +17,11 @@ const VIEW_COUNT = 'viewCount';
 const CSS_CLASS = 'cssClass';
 
 @Component({
-  selector: 'app-bulk-navigation-page',
-  templateUrl: './bulk-navigation-page.component.html',
-  styleUrls: ['./bulk-navigation-page.component.scss'],
+  selector: 'app-bulk-navigation-test-page',
+  templateUrl: './bulk-navigation-test-page.component.html',
+  styleUrls: ['./bulk-navigation-test-page.component.scss'],
 })
-export class BulkNavigationPageComponent {
+export class BulkNavigationTestPageComponent {
 
   public readonly VIEW_COUNT = VIEW_COUNT;
   public readonly CSS_CLASS = CSS_CLASS;

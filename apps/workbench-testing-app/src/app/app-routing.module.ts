@@ -51,8 +51,8 @@ const routes: Routes = [
   },
   {
     path: 'test-bulk-navigation',
-    loadChildren: (): any => import('./bulk-navigation-page/bulk-navigation-page.module').then(m => m.BulkNavigationPageModule),
-    data: {title: 'Bulk Navigation', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-bulk-navigation'},
+    loadChildren: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.module').then(m => m.BulkNavigationTestPageModule),
+    data: {title: 'Bulk Navigation Test', heading: 'Workbench E2E Testpage', cssClass: 'e2e-test-bulk-navigation'},
   },
 ];
 

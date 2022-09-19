@@ -10,13 +10,13 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {BulkNavigationPageComponent} from './bulk-navigation-page.component';
+import {BulkNavigationTestPageComponent} from './bulk-navigation-test-page.component';
 import {RouterModule, Routes} from '@angular/router';
 import {ReactiveFormsModule} from '@angular/forms';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 
 const routes: Routes = [
-  {path: '', component: BulkNavigationPageComponent},
+  {path: '', component: BulkNavigationTestPageComponent},
 ];
 
 @NgModule({
@@ -27,8 +27,8 @@ const routes: Routes = [
     SciFormFieldModule,
   ],
   declarations: [
-    BulkNavigationPageComponent,
+    BulkNavigationTestPageComponent,
   ],
 })
-export class BulkNavigationPageModule {
+export class BulkNavigationTestPageModule {
 }

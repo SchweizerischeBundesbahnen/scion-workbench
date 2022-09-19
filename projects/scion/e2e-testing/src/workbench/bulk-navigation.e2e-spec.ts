@@ -9,7 +9,7 @@
  */
 
 import {test} from '../fixtures';
-import {BulkNavigationPagePO} from './page-object/bulk-navigation-page.po';
+import {BulkNavigationTestPagePO} from './page-object/bulk-navigation-test-page.po';
 import {expect} from '@playwright/test';
 
 test.describe('Bulk Navigation', () => {
@@ -17,10 +17,10 @@ test.describe('Bulk Navigation', () => {
   test('should navigate to multiple views if waiting for each navigation to complete', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const bulkNavigationPagePO = await BulkNavigationPagePO.navigateTo(appPO, workbenchNavigator);
-    await bulkNavigationPagePO.enterViewCount(10);
-    await bulkNavigationPagePO.enterCssClass('bulk-navigation-test-target');
-    await bulkNavigationPagePO.clickNavigateAwait();
+    const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.navigateTo(appPO, workbenchNavigator);
+    await bulkNavigationTestPagePO.enterViewCount(10);
+    await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
+    await bulkNavigationTestPagePO.clickNavigateAwait();
 
     await expect(await appPO.getViewTabCount({viewCssClass: 'bulk-navigation-test-target'})).toEqual(10);
   });
@@ -28,10 +28,10 @@ test.describe('Bulk Navigation', () => {
   test('should navigate to multiple views if not waiting for each navigation to complete', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const bulkNavigationPagePO = await BulkNavigationPagePO.navigateTo(appPO, workbenchNavigator);
-    await bulkNavigationPagePO.enterViewCount(10);
-    await bulkNavigationPagePO.enterCssClass('bulk-navigation-test-target');
-    await bulkNavigationPagePO.clickNavigateNoAwait();
+    const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.navigateTo(appPO, workbenchNavigator);
+    await bulkNavigationTestPagePO.enterViewCount(10);
+    await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
+    await bulkNavigationTestPagePO.clickNavigateNoAwait();
 
     await expect(await appPO.getViewTabCount({viewCssClass: 'bulk-navigation-test-target'})).toEqual(10);
   });
