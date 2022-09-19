@@ -10,7 +10,7 @@
 
 import {test} from '../fixtures';
 import {expect} from '@playwright/test';
-import {BulkNavigationPagePO} from './page-object/bulk-navigation-page.po';
+import {BulkNavigationTestPagePO} from './page-object/bulk-navigation-test-page.po';
 import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 
 test.describe('Bulk Navigation', () => {
@@ -32,9 +32,9 @@ test.describe('Bulk Navigation', () => {
       },
     });
 
-    const bulkNavigationPagePO = await BulkNavigationPagePO.navigateTo(appPO, microfrontendNavigator);
-    await bulkNavigationPagePO.enterViewCount(10);
-    await bulkNavigationPagePO.clickNavigateAwait();
+    const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.navigateTo(appPO, microfrontendNavigator);
+    await bulkNavigationTestPagePO.enterViewCount(10);
+    await bulkNavigationTestPagePO.clickNavigateAwait();
 
     await expect(await appPO.getViewTabCount({viewCssClass: 'bulk-navigation-test-target'})).toEqual(10);
   });
@@ -56,9 +56,9 @@ test.describe('Bulk Navigation', () => {
       },
     });
 
-    const bulkNavigationPagePO = await BulkNavigationPagePO.navigateTo(appPO, microfrontendNavigator);
-    await bulkNavigationPagePO.enterViewCount(10);
-    await bulkNavigationPagePO.clickNavigateNoAwait();
+    const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.navigateTo(appPO, microfrontendNavigator);
+    await bulkNavigationTestPagePO.enterViewCount(10);
+    await bulkNavigationTestPagePO.clickNavigateNoAwait();
 
     await expect(await appPO.getViewTabCount({viewCssClass: 'bulk-navigation-test-target'})).toEqual(10);
   });

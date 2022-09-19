@@ -15,12 +15,12 @@ import {ElementSelectors} from '../../helper/element-selectors';
 import {MicrofrontendNavigator} from '../microfrontend-navigator';
 import {RouterPagePO} from './router-page.po';
 
-export class BulkNavigationPagePO {
+export class BulkNavigationTestPagePO {
 
   private readonly _locator: Locator;
 
   constructor(private _appPO: AppPO, viewId: string) {
-    this._locator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-bulk-navigation-page');
+    this._locator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-bulk-navigation-test-page');
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {
@@ -40,13 +40,13 @@ export class BulkNavigationPagePO {
     await waitUntilStable(async () => this._appPO.page.url(), {probeInterval: 500});
   }
 
-  public static async navigateTo(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationPagePO> {
+  public static async navigateTo(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({component: 'bulk-navigation', app: 'app1'});
+    await routerPagePO.enterQualifier({component: 'bulk-navigation-test', app: 'app1'});
     await routerPagePO.clickNavigate({evalNavigateResponse: false});
 
     const view = await appPO.findView({cssClass: 'e2e-test-bulk-navigation'});
     await view.waitUntilPresent();
-    return new BulkNavigationPagePO(appPO, await view.getViewId());
+    return new BulkNavigationTestPagePO(appPO, await view.getViewId());
   }
 }

@@ -14,12 +14,12 @@ import {waitUntilStable} from '../../helper/testing.util';
 import {RouterPagePO} from './router-page.po';
 import {WorkbenchNavigator} from '../workbench-navigator';
 
-export class BulkNavigationPagePO {
+export class BulkNavigationTestPagePO {
 
   private readonly _locator: Locator;
 
   constructor(private _appPO: AppPO, viewId: string) {
-    this._locator = this._appPO.findView({viewId: viewId}).locator('app-bulk-navigation-page');
+    this._locator = this._appPO.findView({viewId: viewId}).locator('app-bulk-navigation-test-page');
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {
@@ -42,13 +42,13 @@ export class BulkNavigationPagePO {
     await waitUntilStable(async () => this._appPO.page.url());
   }
 
-  public static async navigateTo(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationPagePO> {
+  public static async navigateTo(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPagePO.enterPath('test-bulk-navigation');
     await routerPagePO.clickNavigateViaRouter();
 
     const view = await appPO.findView({cssClass: 'e2e-test-bulk-navigation'});
     await view.waitUntilPresent();
-    return new BulkNavigationPagePO(appPO, await view.getViewId());
+    return new BulkNavigationTestPagePO(appPO, await view.getViewId());
   }
 }

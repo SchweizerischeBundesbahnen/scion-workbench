@@ -54,7 +54,7 @@ const routes: Routes = [
   },
   {
     path: 'test-bulk-navigation',
-    loadChildren: (): any => import('./bulk-navigation-page/bulk-navigation-page.module').then(m => m.BulkNavigationPageModule),
+    loadChildren: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.module').then(m => m.BulkNavigationTestPageModule),
   },
 ];
 

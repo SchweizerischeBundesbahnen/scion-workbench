@@ -206,7 +206,7 @@ export class ActivatorModule {
     await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
-        component: 'bulk-navigation',
+        component: 'bulk-navigation-test',
         app,
       },
       description: '[e2e] Allows testing bulk navigation',
@@ -214,7 +214,7 @@ export class ActivatorModule {
       properties: {
         path: 'test-bulk-navigation',
         pinToStartPage: false,
-        title: 'Bulk Navigation',
+        title: 'Bulk Navigation Test',
         heading,
         cssClass: 'e2e-test-bulk-navigation',
       },
