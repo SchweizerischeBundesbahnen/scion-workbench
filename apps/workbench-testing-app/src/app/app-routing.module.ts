@@ -20,31 +20,31 @@ const routes: Routes = [
       {path: '', component: StartPageComponent}, // default page displayed when all views are closed
     ],
   },
-  {path: 'start-page', component: StartPageComponent, data: {title: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'}},
+  {path: 'start-page', component: StartPageComponent, data: {[WorkbenchRouteData.title]: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'}},
   {
     path: 'test-router',
     loadChildren: (): any => import('./router-page/router-page.module').then(m => m.RouterPageModule),
-    data: {title: 'Workbench Router', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-router', pinToStartPage: true},
+    data: {[WorkbenchRouteData.title]: 'Workbench Router', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-router', pinToStartPage: true},
   },
   {
     path: 'test-view',
     loadChildren: (): any => import('./view-page/view-page.module').then(m => m.ViewPageModule),
-    data: {title: 'Workbench View', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view', pinToStartPage: true},
+    data: {[WorkbenchRouteData.title]: 'Workbench View', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view', pinToStartPage: true},
   },
   {
     path: 'test-message-box',
     loadChildren: (): any => import('./message-box-opener-page/message-box-opener-page.module').then(m => m.MessageBoxOpenerPageModule),
-    data: {title: 'Workbench Messagebox', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-message-box', pinToStartPage: true},
+    data: {[WorkbenchRouteData.title]: 'Workbench Messagebox', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-message-box', pinToStartPage: true},
   },
   {
     path: 'test-notification',
     loadChildren: (): any => import('./notification-opener-page/notification-opener-page.module').then(m => m.NotificationOpenerPageModule),
-    data: {title: 'Workbench Notification', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-notification', pinToStartPage: true},
+    data: {[WorkbenchRouteData.title]: 'Workbench Notification', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-notification', pinToStartPage: true},
   },
   {
     path: 'test-popup',
     loadChildren: (): any => import('./popup-opener-page/popup-opener-page.module').then(m => m.PopupOpenerPageModule),
-    data: {title: 'Workbench Popup', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-popup', pinToStartPage: true},
+    data: {[WorkbenchRouteData.title]: 'Workbench Popup', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-popup', pinToStartPage: true},
   },
   {
     path: 'host-popup',
@@ -53,12 +53,12 @@ const routes: Routes = [
   {
     path: 'test-navigation',
     loadChildren: (): any => import('./navigation-test-page/navigation-test-page.module').then(m => m.NavigationTestPageModule),
-    data: {title: 'Navigation Test', heading: 'Workbench E2E Testpage'},
+    data: {[WorkbenchRouteData.title]: 'Navigation Test', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage'},
   },
   {
     path: 'test-bulk-navigation',
     loadChildren: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.module').then(m => m.BulkNavigationTestPageModule),
-    data: {title: 'Bulk Navigation Test', heading: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-bulk-navigation'},
+    data: {[WorkbenchRouteData.title]: 'Bulk Navigation Test', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-bulk-navigation'},
   },
 ];
 

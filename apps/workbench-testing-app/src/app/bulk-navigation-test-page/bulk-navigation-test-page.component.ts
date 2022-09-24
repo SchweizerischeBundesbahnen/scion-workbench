@@ -9,8 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {WorkbenchRouter, WorkbenchView} from '@scion/workbench';
-import {ActivatedRoute} from '@angular/router';
+import {WorkbenchRouter} from '@scion/workbench';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 const VIEW_COUNT = 'viewCount';
@@ -28,10 +27,7 @@ export class BulkNavigationTestPageComponent {
 
   public form: FormGroup;
 
-  constructor(formBuilder: FormBuilder, route: ActivatedRoute,
-              view: WorkbenchView, private _router: WorkbenchRouter) {
-    view.title = route.snapshot.data['title'];
-    view.heading = route.snapshot.data['heading'];
+  constructor(formBuilder: FormBuilder, private _router: WorkbenchRouter) {
     this.form = formBuilder.group({
       [VIEW_COUNT]: formBuilder.control(1, Validators.required),
       [CSS_CLASS]: formBuilder.control('', Validators.required),

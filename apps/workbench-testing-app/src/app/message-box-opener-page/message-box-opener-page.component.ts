@@ -10,8 +10,7 @@
 
 import {Component, Injectable, Injector, OnDestroy, Type} from '@angular/core';
 import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
-import {MessageBoxService, WorkbenchView} from '@scion/workbench';
-import {ActivatedRoute} from '@angular/router';
+import {MessageBoxService} from '@scion/workbench';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {InspectMessageBoxComponent} from '../inspect-message-box-provider/inspect-message-box.component';
 import {startWith, takeUntil} from 'rxjs/operators';
@@ -58,13 +57,8 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
   public closeAction: string;
 
   constructor(formBuilder: UntypedFormBuilder,
-              route: ActivatedRoute,
-              view: WorkbenchView,
               private _messageBoxService: MessageBoxService,
               private _rootService: RootService) {
-    view.title = route.snapshot.data['title'];
-    view.heading = route.snapshot.data['heading'];
-
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [CONTENT]: formBuilder.control(''),

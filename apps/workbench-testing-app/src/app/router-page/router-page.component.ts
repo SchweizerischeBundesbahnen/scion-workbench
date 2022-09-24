@@ -11,7 +11,7 @@
 import {Component} from '@angular/core';
 import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {WbNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
-import {ActivatedRoute, Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
+import {Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Observable} from 'rxjs';
@@ -54,13 +54,9 @@ export class RouterPageComponent {
   public routes: Routes;
 
   constructor(formBuilder: UntypedFormBuilder,
-              route: ActivatedRoute,
               view: WorkbenchView,
               private _router: Router,
               private _wbRouter: WorkbenchRouter) {
-    view.title = route.snapshot.data['title'];
-    view.heading = route.snapshot.data['heading'];
-
     this.form = formBuilder.group({
       [PATH]: formBuilder.control(''),
       [MATRIX_PARAMS]: formBuilder.array([]),

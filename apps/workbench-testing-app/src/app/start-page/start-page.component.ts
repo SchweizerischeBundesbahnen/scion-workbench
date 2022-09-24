@@ -9,13 +9,13 @@
  */
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, Optional, ViewChild} from '@angular/core';
-import {WorkbenchModuleConfig, WorkbenchView} from '@scion/workbench';
+import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchView} from '@scion/workbench';
 import {ManifestService, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {Observable, of, Subject} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
-import {ActivatedRoute, NavigationEnd, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
+import {NavigationEnd, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {expand, filter, map, take, takeUntil} from 'rxjs/operators';
 import {UntypedFormControl} from '@angular/forms';
 import {SciFilterFieldComponent, toFilterRegExp} from '@scion/components.internal/filter-field';
@@ -44,20 +44,14 @@ export class StartPageComponent implements OnDestroy {
               @Optional() private _propertyService: PlatformPropertyService, // not available when starting the workbench standalone
               private _host: ElementRef<HTMLElement>,
               router: Router,
-              route: ActivatedRoute,
               cd: ChangeDetectorRef,
               workbenchModuleConfig: WorkbenchModuleConfig) {
-    if (this._view) {
-      this._view.title = route.snapshot.data['title'];
-      this._view.heading = route.snapshot.data['heading'];
-    }
-
     // Read workbench views to be pinned to the start page.
     this.workbenchViewRoutes$ = of(router.config)
       .pipe(
         filterArray(it => (!it.outlet || it.outlet === PRIMARY_OUTLET) && it.data && it.data['pinToStartPage'] === true),
         expand(it => this.filterControl.valueChanges.pipe(take(1), map(() => it))),
-        filterArray(it => !this.filterControl.value || it.data['title'].match(toFilterRegExp(this.filterControl.value)) !== null),
+        filterArray(it => !this.filterControl.value || it.data[WorkbenchRouteData.title].match(toFilterRegExp(this.filterControl.value)) !== null),
       );
 
     // Read microfrontend views to be pinned to the start page.

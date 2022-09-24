@@ -13,9 +13,9 @@ We use this app to run our e2e tests and experiment with features.
          [wbRouterLink]="route.path"
          [ngClass]="route.data[WorkbenchRouteData.cssClass]"
          [wbRouterLinkExtras]="{relativeTo: null, activateIfPresent: false}">
-        {{route.data['title']}}
-        <span class="description" *ngIf="route.data['heading']">
-          {{route.data['heading']}}
+        {{route.data[WorkbenchRouteData.title]}}
+        <span class="description" *ngIf="route.data[WorkbenchRouteData.heading]">
+          {{route.data[WorkbenchRouteData.heading]}}
         </span>
       </a>
     </section>

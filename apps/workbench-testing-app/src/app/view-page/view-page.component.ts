@@ -10,8 +10,8 @@
 
 import {Component, OnDestroy} from '@angular/core';
 import {WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
-import {merge, Observable, Subject} from 'rxjs';
-import {filter, map, startWith, takeUntil} from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {map, startWith, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {UntypedFormControl} from '@angular/forms';
@@ -39,9 +39,6 @@ export class ViewPageComponent implements OnDestroy {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
 
-    this.applyConfiguredViewTitle();
-    this.applyConfiguredViewHeading();
-
     this.viewpartActions$ = this.viewpartActionsFormControl.valueChanges
       .pipe(
         map(() => this.parseViewpartActions()),
@@ -50,36 +47,6 @@ export class ViewPageComponent implements OnDestroy {
 
     this.installViewActiveStateLogger();
     this.installNavigationalStateLogger();
-  }
-
-  /**
-   * Sets the title either from the route's data or matrix param.
-   */
-  private applyConfiguredViewTitle(): void {
-    merge(this.route.data, this.route.params)
-      .pipe(
-        map(params => params['title']),
-        filter<string>(Boolean),
-        takeUntil(this._destroy$),
-      )
-      .subscribe(title => {
-        this.view.title = title;
-      });
-  }
-
-  /**
-   * Sets the heading either from the route's data or matrix param.
-   */
-  private applyConfiguredViewHeading(): void {
-    merge(this.route.data, this.route.params)
-      .pipe(
-        map(params => params['heading']),
-        filter<string>(Boolean),
-        takeUntil(this._destroy$),
-      )
-      .subscribe(heading => {
-        this.view.heading = heading;
-      });
   }
 
   private parseViewpartActions(): ViewpartAction[] {

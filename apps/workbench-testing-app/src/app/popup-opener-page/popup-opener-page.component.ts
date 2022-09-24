@@ -10,8 +10,7 @@
 
 import {AfterViewInit, Component, ElementRef, OnDestroy, Type, ViewChild} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
-import {CloseStrategy, PopupOrigin, PopupService, PopupSize, WorkbenchView} from '@scion/workbench';
-import {ActivatedRoute} from '@angular/router';
+import {CloseStrategy, PopupOrigin, PopupService, PopupSize} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
 import {PopupFocusPageComponent} from '../popup-focus-page/popup-focus-page.component';
 import {map, startWith, takeUntil} from 'rxjs/operators';
@@ -84,12 +83,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
 
   constructor(private _host: ElementRef<HTMLElement>,
               private _popupService: PopupService,
-              formBuilder: UntypedFormBuilder,
-              route: ActivatedRoute,
-              view: WorkbenchView) {
-    view.title = route.snapshot.data['title'];
-    view.heading = route.snapshot.data['heading'];
-
+              formBuilder: UntypedFormBuilder) {
     this.form = formBuilder.group({
       [POPUP_COMPONENT]: formBuilder.control('popup-page', Validators.required),
       [ANCHOR]: formBuilder.group({
