@@ -202,8 +202,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
   private setViewProperties(viewCapability: WorkbenchViewCapability, activatedRoute: ActivatedRouteSnapshot): void {
-    this._view.title = viewCapability.properties.title ?? this._view.title; // to support setting the view's title via 'wb.title' param
-    this._view.heading = viewCapability.properties.heading ?? this._view.heading; // to support setting the view's heading via 'wb.view-heading' param
+    this._view.title = viewCapability.properties.title ?? null;
+    this._view.heading = viewCapability.properties.heading ?? null;
     this._view.cssClass = new Array<string>()
       .concat(Arrays.coerce(viewCapability.properties.cssClass))
       .concat(Arrays.coerce(activatedRoute.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));

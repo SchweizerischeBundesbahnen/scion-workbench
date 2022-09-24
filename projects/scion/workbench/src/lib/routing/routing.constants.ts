@@ -9,16 +9,22 @@
  */
 
 /**
- * Specifies the name of the optional path or query parameter for the view title.
+ * Key to define the title of a view in {@link Route.data}.
+ *
+ * @deprecated since version 14.0.0-beta.2; Use {@link WorkbenchRouteData.title} instead; API will be removed in version 16, including setting the title via URL matrix parameters, for which no replacement is planned.
  */
 export const WB_VIEW_TITLE_PARAM = 'wb.title';
 
 /**
- * Specifies the name of the optional path or query parameter for the view heading.
+ * Key to define the heading of a view in {@link Route.data}.
+ *
+ * @deprecated since version 14.0.0-beta.2; Use {@link WorkbenchRouteData.heading} instead; API will be removed in version 16, including setting the heading via URL matrix parameters, for which no replacement is planned.
  */
 export const WB_VIEW_HEADING_PARAM = 'wb.heading';
 
 /**
- * Represents the key under which navigational state is associated in data params.
+ * Key for reading navigational state from {@link ActivatedRoute.data}.
+ *
+ * @deprecated since version 14.0.0-beta.2; Use {@link WorkbenchRouteData.state} instead; API will be removed in version 16.
  */
 export const WB_STATE_DATA = 'wb.state';

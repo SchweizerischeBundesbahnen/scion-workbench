@@ -115,12 +115,8 @@ export class ViewComponent implements OnDestroy {
     const params = route.snapshot.params;
     const data = route.snapshot.data;
 
-    if (params[WB_VIEW_TITLE_PARAM] || data[WB_VIEW_TITLE_PARAM]) {
-      this._view.title = params[WB_VIEW_TITLE_PARAM] || data[WB_VIEW_TITLE_PARAM];
-    }
-    if (params[WB_VIEW_HEADING_PARAM] || data[WB_VIEW_HEADING_PARAM]) {
-      this._view.heading = params[WB_VIEW_HEADING_PARAM] || data[WB_VIEW_HEADING_PARAM];
-    }
+    this._view.title = params[WB_VIEW_TITLE_PARAM] ?? data[WB_VIEW_TITLE_PARAM] ?? data[WorkbenchRouteData.title] ?? null;
+    this._view.heading = params[WB_VIEW_HEADING_PARAM] ?? data[WB_VIEW_HEADING_PARAM] ?? data[WorkbenchRouteData.heading] ?? null;
     this._view.cssClass = new Array<string>()
       .concat(Arrays.coerce(data[WorkbenchRouteData.cssClass]))
       .concat(Arrays.coerce(data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));

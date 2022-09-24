@@ -15,6 +15,14 @@
  */
 export namespace WorkbenchRouteData {
   /**
+   * Key to define the title of a view in {@link Route.data}.
+   */
+  export const title = 'ɵtitle';
+  /**
+   * Key to define the heading of a view in {@link Route.data}.
+   */
+  export const heading = 'ɵheading';
+  /**
    * Key to associate CSS class(es) with a view in {@link Route.data}, useful in end-to-end tests for locating views and view tabs.
    */
   export const cssClass = 'ɵcssClass';
