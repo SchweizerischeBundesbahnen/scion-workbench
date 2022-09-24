@@ -10,8 +10,7 @@
 
 import {Component, Type} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
-import {NotificationService, WorkbenchView} from '@scion/workbench';
-import {ActivatedRoute} from '@angular/router';
+import {NotificationService} from '@scion/workbench';
 import {InspectNotificationComponent} from '../inspect-notification-provider/inspect-notification.component';
 
 const TITLE = 'title';
@@ -43,13 +42,7 @@ export class NotificationOpenerPageComponent {
 
   public form: UntypedFormGroup;
 
-  constructor(formBuilder: UntypedFormBuilder,
-              route: ActivatedRoute,
-              view: WorkbenchView,
-              private _notificationService: NotificationService) {
-    view.title = route.snapshot.data['title'];
-    view.heading = route.snapshot.data['heading'];
-
+  constructor(formBuilder: UntypedFormBuilder, private _notificationService: NotificationService) {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [CONTENT]: formBuilder.control(''),
