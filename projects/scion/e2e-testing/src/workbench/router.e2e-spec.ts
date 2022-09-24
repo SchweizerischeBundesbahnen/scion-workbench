@@ -491,6 +491,36 @@ test.describe('Workbench Router', () => {
     await expect(await viewPagePO.getComponentInstanceId()).toEqual(componentInstanceId);
   });
 
+  test('should allow setting view title via "wb.title" matrix param (DEPRECATED: API will be removed in v16)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterMatrixParams({'wb.title': 'testee'}); // deprecated API
+    await routerPagePO.enterCssClass('e2e-test-view');
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigateViaRouter();
+
+    const viewTab = appPO.findViewTab({cssClass: 'e2e-test-view'});
+    await expect(await viewTab.getTitle()).toEqual('testee');
+  });
+
+  test('should allow setting view heading via "wb.heading" matrix param (DEPRECATED: API will be removed in v16)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterMatrixParams({'wb.heading': 'testee'}); // deprecated API
+    await routerPagePO.enterCssClass('e2e-test-view');
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigateViaRouter();
+
+    const viewTab = appPO.findViewTab({cssClass: 'e2e-test-view'});
+    await expect(await viewTab.getHeading()).toEqual('testee');
+  });
+
   test('should allow setting CSS class(es) via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
