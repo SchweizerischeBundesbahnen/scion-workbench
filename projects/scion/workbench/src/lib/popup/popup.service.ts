@@ -71,6 +71,11 @@ export class PopupService {
    *          - resolves to `undefined` if closed without a result
    */
   public async open<R>(config: PopupConfig): Promise<R> {
+    // Ensure to run in Angular zone to display the popup even when called from outside of the Angular zone.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.open(config));
+    }
+
     const align = config.align || 'north';
     const anchor$ = this.observePopupAnchor$(config).pipe(shareReplay({bufferSize: 1, refCount: false}));
 

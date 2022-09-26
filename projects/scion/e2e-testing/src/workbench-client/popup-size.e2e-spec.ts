@@ -16,34 +16,74 @@ import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 
 test.describe('Workbench Popup', () => {
 
-  test('should size the overlay as configured in the popup capability', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
+  test.describe('Initial Popup Size', () => {
 
-    // register testee popup
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
-      type: 'popup',
-      qualifier: {component: 'testee'},
-      properties: {
-        path: 'popup',
-        cssClass: 'testee',
-        size: {
-          width: '350px',
-          height: '450px',
+    test('should size the overlay as configured in the popup capability', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // register testee popup
+      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPagePO.registerCapability({
+        type: 'popup',
+        qualifier: {test: 'popup'},
+        properties: {
+          path: 'microfrontend',
+          cssClass: 'testee',
+          size: {
+            width: '350px',
+            height: '450px',
+          },
         },
-      },
+      });
+
+      // open the popup
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPagePO.enterQualifier({test: 'popup'});
+      await popupOpenerPagePO.clickOpen();
+
+      const popupPagePO = new PopupPagePO(appPO, 'testee');
+      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+        width: 350,
+        height: 450,
+      }));
     });
 
-    // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.clickOpen();
+    /**
+     * In this test, we do not open the popup from within a microfrontend because opening the popup from within a microfrontend causes that
+     * microfrontend to lose focus, which would trigger a change detection cycle in the host, causing the popup to be displayed at the correct size.
+     *
+     * This test verifies that the popup is displayed at the correct size even without an "additional" change detection cycle, i.e., is opened
+     * inside the Angular zone.
+     */
+    test('should size the overlay as configured in the popup capability (insideAngularZone)', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
 
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
-      width: 350,
-      height: 450,
-    }));
+      // register testee popup
+      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPagePO.registerCapability({
+        type: 'popup',
+        qualifier: {test: 'popup'},
+        properties: {
+          path: 'microfrontend',
+          cssClass: 'e2e-test-popup-size',
+          pinToStartPage: true,
+          size: {
+            width: '350px',
+            height: '450px',
+          },
+        },
+      });
+
+      // open the popup directly from the start page
+      const startPagePO = await appPO.openNewViewTab();
+      await startPagePO.clickTestCapability('e2e-test-popup-size', 'app1');
+
+      const popupPagePO = new PopupPagePO(appPO, 'e2e-test-popup-size');
+      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+        width: 350,
+        height: 450,
+      }));
+    });
   });
 
   test.describe('overlay size constraint', () => {

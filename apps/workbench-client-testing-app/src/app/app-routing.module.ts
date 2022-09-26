@@ -17,6 +17,10 @@ const routes: Routes = [
     loadChildren: (): any => import('./activator/activator.module').then(m => m.ActivatorModule),
   },
   {
+    path: 'microfrontend',
+    loadComponent: (): any => import('./microfrontend-page/microfrontend-page.component').then(m => m.MicrofrontendPageComponent),
+  },
+  {
     path: 'test-router',
     loadChildren: (): any => import('./router-page/router-page.module').then(m => m.RouterPageModule),
   },
