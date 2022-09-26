@@ -71,6 +71,11 @@ export class WorkbenchRouter implements OnDestroy {
    * @see WbRouterLinkDirective
    */
   public navigate(commands: Commands, extras: WbNavigationExtras = {}): Promise<boolean> {
+    // Ensure to run in Angular zone.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.navigate(commands, extras));
+    }
+
     if (extras.closeIfPresent) {
       return this.closeViews(...this.resolvePresentViewIds(commands, extras.relativeTo));
     }
@@ -139,6 +144,11 @@ export class WorkbenchRouter implements OnDestroy {
    * @internal
    */
   public ɵnavigate(onNavigate: (layout: PartsLayout) => PartsLayout | WorkbenchNavigation | null, extras?: NavigationExtras): Promise<boolean> {
+    // Ensure to run in Angular zone.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.ɵnavigate(onNavigate, extras));
+    }
+
     // Serialize navigation requests to prevent race conditions when modifying the currently active workbench layout.
     return this._singleTaskExecutor.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
@@ -165,7 +175,7 @@ export class WorkbenchRouter implements OnDestroy {
       // Perform the navigation.
       Object.entries(viewState).forEach(([outletName, state]) => this._currentNavigationViewState.set(outletName, state));
       try {
-        return await this._zone.run(() => this._router.navigateByUrl(urlTree, extras));
+        return await this._router.navigateByUrl(urlTree, extras);
       }
       finally {
         Object.keys(viewState).forEach(outletName => this._currentNavigationViewState.delete(outletName));
@@ -179,9 +189,15 @@ export class WorkbenchRouter implements OnDestroy {
    * @param onNavigate - Computes the new workbench layout.
    *        The callback is passed the current workbench layout which the caller can modify and return.
    *        In the callback, it is safe to access currently activated routes or the current router url.
+   * @param extras - Options to control navigation.
    * @internal
    */
   public async createUrlTree(onNavigate: (layout: PartsLayout) => Promise<PartsLayout | WorkbenchNavigation> | PartsLayout | WorkbenchNavigation, extras?: NavigationExtras): Promise<UrlTree> {
+    // Ensure to run in Angular zone.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.createUrlTree(onNavigate, extras));
+    }
+
     return this._singleTaskExecutor.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, would override the initial layout as given in the URL.
@@ -248,6 +264,11 @@ export class WorkbenchRouter implements OnDestroy {
    * @internal
    */
   public normalizeCommands(commands: Commands, relativeTo?: ActivatedRoute | null): Commands {
+    // Ensure to run in Angular zone.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.normalizeCommands(commands, relativeTo));
+    }
+
     const normalizeFn = (outlet: string, extras?: NavigationExtras): Commands => {
       return this._router.createUrlTree(commands, extras)
         .root.children[outlet].segments
@@ -272,6 +293,11 @@ export class WorkbenchRouter implements OnDestroy {
    * @internal
    */
   public resolvePresentViewIds(commandList: Commands, relativeTo?: ActivatedRoute | null): string[] {
+    // Ensure to run in Angular zone.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.resolvePresentViewIds(commandList, relativeTo));
+    }
+
     const commands = this.normalizeCommands(commandList, relativeTo);
     const serializeCommands = this.serializeCommands(commands);
     const urlTree = this._router.parseUrl(this._router.url);
@@ -344,6 +370,11 @@ export class WorkbenchRouter implements OnDestroy {
    * @internal
    */
   public closeViews(...viewIds: string[]): Promise<boolean> {
+    // Ensure to run in Angular zone.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.closeViews(...viewIds));
+    }
+
     // Use a separate navigate command to remove each view separately. Otherwise, if a view would reject destruction,
     // no view would be removed at all.
     return viewIds.reduce((prevNavigation, viewId) => {
