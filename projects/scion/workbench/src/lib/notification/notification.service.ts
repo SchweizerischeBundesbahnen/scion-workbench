@@ -56,15 +56,13 @@ export class NotificationService implements OnDestroy {
    * @param  notification - Configures the content and appearance of the notification.
    */
   public notify(notification: string | NotificationConfig): void {
-    const config: NotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
-
     // Ensure to run in Angular zone to display the notification even when called from outside of the Angular zone, e.g. from an error handler.
     if (!NgZone.isInAngularZone()) {
-      this._zone.run(() => this.addNotification(config));
+      this._zone.run(() => this.notify(notification));
     }
-    else {
-      this.addNotification(config);
-    }
+
+    const config: NotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
+    this.addNotification(config);
   }
 
   private addNotification(config: NotificationConfig): void {
