@@ -14,7 +14,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY, ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 
-declare type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage: boolean}};
+declare type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage?: boolean}};
 
 @NgModule({
   providers: [],
@@ -212,8 +212,7 @@ export class ActivatorModule {
       description: '[e2e] Allows testing bulk navigation',
       private: false,
       properties: {
-        path: 'test-bulk-navigation',
-        pinToStartPage: false,
+        path: 'test-pages/bulk-navigation-test-page',
         title: 'Bulk Navigation Test',
         heading,
         cssClass: 'e2e-test-bulk-navigation',

@@ -8,18 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../app.po';
+import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {waitUntilStable} from '../../helper/testing.util';
-import {RouterPagePO} from './router-page.po';
-import {WorkbenchNavigator} from '../workbench-navigator';
+import {waitUntilStable} from '../../../helper/testing.util';
+import {ElementSelectors} from '../../../helper/element-selectors';
+import {MicrofrontendNavigator} from '../../microfrontend-navigator';
+import {RouterPagePO} from '../router-page.po';
 
 export class BulkNavigationTestPagePO {
 
   private readonly _locator: Locator;
 
   constructor(private _appPO: AppPO, viewId: string) {
-    this._locator = this._appPO.findView({viewId: viewId}).locator('app-bulk-navigation-test-page');
+    this._locator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-bulk-navigation-test-page');
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {
@@ -39,13 +40,14 @@ export class BulkNavigationTestPagePO {
   public async clickNavigateAwait(): Promise<void> {
     await this._locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
-    await waitUntilStable(async () => this._appPO.page.url());
+    // Since waiting for microfrontends to load takes some time, an interval of 500ms is used.
+    await waitUntilStable(async () => this._appPO.page.url(), {probeInterval: 500});
   }
 
-  public static async navigateTo(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPagePO.enterPath('test-bulk-navigation');
-    await routerPagePO.clickNavigateViaRouter();
+  public static async navigateTo(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPagePO.enterQualifier({component: 'bulk-navigation-test', app: 'app1'});
+    await routerPagePO.clickNavigate({evalNavigateResponse: false});
 
     const view = await appPO.findView({cssClass: 'e2e-test-bulk-navigation'});
     await view.waitUntilPresent();
