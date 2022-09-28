@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Returns `null` if the given object is empty.
  */
-@Pipe({name: 'wbNullIfEmpty', pure: true})
+@Pipe({name: 'wbNullIfEmpty'})
 export class NullIfEmptyPipe implements PipeTransform {
 
   public transform<T>(value: T): T {

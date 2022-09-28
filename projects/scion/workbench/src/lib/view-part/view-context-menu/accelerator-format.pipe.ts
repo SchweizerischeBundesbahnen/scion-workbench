@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Formats given keyboard accelerator to be displayed to the user.
  */
-@Pipe({name: 'wbFormatAccelerator', pure: true})
+@Pipe({name: 'wbFormatAccelerator'})
 export class WbFormatAcceleratorPipe implements PipeTransform {
 
   public transform(accelerator: string[] | null | undefined): string {
