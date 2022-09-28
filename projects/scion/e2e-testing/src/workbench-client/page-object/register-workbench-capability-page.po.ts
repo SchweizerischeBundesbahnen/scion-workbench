@@ -24,7 +24,7 @@ import {WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapa
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property (enum) with a string literal.
  */
 export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean}};
-export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'};
+export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToStartPage?: boolean}};
 
 /**
  * Page object to interact {@link RegisterWorkbenchCapabilityPageComponent}.
@@ -131,6 +131,9 @@ export class RegisterWorkbenchCapabilityPagePO {
     }
     if (size?.maxHeight) {
       await this._locator.locator('input.e2e-max-height').fill(size.maxHeight);
+    }
+    if (capability.properties.pinToStartPage !== undefined) {
+      await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
     }
   }
 
