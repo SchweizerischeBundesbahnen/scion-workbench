@@ -13,7 +13,7 @@ import {Locator} from '@playwright/test';
 import {waitUntilStable} from '../../../helper/testing.util';
 import {ElementSelectors} from '../../../helper/element-selectors';
 import {MicrofrontendNavigator} from '../../microfrontend-navigator';
-import {RouterPagePO} from '../router-page.po';
+import {RegisterWorkbenchCapabilityPagePO} from '../register-workbench-capability-page.po';
 
 export class BulkNavigationTestPagePO {
 
@@ -45,10 +45,24 @@ export class BulkNavigationTestPagePO {
   }
 
   public static async navigateTo(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
-    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({component: 'bulk-navigation-test', app: 'app1'});
-    await routerPagePO.clickNavigate({evalNavigateResponse: false});
+    // Register the test page as view.
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'view',
+      qualifier: {test: 'bulk-navigation'},
+      properties: {
+        path: 'test-pages/bulk-navigation-test-page',
+        cssClass: 'e2e-test-bulk-navigation',
+        title: 'Bulk Navigation Test',
+        pinToStartPage: true,
+      },
+    });
 
+    // Navigate to the view.
+    const startPagePO = await appPO.openNewViewTab();
+    await startPagePO.clickTestCapability('e2e-test-bulk-navigation', 'app1');
+
+    // Create the page object.
     const view = await appPO.findView({cssClass: 'e2e-test-bulk-navigation'});
     await view.waitUntilPresent();
     return new BulkNavigationTestPagePO(appPO, await view.getViewId());
