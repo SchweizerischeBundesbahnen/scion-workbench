@@ -62,12 +62,12 @@
           border-color: unset;
         }
 
-        &.microfrontend.workbench-client-testing-app1 {
+        &:is(.microfrontend, .test-capability).workbench-client-testing-app1 {
           background-color: var(--workbench-client-testing-app1-color);
           border-color: unset;
         }
 
-        &.microfrontend.workbench-client-testing-app2 {
+        &:is(.microfrontend, .test-capability).workbench-client-testing-app2 {
           background-color: var(--workbench-client-testing-app2-color);
           border-color: unset;
         }

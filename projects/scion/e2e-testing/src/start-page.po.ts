@@ -47,12 +47,20 @@ export class StartPagePO {
   }
 
   /**
-   * Clicks the microfrontend view tile with specified CSS classes set.
+   * Clicks the microfrontend view tile with specified CSS class set.
    */
   public async openMicrofrontendView(viewCssClass: string, app: string): Promise<void> {
     await this._tabbarPO.selectTab('e2e-microfrontend-views');
     await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles a.${viewCssClass}.workbench-client-testing-${app}`).click();
     await this._appPO.findView({cssClass: viewCssClass}).waitUntilPresent();
+  }
+
+  /**
+   * Clicks the test capability tile with specified CSS class set.
+   */
+  public async clickTestCapability(capabilityCssClass: string, app: string): Promise<void> {
+    await this._tabbarPO.selectTab('e2e-test-capabilities');
+    await this._tabbarLocator.locator(`.e2e-test-capability-tiles a.${capabilityCssClass}.workbench-client-testing-${app}`).click();
   }
 
   public async isPresent(): Promise<boolean> {

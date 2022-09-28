@@ -28,6 +28,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {InspectNotificationModule} from './inspect-notification-provider/inspect-notification.module';
 import {InspectMessageBoxModule} from './inspect-message-box-provider/inspect-message-box.module';
 import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup-initializer.service';
+import {UtilModule} from './util/util.module';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-c
     CommonModule,
     BrowserModule,
     AppRoutingModule,
+    UtilModule,
     WorkbenchModule.forRoot({
       startup: {
         launcher: WorkbenchStartupQueryParams.launcher(),

@@ -6,10 +6,10 @@ We use this app to run our e2e tests and experiment with features.
 </span>
 
 <sci-tabbar>
-  <ng-template sciTab label="Workbench Views" cssClass="e2e-workbench-views">
+  <ng-template sciTab label="Workbench Views" cssClass="e2e-workbench-views" *ngIf="workbenchViewRoutes$ | async | wbNullIfEmpty as workbenchViewRoutes">
     <section class="tiles e2e-workbench-view-tiles">
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
-      <a *ngFor="let route of workbenchViewRoutes$ | async"
+      <a *ngFor="let route of workbenchViewRoutes | wbFilter$:filterControl:selectViewRouteText | async"
          [wbRouterLink]="route.path"
          [ngClass]="route.data[WorkbenchRouteData.cssClass]"
          [wbRouterLinkExtras]="{relativeTo: null, activateIfPresent: false}">
@@ -21,16 +21,31 @@ We use this app to run our e2e tests and experiment with features.
     </section>
   </ng-template>
 
-  <ng-template sciTab label="Microfrontend Views" cssClass="e2e-microfrontend-views" *ngIf="this.microfrontendViewCapabilities$">
+  <ng-template sciTab label="Microfrontend Views" cssClass="e2e-microfrontend-views" *ngIf="microfrontendViewCapabilities$ | async | wbNullIfEmpty as microfrontendViewCapabilities">
     <section class="tiles e2e-microfrontend-view-tiles">
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
-      <a *ngFor="let viewCapability of microfrontendViewCapabilities$ | async"
+      <a *ngFor="let viewCapability of microfrontendViewCapabilities | wbFilter$:filterControl:selectViewCapabilityText | async"
          (click)="onMicrofrontendViewOpen(viewCapability)"
-         [ngClass]="concat(viewCapability.metadata.appSymbolicName, viewCapability.properties.cssClass)"
+         [ngClass]="concat(viewCapability.metadata!.appSymbolicName, viewCapability.properties.cssClass)"
          class="microfrontend">
         {{viewCapability.properties.title}}
         <span class="description">
-          {{viewCapability.metadata.appSymbolicName}}
+          {{viewCapability.metadata!.appSymbolicName}}
+        </span>
+      </a>
+    </section>
+  </ng-template>
+
+  <ng-template sciTab label="Test Capabilities" cssClass="e2e-test-capabilities" *ngIf="testCapabilities$ | async | wbNullIfEmpty as testCapabilities">
+    <section class="tiles e2e-test-capability-tiles">
+      <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
+      <a *ngFor="let testCapability of testCapabilities | wbFilter$:filterControl:selectTestCapabilityText | async"
+         (click)="onTestCapabilityOpen(testCapability, $event)"
+         [ngClass]="concat(testCapability.metadata!.appSymbolicName, testCapability.properties?.['cssClass'])"
+         class="test-capability">
+        {{testCapability.properties?.['cssClass']}}
+        <span class="description">
+          {{testCapability.metadata!.appSymbolicName}}
         </span>
       </a>
     </section>
