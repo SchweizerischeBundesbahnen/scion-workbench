@@ -60,6 +60,9 @@
     //      "@scion/components.internal/*": [
     //        "./node_modules/@scion/components.internal/*"
     //      ],
+    //      //      "@scion/microfrontend-platform": [
+    //      //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public-api"
+    //      //      ],
     //      //      "@scion/toolkit/bean-manager": [
     //      //        "../scion-toolkit/projects/scion/toolkit/bean-manager/src/public_api"
     //      //      ],
