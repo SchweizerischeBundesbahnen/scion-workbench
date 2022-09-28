@@ -104,6 +104,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
           [WIDTH]: formBuilder.control(''),
           [MAX_WIDTH]: formBuilder.control(''),
         }),
+        [PIN_TO_START_PAGE]: formBuilder.control(false),
         [CSS_CLASS]: formBuilder.control(''),
       }),
     });
@@ -159,7 +160,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
     };
   }
 
-  private readPopupCapabilityFromUI(): WorkbenchPopupCapability {
+  private readPopupCapabilityFromUI(): WorkbenchPopupCapability & {properties: {pinToStartPage: boolean}} {
     const propertiesGroup = this.form.get(POPUP_PROPERTIES);
     const requiredParams: ParamDefinition[] = this.form.get(REQUIRED_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ParamDefinition[] = this.form.get(OPTIONAL_PARAMS).value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
@@ -181,6 +182,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
           minHeight: propertiesGroup.get([SIZE, MIN_HEIGHT]).value || undefined,
           maxHeight: propertiesGroup.get([SIZE, MAX_HEIGHT]).value || undefined,
         }),
+        pinToStartPage: propertiesGroup.get(PIN_TO_START_PAGE).value,
         cssClass: propertiesGroup.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
       },
     };
