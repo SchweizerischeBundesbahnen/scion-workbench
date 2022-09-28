@@ -44,4 +44,10 @@ export const workbenchManifest: Manifest = {
       },
     },
   ],
+  intentions: [
+    // allow opening test views
+    {type: WorkbenchCapabilities.View, qualifier: {test: '*', '*': '*'}},
+    // allow opening test popups
+    {type: WorkbenchCapabilities.Popup, qualifier: {test: '*', '*': '*'}},
+  ],
 };

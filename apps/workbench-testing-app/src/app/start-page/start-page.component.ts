@@ -10,15 +10,15 @@
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, Optional, ViewChild} from '@angular/core';
 import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchView} from '@scion/workbench';
-import {ManifestService, PlatformPropertyService} from '@scion/microfrontend-platform';
+import {Capability, IntentClient, ManifestService, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {Observable, of, Subject} from 'rxjs';
-import {WorkbenchCapabilities, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
-import {NavigationEnd, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
-import {expand, filter, map, take, takeUntil} from 'rxjs/operators';
+import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
+import {filter, takeUntil} from 'rxjs/operators';
 import {UntypedFormControl} from '@angular/forms';
-import {SciFilterFieldComponent, toFilterRegExp} from '@scion/components.internal/filter-field';
+import {SciFilterFieldComponent} from '@scion/components.internal/filter-field';
 
 @Component({
   selector: 'app-start-page',
@@ -35,11 +35,14 @@ export class StartPageComponent implements OnDestroy {
   public filterControl = new UntypedFormControl('');
   public workbenchViewRoutes$: Observable<Routes>;
   public microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]>;
+  public testCapabilities$: Observable<Capability[]>;
 
   public WorkbenchRouteData = WorkbenchRouteData;
 
   constructor(@Optional() private _view: WorkbenchView, // not available on entry point page
               @Optional() private _workbenchClientRouter: WorkbenchRouter, // not available when starting the workbench standalone
+              @Optional() private _workbenchPopupService: WorkbenchPopupService, // not available when starting the workbench standalone
+              @Optional() private _intentClient: IntentClient, // not available when starting the workbench standalone
               @Optional() private _manifestService: ManifestService, // not available when starting the workbench standalone
               @Optional() private _propertyService: PlatformPropertyService, // not available when starting the workbench standalone
               private _host: ElementRef<HTMLElement>,
@@ -48,20 +51,22 @@ export class StartPageComponent implements OnDestroy {
               workbenchModuleConfig: WorkbenchModuleConfig) {
     // Read workbench views to be pinned to the start page.
     this.workbenchViewRoutes$ = of(router.config)
-      .pipe(
-        filterArray(it => (!it.outlet || it.outlet === PRIMARY_OUTLET) && it.data && it.data['pinToStartPage'] === true),
-        expand(it => this.filterControl.valueChanges.pipe(take(1), map(() => it))),
-        filterArray(it => !this.filterControl.value || it.data[WorkbenchRouteData.title].match(toFilterRegExp(this.filterControl.value)) !== null),
-      );
+      .pipe(filterArray(it => (!it.outlet || it.outlet === PRIMARY_OUTLET) && it.data && it.data['pinToStartPage'] === true));
 
-    // Read microfrontend views to be pinned to the start page.
     if (workbenchModuleConfig.microfrontendPlatform) {
+      // Read microfrontend views to be pinned to the start page.
       this.microfrontendViewCapabilities$ = this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
-          filterArray(viewCapability => viewCapability?.properties['pinToStartPage'] === true),
-          expand(viewCapabilities => this.filterControl.valueChanges.pipe(take(1), map(() => viewCapabilities))),
-          filterArray(viewCapability => !this.filterControl.value || viewCapability?.properties.title?.match(toFilterRegExp(this.filterControl.value)) !== null),
-          sortArray((a, b) => a.metadata.appSymbolicName.localeCompare(b.metadata.appSymbolicName)),
+          filterArray(viewCapability => viewCapability.properties['pinToStartPage'] === true),
+          filterArray(viewCapability => !isTestCapability(viewCapability)),
+          sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata.appSymbolicName)),
+        );
+      // Read test capabilities to be pinned to the start page.
+      this.testCapabilities$ = this._manifestService.lookupCapabilities$()
+        .pipe(
+          filterArray(capability => capability.properties?.['pinToStartPage'] === true),
+          filterArray(viewCapability => isTestCapability(viewCapability)),
+          sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata.appSymbolicName)),
         );
     }
 
@@ -75,18 +80,25 @@ export class StartPageComponent implements OnDestroy {
   }
 
   public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability): void {
-    const qualifier = {...viewCapability.qualifier};
+    this._workbenchClientRouter.navigate(viewCapability.qualifier, {activateIfPresent: false, selfViewId: this._view?.viewId});
+  }
 
-    // Replace wildcard qualifier entries as intents must be exact, thus not contain wildcards.
-    Object.entries(qualifier).forEach(([key, value]) => {
-      if (key === '*' || value === '?') {
-        delete qualifier[key];
+  public async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {
+    // TODO [#343] Remove switch-case after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/343
+    switch (testCapability.type) {
+      case WorkbenchCapabilities.View: {
+        await this._workbenchClientRouter.navigate(testCapability.qualifier, {activateIfPresent: false, selfViewId: this._view?.viewId});
+        break;
       }
-      else if (value === '*') {
-        qualifier[key] = `:${key}`;
+      case WorkbenchCapabilities.Popup: {
+        await this._workbenchPopupService.open(testCapability.qualifier, {anchor: event});
+        break;
       }
-    });
-    this._workbenchClientRouter.navigate(qualifier, {activateIfPresent: false, selfViewId: this._view?.viewId});
+      default: {
+        await this._intentClient.publish({type: testCapability.type, qualifier: testCapability.qualifier});
+        break;
+      }
+    }
   }
 
   @HostListener('keydown', ['$event'])
@@ -155,4 +167,20 @@ export class StartPageComponent implements OnDestroy {
   public ngOnDestroy(): void {
     this._destroy$.next();
   }
+
+  public selectViewCapabilityText = (viewCapability: WorkbenchViewCapability): string | undefined => {
+    return viewCapability.properties!.title;
+  };
+
+  public selectTestCapabilityText = (testCapability: Capability): string | undefined => {
+    return testCapability.properties?.['cssClass'];
+  };
+
+  public selectViewRouteText = (route: Route): string | undefined => {
+    return route.data[WorkbenchRouteData.title];
+  };
+}
+
+function isTestCapability(capability: Capability): boolean {
+  return Object.keys(capability.qualifier ?? {}).includes('test');
 }
