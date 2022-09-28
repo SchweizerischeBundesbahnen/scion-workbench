@@ -10,7 +10,7 @@
 
 import {test} from '../fixtures';
 import {expect} from '@playwright/test';
-import {BulkNavigationTestPagePO} from './page-object/bulk-navigation-test-page.po';
+import {BulkNavigationTestPagePO} from './page-object/test-pages/bulk-navigation-test-page.po';
 
 test.describe('Bulk Navigation', () => {
 

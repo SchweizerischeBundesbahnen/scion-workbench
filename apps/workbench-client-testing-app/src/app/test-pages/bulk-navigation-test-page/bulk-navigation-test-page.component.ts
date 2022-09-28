@@ -10,8 +10,9 @@
 
 import {Component, Inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench-client';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {APP_IDENTITY} from '@scion/microfrontend-platform';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
 
 const VIEW_COUNT = 'viewCount';
 const CSS_CLASS = 'cssClass';
@@ -20,6 +21,11 @@ const CSS_CLASS = 'cssClass';
   selector: 'app-bulk-navigation-test-page',
   templateUrl: './bulk-navigation-test-page.component.html',
   styleUrls: ['./bulk-navigation-test-page.component.scss'],
+  standalone: true,
+  imports: [
+    SciFormFieldModule,
+    ReactiveFormsModule,
+  ]
 })
 export class BulkNavigationTestPageComponent {
 

@@ -56,8 +56,9 @@ const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Navigation Test', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage'},
   },
   {
-    path: 'test-bulk-navigation',
-    loadChildren: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.module').then(m => m.BulkNavigationTestPageModule),
+    // TODO [#357] Configure test page routes via a separate routing module after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/357
+    path: 'test-pages/bulk-navigation-test-page',
+    loadComponent: (): any => import('./test-pages/bulk-navigation-test-page/bulk-navigation-test-page.component').then(m => m.BulkNavigationTestPageComponent),
     data: {[WorkbenchRouteData.title]: 'Bulk Navigation Test', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-bulk-navigation'},
   },
 ];

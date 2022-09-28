@@ -53,8 +53,8 @@ const routes: Routes = [
     loadChildren: (): any => import('./register-workbench-intention-page/register-workbench-intention-page.module').then(m => m.RegisterWorkbenchIntentionPageModule),
   },
   {
-    path: 'test-bulk-navigation',
-    loadChildren: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.module').then(m => m.BulkNavigationTestPageModule),
+    path: 'test-pages',
+    loadChildren: (): any => import('./test-pages/test-pages-routing.module').then(m => m.TestPagesRoutingModule),
   },
 ];
 
