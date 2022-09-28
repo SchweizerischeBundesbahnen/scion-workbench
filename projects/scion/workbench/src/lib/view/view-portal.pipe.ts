@@ -16,7 +16,7 @@ import {ViewComponent} from '../view/view.component';
 /**
  * Resolves the portal for a given view id, or `null` if not found.
  */
-@Pipe({name: 'wbViewPortal', pure: true})
+@Pipe({name: 'wbViewPortal'})
 export class ViewPortalPipe implements PipeTransform {
 
   constructor(private _viewRegistry: WorkbenchViewRegistry) {

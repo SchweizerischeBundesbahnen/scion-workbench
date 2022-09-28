@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Returns the value, if an array, or adds it to an array. If `null` or `undefined` is given, returns an empty array.
  */
-@Pipe({name: 'wbCoerceArray', pure: true})
+@Pipe({name: 'wbCoerceArray'})
 export class ArrayCoercePipe implements PipeTransform {
 
   public transform<T>(arrayLike: T | T[] | null | undefined): T[] {
