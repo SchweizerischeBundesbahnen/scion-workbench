@@ -28,7 +28,7 @@ export abstract class WorkbenchView {
   public abstract title: string | null;
 
   /**
-   * Specifies the sub title to be displayed in the view tab.
+   * Specifies the subtitle to be displayed in the view tab.
    */
   public abstract heading: string | null;
 

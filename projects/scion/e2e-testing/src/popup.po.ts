@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {getCssClasses, isCssClassPresent, isPresent, waitUntilBoundingBoxStable} from './helper/testing.util';
+import {getCssClasses, hasCssClass, isPresent, waitUntilBoundingBoxStable} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench popup.
@@ -53,12 +53,12 @@ export class PopupPO {
     throw Error('[PopupAlignError] Popup not aligned.');
   }
 
-  public async hasVerticalOverflow(): Promise<boolean> {
-    return isCssClassPresent(this._popupLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
+  public hasVerticalOverflow(): Promise<boolean> {
+    return hasCssClass(this._popupLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
   }
 
-  public async hasHorizontalOverflow(): Promise<boolean> {
-    return isCssClassPresent(this._popupLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
+  public hasHorizontalOverflow(): Promise<boolean> {
+    return hasCssClass(this._popupLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
   }
 
   public locator(selector: string): Locator {

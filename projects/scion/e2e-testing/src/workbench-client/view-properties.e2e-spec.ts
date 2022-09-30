@@ -1,0 +1,240 @@
+/*
+ * Copyright (c) 2018-2022 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {test} from '../fixtures';
+import {RouterPagePO} from './page-object/router-page.po';
+import {expect} from '@playwright/test';
+import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
+
+test.describe('Workbench View Properties', () => {
+
+  test('should set view title via Observable in view constructor', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register the test page as view.
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability(
+      {
+        type: 'view',
+        qualifier: {test: 'view-properties'},
+        params: [{name: 'title', required: true}],
+        properties: {
+          path: 'test-pages/view-properties-test-page',
+        },
+      },
+    );
+
+    await test.step('navigating in current view [target="self"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({title: 'Title 1,Title 2,Title 3'});
+      await routerPagePO.selectTarget('self');
+      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.getTitle()).toEqual('Title 3');
+    });
+
+    await test.step('navigating to new view [target="blank"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({title: 'Title 1,Title 2,Title 3'});
+      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterCssClass('testee-blank');
+      await routerPagePO.clickNavigate();
+
+      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.getTitle({probeInterval: 250})).toEqual('Title 3');
+    });
+  });
+
+  test('should set view heading via Observable in view constructor', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register the test page as view.
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability(
+      {
+        type: 'view',
+        qualifier: {test: 'view-properties'},
+        params: [{name: 'heading', required: true}],
+        properties: {
+          path: 'test-pages/view-properties-test-page',
+        },
+      },
+    );
+
+    await test.step('navigating in current view [target="self"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({heading: 'Heading 1,Heading 2,Heading 3'});
+      await routerPagePO.selectTarget('self');
+      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.getHeading()).toEqual('Heading 3');
+    });
+
+    await test.step('navigating to new view [target="blank"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({heading: 'Heading 1,Heading 2,Heading 3'});
+      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterCssClass('testee-blank');
+      await routerPagePO.clickNavigate();
+      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.getHeading({probeInterval: 250})).toEqual('Heading 3');
+    });
+  });
+
+  test('should set view dirty state via Observable in view constructor [emissions=true,false]', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register the test page as view.
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability(
+      {
+        type: 'view',
+        qualifier: {test: 'view-properties'},
+        params: [{name: 'dirty', required: true}],
+        properties: {
+          path: 'test-pages/view-properties-test-page',
+        },
+      },
+    );
+
+    await test.step('navigating in current view [target="self"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({dirty: 'true,false'});
+      await routerPagePO.selectTarget('self');
+      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isDirty()).toBe(false);
+    });
+
+    await test.step('navigating to new view [target="blank"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({dirty: 'true,false'});
+      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterCssClass('testee-blank');
+      await routerPagePO.clickNavigate();
+      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.isDirty({probeInterval: 250})).toBe(false);
+    });
+  });
+
+  test('should set view dirty state via Observable in view constructor [emissions=true,false,true]', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register the test page as view.
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability(
+      {
+        type: 'view',
+        qualifier: {test: 'view-properties'},
+        params: [{name: 'dirty', required: true}],
+        properties: {
+          path: 'test-pages/view-properties-test-page',
+        },
+      },
+    );
+
+    await test.step('navigating in current view [target="self"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({dirty: 'true,false,true'});
+      await routerPagePO.selectTarget('self');
+      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isDirty()).toBe(true);
+    });
+
+    await test.step('navigating to new view [target="blank"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({dirty: 'true,false,true'});
+      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterCssClass('testee-blank');
+      await routerPagePO.clickNavigate();
+      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.isDirty({probeInterval: 250})).toBe(true);
+    });
+  });
+
+  test('should set view closable property via Observable in view constructor [emissions=true,false]', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register the test page as view.
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability(
+      {
+        type: 'view',
+        qualifier: {test: 'view-properties'},
+        params: [{name: 'closable', required: true}],
+        properties: {
+          path: 'test-pages/view-properties-test-page',
+        },
+      },
+    );
+
+    await test.step('navigating in current view [target="self"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({closable: 'true,false'});
+      await routerPagePO.selectTarget('self');
+      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isClosable()).toBe(false);
+    });
+
+    await test.step('navigating to new view [target="blank"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({closable: 'true,false'});
+      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterCssClass('testee-blank');
+      await routerPagePO.clickNavigate();
+      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.isClosable({probeInterval: 250})).toBe(false);
+    });
+  });
+
+  test('should set view closable property via Observable in view constructor [emissions=true,false,true]', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register the test page as view.
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability(
+      {
+        type: 'view',
+        qualifier: {test: 'view-properties'},
+        params: [{name: 'closable', required: true}],
+        properties: {
+          path: 'test-pages/view-properties-test-page',
+        },
+      },
+    );
+
+    await test.step('navigating in current view [target="self"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({closable: 'true,false,true'});
+      await routerPagePO.selectTarget('self');
+      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isClosable()).toBe(true);
+    });
+
+    await test.step('navigating to new view [target="blank"]', async () => {
+      const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPagePO.enterQualifier({test: 'view-properties'});
+      await routerPagePO.enterParams({closable: 'true,false,true'});
+      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterCssClass('testee-blank');
+      await routerPagePO.clickNavigate();
+      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.isClosable({probeInterval: 250})).toBe(true);
+    });
+  });
+});
