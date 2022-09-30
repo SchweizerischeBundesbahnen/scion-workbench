@@ -14,7 +14,7 @@ import {filter, firstValueFrom, map, noop, pairwise, switchMap, timer} from 'rxj
 /**
  * Returns if given CSS class is present on given element.
  */
-export async function isCssClassPresent(element: Locator, cssClass: string): Promise<boolean> {
+export async function hasCssClass(element: Locator, cssClass: string): Promise<boolean> {
   const classes: string[] = await getCssClasses(element);
   return classes.includes(cssClass);
 }
@@ -54,10 +54,14 @@ export async function waitUntilBoundingBoxStable(element: Locator): Promise<DOMR
  * Waits for a value to become stable.
  * This function returns the value if it hasn't changed during `probeInterval` (defaults to 100ms).
  */
-export async function waitUntilStable<A>(value: () => Promise<A>, options?: {isStable?: (previous: A, current: A) => boolean; probeInterval?: number}): Promise<A> {
+export async function waitUntilStable<A>(value: () => Promise<A> | A, options?: {isStable?: (previous: A, current: A) => boolean; probeInterval?: number}): Promise<A> {
+  if (options?.probeInterval === 0) {
+    return value();
+  }
+
   const value$ = timer(0, options?.probeInterval ?? 100)
     .pipe(
-      switchMap(() => value()),
+      switchMap(async () => await value()),
       pairwise(),
       filter(([previous, current]) => options?.isStable ? options.isStable(previous, current) : previous === current),
       map(([previous]) => previous),

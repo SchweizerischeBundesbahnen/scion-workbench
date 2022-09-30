@@ -70,7 +70,7 @@ export interface WorkbenchViewCapability extends Capability {
      */
     title?: string;
     /**
-     * Specifies the sub title to be displayed in the view tab.
+     * Specifies the subtitle to be displayed in the view tab.
      *
      * You can refer to qualifiers or parameters in the form of named parameters to be replaced during navigation.
      * Named parameters begin with a colon (`:`) followed by the parameter name or qualifier key.

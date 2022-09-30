@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, getCssClasses, isPresent} from './helper/testing.util';
+import {fromRect, getCssClasses, hasCssClass, isPresent, waitUntilStable} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
 
@@ -43,24 +43,24 @@ export class ViewTabPO {
     await this._locator.locator('.e2e-close').click();
   }
 
-  public async getTitle(): Promise<string> {
-    return this._locator.locator('.e2e-title').innerText();
+  public getTitle(options?: {probeInterval?: number}): Promise<string> {
+    return waitUntilStable(() => this._locator.locator('.e2e-title').innerText(), options);
   }
 
-  public async getHeading(): Promise<string> {
-    return this._locator.locator('.e2e-heading').innerText();
+  public getHeading(options?: {probeInterval?: number}): Promise<string> {
+    return waitUntilStable(() => this._locator.locator('.e2e-heading').innerText(), options);
   }
 
-  public async isDirty(): Promise<boolean> {
-    return (await this.getCssClasses()).includes('dirty');
+  public isDirty(options?: {probeInterval?: number}): Promise<boolean> {
+    return waitUntilStable(() => hasCssClass(this._locator, 'dirty'), options);
   }
 
-  public isClosable(): Promise<boolean> {
-    return this._locator.locator('.e2e-close').isVisible();
+  public async isClosable(options?: {probeInterval?: number}): Promise<boolean> {
+    return (await waitUntilStable(() => this._locator.locator('.e2e-close').count(), options) !== 0);
   }
 
-  public async isActive(): Promise<boolean> {
-    return (await this.getCssClasses()).includes('active');
+  public isActive(): Promise<boolean> {
+    return hasCssClass(this._locator, 'active');
   }
 
   public getCssClasses(): Promise<string[]> {
