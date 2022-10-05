@@ -9,7 +9,8 @@
  */
 
 import {fromRect} from '../../helper/testing.util';
-import {AppPO, PopupPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {PopupPO} from '../../popup.po';
 import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
 import {WorkbenchPopupCapability} from '@scion/workbench-client';
@@ -28,7 +29,7 @@ export class PopupPagePO {
   public readonly popupPO: PopupPO;
 
   constructor(appPO: AppPO, cssClass: string) {
-    this.popupPO = appPO.findPopup({cssClass});
+    this.popupPO = appPO.popup({cssClass});
     this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame({cssClass: ['e2e-popup'].concat(cssClass)})).locator('app-popup-page');
   }
 

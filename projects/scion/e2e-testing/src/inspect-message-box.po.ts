@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO, MessageBoxPO} from './app.po';
+import {AppPO} from './app.po';
+import {MessageBoxPO} from './message-box.po';
 import {coerceArray, isPresent} from './helper/testing.util';
 import {SciParamsEnterPO} from './components.internal/params-enter.po';
 import {Locator} from '@playwright/test';
@@ -23,7 +24,7 @@ export class InspectMessageBoxPO {
   public readonly msgboxPO: MessageBoxPO;
 
   constructor(appPO: AppPO, public cssClass: string) {
-    this.msgboxPO = appPO.findMessageBox({cssClass: cssClass});
+    this.msgboxPO = appPO.messagebox({cssClass: cssClass});
     this._locator = this.msgboxPO.locator('app-inspect-message-box');
   }
 

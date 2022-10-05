@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {ViewTabPO} from '../../view-tab.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
 
@@ -22,7 +23,7 @@ export class UnregisterWorkbenchCapabilityPagePO {
   public readonly viewTabPO: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this.viewTabPO = appPO.view({viewId}).viewTab;
     this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-unregister-workbench-capability-page');
   }
 

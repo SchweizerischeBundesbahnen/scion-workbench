@@ -95,7 +95,7 @@ export function fromRect(other: DOMRectInit | null): DOMRect {
   };
 }
 
-export function coerceArray<T>(value: T | T[]): T[] {
+export function coerceArray<T>(value: T | T[] | undefined | null): T[] {
   if (value === null || value === undefined) {
     return [];
   }

@@ -65,7 +65,7 @@ test.describe('Workbench View', () => {
     await expect(await viewTabPO.isDirty()).toBe(true);
 
     // Navigate to a different route in the same view
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-router');
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(viewId);
@@ -87,7 +87,7 @@ test.describe('Workbench View', () => {
     await expect(await viewTabPO.isDirty()).toBe(true);
 
     // Update matrix params (does not affect routing)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(viewId);
@@ -98,7 +98,7 @@ test.describe('Workbench View', () => {
     await expect(await viewTabPO.isDirty()).toBe(true);
 
     // Verify matrix params have changed
-    await viewTabPO.activate();
+    await viewTabPO.click();
     await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
@@ -114,7 +114,7 @@ test.describe('Workbench View', () => {
     await expect(await viewTabPO.getTitle()).toEqual('TITLE');
 
     // Update matrix params (does not affect routing)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(viewId);
@@ -124,7 +124,7 @@ test.describe('Workbench View', () => {
     // Expect the title has not changed
     await expect(await viewTabPO.getTitle()).toEqual('TITLE');
     // Verify matrix params have changed
-    await viewTabPO.activate();
+    await viewTabPO.click();
     await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
@@ -140,7 +140,7 @@ test.describe('Workbench View', () => {
     await expect(await viewTabPO.getHeading()).toEqual('HEADING');
 
     // Update matrix params (does not affect routing)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(viewId);
@@ -151,7 +151,7 @@ test.describe('Workbench View', () => {
     await expect(await viewTabPO.getHeading()).toEqual('HEADING');
 
     // Verify matrix params have changed
-    await viewTabPO.activate();
+    await viewTabPO.click();
     await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
@@ -194,7 +194,7 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-1 view
-    await testee1ViewPagePO.viewTabPO.activate();
+    await testee1ViewPagePO.viewTabPO.click();
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
@@ -204,7 +204,7 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-2 view
-    await testee2ViewPagePO.viewTabPO.activate();
+    await testee2ViewPagePO.viewTabPO.click();
     await testee2ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
@@ -224,7 +224,7 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-1 view
-    await testee1ViewPagePO.viewTabPO.activate();
+    await testee1ViewPagePO.viewTabPO.click();
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
@@ -245,32 +245,32 @@ test.describe('Workbench View', () => {
     await viewPagePO2.addViewAction({icon: 'settings', cssClass: 'view-2-settings-action'});
     await viewPagePO2.addViewAction({icon: 'launch', cssClass: 'view-2-launch-action'});
 
-    await viewTabPO1.activate();
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-1-search-action'}).isPresent()).toBe(true);
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
+    await viewTabPO1.click();
+    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(true);
+    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
 
-    await viewTabPO2.activate();
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-1-search-action'}).isPresent()).toBe(false);
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-2-settings-action'}).isPresent()).toBe(true);
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-2-launch-action'}).isPresent()).toBe(true);
+    await viewTabPO2.click();
+    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(true);
+    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(true);
 
-    await appPO.closeAllViewTabs();
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-1-search-action'}).isPresent()).toBe(false);
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
-    await expect(await appPO.findViewPartAction({buttonCssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
+    await appPO.activePart.closeViewTabs();
+    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
   });
 
   test('should allow to close the view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
     await expect(await viewPagePO.viewTabPO.isPresent()).toBe(true);
     await expect(await viewPagePO.viewPO.isPresent()).toBe(true);
 
     await viewPagePO.clickClose();
 
-    await expect(await appPO.getViewTabCount()).toEqual(0);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
     await expect(await viewPagePO.viewTabPO.isPresent()).toBe(false);
     await expect(await viewPagePO.viewPO.isPresent()).toBe(false);
   });

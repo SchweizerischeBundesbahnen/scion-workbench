@@ -74,7 +74,7 @@ export class NotificationOpenerPagePO {
     // Evaluate the response: resolve the promise on success, or reject it on error.
     const errorLocator = this._locator.locator('output.e2e-error');
     return Promise.race([
-      this._appPO.findNotification({cssClass: this._cssClasses}).locator().waitFor({state: 'visible'}),
+      this._appPO.notification({cssClass: this._cssClasses}).locator().waitFor({state: 'visible'}),
       errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
     ]);
   }

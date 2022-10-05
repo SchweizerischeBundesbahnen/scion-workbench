@@ -38,8 +38,8 @@ test.describe('Workbench Router', () => {
     await routerPagePO.clickNavigate();
 
     // expect qualifier to be contained in view params
-    const testeeViewTabPO = appPO.findViewTab({cssClass: 'product'});
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewId = await appPO.view({cssClass: 'product'}).getViewId();
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     await expect(await testeeViewPagePO.getViewParams()).toEqual(
       expect.objectContaining({
@@ -74,8 +74,8 @@ test.describe('Workbench Router', () => {
     await routerPagePO.clickNavigate();
 
     // expect qualifier to be contained in view params
-    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     await expect(await testeeViewPagePO.getViewParams()).toEqual(
       expect.objectContaining({
@@ -111,8 +111,8 @@ test.describe('Workbench Router', () => {
     await routerPagePO.clickNavigate();
 
     // expect qualifier values not to be overwritten by params
-    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     await expect(await testeeViewPagePO.getViewParams()).toEqual(
       expect.objectContaining({
@@ -150,8 +150,8 @@ test.describe('Workbench Router', () => {
     await routerPagePO.clickNavigate();
 
     // expect named params to be substituted
-    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     await expect(await testeeViewPagePO.getViewParams()).toEqual(
       expect.objectContaining({
@@ -194,21 +194,21 @@ test.describe('Workbench Router', () => {
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
-    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     // capture the view's component instance id
     const testeeComponentInstanceId = await testeeViewPagePO.getComponentInstanceId();
 
     // navigate to update the view's params
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({entity: 'product', id: '123'});
     await routerPagePO.enterParams({readonly: 'false'});
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(testeeViewPagePO.viewId);
     await routerPagePO.clickNavigate();
 
-    await testeeViewPagePO.viewTabPO.activate();
+    await testeeViewPagePO.viewTabPO.click();
 
     // expect the view's params to be updated
     await expect(await testeeViewPagePO.getViewParams()).toEqual(
@@ -250,8 +250,8 @@ test.describe('Workbench Router', () => {
     await routerPagePO.clickNavigate();
 
     // expect the qualifier and the optional parameter with value `null` to be contained in view params
-    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     await expect(await testeeViewPagePO.getViewParams()).toEqual(
       expect.objectContaining({
@@ -293,8 +293,8 @@ test.describe('Workbench Router', () => {
     await routerPagePO.clickNavigate();
 
     // expect qualifier to be contained in view params, but the optional parameter with value `undefined` should not be contained
-    const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     const params = await testeeViewPagePO.getViewParams();
     await expect(params).toEqual(
@@ -592,8 +592,8 @@ test.describe('Workbench Router', () => {
       await routerPagePO.clickNavigate();
 
       // expect transient param to be contained in view params
-      const testeeViewTabPO = appPO.findViewTab({cssClass: 'testee'});
-      const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+      const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
+      const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
       await expect(await testeeViewPagePO.getViewParams()).toEqual(
         expect.objectContaining({
@@ -618,8 +618,8 @@ test.describe('Workbench Router', () => {
       await routerPagePO.clickNavigate();
 
       // expect transient param to be contained in view params
-      const testeeViewTabPO = appPO.findViewTab({cssClass: 'e2e-test-view'});
-      const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+      const testeeViewId = await appPO.view({cssClass: 'e2e-test-view'}).getViewId();
+      const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
       await expect(await testeeViewPagePO.getViewParams()).toEqual(
         expect.objectContaining({
@@ -629,8 +629,7 @@ test.describe('Workbench Router', () => {
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
-      const testeeViewTabPO2 = appPO.findViewTab({cssClass: 'e2e-test-view'});
-      const testeeViewPagePO2 = new ViewPagePO(appPO, await testeeViewTabPO2.getViewId());
+      const testeeViewPagePO2 = new ViewPagePO(appPO, testeeViewId);
       await expect(await testeeViewPagePO2.getViewParams()).toEqual(expect.objectContaining({initialTitle: 'TITLE [string]'}));
       await expect(await testeeViewPagePO2.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM')}));
     });
@@ -878,8 +877,8 @@ test.describe('Workbench Router', () => {
       await routerPagePO1.clickNavigate();
 
       // expect transient param to be contained in view params
-      const testeeViewTabPO1 = appPO.findViewTab({cssClass: 'testee1'});
-      const viewId = await testeeViewTabPO1.getViewId();
+      const testeeViewPO1 = appPO.view({cssClass: 'testee1'});
+      const viewId = await testeeViewPO1.getViewId();
       const testeeViewPagePO1 = new ViewPagePO(appPO, viewId);
       await expect(await testeeViewPagePO1.getViewParams()).toEqual(
         expect.objectContaining({
@@ -898,8 +897,8 @@ test.describe('Workbench Router', () => {
       await routerPagePO2.clickNavigate();
 
       // expect transient param to be contained in view params
-      const testeeViewTabPO2 = appPO.findViewTab({cssClass: 'testee2'});
-      await testeeViewTabPO2.activate();
+      const testeeViewTabPO2 = appPO.view({cssClass: 'testee2'}).viewTab;
+      await testeeViewTabPO2.click();
       const testeeViewPagePO2 = new ViewPagePO(appPO, viewId);
       await expect(await testeeViewPagePO2.getViewParams()).toEqual(
         expect.objectContaining({
@@ -959,8 +958,8 @@ test.describe('Workbench Router', () => {
       await routerPagePO1.clickNavigate();
 
       // expect transient param to be contained in view params
-      const testeeViewTabPO1 = appPO.findViewTab({cssClass: 'testee1'});
-      const viewId = await testeeViewTabPO1.getViewId();
+      const testeeViewPO1 = appPO.view({cssClass: 'testee1'});
+      const viewId = await testeeViewPO1.getViewId();
       const testeeViewPagePO1 = new ViewPagePO(appPO, viewId);
       await expect(await testeeViewPagePO1.getViewParams()).toEqual(
         expect.objectContaining({
@@ -977,8 +976,8 @@ test.describe('Workbench Router', () => {
       await routerPagePO2.clickNavigate();
 
       // expect transient param to be contained in view params
-      const testeeViewTabPO2 = appPO.findViewTab({cssClass: 'testee2'});
-      await testeeViewTabPO2.activate();
+      const testeeViewTabPO2 = appPO.view({cssClass: 'testee2'}).viewTab;
+      await testeeViewTabPO2.click();
       const testeeViewPagePO2 = new ViewPagePO(appPO, viewId);
       await expect(await testeeViewPagePO2.getViewParams()).toEqual(
         expect.objectContaining({

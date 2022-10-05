@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {ViewPO} from '../../view.po';
+import {ViewTabPO} from '../../view-tab.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
@@ -27,8 +29,8 @@ export class RouterPagePO {
   public readonly viewTabPO: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this._viewPO = appPO.findView({viewId: viewId});
-    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this._viewPO = appPO.view({viewId});
+    this.viewTabPO = this._viewPO.viewTab;
     this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-router-page');
   }
 

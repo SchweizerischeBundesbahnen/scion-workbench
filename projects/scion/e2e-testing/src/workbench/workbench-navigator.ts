@@ -50,7 +50,7 @@ export class WorkbenchNavigator {
 
   public async openInNewTab(page: Type<any>): Promise<any> {
     const startPO = await this._appPO.openNewViewTab();
-    const viewId = await this._appPO.getActiveView().getViewId();
+    const viewId = startPO.viewId!;
 
     switch (page) {
       case MessageBoxOpenerPagePO: {

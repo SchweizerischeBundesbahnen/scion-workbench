@@ -30,9 +30,9 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
+      const popupPO = await appPO.popup({cssClass: 'testee'});
       const anchorClientRect = await popupOpenerPagePO.getAnchorElementClientRect();
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(anchorClientRect.top, 0);
@@ -50,9 +50,9 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
+      const popupPO = await appPO.popup({cssClass: 'testee'});
       const anchorClientRect = await popupOpenerPagePO.getAnchorElementClientRect();
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(anchorClientRect.top, 0);
@@ -71,9 +71,9 @@ test.describe('Workbench Popup', () => {
 
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
+      const popupPO = await appPO.popup({cssClass: 'testee'});
       const anchorClientRect = await popupOpenerPagePO.getAnchorElementClientRect();
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.top - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(anchorClientRect.bottom, 0);
@@ -91,9 +91,9 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
+      const popupPO = await appPO.popup({cssClass: 'testee'});
       const anchorClientRect = await popupOpenerPagePO.getAnchorElementClientRect();
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(anchorClientRect.top + anchorClientRect.height / 2, 0);
@@ -111,9 +111,9 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
+      const popupPO = await appPO.popup({cssClass: 'testee'});
       const anchorClientRect = await popupOpenerPagePO.getAnchorElementClientRect();
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(anchorClientRect.top + anchorClientRect.height / 2, 0);
@@ -135,8 +135,8 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupPO = await appPO.popup({cssClass: 'testee'});
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(300, 0);
@@ -155,8 +155,8 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupPO = await appPO.popup({cssClass: 'testee'});
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(300, 0);
@@ -176,8 +176,8 @@ test.describe('Workbench Popup', () => {
 
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupPO = await appPO.popup({cssClass: 'testee'});
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.top - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(400, 0);
@@ -196,8 +196,8 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupPO = await appPO.popup({cssClass: 'testee'});
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(350, 0);
@@ -216,8 +216,8 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = await appPO.findPopup({cssClass: 'testee'});
-      const popupClientRect = await popupPO.getClientRect('cdk-overlay');
+      const popupPO = await appPO.popup({cssClass: 'testee'});
+      const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
       await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(350, 0);
@@ -276,17 +276,17 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.findPopup({cssClass: 'testee'});
+      const popupPO = appPO.popup({cssClass: 'testee'});
 
       // capture current popup and anchor location
       const anchorClientRect1 = await popupOpenerPagePO.getAnchorElementClientRect();
-      const popupClientRect1 = await popupPO.getClientRect();
+      const popupClientRect1 = await popupPO.getBoundingBox();
 
       // expand a collapsed panel to move the popup anchor downward
       await popupOpenerPagePO.expandSizePanel();
 
       const anchorClientRect2 = await popupOpenerPagePO.getAnchorElementClientRect();
-      const popupClientRect2 = await popupPO.getClientRect();
+      const popupClientRect2 = await popupPO.getBoundingBox();
       const xDelta = anchorClientRect2.left - anchorClientRect1.left;
       const yDelta = anchorClientRect2.top - anchorClientRect1.top;
 
@@ -300,7 +300,7 @@ test.describe('Workbench Popup', () => {
 
       // collapse the panel to move the popup anchor upward
       await popupOpenerPagePO.collapseSizePanel();
-      const popupClientRect3 = await popupPO.getClientRect();
+      const popupClientRect3 = await popupPO.getBoundingBox();
 
       // assert the popup location
       await expect(popupClientRect3.top).toEqual(popupClientRect1.top);
@@ -319,20 +319,20 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.findPopup({cssClass: 'testee'});
-      const popupClientRect1 = await popupPO.getClientRect('cdk-overlay');
+      const popupPO = appPO.popup({cssClass: 'testee'});
+      const popupClientRect1 = await popupPO.getBoundingBox('cdk-overlay');
       await expect(popupClientRect1.left + 50).toEqual(150);
       await expect(popupClientRect1.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(150);
 
       // move the anchor to another position
       await popupOpenerPagePO.enterAnchorCoordinate({x: 200, y: 300, width: 2, height: 0});
-      const popupClientRect2 = await popupPO.getClientRect('cdk-overlay');
+      const popupClientRect2 = await popupPO.getBoundingBox('cdk-overlay');
       await expect(popupClientRect2.left + 50).toEqual(200);
       await expect(popupClientRect2.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(300);
 
       // move the anchor to another position
       await popupOpenerPagePO.enterAnchorCoordinate({x: 300, y: 400, width: 2, height: 0});
-      const popupClientRect3 = await popupPO.getClientRect('cdk-overlay');
+      const popupClientRect3 = await popupPO.getBoundingBox('cdk-overlay');
       await expect(popupClientRect3.left + 50).toEqual(300);
       await expect(popupClientRect3.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(400);
     });
@@ -348,7 +348,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.findPopup({cssClass: 'testee'});
+      const popupPO = appPO.popup({cssClass: 'testee'});
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
@@ -358,7 +358,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPO.isVisible()).toBe(false);
 
       // re-activate the view
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
     });
@@ -382,7 +382,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPagePO.isVisible()).toBe(false);
 
       // re-activate the view
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
       await expect(await popupPagePO.isPresent()).toBe(true);
       await expect(await popupPagePO.isVisible()).toBe(true);
 
@@ -403,12 +403,12 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.clickOpen();
 
       // open a popup and bind it to the start page view.
-      const popupPO = appPO.findPopup({cssClass: 'testee'});
+      const popupPO = appPO.popup({cssClass: 'testee'});
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(false);
 
       // activate the view to which the popup is bound to
-      await startPagePO.viewTabPO!.activate();
+      await startPagePO.view!.viewTab.click();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
@@ -426,7 +426,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.findPopup({cssClass: 'testee'});
+      const popupPO = appPO.popup({cssClass: 'testee'});
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
@@ -436,12 +436,12 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPO.isVisible()).toBe(false);
 
       // activate the view again
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
       // close the view
-      await popupOpenerPagePO.viewTabPO.close();
+      await popupOpenerPagePO.view.viewTab.close();
       await expect(await popupPO.isPresent()).toBe(false);
       await expect(await popupPO.isVisible()).toBe(false);
     });
@@ -456,7 +456,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.selectAnchor('coordinate');
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.findPopup({cssClass: 'testee'});
+      const popupPO = appPO.popup({cssClass: 'testee'});
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
@@ -466,12 +466,12 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPO.isVisible()).toBe(true);
 
       // activate the view again
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
       // close the view
-      await popupOpenerPagePO.viewTabPO.close();
+      await popupOpenerPagePO.view.viewTab.close();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
     });
@@ -491,7 +491,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
 
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
 
       await expect(await popupPagePO.popupPO.isPresent()).toBe(false);
       await expect(await popupPagePO.popupPO.isVisible()).toBe(false);
@@ -509,7 +509,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
 
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
 
       await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
@@ -644,7 +644,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupFocusPagePO.isVisible()).toBe(false);
 
       // re-activate the view
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
       await expect(await popupFocusPagePO.isPresent()).toBe(true);
       await expect(await popupFocusPagePO.isVisible()).toBe(true);
       await expect(await popupFocusPagePO.isActiveElement('middle-field')).toBe(true);

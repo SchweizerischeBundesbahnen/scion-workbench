@@ -21,7 +21,7 @@ export class TextMessagePO {
 
   constructor(appPO: AppPO, cssClass: string) {
     this._page = appPO.page;
-    this._locator = appPO.findMessageBox({cssClass}).locator('wb-text-message');
+    this._locator = appPO.messagebox({cssClass}).locator('wb-text-message');
   }
 
   public async isVisible(): Promise<boolean> {

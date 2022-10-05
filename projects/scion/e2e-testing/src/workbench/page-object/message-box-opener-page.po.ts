@@ -9,7 +9,8 @@
  */
 
 import {coerceArray} from '../../helper/testing.util';
-import {AppPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {Locator} from '@playwright/test';
@@ -24,8 +25,9 @@ export class MessageBoxOpenerPagePO {
   public readonly viewTabPO: ViewTabPO;
 
   constructor(private _appPO: AppPO, public viewId: string) {
-    this.viewTabPO = this._appPO.findViewTab({viewId: viewId});
-    this._locator = this._appPO.findView({viewId: viewId}).locator('app-message-box-opener-page');
+    const view = this._appPO.view({viewId});
+    this.viewTabPO = view.viewTab;
+    this._locator = view.locator('app-message-box-opener-page');
   }
 
   public async selectComponent(component: 'inspect-message-box' | 'default'): Promise<void> {
@@ -84,14 +86,14 @@ export class MessageBoxOpenerPagePO {
 
   public async clickOpen(): Promise<void> {
     const count = Number(await this._locator.locator('input.e2e-count').inputValue() || 1);
-    const expectedMessageBoxIndex = await this._appPO.getMessageBoxCount() + count - 1;
+    const cssClasses = (await this._locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
 
     await this._locator.locator('button.e2e-open').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     const errorLocator = this._locator.locator('output.e2e-open-error');
-    return Promise.race([
-      this._appPO.messageBoxLocator().nth(expectedMessageBoxIndex).waitFor({state: 'attached'}),
+    await Promise.race([
+      Promise.all(Array.from(Array(count).keys()).map(i => this._appPO.messagebox({cssClass: [`index-${i}`].concat(cssClasses)}).waitUntilAttached())),
       errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
     ]);
   }

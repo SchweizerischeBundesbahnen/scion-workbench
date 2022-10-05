@@ -9,7 +9,7 @@
  */
 
 import {isPresent, waitUntilBoundingBoxStable} from '../../helper/testing.util';
-import {AppPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {PopupOrigin} from '@scion/workbench';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
@@ -17,6 +17,7 @@ import {SciAccordionPO} from '../../components.internal/accordion.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
+import {ViewPO} from '../../view.po';
 
 /**
  * Page object to interact {@link PopupOpenerPageComponent}.
@@ -25,10 +26,10 @@ export class PopupOpenerPagePO {
 
   private readonly _locator: Locator;
 
-  public readonly viewTabPO: ViewTabPO;
+  public readonly view: ViewPO;
 
   constructor(private _appPO: AppPO, public viewId: string) {
-    this.viewTabPO = _appPO.findViewTab({viewId: viewId});
+    this.view = _appPO.view({viewId});
     this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-popup-opener-page');
   }
 

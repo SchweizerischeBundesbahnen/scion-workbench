@@ -25,7 +25,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.clickNavigateViaRouter();
 
       // expect ActivatedRoute.data emitted undefined as state
-      const testeeViewId = await appPO.getActiveView().getViewId();
+      const testeeViewId = await appPO.activePart.activeView.getViewId();
       await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
       ]);
@@ -41,7 +41,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.clickNavigateViaRouter();
 
       // expect ActivatedRoute.data emitted the passed state
-      const testeeViewId = await appPO.getActiveView().getViewId();
+      const testeeViewId = await appPO.activePart.activeView.getViewId();
       await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
       ]);
@@ -57,7 +57,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.clickNavigateViaRouter();
 
       // expect ActivatedRoute.data emitted the passed state
-      const testeeViewId = await appPO.getActiveView().getViewId();
+      const testeeViewId = await appPO.activePart.activeView.getViewId();
       await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
       ]);
@@ -80,7 +80,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.enterMatrixParams({'param': 'value 1'});
       await routerPagePO.clickNavigateViaRouter();
 
-      const testeeViewId = await appPO.getActiveView().getViewId();
+      const testeeViewId = await appPO.activePart.activeView.getViewId();
 
       // expect ActivatedRoute.data emitted undefined as state
       await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
@@ -88,7 +88,7 @@ test.describe('Navigational State', () => {
       ]);
 
       // update matrix param
-      await routerPagePO.viewTabPO.activate();
+      await routerPagePO.viewTabPO.click();
       await routerPagePO.enterMatrixParams({'param': 'value 2'});
       await routerPagePO.selectTarget('self');
       await routerPagePO.enterSelfViewId(testeeViewId);

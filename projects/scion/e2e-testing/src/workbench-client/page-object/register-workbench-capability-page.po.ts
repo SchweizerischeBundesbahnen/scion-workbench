@@ -9,7 +9,8 @@
  */
 
 import {coerceArray} from '../../helper/testing.util';
-import {AppPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {ViewTabPO} from '../../view-tab.po';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
@@ -36,7 +37,7 @@ export class RegisterWorkbenchCapabilityPagePO {
   public readonly viewTabPO: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this.viewTabPO = appPO.view({viewId}).viewTab;
     this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-register-workbench-capability-page');
   }
 

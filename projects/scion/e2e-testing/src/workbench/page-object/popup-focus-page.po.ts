@@ -20,7 +20,7 @@ export class PopupFocusPagePO {
   private readonly _locator: Locator;
 
   constructor(appPO: AppPO, cssClass: string) {
-    this._locator = appPO.findPopup({cssClass}).locator('app-popup-focus-page');
+    this._locator = appPO.popup({cssClass}).locator('app-popup-focus-page');
   }
 
   public async isPresent(): Promise<boolean> {

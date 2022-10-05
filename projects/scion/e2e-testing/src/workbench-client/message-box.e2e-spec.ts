@@ -66,7 +66,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterTitle('TITLE');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getTitle()).toEqual('TITLE');
   });
@@ -84,7 +84,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterTitle('LINE 1\\nLINE 2');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getTitle()).toEqual('LINE 1\nLINE 2');
   });
@@ -101,7 +101,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCssClass('testee');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getSeverity()).toEqual('info');
   });
@@ -119,7 +119,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.selectSeverity('info');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getSeverity()).toEqual('info');
   });
@@ -137,7 +137,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.selectSeverity('warn');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getSeverity()).toEqual('warn');
   });
@@ -155,7 +155,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.selectSeverity('error');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getSeverity()).toEqual('error');
   });
@@ -172,7 +172,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCssClass('testee');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getModality()).toEqual('view');
   });
@@ -190,7 +190,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.checkViewContextActive(false);
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getModality()).toEqual('application');
   });
@@ -208,7 +208,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.selectModality('application');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getModality()).toEqual('application');
   });
@@ -230,7 +230,7 @@ test.describe('Workbench Message Box', () => {
     });
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getActions()).toEqual({
       yes: 'Yes',
@@ -256,7 +256,7 @@ test.describe('Workbench Message Box', () => {
     });
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await msgboxPO.clickActionButton('yes');
     await expect(await msgboxOpenerPagePO.getMessageBoxCloseAction()).toEqual('yes');
 
@@ -300,7 +300,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCssClass('testee');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isPresent()).toBe(true);
     await expect(await msgboxPO.isVisible()).toBe(true);
 
@@ -310,7 +310,7 @@ test.describe('Workbench Message Box', () => {
     await expect(await msgboxPO.isVisible()).toBe(false);
 
     // expect the message box to display when activating the view again
-    await msgboxOpenerPagePO.viewTabPO.activate();
+    await msgboxOpenerPagePO.viewTabPO.click();
     await expect(await msgboxPO.isPresent()).toBe(true);
     await expect(await msgboxPO.isVisible()).toBe(true);
   });
@@ -319,6 +319,7 @@ test.describe('Workbench Message Box', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     const msgboxOpenerPagePO = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
+    await msgboxOpenerPagePO.enterCssClass('testee');
     await expect(msgboxOpenerPagePO.clickOpen()).rejects.toThrow(/NotQualifiedError/);
   });
 
@@ -355,7 +356,7 @@ test.describe('Workbench Message Box', () => {
       await msgboxOpenerPagePO.enterParams({param1: 'PARAM 1'});
       await msgboxOpenerPagePO.clickOpen();
 
-      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      const msgboxPO = appPO.messagebox({cssClass: 'testee'});
       await expect(await msgboxPO.isPresent()).toBe(true);
       await expect(await msgboxPO.isVisible()).toBe(true);
 
@@ -365,7 +366,7 @@ test.describe('Workbench Message Box', () => {
       await expect(await msgboxPO.isVisible()).toBe(false);
 
       // expect the message box to display when activating the view again
-      await msgboxOpenerPagePO.viewTabPO.activate();
+      await msgboxOpenerPagePO.viewTabPO.click();
       await expect(await msgboxPO.isPresent()).toBe(true);
       await expect(await msgboxPO.isVisible()).toBe(true);
     });
@@ -385,7 +386,7 @@ test.describe('Workbench Message Box', () => {
       await msgboxOpenerPagePO.checkViewContextActive(false);
       await msgboxOpenerPagePO.clickOpen();
 
-      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      const msgboxPO = appPO.messagebox({cssClass: 'testee'});
       await expect(await msgboxPO.isVisible()).toBe(true);
       await expect(await msgboxPO.getModality()).toEqual('application');
     });
@@ -405,7 +406,7 @@ test.describe('Workbench Message Box', () => {
       await msgboxOpenerPagePO.selectModality('application');
       await msgboxOpenerPagePO.clickOpen();
 
-      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      const msgboxPO = appPO.messagebox({cssClass: 'testee'});
       await expect(await msgboxPO.isVisible()).toBe(true);
       await expect(await msgboxPO.getModality()).toEqual('application');
     });

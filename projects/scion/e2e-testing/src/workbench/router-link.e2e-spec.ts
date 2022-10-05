@@ -22,9 +22,9 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.getViewTabCount()).toEqual(1);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isPresent()).toBe(true);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isActive()).toBe(true);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
 
   test('should open the view in the current view tab (target="self")', async ({appPO, workbenchNavigator}) => {
@@ -36,9 +36,9 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.selectTarget('self');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.getViewTabCount()).toEqual(1);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isPresent()).toBe(true);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isActive()).toBe(true);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
 
   test('should open the view in a new view tab (target="blank")', async ({appPO, workbenchNavigator}) => {
@@ -50,9 +50,9 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.getViewTabCount()).toEqual(2);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isPresent()).toBe(true);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isActive()).toBe(true);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
 
   test('should open the view in a new view tab when pressing the CTRL modifier key', async ({appPO, workbenchNavigator}) => {
@@ -63,9 +63,9 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink(['Control']);
 
-    await expect(await appPO.getViewTabCount()).toEqual(2);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isPresent()).toBe(true);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isActive()).toBe(true);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
 
   /**
@@ -80,8 +80,8 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink(['Meta']);
 
-    await expect(await appPO.getViewTabCount()).toEqual(2);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isPresent()).toBe(true);
-    await expect(await appPO.findViewTab({cssClass: 'testee'}).isActive()).toBe(true);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
 });

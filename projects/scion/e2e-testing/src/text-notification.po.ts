@@ -20,7 +20,7 @@ export class TextNotificationPO {
   private readonly _locator: Locator;
 
   constructor(appPO: AppPO, cssClass: string) {
-    this._locator = appPO.findNotification({cssClass}).locator('wb-text-notification');
+    this._locator = appPO.notification({cssClass}).locator('wb-text-notification');
   }
 
   public async isVisible(): Promise<boolean> {

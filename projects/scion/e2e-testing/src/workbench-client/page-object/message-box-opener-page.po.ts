@@ -9,7 +9,8 @@
  */
 
 import {coerceArray} from '../../helper/testing.util';
-import {AppPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {ViewTabPO} from '../../view-tab.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
@@ -26,7 +27,7 @@ export class MessageBoxOpenerPagePO {
   public readonly viewTabPO: ViewTabPO;
 
   constructor(private _appPO: AppPO, public viewId: string) {
-    this.viewTabPO = _appPO.findViewTab({viewId: viewId});
+    this.viewTabPO = _appPO.view({viewId}).viewTab;
     this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-message-box-opener-page');
   }
 
@@ -77,14 +78,13 @@ export class MessageBoxOpenerPagePO {
   }
 
   public async clickOpen(): Promise<void> {
-    const expectedMessageBoxIndex = await this._appPO.getMessageBoxCount();
-
     await this._locator.locator('button.e2e-open').click();
+    const cssClasses = (await this._locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     const errorLocator = this._locator.locator('output.e2e-open-error');
     return Promise.race([
-      this._appPO.messageBoxLocator().nth(expectedMessageBoxIndex).waitFor({state: 'attached'}),
+      this._appPO.messagebox({cssClass: cssClasses}).waitUntilAttached(),
       errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
     ]);
   }

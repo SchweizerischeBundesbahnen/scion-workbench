@@ -65,7 +65,7 @@ export class MicrofrontendNavigator {
 
   public async openInNewTab(page: Type<any>, app: 'app1' | 'app2'): Promise<any> {
     const startPO = await this._appPO.openNewViewTab();
-    const viewId = await this._appPO.getActiveView().getViewId();
+    const viewId = await this._appPO.activePart.activeView.getViewId();
 
     switch (page) {
       case MessageBoxOpenerPagePO: {
