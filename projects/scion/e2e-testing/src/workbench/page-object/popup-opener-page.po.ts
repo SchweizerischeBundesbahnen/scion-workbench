@@ -9,11 +9,12 @@
  */
 
 import {coerceArray, fromRect, isPresent} from '../../helper/testing.util';
-import {AppPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
 import {PopupOrigin, PopupSize} from '@scion/workbench';
 import {SciAccordionPO} from '../../components.internal/accordion.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
+import {ViewPO} from '../../view.po';
 
 /**
  * Page object to interact {@link PopupOpenerPageComponent}.
@@ -21,11 +22,11 @@ import {Locator} from '@playwright/test';
 export class PopupOpenerPagePO {
 
   private readonly _locator: Locator;
-  public readonly viewTabPO: ViewTabPO;
+  public readonly view: ViewPO;
 
   constructor(private _appPO: AppPO, public viewId: string) {
-    this.viewTabPO = this._appPO.findViewTab({viewId: viewId});
-    this._locator = this._appPO.findView({viewId: viewId}).locator('app-popup-opener-page');
+    this.view = this._appPO.view({viewId});
+    this._locator = this.view.locator('app-popup-opener-page');
   }
 
   public async selectPopupComponent(component: 'popup-page' | 'popup-focus-page'): Promise<void> {

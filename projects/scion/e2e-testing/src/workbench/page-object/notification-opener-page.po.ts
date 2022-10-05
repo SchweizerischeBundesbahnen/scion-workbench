@@ -22,7 +22,7 @@ export class NotificationOpenerPagePO {
   private _cssClasses = new Array<string>();
 
   constructor(private _appPO: AppPO, public viewId: string) {
-    this._locator = this._appPO.findView({viewId: viewId}).locator('app-notification-opener-page');
+    this._locator = this._appPO.view({viewId}).locator('app-notification-opener-page');
   }
 
   public async selectComponent(component: 'inspect-notification' | 'default'): Promise<void> {
@@ -68,7 +68,7 @@ export class NotificationOpenerPagePO {
     }
 
     await this._locator.locator('button.e2e-show').click();
-    await this._appPO.findNotification({cssClass: this._cssClasses}).locator().waitFor({state: 'visible'});
+    await this._appPO.notification({cssClass: this._cssClasses}).locator().waitFor({state: 'visible'});
   }
 
   public async pressEscape(): Promise<void> {

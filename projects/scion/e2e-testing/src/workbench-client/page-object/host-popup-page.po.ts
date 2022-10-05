@@ -9,7 +9,8 @@
  */
 
 import {isPresent} from '../../helper/testing.util';
-import {AppPO, PopupPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {PopupPO} from '../../popup.po';
 import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
 import {WorkbenchPopupCapability} from '@scion/workbench-client';
@@ -30,7 +31,7 @@ export class HostPopupPagePO {
   public readonly popupPO: PopupPO;
 
   constructor(appPO: AppPO, cssClass: string) {
-    this.popupPO = appPO.findPopup({cssClass});
+    this.popupPO = appPO.popup({cssClass});
     this._locator = this.popupPO.locator('app-host-popup-page');
   }
 

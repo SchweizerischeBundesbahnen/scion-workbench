@@ -9,7 +9,9 @@
  */
 
 import {coerceArray, waitUntilStable} from '../../helper/testing.util';
-import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {ViewPO} from '../../view.po';
+import {ViewTabPO} from '../../view-tab.po';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator, Page} from '@playwright/test';
@@ -28,8 +30,8 @@ export class RouterPagePO {
 
   constructor(appPO: AppPO, public viewId: string) {
     this._page = appPO.page;
-    this.viewPO = appPO.findView({viewId: viewId});
-    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this.viewPO = appPO.view({viewId});
+    this.viewTabPO = this.viewPO.viewTab;
     this._locator = this.viewPO.locator('app-router-page');
   }
 

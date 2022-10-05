@@ -19,7 +19,7 @@ export class BulkNavigationTestPagePO {
   private readonly _locator: Locator;
 
   constructor(private _appPO: AppPO, viewId: string) {
-    this._locator = this._appPO.findView({viewId: viewId}).locator('app-bulk-navigation-test-page');
+    this._locator = this._appPO.view({viewId}).locator('app-bulk-navigation-test-page');
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {
@@ -47,7 +47,7 @@ export class BulkNavigationTestPagePO {
     await routerPagePO.enterPath('test-pages/bulk-navigation-test-page');
     await routerPagePO.clickNavigateViaRouter();
 
-    const view = await appPO.findView({cssClass: 'e2e-test-bulk-navigation'});
+    const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation'});
     await view.waitUntilPresent();
     return new BulkNavigationTestPagePO(appPO, await view.getViewId());
   }

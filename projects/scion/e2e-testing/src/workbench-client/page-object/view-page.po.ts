@@ -9,7 +9,9 @@
  */
 
 import {fromRect, isPresent} from '../../helper/testing.util';
-import {AppPO, ViewPO, ViewTabPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {ViewPO} from '../../view.po';
+import {ViewTabPO} from '../../view-tab.po';
 import {Params} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../components.internal/accordion.po';
@@ -30,8 +32,8 @@ export class ViewPagePO {
   public readonly viewTabPO: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewPO = appPO.findView({viewId: viewId});
-    this.viewTabPO = appPO.findViewTab({viewId: viewId});
+    this.viewPO = appPO.view({viewId});
+    this.viewTabPO = this.viewPO.viewTab;
     this.locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-view-page');
   }
 

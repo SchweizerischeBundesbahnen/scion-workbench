@@ -19,19 +19,19 @@ test.describe('Default Page', () => {
     await appPO.navigateTo({microfrontendSupport: false});
     const startPagePO = new StartPagePO(appPO);
 
-    await expect(await appPO.isDefaultPageShowing('app-start-page')).toBe(true);
+    await expect(await appPO.activePart.isDefaultPagePresent('app-start-page')).toBe(true);
     await expect(await startPagePO.isPresent()).toBe(true);
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewId = await viewPO.getViewId();
-    await expect(await appPO.isDefaultPageShowing('app-start-page')).toBe(false);
-    await expect(await appPO.findViewTab({viewId}).isPresent()).toBe(true);
-    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await appPO.activePart.isDefaultPagePresent('app-start-page')).toBe(false);
+    await expect(await appPO.view({viewId}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
 
     // Close the view
-    await appPO.findViewTab({viewId}).close();
-    await expect(await appPO.getViewTabCount()).toEqual(0);
-    await expect(await appPO.isDefaultPageShowing('app-start-page')).toBe(true);
+    await appPO.view({viewId}).viewTab.close();
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
+    await expect(await appPO.activePart.isDefaultPagePresent('app-start-page')).toBe(true);
   });
 });

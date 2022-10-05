@@ -16,41 +16,41 @@ test.describe('Viewpart Action', () => {
 
   test('should be added to all viewparts (global action)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const openNewTabActionButtonPO = appPO.findViewPartAction({buttonCssClass: 'e2e-open-new-tab'});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
 
     // Global action should show if no view is opened
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
-    await expect(await appPO.getViewTabCount()).toEqual(0);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
 
     // Global action should show in the context of view-1
     const viewPagePO1 = await workbenchNavigator.openInNewTab(ViewPagePO);
     await expect(await viewPagePO1.viewTabPO.isActive()).toBe(true);
     await expect(await viewPagePO1.viewPO.isPresent()).toBe(true);
-    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
 
     // Global action should show in the context of view-2
     const viewPagePO2 = await workbenchNavigator.openInNewTab(ViewPagePO);
     await expect(await viewPagePO2.viewTabPO.isActive()).toBe(true);
     await expect(await viewPagePO2.viewPO.isPresent()).toBe(true);
-    await expect(await appPO.getViewTabCount()).toEqual(2);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
 
     // Global action should show in the context of view-1
     await viewPagePO2.viewTabPO.close();
     await expect(await viewPagePO1.viewTabPO.isActive()).toBe(true);
-    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
 
     // Global action should show if no view is opened
     await viewPagePO1.viewTabPO.close();
-    await expect(await appPO.getViewTabCount()).toEqual(0);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
     await expect(await openNewTabActionButtonPO.isPresent()).toBe(true);
   });
 
   test('should stick to a view if registered in the context of a view (view-local action)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const testeeActionButtonPO = appPO.findViewPartAction({buttonCssClass: 'e2e-testee'});
+    const testeeActionButtonPO = appPO.activePart.action({cssClass: 'e2e-testee'});
 
     // Open view-1 and register a view-local viewpart action
     const viewPagePO1 = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -62,11 +62,11 @@ test.describe('Viewpart Action', () => {
     await expect(await testeeActionButtonPO.isPresent()).toBe(false);
 
     // Activate view-1, expect the action to show
-    await viewPagePO1.viewTabPO.activate();
+    await viewPagePO1.viewTabPO.click();
     await expect(await testeeActionButtonPO.isPresent()).toBe(true);
 
     // Activate view-2, expect the action not to show
-    await viewPagePO2.viewTabPO.activate();
+    await viewPagePO2.viewTabPO.click();
     await expect(await testeeActionButtonPO.isPresent()).toBe(false);
 
     // Close view-2, expect the action to show because view-1 gets activated

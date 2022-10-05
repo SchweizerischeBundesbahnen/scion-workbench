@@ -70,24 +70,24 @@ test.describe('Workbench View', () => {
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
-    const testeeViewId = await appPO.findViewTab({cssClass: 'testee-1'}).getViewId();
-    const testeeViewTabPO = appPO.findViewTab({viewId: testeeViewId});
+    const testeeViewId = await appPO.view({cssClass: 'testee-1'}).getViewId();
+    const testeeViewPO = appPO.view({viewId: testeeViewId});
     const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     // expect testee-1 to show
-    await expect(await testeeViewTabPO.getTitle()).toEqual('Testee 1');
+    await expect(await testeeViewPO.viewTab.getTitle()).toEqual('Testee 1');
     const testee1ComponentInstanceId = await testeeViewPagePO.getComponentInstanceId();
 
     // navigate to testee-2 view (app1)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.clickNavigate();
 
     // expect testee-2 to show
-    await expect(await testeeViewTabPO.getTitle()).toEqual('Testee 2');
-    await testeeViewTabPO.activate();
+    await expect(await testeeViewPO.viewTab.getTitle()).toEqual('Testee 2');
+    await testeeViewPO.viewTab.click();
     const testee2ComponentInstanceId = await testeeViewPagePO.getComponentInstanceId();
 
     // expect following Observables to complete
@@ -105,15 +105,15 @@ test.describe('Workbench View', () => {
     await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqual([]);
 
     // navigate to testee-3 view (app3)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.clickNavigate();
 
     // expect testee-3 to show
-    await expect(await testeeViewTabPO.getTitle()).toEqual('Testee 3');
-    await testeeViewTabPO.activate();
+    await expect(await testeeViewPO.viewTab.getTitle()).toEqual('Testee 3');
+    await testeeViewPO.viewTab.click();
     const testee3ComponentInstanceId = await testeeViewPagePO.getComponentInstanceId();
 
     // expect following Observables to complete
@@ -136,7 +136,7 @@ test.describe('Workbench View', () => {
     expect(new Set([testee1ComponentInstanceId, testee2ComponentInstanceId, testee3ComponentInstanceId]).size).toEqual(3);
 
     // navigate to testee-1 view (app1)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(testeeViewId);
@@ -218,7 +218,7 @@ test.describe('Workbench View', () => {
     // close the view
     await viewPagePO.clickClose();
 
-    await expect(await appPO.getViewTabCount()).toEqual(0);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
     await expect(await viewTabPO.isPresent()).toBe(false);
     await expect(await viewPagePO.isPresent()).toBe(false);
   });
@@ -238,7 +238,7 @@ test.describe('Workbench View', () => {
 
     // try closing the view
     await viewTabPO.close();
-    const msgboxPO = appPO.findMessageBox({cssClass: 'close-view'});
+    const msgboxPO = appPO.messagebox({cssClass: 'close-view'});
     await msgboxPO.clickActionButton('no');
 
     // expect the view not to be closed
@@ -292,28 +292,28 @@ test.describe('Workbench View', () => {
     await contextMenu.closeAllTabs();
 
     // expect all views being still open
-    await expect(await appPO.getViewTabCount()).toEqual(3);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
 
     // confirm closing view 1
-    const msgboxPO1 = appPO.findMessageBox({cssClass: 'close-view'});
+    const msgboxPO1 = appPO.messagebox({cssClass: 'close-view'});
     await msgboxPO1.clickActionButton('yes');
 
     // expect view 1 being closed
-    await expect(await appPO.getViewTabCount()).toEqual(2);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
 
     // prevent closing view 2
-    const msgboxPO2 = appPO.findMessageBox({cssClass: 'close-view'});
+    const msgboxPO2 = appPO.messagebox({cssClass: 'close-view'});
     await msgboxPO2.clickActionButton('no');
 
     // expect view 2 being still open
-    await expect(await appPO.getViewTabCount()).toEqual(2);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
 
     // confirm closing view 3
-    const msgboxPO3 = appPO.findMessageBox({cssClass: 'close-view'});
+    const msgboxPO3 = appPO.messagebox({cssClass: 'close-view'});
     await msgboxPO3.clickActionButton('yes');
 
     // expect view 3 to be closed
-    await expect(await appPO.getViewTabCount()).toEqual(1);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
     await expect(await viewTabPO3.isPresent()).toBe(false);
     await expect(await viewPagePO3.isPresent()).toBe(false);
 
@@ -356,7 +356,7 @@ test.describe('Workbench View', () => {
     expect(await viewPagePO2.isVisible()).toBe(true);
 
     // activate view 1
-    await viewTabPO1.activate();
+    await viewTabPO1.click();
 
     // expect view 1 to be displayed and active
     expect(await viewTabPO1.isPresent()).toBe(true);
@@ -420,12 +420,12 @@ test.describe('Workbench View', () => {
     await viewPagePO2.checkConfirmClosing(true); // prevent the view from closing
 
     // switch to view 1, should not ask for confirmation
-    const msgboxPO = appPO.findMessageBox({cssClass: 'close-view'});
-    await viewTabPO1.activate();
+    const msgboxPO = appPO.messagebox({cssClass: 'close-view'});
+    await viewTabPO1.click();
     expect(await msgboxPO.isPresent()).toBe(false);
 
     // switch to view 2, should not ask for confirmation
-    await viewTabPO2.activate();
+    await viewTabPO2.click();
     expect(await msgboxPO.isPresent()).toBe(false);
   });
 
@@ -460,7 +460,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
-    const testee1ViewTabPO = appPO.findViewTab({cssClass: 'testee-1'});
+    const testee1ViewTabPO = appPO.view({cssClass: 'testee-1'}).viewTab;
     const testee1ViewPagePO = new ViewPagePO(appPO, await testee1ViewTabPO.getViewId());
     const testee1ComponentInstanceId = await testee1ViewPagePO.getComponentInstanceId();
 
@@ -470,11 +470,11 @@ test.describe('Workbench View', () => {
     ]);
 
     // navigate to testee-2 view
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
-    const testee2ViewTabPO = appPO.findViewTab({cssClass: 'testee-2'});
+    const testee2ViewTabPO = appPO.view({cssClass: 'testee-2'}).viewTab;
     const testee2ViewPagePO = new ViewPagePO(appPO, await testee2ViewTabPO.getViewId());
     const testee2ComponentInstanceId = await testee2ViewPagePO.getComponentInstanceId();
 
@@ -485,7 +485,7 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-1 view
-    await testee1ViewTabPO.activate();
+    await testee1ViewTabPO.click();
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
@@ -495,7 +495,7 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-2 view
-    await testee2ViewTabPO.activate();
+    await testee2ViewTabPO.click();
     await testee2ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
@@ -505,7 +505,7 @@ test.describe('Workbench View', () => {
     ]);
 
     // register testee-3 view
-    await registerCapabilityPagePO.viewTabPO.activate();
+    await registerCapabilityPagePO.viewTabPO.click();
 
     // assert emitted view active/deactivated events
     await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
@@ -523,11 +523,11 @@ test.describe('Workbench View', () => {
     });
 
     // navigate to testee-3 view
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
-    const testee3ViewTabPO = appPO.findViewTab({cssClass: 'testee-3'});
+    const testee3ViewTabPO = appPO.view({cssClass: 'testee-3'}).viewTab;
     const testee3ViewPagePO = new ViewPagePO(appPO, await testee3ViewTabPO.getViewId());
     const testee3ComponentInstanceId = await testee3ViewPagePO.getComponentInstanceId();
 
@@ -537,7 +537,7 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-1 view
-    await testee1ViewTabPO.activate();
+    await testee1ViewTabPO.click();
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
@@ -596,7 +596,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
-    const testeeViewId = await appPO.findViewTab({cssClass: 'testee-1'}).getViewId();
+    const testeeViewId = await appPO.view({cssClass: 'testee-1'}).getViewId();
     const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     await expect(await testeeViewPagePO.getViewCapability()).toEqual(expect.objectContaining({
@@ -610,13 +610,13 @@ test.describe('Workbench View', () => {
     }));
 
     // navigate to testee-2 view (app1)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.selectTarget('self');
     await routerPagePO.clickNavigate();
 
-    await testeeViewPagePO.viewTabPO.activate();
+    await testeeViewPagePO.viewTabPO.click();
     await expect(await testeeViewPagePO.getViewCapability()).toEqual(expect.objectContaining({
       qualifier: {component: 'testee-2'},
       type: 'view',
@@ -628,12 +628,12 @@ test.describe('Workbench View', () => {
     }));
 
     // navigate to testee-3 view (app2)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.clickNavigate();
 
-    await testeeViewPagePO.viewTabPO.activate();
+    await testeeViewPagePO.viewTabPO.click();
     await expect(await testeeViewPagePO.getViewCapability()).toEqual(expect.objectContaining({
       qualifier: {component: 'testee-3'},
       type: 'view',
@@ -702,8 +702,8 @@ test.describe('Workbench View', () => {
     await routerPagePO.clickNavigate();
 
     // Construct the PO to interact with the opened view
-    const viewId = await appPO.getActiveView().getViewId();
-    const viewTabPO = appPO.findViewTab({viewId});
+    const viewId = await appPO.activePart.activeView.getViewId();
+    const viewTabPO = appPO.view({viewId}).viewTab;
     const viewPagePO = new ViewPagePO(appPO, viewId);
 
     // Assert the correct capability to be loaded
@@ -713,41 +713,41 @@ test.describe('Workbench View', () => {
     ]);
 
     // navigate to testee-2 view (app1)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
     await routerPagePO.enterSelfViewId(viewId);
     await routerPagePO.selectTarget('self');
     await routerPagePO.clickNavigate();
 
     // Assert the correct capability to be loaded
-    await viewTabPO.activate();
+    await viewTabPO.click();
     await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability2Id, appSymbolicName: 'workbench-client-testing-app1'}}));
     await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability2Id}]`,
     ]);
 
     // navigate to testee-1 view (app1)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.enterSelfViewId(viewId);
     await routerPagePO.selectTarget('self');
     await routerPagePO.clickNavigate();
 
     // Assert the correct capability to be loaded
-    await viewTabPO.activate();
+    await viewTabPO.click();
     await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
     await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability1Id}]`,
     ]);
 
     // navigate to testee-3 view (app2)
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
     await routerPagePO.enterSelfViewId(viewId);
     await routerPagePO.clickNavigate();
 
     // Assert the correct capability to be loaded
-    await viewTabPO.activate();
+    await viewTabPO.click();
     await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability3Id, appSymbolicName: 'workbench-client-testing-app2'}}));
     await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability3Id}]`,
@@ -797,25 +797,25 @@ test.describe('Workbench View', () => {
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
-    const testee1ViewId = await appPO.findViewTab({cssClass: 'testee-1'}).getViewId();
+    const testee1ViewId = await appPO.view({cssClass: 'testee-1'}).getViewId();
     await expect(await new ViewPagePO(appPO, testee1ViewId).getViewId()).toEqual(testee1ViewId);
 
     // navigate to testee-2 view
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
-    const testee2ViewId = await appPO.findViewTab({cssClass: 'testee-2'}).getViewId();
+    const testee2ViewId = await appPO.view({cssClass: 'testee-2'}).getViewId();
     await expect(await new ViewPagePO(appPO, testee2ViewId).getViewId()).toEqual(testee2ViewId);
 
     // navigate to testee-3 view
-    await routerPagePO.viewTabPO.activate();
+    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
-    const testee3ViewId = await appPO.findViewTab({cssClass: 'testee-3'}).getViewId();
+    const testee3ViewId = await appPO.view({cssClass: 'testee-3'}).getViewId();
     await expect(await new ViewPagePO(appPO, testee3ViewId).getViewId()).toEqual(testee3ViewId);
   });
 
@@ -827,13 +827,13 @@ test.describe('Workbench View', () => {
       const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
       const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-      await expect(await appPO.getViewTabCount()).toEqual(3);
+      await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+k' in view 2
-      await viewPage2PO.viewTabPO.activate();
+      await viewPage2PO.viewTabPO.click();
       await viewPage2PO.sendKeys('Control+K');
 
-      await expect(await appPO.getViewTabCount()).toEqual(2);
+      await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
       await expect(await viewPage1PO.isPresent()).toBe(true);
       await expect(await viewPage2PO.isPresent()).toBe(false);
       await expect(await viewPage3PO.isPresent()).toBe(true);
@@ -845,13 +845,13 @@ test.describe('Workbench View', () => {
       const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
       const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-      await expect(await appPO.getViewTabCount()).toEqual(3);
+      await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+shift+k' in view 2
-      await viewPage2PO.viewTabPO.activate();
+      await viewPage2PO.viewTabPO.click();
       await viewPage2PO.sendKeys('Control+Shift+K');
 
-      await expect(await appPO.getViewTabCount()).toEqual(1);
+      await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
       await expect(await viewPage1PO.isPresent()).toBe(false);
       await expect(await viewPage2PO.isPresent()).toBe(true);
       await expect(await viewPage3PO.isPresent()).toBe(false);
@@ -863,13 +863,13 @@ test.describe('Workbench View', () => {
       const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
       const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-      await expect(await appPO.getViewTabCount()).toEqual(3);
+      await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+shift+alt+k' in view 2
-      await viewPage2PO.viewTabPO.activate();
+      await viewPage2PO.viewTabPO.click();
       await viewPage2PO.sendKeys('Control+Shift+Alt+K');
 
-      await expect(await appPO.getViewTabCount()).toEqual(0);
+      await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
       await expect(await viewPage1PO.isPresent()).toBe(false);
       await expect(await viewPage2PO.isPresent()).toBe(false);
       await expect(await viewPage3PO.isPresent()).toBe(false);

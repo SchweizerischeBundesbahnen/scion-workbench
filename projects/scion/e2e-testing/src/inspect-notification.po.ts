@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO, NotificationPO} from './app.po';
+import {AppPO} from './app.po';
+import {NotificationPO} from './notification.po';
 import {coerceArray, isPresent} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 
@@ -22,7 +23,7 @@ export class InspectNotificationPO {
   public readonly notificationPO: NotificationPO;
 
   constructor(appPO: AppPO, public cssClass: string) {
-    this.notificationPO = appPO.findNotification({cssClass: cssClass});
+    this.notificationPO = appPO.notification({cssClass: cssClass});
     this._locator = this.notificationPO.locator('app-inspect-notification');
   }
 

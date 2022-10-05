@@ -53,7 +53,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPagePO.clickOpen();
 
     const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+    await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
       width: 300,
       height: 400,
     }));
@@ -76,7 +76,7 @@ test.describe('Workbench Popup', () => {
         height: '800px',
       });
 
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         width: 600,
         height: 400,
       }));
@@ -104,7 +104,7 @@ test.describe('Workbench Popup', () => {
         height: '800px',
       });
 
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
         height: 800,
       }));
@@ -132,7 +132,7 @@ test.describe('Workbench Popup', () => {
         height: '250px',
       });
 
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         width: 200,
         height: 400,
       }));
@@ -161,7 +161,7 @@ test.describe('Workbench Popup', () => {
         height: '250px',
       });
 
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
         height: 250,
       }));
@@ -191,7 +191,7 @@ test.describe('Workbench Popup', () => {
       await popupPagePO.enterComponentSize({
         height: '300px',
       });
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         height: 300,
         width: expect.any(Number),
       }));
@@ -206,7 +206,7 @@ test.describe('Workbench Popup', () => {
       await popupPagePO.enterComponentSize({
         height: '500px',
       });
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         height: 400,
         width: expect.any(Number),
       }));
@@ -234,7 +234,7 @@ test.describe('Workbench Popup', () => {
       await popupPagePO.enterComponentSize({
         width: '300px',
       });
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         width: 300,
         height: expect.any(Number),
       }));
@@ -249,7 +249,7 @@ test.describe('Workbench Popup', () => {
       await popupPagePO.enterComponentSize({
         width: '500px',
       });
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
         height: expect.any(Number),
       }));
@@ -279,7 +279,7 @@ test.describe('Workbench Popup', () => {
       await popupPagePO.enterComponentSize({
         height: '300px',
       });
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         height: 400,
         width: expect.any(Number),
       }));
@@ -294,7 +294,7 @@ test.describe('Workbench Popup', () => {
       await popupPagePO.enterComponentSize({
         height: '500px',
       });
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         height: 500,
         width: expect.any(Number),
       }));
@@ -322,7 +322,7 @@ test.describe('Workbench Popup', () => {
       await popupPagePO.enterComponentSize({
         width: '300px',
       });
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
         height: expect.any(Number),
       }));
@@ -337,7 +337,7 @@ test.describe('Workbench Popup', () => {
       await popupPagePO.enterComponentSize({
         width: '500px',
       });
-      await expect(await popupPagePO.popupPO.getClientRect()).toEqual(expect.objectContaining({
+      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
         width: 500,
         height: expect.any(Number),
       }));

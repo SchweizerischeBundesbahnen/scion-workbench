@@ -45,9 +45,9 @@ test.describe('Workbench Notification', () => {
   test('should close the last notification when pressing the ESC key', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const notification1PO = appPO.findNotification({cssClass: 'testee-1'});
-    const notification2PO = appPO.findNotification({cssClass: 'testee-2'});
-    const notification3PO = appPO.findNotification({cssClass: 'testee-3'});
+    const notification1PO = appPO.notification({cssClass: 'testee-1'});
+    const notification2PO = appPO.notification({cssClass: 'testee-2'});
+    const notification3PO = appPO.notification({cssClass: 'testee-3'});
 
     const notificationOpenerPagePO = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
     await notificationOpenerPagePO.enterCssClass('testee-1');
@@ -91,7 +91,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPagePO.enterContent('TEXT');
     await notificationOpenerPagePO.clickShow();
 
-    const notificationPO = appPO.findNotification({cssClass: 'testee'});
+    const notificationPO = appPO.notification({cssClass: 'testee'});
     await expect(await notificationPO.isVisible()).toBe(true);
     await notificationPO.clickClose();
     await expect(await notificationPO.isVisible()).toBe(false);
@@ -102,9 +102,9 @@ test.describe('Workbench Notification', () => {
 
     const notificationOpenerPagePO = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
 
-    const notification1PO = appPO.findNotification({cssClass: 'testee-1'});
-    const notification2PO = appPO.findNotification({cssClass: 'testee-2'});
-    const notification3PO = appPO.findNotification({cssClass: 'testee-3'});
+    const notification1PO = appPO.notification({cssClass: 'testee-1'});
+    const notification2PO = appPO.notification({cssClass: 'testee-2'});
+    const notification3PO = appPO.notification({cssClass: 'testee-3'});
 
     await notificationOpenerPagePO.enterCssClass('testee-1');
     await notificationOpenerPagePO.clickShow();
@@ -116,9 +116,9 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPagePO.clickShow();
 
     await expect(await appPO.getNotificationCount()).toEqual(3);
-    const clientRect1 = await notification1PO.getClientRect();
-    const clientRect2 = await notification2PO.getClientRect();
-    const clientRect3 = await notification3PO.getClientRect();
+    const clientRect1 = await notification1PO.getBoundingBox();
+    const clientRect2 = await notification2PO.getBoundingBox();
+    const clientRect3 = await notification3PO.getBoundingBox();
 
     expect(clientRect1.bottom).toBeLessThan(clientRect2.top);
     expect(clientRect2.bottom).toBeLessThan(clientRect3.top);
@@ -134,7 +134,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPagePO.enterTitle('TITLE');
     await notificationOpenerPagePO.clickShow();
 
-    const notificationPO = appPO.findNotification({cssClass: 'testee'});
+    const notificationPO = appPO.notification({cssClass: 'testee'});
     await expect(await notificationPO.isVisible()).toBe(true);
     await expect(await notificationPO.getTitle()).toEqual('TITLE');
   });
@@ -147,7 +147,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPagePO.enterTitle('LINE 1\\nLINE 2');
     await notificationOpenerPagePO.clickShow();
 
-    const notificationPO = appPO.findNotification({cssClass: 'testee'});
+    const notificationPO = appPO.notification({cssClass: 'testee'});
     await expect(await notificationPO.isVisible()).toBe(true);
     await expect(await notificationPO.getTitle()).toEqual('LINE 1\nLINE 2');
   });
@@ -159,7 +159,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPagePO.enterCssClass('testee');
     await notificationOpenerPagePO.clickShow();
 
-    const notificationPO = appPO.findNotification({cssClass: 'testee'});
+    const notificationPO = appPO.notification({cssClass: 'testee'});
     await expect(await notificationPO.isVisible()).toBe(true);
     await expect(await notificationPO.getSeverity()).toEqual('info');
   });
@@ -172,7 +172,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPagePO.selectSeverity('info');
     await notificationOpenerPagePO.clickShow();
 
-    const notificationPO = appPO.findNotification({cssClass: 'testee'});
+    const notificationPO = appPO.notification({cssClass: 'testee'});
     await expect(await notificationPO.isVisible()).toBe(true);
     await expect(await notificationPO.getSeverity()).toEqual('info');
   });
@@ -185,7 +185,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPagePO.selectSeverity('warn');
     await notificationOpenerPagePO.clickShow();
 
-    const notificationPO = appPO.findNotification({cssClass: 'testee'});
+    const notificationPO = appPO.notification({cssClass: 'testee'});
     await expect(await notificationPO.isVisible()).toBe(true);
     await expect(await notificationPO.getSeverity()).toEqual('warn');
   });
@@ -198,7 +198,7 @@ test.describe('Workbench Notification', () => {
     await notificationOpenerPagePO.selectSeverity('error');
     await notificationOpenerPagePO.clickShow();
 
-    const notificationPO = appPO.findNotification({cssClass: 'testee'});
+    const notificationPO = appPO.notification({cssClass: 'testee'});
     await expect(await notificationPO.isVisible()).toBe(true);
     await expect(await notificationPO.getSeverity()).toEqual('error');
   });
@@ -206,10 +206,10 @@ test.describe('Workbench Notification', () => {
   test('should replace notifications of the same group', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const notification1PO = appPO.findNotification({cssClass: 'testee-1'});
-    const notification2PO = appPO.findNotification({cssClass: 'testee-2'});
-    const notification3PO = appPO.findNotification({cssClass: 'testee-3'});
-    const notification4PO = appPO.findNotification({cssClass: 'testee-4'});
+    const notification1PO = appPO.notification({cssClass: 'testee-1'});
+    const notification2PO = appPO.notification({cssClass: 'testee-2'});
+    const notification3PO = appPO.notification({cssClass: 'testee-3'});
+    const notification4PO = appPO.notification({cssClass: 'testee-4'});
 
     const notificationOpenerPagePO = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
     await notificationOpenerPagePO.enterCssClass('testee-1');

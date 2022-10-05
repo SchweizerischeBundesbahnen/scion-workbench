@@ -53,7 +53,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterTitle('TITLE');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getTitle()).toEqual('TITLE');
   });
@@ -67,7 +67,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterTitle('LINE 1\\nLINE 2');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getTitle()).toEqual('LINE 1\nLINE 2');
   });
@@ -80,7 +80,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCssClass('testee');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getSeverity()).toEqual('info');
   });
@@ -94,7 +94,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.selectSeverity('info');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getSeverity()).toEqual('info');
   });
@@ -108,7 +108,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.selectSeverity('warn');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getSeverity()).toEqual('warn');
   });
@@ -122,7 +122,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.selectSeverity('error');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getSeverity()).toEqual('error');
   });
@@ -135,7 +135,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCssClass('testee');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getModality()).toEqual('view');
   });
@@ -148,7 +148,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCssClass('testee');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.isPresent()).toBe(true);
     await expect(await msgboxPO.getModality()).toEqual('view');
@@ -159,7 +159,7 @@ test.describe('Workbench Message Box', () => {
     await expect(await msgboxPO.isVisible()).toBe(false);
 
     // re-activate the view
-    await msgboxOpenerPagePO.viewTabPO.activate();
+    await msgboxOpenerPagePO.viewTabPO.click();
     await expect(await msgboxPO.isPresent()).toBe(true);
     await expect(await msgboxPO.isVisible()).toBe(true);
   });
@@ -184,7 +184,7 @@ test.describe('Workbench Message Box', () => {
     await expect(await inspectorPO.isVisible()).toBe(false);
 
     // re-activate the view
-    await msgboxOpenerPagePO.viewTabPO.activate();
+    await msgboxOpenerPagePO.viewTabPO.click();
     await expect(await inspectorPO.isPresent()).toBe(true);
     await expect(await inspectorPO.isVisible()).toBe(true);
 
@@ -201,7 +201,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.checkViewContextActive(false);
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getModality()).toEqual('application');
   });
@@ -215,7 +215,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.selectModality('application');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getModality()).toEqual('application');
   });
@@ -223,9 +223,9 @@ test.describe('Workbench Message Box', () => {
   test('should allow opening a message box in any view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const viewTab1PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
-    const viewTab2PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
-    const viewTab3PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
+    const viewTab1PO = (await appPO.openNewViewTab()).view!.viewTab;
+    const viewTab2PO = (await appPO.openNewViewTab()).view!.viewTab;
+    const viewTab3PO = (await appPO.openNewViewTab()).view!.viewTab;
 
     // open the message box in view 2
     const msgboxOpenerPagePO = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
@@ -234,25 +234,25 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterContextualViewId(await viewTab2PO.getViewId());
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await appPO.getMessageBoxCount()).toEqual(1);
     await expect(await msgboxPO.isVisible()).toBe(false);
     await expect(await msgboxPO.isPresent()).toBe(true);
 
     // activate view 1
-    await viewTab1PO.activate();
+    await viewTab1PO.click();
     await expect(await msgboxPO.isVisible()).toBe(false);
     await expect(await msgboxPO.isPresent()).toBe(true);
     await expect(await appPO.getMessageBoxCount()).toEqual(1);
 
     // activate view 2
-    await viewTab2PO.activate();
+    await viewTab2PO.click();
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.isPresent()).toBe(true);
     await expect(await appPO.getMessageBoxCount()).toEqual(1);
 
     // activate view 3
-    await viewTab3PO.activate();
+    await viewTab3PO.click();
     await expect(await msgboxPO.isVisible()).toBe(false);
     await expect(await msgboxPO.isPresent()).toBe(true);
     await expect(await appPO.getMessageBoxCount()).toEqual(1);
@@ -262,9 +262,9 @@ test.describe('Workbench Message Box', () => {
     // FIXME: this test will run as soon as https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/344 is fixed
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const viewTab1PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
-    const viewTab2PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
-    const viewTab3PO = (await appPO.openNewViewTab()).viewPO!.viewTabPO;
+    const viewTab1PO = (await appPO.openNewViewTab()).view!.viewTab;
+    const viewTab2PO = (await appPO.openNewViewTab()).view!.viewTab;
+    const viewTab3PO = (await appPO.openNewViewTab()).view!.viewTab;
 
     // open the message box in view 2
     const msgboxOpenerPagePO = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
@@ -274,25 +274,25 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.clickOpen();
     await msgboxOpenerPagePO.viewTabPO.close();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await appPO.getMessageBoxCount()).toEqual(1);
     await expect(await msgboxPO.isVisible()).toBe(false);
     await expect(await msgboxPO.isPresent()).toBe(true);
 
     // activate view 1
-    await viewTab1PO.activate();
+    await viewTab1PO.click();
     await expect(await viewTab1PO.isActive()).toBe(true);
     await expect(await msgboxPO.isVisible()).toBe(false);
     await expect(await msgboxPO.isPresent()).toBe(true);
 
     // activate view 2
-    await viewTab2PO.activate();
+    await viewTab2PO.click();
     await expect(await viewTab2PO.isActive()).toBe(true);
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.isPresent()).toBe(true);
 
     // activate view 3
-    await viewTab3PO.activate();
+    await viewTab3PO.click();
     await expect(await viewTab3PO.isActive()).toBe(true);
     await expect(await msgboxPO.isVisible()).toBe(false);
     await expect(await msgboxPO.isPresent()).toBe(true);
@@ -322,7 +322,7 @@ test.describe('Workbench Message Box', () => {
     // close message box and view 2
     await msgboxPO.clickActionButton('ok');
     await viewTab2PO.close();
-    await expect(await appPO.getViewTabCount()).toBe(0);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
     await expect(await msgboxPO.isPresent()).toBe(false);
     await expect(await appPO.getMessageBoxCount()).toEqual(0);
   });
@@ -340,7 +340,7 @@ test.describe('Workbench Message Box', () => {
     });
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.isVisible()).toBe(true);
     await expect(await msgboxPO.getActions()).toEqual({
       yes: 'Yes',
@@ -365,7 +365,7 @@ test.describe('Workbench Message Box', () => {
     });
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await msgboxPO.clickActionButton('yes');
     await expect(await msgboxOpenerPagePO.getMessageBoxCloseAction()).toEqual('yes');
 
@@ -384,7 +384,7 @@ test.describe('Workbench Message Box', () => {
     // open the message box
     const msgboxOpenerPagePO = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
     await msgboxOpenerPagePO.enterCssClass('testee');
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
 
     // Close on ESC if 'cancel' action is present
     await msgboxOpenerPagePO.enterActions({
@@ -442,19 +442,19 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCount(3);
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgbox1PO = appPO.findMessageBox({cssClass: ['testee', 'index-0']});
+    const msgbox1PO = appPO.messagebox({cssClass: ['testee', 'index-0']});
     await expect(await msgbox1PO.isVisible()).toBe(true);
-    const msgbox1ClientRect = await msgbox1PO.getClientRect();
+    const msgbox1ClientRect = await msgbox1PO.getBoundingBox();
 
-    const msgbox2PO = appPO.findMessageBox({cssClass: ['testee', 'index-1']});
+    const msgbox2PO = appPO.messagebox({cssClass: ['testee', 'index-1']});
     await expect(await msgbox2PO.isVisible()).toBe(true);
-    const msgbox2ClientRect = await msgbox2PO.getClientRect();
+    const msgbox2ClientRect = await msgbox2PO.getBoundingBox();
     await expect(msgbox2ClientRect.left - msgbox1ClientRect.left).toEqual(10);
     await expect(msgbox2ClientRect.top - msgbox1ClientRect.top).toEqual(10);
 
-    const msgbox3PO = appPO.findMessageBox({cssClass: ['testee', 'index-2']});
+    const msgbox3PO = appPO.messagebox({cssClass: ['testee', 'index-2']});
     await expect(await msgbox3PO.isVisible()).toBe(true);
-    const msgbox3ClientRect = await msgbox3PO.getClientRect();
+    const msgbox3ClientRect = await msgbox3PO.getBoundingBox();
     await expect(msgbox3ClientRect.left - msgbox2ClientRect.left).toEqual(10);
     await expect(msgbox3ClientRect.top - msgbox2ClientRect.top).toEqual(10);
   });
@@ -467,7 +467,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCssClass('testee');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     await expect(await msgboxPO.getActions()).toEqual({ok: 'OK'});
   });
 
@@ -480,7 +480,7 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPagePO.enterCssClass('testee');
     await msgboxOpenerPagePO.clickOpen();
 
-    const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+    const msgboxPO = appPO.messagebox({cssClass: 'testee'});
     const titleClick = {failed: false};
     try {
       await msgboxOpenerPagePO.clickTitle();
@@ -506,7 +506,7 @@ test.describe('Workbench Message Box', () => {
       });
       await msgboxOpenerPagePO.clickOpen();
 
-      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      const msgboxPO = appPO.messagebox({cssClass: 'testee'});
       await expect(await msgboxPO.isActionActive('yes')).toBe(true);
       await expect(await msgboxPO.isActionActive('no')).toBe(false);
       await expect(await msgboxPO.isActionActive('cancel')).toBe(false);
@@ -524,7 +524,7 @@ test.describe('Workbench Message Box', () => {
       });
       await msgboxOpenerPagePO.clickOpen();
 
-      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      const msgboxPO = appPO.messagebox({cssClass: 'testee'});
       await expect(await msgboxPO.isActionActive('yes')).toBe(true);
       await expect(await msgboxPO.isActionActive('no')).toBe(false);
       await expect(await msgboxPO.isActionActive('cancel')).toBe(false);
@@ -602,7 +602,7 @@ test.describe('Workbench Message Box', () => {
       });
       await msgboxOpenerPagePO.clickOpen();
 
-      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      const msgboxPO = appPO.messagebox({cssClass: 'testee'});
       await expect(await msgboxPO.isActionActive('yes')).toBe(true);
       await expect(await msgboxPO.isActionActive('no')).toBe(false);
       await expect(await msgboxPO.isActionActive('cancel')).toBe(false);
@@ -680,7 +680,7 @@ test.describe('Workbench Message Box', () => {
       });
       await msgboxOpenerPagePO.clickOpen();
 
-      const msgboxPO = appPO.findMessageBox({cssClass: 'testee'});
+      const msgboxPO = appPO.messagebox({cssClass: 'testee'});
       await page.keyboard.press('ArrowRight');
 
       // activate another view
@@ -689,7 +689,7 @@ test.describe('Workbench Message Box', () => {
       await expect(await msgboxPO.isVisible()).toBe(false);
 
       // re-activate the view
-      await msgboxOpenerPagePO.viewTabPO.activate();
+      await msgboxOpenerPagePO.viewTabPO.click();
       await expect(await msgboxPO.isPresent()).toBe(true);
       await expect(await msgboxPO.isVisible()).toBe(true);
       await expect(await msgboxPO.isActionActive('no')).toBe(true);

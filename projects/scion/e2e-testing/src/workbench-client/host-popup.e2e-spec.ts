@@ -31,7 +31,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
     await popupOpenerPagePO.clickOpen();
 
-    const popupPO = await appPO.findPopup({cssClass: 'host-popup'});
+    const popupPO = await appPO.popup({cssClass: 'host-popup'});
     await expect(await popupPO.isVisible()).toBe(true);
   });
 
@@ -100,17 +100,17 @@ test.describe('Workbench Popup', () => {
     const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
     await hostPopupPagePO.enterComponentSize({height: '100px', width: '100px'});
 
-    const popupPO = appPO.findPopup({cssClass: 'host-popup'});
+    const popupPO = appPO.popup({cssClass: 'host-popup'});
 
     // capture current popup and anchor location
     const anchorClientRect1 = await popupOpenerPagePO.getAnchorElementClientRect();
-    const popupClientRect1 = await popupPO.getClientRect();
+    const popupClientRect1 = await popupPO.getBoundingBox();
 
     // expand a collapsed panel to move the popup anchor downward
     await popupOpenerPagePO.expandAnchorPanel();
 
     const anchorClientRect2 = await popupOpenerPagePO.getAnchorElementClientRect();
-    const popupClientRect2 = await popupPO.getClientRect();
+    const popupClientRect2 = await popupPO.getBoundingBox();
     const xDelta = anchorClientRect2.left - anchorClientRect1.left;
     const yDelta = anchorClientRect2.top - anchorClientRect1.top;
 
@@ -124,7 +124,7 @@ test.describe('Workbench Popup', () => {
 
     // collapse the panel to move the popup anchor upward
     await popupOpenerPagePO.collapseAnchorPanel();
-    const popupClientRect3 = await popupPO.getClientRect();
+    const popupClientRect3 = await popupPO.getBoundingBox();
 
     // assert the popup location
     await expect(popupClientRect3.top).toEqual(popupClientRect1.top);
@@ -156,16 +156,16 @@ test.describe('Workbench Popup', () => {
     const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
     await hostPopupPagePO.enterComponentSize({height: '100px', width: '100px'});
 
-    const popupPO = appPO.findPopup({cssClass: 'host-popup'});
+    const popupPO = appPO.popup({cssClass: 'host-popup'});
 
     // capture current popup and anchor location
-    const popupClientRectInitial = await popupPO.getClientRect();
+    const popupClientRectInitial = await popupPO.getBoundingBox();
 
     // move the anachor
     await popupOpenerPagePO.enterAnchorCoordinate({x: 200, y: 300, width: 2, height: 0});
 
     // assert the popup location
-    await expect(await popupPO.getClientRect()).toEqual(expect.objectContaining({
+    await expect(await popupPO.getBoundingBox()).toEqual(expect.objectContaining({
       left: popupClientRectInitial.left + 50,
       top: popupClientRectInitial.top + 150,
     }));
@@ -174,7 +174,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPagePO.enterAnchorCoordinate({x: 150, y: 150, width: 2, height: 0});
 
     // assert the popup location
-    await expect(await popupPO.getClientRect()).toEqual(popupClientRectInitial);
+    await expect(await popupPO.getBoundingBox()).toEqual(popupClientRectInitial);
   });
 
   test.describe('view context', () => {
@@ -196,7 +196,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.findPopup({cssClass: 'host-popup'});
+      const popupPO = appPO.popup({cssClass: 'host-popup'});
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
@@ -206,7 +206,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPO.isVisible()).toBe(false);
 
       // re-activate the view
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
     });
@@ -239,7 +239,7 @@ test.describe('Workbench Popup', () => {
       await expect(await hostPopupPagePO.isVisible()).toBe(false);
 
       // re-activate the view
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
       await expect(await hostPopupPagePO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.isVisible()).toBe(true);
 
@@ -264,7 +264,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.findPopup({cssClass: 'host-popup'});
+      const popupPO = appPO.popup({cssClass: 'host-popup'});
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
@@ -274,12 +274,12 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPO.isVisible()).toBe(false);
 
       // activate the view again
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
       // close the view
-      await popupOpenerPagePO.viewTabPO.close();
+      await popupOpenerPagePO.view.viewTab.close();
 
       // popup should be closed when view is closed
       await popupPO.waitUntilClosed();
@@ -312,7 +312,7 @@ test.describe('Workbench Popup', () => {
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
 
       // popup should be closed on focus lost
       await hostPopupPagePO.popupPO.waitUntilClosed();
@@ -342,7 +342,7 @@ test.describe('Workbench Popup', () => {
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
-      await popupOpenerPagePO.viewTabPO.activate();
+      await popupOpenerPagePO.view.viewTab.click();
 
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);

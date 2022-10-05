@@ -9,7 +9,8 @@
  */
 
 import {fromRect, isPresent} from '../../helper/testing.util';
-import {AppPO, PopupPO} from '../../app.po';
+import {AppPO} from '../../app.po';
+import {PopupPO} from '../../popup.po';
 import {PopupSize} from '@scion/workbench';
 import {SciAccordionPO} from '../../components.internal/accordion.po';
 import {Locator} from '@playwright/test';
@@ -24,7 +25,7 @@ export class PopupPagePO {
   public readonly popupPO: PopupPO;
 
   constructor(appPO: AppPO, cssClass: string) {
-    this.popupPO = appPO.findPopup({cssClass});
+    this.popupPO = appPO.popup({cssClass});
     this._locator = this.popupPO.locator('app-popup-page');
   }
 
