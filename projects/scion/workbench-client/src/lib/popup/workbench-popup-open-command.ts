@@ -21,6 +21,6 @@ export interface ɵWorkbenchPopupCommand {
   align?: 'east' | 'west' | 'north' | 'south';
   closeStrategy?: CloseStrategy;
   context?: {
-    viewId?: string;
+    viewId?: string | null;
   };
 }

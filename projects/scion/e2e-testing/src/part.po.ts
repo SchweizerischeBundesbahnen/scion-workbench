@@ -12,6 +12,8 @@ import {isPresent, waitUntilStable} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {ViewPO} from './view.po';
 import {ViewTabPO} from './view-tab.po';
+import {PartSashPO} from './part-sash.po';
+import {PartActionPO} from './part-action.po';
 
 /**
  * Handle for interacting with a workbench part.
@@ -25,9 +27,15 @@ export class PartPO {
    */
   public readonly activeView: ViewPO;
 
+  /**
+   * Handle for interacting with the sash that contains this part.
+   */
+  public readonly sash: PartSashPO;
+
   constructor(private readonly _locator: Locator) {
     this._partBarLocator = this._locator.locator('wb-view-part-bar');
     this.activeView = new ViewPO(this._locator.locator('wb-view'), new ViewTabPO(this._locator.locator('wb-view-tab.active'), this));
+    this.sash = new PartSashPO(this._locator);
   }
 
   public async getPartId(): Promise<string> {
@@ -42,17 +50,7 @@ export class PartPO {
    * Handle to the specified action of this part.
    */
   public action(locateBy: {cssClass: string}): PartActionPO {
-    const actionLocator = this._partBarLocator.locator(`button.${locateBy.cssClass}`);
-
-    return new class ViewPartActionPO {
-      public async isPresent(): Promise<boolean> {
-        return isPresent(actionLocator);
-      }
-
-      public async click(): Promise<void> {
-        return actionLocator.click();
-      }
-    };
+    return new PartActionPO(this._partBarLocator.locator(`button.${locateBy.cssClass}`));
   }
 
   /**
@@ -94,13 +92,4 @@ export class PartPO {
   public locator(selector: string): Locator {
     return this._locator.locator(selector);
   }
-}
-
-/**
- * Handle for interacting with a part action.
- */
-export interface PartActionPO {
-  isPresent(): Promise<boolean>;
-
-  click(): Promise<void>;
 }

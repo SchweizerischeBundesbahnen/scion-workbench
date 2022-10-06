@@ -77,7 +77,7 @@ export async function waitUntilAttached(...locators: Locator[]): Promise<void> {
  *
  * Similar to {@link DOMRect#fromRect} but can be used in e2e-tests executed in NodeJS.
  */
-export function fromRect(other: DOMRectInit | null): DOMRect {
+export function fromRect(other: DOMRectInit | null): DOMRect & {hcenter: number; vcenter: number} {
   const width = other?.width ?? 0;
   const height = other?.height ?? 0;
   const x = other?.x ?? 0;
@@ -91,6 +91,8 @@ export function fromRect(other: DOMRectInit | null): DOMRect {
     bottom: y + height,
     left: x,
     right: x + width,
+    hcenter: x + width / 2,
+    vcenter: y + height / 2,
     toJSON: noop,
   };
 }

@@ -10,23 +10,23 @@
 
 import {IntentClient, mapToBody, MessageClient, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {map, takeUntil} from 'rxjs/operators';
+import {finalize, map} from 'rxjs/operators';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Maps, Observables} from '@scion/toolkit/util';
+import {Defined, Maps, Observables} from '@scion/toolkit/util';
 import {fromBoundingClientRect$} from '@scion/toolkit/observable';
-import {firstValueFrom, NEVER, Observable, TeardownLogic} from 'rxjs';
-import {ViewClosingListener, WorkbenchView} from '../view/workbench-view';
+import {concat, firstValueFrom, NEVER, Observable, OperatorFunction} from 'rxjs';
+import {WorkbenchView} from '../view/workbench-view';
 import {ɵWorkbenchPopupCommand} from './workbench-popup-open-command';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {UUID} from '@scion/toolkit/uuid';
-import {PopupOrigin, WorkbenchPopupConfig} from './workbench-popup.config';
+import {WorkbenchPopupConfig} from './workbench-popup.config';
+import {PopupOrigin} from './popup.origin';
 
 /**
  * Allows displaying a microfrontend in a workbench popup.
  *
  * A popup is a visual workbench component for displaying content above other content. It is positioned relative to an anchor,
- * which can be either a page coordinate (x/y) or an HTML element. When using an element as the popup anchor, the popup also
- * moves when the anchor element moves.
+ * which can be either a coordinate or an HTML element. The popup moves when the anchor moves.
  *
  * In a popup, you can display a microfrontend, which an application provides in the form of a popup capability. A qualifier is
  * used to identify the popup capability. Note that for displaying a microfrontend of any other application, you need to declare
@@ -44,20 +44,22 @@ export class WorkbenchPopupService {
    *
    * The qualifier identifies the microfrontend which to display in the workbench popup.
    *
-   * To position the popup, provide either an exact page coordinate (x/y) or an element to serve as the popup anchor.
-   * If you use an element as the popup anchor, the popup also moves when the anchor element moves. If you position the
-   * popup using page coordinates, consider passing an Observable to re-position the popup after it is created. If
-   * passing coordinates via an Observable, the popup will not display until the Observable emits the first coordinate.
+   * To position the popup, provide either a coordinate or an element to serve as the popup anchor.
    *
-   * By setting the alignment of the popup, you can further control where the popup should open relative to its anchor.
+   * If you use an element as the popup anchor, the popup also moves when the anchor element moves. If you use a coordinate
+   * and open the popup in the context of a view, the popup opens relative to the bounds of that view. Otherwise, it
+   * is positioned relative to the page viewport. If you move or resize the view or the page, the popup will also be moved
+   * depending on the pair of coordinates used.
+   *
+   * By setting the alignment of the popup, you can control the region where to open the popup relative to its anchor.
    *
    * You can pass data to the popup microfrontend using parameters. The popup provider can declare mandatory and optional parameters.
    * No additional parameters may be included. Refer to the documentation of the popup capability provider for more information.
    *
    * By default, the popup will close on focus loss, or when the user hits the escape key.
    *
-   * When opening the popup in the context of a workbench view, the popup adheres to that view's lifecycle. Consequently, the
-   * popup is displayed only when the view is the active view in its viewpart, and is closed when the view is closed.
+   * When opening the popup in the context of a view, the popup is bound to the lifecycle of the view, that is, the popup
+   * is displayed only when the view is active and is closed when the view is closed.
    *
    * @param  qualifier - Identifies the popup capability that provides the microfrontend for display as popup.
    * @param  config - Controls popup behavior.
@@ -66,41 +68,28 @@ export class WorkbenchPopupService {
    *         provides the requested popup. The Promise also rejects when closing the popup with an error.
    */
   public async open<T>(qualifier: Qualifier, config: WorkbenchPopupConfig): Promise<T | undefined> {
-    const view = Beans.opt(WorkbenchView);
     const popupCommand: ɵWorkbenchPopupCommand = {
       popupId: UUID.randomUUID(),
       align: config.align,
       closeStrategy: config.closeStrategy,
       context: {
-        viewId: view?.viewId,
+        viewId: Defined.orElse(config.context?.viewId, () => Beans.opt(WorkbenchView)?.viewId),
       },
     };
-    const popupOriginPublisher = this.observePopupOrigin$(config).subscribe(origin => {
-      Beans.get(MessageClient).publish<DOMRect>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), origin, {retain: true});
-    });
-
-    const viewClosing$ = new Observable((observer): TeardownLogic => {
-      const closingListener: ViewClosingListener = {onClosing: () => observer.next()};
-      view!.addClosingListener(closingListener);
-      return () => view!.removeClosingListener(closingListener);
-    });
+    const popupOriginReporter = this.observePopupOrigin$(config)
+      .pipe(finalize(() => Beans.get(MessageClient).publish<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), undefined, {retain: true})))
+      .subscribe(origin => Beans.get(MessageClient).publish<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), origin, {retain: true}));
 
     try {
       const params = Maps.coerce(config.params);
-      const openPopup$ = Beans.get(IntentClient).request$<T>({type: WorkbenchCapabilities.Popup, qualifier, params}, popupCommand)
-        .pipe(
-          mapToBody(),
-          takeUntil(view ? viewClosing$ : NEVER),
-        );
+      const openPopup$ = Beans.get(IntentClient).request$<T>({type: WorkbenchCapabilities.Popup, qualifier, params}, popupCommand).pipe(mapToBody());
       return await firstValueFrom(openPopup$, {defaultValue: undefined});
     }
     catch (error) {
       throw (error instanceof RequestError ? error.message : error);
     }
     finally {
-      popupOriginPublisher.unsubscribe();
-      // Instruct the message broker to delete retained messages to free resources.
-      Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), undefined, {retain: true}).then();
+      popupOriginReporter.unsubscribe();
     }
   }
 
@@ -108,14 +97,21 @@ export class WorkbenchPopupService {
    * Observes the position of the popup anchor.
    *
    * The Observable emits the anchor's initial position, and each time its position changes.
+   * The Observable never completes.
    */
-  private observePopupOrigin$(config: WorkbenchPopupConfig): Observable<DOMRect> {
+  private observePopupOrigin$(config: WorkbenchPopupConfig): Observable<PopupOrigin> {
     if (config.anchor instanceof Element) {
-      return fromBoundingClientRect$(config.anchor as HTMLElement);
+      return fromBoundingClientRect$(config.anchor as HTMLElement).pipe(pluckPopupOrigin());
     }
     else {
-      return Observables.coerce(config.anchor)
-        .pipe(map<PopupOrigin, DOMRect>(({width, height, x, y}) => DOMRectReadOnly.fromRect({height, width, x, y})));
+      return concat(Observables.coerce(config.anchor), NEVER).pipe(pluckPopupOrigin());
     }
   }
+}
+
+/**
+ * Extracts properties from {@link PopupOrigin}, allowing to pass, for example, a {@link MouseEvent}.
+ */
+function pluckPopupOrigin(): OperatorFunction<any, PopupOrigin> {
+  return map(rect => ({x: rect.x, y: rect.y, top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left, width: rect.width, height: rect.height}));
 }

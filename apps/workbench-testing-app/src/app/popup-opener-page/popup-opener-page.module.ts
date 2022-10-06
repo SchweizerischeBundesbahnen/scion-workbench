@@ -21,6 +21,7 @@ import {SciViewportModule} from '@scion/components/viewport';
 import {A11yModule} from '@angular/cdk/a11y';
 import {PopupPageModule} from '../popup-page/popup-page.module';
 import {PopupFocusPageModule} from '../popup-focus-page/popup-focus-page.module';
+import {PopupPositionLabelPipe} from './popup-position-label.pipe';
 
 const routes: Routes = [
   {path: '', component: PopupOpenerPageComponent},
@@ -42,6 +43,7 @@ const routes: Routes = [
   ],
   declarations: [
     PopupOpenerPageComponent,
+    PopupPositionLabelPipe,
   ],
 })
 export class PopupOpenerPageModule {

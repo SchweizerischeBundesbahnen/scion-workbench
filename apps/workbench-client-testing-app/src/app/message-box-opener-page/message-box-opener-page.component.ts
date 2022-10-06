@@ -84,7 +84,7 @@ export class MessageBoxOpenerPageComponent {
         severity: this.form.get(SEVERITY).value || undefined,
         modality: this.form.get(MODALITY).value || undefined,
         contentSelectable: this.form.get(CONTENT_SELECTABLE).value || undefined,
-        cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
+        cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
       }, qualifier)
         .then(closeAction => this.closeAction = closeAction)
         .catch(error => this.openError = error);

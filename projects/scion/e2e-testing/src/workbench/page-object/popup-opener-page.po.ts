@@ -10,7 +10,7 @@
 
 import {coerceArray, fromRect, isPresent} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {PopupOrigin, PopupSize} from '@scion/workbench';
+import {BottomLeftPoint, BottomRightPoint, PopupOrigin, PopupSize, TopLeftPoint, TopRightPoint} from '@scion/workbench';
 import {SciAccordionPO} from '../../components.internal/accordion.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
@@ -29,37 +29,52 @@ export class PopupOpenerPagePO {
     this._locator = this.view.locator('app-popup-opener-page');
   }
 
-  public async selectPopupComponent(component: 'popup-page' | 'popup-focus-page'): Promise<void> {
+  public async selectPopupComponent(component: 'popup-page' | 'popup-focus-page' | 'empty-page'): Promise<void> {
     await this._locator.locator('select.e2e-popup-component').selectOption(component);
   }
 
-  public async selectAnchor(anchor: 'element' | 'coordinate'): Promise<void> {
+  public async enterPosition(position: 'element'): Promise<void>;
+  public async enterPosition(position: TopLeftPoint): Promise<void>;
+  public async enterPosition(position: TopRightPoint): Promise<void>;
+  public async enterPosition(position: BottomLeftPoint): Promise<void>;
+  public async enterPosition(position: BottomRightPoint): Promise<void>;
+  public async enterPosition(position: 'element' | PopupOrigin): Promise<void> {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-anchor'));
     await accordionPO.expand();
     try {
-      await this._locator.locator('select.e2e-anchor').selectOption(anchor);
-    }
-    finally {
-      await accordionPO.collapse();
-    }
-  }
-
-  public async enterAnchorCoordinate(coordinate: PopupOrigin): Promise<void> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-anchor'));
-    await accordionPO.expand();
-    try {
-      if (coordinate.x !== undefined) {
-        await this._locator.locator('input.e2e-anchor-x').fill(`${coordinate.x}`);
+      if (position === 'element') {
+        await this._locator.locator('select.e2e-position').selectOption('element');
+        return;
       }
-      if (coordinate.y !== undefined) {
-        await this._locator.locator('input.e2e-anchor-y').fill(`${coordinate.y}`);
+      const topLeft = position as TopLeftPoint;
+      if (topLeft.top !== undefined && topLeft.left !== undefined) {
+        await this._locator.locator('select.e2e-position').selectOption('top-left');
+        await this._locator.locator('input.e2e-position-vertical').fill(`${topLeft.top}`);
+        await this._locator.locator('input.e2e-position-horizontal').fill(`${topLeft.left}`);
+        return;
       }
-      if (coordinate.width !== undefined) {
-        await this._locator.locator('input.e2e-anchor-width').fill(`${coordinate.width}`);
+      const topRight = position as TopRightPoint;
+      if (topRight.top !== undefined && topRight.right !== undefined) {
+        await this._locator.locator('select.e2e-position').selectOption('top-right');
+        await this._locator.locator('input.e2e-position-vertical').fill(`${topRight.top}`);
+        await this._locator.locator('input.e2e-position-horizontal').fill(`${topRight.right}`);
+        return;
       }
-      if (coordinate.height !== undefined) {
-        await this._locator.locator('input.e2e-anchor-height').fill(`${coordinate.height}`);
+      const bottomLeft = position as BottomLeftPoint;
+      if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
+        await this._locator.locator('select.e2e-position').selectOption('bottom-left');
+        await this._locator.locator('input.e2e-position-vertical').fill(`${bottomLeft.bottom}`);
+        await this._locator.locator('input.e2e-position-horizontal').fill(`${bottomLeft.left}`);
+        return;
       }
+      const bottomRight = position as BottomRightPoint;
+      if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
+        await this._locator.locator('select.e2e-position').selectOption('bottom-right');
+        await this._locator.locator('input.e2e-position-vertical').fill(`${bottomRight.bottom}`);
+        await this._locator.locator('input.e2e-position-horizontal').fill(`${bottomRight.right}`);
+        return;
+      }
+      throw Error('[PopupOriginError] Illegal popup origin; must be "Element", "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
     }
     finally {
       await accordionPO.collapse();
@@ -127,15 +142,19 @@ export class PopupOpenerPagePO {
     }
   }
 
-  public async enterContextualViewId(viewId: string | '<null>'): Promise<void> {
+  public async enterContextualViewId(viewId: string | '<null>' | '<default>'): Promise<void> {
     await this._locator.locator('input.e2e-contextual-view-id').fill(viewId);
   }
 
-  public async clickOpen(): Promise<void> {
+  public async clickOpen(options?: {waitForPopup?: boolean}): Promise<void> {
     await this._locator.locator('button.e2e-open').click();
-    // The popup is expected to be opened, but not necessarily in the active view.
-    // Therefore, we only wait for it to be attached to the DOM.
-    await this._appPO.popupLocator().waitFor({state: 'attached'});
+
+    if (options?.waitForPopup ?? true) {
+      // The popup is expected to be opened, but not necessarily in the active view.
+      // Therefore, we only wait for it to be attached to the DOM.
+      const cssClasses = (await this._locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
+      await this._appPO.popup({cssClass: cssClasses}).waitUntilAttached();
+    }
   }
 
   public async getPopupCloseAction(): Promise<PopupCloseAction> {

@@ -67,7 +67,7 @@ export class NotificationOpenerPageComponent {
       severity: this.form.get(SEVERITY).value || undefined,
       duration: this.parseDurationFromUI(),
       group: this.form.get(GROUP).value || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
     }, qualifier)
       .catch(error => this.error = error);
   }
