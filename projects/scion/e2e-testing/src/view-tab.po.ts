@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {getCssClasses, isPresent} from './helper/testing.util';
+import {fromRect, getCssClasses, isPresent} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
 
@@ -76,6 +76,55 @@ export class ViewTabPO {
         return contextMenuLocator.locator('.e2e-close-all-tabs').click();
       }
     };
+  }
+
+  /**
+   * Drags this view tab to the specified part.
+   *
+   * @param target - Specifies part and region where to drop this view tab.
+   *        <ul>
+   *          <li>partId: Identifies the target part by its id; if not set, defaults to "this" part</li>
+   *          <li>region: Specifies the region where to drop this view tab in the specified part</li>
+   *        </ul>
+   */
+  public async dragToPart(target: {partId?: string; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<void> {
+    // We cannot use {@link Locator#dragTo} because the workbench dynamically inserts drop zones when dragging over the target part.
+    // For this reason, we first perform a "mousedown" on the view tab, move the mouse to the specified region of the target part, and then perform a "mouseup".
+    const mouse = this._locator.page().mouse;
+
+    // 1. Move the mouse cursor to the view tab.
+    const viewTabBounds = fromRect(await this._locator.boundingBox());
+    await mouse.move(viewTabBounds.hcenter, viewTabBounds.vcenter);
+
+    // 2. Perform a "mousedown" on the view tab.
+    await mouse.down();
+
+    // 3. Move the mouse cursor to the specified region of the target part, or "this" part if not specified.
+    const targetPartId = target.partId ?? await this.part.getPartId();
+    const targetPartLocator = this._locator.page().locator(`wb-view-part[data-partid="${targetPartId}"]`);
+    const targetPartDropZoneBounds = fromRect(await targetPartLocator.locator('[wbviewdropzone]').boundingBox()); /* ViewDropZoneDirective */
+
+    switch (target.region) {
+      case 'north':
+        await mouse.move(targetPartDropZoneBounds.hcenter, targetPartDropZoneBounds.top + 1, {steps: 2});
+        break;
+      case 'south':
+        await mouse.move(targetPartDropZoneBounds.hcenter, targetPartDropZoneBounds.bottom - 1, {steps: 2});
+        break;
+      case 'west':
+        await mouse.move(targetPartDropZoneBounds.left + 1, targetPartDropZoneBounds.vcenter, {steps: 2});
+        break;
+      case 'east': {
+        await mouse.move(targetPartDropZoneBounds.right - 1, targetPartDropZoneBounds.vcenter, {steps: 2});
+        break;
+      }
+      default:
+        await mouse.move(targetPartDropZoneBounds.hcenter, targetPartDropZoneBounds.vcenter, {steps: 2});
+        break;
+    }
+
+    // 4. Perform a "mouseup".
+    await mouse.up();
   }
 }
 

@@ -153,7 +153,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
         path: this.readPathFromUI(propertiesGroup),
         title: propertiesGroup.get(TITLE).value || undefined,
         heading: propertiesGroup.get(HEADING).value || undefined,
-        cssClass: propertiesGroup.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
+        cssClass: propertiesGroup.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
         closable: propertiesGroup.get(CLOSABLE).value ?? undefined,
         pinToStartPage: propertiesGroup.get(PIN_TO_START_PAGE).value,
       },
@@ -183,7 +183,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
           maxHeight: propertiesGroup.get([SIZE, MAX_HEIGHT]).value || undefined,
         }),
         pinToStartPage: propertiesGroup.get(PIN_TO_START_PAGE).value,
-        cssClass: propertiesGroup.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
+        cssClass: propertiesGroup.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
       },
     };
   }

@@ -8,17 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AfterViewInit, Component, ElementRef, OnDestroy, Type, ViewChild} from '@angular/core';
+import {Component, ElementRef, Type, ViewChild} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
-import {CloseStrategy, PopupOrigin, PopupService, PopupSize} from '@scion/workbench';
+import {CloseStrategy, PopupService, PopupSize} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
 import {PopupFocusPageComponent} from '../popup-focus-page/popup-focus-page.component';
-import {map, startWith, takeUntil} from 'rxjs/operators';
-import {defer, Observable, Subject} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {EmptyComponent} from '../empty/empty.component';
+import {PopupOrigin} from '@scion/workbench-client';
+import {undefinedIfEmpty} from '../util/util';
 
 const POPUP_COMPONENT = 'popupComponent';
 const ANCHOR = 'anchor';
-const BINDING = 'binding';
+const POSITION = 'position';
 const CONTEXTUAL_VIEW_ID = 'contextualViewId';
 const ALIGN = 'align';
 const INPUT = 'input';
@@ -33,26 +36,19 @@ const MAX_HEIGHT = 'maxHeight';
 const MIN_WIDTH = 'minWidth';
 const WIDTH = 'width';
 const MAX_WIDTH = 'maxWidth';
-const X = 'x';
-const Y = 'y';
-
-interface AnchorFormGroup {
-  x: string;
-  y: string;
-  width: string;
-  height: string;
-}
+const HORIZONTAL_POSITION = 'horizontalPosition';
+const VERTICAL_POSITION = 'verticalPosition';
 
 @Component({
   selector: 'app-popup-opener-page',
   templateUrl: './popup-opener-page.component.html',
   styleUrls: ['./popup-opener-page.component.scss'],
 })
-export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
+export class PopupOpenerPageComponent {
 
   public readonly POPUP_COMPONENT = POPUP_COMPONENT;
   public readonly ANCHOR = ANCHOR;
-  public readonly BINDING = BINDING;
+  public readonly POSITION = POSITION;
   public readonly CONTEXTUAL_VIEW_ID = CONTEXTUAL_VIEW_ID;
   public readonly ALIGN = ALIGN;
   public readonly INPUT = INPUT;
@@ -67,11 +63,10 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
   public readonly MIN_WIDTH = MIN_WIDTH;
   public readonly WIDTH = WIDTH;
   public readonly MAX_WIDTH = MAX_WIDTH;
-  public readonly X = X;
-  public readonly Y = Y;
+  public readonly VERTICAL_POSITION = VERTICAL_POSITION;
+  public readonly HORIZONTAL_POSITION = HORIZONTAL_POSITION;
 
-  private _destroy$ = new Subject<void>();
-  private _coordinateAnchor$: Observable<PopupOrigin>;
+  private _popupOrigin$: Observable<PopupOrigin | null>;
 
   public form: UntypedFormGroup;
 
@@ -81,19 +76,17 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
   @ViewChild('open_button', {static: true})
   private _openButton: ElementRef<HTMLButtonElement>;
 
-  constructor(private _host: ElementRef<HTMLElement>,
-              private _popupService: PopupService,
-              formBuilder: UntypedFormBuilder) {
+  constructor(private _popupService: PopupService, formBuilder: UntypedFormBuilder) {
     this.form = formBuilder.group({
       [POPUP_COMPONENT]: formBuilder.control('popup-page', Validators.required),
       [ANCHOR]: formBuilder.group({
-        [BINDING]: formBuilder.control('element', Validators.required),
-        [X]: formBuilder.control('0'),
-        [Y]: formBuilder.control('0'),
-        [WIDTH]: formBuilder.control('0'),
-        [HEIGHT]: formBuilder.control('0'),
+        [POSITION]: formBuilder.control('element', Validators.required),
+        [VERTICAL_POSITION]: formBuilder.control(0, Validators.required),
+        [HORIZONTAL_POSITION]: formBuilder.control(0, Validators.required),
+        [WIDTH]: formBuilder.control(undefined),
+        [HEIGHT]: formBuilder.control(undefined),
       }),
-      [CONTEXTUAL_VIEW_ID]: formBuilder.control({disabled: true, value: ''}),
+      [CONTEXTUAL_VIEW_ID]: formBuilder.control('<default>', Validators.required),
       [ALIGN]: formBuilder.control(''),
       [CSS_CLASS]: formBuilder.control(''),
       [INPUT]: formBuilder.control(''),
@@ -110,28 +103,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
         [MAX_WIDTH]: formBuilder.control(''),
       }),
     });
-    this.installContextualViewIdEnabler();
-
-    this._coordinateAnchor$ = defer(() => this.form.get(ANCHOR)
-      .valueChanges
-      .pipe(
-        startWith<AnchorFormGroup>(this.form.get(ANCHOR).value as AnchorFormGroup),
-        map(anchorValue => ({
-            x: Number(anchorValue.x),
-            y: Number(anchorValue.y),
-            width: Number(anchorValue.width),
-            height: Number(anchorValue.height),
-          }),
-        ),
-      ));
-  }
-
-  public ngAfterViewInit(): void {
-    const {left, top, width, height} = this._host.nativeElement.getBoundingClientRect();
-    this.form.get(ANCHOR).patchValue({
-      [X]: left + width / 2,
-      [Y]: top + height / 2,
-    });
+    this._popupOrigin$ = this.observePopupOrigin$();
   }
 
   public async onOpen(): Promise<void> {
@@ -141,9 +113,9 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
     await this._popupService.open<string>({
       component: this.parsePopupComponentInput(),
       input: this.form.get(INPUT).value || undefined,
-      anchor: this.form.get([ANCHOR, BINDING]).value === 'element' ? this._openButton : this._coordinateAnchor$,
+      anchor: this.form.get([ANCHOR, POSITION]).value === 'element' ? this._openButton : this._popupOrigin$,
       align: this.form.get(ALIGN).value || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
       closeStrategy: undefinedIfEmpty<CloseStrategy>({
         onFocusLost: this.form.get([CLOSE_STRATEGY, ON_FOCUS_LOST]).value ?? undefined,
         onEscape: this.form.get([CLOSE_STRATEGY, ON_ESCAPE]).value ?? undefined,
@@ -161,7 +133,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
       },
     })
       .then(result => this.returnValue = result)
-      .catch(error => this.popupError = error ?? 'Popup was closed with an error');
+      .catch((error: Error) => this.popupError = error.message ?? 'Popup was closed with an error');
   }
 
   private parsePopupComponentInput(): Type<any> {
@@ -170,6 +142,8 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
         return PopupPageComponent;
       case 'popup-focus-page':
         return PopupFocusPageComponent;
+      case 'empty-page':
+        return EmptyComponent;
       default:
         throw Error(`[IllegalPopupComponent] Popup component not supported: ${this.form.get(POPUP_COMPONENT).value}`);
     }
@@ -178,7 +152,7 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
   private parseContextualViewIdInput(): string | null | undefined {
     const viewId = this.form.get(CONTEXTUAL_VIEW_ID).value;
     switch (viewId) {
-      case '':
+      case '<default>':
         return undefined;
       case '<null>':
         return null;
@@ -187,37 +161,52 @@ export class PopupOpenerPageComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  /**
-   * Enables the field for setting a contextual view reference when choosing not to close the popup on focus loss.
-   */
-  private installContextualViewIdEnabler(): void {
-    this.form.get([CLOSE_STRATEGY, ON_FOCUS_LOST]).valueChanges
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(closeOnFocusLost => {
-        if (closeOnFocusLost) {
-          this.form.get(CONTEXTUAL_VIEW_ID).setValue('');
-          this.form.get(CONTEXTUAL_VIEW_ID).disable();
-        }
-        else {
-          this.form.get(CONTEXTUAL_VIEW_ID).enable();
-        }
-      });
+  private observePopupOrigin$(): Observable<PopupOrigin | null> {
+    return this.form.get(ANCHOR).valueChanges
+      .pipe(
+        startWith(undefined as void),
+        map((): PopupOrigin | null => {
+          switch (this.form.get([ANCHOR, POSITION]).value) {
+            case 'top-left':
+              return {
+                top: this.form.get([ANCHOR, VERTICAL_POSITION]).value,
+                left: this.form.get([ANCHOR, HORIZONTAL_POSITION]).value,
+                width: this.form.get([ANCHOR, WIDTH]).value,
+                height: this.form.get([ANCHOR, HEIGHT]).value,
+              };
+            case 'top-right':
+              return {
+                top: this.form.get([ANCHOR, VERTICAL_POSITION]).value,
+                right: this.form.get([ANCHOR, HORIZONTAL_POSITION]).value,
+                width: this.form.get([ANCHOR, WIDTH]).value,
+                height: this.form.get([ANCHOR, HEIGHT]).value,
+              };
+            case 'bottom-left':
+              return {
+                bottom: this.form.get([ANCHOR, VERTICAL_POSITION]).value,
+                left: this.form.get([ANCHOR, HORIZONTAL_POSITION]).value,
+                width: this.form.get([ANCHOR, WIDTH]).value,
+                height: this.form.get([ANCHOR, HEIGHT]).value,
+              };
+            case 'bottom-right':
+              return {
+                bottom: this.form.get([ANCHOR, VERTICAL_POSITION]).value,
+                right: this.form.get([ANCHOR, HORIZONTAL_POSITION]).value,
+                width: this.form.get([ANCHOR, WIDTH]).value,
+                height: this.form.get([ANCHOR, HEIGHT]).value,
+              };
+            case 'point':
+              return {
+                x: this.form.get([ANCHOR, HORIZONTAL_POSITION]).value,
+                y: this.form.get([ANCHOR, VERTICAL_POSITION]).value,
+                width: this.form.get([ANCHOR, WIDTH]).value,
+                height: this.form.get([ANCHOR, HEIGHT]).value,
+              };
+            default: {
+              return null;
+            }
+          }
+        }),
+      );
   }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
-}
-
-/**
- * Returns a new instance with `undefined` entries removed,
- * or returns `undefined` if all entries are `undefined`.
- */
-function undefinedIfEmpty<T>(object: T): T {
-  return Object.entries(object).reduce((acc, [key, value]) => {
-    if (value === undefined) {
-      return acc;
-    }
-    return {...acc, [key]: value};
-  }, undefined as T);
 }

@@ -66,7 +66,7 @@ export class InspectNotificationComponent implements OnDestroy {
     this.form.get(CSS_CLASS).valueChanges
       .pipe(takeUntil(this._destroy$))
       .subscribe(cssClass => {
-        this.notification.setCssClass(cssClass.split(/\s+/).filter(Boolean) || undefined);
+        this.notification.setCssClass(cssClass.split(/\s+/).filter(Boolean));
       });
   }
 

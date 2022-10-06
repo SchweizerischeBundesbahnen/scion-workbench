@@ -65,7 +65,7 @@ export class NotificationOpenerPageComponent {
       duration: this.parseDurationFromUI(),
       group: this.form.get(GROUP).value || undefined,
       groupInputReduceFn: this.isUseGroupInputReducer() ? concatInput : undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
     });
   }
 

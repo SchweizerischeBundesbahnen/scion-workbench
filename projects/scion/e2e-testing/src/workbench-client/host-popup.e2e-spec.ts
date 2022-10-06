@@ -146,8 +146,7 @@ test.describe('Workbench Popup', () => {
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
     await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpenerPagePO.selectAnchor('coordinate');
-    await popupOpenerPagePO.enterAnchorCoordinate({x: 150, y: 150, width: 2, height: 0});
+    await popupOpenerPagePO.enterPosition({top: 150, left: 150});
     await popupOpenerPagePO.selectAlign('south');
     await popupOpenerPagePO.clickOpen();
 
@@ -162,7 +161,7 @@ test.describe('Workbench Popup', () => {
     const popupClientRectInitial = await popupPO.getBoundingBox();
 
     // move the anachor
-    await popupOpenerPagePO.enterAnchorCoordinate({x: 200, y: 300, width: 2, height: 0});
+    await popupOpenerPagePO.enterPosition({top: 300, left: 200});
 
     // assert the popup location
     await expect(await popupPO.getBoundingBox()).toEqual(expect.objectContaining({
@@ -171,7 +170,7 @@ test.describe('Workbench Popup', () => {
     }));
 
     // move the anchor to its initial position
-    await popupOpenerPagePO.enterAnchorCoordinate({x: 150, y: 150, width: 2, height: 0});
+    await popupOpenerPagePO.enterPosition({top: 150, left: 150});
 
     // assert the popup location
     await expect(await popupPO.getBoundingBox()).toEqual(popupClientRectInitial);

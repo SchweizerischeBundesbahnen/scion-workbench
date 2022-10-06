@@ -63,7 +63,7 @@ export class InspectMessageBoxComponent implements OnDestroy {
     this.form.get(CSS_CLASS).valueChanges
       .pipe(takeUntil(this._destroy$))
       .subscribe(cssClass => {
-        this.messageBox.setCssClass(cssClass.split(/\s+/).filter(Boolean) || undefined);
+        this.messageBox.setCssClass(cssClass.split(/\s+/).filter(Boolean));
       });
 
     this.form.get(ACTIONS).valueChanges

@@ -8,26 +8,23 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, NgZone, StaticProvider} from '@angular/core';
+import {Injectable, StaticProvider} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopup, WorkbenchPopupCapability, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
 import {WbRouterOutletComponent} from '../../routing/wb-router-outlet.component';
 import {ROUTER_OUTLET_NAME} from '../../workbench.constants';
-import {combineLatest, Observable, of} from 'rxjs';
-import {filter, map} from 'rxjs/operators';
-import {observeInside, subscribeInside} from '@scion/toolkit/operators';
-import {fromDimension$} from '@scion/toolkit/observable';
+import {Observable} from 'rxjs';
 import {RouterUtils} from '../../routing/router.util';
 import {Commands} from '../../routing/workbench-router.service';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {Router} from '@angular/router';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../messaging.util';
 import {Maps} from '@scion/toolkit/util';
 import {PopupService} from '../../popup/popup.service';
-import {Popup, PopupOrigin} from '../../popup/popup.config';
+import {Popup} from '../../popup/popup.config';
+import {PopupOrigin} from '../../popup/popup.origin';
 
 /**
  * Handles microfrontend popup intents, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
@@ -40,10 +37,8 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
   private _openedPopups = new Set<string>();
 
   constructor(private _popupService: PopupService,
-              private _logger: Logger,
-              private _viewRegistry: WorkbenchViewRegistry,
               private _router: Router,
-              private _zone: NgZone) {
+              private _logger: Logger) {
   }
 
   /**
@@ -102,7 +97,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
     return this._popupService.open({
       component: MicrofrontendPopupComponent,
       input: popupContext,
-      anchor: this.observePopupAnchor$(command),
+      anchor: this.observePopupOrigin$(command),
       context: command.context,
       align: command.align,
       size: capability.properties?.size,
@@ -139,7 +134,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
           provideWorkbenchPopup(capability, params),
         ],
       },
-      anchor: this.observePopupAnchor$(command),
+      anchor: this.observePopupOrigin$(command),
       context: command.context,
       align: command.align,
       size: capability.properties?.size,
@@ -151,47 +146,8 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
   /**
    * Constructs an Observable that, upon subscription, emits the position of the popup anchor, and then each time it is repositioned.
    */
-  private observePopupAnchor$(command: ɵWorkbenchPopupCommand): Observable<PopupOrigin> {
-    const contextualViewId = command.context?.viewId;
-    return combineLatest([
-      contextualViewId ? this.observeViewBoundingBox$(contextualViewId) : of(undefined),
-      this.observeMicrofrontendPopupOrigin$(command.popupId),
-    ])
-      .pipe(
-        filter(([viewBoundingBox, popupOrigin]) => {
-          // Swallow emissions until both sources report a non-empty dimension. For example, when deactivating
-          // the popup's contextual view, the view reports an empty bounding box, causing the popup to flicker
-          // when activating it again.
-          return (!viewBoundingBox || !isNullClientRect(viewBoundingBox)) && !isNullClientRect(popupOrigin);
-        }),
-        map(([viewBoundingBox, popupOrigin]: [DOMRect | undefined, DOMRect]) => {
-          return {
-            x: (viewBoundingBox?.left ?? 0) + popupOrigin.left,
-            y: (viewBoundingBox?.top ?? 0) + popupOrigin.top,
-            width: popupOrigin.width,
-            height: popupOrigin.height,
-          };
-        }),
-        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
-        observeInside(continueFn => this._zone.run(continueFn)),
-      );
-  }
-
-  /**
-   * Observes the bounding box of the view in which the popup is opened.
-   */
-  private observeViewBoundingBox$(viewId: string): Observable<DOMRect> {
-    const view = this._viewRegistry.getElseThrow(viewId);
-    return fromDimension$(view.portal.componentRef.location.nativeElement)
-      .pipe(map(dimension => dimension.element.getBoundingClientRect()));
-  }
-
-  /**
-   * Observes the bounding box of the popup anchor in which the popup is opened.
-   */
-  private observeMicrofrontendPopupOrigin$(popupId: string): Observable<DOMRect> {
-    return Beans.get(MessageClient).observe$<DOMRect>(ɵWorkbenchCommands.popupOriginTopic(popupId))
-      .pipe(mapToBody());
+  private observePopupOrigin$(command: ɵWorkbenchPopupCommand): Observable<PopupOrigin> {
+    return Beans.get(MessageClient).observe$<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(command.popupId)).pipe(mapToBody());
   }
 
   /**
@@ -205,10 +161,6 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
     return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'merge'});
   }
-}
-
-function isNullClientRect(clientRect: DOMRect): boolean {
-  return clientRect.top === 0 && clientRect.right === 0 && clientRect.bottom === 0 && clientRect.left === 0;
 }
 
 /**

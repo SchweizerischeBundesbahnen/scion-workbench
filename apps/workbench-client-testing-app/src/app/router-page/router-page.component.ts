@@ -75,7 +75,7 @@ export class RouterPageComponent {
       selfViewId: this.form.get(SELF_VIEW_ID).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
       params: params || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || undefined,
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
     };
     await this._router.navigate(qualifier, extras)
       .then(success => this.navigated = success)

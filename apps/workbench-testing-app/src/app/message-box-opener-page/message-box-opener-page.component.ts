@@ -102,7 +102,7 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
         viewId: this.form.get(CONTEXTUAL_VIEW_ID).value || undefined,
       },
       contentSelectable: this.form.get(CONTENT_SELECTABLE).value || undefined,
-      cssClass: [`index-${index}`, ...(this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || [])],
+      cssClass: [`index-${index}`].concat(this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean) || []),
       actions: SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as UntypedFormArray) || undefined,
     })
       .then(closeAction => this.closeAction = closeAction)

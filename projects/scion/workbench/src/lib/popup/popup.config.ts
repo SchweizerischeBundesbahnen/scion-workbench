@@ -10,6 +10,7 @@
 
 import {ElementRef, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
 import {Observable} from 'rxjs';
+import {PopupOrigin} from './popup.origin';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -20,14 +21,25 @@ import {Observable} from 'rxjs';
  */
 export abstract class PopupConfig {
   /**
-   * Specifies where to open the popup.
+   * Controls where to open the popup.
    *
-   * Provide either an exact screen coordinate (x/y) or an element to serve as the popup anchor. If you use
-   * an element as the popup anchor, the popup also moves when the anchor element moves. If you position the
-   * popup using screen coordinates, consider passing an Observable to re-position the popup after it is created.
-   * If passing coordinates via an Observable, the popup will not display until the Observable emits the first coordinate.
+   * Provide either a coordinate or an element to serve as the popup anchor. The align setting can be used to control
+   * the region where to open the popup relative to the anchor.
    *
-   * The align setting can be used to further control where the popup opens relative to its anchor.
+   * If you use an element as the popup anchor, the popup also moves when the anchor element moves. If you use a coordinate
+   * and open the popup in the context of a view, the popup opens relative to the bounds of that view. Otherwise, it
+   * is positioned relative to the page viewport. If you move or resize the view or the page, the popup will also be moved
+   * depending on the pair of coordinates used.
+   *
+   * The following coordinate pairs are supported:
+   * - x/y: relative to the "top/left" corner of the view or page viewport
+   * - top/left: equivalent to passing a "x/y" coordinate
+   * - top/right: relative to the "top/right" corner of the view or page viewport
+   * - bottom/left: relative to the "bottom/left" corner of the view or page viewport
+   * - bottom/right: relative to the "bottom/right" corner of the view or page viewport
+   *
+   * Positioning the popup using coordinates allows to pass an Observable to update the popup position. Note that the popup
+   * will not display until the Observable emits the first coordinate.
    */
   public abstract readonly anchor: ElementRef<Element> | Element | PopupOrigin | Observable<PopupOrigin>;
   /**
@@ -82,22 +94,18 @@ export abstract class PopupConfig {
    */
   public readonly closeStrategy?: CloseStrategy;
   /**
-   * Specifies the context in which the popup is opened.
+   * Specifies the context in which to open the popup.
    */
   public readonly context?: {
     /**
-     * Specifies the view from which the popup was opened.
+     * Specifies the view the popup belongs to.
      *
-     * Allows sticking the popup to the lifecycle of a workbench view so that it is only displayed when the referenced view is the active view
-     * in its viewpart, or closed when closing the view.
+     * Binds the popup to the lifecycle of a view so that it displays only when the view is active and closes when the view is closed.
      *
      * By default, when opening the popup in the context of a view, that view is used as the popup's contextual view.
+     * If you set the view id to `null`, the popup will open without referring to the contextual view.
      */
-    viewId?: string;
-    /**
-     * Specifies the microfrontend capability from which the popup was opened.
-     */
-    capabilityId?: string;
+    viewId?: string | null;
   };
   /**
    * Specifies the preferred popup size. If not specified, the popup adjusts its size to the content size.
@@ -124,16 +132,6 @@ export interface CloseStrategy {
    * opener.
    */
   onEscape?: boolean;
-}
-
-/**
- * Represents a point on the page, optionally with a dimension, where a workbench popup should be attached.
- */
-export interface PopupOrigin {
-  x: number;
-  y: number;
-  width?: number;
-  height?: number;
 }
 
 /**

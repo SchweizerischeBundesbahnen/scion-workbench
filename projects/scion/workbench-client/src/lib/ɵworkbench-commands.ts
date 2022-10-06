@@ -97,7 +97,7 @@ export namespace ɵWorkbenchCommands {
   }
 
   /**
-   * Computes the topic for observing the popup anchor.
+   * Computes the topic for observing the popup origin.
    */
   export function popupOriginTopic(popupId: string): string {
     return `ɵworkbench/popups/${popupId}/origin`;

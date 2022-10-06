@@ -4,11 +4,12 @@
       <select [formControlName]="POPUP_COMPONENT" class="e2e-popup-component">
         <option value="popup-page">PopupPageComponent</option>
         <option value="popup-focus-page">PopupFocusPageComponent</option>
+        <option value="empty-page">EmptyComponent</option>
       </select>
     </sci-form-field>
 
     <sci-form-field label="Contextual View ID">
-      <input [formControlName]="CONTEXTUAL_VIEW_ID" class="e2e-contextual-view-id">
+      <input [formControlName]="CONTEXTUAL_VIEW_ID" class="e2e-contextual-view-id" placeholder="Reference to the view to bind this popup to; can be <default>, <null>, or a view id">
     </sci-form-field>
 
     <sci-form-field label="Align">
@@ -31,24 +32,27 @@
       <header>Anchor</header>
     </ng-template>
     <ng-template #panel_anchor>
-      <sci-form-field label="Binding">
-        <select [formControlName]="BINDING" class="e2e-anchor">
+      <sci-form-field label="Position">
+        <select [formControlName]="POSITION" class="e2e-position">
           <option value="element">Element</option>
-          <option value="coordinate">Coordinate</option>
+          <option value="top-left">Coordinate (top-left)</option>
+          <option value="top-right">Coordinate (top-right)</option>
+          <option value="bottom-left">Coordinate (bottom-left)</option>
+          <option value="bottom-right">Coordinate (bottom-right)</option>
         </select>
       </sci-form-field>
-      <ng-container *ngIf="form.get([ANCHOR, BINDING]).value === 'coordinate'">
-        <sci-form-field label="X">
-          <input [formControlName]="X" class="e2e-anchor-x">
+      <ng-container *ngIf="form.get([ANCHOR, POSITION]).value !== 'element'">
+        <sci-form-field [label]="form.get([ANCHOR, POSITION]).value | wbPopupPositionLabel:'vertical'">
+          <input [formControlName]="VERTICAL_POSITION" type="number" class="e2e-position-vertical">
         </sci-form-field>
-        <sci-form-field label="Y">
-          <input [formControlName]="Y" class="e2e-anchor-y">
+        <sci-form-field [label]="form.get([ANCHOR, POSITION]).value | wbPopupPositionLabel:'horizontal'">
+          <input [formControlName]="HORIZONTAL_POSITION" type="number" class="e2e-position-horizontal">
         </sci-form-field>
         <sci-form-field label="Width">
-          <input [formControlName]="WIDTH" class="e2e-anchor-width">
+          <input [formControlName]="WIDTH" type="number" class="e2e-anchor-width">
         </sci-form-field>
         <sci-form-field label="Height">
-          <input [formControlName]="HEIGHT" class="e2e-anchor-height">
+          <input [formControlName]="HEIGHT" type="number" class="e2e-anchor-height">
         </sci-form-field>
       </ng-container>
     </ng-template>

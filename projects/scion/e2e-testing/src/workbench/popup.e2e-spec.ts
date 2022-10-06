@@ -25,7 +25,7 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.selectAnchor('element');
+      await popupOpenerPagePO.enterPosition('element');
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
@@ -46,7 +46,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.selectAlign('north');
-      await popupOpenerPagePO.selectAnchor('element');
+      await popupOpenerPagePO.enterPosition('element');
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
@@ -66,7 +66,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.selectAlign('south');
-      await popupOpenerPagePO.selectAnchor('element');
+      await popupOpenerPagePO.enterPosition('element');
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
 
       await popupOpenerPagePO.clickOpen();
@@ -87,7 +87,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.selectAlign('east');
-      await popupOpenerPagePO.selectAnchor('element');
+      await popupOpenerPagePO.enterPosition('element');
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
@@ -107,7 +107,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.selectAlign('west');
-      await popupOpenerPagePO.selectAnchor('element');
+      await popupOpenerPagePO.enterPosition('element');
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
@@ -129,18 +129,20 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.selectAnchor('coordinate');
-      await popupOpenerPagePO.enterAnchorCoordinate({x: 300, y: 300, width: 100, height: 100});
+      await popupOpenerPagePO.enterPosition({left: 300, top: 300});
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
+
+      const viewPO = await appPO.activePart.activeView;
+      const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
       const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
-      await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(300, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(350, 0);
+      await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(viewBounds.left + 300, 0);
       await expect(await popupPO.getAlign()).toEqual('north');
     });
 
@@ -150,17 +152,19 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.selectAlign('north');
-      await popupOpenerPagePO.selectAnchor('coordinate');
-      await popupOpenerPagePO.enterAnchorCoordinate({x: 300, y: 300, width: 100, height: 100});
+      await popupOpenerPagePO.enterPosition({left: 300, top: 300});
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
+
+      const viewPO = await appPO.activePart.activeView;
+      const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
       const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
-      await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(300, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(350, 0);
+      await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(viewBounds.left + 300, 0);
       await expect(await popupPO.getAlign()).toEqual('north');
     });
 
@@ -170,18 +174,19 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.selectAlign('south');
-      await popupOpenerPagePO.selectAnchor('coordinate');
-      await popupOpenerPagePO.enterAnchorCoordinate({x: 300, y: 300, width: 100, height: 100});
+      await popupOpenerPagePO.enterPosition({left: 300, top: 300});
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
-
       await popupOpenerPagePO.clickOpen();
+
+      const viewPO = await appPO.activePart.activeView;
+      const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
       const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
-      await expect(popupClientRect.top - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(400, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(350, 0);
+      await expect(popupClientRect.top - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(viewBounds.left + 300, 0);
       await expect(await popupPO.getAlign()).toEqual('south');
     });
 
@@ -191,17 +196,19 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.selectAlign('east');
-      await popupOpenerPagePO.selectAnchor('coordinate');
-      await popupOpenerPagePO.enterAnchorCoordinate({x: 300, y: 300, width: 100, height: 100});
+      await popupOpenerPagePO.enterPosition({left: 300, top: 300});
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
+
+      const viewPO = await appPO.activePart.activeView;
+      const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
       const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
-      await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(350, 0);
-      await expect(popupClientRect.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(400, 0);
+      await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect(popupClientRect.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.left + 300, 0);
       await expect(await popupPO.getAlign()).toEqual('east');
     });
 
@@ -211,17 +218,19 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.selectAlign('west');
-      await popupOpenerPagePO.selectAnchor('coordinate');
-      await popupOpenerPagePO.enterAnchorCoordinate({x: 300, y: 300, width: 100, height: 100});
+      await popupOpenerPagePO.enterPosition({left: 300, top: 300});
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
+
+      const viewPO = await appPO.activePart.activeView;
+      const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
       const popupClientRect = await popupPO.getBoundingBox('cdk-overlay');
 
       await expect(await popupPO.isVisible()).toBe(true);
-      await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(350, 0);
-      await expect(popupClientRect.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(300, 0);
+      await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect(popupClientRect.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.left + 300, 0);
       await expect(await popupPO.getAlign()).toEqual('west');
     });
   });
@@ -271,7 +280,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.selectAnchor('element');
+      await popupOpenerPagePO.enterPosition('element');
       await popupOpenerPagePO.selectAlign('north');
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
@@ -313,28 +322,30 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.selectAnchor('coordinate');
-      await popupOpenerPagePO.enterAnchorCoordinate({x: 150, y: 150, width: 2, height: 0});
+      await popupOpenerPagePO.enterPosition({left: 150, top: 150});
       await popupOpenerPagePO.selectAlign('south');
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
+      const viewPO = await appPO.activePart.activeView;
+      const viewBounds = await viewPO.getBoundingBox();
+
       const popupPO = appPO.popup({cssClass: 'testee'});
       const popupClientRect1 = await popupPO.getBoundingBox('cdk-overlay');
-      await expect(popupClientRect1.left + 50).toEqual(150);
-      await expect(popupClientRect1.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(150);
+      await expect(popupClientRect1.left + popupClientRect1.width / 2).toEqual(viewBounds.left + 150);
+      await expect(popupClientRect1.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(viewBounds.top + 150);
 
       // move the anchor to another position
-      await popupOpenerPagePO.enterAnchorCoordinate({x: 200, y: 300, width: 2, height: 0});
+      await popupOpenerPagePO.enterPosition({left: 200, top: 300});
       const popupClientRect2 = await popupPO.getBoundingBox('cdk-overlay');
-      await expect(popupClientRect2.left + 50).toEqual(200);
-      await expect(popupClientRect2.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(300);
+      await expect(popupClientRect2.left + popupClientRect2.width / 2).toEqual(viewBounds.left + 200);
+      await expect(popupClientRect2.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(viewBounds.top + 300);
 
       // move the anchor to another position
-      await popupOpenerPagePO.enterAnchorCoordinate({x: 300, y: 400, width: 2, height: 0});
+      await popupOpenerPagePO.enterPosition({left: 300, top: 400});
       const popupClientRect3 = await popupPO.getBoundingBox('cdk-overlay');
-      await expect(popupClientRect3.left + 50).toEqual(300);
-      await expect(popupClientRect3.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(400);
+      await expect(popupClientRect3.left + popupClientRect3.width / 2).toEqual(viewBounds.left + 300);
+      await expect(popupClientRect3.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(viewBounds.top + 400);
     });
   });
 
@@ -395,16 +406,17 @@ test.describe('Workbench Popup', () => {
 
       const startPagePO = await appPO.openNewViewTab();
 
+      // open a popup and bind it to the start page view.
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.enterContextualViewId(startPagePO.viewId!);
-      await popupOpenerPagePO.selectAnchor('coordinate');
-      await popupOpenerPagePO.clickOpen();
+      await popupOpenerPagePO.enterPosition({left: 0, top: 0});
+      await popupOpenerPagePO.selectPopupComponent('empty-page');
+      await popupOpenerPagePO.clickOpen({waitForPopup: false});
 
-      // open a popup and bind it to the start page view.
       const popupPO = appPO.popup({cssClass: 'testee'});
-      await expect(await popupPO.isPresent()).toBe(true);
+      await expect(await popupPO.isPresent()).toBe(false);
       await expect(await popupPO.isVisible()).toBe(false);
 
       // activate the view to which the popup is bound to
@@ -416,6 +428,16 @@ test.describe('Workbench Popup', () => {
       await appPO.openNewViewTab();
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(false);
+
+      // activate another view
+      await popupOpenerPagePO.view.viewTab.click();
+      await expect(await popupPO.isPresent()).toBe(true);
+      await expect(await popupPO.isVisible()).toBe(false);
+
+      // activate the view to which the popup is bound to
+      await startPagePO.view!.viewTab.click();
+      await expect(await popupPO.isPresent()).toBe(true);
+      await expect(await popupPO.isVisible()).toBe(true);
     });
 
     test('should bind the popup to the current view, if opened in the context of a view', async ({appPO, workbenchNavigator}) => {
@@ -453,7 +475,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.enterContextualViewId('<null>');
-      await popupOpenerPagePO.selectAnchor('coordinate');
+      await popupOpenerPagePO.enterPosition({left: 300, top: 300});
       await popupOpenerPagePO.clickOpen();
 
       const popupPO = appPO.popup({cssClass: 'testee'});

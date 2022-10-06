@@ -17,6 +17,7 @@ import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {PopupOpenerPageComponent} from './popup-opener-page.component';
+import {PopupPositionLabelPipe} from './popup-position-label.pipe';
 
 const routes: Routes = [
   {path: '', component: PopupOpenerPageComponent},
@@ -35,6 +36,7 @@ const routes: Routes = [
   ],
   declarations: [
     PopupOpenerPageComponent,
+    PopupPositionLabelPipe,
   ],
 })
 export class PopupOpenerPageModule {
