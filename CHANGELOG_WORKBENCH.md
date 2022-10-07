@@ -1,3 +1,32 @@
+# [14.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.1...14.0.0-beta.2) (2022-10-07)
+
+
+### Bug Fixes
+
+* **workbench/popup:** open popup inside Angular zone ([2cdd994](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/2cdd9947056261084a371df6d19d1b1b0bf70476))
+* **workbench/router:** navigate inside Angular zone ([48e0e1a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/48e0e1a615669b173640403c987ed788e3076ace))
+
+
+### Features
+
+* **workbench/popup:** allow positioning of a popup relative to its contextual view or the page viewport ([484d9bd](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/484d9bd60114e7313dcce53b5641477a017da6b0)), closes [#342](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/342)
+* **workbench/router:** allow setting CSS classes on a view via router and route data definition ([3d46204](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3d4620490f2ed1e19191bf0bc2ea8d0779b03d93))
+
+
+### DEPRECATIONS
+
+* **workbench/router:** deprecate constants for declaring view title and heading in route data definition
+
+  - Constants for declaring a view's title and heading in its route data definition have been moved to `WorkbenchRouteData` and the former constants `WB_VIEW_TITLE_PARAM`, `WB_VIEW_HEADING_PARAM` and `WB_STATE_DATA` are deprecated. Deprecated constants will be removed in version 16.
+  - Setting a view's title and heading via URL matrix parameters has been deprecated and will be removed in version 16. No replacement is planned.
+
+  To migrate:
+  - replace `WB_VIEW_TITLE_PARAM` with `WorkbenchRouteData.title`
+  - replace `WB_VIEW_HEADING_PARAM` with `WorkbenchRouteData.heading`
+  - replace `WB_STATE_DATA` with `WorkbenchRouteData.state`
+
+
+
 # [14.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/13.0.0-beta.2...14.0.0-beta.1) (2022-09-14)
 
 
