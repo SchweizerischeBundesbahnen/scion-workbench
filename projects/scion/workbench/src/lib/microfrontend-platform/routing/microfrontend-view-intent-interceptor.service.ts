@@ -15,7 +15,6 @@ import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {MicrofrontendViewRoutes} from './microfrontend-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {stringifyError} from '../messaging.util';
 import {Dictionaries} from '@scion/toolkit/util';
 import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
 
@@ -33,25 +32,20 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
   /**
    * View intents are handled in this interceptor and then swallowed.
    */
-  public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): void {
+  public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.View) {
-      this.consumeViewIntent(intentMessage).then();
+      return this.consumeViewIntent(intentMessage);
     }
     else {
-      next.handle(intentMessage);
+      return next.handle(intentMessage);
     }
   }
 
   private async consumeViewIntent(message: IntentMessage<WorkbenchNavigationExtras>): Promise<void> {
     const replyTo = message.headers.get(MessageHeaders.ReplyTo);
     const viewCapability = message.capability as WorkbenchViewCapability;
-    try {
-      const success = await this.navigate(viewCapability, message.intent, message.body!);
-      await Beans.get(MessageClient).publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
-    }
-    catch (error) {
-      await Beans.get(MessageClient).publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
-    }
+    const success = await this.navigate(viewCapability, message.intent, message.body!);
+    await Beans.get(MessageClient).publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
   }
 
   private navigate(viewCapability: WorkbenchViewCapability, intent: Intent, extras: WorkbenchNavigationExtras): Promise<boolean> {

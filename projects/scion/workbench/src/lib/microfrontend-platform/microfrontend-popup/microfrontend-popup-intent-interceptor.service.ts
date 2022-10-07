@@ -44,12 +44,15 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
   /**
    * Popup intents are handled in this interceptor and then swallowed.
    */
-  public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): void {
+  public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.Popup) {
-      this.consumePopupIntent(intentMessage).then();
+      // Do not block the call until the popup is closed.
+      // Otherwise, the caller may receive a timeout error if not closing the popup before delivery confirmation expires.
+      this.consumePopupIntent(intentMessage).catch(error => this._logger.error('[PopupOpenError] Failed to open popup.', LoggerNames.MICROFRONTEND, intentMessage, error));
+      return Promise.resolve();
     }
     else {
-      next.handle(intentMessage);
+      return next.handle(intentMessage);
     }
   }
 

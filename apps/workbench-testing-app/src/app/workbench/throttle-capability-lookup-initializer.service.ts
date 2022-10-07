@@ -13,7 +13,7 @@ import {WORKBENCH_PRE_STARTUP, WorkbenchInitializer} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Handler, MessageHeaders, MessageInterceptor, TopicMessage} from '@scion/microfrontend-platform';
-import {asyncScheduler} from 'rxjs';
+import {firstValueFrom, timer} from 'rxjs';
 
 /**
  * Simulates the slow retrieval of the microfrontend's current view capability by delaying capability lookups by 2000ms.
@@ -30,15 +30,16 @@ export class ThrottleCapabilityLookupInitializer implements WorkbenchInitializer
 
 class CapabilityLookupMessageInterceptor implements MessageInterceptor {
 
-  public intercept(message: TopicMessage, next: Handler<TopicMessage>): void {
+  public async intercept(message: TopicMessage, next: Handler<TopicMessage>): Promise<void> {
     const requestor: string = message.headers.get(MessageHeaders.AppSymbolicName);
 
     if (message.topic === 'ɵLOOKUP_CAPABILITIES' && requestor.startsWith('workbench-client-testing-app')) {
       console.log(`Delaying the lookup of capabilities for ${requestor} by 2000ms.`, message);
-      asyncScheduler.schedule(() => next.handle(message), 2000);
+      await firstValueFrom(timer(2000));
+      return next.handle(message);
     }
     else {
-      next.handle(message);
+      return next.handle(message);
     }
   }
 }
