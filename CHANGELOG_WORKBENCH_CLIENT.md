@@ -1,3 +1,13 @@
+# [1.0.0-beta.12](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.11...workbench-client-1.0.0-beta.12) (2022-10-07)
+
+
+### Features
+
+* **workbench/popup:** allow positioning of a popup relative to its contextual view or the page viewport ([484d9bd](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/484d9bd60114e7313dcce53b5641477a017da6b0)), closes [#342](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/342)
+* **workbench/router:** allow setting CSS classes on a view via router and route data definition ([3d46204](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3d4620490f2ed1e19191bf0bc2ea8d0779b03d93))
+
+
+
 # [1.0.0-beta.11](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.10...workbench-client-1.0.0-beta.11) (2022-09-14)
 
 
