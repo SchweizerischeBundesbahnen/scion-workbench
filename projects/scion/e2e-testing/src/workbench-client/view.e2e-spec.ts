@@ -238,7 +238,7 @@ test.describe('Workbench View', () => {
 
     // try closing the view
     await viewTabPO.close();
-    const msgboxPO = appPO.messagebox({cssClass: 'close-view'});
+    const msgboxPO = appPO.messagebox({cssClass: ['e2e-close-view', viewPagePO.viewId]});
     await msgboxPO.clickActionButton('no');
 
     // expect the view not to be closed
@@ -295,21 +295,21 @@ test.describe('Workbench View', () => {
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
 
     // confirm closing view 1
-    const msgboxPO1 = appPO.messagebox({cssClass: 'close-view'});
+    const msgboxPO1 = appPO.messagebox({cssClass: ['e2e-close-view', viewPagePO1.viewId]});
     await msgboxPO1.clickActionButton('yes');
 
     // expect view 1 being closed
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
 
     // prevent closing view 2
-    const msgboxPO2 = appPO.messagebox({cssClass: 'close-view'});
+    const msgboxPO2 = appPO.messagebox({cssClass: ['e2e-close-view', viewPagePO2.viewId]});
     await msgboxPO2.clickActionButton('no');
 
     // expect view 2 being still open
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
 
     // confirm closing view 3
-    const msgboxPO3 = appPO.messagebox({cssClass: 'close-view'});
+    const msgboxPO3 = appPO.messagebox({cssClass: ['e2e-close-view', viewPagePO3.viewId]});
     await msgboxPO3.clickActionButton('yes');
 
     // expect view 3 to be closed
@@ -420,13 +420,12 @@ test.describe('Workbench View', () => {
     await viewPagePO2.checkConfirmClosing(true); // prevent the view from closing
 
     // switch to view 1, should not ask for confirmation
-    const msgboxPO = appPO.messagebox({cssClass: 'close-view'});
     await viewTabPO1.click();
-    expect(await msgboxPO.isPresent()).toBe(false);
+    expect(await appPO.messagebox({cssClass: 'e2e-close-view'}).isPresent()).toBe(false);
 
     // switch to view 2, should not ask for confirmation
     await viewTabPO2.click();
-    expect(await msgboxPO.isPresent()).toBe(false);
+    expect(await appPO.messagebox({cssClass: 'e2e-close-view'}).isPresent()).toBe(false);
   });
 
   test('should emit when activating or deactivating a viewtab', async ({appPO, microfrontendNavigator, consoleLogs}) => {
