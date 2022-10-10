@@ -111,21 +111,24 @@ export class AppPO {
    * Handle to the specified popup.
    */
   public popup(locateBy?: {cssClass?: string | string[]}): PopupPO {
-    return new PopupPO(this.page.locator(['.wb-popup'].concat(coerceArray(locateBy?.cssClass)).join('.')));
+    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
+    return new PopupPO(this.page.locator(['.wb-popup'].concat(cssClasses).join('.')));
   }
 
   /**
    * Handle to the specified notification.
    */
   public notification(locateBy?: {cssClass?: string | string[]}): NotificationPO {
-    return new NotificationPO(this.page.locator(['wb-notification'].concat(coerceArray(locateBy?.cssClass)).join('.')));
+    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
+    return new NotificationPO(this.page.locator(['wb-notification'].concat(cssClasses).join('.')));
   }
 
   /**
    * Handle to the specified message box.
    */
   public messagebox(locateBy?: {cssClass?: string | string[]}): MessageBoxPO {
-    return new MessageBoxPO(this.page.locator(['wb-message-box'].concat(coerceArray(locateBy?.cssClass)).join('.')));
+    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
+    return new MessageBoxPO(this.page.locator(['wb-message-box'].concat(cssClasses).join('.')));
   }
 
   /**
