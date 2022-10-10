@@ -1,3 +1,17 @@
+# [14.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.2...14.0.0-beta.3) (2022-10-10)
+
+
+### Dependencies
+
+* **workbench:** migrate to the asynchronous Interception API of `@scion/microfrontend-platform` ([ab8df30](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ab8df30fd43f0318c407d16dfc80a8b67fb9e1e7))
+
+
+### BREAKING CHANGES
+
+* **workbench:** Updating `@scion/microfrontend-platform` to version `1.0.0-rc.7` introduced a breaking change.
+
+  To migrate, refer to the changelog of the SCION Microfrontend Platform: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/CHANGELOG.md#100-rc7-2022-10-07
+
 # [14.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.1...14.0.0-beta.2) (2022-10-07)
 
 
