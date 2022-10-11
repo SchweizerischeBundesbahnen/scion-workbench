@@ -9,19 +9,22 @@
  */
 
 import {ComponentFixture, discardPeriodicTasks, fakeAsync, inject, TestBed, waitForAsync} from '@angular/core/testing';
-import {NgModule} from '@angular/core';
+import {Component, NgModule, OnDestroy} from '@angular/core';
 import {PartsLayoutComponent} from '../layout/parts-layout.component';
 import {WorkbenchService} from '../workbench.service';
 import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
 import {RouterTestingModule} from '@angular/router/testing';
-import {Router} from '@angular/router';
-import {SpecView1Component, SpecView2Component} from './view.component.model.spec';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ViewComponent} from '../view/view.component';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {advance} from './util/util.spec';
 import {WorkbenchTestingModule} from './workbench-testing.module';
 import {WorkbenchView} from '../view/workbench-view.model';
+import {WbBeforeDestroy} from '../workbench.model';
+import {Observable, Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {WorkbenchRouteData} from '../routing/workbench-route-data';
 
 describe('ViewComponent', () => {
 
@@ -62,17 +65,42 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('should render heading text', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+  it('should render title', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View
-    workbenchRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view'], {queryParams: {title: 'TITLE'}}).then(); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('TITLE');
+
+    // Set title
+    const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
+    viewDebugElement.view.title = 'Foo';
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('Foo');
+
+    // Set title
+    viewDebugElement.view.title = 'Bar';
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(C)').toEqual('Bar');
+
+    discardPeriodicTasks();
+  })));
+
+  it('should render heading', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
+    // Add View
+    workbenchRouter.navigate(['view'], {queryParams: {heading: 'HEADING'}}).then(); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('HEADING');
+
     // Set heading
-    const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
+    const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
     viewDebugElement.view.heading = 'Foo';
     advance(fixture);
     expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('Foo');
@@ -85,25 +113,168 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   })));
 
-  it('should render title', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+  it('should render title as configured on route', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
     const fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     advance(fixture);
 
     // Add View
-    workbenchRouter.navigate(['view-1']).then();
+    workbenchRouter.navigate(['view-with-title']).then();
     advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('ROUTE TITLE');
 
-    // Set heading
-    const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
+    // Set title
+    const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
     viewDebugElement.view.title = 'Foo';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('Foo');
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('Foo');
 
-    // Set heading
+    // Set title
     viewDebugElement.view.title = 'Bar';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('Bar');
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(C)').toEqual('Bar');
+
+    discardPeriodicTasks();
+  })));
+
+  it('should render heading as configured on route', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View
+    workbenchRouter.navigate(['view-with-heading']).then();
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('ROUTE HEADING');
+
+    // Set heading
+    const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
+    viewDebugElement.view.heading = 'Foo';
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(B)').toEqual('Foo');
+
+    // Set heading
+    viewDebugElement.view.heading = 'Bar';
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(C)').toEqual('Bar');
+
+    discardPeriodicTasks();
+  })));
+
+  it('should take title from view over title configured on route', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View
+    workbenchRouter.navigate(['view-with-title'], {queryParams: {title: 'TITLE'}}).then(); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('TITLE');
+
+    // Set title
+    const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
+    viewDebugElement.view.title = 'Foo';
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('Foo');
+
+    // Set title
+    viewDebugElement.view.title = 'Bar';
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(C)').toEqual('Bar');
+
+    discardPeriodicTasks();
+  })));
+
+  it('should take heading from view over heading configured on route', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View
+    workbenchRouter.navigate(['view-with-heading'], {queryParams: {heading: 'HEADING'}}).then(); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('HEADING');
+
+    // Set heading
+    const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
+    viewDebugElement.view.heading = 'Foo';
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(B)').toEqual('Foo');
+
+    // Set heading
+    viewDebugElement.view.heading = 'Bar';
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(C)').toEqual('Bar');
+
+    discardPeriodicTasks();
+  })));
+
+  it('should unset title when navigating to a different route', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View
+    workbenchRouter.navigate(['view-1'], {queryParams: {title: 'TITLE'}}).then(); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('TITLE');
+
+    workbenchRouter.navigate(['view-2'], {queryParams: {title: ''}, selfViewId: 'view.1'}).then(); // TODO[#239]: Remove queryParam when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('');
+
+    discardPeriodicTasks();
+  })));
+
+  it('should unset heading when navigating to a different route', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View
+    workbenchRouter.navigate(['view-1'], {queryParams: {heading: 'HEADING'}}).then(); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('HEADING');
+
+    workbenchRouter.navigate(['view-2'], {queryParams: {heading: ''}, selfViewId: 'view.1'}).then(); // TODO[#239]: Remove queryParam when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading')).withContext('(B)').toBeUndefined();
+
+    discardPeriodicTasks();
+  })));
+
+  it('should replace title when navigating to a different route', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View
+    workbenchRouter.navigate(['view-1'], {queryParams: {title: 'TITLE 1'}}).then(); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('TITLE 1');
+
+    // Navigate to a different view
+    workbenchRouter.navigate(['view-2'], {queryParams: {title: 'TITLE 2'}, selfViewId: 'view.1'}).then(); // TODO[#239]: Remove queryParam when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('TITLE 2');
+
+    discardPeriodicTasks();
+  })));
+
+  it('should replace heading when navigating to a different route', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View
+    workbenchRouter.navigate(['view-1'], {queryParams: {heading: 'HEADING 1'}}).then(); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('HEADING 1');
+
+    // Navigate to a different view
+    workbenchRouter.navigate(['view-2'], {queryParams: {heading: 'HEADING 2'}, selfViewId: 'view.1'}).then(); // TODO[#239]: Remove queryParam when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    advance(fixture);
+    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(B)').toEqual('HEADING 2');
 
     discardPeriodicTasks();
   })));
@@ -382,12 +553,14 @@ describe('ViewComponent', () => {
  ****************************************************************************************************/
 
 @NgModule({
-  declarations: [SpecView1Component, SpecView2Component],
   imports: [
     WorkbenchTestingModule.forRoot({startup: {launcher: 'APP_INITIALIZER'}}),
     RouterTestingModule.withRoutes([
-      {path: 'view-1', component: SpecView1Component},
-      {path: 'view-2', component: SpecView2Component},
+      {path: 'view', loadComponent: () => SpecViewComponent},
+      {path: 'view-with-title', loadComponent: () => SpecViewComponent, data: {[WorkbenchRouteData.title]: 'ROUTE TITLE'}},
+      {path: 'view-with-heading', loadComponent: () => SpecViewComponent, data: {[WorkbenchRouteData.heading]: 'ROUTE HEADING'}},
+      {path: 'view-1', loadComponent: () => SpecView1Component},
+      {path: 'view-2', loadComponent: () => SpecView2Component},
     ]),
   ],
 })
@@ -408,4 +581,71 @@ function querySelector(fixture: ComponentFixture<any>, selector: string): HTMLEl
  */
 function cssClasses(fixture: ComponentFixture<any>, selector: string): string[] {
   return Array.from(querySelector(fixture, selector)?.classList);
+}
+
+@Component({
+  selector: 'spec-view',
+  template: '{{checkFromTemplate()}}',
+  standalone: true,
+})
+class SpecViewComponent implements OnDestroy, WbBeforeDestroy {
+
+  private _destroy$ = new Subject<void>();
+
+  public destroyed = false;
+  public activated: boolean;
+  public checked = false;
+  public preventDestroy = false;
+
+  constructor(public view: WorkbenchView, route: ActivatedRoute) {
+    const title = route.snapshot.queryParamMap.get('title'); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    if (title) {
+      view.title = title;
+    }
+    const heading = route.snapshot.queryParamMap.get('heading'); // TODO[#239]: Change to matrix params when fixed https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239
+    if (heading) {
+      view.heading = heading;
+    }
+    view.active$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(active => this.activated = active);
+  }
+
+  public wbBeforeDestroy(): Observable<boolean> | Promise<boolean> | boolean {
+    return !this.preventDestroy;
+  }
+
+  public ngOnDestroy(): void {
+    this.destroyed = true;
+    this._destroy$.next();
+  }
+
+  public checkFromTemplate(): boolean {
+    this.checked = true;
+    return this.checked;
+  }
+}
+
+@Component({
+  selector: 'spec-view-1',
+  template: '{{checkFromTemplate()}}',
+  standalone: true,
+})
+class SpecView1Component extends SpecViewComponent {
+
+  constructor(view: WorkbenchView, route: ActivatedRoute) {
+    super(view, route);
+  }
+}
+
+@Component({
+  selector: 'spec-view-2',
+  template: '{{checkFromTemplate()}}',
+  standalone: true,
+})
+class SpecView2Component extends SpecViewComponent {
+
+  constructor(view: WorkbenchView, route: ActivatedRoute) {
+    super(view, route);
+  }
 }

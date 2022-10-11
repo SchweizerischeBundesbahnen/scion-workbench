@@ -22,7 +22,7 @@ export class ViewTabContentComponent {
   @HostBinding('attr.context')
   public context: ViewTabContext;
 
-  @HostBinding('class.heading')
+  @HostBinding('class.has-heading')
   public get hasHeading(): boolean {
     return !!this.view.heading;
   }
