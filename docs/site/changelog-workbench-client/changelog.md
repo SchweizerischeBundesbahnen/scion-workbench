@@ -6,6 +6,15 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.13](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.12...workbench-client-1.0.0-beta.13) (2022-10-11)
+
+
+### Features
+
+* **workbench-client/popup:** add 'referrer' to popup handle to provide information about the calling context ([920d831](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/920d83192a56ef0d4e0f2dac3ceb6e4ac9d17c12))
+
+
+
 # [1.0.0-beta.12](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.11...workbench-client-1.0.0-beta.12) (2022-10-07)
 
 
