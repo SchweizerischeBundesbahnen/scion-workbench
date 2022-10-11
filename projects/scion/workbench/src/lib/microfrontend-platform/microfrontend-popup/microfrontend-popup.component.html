@@ -1,6 +1,8 @@
 <sci-router-outlet #router_outlet
                    [name]="popupId"
+                   [attr.data-capabilityid]="popupCapability.metadata!.id"
+                   [attr.data-app]="popupCapability.metadata!.appSymbolicName"
+                   [ngClass]="popupCapability.properties.cssClass" class="e2e-popup"
                    keystrokes="keydown.escape"
-                   (focuswithin)="onFocusWithin($event)"
-                   [ngClass]="microfrontendCssClasses">
+                   (focuswithin)="onFocusWithin($event)">
 </sci-router-outlet>
