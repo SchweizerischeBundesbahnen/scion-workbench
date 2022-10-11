@@ -47,7 +47,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await testeeViewPagePO.viewPO.isPresent()).toBe(true);
+    await expect(await testeeViewPagePO.view.isPresent()).toBe(true);
     await expect(await testeeViewPagePO.isVisible()).toBe(true);
   });
 
@@ -78,7 +78,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await testeeViewPagePO.viewPO.isPresent()).toBe(true);
+    await expect(await testeeViewPagePO.view.isPresent()).toBe(true);
     await expect(await testeeViewPagePO.isVisible()).toBe(true);
   });
 
@@ -147,7 +147,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
     await expect(await appPO.activePart.getViewIds()).toHaveLength(4);
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await testeeViewPagePO.viewPO.isPresent()).toBe(true);
+    await expect(await testeeViewPagePO.view.isPresent()).toBe(true);
     await expect(await testeeViewPagePO.isVisible()).toBe(true);
   });
 
@@ -207,7 +207,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await testeeViewPagePO.viewPO.isPresent()).toBe(true);
+    await expect(await testeeViewPagePO.view.isPresent()).toBe(true);
     await expect(await testeeViewPagePO.isVisible()).toBe(true);
   });
 
@@ -237,7 +237,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await testeeViewPagePO.viewPO.isPresent()).toBe(true);
+    await expect(await testeeViewPagePO.view.isPresent()).toBe(true);
     await expect(await testeeViewPagePO.isVisible()).toBe(true);
     await expect(await routerPagePO.isVisible()).toBe(false);
     await expect(testeeViewPagePO.viewId).toEqual(routerPagePO.viewId);
@@ -268,7 +268,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
     await expect(await testeeViewTabPO.isActive()).toBe(true);
-    await expect(await testeeViewPagePO.viewPO.isPresent()).toBe(true);
+    await expect(await testeeViewPagePO.view.isPresent()).toBe(true);
     await expect(await testeeViewPagePO.isVisible()).toBe(true);
     await expect(await routerPagePO.isVisible()).toBe(false);
     await expect(testeeViewPagePO.viewId).toEqual(routerPagePO.viewId);
@@ -322,8 +322,8 @@ test.describe('Workbench Router', () => {
     await expect(await testeeViewTab1PO.isPresent()).toBe(true);
     await expect(await testeeViewTab2PO.isPresent()).toBe(true);
     await expect(await testeeViewTab1PO.isActive() || await testeeViewTab2PO.isActive()).toBe(true);
-    await expect(await testeeViewPage1PO.viewPO.isPresent() || await testeeViewPage2PO.viewPO.isPresent()).toBe(true);
-    await expect(await testeeViewPage1PO.viewPO.isPresent()).not.toEqual(await testeeViewPage2PO.viewPO.isPresent());
+    await expect(await testeeViewPage1PO.view.isPresent() || await testeeViewPage2PO.view.isPresent()).toBe(true);
+    await expect(await testeeViewPage1PO.view.isPresent()).not.toEqual(await testeeViewPage2PO.view.isPresent());
     await expect(await testeeViewPage1PO.isVisible() || await testeeViewPage2PO.isVisible()).toBe(true);
     await expect(await testeeViewPage1PO.isVisible()).not.toEqual(await testeeViewPage2PO.isVisible());
   });
@@ -378,7 +378,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.clickNavigate();
-    await testeeViewPagePO.viewTabPO.click();
+    await testeeViewPagePO.view.viewTab.click();
 
     // expect the correct view to display
     await expect(await testeeViewPagePO.getViewParams()).toEqual(expect.objectContaining({component: 'testee-2 [string]'}));
@@ -394,7 +394,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.selectTarget('self');
     await routerPagePO.clickNavigate();
-    await testeeViewPagePO.viewTabPO.click();
+    await testeeViewPagePO.view.viewTab.click();
 
     // expect the correct view to display
     await expect(await testeeViewPagePO.getViewParams()).toEqual(expect.objectContaining({component: 'testee-1 [string]'}));
@@ -410,7 +410,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.selectTarget('self');
     await routerPagePO.clickNavigate();
-    await testeeViewPagePO.viewTabPO.click();
+    await testeeViewPagePO.view.viewTab.click();
 
     // expect the correct view to display
     await expect(await testeeViewPagePO.getViewParams()).toEqual(expect.objectContaining({component: 'testee-2 [string]'}));
@@ -539,10 +539,10 @@ test.describe('Workbench Router', () => {
 
     // expect the views to be present
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
-    await expect(await viewPage1PO.viewTabPO.isActive()).toBe(false);
+    await expect(await viewPage1PO.view.viewTab.isActive()).toBe(false);
     await expect(await viewPage1PO.isPresent()).toBe(true);
     await expect(await viewPage1PO.isVisible()).toBe(false);
-    await expect(await viewPage2PO.viewTabPO.isActive()).toBe(true);
+    await expect(await viewPage2PO.view.viewTab.isActive()).toBe(true);
     await expect(await viewPage2PO.isVisible()).toBe(true);
   });
 
@@ -571,15 +571,15 @@ test.describe('Workbench Router', () => {
 
     // expect views to be present
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
-    await expect(await viewPage1PO.viewTabPO.isActive()).toBe(false);
+    await expect(await viewPage1PO.view.viewTab.isActive()).toBe(false);
     await expect(await viewPage1PO.isPresent()).toBe(true);
     await expect(await viewPage1PO.isVisible()).toBe(false);
-    await expect(await viewPage2PO.viewTabPO.isActive()).toBe(true);
+    await expect(await viewPage2PO.view.viewTab.isActive()).toBe(true);
     await expect(await viewPage2PO.isVisible()).toBe(true);
 
     // expect view microfrontends to have set their initial title
-    await expect(await viewPage1PO.viewTabPO.getTitle()).toEqual('INITIAL TITLE 1');
-    await expect(await viewPage2PO.viewTabPO.getTitle()).toEqual('INITIAL TITLE 2');
+    await expect(await viewPage1PO.view.viewTab.getTitle()).toEqual('INITIAL TITLE 1');
+    await expect(await viewPage2PO.view.viewTab.getTitle()).toEqual('INITIAL TITLE 2');
   });
 
   test('should set view properties upon initial view tab navigation', async ({appPO, microfrontendNavigator}) => {

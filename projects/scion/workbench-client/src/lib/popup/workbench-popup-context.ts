@@ -9,6 +9,7 @@
  */
 
 import {WorkbenchPopupCapability} from './workbench-popup-capability';
+import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
 
 /**
  * Information about the popup embedding a microfrontend.
@@ -23,6 +24,7 @@ export interface ɵPopupContext {
   params: Map<string, any>;
   capability: WorkbenchPopupCapability;
   closeOnFocusLost: boolean;
+  referrer: WorkbenchPopupReferrer;
 }
 
 /**

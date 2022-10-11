@@ -158,7 +158,7 @@ test.describe('Workbench View', () => {
   test('should allow updating the viewtab title', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO = viewPagePO.viewTabPO;
+    const viewTabPO = viewPagePO.view.viewTab;
 
     await viewPagePO.enterTitle('UPDATED TITLE');
     await expect(await viewTabPO.getTitle()).toEqual('UPDATED TITLE');
@@ -170,7 +170,7 @@ test.describe('Workbench View', () => {
   test('should allow updating the viewtab heading', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO = viewPagePO.viewTabPO;
+    const viewTabPO = viewPagePO.view.viewTab;
 
     await viewPagePO.enterHeading('UPDATED HEADING');
     await expect(await viewTabPO.getHeading()).toEqual('UPDATED HEADING');
@@ -182,7 +182,7 @@ test.describe('Workbench View', () => {
   test('should allow updating the viewtab dirty state', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO = viewPagePO.viewTabPO;
+    const viewTabPO = viewPagePO.view.viewTab;
 
     await viewPagePO.markDirty(true);
     await expect(await viewTabPO.isDirty()).toBe(true);
@@ -197,7 +197,7 @@ test.describe('Workbench View', () => {
   test('should allow updating the viewtab closable flag', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO = viewPagePO.viewTabPO;
+    const viewTabPO = viewPagePO.view.viewTab;
 
     await viewPagePO.checkClosable(true);
     await expect(await viewTabPO.isClosable()).toBe(true);
@@ -209,7 +209,7 @@ test.describe('Workbench View', () => {
   test('should allow closing the view', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO = viewPagePO.viewTabPO;
+    const viewTabPO = viewPagePO.view.viewTab;
 
     await waitUntilAttached(viewPagePO.locator);
     await expect(await viewTabPO.isPresent()).toBe(true);
@@ -231,7 +231,7 @@ test.describe('Workbench View', () => {
     await registerIntentionPagePO.registerIntention({type: 'messagebox'});
 
     const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO = viewPagePO.viewTabPO;
+    const viewTabPO = viewPagePO.view.viewTab;
 
     // prevent the view from closing
     await viewPagePO.checkConfirmClosing(true);
@@ -272,17 +272,17 @@ test.describe('Workbench View', () => {
 
     // open test view 1
     const viewPagePO1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO1 = viewPagePO1.viewTabPO;
+    const viewTabPO1 = viewPagePO1.view.viewTab;
     await viewPagePO1.checkConfirmClosing(true); // prevent the view from closing
 
     // open test view 2
     const viewPagePO2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO2 = viewPagePO2.viewTabPO;
+    const viewTabPO2 = viewPagePO2.view.viewTab;
     await viewPagePO2.checkConfirmClosing(true); // prevent the view from closing
 
     // open test view 3
     const viewPagePO3 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO3 = viewPagePO3.viewTabPO;
+    const viewTabPO3 = viewPagePO3.view.viewTab;
     await viewPagePO3.checkConfirmClosing(true); // prevent the view from closing
 
     // open context menu of viewtab 3
@@ -332,7 +332,7 @@ test.describe('Workbench View', () => {
 
     // open test view 1
     const viewPagePO1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO1 = viewPagePO1.viewTabPO;
+    const viewTabPO1 = viewPagePO1.view.viewTab;
     await waitUntilAttached(viewPagePO1.locator);
 
     // expect view 1 to be present and active
@@ -342,7 +342,7 @@ test.describe('Workbench View', () => {
 
     // open test view 2
     const viewPagePO2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO2 = viewPagePO2.viewTabPO;
+    const viewTabPO2 = viewPagePO2.view.viewTab;
     await waitUntilAttached(viewPagePO2.locator);
 
     // expect view 1 not to be displayed and its viewtab being inactive
@@ -374,7 +374,7 @@ test.describe('Workbench View', () => {
 
     // open test view 1
     const viewPagePO1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO1 = viewPagePO1.viewTabPO;
+    const viewTabPO1 = viewPagePO1.view.viewTab;
     const activeViewSize = await viewPagePO1.getSize();
 
     // expect view 1 to be present and active
@@ -384,7 +384,7 @@ test.describe('Workbench View', () => {
 
     // open test view 2
     const viewPagePO2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO2 = viewPagePO2.viewTabPO;
+    const viewTabPO2 = viewPagePO2.view.viewTab;
     const inactiveViewSize = await viewPagePO1.getSize();
 
     // expect view 1 not to be displayed and its viewtab to be inactive
@@ -411,12 +411,12 @@ test.describe('Workbench View', () => {
 
     // open test view 1
     const viewPagePO1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO1 = viewPagePO1.viewTabPO;
+    const viewTabPO1 = viewPagePO1.view.viewTab;
     await viewPagePO1.checkConfirmClosing(true); // prevent the view from closing
 
     // open test view 2
     const viewPagePO2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewTabPO2 = viewPagePO2.viewTabPO;
+    const viewTabPO2 = viewPagePO2.view.viewTab;
     await viewPagePO2.checkConfirmClosing(true); // prevent the view from closing
 
     // switch to view 1, should not ask for confirmation
@@ -615,7 +615,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.selectTarget('self');
     await routerPagePO.clickNavigate();
 
-    await testeeViewPagePO.viewTabPO.click();
+    await testeeViewPagePO.view.viewTab.click();
     await expect(await testeeViewPagePO.getViewCapability()).toEqual(expect.objectContaining({
       qualifier: {component: 'testee-2'},
       type: 'view',
@@ -632,7 +632,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.clickNavigate();
 
-    await testeeViewPagePO.viewTabPO.click();
+    await testeeViewPagePO.view.viewTab.click();
     await expect(await testeeViewPagePO.getViewCapability()).toEqual(expect.objectContaining({
       qualifier: {component: 'testee-3'},
       type: 'view',
@@ -829,7 +829,7 @@ test.describe('Workbench View', () => {
       await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+k' in view 2
-      await viewPage2PO.viewTabPO.click();
+      await viewPage2PO.view.viewTab.click();
       await viewPage2PO.sendKeys('Control+K');
 
       await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
@@ -847,7 +847,7 @@ test.describe('Workbench View', () => {
       await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+shift+k' in view 2
-      await viewPage2PO.viewTabPO.click();
+      await viewPage2PO.view.viewTab.click();
       await viewPage2PO.sendKeys('Control+Shift+K');
 
       await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
@@ -865,7 +865,7 @@ test.describe('Workbench View', () => {
       await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+shift+alt+k' in view 2
-      await viewPage2PO.viewTabPO.click();
+      await viewPage2PO.view.viewTab.click();
       await viewPage2PO.sendKeys('Control+Shift+Alt+K');
 
       await expect(await appPO.activePart.getViewIds()).toHaveLength(0);

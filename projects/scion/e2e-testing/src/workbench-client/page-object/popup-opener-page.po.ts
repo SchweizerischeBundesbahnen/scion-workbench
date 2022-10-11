@@ -18,6 +18,7 @@ import {SciAccordionPO} from '../../components.internal/accordion.po';
 import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
+import {SciRouterOutletPO} from './sci-router-outlet.po';
 
 /**
  * Page object to interact {@link PopupOpenerPageComponent}.
@@ -27,9 +28,11 @@ export class PopupOpenerPagePO {
   private readonly _locator: Locator;
 
   public readonly view: ViewPO;
+  public readonly outlet: SciRouterOutletPO;
 
   constructor(private _appPO: AppPO, public viewId: string) {
     this.view = _appPO.view({viewId});
+    this.outlet = new SciRouterOutletPO(_appPO, viewId);
     this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-popup-opener-page');
   }
 
@@ -93,7 +96,7 @@ export class PopupOpenerPagePO {
     }
   }
 
-  public async enterContextualViewId(viewId: string | '<null>'| '<default>'): Promise<void> {
+  public async enterContextualViewId(viewId: string | '<null>' | '<default>'): Promise<void> {
     await this._locator.locator('input.e2e-contextual-view-id').fill(viewId);
   }
 
@@ -127,17 +130,18 @@ export class PopupOpenerPagePO {
     await accordionPO.collapse();
   }
 
-  public async clickOpen(): Promise<void> {
+  public async clickOpen(options?: {waitForPopup?: boolean}): Promise<void> {
     const expectedPopupIndex = await this._appPO.popupLocator().count();
 
     await this._locator.locator('button.e2e-open').click();
-
-    // Evaluate the response: resolve the promise on success, or reject it on error.
-    const errorLocator = this._locator.locator('output.e2e-popup-error');
-    return Promise.race([
-      this._appPO.popupLocator().nth(expectedPopupIndex).waitFor({state: 'visible'}),
-      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
-    ]);
+    if (options?.waitForPopup ?? true) {
+      // Evaluate the response: resolve the promise on success, or reject it on error.
+      const errorLocator = this._locator.locator('output.e2e-popup-error');
+      await Promise.race([
+        this._appPO.popupLocator().nth(expectedPopupIndex).waitFor({state: 'visible'}),
+        errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+      ]);
+    }
   }
 
   public async getPopupCloseAction(): Promise<PopupCloseAction> {

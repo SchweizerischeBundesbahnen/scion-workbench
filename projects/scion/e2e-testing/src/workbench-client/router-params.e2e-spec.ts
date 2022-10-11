@@ -208,7 +208,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterSelfViewId(testeeViewPagePO.viewId);
     await routerPagePO.clickNavigate();
 
-    await testeeViewPagePO.viewTabPO.click();
+    await testeeViewPagePO.view.viewTab.click();
 
     // expect the view's params to be updated
     await expect(await testeeViewPagePO.getViewParams()).toEqual(

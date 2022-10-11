@@ -11,7 +11,6 @@
 import {fromRect, isPresent} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {Params} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../components.internal/accordion.po';
@@ -20,6 +19,7 @@ import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
+import {SciRouterOutletPO} from './sci-router-outlet.po';
 
 /**
  * Page object to interact {@link ViewPageComponent} of workbench-client testing app.
@@ -28,21 +28,21 @@ export class ViewPagePO {
 
   public readonly locator: Locator;
 
-  public readonly viewPO: ViewPO;
-  public readonly viewTabPO: ViewTabPO;
+  public readonly view: ViewPO;
+  public readonly outlet: SciRouterOutletPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewPO = appPO.view({viewId});
-    this.viewTabPO = this.viewPO.viewTab;
+    this.view = appPO.view({viewId});
+    this.outlet = new SciRouterOutletPO(appPO, viewId);
     this.locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-view-page');
   }
 
   public async isPresent(): Promise<boolean> {
-    return await this.viewTabPO.isPresent() && await isPresent(this.locator);
+    return await this.view.viewTab.isPresent() && await isPresent(this.locator);
   }
 
   public async isVisible(): Promise<boolean> {
-    return await this.viewPO.isVisible() && await this.locator.isVisible();
+    return await this.view.isVisible() && await this.locator.isVisible();
   }
 
   public async getViewId(): Promise<string> {

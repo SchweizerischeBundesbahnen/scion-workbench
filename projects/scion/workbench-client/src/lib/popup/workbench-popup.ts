@@ -13,6 +13,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {MessageClient} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {ɵPopupContext} from './workbench-popup-context';
+import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
 
 /**
  * A popup is a visual workbench component for displaying content above other content.
@@ -44,6 +45,11 @@ export abstract class WorkbenchPopup {
   public abstract readonly capability: WorkbenchPopupCapability;
 
   /**
+   * Provides information about the context in which this popup was opened.
+   */
+  public abstract readonly referrer: WorkbenchPopupReferrer;
+
+  /**
    * Parameters including qualifier entries as passed for navigation by the popup opener.
    */
   public abstract readonly params: Map<string, any>;
@@ -66,10 +72,12 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
 
   public params: Map<string, any>;
   public capability: WorkbenchPopupCapability;
+  public referrer: WorkbenchPopupReferrer;
 
   constructor(private _context: ɵPopupContext) {
     this.capability = this._context.capability;
     this.params = coerceMap(this._context.params);
+    this.referrer = this._context.referrer;
 
     // In order to close the popup on focus loss, microfrontend content must gain the focus first.
     if (this._context.closeOnFocusLost) {
