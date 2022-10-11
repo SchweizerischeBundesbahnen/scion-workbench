@@ -103,3 +103,15 @@ export function coerceArray<T>(value: T | T[] | undefined | null): T[] {
   }
   return Array.isArray(value) ? value : [value];
 }
+
+/**
+ * Returns a new {@link Record} with `undefined` and `<undefined>` values removed.
+ */
+export function withoutUndefinedEntries<T>(object: Record<string, T>): Record<string, T> {
+  return Object.entries(object).reduce((acc, [key, value]) => {
+    if (value !== undefined && (value as unknown) !== '<undefined>') {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as Record<string, T>);
+}

@@ -13,9 +13,9 @@ import {ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPosi
 import {combineLatestWith, firstValueFrom, from, fromEvent, MonoTypeOperatorFunction, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map, shareReplay, startWith, takeUntil} from 'rxjs/operators';
 import {ComponentPortal} from '@angular/cdk/portal';
-import {Popup, PopupConfig, ɵPopup, ɵPopupError} from './popup.config';
+import {Popup, PopupConfig, PopupReferrer, ɵPopup, ɵPopupError} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
-import {Arrays, Objects, Observables} from '@scion/toolkit/util';
+import {Arrays, Dictionaries, Objects, Observables} from '@scion/toolkit/util';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {fromBoundingClientRect$, fromDimension$} from '@scion/toolkit/observable';
@@ -84,6 +84,9 @@ export class PopupService {
 
     const align = config.align || 'north';
     const popupOrigin$ = this.observePopupOrigin$(config).pipe(shareReplay({bufferSize: 1, refCount: false}));
+    const referrer: PopupReferrer = Dictionaries.withoutUndefinedEntries({
+      viewId: this.resolveContextualView(config)?.viewId,
+    });
 
     // Set up the popup positioning strategy.
     const overlayPositionStrategy = this._overlay.position()
@@ -120,7 +123,7 @@ export class PopupService {
 
     // Construct the popup component and attach it to the DOM.
     const overlayRef = this._overlay.create(overlayConfig);
-    const popupHandle = new ɵPopup(config.input, config.size);
+    const popupHandle = new ɵPopup(config.input, config.size, referrer);
     const popupPortal = new ComponentPortal(PopupComponent, null, Injector.create({
       parent: config.componentConstructOptions?.injector || this._injector,
       providers: [

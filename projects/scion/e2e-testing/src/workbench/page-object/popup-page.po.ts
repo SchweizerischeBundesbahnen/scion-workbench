@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, isPresent} from '../../helper/testing.util';
+import {fromRect, isPresent, withoutUndefinedEntries} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {PopupPO} from '../../popup.po';
-import {PopupSize} from '@scion/workbench';
+import {PopupReferrer, PopupSize} from '@scion/workbench';
 import {SciAccordionPO} from '../../components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 
@@ -67,7 +67,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-return-value'));
     await accordionPO.expand();
     try {
-      await this._locator.locator('input.e2e-return-value').fill(returnValue);
+      await accordionPO.locator('input.e2e-return-value').fill(returnValue);
     }
     finally {
       await accordionPO.collapse();
@@ -78,11 +78,24 @@ export class PopupPagePO {
     return this._locator.locator('output.e2e-input').innerText();
   }
 
+  public async getReferrer(): Promise<PopupReferrer> {
+    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-referrer'));
+    await accordionPO.expand();
+    try {
+      return withoutUndefinedEntries({
+        viewId: await accordionPO.locator('output.e2e-view-id').innerText(),
+      });
+    }
+    finally {
+      await accordionPO.collapse();
+    }
+  }
+
   public async getPreferredOverlaySize(): Promise<PopupSize> {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-preferred-overlay-size'));
     await accordionPO.expand();
     try {
-      return JSON.parse(await this._locator.locator('div.e2e-preferred-overlay-size').innerText());
+      return JSON.parse(await accordionPO.locator('div.e2e-preferred-overlay-size').innerText());
     }
     finally {
       await accordionPO.collapse();

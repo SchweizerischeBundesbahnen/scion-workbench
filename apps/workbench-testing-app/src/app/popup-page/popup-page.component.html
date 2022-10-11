@@ -53,6 +53,17 @@
     </ng-template>
   </sci-accordion>
 
+  <sci-accordion class="e2e-referrer" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_referrer">
+      <header>Referrer</header>
+    </ng-template>
+    <ng-template #panel_referrer>
+      <sci-form-field label="View ID">
+        <output class="e2e-view-id" [value]="popup.referrer.viewId ?? '<undefined>'"></output>
+      </sci-form-field>
+    </ng-template>
+  </sci-accordion>
+
   <sci-accordion class="return-value e2e-return-value" variant="solid">
     <ng-template sciAccordionItem [panel]="panel_return_value">
       <header>Return Value</header>

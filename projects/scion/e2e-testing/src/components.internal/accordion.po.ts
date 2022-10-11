@@ -36,4 +36,8 @@ export class SciAccordionPO {
     }
     return this._sciAccordionLocator.locator(`section.e2e-accordion-item.${itemCssClass}`);
   }
+
+  public locator(selector: string): Locator {
+    return this._sciAccordionLocator.locator(selector);
+  }
 }
