@@ -10,7 +10,7 @@
 
 import {Injectable, StaticProvider} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchPopup, WorkbenchPopupCapability, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchPopup, WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
 import {WbRouterOutletComponent} from '../../routing/wb-router-outlet.component';
 import {ROUTER_OUTLET_NAME} from '../../workbench.constants';
@@ -25,6 +25,8 @@ import {Maps} from '@scion/toolkit/util';
 import {PopupService} from '../../popup/popup.service';
 import {Popup} from '../../popup/popup.config';
 import {PopupOrigin} from '../../popup/popup.origin';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 
 /**
  * Handles microfrontend popup intents, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
@@ -37,6 +39,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
   private _openedPopups = new Set<string>();
 
   constructor(private _popupService: PopupService,
+              private _viewRegistry: WorkbenchViewRegistry,
               private _router: Router,
               private _logger: Logger) {
   }
@@ -96,7 +99,9 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
       capability: capability,
       params: params,
       closeOnFocusLost: command.closeStrategy?.onFocusLost ?? true,
+      referrer: this.getReferrer(command),
     };
+
     return this._popupService.open({
       component: MicrofrontendPopupComponent,
       input: popupContext,
@@ -134,7 +139,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
       componentConstructOptions: {
         providers: [
           {provide: ROUTER_OUTLET_NAME, useValue: popupOutletName},
-          provideWorkbenchPopup(capability, params),
+          provideHostWorkbenchPopupHandle(capability, params, this.getReferrer(command)),
         ],
       },
       anchor: this.observePopupOrigin$(command),
@@ -164,12 +169,31 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
     return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'merge'});
   }
+
+  /**
+   * Returns information about the context in which a popup was opened.
+   */
+  private getReferrer(command: ɵWorkbenchPopupCommand): WorkbenchPopupReferrer {
+    if (!command.context?.viewId) {
+      return {};
+    }
+
+    const view = this._viewRegistry.getElseThrow(command.context.viewId);
+    if (!MicrofrontendViewRoutes.isMicrofrontendRoute(view.urlSegments)) {
+      return {viewId: view.viewId};
+    }
+
+    return {
+      viewId: view.viewId,
+      viewCapabilityId: MicrofrontendViewRoutes.parseParams(view.urlSegments).viewCapabilityId,
+    };
+  }
 }
 
 /**
  * Provides the {@link WorkbenchPopup} handle for interacting with the popup in a routed component of the host app.
  */
-function provideWorkbenchPopup(capability: WorkbenchPopupCapability, params: Map<string, any>): StaticProvider {
+function provideHostWorkbenchPopupHandle(capability: WorkbenchPopupCapability, params: Map<string, any>, referrer: WorkbenchPopupReferrer): StaticProvider {
   return {
     provide: WorkbenchPopup,
     deps: [Popup],
@@ -177,6 +201,7 @@ function provideWorkbenchPopup(capability: WorkbenchPopupCapability, params: Map
       return new class implements WorkbenchPopup {
         public readonly capability = capability;
         public readonly params = params;
+        public readonly referrer = referrer;
 
         public close<R = any>(result?: R | undefined): void {
           popup.close(result);

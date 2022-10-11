@@ -16,19 +16,26 @@ import {coerceArray} from './testing.util';
 export namespace ElementSelectors {
 
   /**
-   * Returns the selector for the <iframe> contained within the <sci-router-outlet> element with the given name or that has set the given CSS class(es).
+   * Selects the <sci-router-outlet> element with the given name or that has set the given CSS class(es).
    */
-  export function routerOutletFrame(outletNameOrSelector: string | RouterOutletSelector): string {
+  export function routerOutlet(outletNameOrSelector: string | RouterOutletSelector): string {
     if (typeof outletNameOrSelector === 'string') {
-      return `sci-router-outlet[name="${outletNameOrSelector}"] iframe`;
+      return `sci-router-outlet[name="${outletNameOrSelector}"]`;
     }
     if (outletNameOrSelector.outletName) {
-      return `sci-router-outlet[name="${outletNameOrSelector.outletName}"] iframe`;
+      return `sci-router-outlet[name="${outletNameOrSelector.outletName}"]`;
     }
     if (outletNameOrSelector.cssClass) {
-      return `sci-router-outlet.${coerceArray(outletNameOrSelector.cssClass).join('.')} iframe`;
+      return `sci-router-outlet.${coerceArray(outletNameOrSelector.cssClass).join('.')}`;
     }
     throw Error('[RouterOutletSelectorError] Missing required outlet name or CSS class');
+  }
+
+  /**
+   * Selects the iframe of the <sci-router-outlet> element with the given name or that has set the given CSS class(es).
+   */
+  export function routerOutletFrame(outletNameOrSelector: string | RouterOutletSelector): string {
+    return `${routerOutlet(outletNameOrSelector)} iframe`;
   }
 }
 

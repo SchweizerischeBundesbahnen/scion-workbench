@@ -22,22 +22,28 @@ export namespace MicrofrontendViewRoutes {
    */
   export const ROUTE_PREFIX = '~';
 
+  export function isMicrofrontendRoute(route: ActivatedRouteSnapshot | UrlSegment[]): boolean {
+    const segments = Array.isArray(route) ? route : route.url;
+    return segments.length === 2 && segments[0].path === ROUTE_PREFIX;
+  }
+
   /**
    * Parses the params of a given microfrontend route. Throws if not a valid microfrontend route.
    *
    * Note that transient parameters are not part of the URL segments and are only returned if passing a {@link ActivatedRouteSnapshot} object.
    */
   export function parseParams(route: ActivatedRouteSnapshot | UrlSegment[]): MicrofrontendRouteParams {
-    const segments = Array.isArray(route) ? route : route.url;
-    if (segments.length === 2 && segments[0].path === ROUTE_PREFIX) {
-      return {
-        viewCapabilityId: segments[1].path,
-        qualifier: segments[0].parameters,
-        urlParams: segments[1].parameters,
-        transientParams: Array.isArray(route) ? {} : route.data[WorkbenchRouteData.state]?.[MicrofrontendNavigationalStates.transientParams] || {},
-      };
+    if (!isMicrofrontendRoute(route)) {
+      throw Error(`[NullMicrofrontendRouteError] Given URL segments do not match a microfrontend route. [segments=${route.toString()}]`);
     }
-    throw Error(`[NullMicrofrontendRouteError] Given URL segments do not match a microfrontend route. [segments=${segments.toString()}]`);
+
+    const segments = Array.isArray(route) ? route : route.url;
+    return {
+      viewCapabilityId: segments[1].path,
+      qualifier: segments[0].parameters,
+      urlParams: segments[1].parameters,
+      transientParams: Array.isArray(route) ? {} : route.data[WorkbenchRouteData.state]?.[MicrofrontendNavigationalStates.transientParams] || {},
+    };
   }
 
   /**

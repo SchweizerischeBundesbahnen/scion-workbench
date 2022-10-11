@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect} from '../../helper/testing.util';
+import {fromRect, withoutUndefinedEntries} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {PopupPO} from '../../popup.po';
 import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
-import {WorkbenchPopupCapability} from '@scion/workbench-client';
+import {WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../components.internal/accordion.po';
 import {SciPropertyPO} from '../../components.internal/property.po';
 import {ElementSelectors} from '../../helper/element-selectors';
@@ -41,7 +41,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-capability'));
     await accordionPO.expand();
     try {
-      return JSON.parse(await this._locator.locator('div.e2e-popup-capability').innerText());
+      return JSON.parse(await accordionPO.locator('div.e2e-popup-capability').innerText());
     }
     finally {
       await accordionPO.collapse();
@@ -52,7 +52,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(this._locator.locator('sci-property.e2e-popup-params')).readProperties();
+      return await new SciPropertyPO(accordionPO.locator('sci-property.e2e-popup-params')).readProperties();
     }
     finally {
       await accordionPO.collapse();
@@ -63,7 +63,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(this._locator.locator('sci-property.e2e-route-params')).readProperties();
+      return await new SciPropertyPO(accordionPO.locator('sci-property.e2e-route-params')).readProperties();
     }
     finally {
       await accordionPO.collapse();
@@ -74,7 +74,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-query-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(this._locator.locator('sci-property.e2e-route-query-params')).readProperties();
+      return await new SciPropertyPO(accordionPO.locator('sci-property.e2e-route-query-params')).readProperties();
     }
     finally {
       await accordionPO.collapse();
@@ -85,7 +85,21 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-fragment'));
     await accordionPO.expand();
     try {
-      return this._locator.locator('span.e2e-route-fragment').innerText();
+      return accordionPO.locator('span.e2e-route-fragment').innerText();
+    }
+    finally {
+      await accordionPO.collapse();
+    }
+  }
+
+  public async getReferrer(): Promise<WorkbenchPopupReferrer> {
+    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-referrer'));
+    await accordionPO.expand();
+    try {
+      return withoutUndefinedEntries({
+        viewId: await accordionPO.locator('output.e2e-view-id').innerText(),
+        viewCapabilityId: await accordionPO.locator('output.e2e-view-capability-id').innerText(),
+      });
     }
     finally {
       await accordionPO.collapse();
@@ -105,7 +119,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-return-value'));
     await accordionPO.expand();
     try {
-      await this._locator.locator('input.e2e-return-value').fill(returnValue);
+      await accordionPO.locator('input.e2e-return-value').fill(returnValue);
     }
     finally {
       await accordionPO.collapse();

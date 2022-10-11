@@ -23,6 +23,7 @@ export {WorkbenchPopupService} from './lib/popup/workbench-popup-service';
 export {WorkbenchPopup, ɵWorkbenchPopupMessageHeaders} from './lib/popup/workbench-popup';
 export {WorkbenchPopupCapability, PopupSize} from './lib/popup/workbench-popup-capability';
 export {WorkbenchPopupConfig, CloseStrategy} from './lib/popup/workbench-popup.config';
+export {WorkbenchPopupReferrer} from './lib/popup/workbench-popup-referrer';
 export {Point, TopLeftPoint, TopRightPoint, BottomLeftPoint, BottomRightPoint, PopupOrigin} from './lib/popup/popup.origin';
 export {ɵPopupContext, ɵPOPUP_CONTEXT} from './lib/popup/workbench-popup-context';
 export {WorkbenchMessageBoxCapability} from './lib/message-box/workbench-message-box-capability';
