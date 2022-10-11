@@ -12,9 +12,8 @@ import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core
 import {Subject} from 'rxjs';
 import {filter, takeUntil} from 'rxjs/operators';
 import {Application, ManifestService, MessageClient, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
-import {Arrays} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
-import {ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
+import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {Popup} from '../../popup/popup.config';
 
 /**
@@ -31,7 +30,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   private _focusWithin$ = new Subject<boolean>();
   private _popupContext: ɵPopupContext;
 
-  public microfrontendCssClasses!: string[];
+  public popupCapability: WorkbenchPopupCapability;
 
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
@@ -42,6 +41,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
               private _messageClient: MessageClient,
               private _logger: Logger) {
     this._popupContext = this._popup.input!;
+    this.popupCapability = this._popupContext.capability;
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
   }
 
@@ -50,19 +50,18 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   private async onInit(): Promise<void> {
-    const popupCapability = this._popupContext.capability;
 
     // Obtain the capability provider.
-    const application = this.lookupApplication(popupCapability.metadata!.appSymbolicName);
+    const application = this.lookupApplication(this.popupCapability.metadata!.appSymbolicName);
     if (!application) {
-      this._popup.closeWithError(`[NullApplicationError] Unexpected. Cannot resolve application '${popupCapability.metadata!.appSymbolicName}'.`);
+      this._popup.closeWithError(`[NullApplicationError] Unexpected. Cannot resolve application '${this.popupCapability.metadata!.appSymbolicName}'.`);
       return;
     }
 
     // Obtain the microfrontend path.
-    const microfrontendPath = popupCapability.properties?.path;
+    const microfrontendPath = this.popupCapability.properties?.path;
     if (microfrontendPath === undefined || microfrontendPath === null) { // empty path is a valid path
-      this._popup.closeWithError(`[PopupProviderError] Popup capability has no path to the microfrontend defined: ${JSON.stringify(popupCapability)}`);
+      this._popup.closeWithError(`[PopupProviderError] Popup capability has no path to the microfrontend defined: ${JSON.stringify(this.popupCapability)}`);
       return;
     }
 
@@ -92,10 +91,9 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
     // Make the popup context available to embedded content.
     this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
-    this.microfrontendCssClasses = ['e2e-popup', `e2e-${popupCapability.metadata!.appSymbolicName}`, ...Arrays.coerce(popupCapability.properties.cssClass)];
 
     // Navigate to the microfrontend.
-    this._logger.debug(() => `Loading microfrontend into workbench popup [app=${popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, popupCapability);
+    this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
     await this._outletRouter.navigate(microfrontendPath, {
       outlet: this.popupId,
       relativeTo: application.baseUrl,
