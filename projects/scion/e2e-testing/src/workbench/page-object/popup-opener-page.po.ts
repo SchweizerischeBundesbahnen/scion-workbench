@@ -150,8 +150,6 @@ export class PopupOpenerPagePO {
     await this._locator.locator('button.e2e-open').click();
 
     if (options?.waitForPopup ?? true) {
-      // The popup is expected to be opened, but not necessarily in the active view.
-      // Therefore, we only wait for it to be attached to the DOM.
       const cssClasses = (await this._locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
       await this._appPO.popup({cssClass: cssClasses}).waitUntilAttached();
     }

@@ -181,6 +181,11 @@ export abstract class Popup<T = any> {
   public abstract readonly size: PopupSize | undefined;
 
   /**
+   * Provides information about the context in which this popup was opened.
+   */
+  public abstract readonly referrer: PopupReferrer;
+
+  /**
    * Closes the popup. Optionally, pass a result to the popup opener.
    */
   public abstract close<R = any>(result?: R | undefined): void;
@@ -200,7 +205,9 @@ export class ɵPopup implements Popup {
 
   public readonly whenClose = new Promise<any | undefined>(resolve => this._closeResolveFn = resolve);
 
-  constructor(public readonly input: any | undefined, public readonly size: PopupSize | undefined) {
+  constructor(public readonly input: any | undefined,
+              public readonly size: PopupSize | undefined,
+              public readonly referrer: PopupReferrer) {
   }
 
   /**
@@ -225,4 +232,14 @@ export class ɵPopupError {
 
   constructor(public error: string | Error) {
   }
+}
+
+/**
+ * Information about the context in which a popup was opened.
+ */
+export interface PopupReferrer {
+  /**
+   * Identity of the view if opened in the context of a view.
+   */
+  viewId?: string;
 }
