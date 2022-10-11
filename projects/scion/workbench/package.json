@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench",
-  "version": "14.0.0-beta.3",
+  "version": "14.0.0-beta.4",
   "description": "SCION Workbench provides a workbench layout for Angular applications useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel.",
   "license": "EPL-2.0",
   "private": false,

@@ -1,3 +1,19 @@
+# [14.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.3...14.0.0-beta.4) (2022-10-11)
+
+
+### Bug Fixes
+
+* **workbench/view:** display title/heading of a view as specified in the constructor of the view ([74db341](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/74db3416f3f10e669aa8660853551219e73484d7))
+
+
+### Features
+
+* **workbench/popup:** add 'referrer' to popup handle to provide information about the calling context ([edf6f53](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/edf6f53244508f77bc6b8db3e32607b5211c4ccd))
+* **workbench/popup:** associate `sci-router-outlet` with provider and capability identity ([71176b7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/71176b723b275056df4bc79b1489b6ebd61f0036))
+* **workbench/view:** associate `sci-router-outlet` with provider and capability identity ([47f0f96](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/47f0f96a1151f424df2f0775bdc6feca53932586))
+
+
+
 # [14.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.2...14.0.0-beta.3) (2022-10-10)
 
 
