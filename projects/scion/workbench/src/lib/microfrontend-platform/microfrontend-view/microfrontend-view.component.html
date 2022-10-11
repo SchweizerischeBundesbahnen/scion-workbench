@@ -1,7 +1,9 @@
 <wb-content-as-overlay [overlayHost]="iframeHost">
   <sci-router-outlet #router_outlet
                      [name]="viewId"
-                     [ngClass]="microfrontendCssClasses"
+                     [attr.data-capabilityid]="viewCapability && viewCapability.metadata!.id"
+                     [attr.data-app]="viewCapability && viewCapability.metadata!.appSymbolicName"
+                     [ngClass]="viewCssClasses" class="e2e-view"
                      [keystrokes]="keystrokesToBubble$ | async">
   </sci-router-outlet>
 </wb-content-as-overlay>

@@ -46,7 +46,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     'keydown.escape', // allows closing notifications
   ];
 
-  public microfrontendCssClasses!: string[];
+  public viewCapability: WorkbenchViewCapability | undefined;
   public iframeHost: Promise<ViewContainerRef>;
 
   @ViewChild('router_outlet', {static: true})
@@ -126,6 +126,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
 
     // Check if navigating to a new microfrontend.
     if (!prevViewCapability || prevViewCapability.metadata!.id !== viewCapability.metadata!.id) {
+      this.viewCapability = viewCapability;
       this.setViewProperties(viewCapability, activatedRoute);
       this.installParamsUpdater(viewCapability);
     }
@@ -209,7 +210,6 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
       .concat(Arrays.coerce(activatedRoute.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));
     this._view.closable = viewCapability.properties.closable ?? true;
     this._view.dirty = false;
-    this.microfrontendCssClasses = ['e2e-view', `e2e-${viewCapability.metadata!.appSymbolicName}`, ...this._view.cssClasses];
   }
 
   /**
@@ -224,6 +224,10 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    */
   public get viewId(): string {
     return this._view.viewId;
+  }
+
+  public get viewCssClasses(): string[] {
+    return this._view.cssClasses;
   }
 
   /**
