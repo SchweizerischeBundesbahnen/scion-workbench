@@ -29,6 +29,7 @@ import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {WorkbenchNavigationalStates} from '../../routing/workbench-navigational-states';
 import {MicrofrontendNavigationalStates} from '../routing/microfrontend-navigational-states';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../../routing/routing.constants';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -203,8 +204,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
   private setViewProperties(viewCapability: WorkbenchViewCapability, activatedRoute: ActivatedRouteSnapshot): void {
-    this._view.title = viewCapability.properties.title ?? null;
-    this._view.heading = viewCapability.properties.heading ?? null;
+    this._view.title = activatedRoute.params[WB_VIEW_TITLE_PARAM] ?? viewCapability.properties.title ?? null;
+    this._view.heading = activatedRoute.params[WB_VIEW_HEADING_PARAM] ?? viewCapability.properties.heading ?? null;
     this._view.cssClass = new Array<string>()
       .concat(Arrays.coerce(viewCapability.properties.cssClass))
       .concat(Arrays.coerce(activatedRoute.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));
