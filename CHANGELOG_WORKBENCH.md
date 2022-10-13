@@ -1,3 +1,17 @@
+# [14.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.4...14.0.0-beta.5) (2022-10-13)
+
+
+### Bug Fixes
+
+* **workbench-client/router:** set title/heading as passed to navigation ([f182859](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f18285912a900d33ca3f46837eefb03a58c6d241))
+
+
+### Features
+
+* **workbench-client/router:** support named parameters in title/heading of view capability ([98f4bbd](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/98f4bbd9396480aa18d1e4fb8f339c707d48043c))
+
+
+
 # [14.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.3...14.0.0-beta.4) (2022-10-11)
 
 
