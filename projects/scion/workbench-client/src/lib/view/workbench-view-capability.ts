@@ -31,9 +31,9 @@ export interface WorkbenchViewCapability extends Capability {
      * The path is relative to the base URL, as specified in the application manifest. If the
      * application does not declare a base URL, it is relative to the origin of the manifest file.
      *
-     * In the path, you can reference qualifier and parameter values in the form of named parameters.
-     * Named parameters begin with a colon (`:`) followed by the parameter or qualifier name, and are allowed in path segments, query parameters, matrix parameters
-     * and the fragment part. The workbench router will substitute named parameters in the URL accordingly.
+     * You can refer to qualifiers or parameters in the form of named parameters to be replaced during navigation.
+     * Named parameters begin with a colon (`:`) followed by the parameter name or qualifier key, and are allowed in path segments,
+     * query parameters, matrix parameters and the fragment part. Empty query and matrix params are removed, but not empty path params.
      *
      * In addition to using qualifier and parameter values as named parameters in the URL, params are available in the microfrontend via {@link WorkbenchView.params$} Observable.
      *
@@ -64,10 +64,16 @@ export interface WorkbenchViewCapability extends Capability {
     path: string;
     /**
      * Specifies the title to be displayed in the view tab.
+     *
+     * You can refer to qualifiers or parameters in the form of named parameters to be replaced during navigation.
+     * Named parameters begin with a colon (`:`) followed by the parameter name or qualifier key.
      */
     title?: string;
     /**
      * Specifies the sub title to be displayed in the view tab.
+     *
+     * You can refer to qualifiers or parameters in the form of named parameters to be replaced during navigation.
+     * Named parameters begin with a colon (`:`) followed by the parameter name or qualifier key.
      */
     heading?: string;
     /**

@@ -128,7 +128,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     // Check if navigating to a new microfrontend.
     if (!prevViewCapability || prevViewCapability.metadata!.id !== viewCapability.metadata!.id) {
       this.viewCapability = viewCapability;
-      this.setViewProperties(viewCapability, activatedRoute);
+      this.setViewProperties(viewCapability, activatedRoute, params);
       this.installParamsUpdater(viewCapability);
     }
 
@@ -203,9 +203,9 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
   /**
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
-  private setViewProperties(viewCapability: WorkbenchViewCapability, activatedRoute: ActivatedRouteSnapshot): void {
-    this._view.title = activatedRoute.params[WB_VIEW_TITLE_PARAM] ?? viewCapability.properties.title ?? null;
-    this._view.heading = activatedRoute.params[WB_VIEW_HEADING_PARAM] ?? viewCapability.properties.heading ?? null;
+  private setViewProperties(viewCapability: WorkbenchViewCapability, activatedRoute: ActivatedRouteSnapshot, params: Params): void {
+    this._view.title = activatedRoute.params[WB_VIEW_TITLE_PARAM] ?? substituteNamedParameters(viewCapability.properties.title, params) ?? null;
+    this._view.heading = activatedRoute.params[WB_VIEW_HEADING_PARAM] ?? substituteNamedParameters(viewCapability.properties.heading, params) ?? null;
     this._view.cssClass = new Array<string>()
       .concat(Arrays.coerce(viewCapability.properties.cssClass))
       .concat(Arrays.coerce(activatedRoute.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));
@@ -320,4 +320,11 @@ interface ActivatedMicrofrontendRouteSnapshot {
   activatedRoute: ActivatedRouteSnapshot;
   params: Params;
   viewCapability?: WorkbenchViewCapability;
+}
+
+/**
+ * Replaces named parameters with values of the contained {@link Params}.
+ */
+function substituteNamedParameters(value: string | null | undefined, params: Params): string | null {
+  return value?.replace(/:(\w+)/g, (match, paramName) => params[paramName] ?? match) || null;
 }
