@@ -1138,4 +1138,68 @@ test.describe('Workbench Router', () => {
     const testeeViewTab = appPO.view({cssClass: 'testee'}).viewTab;
     await expect(await testeeViewTab.getHeading()).toEqual('Param Heading');
   });
+
+  test('should substitute named parameter in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee microfrontend
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'testee'},
+      params: [
+        {name: 'title', required: false},
+        {name: 'heading', required: false},
+      ],
+      properties: {
+        path: 'microfrontend',
+        title: ':title',
+        heading: ':heading',
+        cssClass: 'testee',
+      },
+    });
+
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPagePO.enterQualifier({component: 'testee'});
+    await routerPagePO.enterParams({title: 'Title Param', heading: 'Heading Param'});
+    await routerPagePO.enterCssClass('testee');
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigate();
+
+    const testeeViewTab = appPO.view({cssClass: 'testee'}).viewTab;
+    await expect(await testeeViewTab.getTitle()).toEqual('Title Param');
+    await expect(await testeeViewTab.getHeading()).toEqual('Heading Param');
+  });
+
+  test('should substitute multiple named parameters in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee microfrontend
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'view',
+      qualifier: {component: 'testee'},
+      params: [
+        {name: 'param1', required: false},
+        {name: 'param2', required: false},
+      ],
+      properties: {
+        path: 'microfrontend',
+        title: ':param1/:param2/:param3 [component=:component]',
+        heading: ':param1 :param2 :param3 [component=:component]',
+        cssClass: 'testee',
+      },
+    });
+
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPagePO.enterQualifier({component: 'testee'});
+    await routerPagePO.enterParams({param1: 'value1', param2: 'value2'});
+    await routerPagePO.enterCssClass('testee');
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigate();
+
+    const testeeViewTab = appPO.view({cssClass: 'testee'}).viewTab;
+    await expect(await testeeViewTab.getTitle()).toEqual('value1/value2/:param3 [component=testee]');
+    await expect(await testeeViewTab.getHeading()).toEqual('value1 value2 :param3 [component=testee]');
+  });
 });
