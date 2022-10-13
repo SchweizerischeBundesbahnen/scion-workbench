@@ -1,3 +1,12 @@
+# [14.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.4...14.0.0-beta.5) (2022-10-13)
+
+
+### Bug Fixes
+
+* **workbench-client/router:** set title/heading as passed to navigation ([f182859](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f18285912a900d33ca3f46837eefb03a58c6d241))
+
+
+
 # [14.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.3...14.0.0-beta.4) (2022-10-11)
 
 
