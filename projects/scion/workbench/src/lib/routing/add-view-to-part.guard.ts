@@ -14,6 +14,8 @@ import {Observable} from 'rxjs';
 import {PARTS_LAYOUT_QUERY_PARAM, VIEW_TARGET} from '../workbench.constants';
 import {PartsLayout} from '../layout/parts-layout';
 import {ViewTarget, WorkbenchRouter} from '../routing/workbench-router.service';
+import {RouterUtils} from './router.util';
+import {WorkbenchRouteData} from './workbench-route-data';
 
 /**
  * Guard for adding a view to a part.
@@ -57,7 +59,8 @@ export class WbAddViewToPartGuard implements CanActivate {
   }
 
   private getPreferredPartId(route: ActivatedRouteSnapshot, partsLayout: PartsLayout): string | null {
-    const preferredPartId = route.data['part'];
+    const actualRouteSnapshot = RouterUtils.resolveActualRouteSnapshot(route);
+    const preferredPartId = RouterUtils.lookupRouteData<string>(actualRouteSnapshot, WorkbenchRouteData.part);
     if (!preferredPartId) {
       return null;
     }

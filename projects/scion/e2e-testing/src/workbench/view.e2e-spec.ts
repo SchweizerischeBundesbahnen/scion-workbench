@@ -69,7 +69,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.enterPath('test-router');
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(viewId);
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     // Expect the view to be pristine
     await expect(await viewTabPO.isDirty()).toBe(false);
@@ -92,7 +92,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(viewId);
     await routerPagePO.enterMatrixParams({matrixParam: 'value'});
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     // Expect the view to still be dirty
     await expect(await viewTabPO.isDirty()).toBe(true);
@@ -119,7 +119,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(viewId);
     await routerPagePO.enterMatrixParams({matrixParam: 'value'});
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     // Expect the title has not changed
     await expect(await viewTabPO.getTitle()).toEqual('TITLE');
@@ -145,7 +145,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(viewId);
     await routerPagePO.enterMatrixParams({matrixParam: 'value'});
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     // Expect the heading has not changed
     await expect(await viewTabPO.getHeading()).toEqual('HEADING');

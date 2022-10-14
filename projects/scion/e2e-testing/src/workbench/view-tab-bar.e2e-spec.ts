@@ -55,7 +55,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterCssClass('e2e-test-view-1');
     await routerPagePO.checkActivateIfPresent(false);
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-1'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
@@ -66,7 +66,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterCssClass('e2e-test-view-2');
     await routerPagePO.checkActivateIfPresent(false);
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
@@ -77,7 +77,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterCssClass('e2e-test-view-3');
     await routerPagePO.checkActivateIfPresent(false);
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(4);
@@ -118,7 +118,7 @@ test.describe('View Tabbar', () => {
     // open view.2
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.2']);
@@ -127,7 +127,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.3', 'view.2']);
@@ -136,7 +136,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
@@ -153,7 +153,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex('end');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.2']);
@@ -163,7 +163,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex('end');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.2', 'view.3']);
@@ -173,7 +173,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex('end');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
@@ -190,7 +190,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex('start');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.2', 'view.1']);
@@ -200,7 +200,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex('start');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.3', 'view.2', 'view.1']);
@@ -210,7 +210,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex('start');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.4', 'view.3', 'view.2', 'view.1']);
@@ -227,7 +227,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex(1);
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.2']);
@@ -237,7 +237,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex(1);
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.3', 'view.2']);
@@ -247,7 +247,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.enterPath('test-view');
     await routerPagePO.selectTarget('blank');
     await routerPagePO.enterInsertionIndex(1);
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);

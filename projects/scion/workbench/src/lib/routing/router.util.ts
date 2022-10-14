@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {PRIMARY_OUTLET, Router, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
+import {ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
 
 export namespace RouterUtils {
 
@@ -53,5 +53,23 @@ export namespace RouterUtils {
       throw Error(`[RouteMatchError] Cannot match any route for '${path}'.`);
     }
     return segmentGroup.segments;
+  }
+
+  /**
+   * Resolves to the actual {@link ActivatedRouteSnapshot} loaded into a router outlet.
+   *
+   * The route that is reported as the activated route of an outlet, or the route that is passed to a guard
+   * or resolver, is not always the route that is actually loaded into the outlet, for example, if the route
+   * is a child of a component-less route.
+   */
+  export function resolveActualRouteSnapshot(route: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
+    return route.firstChild ? resolveActualRouteSnapshot(route.firstChild) : route;
+  }
+
+  /**
+   * Looks for requested data on given route, or its parent route(s) if not declared.
+   */
+  export function lookupRouteData<T>(activatedRoute: ActivatedRouteSnapshot, dataKey: string): T | undefined {
+    return activatedRoute.pathFromRoot.reduceRight((resolvedData, route) => resolvedData ?? route.data[dataKey], undefined);
   }
 }

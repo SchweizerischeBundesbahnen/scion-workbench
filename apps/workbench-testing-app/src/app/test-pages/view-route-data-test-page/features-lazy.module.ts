@@ -8,15 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {featureRoutes} from './feature-routes';
 
-/**
- * Component that does not display anything. Can be used in end-to-end tests, e.g., as a popup component.
- */
-@Component({
-  selector: 'app-empty',
-  template: 'EmptyComponent',
-  standalone: true,
+@NgModule({
+  imports: [RouterModule.forChild(featureRoutes)],
 })
-export class EmptyComponent {
+export class FeaturesLazyModule {
 }

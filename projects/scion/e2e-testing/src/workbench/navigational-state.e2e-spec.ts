@@ -22,7 +22,7 @@ test.describe('Navigational State', () => {
       // navigate to the test view
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath('test-view');
-      await routerPagePO.clickNavigateViaRouter();
+      await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data emitted undefined as state
       const testeeViewId = await appPO.activePart.activeView.getViewId();
@@ -38,7 +38,7 @@ test.describe('Navigational State', () => {
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath('test-view');
       await routerPagePO.enterNavigationalState({'some': 'state'});
-      await routerPagePO.clickNavigateViaRouter();
+      await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data emitted the passed state
       const testeeViewId = await appPO.activePart.activeView.getViewId();
@@ -54,7 +54,7 @@ test.describe('Navigational State', () => {
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath('test-view');
       await routerPagePO.enterNavigationalState({'some': 'state'});
-      await routerPagePO.clickNavigateViaRouter();
+      await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data emitted the passed state
       const testeeViewId = await appPO.activePart.activeView.getViewId();
@@ -78,7 +78,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.enterPath('test-view');
       await routerPagePO.selectTarget('blank');
       await routerPagePO.enterMatrixParams({'param': 'value 1'});
-      await routerPagePO.clickNavigateViaRouter();
+      await routerPagePO.clickNavigate();
 
       const testeeViewId = await appPO.activePart.activeView.getViewId();
 
@@ -92,7 +92,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.enterMatrixParams({'param': 'value 2'});
       await routerPagePO.selectTarget('self');
       await routerPagePO.enterSelfViewId(testeeViewId);
-      await routerPagePO.clickNavigateViaRouter();
+      await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data not to emit
       await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([]);

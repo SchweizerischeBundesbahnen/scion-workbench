@@ -24,6 +24,7 @@ import {PopupService} from '../popup/popup.service';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {WorkbenchNavigationalStates} from '../routing/workbench-navigational-states';
+import {RouterUtils} from '../routing/router.util';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -112,14 +113,23 @@ export class ViewComponent implements OnDestroy {
   }
 
   public onActivateRoute(route: ActivatedRoute): void {
-    const params = route.snapshot.params;
-    const data = route.snapshot.data;
+    const actualRouteSnapshot = RouterUtils.resolveActualRouteSnapshot(route.snapshot);
 
-    this._view.title = this._view.title ?? params[WB_VIEW_TITLE_PARAM] ?? data[WB_VIEW_TITLE_PARAM] ?? data[WorkbenchRouteData.title] ?? null;
-    this._view.heading = this._view.heading ?? params[WB_VIEW_HEADING_PARAM] ?? data[WB_VIEW_HEADING_PARAM] ?? data[WorkbenchRouteData.heading] ?? null;
+    this._view.title ??= (
+      route.snapshot.params[WB_VIEW_TITLE_PARAM] ??
+      RouterUtils.lookupRouteData(actualRouteSnapshot, WB_VIEW_TITLE_PARAM) ??
+      RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.title) ??
+      null);
+
+    this._view.heading ??= (
+      route.snapshot.params[WB_VIEW_HEADING_PARAM] ??
+      RouterUtils.lookupRouteData(actualRouteSnapshot, WB_VIEW_HEADING_PARAM) ??
+      RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.heading) ??
+      null);
+
     this._view.cssClass = new Array<string>()
-      .concat(Arrays.coerce(data[WorkbenchRouteData.cssClass]))
-      .concat(Arrays.coerce(data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));
+      .concat(Arrays.coerce(RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.cssClass)))
+      .concat(Arrays.coerce(route.snapshot.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));
     if (!this._view.active) {
       this._cd.detectChanges();
     }
