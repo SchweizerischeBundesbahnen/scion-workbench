@@ -15,6 +15,10 @@
  */
 export namespace WorkbenchRouteData {
   /**
+   * Key to define the preferred part of a view.
+   */
+  export const part = 'ɵpart';
+  /**
    * Key to define the title of a view in {@link Route.data}.
    */
   export const title = 'ɵtitle';

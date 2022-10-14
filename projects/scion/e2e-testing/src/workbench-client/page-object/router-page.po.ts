@@ -83,7 +83,7 @@ export class RouterPagePO {
   public async clickNavigate(options?: {evalNavigateResponse?: boolean}): Promise<void> {
     await this._locator.locator('button.e2e-navigate').click();
     // Wait until navigation completed.
-    await waitUntilStable(async () => this._locator.page().url());
+    await waitUntilStable(() => this._locator.page().url());
 
     if (!(options?.evalNavigateResponse ?? true)) {
       return;

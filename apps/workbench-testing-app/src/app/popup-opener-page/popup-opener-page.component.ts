@@ -15,7 +15,7 @@ import {PopupPageComponent} from '../popup-page/popup-page.component';
 import {PopupFocusPageComponent} from '../popup-focus-page/popup-focus-page.component';
 import {map, startWith} from 'rxjs/operators';
 import {Observable} from 'rxjs';
-import {EmptyComponent} from '../empty/empty.component';
+import {BlankComponent} from '../blank/blank.component';
 import {PopupOrigin} from '@scion/workbench-client';
 import {undefinedIfEmpty} from '../util/util';
 
@@ -142,8 +142,8 @@ export class PopupOpenerPageComponent {
         return PopupPageComponent;
       case 'popup-focus-page':
         return PopupFocusPageComponent;
-      case 'empty-page':
-        return EmptyComponent;
+      case 'blank-component':
+        return BlankComponent;
       default:
         throw Error(`[IllegalPopupComponent] Popup component not supported: ${this.form.get(POPUP_COMPONENT).value}`);
     }

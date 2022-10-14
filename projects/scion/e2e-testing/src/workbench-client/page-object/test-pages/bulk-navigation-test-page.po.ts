@@ -34,14 +34,14 @@ export class BulkNavigationTestPagePO {
   public async clickNavigateNoAwait(): Promise<void> {
     await this._locator.locator('button.e2e-navigate').click();
     // Wait for the URL to become stable after navigating.
-    await waitUntilStable(async () => this._appPO.page.url());
+    await waitUntilStable(() => this._appPO.page.url());
   }
 
   public async clickNavigateAwait(): Promise<void> {
     await this._locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
     // Since waiting for microfrontends to load takes some time, an interval of 500ms is used.
-    await waitUntilStable(async () => this._appPO.page.url(), {probeInterval: 500});
+    await waitUntilStable(() => this._appPO.page.url(), {probeInterval: 500});
   }
 
   public static async navigateTo(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {

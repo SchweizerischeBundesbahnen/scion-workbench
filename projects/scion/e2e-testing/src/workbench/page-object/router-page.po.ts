@@ -81,10 +81,15 @@ export class RouterPagePO {
     await this._locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
   }
 
-  public async clickNavigateViaRouter(): Promise<void> {
+  public async clickNavigate(): Promise<void> {
     await this._locator.locator('button.e2e-router-navigate').click();
-    // Wait until navigation completed.
-    await waitUntilStable(async () => this._page.url());
+
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    const errorLocator = this._locator.locator('output.e2e-navigate-error');
+    await Promise.race([
+      waitUntilStable(() => this._page.url()),
+      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+    ]);
   }
 
   /**
@@ -93,6 +98,6 @@ export class RouterPagePO {
   public async clickNavigateViaRouterLink(modifiers?: Array<'Alt' | 'Control' | 'Meta' | 'Shift'>): Promise<void> {
     await this._locator.locator('a.e2e-router-link-navigate').click({modifiers});
     // Wait until navigation completed.
-    await waitUntilStable(async () => this._page.url());
+    await waitUntilStable(() => this._page.url());
   }
 }

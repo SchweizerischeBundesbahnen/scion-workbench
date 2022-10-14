@@ -412,7 +412,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.enterContextualViewId(startPagePO.viewId!);
       await popupOpenerPagePO.enterPosition({left: 0, top: 0});
-      await popupOpenerPagePO.selectPopupComponent('empty-page');
+      await popupOpenerPagePO.selectPopupComponent('blank-component');
       await popupOpenerPagePO.clickOpen({waitForPopup: false});
 
       const popupPO = appPO.popup({cssClass: 'testee'});

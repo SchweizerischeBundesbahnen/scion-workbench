@@ -33,19 +33,19 @@ export class BulkNavigationTestPagePO {
   public async clickNavigateNoAwait(): Promise<void> {
     await this._locator.locator('button.e2e-navigate').click();
     // Wait for the URL to become stable after navigating.
-    await waitUntilStable(async () => this._appPO.page.url());
+    await waitUntilStable(() => this._appPO.page.url());
   }
 
   public async clickNavigateAwait(): Promise<void> {
     await this._locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
-    await waitUntilStable(async () => this._appPO.page.url());
+    await waitUntilStable(() => this._appPO.page.url());
   }
 
   public static async navigateTo(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPagePO.enterPath('test-pages/bulk-navigation-test-page');
-    await routerPagePO.clickNavigateViaRouter();
+    await routerPagePO.clickNavigate();
 
     const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation'});
     await view.waitUntilPresent();
