@@ -463,7 +463,7 @@ test.describe('Workbench Router', () => {
     await expect(await testeeViewTabPO.isPresent()).toBe(false);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
-    await expect(consoleLogs.get({severity: 'error', filter: /ViewProviderError|ViewError/, clear: true})).not.toEqual([]);
+    await expect(await consoleLogs.get({severity: 'error', filter: /ViewProviderError|ViewError/, consume: true})).not.toEqual([]);
 
     // navigate to the view with `null` as path
     await routerPagePO.enterQualifier({component: 'testee', path: 'null'});
@@ -473,7 +473,7 @@ test.describe('Workbench Router', () => {
     await expect(await testeeViewTabPO.isPresent()).toBe(false);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
-    await expect(consoleLogs.get({severity: 'error', filter: /ViewProviderError|ViewError/, clear: true})).not.toEqual([]);
+    await expect(await consoleLogs.get({severity: 'error', filter: /ViewProviderError|ViewError/, consume: true})).not.toEqual([]);
 
     // navigate to the view with `empty` as path
     await routerPagePO.enterQualifier({component: 'testee', path: 'empty'});
@@ -484,7 +484,7 @@ test.describe('Workbench Router', () => {
     await expect(await testeeViewTabPO.isPresent()).toBe(true);
     await expect(await testeeViewTabPO.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
-    await expect(consoleLogs.get({severity: 'error', filter: /ViewProviderError|ViewError/, clear: true})).toEqual([]);
+    await expect(await consoleLogs.get({severity: 'error', filter: /ViewProviderError|ViewError/, consume: true})).toEqual([]);
 
     await expect(page.locator('app-root')).toBeVisible();
   });
@@ -523,7 +523,7 @@ test.describe('Workbench Router', () => {
     // expect the view not to be present
     await expect(await testeeViewTabPO.isPresent()).toBe(false);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
-    await expect(consoleLogs.get({severity: 'warning', filter: /NullViewError/})).not.toEqual([]);
+    await expect(await consoleLogs.get({severity: 'warning', filter: /NullViewError/})).not.toEqual([]);
   });
 
   test('should open views as contained in the URL on initial navigation', async ({appPO, microfrontendNavigator}) => {
@@ -896,7 +896,7 @@ test.describe('Workbench Router', () => {
     await expect(await testeeViewTabPO.isPresent()).toBe(false);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
-    await expect(consoleLogs.get({severity: 'warning', filter: /NullViewError/})).not.toEqual([]);
+    await expect(await consoleLogs.get({severity: 'warning', filter: /NullViewError/})).not.toEqual([]);
   });
 
   test('should allow closing a single view', async ({appPO, microfrontendNavigator}) => {

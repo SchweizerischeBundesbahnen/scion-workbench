@@ -26,7 +26,7 @@ test.describe('Navigational State', () => {
 
       // expect ActivatedRoute.data emitted undefined as state
       const testeeViewId = await appPO.activePart.activeView.getViewId();
-      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
+      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
       ]);
     });
@@ -42,7 +42,7 @@ test.describe('Navigational State', () => {
 
       // expect ActivatedRoute.data emitted the passed state
       const testeeViewId = await appPO.activePart.activeView.getViewId();
-      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
+      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
       ]);
     });
@@ -58,13 +58,13 @@ test.describe('Navigational State', () => {
 
       // expect ActivatedRoute.data emitted the passed state
       const testeeViewId = await appPO.activePart.activeView.getViewId();
-      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
+      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
       ]);
 
       await appPO.reload();
       // expect ActivatedRoute.data emitting undefined as state after page reload
-      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
+      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
       ]);
     });
@@ -83,7 +83,7 @@ test.describe('Navigational State', () => {
       const testeeViewId = await appPO.activePart.activeView.getViewId();
 
       // expect ActivatedRoute.data emitted undefined as state
-      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([
+      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
       ]);
 
@@ -95,7 +95,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data not to emit
-      await expect(consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, clear: true})).toEqual([]);
+      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([]);
     });
   });
 });

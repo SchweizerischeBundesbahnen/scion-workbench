@@ -91,7 +91,7 @@ test.describe('Workbench View', () => {
     const testee2ComponentInstanceId = await testeeViewPagePO.getComponentInstanceId();
 
     // expect following Observables to complete
-    await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqualIgnoreOrder([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, consume: true})).toEqualIgnoreOrder([
       `[TitleObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[HeadingObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[DirtyObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
@@ -102,7 +102,7 @@ test.describe('Workbench View', () => {
     await testeeViewPagePO.navigateSelf({param1: 'param-1'});
 
     // expect following Observables to complete
-    await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqual([]);
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, consume: true})).toEqual([]);
 
     // navigate to testee-3 view (app3)
     await routerPagePO.viewTabPO.click();
@@ -117,7 +117,7 @@ test.describe('Workbench View', () => {
     const testee3ComponentInstanceId = await testeeViewPagePO.getComponentInstanceId();
 
     // expect following Observables to complete
-    await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqualIgnoreOrder([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, consume: true})).toEqualIgnoreOrder([
       `[ParamsObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[CapabilityObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
@@ -143,7 +143,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.clickNavigate();
 
     // expect following Observables to complete
-    await expect(consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, clear: true})).toEqualIgnoreOrder([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ObservableComplete/, consume: true})).toEqualIgnoreOrder([
       `[ParamsObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[CapabilityObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ActiveObservableComplete] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
@@ -464,7 +464,7 @@ test.describe('Workbench View', () => {
     const testee1ComponentInstanceId = await testee1ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqual([
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
 
@@ -478,7 +478,7 @@ test.describe('Workbench View', () => {
     const testee2ComponentInstanceId = await testee2ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
     ]);
@@ -488,7 +488,7 @@ test.describe('Workbench View', () => {
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
@@ -498,7 +498,7 @@ test.describe('Workbench View', () => {
     await testee2ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
     ]);
@@ -507,7 +507,7 @@ test.describe('Workbench View', () => {
     await registerCapabilityPagePO.viewTabPO.click();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqual([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
     ]);
 
@@ -531,7 +531,7 @@ test.describe('Workbench View', () => {
     const testee3ComponentInstanceId = await testee3ViewPagePO.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqual([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqual([
       `[ViewActivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
     ]);
 
@@ -540,7 +540,7 @@ test.describe('Workbench View', () => {
     await testee1ViewPagePO.isPresent();
 
     // assert emitted view active/deactivated events
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, clear: true})).toEqualIgnoreOrder([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
@@ -707,7 +707,7 @@ test.describe('Workbench View', () => {
 
     // Assert the correct capability to be loaded
     await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, consume: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability1Id}]`,
     ]);
 
@@ -721,7 +721,7 @@ test.describe('Workbench View', () => {
     // Assert the correct capability to be loaded
     await viewTabPO.click();
     await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability2Id, appSymbolicName: 'workbench-client-testing-app1'}}));
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, consume: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability2Id}]`,
     ]);
 
@@ -735,7 +735,7 @@ test.describe('Workbench View', () => {
     // Assert the correct capability to be loaded
     await viewTabPO.click();
     await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability1Id, appSymbolicName: 'workbench-client-testing-app1'}}));
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, consume: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability1Id}]`,
     ]);
 
@@ -748,7 +748,7 @@ test.describe('Workbench View', () => {
     // Assert the correct capability to be loaded
     await viewTabPO.click();
     await expect(await viewPagePO.getViewCapability()).toEqual(expect.objectContaining({metadata: {id: capability3Id, appSymbolicName: 'workbench-client-testing-app2'}}));
-    await expect(consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, clear: true})).toEqual([
+    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewCapability\$::first/, consume: true})).toEqual([
       `[ViewCapability$::first] [component=ViewPageComponent@${await viewPagePO.getComponentInstanceId()}, capabilityId=${capability3Id}]`,
     ]);
   });

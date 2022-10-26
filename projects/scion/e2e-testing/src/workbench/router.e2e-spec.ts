@@ -145,7 +145,7 @@ test.describe('Workbench Router', () => {
     await expect(await viewTab2.getTitle()).toEqual('view-2-title');
     await expect(await viewTab2.getHeading()).toEqual('view-2-heading');
 
-    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
+    await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
   });
 
   test('should not throw outlet activation error when opening a new view tab once a view tab was closed', async ({appPO, consoleLogs}) => {
@@ -163,14 +163,14 @@ test.describe('Workbench Router', () => {
     await appPO.openNewViewTab();
     await expect(await appPO.activePart.getViewIds({cssClass: 'e2e-start-page'})).toHaveLength(1);
     // expect no error to be thrown
-    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
+    await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
 
     // open view tab
     await appPO.openNewViewTab();
     await expect(await appPO.activePart.getViewIds({cssClass: 'e2e-start-page'})).toHaveLength(2);
 
     // expect no error to be thrown
-    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
+    await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
   });
 
   test('should allow closing all views by pressing CTRL+ALT+SHIFT+K keystroke', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -193,7 +193,7 @@ test.describe('Workbench Router', () => {
     await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
 
     // expect no error to be thrown
-    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
+    await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
   });
 
   test('should allow closing multiple views via router', async ({appPO, workbenchNavigator}) => {
