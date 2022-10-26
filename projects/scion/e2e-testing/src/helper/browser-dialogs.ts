@@ -8,38 +8,36 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Page} from '@playwright/test';
+import {Dialog as PWDialog, Page} from '@playwright/test';
 import {firstValueFrom, timer} from 'rxjs';
 
 /**
- * Installs a handler that automatically accepts displayed browser dialogs.
- */
-export function installDialogAutoAcceptHandler(page: Page, options?: {confirmDelay?: number}): BrowserDialogs {
-  const browserDialogCollector: BrowserDialogs = new BrowserDialogs();
-  page.on('dialog', async dialog => {
-    if (options?.confirmDelay) {
-      await firstValueFrom(timer(options.confirmDelay));
-    }
-
-    await dialog.accept();
-    browserDialogCollector.add({type: dialog.type() as DialogType, message: dialog.message()});
-  });
-  return browserDialogCollector;
-}
-
-/**
- * Dialogs opened in the browser.
+ * Captures dialogs opened in the browser and closes them automatically.
  */
 export class BrowserDialogs {
+
   private _dialogs: Dialog[] = [];
 
-  public add(dialog: Dialog): void {
-    this._dialogs.push(dialog);
+  constructor(private _page: Page, private _options?: {confirmDelay?: number}) {
+    this._page.on('dialog', this.onDialog);
   }
 
   public get(): Dialog[] {
     return this._dialogs;
   }
+
+  public dispose(): void {
+    this._page.off('dialog', () => this.onDialog);
+  }
+
+  private onDialog = async (dialog: PWDialog): Promise<void> => {
+    if (this._options?.confirmDelay) {
+      await firstValueFrom(timer(this._options.confirmDelay));
+    }
+
+    await dialog.accept();
+    this._dialogs.push({type: dialog.type() as DialogType, message: dialog.message()});
+  };
 }
 
 export interface Dialog {

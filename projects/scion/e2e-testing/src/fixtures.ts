@@ -10,7 +10,7 @@
 
 import {AppPO} from './app.po';
 import {ConsoleLogs} from './helper/console-logs';
-import {BrowserDialogs, installDialogAutoAcceptHandler} from './helper/browser-dialogs';
+import {BrowserDialogs} from './helper/browser-dialogs';
 import {WorkbenchNavigator} from './workbench/workbench-navigator';
 import {MicrofrontendNavigator} from './workbench-client/microfrontend-navigator';
 import {test as playwrightTest} from '@playwright/test';
@@ -57,6 +57,6 @@ export const test = playwrightTest.extend<TestFixtures>({
     await use(new ConsoleLogs(page));
   },
   browserDialogs: async ({page}, use) => {
-    await use(installDialogAutoAcceptHandler(page, {confirmDelay: 1000}));
+    await use(new BrowserDialogs(page, {confirmDelay: 1000}));
   },
 });
