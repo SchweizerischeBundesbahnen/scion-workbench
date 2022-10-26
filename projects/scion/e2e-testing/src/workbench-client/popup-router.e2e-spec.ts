@@ -396,7 +396,7 @@ test.describe('Popup Router', () => {
     await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
 
     // expect warning to be logged for the second popup
-    await expect(consoleLogs.get({severity: 'warning', filter: /Ignoring popup intent/})).not.toEqual([]);
+    await expect(await consoleLogs.get({severity: 'warning', filter: /Ignoring popup intent/})).not.toEqual([]);
   });
 
   test('should log warning if multiple popup providers match the qualifier', async ({appPO, microfrontendNavigator, consoleLogs}) => {
@@ -431,7 +431,7 @@ test.describe('Popup Router', () => {
     await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
 
     // expect warning to be logged for the second popup
-    await expect(consoleLogs.get({severity: 'warning', filter: /Ignoring popup intent/})).not.toEqual([]);
+    await expect(await consoleLogs.get({severity: 'warning', filter: /Ignoring popup intent/})).not.toEqual([]);
   });
 
   test('should allow closing and re-opening a popup', async ({appPO, microfrontendNavigator}) => {

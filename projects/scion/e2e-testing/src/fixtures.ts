@@ -9,7 +9,7 @@
  */
 
 import {AppPO} from './app.po';
-import {ConsoleLogs, installConsoleLogCollector} from './helper/console-logs';
+import {ConsoleLogs} from './helper/console-logs';
 import {BrowserDialogs, installDialogAutoAcceptHandler} from './helper/browser-dialogs';
 import {WorkbenchNavigator} from './workbench/workbench-navigator';
 import {MicrofrontendNavigator} from './workbench-client/microfrontend-navigator';
@@ -54,7 +54,7 @@ export const test = playwrightTest.extend<TestFixtures>({
     await use(new MicrofrontendNavigator(appPO));
   },
   consoleLogs: async ({page}, use) => {
-    await use(installConsoleLogCollector(page));
+    await use(new ConsoleLogs(page));
   },
   browserDialogs: async ({page}, use) => {
     await use(installDialogAutoAcceptHandler(page, {confirmDelay: 1000}));

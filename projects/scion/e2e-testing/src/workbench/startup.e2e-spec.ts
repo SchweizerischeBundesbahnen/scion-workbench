@@ -35,7 +35,7 @@ test.describe('Startup', () => {
     ]);
 
     // Expect the test view not to error.
-    await expect(consoleLogs.get({severity: 'error'})).toEqual([]);
+    await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
 
     // Expect the test view to show.
     const testingViewPO = appPO.view({cssClass: 'e2e-test-view'});
