@@ -401,7 +401,7 @@ test.describe('Workbench Notification', () => {
       const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
       await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
       await notificationOpenerPagePO.enterCssClass('testee');
-      await expect(notificationOpenerPagePO.clickShow()).rejects.toThrow(/ParamMismatchError/);
+      await expect(notificationOpenerPagePO.clickShow()).rejects.toThrow(/IntentParamValidationError/);
     });
 
     test('should throw when passing params not specified by the notification provider', async ({appPO, microfrontendNavigator}) => {
@@ -416,7 +416,7 @@ test.describe('Workbench Notification', () => {
       await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
       await notificationOpenerPagePO.enterCssClass('testee');
       await notificationOpenerPagePO.enterParams({xyz: 'XYZ'});
-      await expect(notificationOpenerPagePO.clickShow()).rejects.toThrow(/ParamMismatchError/);
+      await expect(notificationOpenerPagePO.clickShow()).rejects.toThrow(/IntentParamValidationError/);
     });
 
     test('should allow reducing params of notifications in the same group', async ({appPO, microfrontendNavigator}) => {

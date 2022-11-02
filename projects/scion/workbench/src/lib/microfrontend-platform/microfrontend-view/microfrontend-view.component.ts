@@ -10,9 +10,9 @@
 
 import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
-import {asapScheduler, combineLatest, defaultIfEmpty, firstValueFrom, merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
+import {asapScheduler, combineLatest, EMPTY, firstValueFrom, merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
-import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, takeUntilUnsubscribe, TopicMessage} from '@scion/microfrontend-platform';
+import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
@@ -249,16 +249,17 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * If the embedded microfrontend has a listener installed to be notified when closing this view,
    * initiates a request-reply communication, allowing the microfrontend to prevent this view from closing.
    */
-  public wbBeforeDestroy(): Observable<boolean> {
+  public async wbBeforeDestroy(): Promise<boolean> {
     const closingTopic = ɵWorkbenchCommands.viewClosingTopic(this.viewId);
 
     // Allow the microfrontend to prevent this view from closing.
-    return this._messageClient.request$<boolean>(closingTopic)
-      .pipe(
-        mapToBody(),
-        takeUntilUnsubscribe(closingTopic), // will complete the request immediately if no subscriber is subscribed
-        defaultIfEmpty(true),
-      );
+    const count = await firstValueFrom(this._messageClient.subscriberCount$(closingTopic));
+    if (count === 0) {
+      return true;
+    }
+
+    const doit = this._messageClient.request$<boolean>(closingTopic).pipe(mapToBody(), catchError(() => EMPTY));
+    return firstValueFrom(doit, {defaultValue: true});
   }
 
   /**
