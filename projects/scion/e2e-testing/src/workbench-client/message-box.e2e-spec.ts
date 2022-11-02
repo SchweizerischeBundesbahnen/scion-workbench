@@ -473,7 +473,7 @@ test.describe('Workbench Message Box', () => {
       const msgboxOpenerPagePO = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
       await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
       await msgboxOpenerPagePO.enterCssClass('testee');
-      await expect(msgboxOpenerPagePO.clickOpen()).rejects.toThrow(/ParamMismatchError/);
+      await expect(msgboxOpenerPagePO.clickOpen()).rejects.toThrow(/IntentParamValidationError/);
     });
 
     test('should throw when passing params not specified by the message box provider', async ({appPO, microfrontendNavigator}) => {
@@ -488,7 +488,7 @@ test.describe('Workbench Message Box', () => {
       await msgboxOpenerPagePO.enterQualifier({'component': 'inspector'});
       await msgboxOpenerPagePO.enterCssClass('testee');
       await msgboxOpenerPagePO.enterParams({xyz: 'XYZ'});
-      await expect(msgboxOpenerPagePO.clickOpen()).rejects.toThrow(/ParamMismatchError/);
+      await expect(msgboxOpenerPagePO.clickOpen()).rejects.toThrow(/IntentParamValidationError/);
     });
   });
 });
