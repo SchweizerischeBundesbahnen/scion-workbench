@@ -420,30 +420,12 @@ test.describe('Workbench Router', () => {
     await expect(componentInstanceIds.add(await testeeViewPagePO.getComponentInstanceId()).size).toEqual(4);
   });
 
-  test('should not open views that have no microfrontend path declared', async ({page, appPO, microfrontendNavigator, consoleLogs}) => {
+  test('should open microfrontend with empty path', async ({page, appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     const testeeViewTabPO = appPO.view({cssClass: 'testee'}).viewTab;
 
     // register testee view
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
-      type: 'view',
-      qualifier: {component: 'testee', path: 'undefined'},
-      properties: {
-        path: '<undefined>',
-        title: 'testee',
-        cssClass: 'testee',
-      },
-    });
-    await registerCapabilityPagePO.registerCapability({
-      type: 'view',
-      qualifier: {component: 'testee', path: 'null'},
-      properties: {
-        path: '<null>',
-        title: 'testee',
-        cssClass: 'testee',
-      },
-    });
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee', path: 'empty'},
@@ -454,28 +436,8 @@ test.describe('Workbench Router', () => {
       },
     });
 
-    // navigate to the view with `undefined` as path
-    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({component: 'testee', path: 'undefined'});
-    await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigate();
-    // expect the view not to open
-    await expect(await testeeViewTabPO.isPresent()).toBe(false);
-    await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
-    await expect(await consoleLogs.get({severity: 'error', filter: /ViewProviderError|ViewError/, consume: true})).not.toEqual([]);
-
-    // navigate to the view with `null` as path
-    await routerPagePO.enterQualifier({component: 'testee', path: 'null'});
-    await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigate();
-
-    await expect(await testeeViewTabPO.isPresent()).toBe(false);
-    await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
-    await expect(await consoleLogs.get({severity: 'error', filter: /ViewProviderError|ViewError/, consume: true})).not.toEqual([]);
-
     // navigate to the view with `empty` as path
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee', path: 'empty'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
@@ -864,7 +826,7 @@ test.describe('Workbench Router', () => {
 
     // register testee view
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const capabilityId = await registerCapabilityPagePO.registerCapability({
+    const capabilityId = (await registerCapabilityPagePO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee'},
       properties: {
@@ -872,7 +834,7 @@ test.describe('Workbench Router', () => {
         title: 'testee',
         cssClass: 'testee',
       },
-    });
+    })).metadata!.id;
     await registerCapabilityPagePO.viewTabPO.close();
 
     // navigate to the view

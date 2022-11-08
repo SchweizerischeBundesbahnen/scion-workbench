@@ -16,6 +16,7 @@ import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {ReactiveFormsModule} from '@angular/forms';
 import {RegisterWorkbenchCapabilityPageComponent} from './register-workbench-capability-page.component';
 import {RouterModule, Routes} from '@angular/router';
+import {SciViewportModule} from '@scion/components/viewport';
 
 const routes: Routes = [
   {path: '', component: RegisterWorkbenchCapabilityPageComponent},
@@ -29,6 +30,7 @@ const routes: Routes = [
     SciFormFieldModule,
     SciParamsEnterModule,
     SciCheckboxModule,
+    SciViewportModule,
   ],
   declarations: [
     RegisterWorkbenchCapabilityPageComponent,

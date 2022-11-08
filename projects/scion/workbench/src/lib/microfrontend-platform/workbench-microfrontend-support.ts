@@ -26,6 +26,7 @@ import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-
 import {Route, ROUTES} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
 import {MicrofrontendViewRoutes} from './routing/microfrontend-routes';
+import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-view-capability-interceptor.service';
 
 /**
  * Registers a set of DI providers to set up microfrontend support in the workbench.
@@ -63,6 +64,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       },
       MicrofrontendViewIntentInterceptor,
       MicrofrontendPopupIntentInterceptor,
+      MicrofrontendViewCapabilityInterceptor,
       WorkbenchRouter,
       WorkbenchPopupService,
       WorkbenchMessageBoxService,

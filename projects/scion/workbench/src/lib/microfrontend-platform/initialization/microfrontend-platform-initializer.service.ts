@@ -9,7 +9,7 @@
  */
 
 import {Injectable, Injector, NgZone} from '@angular/core';
-import {HostManifestInterceptor, IntentClient, IntentInterceptor, MessageClient, MicrofrontendPlatform, MicrofrontendPlatformConfig, Runlevel} from '@scion/microfrontend-platform';
+import {CapabilityInterceptor, HostManifestInterceptor, IntentClient, IntentInterceptor, MessageClient, MicrofrontendPlatform, MicrofrontendPlatformConfig, Runlevel} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
 import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './ng-zone-decorators';
@@ -18,6 +18,7 @@ import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-confi
 import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-intent-interceptor.service';
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microfrontend-popup-intent-interceptor.service';
+import {MicrofrontendViewCapabilityInterceptor} from '../routing/microfrontend-view-capability-interceptor.service';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -31,6 +32,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
               private _ngZoneIntentClientDecorator: NgZoneIntentClientDecorator,
               private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
               private _microfrontendPopupIntentInterceptor: MicrofrontendPopupIntentInterceptor,
+              private _microfrontendViewCapabilityInterceptor: MicrofrontendViewCapabilityInterceptor,
               private _injector: Injector,
               private _zone: NgZone,
               private _logger: Logger) {
@@ -63,6 +65,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
 
     // Register popup intent interceptor to translate popup intents into workbench popup commands.
     Beans.register(IntentInterceptor, {useValue: this._microfrontendPopupIntentInterceptor, multi: true});
+
+    // Register view capability interceptor to assign view capabilities a stable identifier required for persistent navigation.
+    Beans.register(CapabilityInterceptor, {useValue: this._microfrontendViewCapabilityInterceptor, multi: true});
 
     // Instantiate services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.

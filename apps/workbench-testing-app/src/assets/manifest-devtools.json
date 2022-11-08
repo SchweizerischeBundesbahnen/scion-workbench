@@ -1,6 +1,6 @@
 {
   "name": "SCION Microfrontend Platform DevTools",
-  "baseUrl": "https://scion-microfrontend-platform-devtools-v1-0-0-beta-20.vercel.app",
+  "baseUrl": "https://scion-microfrontend-platform-devtools-v1-0-0-rc-10.vercel.app",
   "capabilities": [
     {
       "type": "view",
