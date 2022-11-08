@@ -111,13 +111,6 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
       return;
     }
 
-    const microfrontendPath = viewCapability.properties?.path;
-    if (microfrontendPath === undefined || microfrontendPath === null) { // empty path is a valid path
-      this._logger.error(() => `[ViewProviderError] Requested view has no path to the microfrontend defined.`, LoggerNames.MICROFRONTEND_ROUTING, viewCapability);
-      await this._view.close();
-      return;
-    }
-
     const application = this.lookupApplication(viewCapability.metadata!.appSymbolicName);
     if (!application) {
       this._logger.error(() => `[NullApplicationError] Unexpected. Cannot resolve application '${viewCapability.metadata!.appSymbolicName}'.`, LoggerNames.MICROFRONTEND_ROUTING, viewCapability);
@@ -150,8 +143,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     }
 
     // Navigate to the microfrontend.
-    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.viewId}, app=${viewCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND_ROUTING, params, viewCapability);
-    await this._outletRouter.navigate(microfrontendPath, {
+    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.viewId}, app=${viewCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(viewCapability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, viewCapability);
+    await this._outletRouter.navigate(viewCapability.properties.path, {
       outlet: this.viewId,
       relativeTo: application.baseUrl,
       params: params,

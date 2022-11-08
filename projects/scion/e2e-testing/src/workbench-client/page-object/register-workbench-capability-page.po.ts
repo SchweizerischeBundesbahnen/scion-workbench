@@ -16,6 +16,7 @@ import {SciCheckboxPO} from '../../components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
 import {WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
+import {Capability} from '@scion/microfrontend-platform';
 
 /**
  * Playwright's test runner fails to compile when importing runtime types from `@scion/workbench` or `@scion/microfrontend-platform`, because
@@ -46,9 +47,9 @@ export class RegisterWorkbenchCapabilityPagePO {
    *
    * This method exists as a convenience method to not have to enter all fields separately.
    *
-   * Returns a Promise that resolves to the capability ID upon successful registration, or that rejects on registration error.
+   * Returns a Promise that resolves to the registered capability upon successful registration, or that rejects on registration error.
    */
-  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(capability: T): Promise<string> {
+  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(capability: T): Promise<Capability> {
     if (capability.type !== undefined) {
       await this._locator.locator('select.e2e-type').selectOption(capability.type);
     }
@@ -78,7 +79,6 @@ export class RegisterWorkbenchCapabilityPagePO {
     if (capability.properties.cssClass !== undefined) {
       await this._locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
     }
-
     if (capability.type === 'view') {
       await this.enterViewCapabilityProperties(capability as WorkbenchViewCapability);
     }
@@ -91,10 +91,12 @@ export class RegisterWorkbenchCapabilityPagePO {
     // Evaluate the response: resolve the promise on success, or reject it on error.
     const responseLocator = this._locator.locator('output.e2e-register-response');
     const errorLocator = this._locator.locator('output.e2e-register-error');
-    return Promise.race([
-      responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-capability-id').innerText()),
+    await Promise.race([
+      responseLocator.waitFor({state: 'attached'}),
       errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
     ]);
+
+    return JSON.parse(await responseLocator.locator('div.e2e-capability').innerText());
   }
 
   private async enterViewCapabilityProperties(capability: WorkbenchViewCapability): Promise<void> {

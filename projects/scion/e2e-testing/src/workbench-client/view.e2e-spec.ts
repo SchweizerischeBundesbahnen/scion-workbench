@@ -653,7 +653,7 @@ test.describe('Workbench View', () => {
 
     // register testee-1 view in app1
     const registerCapabilityApp1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const capability1Id = await registerCapabilityApp1PO.registerCapability({
+    const capability1Id = (await registerCapabilityApp1PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
@@ -662,10 +662,10 @@ test.describe('Workbench View', () => {
         heading: 'app 1',
         cssClass: 'testee-1',
       },
-    });
+    })).metadata!.id;
 
     // register testee-2 view in app1
-    const capability2Id = await registerCapabilityApp1PO.registerCapability({
+    const capability2Id = (await registerCapabilityApp1PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-2'},
       properties: {
@@ -674,11 +674,11 @@ test.describe('Workbench View', () => {
         heading: 'app 1',
         cssClass: 'testee-2',
       },
-    });
+    })).metadata!.id;
 
     // register testee-3 view in app2
     const registerCapabilityApp2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-    const capability3Id = await registerCapabilityApp2PO.registerCapability({
+    const capability3Id = (await registerCapabilityApp2PO.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-3'},
       private: false,
@@ -688,7 +688,7 @@ test.describe('Workbench View', () => {
         heading: 'app 2',
         cssClass: 'testee-3',
       },
-    });
+    })).metadata!.id;
 
     // allow app1 to open testee-3 view of app2
     const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');

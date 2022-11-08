@@ -9,7 +9,7 @@
  */
 
 import {BeanDecorator} from '@scion/toolkit/bean-manager';
-import {Intent, IntentClient, IntentMessage, IntentOptions, IntentSelector, MessageClient, PublishOptions, RequestOptions, TopicMessage} from '@scion/microfrontend-platform';
+import {Intent, IntentClient, IntentMessage, IntentSelector, MessageClient, PublishOptions, RequestOptions, TopicMessage} from '@scion/microfrontend-platform';
 import {Injectable, NgZone} from '@angular/core';
 import {MonoTypeOperatorFunction, Observable, pipe, Subscription} from 'rxjs';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
@@ -67,11 +67,11 @@ export class NgZoneIntentClientDecorator implements BeanDecorator<IntentClient> 
     const zone = this._zone;
     return new class implements IntentClient {
 
-      public publish<T = any>(intent: Intent, body?: T, options?: IntentOptions): Promise<void> {
+      public publish<T = any>(intent: Intent, body?: T, options?: PublishOptions): Promise<void> {
         return intentClient.publish(intent, body, options);
       }
 
-      public request$<T>(intent: Intent, body?: any, options?: IntentOptions): Observable<TopicMessage<T>> {
+      public request$<T>(intent: Intent, body?: any, options?: RequestOptions): Observable<TopicMessage<T>> {
         return intentClient.request$<T>(intent, body, options).pipe(synchronizeWithAngular(zone));
       }
 

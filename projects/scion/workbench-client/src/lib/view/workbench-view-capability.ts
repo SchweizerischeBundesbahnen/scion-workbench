@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Capability, ParamDefinition} from '@scion/microfrontend-platform';
+import {Capability, ParamDefinition, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 
 /**
@@ -21,6 +21,11 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 export interface WorkbenchViewCapability extends Capability {
 
   type: WorkbenchCapabilities.View;
+
+  /**
+   * Qualifies this view. The qualifier is required for views.
+   */
+  qualifier: Qualifier;
 
   params?: ViewParamDefinition[];
 

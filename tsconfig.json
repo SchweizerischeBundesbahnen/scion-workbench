@@ -66,6 +66,9 @@
     //      //      "@scion/toolkit/bean-manager": [
     //      //        "../scion-toolkit/projects/scion/toolkit/bean-manager/src/public_api"
     //      //      ],
+    //      //      "@scion/toolkit/crypto": [
+    //      //        "../scion-toolkit/projects/scion/toolkit/crypto/src/public_api"
+    //      //      ],
     //      //      "@scion/toolkit/observable": [
     //      //        "../scion-toolkit/projects/scion/toolkit/observable/src/public_api"
     //      //      ],

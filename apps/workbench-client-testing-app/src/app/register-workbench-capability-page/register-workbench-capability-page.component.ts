@@ -14,6 +14,7 @@ import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
 import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {undefinedIfEmpty} from '../util/util';
+import {firstValueFrom} from 'rxjs';
 
 const TYPE = 'type';
 const QUALIFIER = 'qualifier';
@@ -71,7 +72,7 @@ export class RegisterWorkbenchCapabilityPageComponent {
 
   public form: UntypedFormGroup;
 
-  public capabilityId: string;
+  public capability: Capability;
   public registerError: string;
   public WorkbenchCapabilities = WorkbenchCapabilities;
 
@@ -123,12 +124,12 @@ export class RegisterWorkbenchCapabilityPageComponent {
       }
     })();
 
-    this.capabilityId = null;
+    this.capability = null;
     this.registerError = null;
 
     await this._manifestService.registerCapability(capability)
-      .then(id => {
-        this.capabilityId = id;
+      .then(async id => {
+        this.capability = (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0];
         this.form.reset(this._formInitialValue);
         this.form.setControl(QUALIFIER, new UntypedFormArray([]));
       })

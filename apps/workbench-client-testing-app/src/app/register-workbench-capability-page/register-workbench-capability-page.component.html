@@ -98,9 +98,17 @@
 
   <button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid">Register</button>
 
-  <output class="capability-id e2e-register-response" *ngIf="capabilityId">
-    Capability ID: <span class="e2e-capability-id">{{capabilityId}}</span>
-  </output>
+  <ng-container *ngIf="capability">
+    <output class="register-response">
+      Capability ID: {{capability.metadata!.id}}
+    </output>
+
+    <output class="register-response e2e-register-response">
+      <sci-viewport>
+        <div class="e2e-capability">{{capability | json}}</div>
+      </sci-viewport>
+    </output>
+  </ng-container>
 
   <output class="register-error e2e-register-error" *ngIf="registerError">
     {{registerError}}
