@@ -47,6 +47,8 @@ export const workbenchManifest: Manifest = {
   intentions: [
     // allow opening test views
     {type: WorkbenchCapabilities.View, qualifier: {test: '*', '*': '*'}},
+    // allow opening DevTools
+    {type: WorkbenchCapabilities.View, qualifier: {component: 'devtools', vendor: 'scion'}},
     // allow opening test popups
     {type: WorkbenchCapabilities.Popup, qualifier: {test: '*', '*': '*'}},
   ],
