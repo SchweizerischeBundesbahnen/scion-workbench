@@ -19,6 +19,7 @@ import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microfrontend-popup-intent-interceptor.service';
 import {MicrofrontendViewCapabilityInterceptor} from '../routing/microfrontend-view-capability-interceptor.service';
+import {MicrofrontendPopupCapabilityInterceptor} from '../microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -33,6 +34,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
               private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
               private _microfrontendPopupIntentInterceptor: MicrofrontendPopupIntentInterceptor,
               private _microfrontendViewCapabilityInterceptor: MicrofrontendViewCapabilityInterceptor,
+              private _microfrontendPopupCapabilityInterceptor: MicrofrontendPopupCapabilityInterceptor,
               private _injector: Injector,
               private _zone: NgZone,
               private _logger: Logger) {
@@ -68,6 +70,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
 
     // Register view capability interceptor to assign view capabilities a stable identifier required for persistent navigation.
     Beans.register(CapabilityInterceptor, {useValue: this._microfrontendViewCapabilityInterceptor, multi: true});
+
+    // Register popup capability interceptor to assert required popup capability properties.
+    Beans.register(CapabilityInterceptor, {useValue: this._microfrontendPopupCapabilityInterceptor, multi: true});
 
     // Instantiate services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.
