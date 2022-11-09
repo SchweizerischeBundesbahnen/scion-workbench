@@ -13,7 +13,7 @@ import {CapabilityInterceptor, HostManifestInterceptor, IntentClient, IntentInte
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
 import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './ng-zone-decorators';
-import {MICROFRONTEND_PLATFORM_POST_STARTUP, runWorkbenchInitializers, WorkbenchInitializer} from '../../startup/workbench-initializer';
+import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, runWorkbenchInitializers, WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
 import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-intent-interceptor.service';
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
@@ -74,12 +74,15 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._microfrontendPopupCapabilityInterceptor, multi: true});
 
-    // Instantiate services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
+    // Inject services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.
     Beans.registerInitializer({
       useFunction: () => runWorkbenchInitializers(MICROFRONTEND_PLATFORM_POST_STARTUP, this._injector),
       runlevel: Runlevel.Two,
     });
+
+    // Inject services registered under {MICROFRONTEND_PLATFORM_PRE_STARTUP} DI token.
+    await runWorkbenchInitializers(MICROFRONTEND_PLATFORM_PRE_STARTUP, this._injector);
 
     // Start the SCION Microfrontend Platform.
     // We start the platform outside the Angular zone in order to avoid excessive change detection cycles

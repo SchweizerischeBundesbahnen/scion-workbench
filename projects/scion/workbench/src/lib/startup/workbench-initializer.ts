@@ -16,10 +16,6 @@ import {InjectFlags, InjectionToken, Injector} from '@angular/core';
  *
  * Initializers registered under this DI token are injected and executed immediately when calling {@link WorkbenchLauncher#launch}.
  * After all initializers associated with this DI token have completed, the workbench transitions into the "started" state.
- *
- * If microfrontend support is enabled, the workbench starts the "SCION Microfrontend Platform" in this lifecycle hook. Therefore,
- * you should not register hooks that depend on a running platform under this DI token. To interact with the platform, use the
- * lifecycle hook {@link MICROFRONTEND_PLATFORM_POST_STARTUP} instead.
  */
 export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializer | any>('WORKBENCH_STARTUP');
 
@@ -29,9 +25,6 @@ export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializer | any>(
  *
  * Initializers registered under this DI token are injected and executed immediately when calling {@link WorkbenchLauncher#launch},
  * but before running workbench initializers associated with the {@link WORKBENCH_STARTUP} injection token.
- *
- * If microfrontend support is enabled, you can configure the "SCION Microfrontend Platform" in this lifecycle hook, for example,
- * register interceptors or decorators. However, you cannot interact with the platform yet, because it has not been started yet.
  */
 export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | any>('WORKBENCH_PRE_STARTUP');
 
@@ -41,7 +34,20 @@ export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | a
  *
  * This lifecycle hook is only called if microfrontend support is enabled.
  *
- * Initializers registered under this DI token are injected and executed after bootstrapping the "SCION Microfrontend Platform".
+ * Initializers registered under this DI token are injected and executed before starting the SCION Microfrontend Platform.
+ * Typically, you would configure the SCION Microfrontend Platform in this lifecycle hook, for example, register interceptors or decorators.
+ *
+ * Note that you cannot interact with the microfrontend platform in this lifecycle hook because it has not been started yet.
+ */
+export const MICROFRONTEND_PLATFORM_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | any>('MICROFRONTEND_PLATFORM_PRE_STARTUP');
+
+/**
+ * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
+ * Hooks are called at defined points during startup, enabling the application's controlled initialization.
+ *
+ * This lifecycle hook is only called if microfrontend support is enabled.
+ *
+ * Initializers registered under this DI token are injected and executed after started the SCION Microfrontend Platform.
  * At this point, the activators of the micro applications are not yet installed. Typically, you would install intent and message
  * handlers in this lifecycle hook.
  */
@@ -73,6 +79,7 @@ export const WORKBENCH_POST_STARTUP = new InjectionToken<WorkbenchInitializer | 
  * - {@link WORKBENCH_PRE_STARTUP}
  * - {@link WORKBENCH_STARTUP}
  * - {@link WORKBENCH_POST_STARTUP}
+ * - {@link MICROFRONTEND_PLATFORM_PRE_STARTUP}
  * - {@link MICROFRONTEND_PLATFORM_POST_STARTUP}
  *
  * ### Example of how to associate an initializer with the DI token {@link MICROFRONTEND_PLATFORM_POST_STARTUP}.

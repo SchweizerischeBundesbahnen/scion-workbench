@@ -29,6 +29,7 @@ import {InspectNotificationModule} from './inspect-notification-provider/inspect
 import {InspectMessageBoxModule} from './inspect-message-box-provider/inspect-message-box.module';
 import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup-initializer.service';
 import {UtilModule} from './util/util.module';
+import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
 
 @NgModule({
   declarations: [
@@ -61,6 +62,7 @@ import {UtilModule} from './util/util.module';
   providers: [
     provideConfirmWorkbenchStartupInitializer(),
     provideThrottleCapabilityLookupInterceptor(),
+    provideWorkbenchLifecycleHookLoggers(),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
