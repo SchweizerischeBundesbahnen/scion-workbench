@@ -1,3 +1,22 @@
+# [14.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.5...14.0.0-beta.6) (2022-11-09)
+
+
+### Bug Fixes
+
+* **workbench:** resolve view-related data for views that are child of component-less routes ([2fb8ae9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/2fb8ae95f7dc3bd7673ce1faaf9931abb65c8a7c)), closes [#357](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/357)
+
+
+### Features
+
+* **workbench:** provide lifecycle hook to be invoked before starting the microfrontend platform ([0ee9982](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0ee9982b7caf061218497d1e37df9fc6992d0b94))
+
+
+### Dependencies
+
+* **workbench:** migrate to `@scion/microfrontend-platform` version `1.0.0-rc.10` ([966ec41](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/966ec41e8e1e4c8b4f98c233cba59c246c88b349))
+
+
+
 # [14.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.4...14.0.0-beta.5) (2022-10-13)
 
 
