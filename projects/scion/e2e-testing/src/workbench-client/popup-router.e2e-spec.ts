@@ -222,28 +222,12 @@ test.describe('Popup Router', () => {
     await expect((await popupPageApp2PO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app2');
   });
 
-  test('should throw when the requested popup has no microfrontend path declared', async ({page, appPO, microfrontendNavigator}) => {
+  test('should open popup with empty microfrontend path', async ({page, appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     const popupPagePO = new PopupPagePO(appPO, 'testee');
 
     // register testee popups
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
-      type: 'popup',
-      qualifier: {component: 'testee', path: 'undefined'},
-      properties: {
-        path: '<undefined>',
-        cssClass: 'testee',
-      },
-    });
-    await registerCapabilityPagePO.registerCapability({
-      type: 'popup',
-      qualifier: {component: 'testee', path: 'null'},
-      properties: {
-        path: '<null>',
-        cssClass: 'testee',
-      },
-    });
     await registerCapabilityPagePO.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee', path: 'empty'},
@@ -253,22 +237,8 @@ test.describe('Popup Router', () => {
       },
     });
 
-    // open the popup with `undefined` as path
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee', path: 'undefined'});
-    await expect(popupOpenerPagePO.clickOpen()).rejects.toThrow(/PopupProviderError/);
-
-    // expect popup not to display
-    await expect(await popupPagePO.popupPO.isPresent()).toBe(false);
-
-    // open the popup with `null` as path
-    await popupOpenerPagePO.enterQualifier({component: 'testee', path: 'null'});
-    await expect(popupOpenerPagePO.clickOpen()).rejects.toThrow(/PopupProviderError/);
-
-    // expect popup not to display
-    await expect(await popupPagePO.popupPO.isPresent()).toBe(false);
-
     // open the popup with `empty` as path
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee', path: 'empty'});
     await popupOpenerPagePO.clickOpen();
 

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Capability} from '@scion/microfrontend-platform';
+import {Capability, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 
 /**
@@ -23,6 +23,11 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 export interface WorkbenchPopupCapability extends Capability {
 
   type: WorkbenchCapabilities.Popup;
+
+  /**
+   * Qualifies this popup. The qualifier is required for popups.
+   */
+  qualifier: Qualifier;
 
   properties: {
     /**

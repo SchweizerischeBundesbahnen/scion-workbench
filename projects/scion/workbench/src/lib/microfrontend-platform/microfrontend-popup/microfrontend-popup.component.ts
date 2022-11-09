@@ -58,13 +58,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Obtain the microfrontend path.
-    const microfrontendPath = this.popupCapability.properties?.path;
-    if (microfrontendPath === undefined || microfrontendPath === null) { // empty path is a valid path
-      this._popup.closeWithError(`[PopupProviderError] Popup capability has no path to the microfrontend defined: ${JSON.stringify(this.popupCapability)}`);
-      return;
-    }
-
     // Listen to popup close requests.
     this._messageClient.observe$<any>(ɵWorkbenchCommands.popupCloseTopic(this.popupId))
       .pipe(takeUntil(this._destroy$))
@@ -93,8 +86,8 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
 
     // Navigate to the microfrontend.
-    this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${microfrontendPath}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
-    await this._outletRouter.navigate(microfrontendPath, {
+    this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
+    await this._outletRouter.navigate(this.popupCapability.properties.path, {
       outlet: this.popupId,
       relativeTo: application.baseUrl,
       params: this._popupContext.params,
