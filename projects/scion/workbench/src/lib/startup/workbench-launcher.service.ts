@@ -72,8 +72,9 @@ export class WorkbenchLauncher {
    *
    * - {@link WORKBENCH_PRE_STARTUP}
    * - {@link WORKBENCH_STARTUP}
-   * - {@link WORKBENCH_POST_STARTUP}
+   * - {@link MICROFRONTEND_PLATFORM_PRE_STARTUP}
    * - {@link MICROFRONTEND_PLATFORM_POST_STARTUP}
+   * - {@link WORKBENCH_POST_STARTUP}
    *
    * ### Example of how to hook into the startup process.
    *
@@ -82,7 +83,7 @@ export class WorkbenchLauncher {
    *   ...
    *   providers: [
    *     {
-   *       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+   *       provide: WORKBENCH_PRE_STARTUP,
    *       multi: true,
    *       useClass: SomeInitializer,
    *     }
