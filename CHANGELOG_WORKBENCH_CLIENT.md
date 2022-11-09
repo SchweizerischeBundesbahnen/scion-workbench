@@ -1,3 +1,12 @@
+# [1.0.0-beta.14](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.13...workbench-client-1.0.0-beta.14) (2022-11-09)
+
+
+### Features
+
+* **workbench-client/router:** support named parameters in title/heading of view capability ([98f4bbd](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/98f4bbd9396480aa18d1e4fb8f339c707d48043c))
+
+
+
 # [1.0.0-beta.13](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.12...workbench-client-1.0.0-beta.13) (2022-10-11)
 
 
