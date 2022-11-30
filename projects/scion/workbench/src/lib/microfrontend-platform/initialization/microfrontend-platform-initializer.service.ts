@@ -55,7 +55,10 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
       scopeCheckDisabled: true,
     };
 
-    // Register hook for the workbench to register workbench-specific intentions and capabilities.
+    // Inject services registered under {MICROFRONTEND_PLATFORM_PRE_STARTUP} DI token.
+    await runWorkbenchInitializers(MICROFRONTEND_PLATFORM_PRE_STARTUP, this._injector);
+
+    // Register host manifest interceptor for the workbench to register workbench-specific intentions and capabilities.
     Beans.register(HostManifestInterceptor, {useValue: this._hostManifestInterceptor, multi: true});
 
     // Synchronize emissions of messaging Observables with the Angular zone.
@@ -80,9 +83,6 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
       useFunction: () => runWorkbenchInitializers(MICROFRONTEND_PLATFORM_POST_STARTUP, this._injector),
       runlevel: Runlevel.Two,
     });
-
-    // Inject services registered under {MICROFRONTEND_PLATFORM_PRE_STARTUP} DI token.
-    await runWorkbenchInitializers(MICROFRONTEND_PLATFORM_PRE_STARTUP, this._injector);
 
     // Start the SCION Microfrontend Platform.
     // We start the platform outside the Angular zone in order to avoid excessive change detection cycles
