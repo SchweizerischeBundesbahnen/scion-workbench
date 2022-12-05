@@ -23,59 +23,7 @@ test.describe('Popup', () => {
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
       type: 'popup',
-      qualifier: {entity: 'product', id: '*'},
-      params: [
-        {name: 'readonly', required: true},
-      ],
-      properties: {
-        path: 'popup',
-        cssClass: 'product',
-      },
-    });
-
-    // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({entity: 'product', id: '123'});
-    await popupOpenerPagePO.enterParams({readonly: 'true'});
-    await popupOpenerPagePO.clickOpen();
-
-    // expect qualifier to be contained in popup params
-    const popupPagePO = new PopupPagePO(appPO, 'product');
-    await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', id: '123', readonly: 'true'}));
-  });
-
-  test('should contain the qualifier in popup params', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register testee popup
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
-      type: 'popup',
-      qualifier: {entity: 'product', id: '*'},
-      properties: {
-        path: 'popup',
-        cssClass: 'product',
-      },
-    });
-
-    // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({entity: 'product', id: '123'});
-    await popupOpenerPagePO.clickOpen();
-
-    // expect qualifier to be contained in popup params
-    const popupPagePO = new PopupPagePO(appPO, 'product');
-    await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', id: '123'}));
-  });
-
-  test('should not overwrite qualifier values with param values', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register testee popup
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
-      type: 'popup',
-      qualifier: {entity: 'product', id: '*'},
+      qualifier: {entity: 'product'},
       params: [
         {name: 'id', required: true},
       ],
@@ -87,13 +35,65 @@ test.describe('Popup', () => {
 
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({entity: 'product', id: '123'});
-    await popupOpenerPagePO.enterParams({id: '456'}); // should be ignored
+    await popupOpenerPagePO.enterQualifier({entity: 'product'});
+    await popupOpenerPagePO.enterParams({id: '123'});
+    await popupOpenerPagePO.clickOpen();
+
+    // expect qualifier to be contained in popup params
+    const popupPagePO = new PopupPagePO(appPO, 'product');
+    await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', id: '123'}));
+  });
+
+  test('should contain the qualifier in popup params', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee popup
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'popup',
+      qualifier: {entity: 'products'},
+      properties: {
+        path: 'popup',
+        cssClass: 'products',
+      },
+    });
+
+    // open the popup
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPagePO.enterQualifier({entity: 'products'});
+    await popupOpenerPagePO.clickOpen();
+
+    // expect qualifier to be contained in popup params
+    const popupPagePO = new PopupPagePO(appPO, 'products');
+    await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'products'}));
+  });
+
+  test('should not overwrite qualifier values with param values', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee popup
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'popup',
+      qualifier: {entity: 'product', mode: 'new'},
+      params: [
+        {name: 'mode', required: true},
+      ],
+      properties: {
+        path: 'popup',
+        cssClass: 'product',
+      },
+    });
+
+    // open the popup
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPagePO.enterQualifier({entity: 'product', mode: 'new'});
+    await popupOpenerPagePO.enterParams({mode: 'edit'}); // should be ignored
     await popupOpenerPagePO.clickOpen();
 
     // expect qualifier values not to be overwritten by params
     const popupPagePO = new PopupPagePO(appPO, 'product');
-    await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', id: '123'}));
+    await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', mode: 'new'}));
   });
 
   test('should substitute named URL params with values of the qualifier and params', async ({appPO, microfrontendNavigator}) => {
@@ -103,7 +103,7 @@ test.describe('Popup', () => {
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
       type: 'popup',
-      qualifier: {component: 'testee', seg1: '*', mp1: '*', qp1: '*'},
+      qualifier: {component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'},
       params: [
         {name: 'seg3', required: true},
         {name: 'mp2', required: true},
