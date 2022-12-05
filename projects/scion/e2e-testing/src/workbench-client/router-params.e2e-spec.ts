@@ -23,28 +23,27 @@ test.describe('Workbench Router', () => {
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
-      qualifier: {entity: 'product', id: '*'},
+      qualifier: {entity: 'products'},
       properties: {
         path: 'test-view',
         title: 'product',
-        cssClass: 'product',
+        cssClass: 'products',
       },
     });
 
     // navigate
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({entity: 'product', id: '123'});
+    await routerPagePO.enterQualifier({entity: 'products'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
     // expect qualifier to be contained in view params
-    const testeeViewId = await appPO.view({cssClass: 'product'}).getViewId();
+    const testeeViewId = await appPO.view({cssClass: 'products'}).getViewId();
     const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
     await expect(await testeeViewPagePO.getViewParams()).toEqual(
       expect.objectContaining({
-        entity: 'product [string]',
-        id: '123 [string]',
+        entity: 'products [string]',
       }));
   });
 
@@ -55,44 +54,7 @@ test.describe('Workbench Router', () => {
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
-      qualifier: {entity: 'product', id: '*'},
-      params: [
-        {name: 'readonly', required: true},
-      ],
-      properties: {
-        path: 'test-view',
-        title: 'testee',
-        cssClass: 'testee',
-      },
-    });
-
-    // navigate
-    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({entity: 'product', id: '123'});
-    await routerPagePO.enterParams({readonly: 'true'});
-    await routerPagePO.selectTarget('blank');
-    await routerPagePO.clickNavigate();
-
-    // expect qualifier to be contained in view params
-    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
-
-    await expect(await testeeViewPagePO.getViewParams()).toEqual(
-      expect.objectContaining({
-        entity: 'product [string]',
-        id: '123 [string]',
-        readonly: 'true [string]',
-      }));
-  });
-
-  test('should not overwrite qualifier values with param values', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register testee view
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
-      type: 'view',
-      qualifier: {entity: 'product', id: '*'},
+      qualifier: {entity: 'product'},
       params: [
         {name: 'id', required: true},
       ],
@@ -105,12 +67,12 @@ test.describe('Workbench Router', () => {
 
     // navigate
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({entity: 'product', id: '123'});
-    await routerPagePO.enterParams({id: '456'}); // should be ignored
+    await routerPagePO.enterQualifier({entity: 'product'});
+    await routerPagePO.enterParams({id: '123'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
-    // expect qualifier values not to be overwritten by params
+    // expect qualifier to be contained in view params
     const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
     const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
 
@@ -121,6 +83,42 @@ test.describe('Workbench Router', () => {
       }));
   });
 
+  test('should not overwrite qualifier values with param values', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee view
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'view',
+      qualifier: {entity: 'product', mode: 'new'},
+      params: [
+        {name: 'mode', required: true},
+      ],
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+        cssClass: 'testee',
+      },
+    });
+
+    // navigate
+    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPagePO.enterQualifier({entity: 'product', mode: 'new'});
+    await routerPagePO.enterParams({mode: 'edit'}); // should be ignored
+    await routerPagePO.selectTarget('blank');
+    await routerPagePO.clickNavigate();
+
+    // expect qualifier values not to be overwritten by params
+    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
+    const testeeViewPagePO = new ViewPagePO(appPO, testeeViewId);
+
+    await expect(await testeeViewPagePO.getViewParams()).toEqual(
+      expect.objectContaining({
+        entity: 'product [string]',
+        mode: 'new [string]',
+      }));
+  });
+
   test('should substitute named URL params with values of the qualifier and params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
@@ -128,7 +126,7 @@ test.describe('Workbench Router', () => {
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
-      qualifier: {component: 'testee', seg1: '*', mp1: '*', qp1: '*'},
+      qualifier: {component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'},
       params: [
         {name: 'seg3', required: true},
         {name: 'mp2', required: true},
@@ -176,9 +174,9 @@ test.describe('Workbench Router', () => {
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
       type: 'view',
-      qualifier: {entity: 'product', id: '*'},
+      qualifier: {entity: 'product'},
       params: [
-        {name: 'readonly', required: true},
+        {name: 'id', required: true},
       ],
       properties: {
         path: 'test-view',
@@ -189,8 +187,8 @@ test.describe('Workbench Router', () => {
 
     // navigate
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({entity: 'product', id: '123'});
-    await routerPagePO.enterParams({readonly: 'true'});
+    await routerPagePO.enterQualifier({entity: 'product'});
+    await routerPagePO.enterParams({id: '123'});
     await routerPagePO.selectTarget('blank');
     await routerPagePO.clickNavigate();
 
@@ -202,8 +200,8 @@ test.describe('Workbench Router', () => {
 
     // navigate to update the view's params
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterQualifier({entity: 'product', id: '123'});
-    await routerPagePO.enterParams({readonly: 'false'});
+    await routerPagePO.enterQualifier({entity: 'product'});
+    await routerPagePO.enterParams({id: '456'});
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(testeeViewPagePO.viewId);
     await routerPagePO.clickNavigate();
@@ -214,8 +212,7 @@ test.describe('Workbench Router', () => {
     await expect(await testeeViewPagePO.getViewParams()).toEqual(
       expect.objectContaining({
         entity: 'product [string]',
-        id: '123 [string]',
-        readonly: 'false [string]',
+        id: '456 [string]',
       }));
     // expect no new view instance to be constructed
     await expect(await testeeViewPagePO.getComponentInstanceId()).toEqual(testeeComponentInstanceId);
@@ -564,8 +561,12 @@ test.describe('Workbench Router', () => {
       const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
       await registerCapabilityPagePO.registerCapability({
         type: 'view',
-        qualifier: {entity: 'product', id: '*'},
+        qualifier: {entity: 'product'},
         params: [
+          {
+            name: 'id',
+            required: true,
+          },
           {
             name: 'param1',
             required: false,
@@ -586,8 +587,8 @@ test.describe('Workbench Router', () => {
 
       // navigate
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPagePO.enterQualifier({entity: 'product', id: '123'});
-      await routerPagePO.enterParams({param1: 'transient param1', param2: 'transient param2'});
+      await routerPagePO.enterQualifier({entity: 'product'});
+      await routerPagePO.enterParams({id: '123', param1: 'transient param1', param2: 'transient param2'});
       await routerPagePO.selectTarget('blank');
       await routerPagePO.clickNavigate();
 
