@@ -501,7 +501,7 @@ test.describe('Workbench Popup', () => {
 
   test.describe('popup closing', () => {
 
-    test('should close the popup on focus lost', async ({appPO, workbenchNavigator}) => {
+    test('should close the popup on focus loss', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
@@ -519,7 +519,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isVisible()).toBe(false);
     });
 
-    test('should not close the popup on focus lost', async ({appPO, workbenchNavigator}) => {
+    test('should not close the popup on focus loss', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);

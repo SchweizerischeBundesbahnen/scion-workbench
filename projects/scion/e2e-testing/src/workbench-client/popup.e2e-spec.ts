@@ -415,7 +415,7 @@ test.describe('Workbench Popup', () => {
 
   test.describe('popup closing', () => {
 
-    test('should close the popup on focus lost', async ({appPO, microfrontendNavigator}) => {
+    test('should close the popup on focus loss', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
@@ -436,19 +436,18 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+      await popupPagePO.waitForFocus();
 
       await popupOpenerPagePO.view.viewTab.click();
 
-      // popup should be closed on focus lost
+      // popup should be closed on focus loss
       await popupPagePO.popupPO.waitUntilClosed();
 
       await expect(await popupPagePO.popupPO.isPresent()).toBe(false);
       await expect(await popupPagePO.popupPO.isVisible()).toBe(false);
     });
 
-    test('should not close the popup on focus lost', async ({appPO, microfrontendNavigator}) => {
+    test('should not close the popup on focus loss', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
@@ -469,8 +468,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+      await popupPagePO.waitForFocus();
 
       await popupOpenerPagePO.view.viewTab.click();
 
@@ -499,9 +497,11 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.clickOpen();
 
       const popupPage1PO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPage1PO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPage1PO.popupPO.isVisible()).toBe(true);
+      await popupPage1PO.waitForFocus();
 
+      // Pause execution since the installation of the escape keystroke may take some time.
+      // TODO [#207]: Wait until keystrokes are installed: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/issues/207
+      await page.waitForTimeout(500);
       await page.keyboard.press('Escape');
 
       // popup should be closed on escape keystroke
@@ -516,8 +516,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.clickOpen();
 
       const popupPage2PO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPage2PO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPage2PO.popupPO.isVisible()).toBe(true);
+      await popupPage2PO.waitForFocus();
 
       await popupPage2PO.enterReturnValue('explicitly request the focus');
       await page.keyboard.press('Escape');
@@ -550,9 +549,11 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
-      await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+      await popupPagePO.waitForFocus();
 
+      // Pause execution since the installation of the escape keystroke may take some time.
+      // TODO [#207]: Wait until keystrokes are installed: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/issues/207
+      await page.waitForTimeout(500);
       await page.keyboard.press('Escape');
 
       await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
