@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Injector, NgZone} from '@angular/core';
+import {Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
 import {CapabilityInterceptor, HostManifestInterceptor, IntentClient, IntentInterceptor, MessageClient, MicrofrontendPlatform, MicrofrontendPlatformConfig, Runlevel} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
@@ -25,7 +25,7 @@ import {MicrofrontendPopupCapabilityInterceptor} from '../microfrontend-popup/mi
  * Initializes and starts the SCION Microfrontend Platform in host mode.
  */
 @Injectable()
-export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
+export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, OnDestroy {
 
   constructor(private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
               private _hostManifestInterceptor: WorkbenchHostManifestInterceptor,
@@ -90,6 +90,10 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer {
     await this._zone.runOutsideAngular(() => MicrofrontendPlatform.startHost(microfrontendPlatformConfig));
 
     this._logger.debug('SCION Microfrontend Platform started.', LoggerNames.LIFECYCLE, microfrontendPlatformConfig);
+  }
+
+  public ngOnDestroy(): void {
+    MicrofrontendPlatform.destroy().then();
   }
 }
 
