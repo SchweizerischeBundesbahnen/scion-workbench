@@ -51,7 +51,7 @@ export class HostPopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-capability'));
     await accordionPO.expand();
     try {
-      return JSON.parse(await accordionPO.locator('div.e2e-popup-capability').innerText());
+      return JSON.parse(await accordionPO.itemLocator().locator('div.e2e-popup-capability').innerText());
     }
     finally {
       await accordionPO.collapse();
@@ -62,7 +62,7 @@ export class HostPopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(accordionPO.locator('sci-property.e2e-popup-params')).readProperties();
+      return await new SciPropertyPO(accordionPO.itemLocator().locator('sci-property.e2e-popup-params')).readProperties();
     }
     finally {
       await accordionPO.collapse();
@@ -73,7 +73,7 @@ export class HostPopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(accordionPO.locator('sci-property.e2e-route-params')).readProperties();
+      return await new SciPropertyPO(accordionPO.itemLocator().locator('sci-property.e2e-route-params')).readProperties();
     }
     finally {
       await accordionPO.collapse();
@@ -85,8 +85,8 @@ export class HostPopupPagePO {
     await accordionPO.expand();
     try {
       return withoutUndefinedEntries({
-        viewId: await accordionPO.locator('output.e2e-view-id').innerText(),
-        viewCapabilityId: await accordionPO.locator('output.e2e-view-capability-id').innerText(),
+        viewId: await accordionPO.itemLocator().locator('output.e2e-view-id').innerText(),
+        viewCapabilityId: await accordionPO.itemLocator().locator('output.e2e-view-capability-id').innerText(),
       });
     }
     finally {
@@ -107,7 +107,7 @@ export class HostPopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-return-value'));
     await accordionPO.expand();
     try {
-      await accordionPO.locator('input.e2e-return-value').fill(returnValue);
+      await accordionPO.itemLocator().locator('input.e2e-return-value').fill(returnValue);
     }
     finally {
       await accordionPO.collapse();

@@ -21,23 +21,19 @@ export class SciAccordionPO {
   public async expand(itemCssClass?: string): Promise<void> {
     const expandButtonLocator = this.itemLocator(itemCssClass).locator('button.e2e-expand');
     await expandButtonLocator.click();
-    await this.itemLocator(itemCssClass).locator('section').waitFor({state: 'visible'});
+    await this.itemLocator(itemCssClass).locator('> section').waitFor({state: 'visible'});
   }
 
   public async collapse(itemCssClass?: string): Promise<void> {
     const collapseButtonLocator = this.itemLocator(itemCssClass).locator('button.e2e-collapse');
     await collapseButtonLocator.click();
-    await this.itemLocator(itemCssClass).locator('section').waitFor({state: 'detached'});
+    await this.itemLocator(itemCssClass).locator('> section').waitFor({state: 'detached'});
   }
 
-  private itemLocator(itemCssClass?: string): Locator {
+  public itemLocator(itemCssClass?: string): Locator {
     if (!itemCssClass) {
       return this._sciAccordionLocator.locator('section.e2e-accordion-item');
     }
     return this._sciAccordionLocator.locator(`section.e2e-accordion-item.${itemCssClass}`);
-  }
-
-  public locator(selector: string): Locator {
-    return this._sciAccordionLocator.locator(selector);
   }
 }
