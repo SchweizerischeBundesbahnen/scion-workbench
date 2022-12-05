@@ -82,7 +82,7 @@ export class MessageBoxService implements OnDestroy {
   public open(message: string | MessageBoxConfig): Promise<any> {
     // Ensure to run in Angular zone to display the message box even when called from outside of the Angular zone, e.g. from an error handler.
     if (!NgZone.isInAngularZone()) {
-      return this._zone.run(() => this.open(config));
+      return this._zone.run(() => this.open(message));
     }
 
     const config: MessageBoxConfig = typeof message === 'string' ? {content: message} : message;
