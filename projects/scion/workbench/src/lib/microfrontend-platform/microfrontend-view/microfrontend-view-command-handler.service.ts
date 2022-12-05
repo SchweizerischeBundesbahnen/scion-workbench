@@ -15,7 +15,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {map, switchMap, takeUntil} from 'rxjs/operators';
 import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {merge, Subject} from 'rxjs';
+import {merge, Subject, Subscription} from 'rxjs';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 
 /**
@@ -28,6 +28,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
   private _viewCapabilities = new Map<string, WorkbenchViewCapability>();
+  private _subscriptions = new Set<Subscription>();
 
   constructor(private _messageClient: MessageClient,
               private _viewRegistry: WorkbenchViewRegistry,
@@ -36,11 +37,11 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
     this.installViewCapabilityObserver();
     this.installViewActiveStatePublisher();
 
-    this.installViewTitleCommandHandler();
-    this.installViewHeadingCommandHandler();
-    this.installViewDirtyCommandHandler();
-    this.installViewClosableCommandHandler();
-    this.installViewCloseCommandHandler();
+    this._subscriptions.add(this.installViewTitleCommandHandler());
+    this._subscriptions.add(this.installViewHeadingCommandHandler());
+    this._subscriptions.add(this.installViewDirtyCommandHandler());
+    this._subscriptions.add(this.installViewClosableCommandHandler());
+    this._subscriptions.add(this.installViewCloseCommandHandler());
   }
 
   /**
@@ -62,8 +63,8 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   /**
    * Handles commands to update the title of a view.
    */
-  private installViewTitleCommandHandler(): void {
-    this._messageClient.onMessage(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
+  private installViewTitleCommandHandler(): Subscription {
+    return this._messageClient.onMessage(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.title = message.body;
@@ -74,8 +75,8 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   /**
    * Handles commands to update the heading of a view.
    */
-  private installViewHeadingCommandHandler(): void {
-    this._messageClient.onMessage(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
+  private installViewHeadingCommandHandler(): Subscription {
+    return this._messageClient.onMessage(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.heading = message.body;
@@ -86,8 +87,8 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   /**
    * Handles commands to update the dirty state of a view.
    */
-  private installViewDirtyCommandHandler(): void {
-    this._messageClient.onMessage(ɵWorkbenchCommands.viewDirtyTopic(':viewId'), message => {
+  private installViewDirtyCommandHandler(): Subscription {
+    return this._messageClient.onMessage(ɵWorkbenchCommands.viewDirtyTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.dirty = message.body;
@@ -98,8 +99,8 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   /**
    * Handles commands to update the closable property of a view.
    */
-  private installViewClosableCommandHandler(): void {
-    this._messageClient.onMessage(ɵWorkbenchCommands.viewClosableTopic(':viewId'), message => {
+  private installViewClosableCommandHandler(): Subscription {
+    return this._messageClient.onMessage(ɵWorkbenchCommands.viewClosableTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.closable = message.body;
@@ -110,8 +111,8 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   /**
    * Handles commands to close a view.
    */
-  private installViewCloseCommandHandler(): void {
-    this._messageClient.onMessage(ɵWorkbenchCommands.viewCloseTopic(':viewId'), message => {
+  private installViewCloseCommandHandler(): Subscription {
+    return this._messageClient.onMessage(ɵWorkbenchCommands.viewCloseTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId')!;
       this.runIfPrivileged(viewId, message, view => {
         view.close().then();
@@ -158,5 +159,6 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
 
   public ngOnDestroy(): void {
     this._destroy$.next();
+    this._subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 }
