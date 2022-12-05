@@ -25,12 +25,16 @@ import {Locator} from '@playwright/test';
 export class PopupPagePO {
 
   private readonly _locator: Locator;
+  private readonly _hasFocusLocator: Locator;
 
   public readonly popupPO: PopupPO;
 
   constructor(appPO: AppPO, cssClass: string) {
     this.popupPO = appPO.popup({cssClass});
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame({cssClass: ['e2e-popup'].concat(cssClass)})).locator('app-popup-page');
+
+    const frameLocator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame({cssClass: ['e2e-popup'].concat(cssClass)}));
+    this._locator = frameLocator.locator('app-popup-page');
+    this._hasFocusLocator = frameLocator.locator('app-root').locator('.e2e-has-focus');
   }
 
   public async getComponentInstanceId(): Promise<string> {
@@ -142,6 +146,13 @@ export class PopupPagePO {
   public async getSize(): Promise<Size> {
     const {width, height} = fromRect(await this._locator.boundingBox());
     return {width, height};
+  }
+
+  /**
+   * Waits until this page gains focus.
+   */
+  public async waitForFocus(): Promise<void> {
+    await this._hasFocusLocator.waitFor({state: 'visible'});
   }
 }
 

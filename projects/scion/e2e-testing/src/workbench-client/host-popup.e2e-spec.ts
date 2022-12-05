@@ -290,7 +290,7 @@ test.describe('Workbench Popup', () => {
 
   test.describe('popup closing', () => {
 
-    test('should close the popup on focus lost', async ({appPO, microfrontendNavigator}) => {
+    test('should close the popup on focus loss', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
@@ -313,14 +313,14 @@ test.describe('Workbench Popup', () => {
 
       await popupOpenerPagePO.view.viewTab.click();
 
-      // popup should be closed on focus lost
+      // popup should be closed on focus loss
       await hostPopupPagePO.popupPO.waitUntilClosed();
 
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(false);
       await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(false);
     });
 
-    test('should not close the popup on focus lost', async ({appPO, microfrontendNavigator}) => {
+    test('should not close the popup on focus loss', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271

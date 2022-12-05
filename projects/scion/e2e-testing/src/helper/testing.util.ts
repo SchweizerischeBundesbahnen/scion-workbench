@@ -37,7 +37,7 @@ export async function isActiveElement(element: Locator): Promise<boolean> {
  * Returns true if the element is attached to the DOM.
  */
 export async function isPresent(element: Locator): Promise<boolean> {
-  return await element.count() > 0;
+  return await waitUntilStable(() => element.count(), {probeInterval: 25}) > 0;
 }
 
 /**
