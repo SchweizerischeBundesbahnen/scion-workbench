@@ -67,7 +67,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-return-value'));
     await accordionPO.expand();
     try {
-      await accordionPO.locator('input.e2e-return-value').fill(returnValue);
+      await accordionPO.itemLocator().locator('input.e2e-return-value').fill(returnValue);
     }
     finally {
       await accordionPO.collapse();
@@ -83,7 +83,7 @@ export class PopupPagePO {
     await accordionPO.expand();
     try {
       return withoutUndefinedEntries({
-        viewId: await accordionPO.locator('output.e2e-view-id').innerText(),
+        viewId: await accordionPO.itemLocator().locator('output.e2e-view-id').innerText(),
       });
     }
     finally {
@@ -95,7 +95,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-preferred-overlay-size'));
     await accordionPO.expand();
     try {
-      return JSON.parse(await accordionPO.locator('div.e2e-preferred-overlay-size').innerText());
+      return JSON.parse(await accordionPO.itemLocator().locator('div.e2e-preferred-overlay-size').innerText());
     }
     finally {
       await accordionPO.collapse();
