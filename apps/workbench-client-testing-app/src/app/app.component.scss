@@ -12,12 +12,19 @@
     position: absolute; // take router outlet out of the document flow
   }
 
-  &::after {
-    content: attr(data-app-symbolic-name);
+  > section.metadata {
     position: absolute;
-    right: 5px;
-    top: 5px;
-    @include sci-ɵcomponents.theme-chip(var(--app-color), var(--app-color), white);
+    display: flex;
+    justify-self: end;
+    padding: .25em;
+
+    > span.chip.has-focus {
+      @include sci-ɵcomponents.theme-chip(var(--sci-color-primary-darker), var(--sci-color-background), var(--sci-color-P900));
+    }
+
+    > span.chip.app-symbolic-name {
+      @include sci-ɵcomponents.theme-chip(var(--app-color), var(--app-color), var(--sci-color-background));
+    }
   }
 
   > span.workbench-context-note {
