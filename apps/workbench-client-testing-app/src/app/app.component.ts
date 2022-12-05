@@ -9,7 +9,7 @@
  */
 
 import {Component, HostBinding, Inject, Optional} from '@angular/core';
-import {APP_IDENTITY, MicrofrontendPlatform, PlatformPropertyService} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatform, PlatformPropertyService} from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-root',
@@ -20,14 +20,14 @@ export class AppComponent {
 
   public readonly workbenchContextActive = MicrofrontendPlatform.isConnectedToHost();
 
-  @HostBinding('attr.data-app-symbolic-name')
   public appSymbolicName: string;
 
   @HostBinding('style.--app-color')
   public appColor: string;
 
   constructor(@Inject(APP_IDENTITY) @Optional() symbolicName: string, // not available if not running in the workbench context
-              @Optional() propertyService: PlatformPropertyService) { // not available if not running in the workbench context
+              @Optional() propertyService: PlatformPropertyService,  // not available if not running in the workbench context
+              @Optional() public focusMonitor: FocusMonitor) { // not available if not running in the workbench context
     this.appSymbolicName = symbolicName;
     this.appColor = propertyService?.get<any>(symbolicName).color;
   }
