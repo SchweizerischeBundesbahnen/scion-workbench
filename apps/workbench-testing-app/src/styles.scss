@@ -25,6 +25,8 @@
 
 html {
   font-size: 14px; // defines 1rem as 14px
+  width: 100vw;
+  height: 100vh;
 }
 
 body {
@@ -32,4 +34,6 @@ body {
   color: var(--sci-color-foreground);
   background-color: var(--sci-color-background);
   margin: 0;
+  width: 100vw;
+  height: 100vh;
 }
