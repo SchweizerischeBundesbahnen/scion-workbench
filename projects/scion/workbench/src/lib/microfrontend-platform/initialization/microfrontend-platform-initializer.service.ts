@@ -80,7 +80,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // Inject services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.
     Beans.registerInitializer({
-      useFunction: () => runWorkbenchInitializers(MICROFRONTEND_PLATFORM_POST_STARTUP, this._injector),
+      useFunction: () => this._zone.run(() => runWorkbenchInitializers(MICROFRONTEND_PLATFORM_POST_STARTUP, this._injector)),
       runlevel: Runlevel.Two,
     });
 
