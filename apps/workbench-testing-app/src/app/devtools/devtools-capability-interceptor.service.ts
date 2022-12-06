@@ -17,7 +17,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 /**
  * Qualifier of the SCION DevTools view capability.
  */
-const DEVTOOLS_QUALIFIER_MATCHER = new QualifierMatcher({component: 'devtools', vendor: 'scion'}, {evalAsterisk: false, evalOptional: false});
+const DEVTOOLS_QUALIFIER_MATCHER = new QualifierMatcher({component: 'devtools', vendor: 'scion'});
 
 /**
  * Intercepts the DevTools view capability to pin it to the start page.

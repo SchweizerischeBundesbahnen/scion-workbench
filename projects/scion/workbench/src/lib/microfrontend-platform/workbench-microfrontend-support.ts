@@ -15,7 +15,7 @@ import {APP_IDENTITY, IntentClient, ManifestService, MessageClient, Microfronten
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
-import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './initialization/ng-zone-decorators';
+import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.service';
@@ -71,8 +71,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       WorkbenchPopupService,
       WorkbenchMessageBoxService,
       WorkbenchNotificationService,
-      NgZoneMessageClientDecorator,
-      NgZoneIntentClientDecorator,
+      NgZoneObservableDecorator,
       WorkbenchHostManifestInterceptor,
       provideMicrofrontendRoutes(),
       provideMicrofrontendPlatformBeans(),

@@ -9,10 +9,10 @@
  */
 
 import {Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
-import {CapabilityInterceptor, HostManifestInterceptor, IntentClient, IntentInterceptor, MessageClient, MicrofrontendPlatform, MicrofrontendPlatformConfig, Runlevel} from '@scion/microfrontend-platform';
+import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, MicrofrontendPlatform, MicrofrontendPlatformConfig, ObservableDecorator, Runlevel} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
-import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './ng-zone-decorators';
+import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, runWorkbenchInitializers, WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
 import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-intent-interceptor.service';
@@ -29,8 +29,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
   constructor(private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
               private _hostManifestInterceptor: WorkbenchHostManifestInterceptor,
-              private _ngZoneMessageClientDecorator: NgZoneMessageClientDecorator,
-              private _ngZoneIntentClientDecorator: NgZoneIntentClientDecorator,
+              private _ngZoneObservableDecorator: NgZoneObservableDecorator,
               private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
               private _microfrontendPopupIntentInterceptor: MicrofrontendPopupIntentInterceptor,
               private _microfrontendViewCapabilityInterceptor: MicrofrontendViewCapabilityInterceptor,
@@ -61,9 +60,8 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // Register host manifest interceptor for the workbench to register workbench-specific intentions and capabilities.
     Beans.register(HostManifestInterceptor, {useValue: this._hostManifestInterceptor, multi: true});
 
-    // Synchronize emissions of messaging Observables with the Angular zone.
-    Beans.registerDecorator(MessageClient, {useValue: this._ngZoneMessageClientDecorator});
-    Beans.registerDecorator(IntentClient, {useValue: this._ngZoneIntentClientDecorator});
+    // Synchronize emissions of Observables exposed by the SCION Microfrontend Platform with the Angular zone.
+    Beans.register(ObservableDecorator, {useValue: this._ngZoneObservableDecorator});
 
     // Register view intent interceptor to translate view intents into workbench router commands.
     Beans.register(IntentInterceptor, {useValue: this._microfrontendViewIntentInterceptor, multi: true});
