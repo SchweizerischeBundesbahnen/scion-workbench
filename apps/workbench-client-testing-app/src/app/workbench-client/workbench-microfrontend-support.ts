@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {APP_INITIALIZER, NgZone, Provider} from '@angular/core';
-import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
+import {APP_INITIALIZER, inject, NgZone, Provider} from '@angular/core';
+import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
 import {WorkbenchClient, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
-import {NgZoneIntentClientDecorator, NgZoneMessageClientDecorator} from './ng-zone-decorators';
+import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {environment} from '../../environments/environment';
 
@@ -27,11 +27,8 @@ export function provideWorkbenchClientInitializer(): Provider[] {
     {
       provide: APP_INITIALIZER,
       useFactory: connectToWorkbenchFn,
-      deps: [NgZoneMessageClientDecorator, NgZoneIntentClientDecorator, NgZone],
       multi: true,
     },
-    NgZoneMessageClientDecorator,
-    NgZoneIntentClientDecorator,
     {provide: APP_IDENTITY, useFactory: () => Beans.get(APP_IDENTITY)},
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
@@ -53,11 +50,10 @@ export function provideWorkbenchClientInitializer(): Provider[] {
 /**
  * Connects this app to the workbench in the host app.
  */
-export function connectToWorkbenchFn(ngZoneMessageClientDecorator: NgZoneMessageClientDecorator, ngZoneIntentClientDecorator: NgZoneIntentClientDecorator, zone: NgZone): () => Promise<void> {
+export function connectToWorkbenchFn(): () => Promise<void> {
+  const zone = inject(NgZone);
   return (): Promise<void> => {
-    Beans.registerDecorator(MessageClient, {useValue: ngZoneMessageClientDecorator});
-    Beans.registerDecorator(IntentClient, {useValue: ngZoneIntentClientDecorator});
-    // We connect to the host outside the Angular zone in order to avoid excessive change detection cycles of platform-internal subscriptions to global DOM events.
+    Beans.register(ObservableDecorator, {useValue: new NgZoneObservableDecorator(zone)});
     return zone.runOutsideAngular(() => WorkbenchClient.connect(determineAppSymbolicName()));
   };
 }
