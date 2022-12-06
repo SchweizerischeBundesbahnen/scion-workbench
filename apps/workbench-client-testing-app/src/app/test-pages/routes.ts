@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
+import {Routes} from '@angular/router';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'bulk-navigation-test-page',
     loadComponent: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.component').then(m => m.BulkNavigationTestPageComponent),
@@ -20,11 +19,8 @@ const routes: Routes = [
     path: 'view-properties-test-page',
     loadComponent: (): any => import('./view-properties-test-page/view-properties-test-page.component').then(m => m.ViewPropertiesTestPageComponent),
   },
+  {
+    path: 'input-field-test-page',
+    loadComponent: (): any => import('./input-field-test-page/input-field-test-page.component').then(m => m.InputFieldTestPageComponent),
+  },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-})
-export class TestPagesRoutingModule {
-}

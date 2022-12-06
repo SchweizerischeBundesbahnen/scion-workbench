@@ -42,7 +42,7 @@ export class BulkNavigationTestPagePO {
     await waitUntilStable(() => this._appPO.page.url());
   }
 
-  public static async navigateTo(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
+  public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPagePO.enterPath('test-pages/bulk-navigation-test-page');
     await routerPagePO.clickNavigate();

@@ -13,6 +13,7 @@ import {test} from '../fixtures';
 import {PopupFocusPagePO} from './page-object/popup-focus-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {PopupPagePO} from './page-object/popup-page.po';
+import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 
 const POPUP_DIAMOND_ANCHOR_SIZE = 8;
 
@@ -571,6 +572,36 @@ test.describe('Workbench Popup', () => {
 
       await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+    });
+
+    test('should remain focus on the element that caused the popup to lose focus', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup page
+      const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      // Open test page
+      const inputFieldPagePO = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+      // Move test page to the right
+      await inputFieldPagePO.view.viewTab.dragToPart({region: 'east'});
+
+      // Open popup
+      await popupOpenerPagePO.enterCssClass('testee');
+      await popupOpenerPagePO.selectPopupComponent('popup-focus-page');
+      await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: true});
+      await popupOpenerPagePO.clickOpen();
+
+      // Expect popup to have focus.
+      const popupFocusPagePO = new PopupFocusPagePO(appPO, 'testee');
+      await expect(await popupFocusPagePO.isActiveElement('first-field')).toBe(true);
+
+      // Click the input field to make popup lose focus
+      await inputFieldPagePO.clickInputField();
+
+      // Expect popup to be closed
+      await expect(await popupFocusPagePO.popupPO.isVisible()).toBe(false);
+
+      // Expect focus to remain in the input field that caused focus loss of the popup.
+      await expect(await inputFieldPagePO.isActiveElement()).toBe(true);
     });
   });
 
