@@ -11,8 +11,8 @@
 import {coerceArray} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
-import {SciCheckboxPO} from '../../components.internal/checkbox.po';
-import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
 import {Locator} from '@playwright/test';
 
 /**

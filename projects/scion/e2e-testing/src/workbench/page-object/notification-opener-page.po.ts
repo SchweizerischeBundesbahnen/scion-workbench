@@ -10,7 +10,7 @@
 
 import {coerceArray} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {SciCheckboxPO} from '../../components.internal/checkbox.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 
 /**

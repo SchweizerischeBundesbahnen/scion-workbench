@@ -13,9 +13,9 @@ import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {Locator} from '@playwright/test';
-import {SciCheckboxPO} from '../../components.internal/checkbox.po';
-import {SciAccordionPO} from '../../components.internal/accordion.po';
-import {SciPropertyPO} from '../../components.internal/property.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
+import {SciPropertyPO} from '../../@scion/components.internal/property.po';
 import {Params} from '@angular/router';
 
 /**

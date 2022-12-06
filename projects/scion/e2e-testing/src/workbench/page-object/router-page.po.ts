@@ -12,8 +12,8 @@ import {coerceArray, waitUntilStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
-import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
-import {SciCheckboxPO} from '../../components.internal/checkbox.po';
+import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator, Page} from '@playwright/test';
 import {Params} from '@angular/router';
 

@@ -11,8 +11,8 @@
 import {Locator} from '@playwright/test';
 import {AppPO} from '../../../app.po';
 import {ElementSelectors} from '../../../helper/element-selectors';
-import {SciAccordionPO} from '../../../components.internal/accordion.po';
-import {SciCheckboxPO} from '../../../components.internal/checkbox.po';
+import {SciAccordionPO} from '../../../@scion/components.internal/accordion.po';
+import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {RegisterWorkbenchCapabilityPagePO} from '../register-workbench-capability-page.po';
 

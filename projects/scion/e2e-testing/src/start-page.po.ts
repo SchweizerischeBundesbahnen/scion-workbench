@@ -11,7 +11,7 @@
 import {AppPO} from './app.po';
 import {ViewPO} from './view.po';
 import {Locator} from '@playwright/test';
-import {SciTabbarPO} from './components.internal/tabbar.po';
+import {SciTabbarPO} from './@scion/components.internal/tabbar.po';
 
 /**
  * Page object to interact {@link StartPageComponent}.
