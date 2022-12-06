@@ -12,7 +12,7 @@ import {fromRect, isPresent, withoutUndefinedEntries} from '../../helper/testing
 import {AppPO} from '../../app.po';
 import {PopupPO} from '../../popup.po';
 import {PopupReferrer, PopupSize} from '@scion/workbench';
-import {SciAccordionPO} from '../../components.internal/accordion.po';
+import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 
 /**

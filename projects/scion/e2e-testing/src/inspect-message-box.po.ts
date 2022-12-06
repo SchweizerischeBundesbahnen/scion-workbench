@@ -11,7 +11,7 @@
 import {AppPO} from './app.po';
 import {MessageBoxPO} from './message-box.po';
 import {coerceArray, isPresent} from './helper/testing.util';
-import {SciParamsEnterPO} from './components.internal/params-enter.po';
+import {SciParamsEnterPO} from './@scion/components.internal/params-enter.po';
 import {Locator} from '@playwright/test';
 
 /**

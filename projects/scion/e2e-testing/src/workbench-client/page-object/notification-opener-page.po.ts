@@ -11,7 +11,7 @@
 import {coerceArray} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {Qualifier} from '@scion/microfrontend-platform';
-import {SciParamsEnterPO} from '../../components.internal/params-enter.po';
+import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
 

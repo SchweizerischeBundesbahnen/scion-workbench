@@ -14,8 +14,8 @@ import {PopupPO} from '../../popup.po';
 import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
 import {WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
-import {SciAccordionPO} from '../../components.internal/accordion.po';
-import {SciPropertyPO} from '../../components.internal/property.po';
+import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
+import {SciPropertyPO} from '../../@scion/components.internal/property.po';
 import {ElementSelectors} from '../../helper/element-selectors';
 import {Locator} from '@playwright/test';
 

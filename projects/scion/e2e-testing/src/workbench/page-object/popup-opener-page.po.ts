@@ -11,8 +11,8 @@
 import {coerceArray, fromRect, isPresent} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {BottomLeftPoint, BottomRightPoint, PopupOrigin, PopupSize, TopLeftPoint, TopRightPoint} from '@scion/workbench';
-import {SciAccordionPO} from '../../components.internal/accordion.po';
-import {SciCheckboxPO} from '../../components.internal/checkbox.po';
+import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
 
