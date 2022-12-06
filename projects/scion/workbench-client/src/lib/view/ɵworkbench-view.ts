@@ -9,20 +9,20 @@
  */
 
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
-import {BehaviorSubject, firstValueFrom, merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription} from 'rxjs';
+import {merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription, take} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
 import {ManifestService, mapToBody, Message, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, skipWhile, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 import {Observables} from '@scion/toolkit/util';
 import {ViewClosingEvent, ViewClosingListener, ViewSnapshot, WorkbenchView} from './workbench-view';
+import {decorateObservable} from '../observable-decorator';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
   private _propertyChange$ = new Subject<'title' | 'heading' | 'dirty' | 'closable'>();
   private _destroy$ = new Subject<void>();
-
   /**
    * Observable that emits when the application loaded into the current view receives an unloading event,
    * i.e., is just about to be replaced by a microfrontend of another application.
@@ -36,32 +36,31 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   private _closingSubscription: Subscription | undefined;
 
   public active$: Observable<boolean>;
+  public params$: Observable<ReadonlyMap<string, any>>;
   public capability$: Observable<WorkbenchViewCapability>;
   public whenInitialParams: Promise<void>;
-  public params$ = new BehaviorSubject<Map<string, any>>(PARAMS_PENDING_GUARD);
+  public snapshot: ViewSnapshot = {
+    params: new Map<string, any>(),
+  };
 
   constructor(public viewId: string) {
     this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.viewId))
       .pipe(map(() => undefined));
 
-    Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
+    this.params$ = Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
       .pipe(
         mapToBody(),
         coerceMap(),
+        shareReplay({refCount: false, bufferSize: 1}),
+        decorateObservable(),
         takeUntil(merge(this._beforeUnload$, this._destroy$)),
-      )
-      .subscribe(this.params$);
-
-    // Create Promise to wait for initial params.
-    this.whenInitialParams = (async () => {
-      const params$ = this.params$.pipe(skipWhile(params => params === PARAMS_PENDING_GUARD));
-      await firstValueFrom(params$, {defaultValue: undefined});
-    })();
+      );
 
     this.capability$ = this.params$
       .pipe(
         map(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID)),
         lookupViewCapabilityAndShareReplay(),
+        decorateObservable(),
         takeUntil(this._beforeUnload$),
       );
 
@@ -69,10 +68,16 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       .pipe(
         mapToBody(),
         distinctUntilChanged(),
-        shareReplay({refCount: true, bufferSize: 1}),
+        shareReplay({refCount: false, bufferSize: 1}),
+        decorateObservable(),
         takeUntil(this._beforeUnload$),
       );
 
+    // Notify when received initial params.
+    this.whenInitialParams = new Promise(resolve => this.params$.pipe(take(1)).subscribe(() => resolve()));
+    // Update params snapshot when params change.
+    this.params$.subscribe(params => this.snapshot.params = new Map(params));
+    // Detect navigation to a different view capability of the same app.
     this.capability$
       .pipe(
         skip(1), // skip the initial navigation
@@ -83,15 +88,6 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
         this._closingListeners.clear();
         this._closingSubscription?.unsubscribe();
       });
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public get snapshot(): ViewSnapshot {
-    return {
-      params: this.params$.value,
-    };
   }
 
   /**
@@ -218,8 +214,6 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   }
 }
 
-const PARAMS_PENDING_GUARD = new Map();
-
 /**
  * Context key to retrieve the view ID for microfrontends embedded in the context of a workbench view.
  *
@@ -261,7 +255,7 @@ function lookupViewCapabilityAndShareReplay(): OperatorFunction<string, Workbenc
     switchMap(viewCapabilityId => Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({id: viewCapabilityId})), // async call; long-living
     map(viewCapabilities => viewCapabilities[0]),
     // Replay the latest looked up capability for new subscribers.
-    shareReplay({refCount: true, bufferSize: 1}),
+    shareReplay({refCount: false, bufferSize: 1}),
     // Ensure not to replay a stale capability upon the subscription of new subscribers. For this reason, we install a filter to filter them out.
     // The 'shareReplay' operator would replay a stale capability if the source has emitted a new capability id, but the lookup for it did not complete yet.
     filter(viewCapability => latestViewCapabilityId === viewCapability.metadata!.id),

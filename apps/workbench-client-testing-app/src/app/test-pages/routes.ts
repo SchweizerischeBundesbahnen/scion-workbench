@@ -23,4 +23,8 @@ export const routes: Routes = [
     path: 'input-field-test-page',
     loadComponent: (): any => import('./input-field-test-page/input-field-test-page.component').then(m => m.InputFieldTestPageComponent),
   },
+  {
+    path: 'angular-zone-test-page',
+    loadComponent: (): any => import('./angular-zone-test-page/angular-zone-test-page.component').then(m => m.AngularZoneTestPageComponent),
+  },
 ];
