@@ -12,6 +12,7 @@ import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {expect} from '@playwright/test';
 import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
+import {ViewPropertiesTestPagePO} from './page-object/test-pages/view-properties-test-page.po';
 
 test.describe('Workbench View Properties', () => {
 
@@ -49,7 +50,10 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
 
-      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.getTitle({probeInterval: 250})).toEqual('Title 3');
+      const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
+      const viewPropertiesTestPO = new ViewPropertiesTestPagePO(appPO, viewId);
+      await viewPropertiesTestPO.waitUntilPresent();
+      await expect(await viewPropertiesTestPO.viewTab.getTitle()).toEqual('Title 3');
     });
   });
 
@@ -86,7 +90,11 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.selectTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.getHeading({probeInterval: 250})).toEqual('Heading 3');
+
+      const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
+      const viewPropertiesTestPO = new ViewPropertiesTestPagePO(appPO, viewId);
+      await viewPropertiesTestPO.waitUntilPresent();
+      await expect(await viewPropertiesTestPO.viewTab.getHeading()).toEqual('Heading 3');
     });
   });
 
@@ -123,7 +131,11 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.selectTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.isDirty({probeInterval: 250})).toBe(false);
+
+      const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
+      const viewPropertiesTestPO = new ViewPropertiesTestPagePO(appPO, viewId);
+      await viewPropertiesTestPO.waitUntilPresent();
+      await expect(await viewPropertiesTestPO.viewTab.isDirty()).toBe(false);
     });
   });
 
@@ -160,7 +172,11 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.selectTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.isDirty({probeInterval: 250})).toBe(true);
+
+      const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
+      const viewPropertiesTestPO = new ViewPropertiesTestPagePO(appPO, viewId);
+      await viewPropertiesTestPO.waitUntilPresent();
+      await expect(await viewPropertiesTestPO.viewTab.isDirty()).toBe(true);
     });
   });
 
@@ -197,7 +213,11 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.selectTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.isClosable({probeInterval: 250})).toBe(false);
+
+      const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
+      const viewPropertiesTestPO = new ViewPropertiesTestPagePO(appPO, viewId);
+      await viewPropertiesTestPO.waitUntilPresent();
+      await expect(await viewPropertiesTestPO.viewTab.isClosable()).toBe(false);
     });
   });
 
@@ -234,7 +254,11 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.selectTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-blank'}).viewTab.isClosable({probeInterval: 250})).toBe(true);
+
+      const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
+      const viewPropertiesTestPO = new ViewPropertiesTestPagePO(appPO, viewId);
+      await viewPropertiesTestPO.waitUntilPresent();
+      await expect(await viewPropertiesTestPO.viewTab.isClosable()).toBe(true);
     });
   });
 });

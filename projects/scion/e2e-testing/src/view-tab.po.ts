@@ -43,20 +43,20 @@ export class ViewTabPO {
     await this._locator.locator('.e2e-close').click();
   }
 
-  public getTitle(options?: {probeInterval?: number}): Promise<string> {
-    return waitUntilStable(() => this._locator.locator('.e2e-title').innerText(), options);
+  public getTitle(): Promise<string> {
+    return waitUntilStable(() => this._locator.locator('.e2e-title').innerText());
   }
 
-  public getHeading(options?: {probeInterval?: number}): Promise<string> {
-    return waitUntilStable(() => this._locator.locator('.e2e-heading').innerText(), options);
+  public getHeading(): Promise<string> {
+    return waitUntilStable(() => this._locator.locator('.e2e-heading').innerText());
   }
 
-  public isDirty(options?: {probeInterval?: number}): Promise<boolean> {
-    return waitUntilStable(() => hasCssClass(this._locator, 'dirty'), options);
+  public isDirty(): Promise<boolean> {
+    return waitUntilStable(() => hasCssClass(this._locator, 'dirty'));
   }
 
-  public async isClosable(options?: {probeInterval?: number}): Promise<boolean> {
-    return (await waitUntilStable(() => this._locator.locator('.e2e-close').count(), options) !== 0);
+  public async isClosable(): Promise<boolean> {
+    return (await waitUntilStable(() => this._locator.locator('.e2e-close').count()) !== 0);
   }
 
   public isActive(): Promise<boolean> {
