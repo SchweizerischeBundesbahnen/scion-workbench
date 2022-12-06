@@ -13,6 +13,8 @@ import {test} from '../fixtures';
 import {PopupPagePO} from './page-object/popup-page.po';
 import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {InputFieldTestPagePO as MicrofrontendInputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
+import {InputFieldTestPagePO as WorkbenchInputFieldTestPagePO} from '../workbench/page-object/test-pages/input-field-test-page.po';
 
 test.describe('Workbench Popup', () => {
 
@@ -292,6 +294,37 @@ test.describe('Workbench Popup', () => {
     await expect(await popupPO.getBoundingBox()).toEqual(popupClientRectInitial);
   });
 
+  test('should provide the popup\'s capability', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // register testee popup
+    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPagePO.registerCapability({
+      type: 'popup',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'popup',
+        cssClass: 'testee',
+      },
+    });
+
+    // open the popup
+    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.clickOpen();
+
+    // expect the popup of this app to display
+    const popupPagePO = new PopupPagePO(appPO, 'testee');
+    await expect(await popupPagePO.getPopupCapability()).toEqual(expect.objectContaining({
+      qualifier: {component: 'testee'},
+      type: 'popup',
+      properties: expect.objectContaining({
+        path: 'popup',
+        cssClass: ['testee'],
+      }),
+    }));
+  });
+
   test.describe('view context', () => {
 
     test('should hide the popup when its contextual view (if any) is deactivated, and then display the popup again when activating it', async ({appPO, microfrontendNavigator}) => {
@@ -560,7 +593,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
     });
 
-    test('should provide the popup\'s capability', async ({appPO, microfrontendNavigator}) => {
+    test('should remain focus on the element that caused the popup to lose focus when focusing element on a microfrontend view', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
@@ -574,21 +607,72 @@ test.describe('Workbench Popup', () => {
         },
       });
 
-      // open the popup
+      // Open popup opener page
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      // Open test view
+      const inputFieldPagePO = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+      // Move test page to the right
+      await inputFieldPagePO.view.viewTab.dragToPart({region: 'east'});
+
+      // Open popup
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: true});
       await popupOpenerPagePO.clickOpen();
 
-      // expect the popup of this app to display
+      // Expect popup to have focus.
       const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPagePO.getPopupCapability()).toEqual(expect.objectContaining({
-        qualifier: {component: 'testee'},
+      await popupPagePO.waitForFocus();
+
+      // Click the input field to make popup lose focus
+      await inputFieldPagePO.clickInputField();
+
+      // Expect popup to be closed
+      await popupPagePO.popupPO.waitUntilClosed();
+      await expect(await popupPagePO.popupPO.isVisible()).toBe(false);
+
+      // Expect focus to remain in the input field that caused focus loss of the popup.
+      await expect(await inputFieldPagePO.isActiveElement()).toBe(true);
+    });
+
+    test('should remain focus on the element that caused the popup to lose focus when focusing element on a non-microfrontend view', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // register testee popup
+      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPagePO.registerCapability({
         type: 'popup',
-        properties: expect.objectContaining({
+        qualifier: {component: 'testee'},
+        properties: {
           path: 'popup',
-          cssClass: ['testee'],
-        }),
-      }));
+          cssClass: 'testee',
+        },
+      });
+
+      // Open popup opener page
+      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      // Open test view
+      const inputFieldPagePO = await WorkbenchInputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+      // Move test page to the right
+      await inputFieldPagePO.view.viewTab.dragToPart({region: 'east'});
+
+      // Open popup
+      await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: true});
+      await popupOpenerPagePO.clickOpen();
+
+      // Expect popup to have focus.
+      const popupPagePO = new PopupPagePO(appPO, 'testee');
+      await popupPagePO.waitForFocus();
+
+      // Click the input field to make popup lose focus
+      await inputFieldPagePO.clickInputField();
+
+      // Expect popup to be closed
+      await popupPagePO.popupPO.waitUntilClosed();
+      await expect(await popupPagePO.popupPO.isVisible()).toBe(false);
+
+      // Expect focus to remain in the input field that caused focus loss of the popup.
+      await expect(await inputFieldPagePO.isActiveElement()).toBe(true);
     });
   });
 });

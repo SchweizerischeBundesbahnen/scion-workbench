@@ -11,6 +11,7 @@
 import {isActiveElement, isPresent} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {Locator} from '@playwright/test';
+import {PopupPO} from '../../popup.po';
 
 /**
  * Page object to interact {@link PopupFocusPageComponent}.
@@ -18,9 +19,11 @@ import {Locator} from '@playwright/test';
 export class PopupFocusPagePO {
 
   private readonly _locator: Locator;
+  public readonly popupPO: PopupPO;
 
   constructor(appPO: AppPO, cssClass: string) {
-    this._locator = appPO.popup({cssClass}).locator('app-popup-focus-page');
+    this.popupPO = appPO.popup({cssClass});
+    this._locator = this.popupPO.locator('app-popup-focus-page');
   }
 
   public async isPresent(): Promise<boolean> {

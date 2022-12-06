@@ -57,18 +57,7 @@ const routes: Routes = [
   },
   {
     path: 'test-pages',
-    children: [
-      {
-        path: 'bulk-navigation-test-page',
-        loadComponent: (): any => import('./test-pages/bulk-navigation-test-page/bulk-navigation-test-page.component').then(m => m.BulkNavigationTestPageComponent),
-        data: {[WorkbenchRouteData.title]: 'Bulk Navigation Test', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-bulk-navigation'},
-      },
-      {
-        path: 'view-route-data-test-page',
-        loadChildren: (): any => import('./test-pages/view-route-data-test-page/view-route-data-test-page.module').then(m => m.ViewRouteDataTestPageModule),
-        data: {[WorkbenchRouteData.title]: 'View Route Data Test', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view-route-data'},
-      },
-    ],
+    loadChildren: (): any => import('./test-pages/routes').then(m => m.routes),
   },
 ];
 

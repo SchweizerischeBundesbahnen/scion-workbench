@@ -58,7 +58,7 @@ const routes: Routes = [
   },
   {
     path: 'test-pages',
-    loadChildren: (): any => import('./test-pages/test-pages-routing.module').then(m => m.TestPagesRoutingModule),
+    loadChildren: (): any => import('./test-pages/routes').then(m => m.routes),
   },
 ];
 

@@ -44,7 +44,7 @@ export class BulkNavigationTestPagePO {
     await waitUntilStable(() => this._appPO.page.url(), {probeInterval: 500});
   }
 
-  public static async navigateTo(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
+  public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
     // Register the test page as view.
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPagePO.registerCapability({
