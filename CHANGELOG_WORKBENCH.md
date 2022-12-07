@@ -1,3 +1,32 @@
+# [14.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.6...14.0.0-beta.7) (2022-12-07)
+
+
+### Bug Fixes
+
+* **workbench/host:** destroy SCION Microfrontend Platform when destroying the Angular platform ([2f62e66](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/2f62e665b20e1f2f79155929dd72a344668d99ac))
+* **workbench/host:** dispose view-related command handlers on platform shutdown ([f784a28](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f784a28f5c9f477eb83e50ea57fdf46fa43b9932))
+* **workbench/host:** fix zone synchronization when displaying a notification outside of the Angular zone ([db78df0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/db78df033e6baba36af317707af04e4619408fd8))
+* **workbench/host:** fix zone synchronization when opening a message box outside of the Angular zone ([d4e70fe](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d4e70fec4cf84129d1c175b4e89c6ed8b920e6fc))
+* **workbench/host:** inject initializers provided under `MICROFRONTEND_PLATFORM_POST_STARTUP` DI token in the Angular zone ([2581190](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/25811905780577d894e2d3372ae04228c5d7fed6))
+* **workbench/host:** provide `WorkbenchNotificationService` for injection ([ee89380](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ee89380d36b9876aa1fd2659a080abb6bdec1b22))
+* **workbench/host:** register application-specific messaging interceptors before workbench/platform interceptors ([3204973](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/32049738e0d7bc678b87c26e94af5988f49c3ee9))
+* **workbench/host:** retain focus on element that closed popup due to loss of focus ([29c82bf](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/29c82bf0961b393bbc4396ceb399dcee07425e22))
+
+
+### Dependencies
+
+* **workbench/host:** update `@scion/microfrontend-platform` to version `1.0.0-rc.11` ([34fec1d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/34fec1dd61499cfbed15af8dfa3a69c2a647044c))
+
+
+### BREAKING CHANGES
+
+* **workbench/host:** Updating `@scion/microfrontend-platform` to version `1.0.0-rc.11` introduced a breaking change.
+
+  More information on how to migrate can be found in the [changelog](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/docs/site/changelog/changelog.md) of the SCION Microfrontend Platform.
+
+
+
+
 # [14.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.5...14.0.0-beta.6) (2022-11-09)
 
 
@@ -8,12 +37,12 @@
 
 ### Features
 
-* **workbench:** provide lifecycle hook to be invoked before starting the microfrontend platform ([0ee9982](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0ee9982b7caf061218497d1e37df9fc6992d0b94))
+* **workbench/host:** provide lifecycle hook invoked before starting the microfrontend platform ([0ee9982](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0ee9982b7caf061218497d1e37df9fc6992d0b94))
 
 
 ### Dependencies
 
-* **workbench:** migrate to `@scion/microfrontend-platform` version `1.0.0-rc.10` ([966ec41](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/966ec41e8e1e4c8b4f98c233cba59c246c88b349))
+* **workbench/host:** update `@scion/microfrontend-platform` to version `1.0.0-rc.10` ([966ec41](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/966ec41e8e1e4c8b4f98c233cba59c246c88b349))
 
 
 
