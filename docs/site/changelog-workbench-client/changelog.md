@@ -6,6 +6,70 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.15](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.14...workbench-client-1.0.0-beta.15) (2022-12-07)
+
+
+### Bug Fixes
+
+* **workbench-client:** do not focus nested microfrontend in a popup ([9293464](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/9293464762b2d1a1b123fda33af6224c7672d732))
+
+
+### Dependencies
+
+* **workbench-client:** update `@scion/microfrontend-platform` to version `1.0.0-rc.11` ([34fec1d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/34fec1dd61499cfbed15af8dfa3a69c2a647044c))
+
+
+### Features
+
+* **workbench-client:** enable Observables of `WorkbenchView` to emit in the correct context ([ec0d808](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ec0d8088fbb2dae9b03624835f9f238c0b4f7053))
+
+
+### BREAKING CHANGES
+
+* **workbench-client:** Updating `@scion/microfrontend-platform` to version `1.0.0-rc.11` introduced a breaking change.
+
+  More information on how to migrate can be found in the [changelog](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/docs/site/changelog/changelog.md) of the SCION Microfrontend Platform.
+  
+  **For Angular applications, we strongly recommend replacing zone-specific decorators for `MessageClient` and `IntentClient` with an `ObservableDecorator`. Otherwise, you may experience performance degradation due to frequent change detection cycles.**
+  
+  To migrate:
+  - Remove decorators for `MessageClient` and `IntentClient`, including their registration in the bean manager (e.g., `NgZoneMessageClientDecorator` and `NgZoneIntentClientDecorator`).
+  - Provide a `NgZoneObservableDecorator` and register it in the bean manager before starting the platform. Note to register it as a bean, not as a decorator.
+  
+  ##### Example of an `ObservableDecorator` for Angular Applications
+  ```ts
+  export class NgZoneObservableDecorator implements ObservableDecorator {
+  
+    constructor(private zone: NgZone) {
+    }
+  
+    public decorate$<T>(source$: Observable<T>): Observable<T> {
+      return new Observable<T>(observer => {
+        const insideAngular = NgZone.isInAngularZone();
+        const subscription = source$
+          .pipe(
+            subscribeInside(fn => this.zone.runOutsideAngular(fn)),
+            observeInside(fn => insideAngular ? this.zone.run(fn) : this.zone.runOutsideAngular(fn)),
+          )
+          .subscribe(observer);
+        return () => subscription.unsubscribe();
+      });
+    }
+  }
+  ```
+  
+  ##### Example of Registering an `ObservableDecorator` in Angular Applications
+  ```ts
+  const zone: NgZone = ...;
+  
+  // Register decorator
+  Beans.register(ObservableDecorator, {useValue: new NgZoneObservableDecorator(zone)});
+  // Connect to the host
+  zone.runOutsideAngular(() => WorkbenchClient.connect(...));
+  ```
+
+
+
 # [1.0.0-beta.14](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.13...workbench-client-1.0.0-beta.14) (2022-11-09)
 
 
