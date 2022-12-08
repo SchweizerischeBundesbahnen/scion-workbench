@@ -53,6 +53,10 @@ export class PopupPO {
     throw Error('[PopupAlignError] Popup not aligned.');
   }
 
+  public getCssClasses(): Promise<string[]> {
+    return getCssClasses(this._popupLocator);
+  }
+
   public hasVerticalOverflow(): Promise<boolean> {
     return hasCssClass(this._popupLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
   }

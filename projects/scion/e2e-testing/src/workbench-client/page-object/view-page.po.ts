@@ -37,6 +37,10 @@ export class ViewPagePO {
     this.locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-view-page');
   }
 
+  public async waitUntilAttached(): Promise<void> {
+    await this.locator.waitFor({state: 'attached'});
+  }
+
   public async isPresent(): Promise<boolean> {
     return await this.view.viewTab.isPresent() && await isPresent(this.locator);
   }

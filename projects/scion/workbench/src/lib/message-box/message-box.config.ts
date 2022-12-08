@@ -128,7 +128,7 @@ export interface MessageBoxConfig {
   contentSelectable?: boolean;
 
   /**
-   * Specifies CSS class(es) added to the message box, e.g. used for e2e testing.
+   * Specifies CSS class(es) to be added to the message box, useful in end-to-end tests for locating the message box.
    */
   cssClass?: string | string[];
 }

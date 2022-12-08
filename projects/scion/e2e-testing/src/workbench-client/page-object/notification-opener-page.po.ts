@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
@@ -72,10 +72,9 @@ export class NotificationOpenerPagePO {
     await this._locator.locator('button.e2e-show').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    const errorLocator = this._locator.locator('output.e2e-error');
     return Promise.race([
       this._appPO.notification({cssClass: this._cssClasses}).locator().waitFor({state: 'visible'}),
-      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+      rejectWhenAttached(this._locator.locator('output.e2e-error')),
     ]);
   }
 

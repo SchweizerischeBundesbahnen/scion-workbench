@@ -38,7 +38,6 @@ test.describe('Workbench Popup Position', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'microfrontend',
-        cssClass: 'testee',
         size: {width: '50px', height: '50px'},
       },
     });
@@ -76,6 +75,7 @@ test.describe('Workbench Popup Position', () => {
 
     await popupOpenerPage.enterQualifier({component: 'testee'});
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerPage.enterCssClass('testee');
 
     popup = appPO.popup({cssClass: 'testee'});
   });

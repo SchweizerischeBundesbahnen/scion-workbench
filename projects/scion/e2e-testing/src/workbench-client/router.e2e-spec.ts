@@ -475,6 +475,7 @@ test.describe('Workbench Router', () => {
 
     // expect the view to be present
     const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    await testeeViewPagePO.waitUntilAttached();
     await expect(await testeeViewTabPO.isActive()).toBe(true);
     await expect(await testeeViewPagePO.isVisible()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
@@ -845,6 +846,7 @@ test.describe('Workbench Router', () => {
 
     // expect the view to be present
     const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    await testeeViewPagePO.waitUntilAttached();
     await expect(await testeeViewTabPO.isActive()).toBe(true);
     await expect(await testeeViewPagePO.isVisible()).toBe(true);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);

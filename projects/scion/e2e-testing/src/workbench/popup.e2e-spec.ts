@@ -274,6 +274,18 @@ test.describe('Workbench Popup', () => {
     await expect(await popupOpenerPagePO.getPopupCloseAction()).toEqual({type: 'closed-with-error', value: 'ERROR'});
   });
 
+  test('should associate popup with specified CSS class(es) ', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPagePO.enterCssClass(['testee', 'a', 'b']);
+    await popupOpenerPagePO.clickOpen();
+
+    const popupPagePO = new PopupPagePO(appPO, 'testee');
+
+    await expect(await popupPagePO.popupPO.getCssClasses()).toEqual(expect.arrayContaining(['testee', 'a', 'b']));
+  });
+
   test.describe('Moving the anchor', () => {
     test('should stick the popup to the HTMLElement anchor when moving the anchor element', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -409,12 +421,12 @@ test.describe('Workbench Popup', () => {
 
       // open a popup and bind it to the start page view.
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.enterContextualViewId(startPagePO.viewId!);
       await popupOpenerPagePO.enterPosition({left: 0, top: 0});
       await popupOpenerPagePO.selectPopupComponent('blank-component');
-      await popupOpenerPagePO.clickOpen({waitForPopup: false});
+      await popupOpenerPagePO.enterCssClass('testee');
+      await popupOpenerPagePO.clickOpen();
 
       const popupPO = appPO.popup({cssClass: 'testee'});
       await expect(await popupPO.isPresent()).toBe(true);

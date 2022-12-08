@@ -35,7 +35,7 @@ export abstract class MessageBox<T = any> {
   public abstract setSeverity(severity: 'info' | 'warn' | 'error'): void;
 
   /**
-   * Sets CSS class(es) to be added to the message box, e.g. used for e2e testing.
+   * Specifies CSS class(es) to be added to the message box, useful in end-to-end tests for locating the message box.
    *
    * This operation is additive, that is, it does not override CSS classes set by the message box opener.
    */

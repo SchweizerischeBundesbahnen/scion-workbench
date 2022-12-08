@@ -31,6 +31,7 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
+      await popupOpenerPagePO.enterCssClass('host-popup');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new HostPopupPagePO(appPO, 'host-popup');
@@ -57,7 +58,8 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterContextualViewId(startPageViewId);
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.clickOpen({waitForPopup: false});
+      await popupOpenerPagePO.enterCssClass('host-popup');
+      await popupOpenerPagePO.clickOpen();
 
       await startPagePO.view!.viewTab.click();
 
@@ -84,7 +86,8 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterContextualViewId(microfrontendViewId);
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.clickOpen({waitForPopup: false});
+      await popupOpenerPagePO.enterCssClass('host-popup');
+      await popupOpenerPagePO.clickOpen();
 
       await microfrontendPO.view!.viewTab.click();
 
@@ -108,6 +111,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterContextualViewId('<null>');
+      await popupOpenerPagePO.enterCssClass('host-popup');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new HostPopupPagePO(appPO, 'host-popup');

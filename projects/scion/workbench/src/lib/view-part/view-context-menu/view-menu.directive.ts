@@ -49,7 +49,7 @@ export class ViewMenuItemDirective implements OnDestroy {
   public disabled = false;
 
   /**
-   * Specifies CSS class(es) added to the menu items, e.g. used for e2e testing.
+   * Specifies CSS class(es) to be added to the menu item, useful in end-to-end tests for locating the menu item.
    */
   @Input()
   public cssClass?: string | string[];

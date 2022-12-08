@@ -40,7 +40,6 @@ export const workbenchManifest: Manifest = {
       ],
       properties: {
         path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
-        cssClass: 'host-popup',
       },
     },
   ],

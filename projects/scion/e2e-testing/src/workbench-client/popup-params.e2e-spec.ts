@@ -29,7 +29,6 @@ test.describe('Popup', () => {
       ],
       properties: {
         path: 'popup',
-        cssClass: 'product',
       },
     });
 
@@ -37,10 +36,11 @@ test.describe('Popup', () => {
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({entity: 'product'});
     await popupOpenerPagePO.enterParams({id: '123'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect qualifier to be contained in popup params
-    const popupPagePO = new PopupPagePO(appPO, 'product');
+    const popupPagePO = new PopupPagePO(appPO, 'testee');
     await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', id: '123'}));
   });
 
@@ -54,17 +54,17 @@ test.describe('Popup', () => {
       qualifier: {entity: 'products'},
       properties: {
         path: 'popup',
-        cssClass: 'products',
       },
     });
 
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({entity: 'products'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect qualifier to be contained in popup params
-    const popupPagePO = new PopupPagePO(appPO, 'products');
+    const popupPagePO = new PopupPagePO(appPO, 'testee');
     await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'products'}));
   });
 
@@ -81,7 +81,6 @@ test.describe('Popup', () => {
       ],
       properties: {
         path: 'popup',
-        cssClass: 'product',
       },
     });
 
@@ -89,10 +88,11 @@ test.describe('Popup', () => {
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({entity: 'product', mode: 'new'});
     await popupOpenerPagePO.enterParams({mode: 'edit'}); // should be ignored
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect qualifier values not to be overwritten by params
-    const popupPagePO = new PopupPagePO(appPO, 'product');
+    const popupPagePO = new PopupPagePO(appPO, 'testee');
     await expect(await popupPagePO.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', mode: 'new'}));
   });
 
@@ -112,7 +112,6 @@ test.describe('Popup', () => {
       ],
       properties: {
         path: 'popup/:seg1/segment2/:seg3;mp1=:mp1;mp2=:mp2?qp1=:qp1&qp2=:qp2#:fragment',
-        cssClass: 'testee',
       },
     });
 
@@ -120,6 +119,7 @@ test.describe('Popup', () => {
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'});
     await popupOpenerPagePO.enterParams({seg3: 'SEG3', mp2: 'MP2', qp2: 'QP2', fragment: 'FRAGMENT'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect named params to be substituted

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {isPresent, waitUntilBoundingBoxStable} from '../../helper/testing.util';
+import {coerceArray, isPresent, rejectWhenAttached, waitUntilBoundingBoxStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
@@ -104,6 +104,10 @@ export class PopupOpenerPagePO {
     await this._locator.locator('select.e2e-align').selectOption(align);
   }
 
+  public async enterCssClass(cssClass: string | string[]): Promise<void> {
+    await this._locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
+  }
+
   public async enterCloseStrategy(options: {closeOnFocusLost?: boolean; closeOnEscape?: boolean}): Promise<void> {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-close-strategy'));
     await accordionPO.expand();
@@ -130,18 +134,15 @@ export class PopupOpenerPagePO {
     await accordionPO.collapse();
   }
 
-  public async clickOpen(options?: {waitForPopup?: boolean}): Promise<void> {
-    const expectedPopupIndex = await this._appPO.popupLocator().count();
-
+  public async clickOpen(): Promise<void> {
     await this._locator.locator('button.e2e-open').click();
-    if (options?.waitForPopup ?? true) {
-      // Evaluate the response: resolve the promise on success, or reject it on error.
-      const errorLocator = this._locator.locator('output.e2e-popup-error');
-      await Promise.race([
-        this._appPO.popupLocator().nth(expectedPopupIndex).waitFor({state: 'visible'}),
-        errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
-      ]);
-    }
+    const cssClasses = (await this._locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
+
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    await Promise.race([
+      this._appPO.popup({cssClass: cssClasses}).waitUntilAttached(),
+      rejectWhenAttached(this._locator.locator('output.e2e-popup-error')),
+    ]);
   }
 
   public async getPopupCloseAction(): Promise<PopupCloseAction> {

@@ -28,7 +28,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {test: 'popup'},
         properties: {
           path: 'microfrontend',
-          cssClass: 'testee',
           size: {
             width: '350px',
             height: '450px',
@@ -39,6 +38,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({test: 'popup'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -97,7 +97,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
           size: {
             height: '400px',
           },
@@ -107,6 +106,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -137,7 +137,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
           size: {
             width: '400px',
           },
@@ -147,6 +146,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -177,7 +177,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
           size: {
             height: '400px',
           },
@@ -187,6 +186,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -217,7 +217,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
           size: {
             width: '400px',
           },
@@ -227,6 +226,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -259,7 +259,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
           size: {
             maxHeight: '400px',
           },
@@ -269,6 +268,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -314,7 +314,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
           size: {
             maxWidth: '400px',
           },
@@ -324,6 +323,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -372,7 +372,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
           size: {
             minHeight: '400px',
           },
@@ -382,6 +381,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -427,7 +427,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
           size: {
             minWidth: '400px',
           },
@@ -437,6 +436,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');

@@ -62,6 +62,11 @@ export class PopupComponent implements OnInit {
     return this._popup.size?.maxHeight;
   }
 
+  @HostBinding('attr.class')
+  public get cssClasses(): string {
+    return this._popup.cssClasses.join(' ');
+  }
+
   constructor(private _popup: ɵPopup, injector: Injector) {
     this.portal = new ComponentPortal(this._popup.component, this._popup.viewContainerRef, injector);
   }

@@ -162,7 +162,6 @@ export class ActivatorModule {
       private: false,
       properties: {
         path: 'popup',
-        cssClass: 'e2e-test-popup',
       },
     });
 

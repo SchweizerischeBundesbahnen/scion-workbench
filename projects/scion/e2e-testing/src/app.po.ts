@@ -132,15 +132,6 @@ export class AppPO {
   }
 
   /**
-   * Returns the locator of opened popups.
-   *
-   * TODO [#358] Remove locator after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/358
-   */
-  public popupLocator(): Locator {
-    return this.page.locator('wb-popup');
-  }
-
-  /**
    * Returns the number of opened message boxes.
    */
   public getMessageBoxCount(): Promise<number> {

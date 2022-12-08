@@ -16,7 +16,7 @@ import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
-import {coerceArray, waitUntilStable} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/testing.util';
 
 /**
  * Page object to interact {@link RouterPageComponent} of workbench-client testing app.
@@ -78,10 +78,9 @@ export class RouterPagePO {
     await this._locator.locator('button.e2e-navigate').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    const errorLocator = this._locator.locator('output.e2e-navigate-error');
     await Promise.race([
       waitUntilStable(() => this._locator.page().url()),
-      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+      rejectWhenAttached(this._locator.locator('output.e2e-navigate-error')),
     ]);
   }
 }

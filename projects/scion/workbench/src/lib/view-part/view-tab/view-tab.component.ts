@@ -213,7 +213,7 @@ export class ViewTabComponent implements OnDestroy {
   }
 
   /**
-   * Adds view specific CSS classes to the <view-tab>, e.g. used for e2e testing.
+   * Adds view specific CSS classes to the <view-tab>.
    */
   private installViewCssClassListener(): void {
     const differ = this._differs.find([]).create<string>();
