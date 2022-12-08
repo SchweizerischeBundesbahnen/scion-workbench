@@ -16,7 +16,6 @@ import {ComponentPortal} from '@angular/cdk/portal';
 import {Popup, PopupConfig, PopupReferrer, ɵPopup, ɵPopupError} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {Arrays, Dictionaries, Objects, Observables} from '@scion/toolkit/util';
-import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {fromBoundingClientRect$, fromDimension$} from '@scion/toolkit/observable';
 import {PopupComponent} from './popup.component';
@@ -83,12 +82,13 @@ export class PopupService {
     }
 
     const align = config.align || 'north';
-    const popupOrigin$ = this.observePopupOrigin$(config).pipe(shareReplay({bufferSize: 1, refCount: false}));
+    const contextualView = this.resolveContextualView(config);
     const referrer: PopupReferrer = Dictionaries.withoutUndefinedEntries({
-      viewId: this.resolveContextualView(config)?.viewId,
+      viewId: contextualView?.viewId,
     });
 
     // Set up the popup positioning strategy.
+    const popupOrigin$ = this.observePopupOrigin$(config, contextualView).pipe(shareReplay({bufferSize: 1, refCount: false}));
     const overlayPositionStrategy = this._overlay.position()
       .flexibleConnectedTo(await firstValueFrom(popupOrigin$))
       .withFlexibleDimensions(false)
@@ -153,12 +153,18 @@ export class PopupService {
         overlayRef.updatePosition();
       });
 
-    // Let the popup reposition itself when the popup size changes.
+    // Reposition the popup when its size changes (if necessary).
     fromDimension$(overlayRef.overlayElement)
       .pipe(takeUntilClose())
       .subscribe(() => overlayRef.updatePosition());
 
-    this.installPopupCloser(config, popupElement, overlayRef, popupHandle, takeUntilClose);
+    // Close the popup depending on the passed config.
+    this.installPopupCloser(config, popupElement, overlayRef, popupHandle, contextualView, takeUntilClose);
+
+    // Hide the popup when deactivating the contextual view, if any.
+    if (contextualView) {
+      this.hidePopupOnViewDeactivate(overlayRef, contextualView, takeUntilClose);
+    }
 
     // Dispose the popup when closing it.
     popupHandle.whenClose.then(() => {
@@ -194,7 +200,7 @@ export class PopupService {
   /**
    * Closes the popup depending on the configured popup closing strategy.
    */
-  private installPopupCloser(config: PopupConfig, popupElement: HTMLElement, overlayRef: OverlayRef, popupHandle: Popup, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
+  private installPopupCloser(config: PopupConfig, popupElement: HTMLElement, overlayRef: OverlayRef, popupHandle: Popup, contextualView: ɵWorkbenchView | null, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
     // Close the popup on escape keystroke.
     if (config.closeStrategy?.onEscape ?? true) {
       fromEvent<KeyboardEvent>(popupElement, 'keydown')
@@ -216,15 +222,9 @@ export class PopupService {
         )
         .subscribe(() => popupHandle.close());
     }
-    // If in the context of a view, hide the popup when inactivating the view, or close it when closing the view.
-    const contextualView = this.resolveContextualView(config);
+
+    // Close the popup when closing the view.
     if (contextualView) {
-      overlayRef.overlayElement.classList.add('wb-view-context');
-
-      // Hide the popup when inactivating the view.
-      this.bindPopupToViewActiveState(contextualView, overlayRef, takeUntilClose);
-
-      // Close the popup when closing the view.
       this._viewRegistry.viewIds$
         .pipe(takeUntilClose())
         .subscribe(viewIds => {
@@ -236,17 +236,48 @@ export class PopupService {
   }
 
   /**
+   * Hides the popup when its contextual view is deactivated, and then displays the popup again when activating it.
+   * Also restores the focus on re-activation.
+   */
+  private hidePopupOnViewDeactivate(overlayRef: OverlayRef, contextualView: ɵWorkbenchView, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
+    overlayRef.overlayElement.classList.add('wb-view-context');
+
+    let activeElement: HTMLElement | undefined;
+
+    contextualView.active$
+      .pipe(takeUntilClose())
+      .subscribe(viewActive => {
+        if (viewActive) {
+          overlayRef.overlayElement.classList.add('wb-view-active');
+          activeElement?.focus();
+        }
+        else {
+          overlayRef.overlayElement.classList.remove('wb-view-active');
+        }
+      });
+
+    // Track the focus in the popup to restore it when activating the popup.
+    fromEvent(overlayRef.overlayElement, 'focusin')
+      .pipe(
+        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
+        takeUntilClose(),
+      )
+      .subscribe(() => {
+        activeElement = this._document.activeElement instanceof HTMLElement ? this._document.activeElement : undefined;
+      });
+  }
+
+  /**
    * Observes the position of the popup anchor.
    *
    * The Observable emits the anchor's initial position, and each time when its position changes.
    */
-  private observePopupOrigin$(config: PopupConfig): Observable<FlexibleConnectedPositionStrategyOrigin> {
+  private observePopupOrigin$(config: PopupConfig, contextualView: ɵWorkbenchView | null): Observable<FlexibleConnectedPositionStrategyOrigin> {
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
       return fromBoundingClientRect$(coerceElement<HTMLElement>(config.anchor as HTMLElement))
         .pipe(map(clientRect => ({x: clientRect.x, y: clientRect.y, width: clientRect.width, height: clientRect.height})));
     }
     else {
-      const contextualView: ɵWorkbenchView | null = this.resolveContextualView(config);
       return Observables.coerce(config.anchor)
         .pipe(
           combineLatestWith(this.viewportBounds$(contextualView)),
@@ -334,35 +365,6 @@ export class PopupService {
       };
     }
     throw Error('[PopupOriginError] Illegal popup origin; must be "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
-  }
-
-  /**
-   * Hides the popup when its contextual view is deactivated, and then displays the popup again when activating it.
-   * Also restores the focus on re-activation.
-   */
-  private bindPopupToViewActiveState(view: WorkbenchView, overlayRef: OverlayRef, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
-    let activeElement: HTMLElement | undefined;
-
-    view.active$
-      .pipe(takeUntilClose())
-      .subscribe(viewActive => {
-        if (viewActive) {
-          overlayRef.overlayElement.classList.add('wb-view-active');
-          activeElement?.focus();
-        }
-        else {
-          overlayRef.overlayElement.classList.remove('wb-view-active');
-        }
-      });
-
-    fromEvent(overlayRef.overlayElement, 'focusin')
-      .pipe(
-        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
-        takeUntilClose(),
-      )
-      .subscribe(() => {
-        activeElement = this._document.activeElement instanceof HTMLElement ? this._document.activeElement : undefined;
-      });
   }
 }
 
