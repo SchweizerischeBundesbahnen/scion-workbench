@@ -38,7 +38,7 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.enterParams({title: 'Title 1,Title 2,Title 3'});
       await routerPagePO.selectTarget('self');
       await routerPagePO.enterCssClass('testee-self');
-      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await routerPagePO.clickNavigate();
       await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.getTitle()).toEqual('Title 3');
     });
 
@@ -79,7 +79,7 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.enterParams({heading: 'Heading 1,Heading 2,Heading 3'});
       await routerPagePO.selectTarget('self');
       await routerPagePO.enterCssClass('testee-self');
-      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await routerPagePO.clickNavigate();
       await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.getHeading()).toEqual('Heading 3');
     });
 
@@ -120,7 +120,7 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.enterParams({dirty: 'true,false'});
       await routerPagePO.selectTarget('self');
       await routerPagePO.enterCssClass('testee-self');
-      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await routerPagePO.clickNavigate();
       await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isDirty()).toBe(false);
     });
 
@@ -161,7 +161,7 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.enterParams({dirty: 'true,false,true'});
       await routerPagePO.selectTarget('self');
       await routerPagePO.enterCssClass('testee-self');
-      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await routerPagePO.clickNavigate();
       await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isDirty()).toBe(true);
     });
 
@@ -202,7 +202,7 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.enterParams({closable: 'true,false'});
       await routerPagePO.selectTarget('self');
       await routerPagePO.enterCssClass('testee-self');
-      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await routerPagePO.clickNavigate();
       await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isClosable()).toBe(false);
     });
 
@@ -243,7 +243,7 @@ test.describe('Workbench View Properties', () => {
       await routerPagePO.enterParams({closable: 'true,false,true'});
       await routerPagePO.selectTarget('self');
       await routerPagePO.enterCssClass('testee-self');
-      await routerPagePO.clickNavigate({evalNavigateResponse: false});
+      await routerPagePO.clickNavigate();
       await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isClosable()).toBe(true);
     });
 
