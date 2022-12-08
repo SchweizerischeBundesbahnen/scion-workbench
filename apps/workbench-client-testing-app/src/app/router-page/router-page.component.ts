@@ -42,7 +42,6 @@ export class RouterPageComponent {
 
   public form: UntypedFormGroup;
   public navigateError: string;
-  public navigated = false;
 
   constructor(formBuilder: UntypedFormBuilder,
               private _router: WorkbenchRouter) {
@@ -60,7 +59,6 @@ export class RouterPageComponent {
 
   public async onNavigate(): Promise<void> {
     this.navigateError = undefined;
-    this.navigated = false;
 
     const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray);
     const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as UntypedFormArray);
@@ -77,9 +75,7 @@ export class RouterPageComponent {
       params: params || undefined,
       cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
     };
-    await this._router.navigate(qualifier, extras)
-      .then(success => this.navigated = success)
-      .catch(error => this.navigateError = error);
+    await this._router.navigate(qualifier, extras).catch(error => this.navigateError = error);
   }
 }
 

@@ -230,7 +230,7 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee'});
     await routerPagePO.selectTarget('self');
-    await routerPagePO.clickNavigate({evalNavigateResponse: false});
+    await routerPagePO.clickNavigate();
 
     // expect testee view to be opened in the current tab
     const testeeViewTabPO = appPO.view({cssClass: 'testee'}).viewTab;
@@ -261,7 +261,7 @@ test.describe('Workbench Router', () => {
     // navigate to the testee view
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee'});
-    await routerPagePO.clickNavigate({evalNavigateResponse: false});
+    await routerPagePO.clickNavigate();
 
     // expect testee view to be opened in the current tab
     const testeeViewTabPO = appPO.view({cssClass: 'testee'}).viewTab;
@@ -1037,7 +1037,7 @@ test.describe('Workbench Router', () => {
 
     await routerPagePO.enterQualifier({component: 'view', app: 'app1'});
     await routerPagePO.enterCssClass('testee');
-    await routerPagePO.clickNavigate({evalNavigateResponse: false});
+    await routerPagePO.clickNavigate();
 
     await expect(await activeViewPO.getCssClasses()).toEqual(expect.arrayContaining(['testee']));
     await expect(await activeViewPO.viewTab.getCssClasses()).toEqual(expect.arrayContaining(['testee']));

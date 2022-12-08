@@ -74,26 +74,13 @@ export class RouterPagePO {
     await this._locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
   }
 
-  /**
-   * Clicks navigate.
-   *
-   * Set `evalNavigateResponse` to `false` when replacing the current microfrontend,
-   * as this unloads the current router page.
-   */
-  public async clickNavigate(options?: {evalNavigateResponse?: boolean}): Promise<void> {
+  public async clickNavigate(): Promise<void> {
     await this._locator.locator('button.e2e-navigate').click();
-    // Wait until navigation completed.
-    await waitUntilStable(() => this._locator.page().url());
-
-    if (!(options?.evalNavigateResponse ?? true)) {
-      return;
-    }
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    const navigatedLocator = this._locator.locator('output.e2e-navigated');
     const errorLocator = this._locator.locator('output.e2e-navigate-error');
     await Promise.race([
-      navigatedLocator.waitFor({state: 'attached'}),
+      waitUntilStable(() => this._locator.page().url()),
       errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
     ]);
   }
