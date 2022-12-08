@@ -123,12 +123,12 @@ export class PopupService {
 
     // Construct the popup component and attach it to the DOM.
     const overlayRef = this._overlay.create(overlayConfig);
-    const popupHandle = new ɵPopup(config.input, config.size, referrer);
+    const popupHandle = new ɵPopup(config, referrer);
     const popupPortal = new ComponentPortal(PopupComponent, null, Injector.create({
       parent: config.componentConstructOptions?.injector || this._injector,
       providers: [
-        {provide: PopupConfig, useValue: config},
-        {provide: Popup, useValue: popupHandle},
+        {provide: ɵPopup, useValue: popupHandle},
+        {provide: Popup, useExisting: ɵPopup},
         ...[config.componentConstructOptions?.providers || []],
       ],
     }));
