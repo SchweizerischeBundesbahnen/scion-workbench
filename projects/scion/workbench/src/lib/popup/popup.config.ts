@@ -196,32 +196,41 @@ export abstract class Popup<T = any> {
   public abstract closeWithError(error: Error | string): void;
 }
 
-/**
- * @internal
- */
-export class ɵPopup implements Popup {
+export class ɵPopup<T = any> implements Popup<T> {
 
   private _closeResolveFn!: (result: any | undefined) => void;
 
   public readonly whenClose = new Promise<any | undefined>(resolve => this._closeResolveFn = resolve);
 
-  constructor(public readonly input: any | undefined,
-              public readonly size: PopupSize | undefined,
-              public readonly referrer: PopupReferrer) {
+  constructor(private _config: PopupConfig, public readonly referrer: PopupReferrer) {
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public close<R = any>(result?: R | undefined): void {
     this._closeResolveFn(result);
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public closeWithError(error: Error | string): void {
     this._closeResolveFn(new ɵPopupError(error));
+  }
+
+  /** @inheritDoc */
+  public get input(): T | undefined {
+    return this._config.input;
+  }
+
+  /** @inheritDoc */
+  public get size(): PopupSize | undefined {
+    return this._config.size;
+  }
+
+  public get component(): Type<any> {
+    return this._config.component;
+  }
+
+  public get viewContainerRef(): ViewContainerRef | undefined {
+    return this._config.componentConstructOptions?.viewContainerRef;
   }
 }
 

@@ -9,7 +9,7 @@
  */
 
 import {Component, HostBinding, Injector, OnInit, ViewChild} from '@angular/core';
-import {PopupConfig} from './popup.config';
+import {ɵPopup} from './popup.config';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {noop} from 'rxjs';
@@ -34,40 +34,36 @@ export class PopupComponent implements OnInit {
 
   @HostBinding('style.width')
   public get popupWidth(): string | undefined {
-    return this._popupConfig.size?.width;
+    return this._popup.size?.width;
   }
 
   @HostBinding('style.min-width')
   public get popupMinWidth(): string | undefined {
-    return this._popupConfig.size?.minWidth;
+    return this._popup.size?.minWidth;
   }
 
   @HostBinding('style.max-width')
   public get popupMaxWidth(): string | undefined {
-    return this._popupConfig.size?.maxWidth;
+    return this._popup.size?.maxWidth;
   }
 
   @HostBinding('style.height')
   public get popupHeight(): string | undefined {
-    return this._popupConfig.size?.height;
+    return this._popup.size?.height;
   }
 
   @HostBinding('style.min-height')
   public get popupMinHeight(): string | undefined {
-    return this._popupConfig.size?.minHeight;
+    return this._popup.size?.minHeight;
   }
 
   @HostBinding('style.max-height')
   public get popupMaxHeight(): string | undefined {
-    return this._popupConfig.size?.maxHeight;
+    return this._popup.size?.maxHeight;
   }
 
-  constructor(private _popupConfig: PopupConfig, injector: Injector) {
-    this.portal = new ComponentPortal(
-      this._popupConfig.component,
-      this._popupConfig.componentConstructOptions?.viewContainerRef || null,
-      injector,
-    );
+  constructor(private _popup: ɵPopup, injector: Injector) {
+    this.portal = new ComponentPortal(this._popup.component, this._popup.viewContainerRef, injector);
   }
 
   public ngOnInit(): void {
