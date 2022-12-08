@@ -417,7 +417,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.clickOpen({waitForPopup: false});
 
       const popupPO = appPO.popup({cssClass: 'testee'});
-      await expect(await popupPO.isPresent()).toBe(false);
+      await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(false);
 
       // activate the view to which the popup is bound to
