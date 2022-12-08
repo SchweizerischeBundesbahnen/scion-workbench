@@ -86,7 +86,7 @@ export interface WorkbenchViewCapability extends Capability {
      */
     closable?: boolean;
     /**
-     * Specifies CSS class(es) added to the `<wb-view-tab>`, `<wb-view>`, and `<sci-router-outlet>` elements, e.g., to locate the view in e2e tests.
+     * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
      */
     cssClass?: string | string[];
   };

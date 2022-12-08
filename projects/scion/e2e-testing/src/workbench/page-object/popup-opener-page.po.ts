@@ -146,13 +146,10 @@ export class PopupOpenerPagePO {
     await this._locator.locator('input.e2e-contextual-view-id').fill(viewId);
   }
 
-  public async clickOpen(options?: {waitForPopup?: boolean}): Promise<void> {
+  public async clickOpen(): Promise<void> {
     await this._locator.locator('button.e2e-open').click();
-
-    if (options?.waitForPopup ?? true) {
-      const cssClasses = (await this._locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-      await this._appPO.popup({cssClass: cssClasses}).waitUntilAttached();
-    }
+    const cssClasses = (await this._locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
+    await this._appPO.popup({cssClass: cssClasses}).waitUntilAttached();
   }
 
   public async getPopupCloseAction(): Promise<PopupCloseAction> {

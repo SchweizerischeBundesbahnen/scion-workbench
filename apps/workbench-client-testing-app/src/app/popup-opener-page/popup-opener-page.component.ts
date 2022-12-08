@@ -22,6 +22,7 @@ const ANCHOR = 'anchor';
 const POSITION = 'position';
 const CONTEXTUAL_VIEW_ID = 'contextualViewId';
 const ALIGN = 'align';
+const CSS_CLASS = 'cssClass';
 const CLOSE_STRATEGY = 'closeStrategy';
 const ON_FOCUS_LOST = 'onFocusLost';
 const ON_ESCAPE = 'onEscape';
@@ -43,6 +44,7 @@ export class PopupOpenerPageComponent {
   public readonly POSITION = POSITION;
   public readonly CONTEXTUAL_VIEW_ID = CONTEXTUAL_VIEW_ID;
   public readonly ALIGN = ALIGN;
+  public readonly CSS_CLASS = CSS_CLASS;
   public readonly CLOSE_STRATEGY = CLOSE_STRATEGY;
   public readonly ON_FOCUS_LOST = ON_FOCUS_LOST;
   public readonly ON_ESCAPE = ON_ESCAPE;
@@ -83,6 +85,7 @@ export class PopupOpenerPageComponent {
       }),
       [CONTEXTUAL_VIEW_ID]: formBuilder.control('<default>', Validators.required),
       [ALIGN]: formBuilder.control(''),
+      [CSS_CLASS]: formBuilder.control(''),
       [CLOSE_STRATEGY]: formBuilder.group({
         [ON_FOCUS_LOST]: formBuilder.control(true),
         [ON_ESCAPE]: formBuilder.control(true),
@@ -106,6 +109,7 @@ export class PopupOpenerPageComponent {
         onFocusLost: this.form.get([CLOSE_STRATEGY, ON_FOCUS_LOST]).value ?? undefined,
         onEscape: this.form.get([CLOSE_STRATEGY, ON_ESCAPE]).value ?? undefined,
       }),
+      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
       context: {
         viewId: this.parseContextualViewIdInput(),
       },

@@ -76,7 +76,7 @@ export interface WorkbenchPopupCapability extends Capability {
      */
     size?: PopupSize;
     /**
-     * Specifies CSS class(es) added to the `<sci-router-outlet>` and popup overlay element, e.g., to locate the popup in e2e tests.
+     * Specifies CSS class(es) to be added to the popup, useful in end-to-end tests for locating the popup.
      */
     cssClass?: string | string[];
   };

@@ -19,7 +19,7 @@ export abstract class Activity {
   public abstract title: string | null;
 
   /**
-   * Specifies CSS class(es) added to the activity item and activity panel, e.g. used for e2e testing.
+   * Specifies CSS class(es) to be added to the activity, useful in end-to-end tests for locating the activity.
    */
   public abstract cssClass: string | string[] | undefined;
 

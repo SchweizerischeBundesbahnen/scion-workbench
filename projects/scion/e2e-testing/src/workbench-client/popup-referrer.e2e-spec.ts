@@ -29,12 +29,12 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
         },
       });
 
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');
@@ -54,7 +54,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
         },
       });
 
@@ -65,7 +64,8 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
       await popupOpenerPagePO.enterContextualViewId(startPageViewId);
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.clickOpen({waitForPopup: false});
+      await popupOpenerPagePO.enterCssClass('testee');
+      await popupOpenerPagePO.clickOpen();
 
       await startPagePO.view!.viewTab.click();
 
@@ -85,7 +85,6 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
         },
       });
 
@@ -96,7 +95,8 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
       await popupOpenerPagePO.enterContextualViewId(microfrontendViewId);
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.clickOpen({waitForPopup: false});
+      await popupOpenerPagePO.enterCssClass('testee');
+      await popupOpenerPagePO.clickOpen();
 
       await microfrontendPO.view!.viewTab.click();
 
@@ -117,13 +117,13 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'testee'},
         properties: {
           path: 'popup',
-          cssClass: 'testee',
         },
       });
 
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
       await popupOpenerPagePO.enterContextualViewId('<null>');
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       const popupPagePO = new PopupPagePO(appPO, 'testee');

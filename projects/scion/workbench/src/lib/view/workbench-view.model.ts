@@ -33,12 +33,12 @@ export abstract class WorkbenchView {
   public abstract heading: string | null;
 
   /**
-   * Specifies CSS class(es) added to the <wb-view-tab> and <wb-view> elements, e.g. used for e2e testing.
+   * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
    */
   public abstract set cssClass(cssClass: string | string[]);
 
   /**
-   * Returns CSS classes specified, if any.
+   * CSS classes associated with the view.
    */
   public abstract readonly cssClasses: string[];
 

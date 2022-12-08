@@ -12,6 +12,7 @@ import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
+import {rejectWhenAttached} from '../../helper/testing.util';
 
 /**
  * Page object to interact {@link UnregisterWorkbenchCapabilityPageComponent}.
@@ -43,7 +44,7 @@ export class UnregisterWorkbenchCapabilityPagePO {
     const errorLocator = this._locator.locator('output.e2e-unregister-error');
     return Promise.race([
       responseLocator.waitFor({state: 'attached'}),
-      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+      rejectWhenAttached(errorLocator)
     ]);
   }
 

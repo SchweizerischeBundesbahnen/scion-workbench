@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, waitUntilStable} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
@@ -85,10 +85,9 @@ export class RouterPagePO {
     await this._locator.locator('button.e2e-router-navigate').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    const errorLocator = this._locator.locator('output.e2e-navigate-error');
     await Promise.race([
       waitUntilStable(() => this._page.url()),
-      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+      rejectWhenAttached(this._locator.locator('output.e2e-navigate-error')),
     ]);
   }
 

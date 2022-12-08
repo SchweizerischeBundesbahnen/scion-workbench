@@ -28,13 +28,13 @@ test.describe('Popup Router', () => {
       private: false, // PUBLIC
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
 
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect popup to display
@@ -53,13 +53,13 @@ test.describe('Popup Router', () => {
       private: true, // PRIVATE
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
 
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect popup to display
@@ -78,7 +78,6 @@ test.describe('Popup Router', () => {
       private: true, // PRIVATE
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
 
@@ -89,6 +88,7 @@ test.describe('Popup Router', () => {
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await expect(popupOpenerPagePO.clickOpen()).rejects.toThrow(/NullProviderError/);
 
     // expect popup not to display
@@ -107,7 +107,6 @@ test.describe('Popup Router', () => {
       private: false, // PUBLIC
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
 
@@ -118,6 +117,7 @@ test.describe('Popup Router', () => {
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect popup to display
@@ -136,13 +136,13 @@ test.describe('Popup Router', () => {
       private: false, // PUBLIC
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
 
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await expect(popupOpenerPagePO.clickOpen()).rejects.toThrow(/NotQualifiedError/);
 
     // expect popup not to display
@@ -160,7 +160,6 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee-1'},
       properties: {
         path: 'popup',
-        cssClass: 'testee-1',
       },
     });
     await registerCapabilityPage1PO.registerCapability({
@@ -168,7 +167,6 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee-2'},
       properties: {
         path: 'popup',
-        cssClass: 'testee-2',
       },
     });
     const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
@@ -178,7 +176,6 @@ test.describe('Popup Router', () => {
       private: false, // PUBLIC
       properties: {
         path: 'popup',
-        cssClass: 'testee-3',
       },
     });
 
@@ -186,6 +183,7 @@ test.describe('Popup Router', () => {
     const popupOpenerApp1aPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerApp1aPagePO.enterQualifier({component: 'testee-1'});
     await popupOpenerApp1aPagePO.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
+    await popupOpenerApp1aPagePO.enterCssClass('testee-1');
     await popupOpenerApp1aPagePO.clickOpen();
 
     // expect popup to display
@@ -199,6 +197,7 @@ test.describe('Popup Router', () => {
     const popupOpenerApp1bPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerApp1bPagePO.enterQualifier({component: 'testee-2'});
     await popupOpenerApp1bPagePO.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
+    await popupOpenerApp1bPagePO.enterCssClass('testee-2');
     await popupOpenerApp1bPagePO.clickOpen();
 
     // expect popup to display
@@ -212,6 +211,7 @@ test.describe('Popup Router', () => {
     const popupOpenerApp2PagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app2');
     await popupOpenerApp2PagePO.enterQualifier({component: 'testee-3'});
     await popupOpenerApp2PagePO.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
+    await popupOpenerApp2PagePO.enterCssClass('testee-3');
     await popupOpenerApp2PagePO.clickOpen();
 
     // expect popup to display
@@ -233,13 +233,13 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee', path: 'empty'},
       properties: {
         path: '<empty>',
-        cssClass: 'testee',
       },
     });
 
     // open the popup with `empty` as path
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee', path: 'empty'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect popup to display
@@ -258,7 +258,6 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
     const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
@@ -268,7 +267,6 @@ test.describe('Popup Router', () => {
       private: true, // PRIVATE
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
     const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
@@ -280,6 +278,7 @@ test.describe('Popup Router', () => {
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect popup to display
@@ -300,7 +299,6 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
     const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
@@ -310,13 +308,13 @@ test.describe('Popup Router', () => {
       private: false, // PUBLIC
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
 
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect popup to display
@@ -337,7 +335,6 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
     const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
@@ -347,7 +344,6 @@ test.describe('Popup Router', () => {
       private: false, // PUBLIC
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
     const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
@@ -359,6 +355,7 @@ test.describe('Popup Router', () => {
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect first popup to display
@@ -379,7 +376,6 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
     await registerCapabilityPagePO.registerCapability({
@@ -387,13 +383,13 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
 
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // expect first popup to display
@@ -415,13 +411,13 @@ test.describe('Popup Router', () => {
       private: true, // PRIVATE
       properties: {
         path: 'popup',
-        cssClass: 'testee',
       },
     });
 
     // open the popup for the first time
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'testee'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
     const popupPagePO = new PopupPagePO(appPO, 'testee');
 

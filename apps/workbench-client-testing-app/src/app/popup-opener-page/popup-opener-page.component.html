@@ -21,6 +21,10 @@
         <option value="">default</option>
       </select>
     </sci-form-field>
+
+    <sci-form-field label="CSS Class(es)">
+      <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+    </sci-form-field>
   </section>
 
   <sci-accordion class="anchor e2e-anchor" variant="solid" [formGroupName]="ANCHOR">

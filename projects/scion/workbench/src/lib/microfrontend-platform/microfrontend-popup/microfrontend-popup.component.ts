@@ -35,12 +35,12 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
-  constructor(private _popup: Popup<ɵPopupContext>,
+  constructor(public popup: Popup<ɵPopupContext>,
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
               private _messageClient: MessageClient,
               private _logger: Logger) {
-    this._popupContext = this._popup.input!;
+    this._popupContext = this.popup.input!;
     this.popupCapability = this._popupContext.capability;
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
   }
@@ -54,7 +54,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     // Obtain the capability provider.
     const application = this.lookupApplication(this.popupCapability.metadata!.appSymbolicName);
     if (!application) {
-      this._popup.closeWithError(`[NullApplicationError] Unexpected. Cannot resolve application '${this.popupCapability.metadata!.appSymbolicName}'.`);
+      this.popup.closeWithError(`[NullApplicationError] Unexpected. Cannot resolve application '${this.popupCapability.metadata!.appSymbolicName}'.`);
       return;
     }
 
@@ -63,10 +63,10 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(closeRequest => {
         if (closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) === true) {
-          this._popup.closeWithError(closeRequest.body);
+          this.popup.closeWithError(closeRequest.body);
         }
         else {
-          this._popup.close(closeRequest.body);
+          this.popup.close(closeRequest.body);
         }
       });
 
@@ -78,7 +78,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
           takeUntil(this._destroy$),
         )
         .subscribe(() => {
-          this._popup.close();
+          this.popup.close();
         });
     }
 

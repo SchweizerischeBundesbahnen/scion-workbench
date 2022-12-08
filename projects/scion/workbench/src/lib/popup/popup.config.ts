@@ -11,6 +11,7 @@
 import {ElementRef, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
 import {Observable} from 'rxjs';
 import {PopupOrigin} from './popup.origin';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -94,6 +95,14 @@ export abstract class PopupConfig {
    */
   public readonly closeStrategy?: CloseStrategy;
   /**
+   * Specifies the preferred popup size. If not specified, the popup adjusts its size to the content size.
+   */
+  public readonly size?: PopupSize;
+  /**
+   * Specifies CSS class(es) to be added to the popup, useful in end-to-end tests for locating the popup.
+   */
+  public readonly cssClass?: string | string[];
+  /**
    * Specifies the context in which to open the popup.
    */
   public readonly context?: {
@@ -107,14 +116,6 @@ export abstract class PopupConfig {
      */
     viewId?: string | null;
   };
-  /**
-   * Specifies the preferred popup size. If not specified, the popup adjusts its size to the content size.
-   */
-  public readonly size?: PopupSize;
-  /**
-   * Specifies CSS class(es) added to the popup overlay, e.g. used for e2e testing.
-   */
-  public readonly cssClass?: string | string[];
 }
 
 /**
@@ -186,6 +187,11 @@ export abstract class Popup<T = any> {
   public abstract readonly referrer: PopupReferrer;
 
   /**
+   * CSS classes associated with the popup.
+   */
+  public abstract readonly cssClasses: string[];
+
+  /**
    * Closes the popup. Optionally, pass a result to the popup opener.
    */
   public abstract close<R = any>(result?: R | undefined): void;
@@ -201,8 +207,10 @@ export class ɵPopup<T = any> implements Popup<T> {
   private _closeResolveFn!: (result: any | undefined) => void;
 
   public readonly whenClose = new Promise<any | undefined>(resolve => this._closeResolveFn = resolve);
+  public readonly cssClasses: string[];
 
   constructor(private _config: PopupConfig, public readonly referrer: PopupReferrer) {
+    this.cssClasses = Arrays.coerce(this._config.cssClass);
   }
 
   /** @inheritDoc */

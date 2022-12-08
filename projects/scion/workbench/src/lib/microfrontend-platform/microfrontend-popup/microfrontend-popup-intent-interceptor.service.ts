@@ -21,7 +21,7 @@ import {Router} from '@angular/router';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {stringifyError} from '../messaging.util';
-import {Maps} from '@scion/toolkit/util';
+import {Arrays, Maps} from '@scion/toolkit/util';
 import {PopupService} from '../../popup/popup.service';
 import {Popup} from '../../popup/popup.config';
 import {PopupOrigin} from '../../popup/popup.origin';
@@ -113,7 +113,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
         ...command.closeStrategy,
         onFocusLost: false, // Closing the popup on focus loss is handled in {MicrofrontendPopupComponent}
       },
-      cssClass: capability.properties?.cssClass,
+      cssClass: Arrays.coerce(capability.properties?.cssClass).concat(Arrays.coerce(command.cssClass)),
     });
   }
 
@@ -147,7 +147,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
       align: command.align,
       size: capability.properties?.size,
       closeStrategy: command.closeStrategy,
-      cssClass: capability.properties?.cssClass,
+      cssClass: Arrays.coerce(capability.properties?.cssClass).concat(Arrays.coerce(command.cssClass)),
     }).finally(() => this.navigate(null, {outletName: popupOutletName})); // Remove the outlet from the URL
   }
 

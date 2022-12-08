@@ -14,6 +14,7 @@ import {Intention, Qualifier} from '@scion/microfrontend-platform';
 import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
+import {rejectWhenAttached} from '../../helper/testing.util';
 
 /**
  * Page object to interact {@link RegisterWorkbenchIntentionPageComponent}.
@@ -46,7 +47,7 @@ export class RegisterWorkbenchIntentionPagePO {
     const errorLocator = this._locator.locator('output.e2e-register-error');
     return Promise.race([
       responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-intention-id').innerText()),
-      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+      rejectWhenAttached(errorLocator)
     ]);
   }
 

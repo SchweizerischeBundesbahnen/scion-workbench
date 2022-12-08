@@ -77,6 +77,14 @@ export async function waitUntilAttached(...locators: Locator[]): Promise<void> {
 }
 
 /**
+ * Rejects with the content of the specified element when attached to the DOM,
+ * or rejects with a TimeoutError if not attached within the global timeout.
+ */
+export function rejectWhenAttached(locator: Locator): Promise<never> {
+  return locator.waitFor({state: 'attached'}).then(() => locator.innerText()).then(error => Promise.reject(Error(error)));
+}
+
+/**
  * Creates a {@link DOMRect} from given rectangle.
  *
  * Similar to {@link DOMRect#fromRect} but can be used in e2e-tests executed in NodeJS.

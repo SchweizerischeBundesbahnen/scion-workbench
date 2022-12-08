@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -91,10 +91,9 @@ export class MessageBoxOpenerPagePO {
     await this._locator.locator('button.e2e-open').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    const errorLocator = this._locator.locator('output.e2e-open-error');
     await Promise.race([
       Promise.all(Array.from(Array(count).keys()).map(i => this._appPO.messagebox({cssClass: [`index-${i}`].concat(cssClasses)}).waitUntilAttached())),
-      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+      rejectWhenAttached(this._locator.locator('output.e2e-open-error')),
     ]);
   }
 

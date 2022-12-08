@@ -72,6 +72,7 @@ export class WorkbenchPopupService {
       popupId: UUID.randomUUID(),
       align: config.align,
       closeStrategy: config.closeStrategy,
+      cssClass: config.cssClass,
       context: {
         viewId: Defined.orElse(config.context?.viewId, () => Beans.opt(WorkbenchView)?.viewId),
       },

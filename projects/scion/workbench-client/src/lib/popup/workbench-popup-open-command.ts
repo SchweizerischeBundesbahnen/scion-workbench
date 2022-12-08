@@ -20,6 +20,7 @@ export interface ɵWorkbenchPopupCommand {
   popupId: string;
   align?: 'east' | 'west' | 'north' | 'south';
   closeStrategy?: CloseStrategy;
+  cssClass?: string | string[];
   context?: {
     viewId?: string | null;
   };

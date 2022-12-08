@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
@@ -93,7 +93,7 @@ export class RegisterWorkbenchCapabilityPagePO {
     const errorLocator = this._locator.locator('output.e2e-register-error');
     await Promise.race([
       responseLocator.waitFor({state: 'attached'}),
-      errorLocator.waitFor({state: 'attached'}).then(() => errorLocator.innerText()).then(error => Promise.reject(Error(error))),
+      rejectWhenAttached(errorLocator),
     ]);
 
     return JSON.parse(await responseLocator.locator('div.e2e-capability').innerText());

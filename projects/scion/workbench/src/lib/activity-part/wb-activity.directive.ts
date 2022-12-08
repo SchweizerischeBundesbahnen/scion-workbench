@@ -62,7 +62,7 @@ export class WbActivityDirective implements OnInit, OnDestroy {
   }
 
   /**
-   * Specifies CSS class(es) added to the activity item and activity panel, e.g. used for e2e testing.
+   * Specifies CSS class(es) to be added to the activity item, useful in end-to-end tests for locating the activity item.
    */
   @Input()
   public set cssClass(cssClass: string | string[] | undefined) {

@@ -55,6 +55,10 @@ export interface WorkbenchPopupConfig {
    */
   closeStrategy?: CloseStrategy;
   /**
+   * Specifies CSS class(es) to be added to the popup, useful in end-to-end tests for locating the popup.
+   */
+  cssClass?: string | string[];
+  /**
    * Specifies the context in which to open the popup.
    */
   context?: {

@@ -29,9 +29,10 @@ test.describe('Workbench Popup', () => {
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
-    const popupPO = await appPO.popup({cssClass: 'host-popup'});
+    const popupPO = await appPO.popup({cssClass: 'testee'});
     await expect(await popupPO.isVisible()).toBe(true);
   });
 
@@ -48,9 +49,10 @@ test.describe('Workbench Popup', () => {
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
-    const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+    const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
     await hostPopupPagePO.clickClose({returnValue: 'RETURN VALUE'});
     await expect(await popupOpenerPagePO.getPopupCloseAction()).toEqual({type: 'closed-with-value', value: 'RETURN VALUE'});
   });
@@ -68,9 +70,10 @@ test.describe('Workbench Popup', () => {
     // open the popup
     const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
-    const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+    const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
     await hostPopupPagePO.clickClose({returnValue: 'ERROR', closeWithError: true});
 
     await expect(await popupOpenerPagePO.getPopupCloseAction()).toEqual({type: 'closed-with-error', value: 'ERROR'});
@@ -92,15 +95,16 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
     await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
     await popupOpenerPagePO.selectAlign('north');
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // TODO [#271]: Specify the preferred size via popup capability when implemented the issue #271
     // Also consider merging this specs with popup.e2e-spec.ts.
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
-    const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+    const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
     await hostPopupPagePO.enterComponentSize({height: '100px', width: '100px'});
 
-    const popupPO = appPO.popup({cssClass: 'host-popup'});
+    const popupPO = appPO.popup({cssClass: 'testee'});
 
     // capture current popup and anchor location
     const anchorClientRect1 = await popupOpenerPagePO.getAnchorElementClientRect();
@@ -148,14 +152,15 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
     await popupOpenerPagePO.enterPosition({top: 150, left: 150});
     await popupOpenerPagePO.selectAlign('south');
+    await popupOpenerPagePO.enterCssClass('testee');
     await popupOpenerPagePO.clickOpen();
 
     // TODO [#271]: Specify the preferred size via popup capability when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
-    const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+    const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
     await hostPopupPagePO.enterComponentSize({height: '100px', width: '100px'});
 
-    const popupPO = appPO.popup({cssClass: 'host-popup'});
+    const popupPO = appPO.popup({cssClass: 'testee'});
 
     // capture current popup and anchor location
     const popupClientRectInitial = await popupPO.getBoundingBox();
@@ -193,9 +198,10 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.popup({cssClass: 'host-popup'});
+      const popupPO = appPO.popup({cssClass: 'testee'});
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
@@ -225,9 +231,10 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       const componentInstanceId = await hostPopupPagePO.getComponentInstanceId();
       await expect(await hostPopupPagePO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.isVisible()).toBe(true);
@@ -261,9 +268,10 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
-      const popupPO = appPO.popup({cssClass: 'host-popup'});
+      const popupPO = appPO.popup({cssClass: 'testee'});
       await expect(await popupPO.isPresent()).toBe(true);
       await expect(await popupPO.isVisible()).toBe(true);
 
@@ -305,9 +313,10 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: true});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
@@ -335,9 +344,10 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
@@ -362,9 +372,10 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnEscape: true});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
@@ -379,6 +390,7 @@ test.describe('Workbench Popup', () => {
       // open the popup
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnEscape: true});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
@@ -406,9 +418,10 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterCloseStrategy({closeOnEscape: false});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       await expect(await hostPopupPagePO.popupPO.isPresent()).toBe(true);
       await expect(await hostPopupPagePO.popupPO.isVisible()).toBe(true);
 
@@ -432,16 +445,16 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       // expect the popup of this app to display
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       await expect(await hostPopupPagePO.getPopupCapability()).toEqual(expect.objectContaining({
         qualifier: {component: 'host-popup'},
         type: 'popup',
         properties: expect.objectContaining({
           path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
-          cssClass: 'host-popup',
         }),
       }));
     });
@@ -461,10 +474,11 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterParams({param1: 'PARAM1'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       // expect values to be contained in popup params
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       await expect(await hostPopupPagePO.getPopupParams()).toEqual(expect.objectContaining({param1: 'PARAM1'}));
     });
 
@@ -482,10 +496,11 @@ test.describe('Workbench Popup', () => {
       // open the popup
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       // expect qualifier to be contained in popup params
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       await expect(await hostPopupPagePO.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup'}));
     });
 
@@ -504,10 +519,11 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
       await popupOpenerPagePO.enterParams({param1: 'PARAM1'});
+      await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
       // expect named params to be substituted
-      const hostPopupPagePO = new HostPopupPagePO(appPO, 'host-popup');
+      const hostPopupPagePO = new HostPopupPagePO(appPO, 'testee');
       await expect(await hostPopupPagePO.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup', param1: 'PARAM1'}));
       await expect(await hostPopupPagePO.getRouteParams()).toEqual({matrixParam1: 'PARAM1', matrixParam2: 'host-popup'});
     });
