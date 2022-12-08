@@ -10,7 +10,7 @@
 
 import {ElementRef, Inject, Injectable, Injector, NgZone, Optional} from '@angular/core';
 import {ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
-import {combineLatestWith, firstValueFrom, from, fromEvent, MonoTypeOperatorFunction, Observable} from 'rxjs';
+import {combineLatestWith, firstValueFrom, from, fromEvent, identity, MonoTypeOperatorFunction, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map, shareReplay, startWith, takeUntil} from 'rxjs/operators';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {Popup, PopupConfig, PopupReferrer, ɵPopup, ɵPopupError} from './popup.config';
@@ -269,6 +269,7 @@ export class PopupService {
           map(dimension => dimension.element.getBoundingClientRect()),
           filter(clientRect => !isNullClientRect(clientRect)), // Omit viewport change if not having a size, for example, if the view is deactivated.
           map(clientRect => ({x: clientRect.left, y: clientRect.top, width: clientRect.width, height: clientRect.height})),
+          startWithNullBoundsIf(() => !view.active), // Ensure initial bounds to be emitted even if the view is inactive. Otherwise, the popup would not be attached to the DOM until the view is activated.
         );
     }
     else {
@@ -367,6 +368,10 @@ export class PopupService {
 
 function isNullClientRect(clientRect: DOMRect): boolean {
   return clientRect.top === 0 && clientRect.right === 0 && clientRect.bottom === 0 && clientRect.left === 0;
+}
+
+function startWithNullBoundsIf(condition: () => boolean): MonoTypeOperatorFunction<ViewportBounds> {
+  return condition() ? startWith({x: 0, y: 0, width: 0, height: 0}) : identity;
 }
 
 interface ViewportBounds {
