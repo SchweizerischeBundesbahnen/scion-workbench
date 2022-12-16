@@ -12,6 +12,7 @@ import {MPart, MPartsLayout, MTreeNode} from './parts-layout.model';
 import {Defined} from '@scion/toolkit/util';
 import {UUID} from '@scion/toolkit/uuid';
 import {assertNotNullish, assertType} from '../asserts.util';
+import {VIEW_REF_PREFIX} from '../workbench.constants';
 
 /**
  * Represents the arrangement of parts and provides methods to modify the layout.
@@ -82,21 +83,27 @@ export class PartsLayout {
   /**
    * Adds a view to the specified part and makes it the active view.
    *
-   * If not specifying an insert position, then the view is added to the part as the last view.
+   * @param partId - Identifies the part to which to add the view
+   * @param viewId - Specifies the identity of the view
+   * @param options - Controls how to add the view to the layout
+   *        @property insertionIndex - position of the view in the tabbar. If not set, defaults to the end.
+   *        @property activate - whether to activate the view. If not set, defaults to `false`.
    *
    * @return copy of this layout, but with the view added.
    */
-  public addView(partId: string, viewId: string, insertionIndex?: number): PartsLayout {
-    return this._workingCopy()._addView(partId, viewId, insertionIndex);
+  public addView(partId: string, viewId: string, options?: {position?: number; activate?: boolean}): PartsLayout {
+    return this._workingCopy()._addView(partId, viewId, options);
   }
 
   /**
    * Moves a view to a different part of this layout, or if the same part, moves it within the part.
    *
-   * @return copy of this layout, but with the view moved.
+   * @return copy of this layout, but with the view moved and activated.
    */
   public moveView(viewId: string, targetPartId: string, insertionIndex?: number): PartsLayout {
-    return this._workingCopy()._moveView(viewId, targetPartId, insertionIndex);
+    return this._workingCopy()
+      ._moveView(viewId, targetPartId, insertionIndex)
+      ._activateView(viewId);
   }
 
   /**
@@ -198,6 +205,45 @@ export class PartsLayout {
   }
 
   /**
+   * Computes the next available view identity.
+   */
+  public computeNextAvailableViewId(): string {
+    const ids = this.viewsIds
+      .map(viewId => Number(viewId.substring(VIEW_REF_PREFIX.length)))
+      .reduce((set, viewId) => set.add(viewId), new Set<number>());
+
+    for (let i = 1; i <= ids.size; i++) {
+      if (!ids.has(i)) {
+        return `${VIEW_REF_PREFIX}${i}`;
+      }
+    }
+    return `${VIEW_REF_PREFIX}${ids.size + 1}`;
+  }
+
+
+  /**
+   * Computes the index for 'start' or 'last' literals, or, if `undefined`, returns the position after the currently active view.
+   */
+  public computeViewInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined, partId: string): number {
+    switch (insertionIndex) {
+      case undefined: {  // index after the active view, if any, or after the last view otherwise
+        const part = this.findPart(partId, {orElseThrow: true});
+        const index = part.viewIds.indexOf(part.activeViewId!);
+        return (index > -1 ? index + 1 : part.viewIds.length);
+      }
+      case 'start': {
+        return 0;
+      }
+      case 'end': {
+        return this.findPart(partId, {orElseThrow: true}).viewIds.length;
+      }
+      default: {
+        return insertionIndex;
+      }
+    }
+  }
+
+  /**
    * Serializes this layout into a URL-safe base64 string.
    *
    * If this layout consists of a single root part with no views added to it, by default, this method returns `null`.
@@ -295,13 +341,15 @@ export class PartsLayout {
   /**
    * Note: This method name begins with an underscore, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private _addView(partId: string, viewId: string, insertionIndex?: number): this {
+  private _addView(partId: string, viewId: string, options?: {position?: number; activate?: boolean}): this {
     assertNotNullish(partId, {orElseThrow: () => Error(`[PartsLayoutError] PartId must not be 'null' or 'undefined'.`)});
     assertNotNullish(viewId, {orElseThrow: () => Error(`[PartsLayoutError] ViewId must not be 'null' or 'undefined'.`)});
 
     const part = this._findPart(partId, {orElseThrow: true});
-    part.viewIds.splice(insertionIndex ?? part.viewIds.length, 0, viewId);
-    this._activateView(viewId);
+    part.viewIds.splice(options?.position ?? part.viewIds.length, 0, viewId);
+    if (options?.activate) {
+      this._activateView(viewId);
+    }
     return this;
   }
 
@@ -318,7 +366,7 @@ export class PartsLayout {
 
     this._removeView(viewId, {preventPartRemoval: sourcePart === targetPart});
     const targetInsertionIndex = targetViewId ? targetPart.viewIds.indexOf(targetViewId) : undefined;
-    this._addView(targetPartId, viewId, targetInsertionIndex);
+    this._addView(targetPartId, viewId, {position: targetInsertionIndex});
     return this;
   }
 

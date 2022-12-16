@@ -21,6 +21,7 @@ import {VIEW_TAB_CONTEXT} from '../workbench.constants';
 import {UrlSegment} from '@angular/router';
 import {Disposable} from '../disposable';
 import {WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 
@@ -208,7 +209,6 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly viewId: string;
   public readonly title: string;
   public readonly heading: string;
-  public readonly part = null;
   public readonly closable: boolean;
   public readonly dirty: boolean;
   public readonly destroyed = false;
@@ -244,6 +244,10 @@ class DragImageWorkbenchView implements WorkbenchView {
   }
 
   public registerMenuItem(menuItem: WorkbenchMenuItem): Disposable {
+    throw Error('[UnsupportedOperationError]');
+  }
+
+  public get part(): WorkbenchViewPart {
     throw Error('[UnsupportedOperationError]');
   }
 }

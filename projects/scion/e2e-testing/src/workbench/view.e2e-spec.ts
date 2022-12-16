@@ -67,8 +67,7 @@ test.describe('Workbench View', () => {
     // Navigate to a different route in the same view
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-router');
-    await routerPagePO.selectTarget('self');
-    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.enterTarget(viewId);
     await routerPagePO.clickNavigate();
 
     // Expect the view to be pristine
@@ -89,8 +88,7 @@ test.describe('Workbench View', () => {
     // Update matrix params (does not affect routing)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('self');
-    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.enterTarget(viewId);
     await routerPagePO.enterMatrixParams({matrixParam: 'value'});
     await routerPagePO.clickNavigate();
 
@@ -116,8 +114,7 @@ test.describe('Workbench View', () => {
     // Update matrix params (does not affect routing)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('self');
-    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.enterTarget(viewId);
     await routerPagePO.enterMatrixParams({matrixParam: 'value'});
     await routerPagePO.clickNavigate();
 
@@ -142,8 +139,7 @@ test.describe('Workbench View', () => {
     // Update matrix params (does not affect routing)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('self');
-    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.enterTarget(viewId);
     await routerPagePO.enterMatrixParams({matrixParam: 'value'});
     await routerPagePO.clickNavigate();
 

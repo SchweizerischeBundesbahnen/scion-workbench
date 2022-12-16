@@ -10,7 +10,7 @@
 
 import {Component, OnDestroy} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {map, takeUntil} from 'rxjs/operators';
+import {distinct, map, takeUntil} from 'rxjs/operators';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {combineLatest, Observable, Subject} from 'rxjs';
 import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
@@ -37,7 +37,7 @@ export class WorkbenchComponent implements OnDestroy {
    * If enabled, installs the handler to automatically open the start tab when the user closes the last tab.
    */
   private installStickyStartViewTab(): void {
-    const stickyStartViewTab$ = this._route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get('stickyStartViewTab'))));
+    const stickyStartViewTab$ = this._route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get('stickyStartViewTab'))), distinct());
     const views$ = this._workbench.views$;
     combineLatest([stickyStartViewTab$, views$])
       .pipe(takeUntil(this._destroy$))

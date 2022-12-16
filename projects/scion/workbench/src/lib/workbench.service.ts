@@ -68,13 +68,6 @@ export abstract class WorkbenchService {
   public abstract activateView(viewId: string): Promise<boolean>;
 
   /**
-   * Returns the identity of the viewpart which contains the specified view.
-   *
-   * Throws an error if no viewpart contains the view.
-   */
-  public abstract resolveViewPart(viewId: string): string;
-
-  /**
    * Registers an action which is added to every viewpart.
    *
    * Viewpart actions are displayed next to the opened view tabs.

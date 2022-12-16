@@ -1011,7 +1011,7 @@ describe('PartsLayoutComponent', () => {
     expect('view.2').toBeRegistered({partId: 'main', active: true, transientState: 'B'});
 
     // Add view 2 again
-    await wbRouter.navigate(['view-2'], {blankPartId: 'main', activateIfPresent: true});
+    await wbRouter.navigate(['view-2'], {blankPartId: 'main'});
     await waitUntilLayoutChanged();
 
     expect(fixture).toEqualPartsLayout(new MPart({partId: 'main', activeViewId: 'view.2', viewIds: ['view.1', 'view.2']}));
@@ -1038,7 +1038,7 @@ describe('PartsLayoutComponent', () => {
     expect('view.2').toBeRegistered({partId: 'main', active: true, transientState: 'B'});
 
     // Add view 2 again
-    await wbRouter.navigate(['view-2'], {blankPartId: 'main', activateIfPresent: false});
+    await wbRouter.navigate(['view-2'], {blankPartId: 'main', target: 'blank'});
     await waitUntilLayoutChanged();
     enterTransientViewState(fixture, 'view.3', 'C');
 

@@ -34,7 +34,7 @@ test.describe('Workbench Router', () => {
     // navigate
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({entity: 'products'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     // expect qualifier to be contained in view params
@@ -69,7 +69,7 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({entity: 'product'});
     await routerPagePO.enterParams({id: '123'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     // expect qualifier to be contained in view params
@@ -105,7 +105,7 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({entity: 'product', mode: 'new'});
     await routerPagePO.enterParams({mode: 'edit'}); // should be ignored
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     // expect qualifier values not to be overwritten by params
@@ -144,7 +144,7 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'});
     await routerPagePO.enterParams({seg3: 'SEG3', mp2: 'MP2', qp2: 'QP2', fragment: 'FRAGMENT'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     // expect named params to be substituted
@@ -189,7 +189,7 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({entity: 'product'});
     await routerPagePO.enterParams({id: '123'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
@@ -202,8 +202,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({entity: 'product'});
     await routerPagePO.enterParams({id: '456'});
-    await routerPagePO.selectTarget('self');
-    await routerPagePO.enterSelfViewId(testeeViewPagePO.viewId);
+    await routerPagePO.enterTarget(testeeViewPagePO.viewId);
     await routerPagePO.clickNavigate();
 
     await testeeViewPagePO.view.viewTab.click();
@@ -243,7 +242,7 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({entity: 'product'});
     await routerPagePO.enterParams({id: '<null>'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     // expect the qualifier and the optional parameter with value `null` to be contained in view params
@@ -286,7 +285,7 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({entity: 'product'});
     await routerPagePO.enterParams({id: '123', param1: '<undefined>'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     // expect qualifier to be contained in view params, but the optional parameter with value `undefined` should not be contained
@@ -589,7 +588,7 @@ test.describe('Workbench Router', () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO.enterQualifier({entity: 'product'});
       await routerPagePO.enterParams({id: '123', param1: 'transient param1', param2: 'transient param2'});
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.clickNavigate();
 
       // expect transient param to be contained in view params
@@ -615,7 +614,7 @@ test.describe('Workbench Router', () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO.enterQualifier({component: 'view', app: 'app1'});
       await routerPagePO.enterParams({initialTitle: 'TITLE', transientParam: 'TRANSIENT PARAM'});
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.clickNavigate();
 
       // expect transient param to be contained in view params
@@ -874,7 +873,7 @@ test.describe('Workbench Router', () => {
       const routerPagePO1 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO1.enterQualifier({entity: 'product', app: 'app1'});
       await routerPagePO1.enterParams({param: 'param app1', transientParam: 'transient param app1'});
-      await routerPagePO1.selectTarget('blank');
+      await routerPagePO1.enterTarget('blank');
       await routerPagePO1.clickNavigate();
 
       // expect transient param to be contained in view params
@@ -893,8 +892,7 @@ test.describe('Workbench Router', () => {
       const routerPagePO2 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app2');
       await routerPagePO2.enterQualifier({entity: 'product', app: 'app2'});
       await routerPagePO2.enterParams({param: 'param app2', transientParam: 'transient param app2'});
-      await routerPagePO2.selectTarget('self');
-      await routerPagePO2.enterSelfViewId(viewId);
+      await routerPagePO2.enterTarget(viewId);
       await routerPagePO2.clickNavigate();
 
       // expect transient param to be contained in view params
@@ -955,7 +953,7 @@ test.describe('Workbench Router', () => {
       const routerPagePO1 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO1.enterQualifier({entity: 'product', app: 'app1'});
       await routerPagePO1.enterParams({transientParam: 'transient param app1'});
-      await routerPagePO1.selectTarget('blank');
+      await routerPagePO1.enterTarget('blank');
       await routerPagePO1.clickNavigate();
 
       // expect transient param to be contained in view params
@@ -972,8 +970,7 @@ test.describe('Workbench Router', () => {
       // self-navigate to view of app2
       const routerPagePO2 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app2');
       await routerPagePO2.enterQualifier({entity: 'product', app: 'app2'});
-      await routerPagePO2.selectTarget('self');
-      await routerPagePO2.enterSelfViewId(viewId);
+      await routerPagePO2.enterTarget(viewId);
       await routerPagePO2.clickNavigate();
 
       // expect transient param to be contained in view params

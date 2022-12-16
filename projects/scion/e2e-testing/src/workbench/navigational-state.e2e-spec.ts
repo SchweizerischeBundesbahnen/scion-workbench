@@ -76,7 +76,7 @@ test.describe('Navigational State', () => {
 
       // navigate to the test view
       await routerPagePO.enterPath('test-view');
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterMatrixParams({'param': 'value 1'});
       await routerPagePO.clickNavigate();
 
@@ -90,8 +90,7 @@ test.describe('Navigational State', () => {
       // update matrix param
       await routerPagePO.viewTabPO.click();
       await routerPagePO.enterMatrixParams({'param': 'value 2'});
-      await routerPagePO.selectTarget('self');
-      await routerPagePO.enterSelfViewId(testeeViewId);
+      await routerPagePO.enterTarget(testeeViewId);
       await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data not to emit

@@ -61,9 +61,9 @@ export const POPUP_REF_PREFIX = 'popup.';
 export const PARTS_LAYOUT_QUERY_PARAM = 'parts';
 
 /**
- * Property name of the view navigation state.
+ * Property name of the navigation extras in navigational state.
  */
-export const VIEW_TARGET = 'scion.workbench.routing.viewTarget';
+export const NAVIGATION_EXTRAS = 'ɵscion.workbench.routing.navigationextras';
 
 /**
  * Defines the contexts in which a viewtab is rendered.

@@ -673,7 +673,7 @@ describe('PartsLayout', () => {
    * | bottomLeft  |      |
    * +-------------+------+
    */
-  it('activates the part when adding a view to it', () => {
+  it('does not activate the part when adding a view to it', () => {
     let partsLayout = createSimplePartsLayout();
 
     // make part 'top-left' the active part
@@ -682,11 +682,11 @@ describe('PartsLayout', () => {
 
     // add view to the main part
     partsLayout = partsLayout.addView('main', 'view.1');
-    expect(partsLayout.activePart.partId).toEqual('main');
+    expect(partsLayout.activePart.partId).toEqual('topLeft');
 
     // add view to the main part
     partsLayout = partsLayout.addView('main', 'view.2');
-    expect(partsLayout.activePart.partId).toEqual('main');
+    expect(partsLayout.activePart.partId).toEqual('topLeft');
 
     // add view to the 'top-left' part
     partsLayout = partsLayout.addView('topLeft', 'view.3');
@@ -694,6 +694,30 @@ describe('PartsLayout', () => {
 
     // add view to the 'bottom-left' part
     partsLayout = partsLayout.addView('bottomLeft', 'view.4');
+    expect(partsLayout.activePart.partId).toEqual('topLeft');
+  });
+
+  it('activates the part when activating one of its views', () => {
+    let partsLayout = createSimplePartsLayout();
+
+    // make part 'top-left' the active part
+    partsLayout = partsLayout.activatePart('topLeft');
+    expect(partsLayout.activePart.partId).toEqual('topLeft');
+
+    // add view to the main part
+    partsLayout = partsLayout.addView('main', 'view.1').activateView('view.1');
+    expect(partsLayout.activePart.partId).toEqual('main');
+
+    // add view to the main part
+    partsLayout = partsLayout.addView('main', 'view.2').activateView('view.2');
+    expect(partsLayout.activePart.partId).toEqual('main');
+
+    // add view to the 'top-left' part
+    partsLayout = partsLayout.addView('topLeft', 'view.3').activateView('view.3');
+    expect(partsLayout.activePart.partId).toEqual('topLeft');
+
+    // add view to the 'bottom-left' part
+    partsLayout = partsLayout.addView('bottomLeft', 'view.4').activateView('view.4');
     expect(partsLayout.activePart.partId).toEqual('bottomLeft');
   });
 
@@ -829,6 +853,43 @@ describe('PartsLayout', () => {
 
     expect(partsLayout.root).toEqualPartsLayout(new MPart({partId: 'root'}));
     expect(partsLayout.activePart.partId).toEqual('root');
+  });
+
+  it('should compute next available view id', async () => {
+    let partsLayout = createSinglePartLayout('main');
+
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.1');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.1');
+
+    partsLayout = partsLayout.addView('main', 'view.1');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.2');
+
+    partsLayout = partsLayout.addView('main', 'view.2');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.3');
+
+    partsLayout = partsLayout.addView('main', 'view.6');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.3');
+
+    partsLayout = partsLayout.addView('main', 'view.3');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.4');
+
+    partsLayout = partsLayout.addView('main', 'view.4');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.5');
+
+    partsLayout = partsLayout.addView('main', 'view.5');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.7');
+
+    partsLayout = partsLayout.removeView('view.3');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.3');
+
+    partsLayout = partsLayout.removeView('view.1');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.1');
+
+    partsLayout = partsLayout.addView('main', 'view.1');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.3');
+
+    partsLayout = partsLayout.addView('main', 'view.3');
+    expect(partsLayout.computeNextAvailableViewId()).toEqual('view.7');
   });
 });
 

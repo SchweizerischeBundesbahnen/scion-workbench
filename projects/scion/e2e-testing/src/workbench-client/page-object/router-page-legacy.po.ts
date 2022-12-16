@@ -19,9 +19,9 @@ import {ElementSelectors} from '../../helper/element-selectors';
 import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/testing.util';
 
 /**
- * Page object to interact {@link RouterPageComponent} of workbench-client testing app.
+ * Page object to interact {@link RouterPageLegacyComponent} of workbench-client testing app.
  */
-export class RouterPagePO {
+export class RouterPageLegacyPO {
 
   private readonly _locator: Locator;
   private readonly _viewPO: ViewPO;
@@ -31,7 +31,7 @@ export class RouterPagePO {
   constructor(appPO: AppPO, public viewId: string) {
     this._viewPO = appPO.view({viewId});
     this.viewTabPO = this._viewPO.viewTab;
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-router-page');
+    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-router-page-legacy');
   }
 
   public async isVisible(): Promise<boolean> {
@@ -50,16 +50,20 @@ export class RouterPagePO {
     await paramsEnterPO.enterParams(params);
   }
 
-  public async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
-    await this._locator.locator('input.e2e-target').fill(target ?? '');
+  public async selectTarget(target: 'self' | 'blank'): Promise<void> {
+    await this._locator.locator('select.e2e-target').selectOption(target);
+  }
+
+  public async enterSelfViewId(selfViewId: string): Promise<void> {
+    await this._locator.locator('input.e2e-self-view-id').fill(selfViewId);
   }
 
   public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
     await this._locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
   }
 
-  public async checkActivate(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate')).toggle(check);
+  public async checkActivateIfPresent(check: boolean): Promise<void> {
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate-if-present')).toggle(check);
   }
 
   public async checkCloseIfPresent(check: boolean): Promise<void> {

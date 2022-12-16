@@ -34,27 +34,27 @@ export class WbComponentPortal<T> {
   /**
    * Constructs the portal's component using given injection context.
    */
-  private createComponent(elementInjector: Injector, environmentInjector: EnvironmentInjector): ComponentRef<T> {
+  private createComponent(elementInjector: Injector): ComponentRef<T> {
     const componentRef = createComponent(this.componentType, {
       elementInjector: Injector.create({
         name: 'WbComponentPortalInjector',
         parent: elementInjector,
         providers: this._options?.providers || [],
       }),
-      environmentInjector: environmentInjector,
+      environmentInjector: elementInjector.get(EnvironmentInjector),
     });
     componentRef.onDestroy(() => this.onDestroy());
     return componentRef;
   }
 
   /**
-   * Constructs the portal's component using the current injection context.
+   * Constructs the portal's component using the given injection context.
    */
-  public createComponentFromInjectionContext(): void {
+  public createComponentFromInjectionContext(injectionContext: Injector): void {
     if (this.isConstructed) {
       throw Error('[PortalError] Component already constructed.');
     }
-    this._componentRef = this.createComponent(inject(Injector), inject(EnvironmentInjector));
+    this._componentRef = this.createComponent(injectionContext);
   }
 
   /**
@@ -73,7 +73,7 @@ export class WbComponentPortal<T> {
     }
 
     this._viewContainerRef = viewContainerRef;
-    this._componentRef = this._componentRef || this.createComponent(this._viewContainerRef.injector, this._viewContainerRef.injector.get(EnvironmentInjector));
+    this._componentRef = this._componentRef || this.createComponent(this._viewContainerRef.injector);
     this._componentRef.changeDetectorRef.reattach();
     this._viewContainerRef.insert(this._componentRef.hostView);
     this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef);
@@ -96,7 +96,7 @@ export class WbComponentPortal<T> {
     this._componentRef!.changeDetectorRef.detach();
   }
 
-  private get isConstructed(): boolean {
+  public get isConstructed(): boolean {
     return !!this._componentRef;
   }
 

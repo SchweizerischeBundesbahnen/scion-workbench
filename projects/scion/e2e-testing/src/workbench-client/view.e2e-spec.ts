@@ -67,7 +67,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-1 view (app1)
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testeeViewId = await appPO.view({cssClass: 'testee-1'}).getViewId();
@@ -81,8 +81,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-2 view (app1)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
-    await routerPagePO.selectTarget('self');
-    await routerPagePO.enterSelfViewId(testeeViewId);
+    await routerPagePO.enterTarget(testeeViewId);
     await routerPagePO.clickNavigate();
 
     // expect testee-2 to show
@@ -107,8 +106,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-3 view (app3)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
-    await routerPagePO.selectTarget('self');
-    await routerPagePO.enterSelfViewId(testeeViewId);
+    await routerPagePO.enterTarget(testeeViewId);
     await routerPagePO.clickNavigate();
 
     // expect testee-3 to show
@@ -138,8 +136,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-1 view (app1)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-1'});
-    await routerPagePO.selectTarget('self');
-    await routerPagePO.enterSelfViewId(testeeViewId);
+    await routerPagePO.enterTarget(testeeViewId);
     await routerPagePO.clickNavigate();
 
     // expect following Observables to complete
@@ -457,7 +454,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-1 view
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
     const testee1ViewTabPO = appPO.view({cssClass: 'testee-1'}).viewTab;
     const testee1ViewPagePO = new ViewPagePO(appPO, await testee1ViewTabPO.getViewId());
@@ -471,7 +468,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-2 view
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
     const testee2ViewTabPO = appPO.view({cssClass: 'testee-2'}).viewTab;
     const testee2ViewPagePO = new ViewPagePO(appPO, await testee2ViewTabPO.getViewId());
@@ -524,7 +521,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-3 view
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
     const testee3ViewTabPO = appPO.view({cssClass: 'testee-3'}).viewTab;
     const testee3ViewPagePO = new ViewPagePO(appPO, await testee3ViewTabPO.getViewId());
@@ -592,7 +589,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-1 view (app1)
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testeeViewId = await appPO.view({cssClass: 'testee-1'}).getViewId();
@@ -611,8 +608,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-2 view (app1)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
-    await routerPagePO.enterSelfViewId(testeeViewId);
-    await routerPagePO.selectTarget('self');
+    await routerPagePO.enterTarget(testeeViewId);
     await routerPagePO.clickNavigate();
 
     await testeeViewPagePO.view.viewTab.click();
@@ -629,7 +625,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-3 view (app2)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
-    await routerPagePO.enterSelfViewId(testeeViewId);
+    await routerPagePO.enterTarget(testeeViewId);
     await routerPagePO.clickNavigate();
 
     await testeeViewPagePO.view.viewTab.click();
@@ -697,7 +693,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-1 view (app1)
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     // Construct the PO to interact with the opened view
@@ -714,8 +710,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-2 view (app1)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
-    await routerPagePO.enterSelfViewId(viewId);
-    await routerPagePO.selectTarget('self');
+    await routerPagePO.enterTarget(viewId);
     await routerPagePO.clickNavigate();
 
     // Assert the correct capability to be loaded
@@ -728,8 +723,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-1 view (app1)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-1'});
-    await routerPagePO.enterSelfViewId(viewId);
-    await routerPagePO.selectTarget('self');
+    await routerPagePO.enterTarget(viewId);
     await routerPagePO.clickNavigate();
 
     // Assert the correct capability to be loaded
@@ -742,7 +736,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-3 view (app2)
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
-    await routerPagePO.enterSelfViewId(viewId);
+    await routerPagePO.enterTarget(viewId);
     await routerPagePO.clickNavigate();
 
     // Assert the correct capability to be loaded
@@ -793,7 +787,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-1 view
     const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPagePO.enterQualifier({component: 'testee-1'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testee1ViewId = await appPO.view({cssClass: 'testee-1'}).getViewId();
@@ -802,7 +796,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-2 view
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testee2ViewId = await appPO.view({cssClass: 'testee-2'}).getViewId();
@@ -811,7 +805,7 @@ test.describe('Workbench View', () => {
     // navigate to testee-3 view
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-3'});
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     const testee3ViewId = await appPO.view({cssClass: 'testee-3'}).getViewId();

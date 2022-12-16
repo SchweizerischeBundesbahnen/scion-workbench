@@ -12,7 +12,7 @@ We use this app to run our e2e tests and experiment with features.
       <a *ngFor="let route of workbenchViewRoutes | wbFilter$:filterControl:selectViewRouteText | async"
          [wbRouterLink]="route.path"
          [ngClass]="route.data[WorkbenchRouteData.cssClass]"
-         [wbRouterLinkExtras]="{relativeTo: null, activateIfPresent: false}">
+         [wbRouterLinkExtras]="{relativeTo: null}">
         {{route.data[WorkbenchRouteData.title]}}
         <span class="description" *ngIf="route.data[WorkbenchRouteData.heading]">
           {{route.data[WorkbenchRouteData.heading]}}

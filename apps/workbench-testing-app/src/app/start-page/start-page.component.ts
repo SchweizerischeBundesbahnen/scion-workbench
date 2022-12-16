@@ -80,14 +80,14 @@ export class StartPageComponent implements OnDestroy {
   }
 
   public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability): void {
-    this._workbenchClientRouter.navigate(viewCapability.qualifier, {activateIfPresent: false, selfViewId: this._view?.viewId});
+    this._workbenchClientRouter.navigate(viewCapability.qualifier, {target: this._view?.viewId});
   }
 
   public async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {
     // TODO [#343] Remove switch-case after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/343
     switch (testCapability.type) {
       case WorkbenchCapabilities.View: {
-        await this._workbenchClientRouter.navigate(testCapability.qualifier, {activateIfPresent: false, selfViewId: this._view?.viewId});
+        await this._workbenchClientRouter.navigate(testCapability.qualifier, {target: this._view?.viewId});
         break;
       }
       case WorkbenchCapabilities.Popup: {

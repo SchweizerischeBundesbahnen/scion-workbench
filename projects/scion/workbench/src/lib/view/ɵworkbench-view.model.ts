@@ -13,7 +13,6 @@ import {ViewActivationInstantProvider} from './view-activation-instant-provider.
 import {ChildrenOutletContexts, Router, UrlSegment} from '@angular/router';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WorkbenchViewPartRegistry} from '../view-part/workbench-view-part.registry';
-import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Arrays} from '@scion/toolkit/util';
@@ -30,6 +29,7 @@ import {inject} from '@angular/core';
 export class ɵWorkbenchView implements WorkbenchView {
 
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
+  private _partId: string | null = null;
 
   public title: string | null = null;
   public heading: string | null = null;
@@ -49,7 +49,6 @@ export class ɵWorkbenchView implements WorkbenchView {
   constructor(public readonly viewId: string,
               viewComponent: ComponentType<any>, // do not reference `ViewComponent` to avoid import cycles
               private _workbench: ɵWorkbenchService = inject(ɵWorkbenchService),
-              private _workbenchLayoutService: WorkbenchLayoutService = inject(WorkbenchLayoutService),
               private _viewPartRegistry: WorkbenchViewPartRegistry = inject(WorkbenchViewPartRegistry),
               private _viewDragService: ViewDragService = inject(ViewDragService),
               private _router: Router = inject(Router),
@@ -80,6 +79,10 @@ export class ɵWorkbenchView implements WorkbenchView {
         {provide: ChildrenOutletContexts, useValue: inject(ChildrenOutletContexts)},
       ],
     });
+  }
+
+  public setPartId(partId: string): void {
+    this._partId = partId;
   }
 
   public get first(): boolean {
@@ -118,8 +121,10 @@ export class ɵWorkbenchView implements WorkbenchView {
 
   public get part(): WorkbenchViewPart {
     // DO NOT resolve the part at construction time because it can change, e.g. when this view is moved to another part.
-    const part = this._workbenchLayoutService.layout!.findPartByViewId(this.viewId, {orElseThrow: true});
-    return this._viewPartRegistry.getElseThrow(part.partId);
+    if (this._partId) {
+      return this._viewPartRegistry.getElseThrow(this._partId);
+    }
+    throw Error(`[NullPartError] View not added to a part [view=${this.viewId}].`);
   }
 
   public close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean> {
