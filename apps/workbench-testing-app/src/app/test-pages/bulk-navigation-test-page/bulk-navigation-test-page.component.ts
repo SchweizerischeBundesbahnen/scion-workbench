@@ -57,7 +57,6 @@ export class BulkNavigationTestPageComponent {
   private navigateToViewPage(): Promise<boolean> {
     return this._router.navigate(['test-view'], {
       target: 'blank',
-      activateIfPresent: false,
       cssClass: this.form.get(CSS_CLASS).value,
     });
   }

@@ -45,6 +45,7 @@ export class BulkNavigationTestPagePO {
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPagePO.enterPath('test-pages/bulk-navigation-test-page');
+    await routerPagePO.enterTarget(routerPagePO.viewId);
     await routerPagePO.clickNavigate();
 
     const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation'});

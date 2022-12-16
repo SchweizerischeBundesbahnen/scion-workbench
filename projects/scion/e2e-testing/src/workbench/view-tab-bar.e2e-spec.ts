@@ -53,8 +53,7 @@ test.describe('View Tabbar', () => {
     // open view-1
     await routerPagePO.enterPath('test-view');
     await routerPagePO.enterCssClass('e2e-test-view-1');
-    await routerPagePO.checkActivateIfPresent(false);
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-1'}).viewTab.isActive()).toBe(true);
@@ -64,8 +63,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
     await routerPagePO.enterCssClass('e2e-test-view-2');
-    await routerPagePO.checkActivateIfPresent(false);
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-2'}).viewTab.isActive()).toBe(true);
@@ -75,8 +73,7 @@ test.describe('View Tabbar', () => {
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
     await routerPagePO.enterCssClass('e2e-test-view-3');
-    await routerPagePO.checkActivateIfPresent(false);
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-3'}).viewTab.isActive()).toBe(true);
@@ -117,7 +114,7 @@ test.describe('View Tabbar', () => {
 
     // open view.2
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
@@ -126,7 +123,7 @@ test.describe('View Tabbar', () => {
     // open view.3
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
@@ -135,7 +132,7 @@ test.describe('View Tabbar', () => {
     // open view.4
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
@@ -151,7 +148,7 @@ test.describe('View Tabbar', () => {
 
     // open view.2
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex('end');
     await routerPagePO.clickNavigate();
 
@@ -161,7 +158,7 @@ test.describe('View Tabbar', () => {
     // open view.3
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex('end');
     await routerPagePO.clickNavigate();
 
@@ -171,7 +168,7 @@ test.describe('View Tabbar', () => {
     // open view.4
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex('end');
     await routerPagePO.clickNavigate();
 
@@ -188,7 +185,7 @@ test.describe('View Tabbar', () => {
 
     // open view.2
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex('start');
     await routerPagePO.clickNavigate();
 
@@ -198,7 +195,7 @@ test.describe('View Tabbar', () => {
     // open view.3
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex('start');
     await routerPagePO.clickNavigate();
 
@@ -208,7 +205,7 @@ test.describe('View Tabbar', () => {
     // open view.4
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex('start');
     await routerPagePO.clickNavigate();
 
@@ -225,7 +222,7 @@ test.describe('View Tabbar', () => {
 
     // open view.2
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex(1);
     await routerPagePO.clickNavigate();
 
@@ -235,7 +232,7 @@ test.describe('View Tabbar', () => {
     // open view.3
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex(1);
     await routerPagePO.clickNavigate();
 
@@ -245,7 +242,7 @@ test.describe('View Tabbar', () => {
     // open view.4
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-view');
-    await routerPagePO.selectTarget('blank');
+    await routerPagePO.enterTarget('blank');
     await routerPagePO.enterInsertionIndex(1);
     await routerPagePO.clickNavigate();
 

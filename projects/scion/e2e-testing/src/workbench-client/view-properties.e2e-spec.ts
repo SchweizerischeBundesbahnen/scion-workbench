@@ -32,21 +32,21 @@ test.describe('Workbench View Properties', () => {
       },
     );
 
-    await test.step('navigating in current view [target="self"]', async () => {
+    await test.step('navigating in current view [target="viewId"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      const viewId = routerPagePO.viewId;
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({title: 'Title 1,Title 2,Title 3'});
-      await routerPagePO.selectTarget('self');
-      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.enterTarget(viewId);
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.getTitle()).toEqual('Title 3');
+      await expect(await appPO.view({viewId}).viewTab.getTitle()).toEqual('Title 3');
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({title: 'Title 1,Title 2,Title 3'});
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
 
@@ -73,21 +73,21 @@ test.describe('Workbench View Properties', () => {
       },
     );
 
-    await test.step('navigating in current view [target="self"]', async () => {
+    await test.step('navigating in current view [target="viewId"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      const viewId = routerPagePO.viewId;
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({heading: 'Heading 1,Heading 2,Heading 3'});
-      await routerPagePO.selectTarget('self');
-      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.enterTarget(viewId);
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.getHeading()).toEqual('Heading 3');
+      await expect(await appPO.view({viewId}).viewTab.getHeading()).toEqual('Heading 3');
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({heading: 'Heading 1,Heading 2,Heading 3'});
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
 
@@ -114,21 +114,21 @@ test.describe('Workbench View Properties', () => {
       },
     );
 
-    await test.step('navigating in current view [target="self"]', async () => {
+    await test.step('navigating in current view [target="viewId"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      const viewId = routerPagePO.viewId;
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({dirty: 'true,false'});
-      await routerPagePO.selectTarget('self');
-      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.enterTarget(viewId);
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isDirty()).toBe(false);
+      await expect(await appPO.view({viewId}).viewTab.isDirty()).toBe(false);
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({dirty: 'true,false'});
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
 
@@ -155,21 +155,21 @@ test.describe('Workbench View Properties', () => {
       },
     );
 
-    await test.step('navigating in current view [target="self"]', async () => {
+    await test.step('navigating in current view [target="viewId"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      const viewId = routerPagePO.viewId;
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({dirty: 'true,false,true'});
-      await routerPagePO.selectTarget('self');
-      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.enterTarget(viewId);
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isDirty()).toBe(true);
+      await expect(await appPO.view({viewId}).viewTab.isDirty()).toBe(true);
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({dirty: 'true,false,true'});
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
 
@@ -196,21 +196,21 @@ test.describe('Workbench View Properties', () => {
       },
     );
 
-    await test.step('navigating in current view [target="self"]', async () => {
+    await test.step('navigating in current view [target="viewId"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      const viewId = routerPagePO.viewId;
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({closable: 'true,false'});
-      await routerPagePO.selectTarget('self');
-      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.enterTarget(viewId);
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isClosable()).toBe(false);
+      await expect(await appPO.view({viewId}).viewTab.isClosable()).toBe(false);
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({closable: 'true,false'});
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
 
@@ -237,21 +237,21 @@ test.describe('Workbench View Properties', () => {
       },
     );
 
-    await test.step('navigating in current view [target="self"]', async () => {
+    await test.step('navigating in current view [target="viewId"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      const viewId = routerPagePO.viewId;
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({closable: 'true,false,true'});
-      await routerPagePO.selectTarget('self');
-      await routerPagePO.enterCssClass('testee-self');
+      await routerPagePO.enterTarget(viewId);
       await routerPagePO.clickNavigate();
-      await expect(await appPO.view({cssClass: 'testee-self'}).viewTab.isClosable()).toBe(true);
+      await expect(await appPO.view({viewId}).viewTab.isClosable()).toBe(true);
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       await routerPagePO.enterQualifier({test: 'view-properties'});
       await routerPagePO.enterParams({closable: 'true,false,true'});
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee-blank');
       await routerPagePO.clickNavigate();
 

@@ -9,16 +9,16 @@
  */
 
 import {ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
-import {Arrays, Defined, Dictionaries, Dictionary} from '@scion/toolkit/util';
+import {Arrays, Dictionary} from '@scion/toolkit/util';
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {ACTIVITY_OUTLET_NAME, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX, VIEW_TARGET} from '../workbench.constants';
+import {ACTIVITY_OUTLET_NAME, NAVIGATION_EXTRAS, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX} from '../workbench.constants';
 import {PartsLayout} from '../layout/parts-layout';
 import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 import {SingleTaskExecutor} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -49,15 +49,19 @@ export class WorkbenchRouter implements OnDestroy {
 
   /**
    * Navigates based on the provided array of commands, and is like 'Router.navigate(...)' but with a workbench view as the router outlet target.
+   * Navigation is absolute unless providing a `relativeTo` route in navigational extras.
    *
-   * By default, navigation is absolute. Make it relative by providing a `relativeTo` route in navigational extras.
-   * Navigation allows to close present views matching the routing commands if `closeIfPresent` is set in navigational extras.
+   * By passing navigation extras, you can control navigation. By default, the router opens a new view tab if no view is found that matches the
+   * specified path. Matrix parameters do not affect view resolution. If one (or more) view(s) match the specified path, they are navigated
+   * instead of opening the view in a new view tab, e.g., to update matrix parameters.
    *
-   * - Target view can be set via {WbNavigationExtras} object.
+   * The router supports for closing views matching the routing commands by setting `closeIfPresent` in navigational extras.
+   *
+   * ### Commands
    * - Multiple static segments can be merged into one, e.g. `['/team/11/user', userName, {details: true}]`
    * - The first segment name can be prepended with `/`, `./`, or `../`
    * - Matrix parameters can be used to associate optional data with the URL, e.g. `['user', userName, {details: true}]`
-   *   Matrix parameters are like regular URL parameters, but do not affect route resolution. Unlike query parameters, matrix parameters
+   *   Matrix parameters are like regular URL parameters, but do not affect route and view resolution. Unlike query parameters, matrix parameters
    *   are not global but part of the routing path, which makes them suitable for auxiliary routes.
    *
    * ### Usage
@@ -77,61 +81,80 @@ export class WorkbenchRouter implements OnDestroy {
     }
 
     if (extras.closeIfPresent) {
-      return this.closeViews(...this.resolvePresentViewIds(commands, extras.relativeTo));
+      return this.closeViews(...this.resolvePresentViewIds(commands, {relativeTo: extras.relativeTo}));
     }
 
-    return this.ɵnavigate((layout: PartsLayout): WorkbenchNavigation | PartsLayout => {
-      const activateIfPresent = Defined.orElse(extras.activateIfPresent, !commands.includes('new') && !commands.includes('create') /* coerce activation based on command segment names */);
-      // If the view is present, activate it.
-      if (activateIfPresent) {
-        const presentViewId = this.resolvePresentViewIds(commands, extras.relativeTo)[0];
-        if (presentViewId) {
-          return layout.activateView(presentViewId);
-        }
-      }
+    // Add CSS classes to navigational state in order to be added to view and view tab when activating the route.
+    extras.state = {
+      ...extras.state,
+      ...(extras.cssClass ? {[WorkbenchNavigationalStates.cssClass]: extras.cssClass} : null),
+    };
 
-      // Add CSS classes to navigational state in order to be added to view and view tab when activating the route.
-      extras.state = {
-        ...extras.state,
-        ...(extras.cssClass ? {[WorkbenchNavigationalStates.cssClass]: extras.cssClass} : null),
-      };
-
-      switch (extras.target || (extras.selfViewId ? 'self' : 'blank')) {
+    return this.ɵnavigate((layout: PartsLayout): WorkbenchNavigation | PartsLayout | null => {
+      switch (extras.target ?? 'auto') {
         case 'blank': {
-          const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
-          const viewTarget: ViewTarget = Dictionaries.withoutUndefinedEntries({
-            partId: extras.blankPartId,
-            viewIndex: extras.blankInsertionIndex,
-          });
-
-          return {
-            layout, // The view is added in {WbAddViewToPartGuard} to the layout in order to resolve its part
-            viewOutlets: {[newViewId]: commands},
-            viewState: {[newViewId]: {...extras.state, ...Object.keys(viewTarget).length ? {[VIEW_TARGET]: viewTarget} : {}}},
-          };
+          return addView(layout.computeNextAvailableViewId(), layout);
         }
-        case 'self': {
-          if (!extras.selfViewId) {
-            throw Error('[WorkbenchRouterError] Missing required navigation property \'selfViewId\'.');
+        case 'auto': {
+          const viewIds = this.resolvePresentViewIds(commands, {relativeTo: extras.relativeTo, ignoreMatrixParams: true});
+          if (viewIds.length) {
+            return viewIds.reduce((navigation, viewId) => updateView(viewId, navigation), {layout});
           }
-
-          const urlTree = this._router.parseUrl(this._router.url);
-          const urlSegmentGroups = urlTree.root.children;
-          if (!urlSegmentGroups[extras.selfViewId]) {
-            throw Error(`[WorkbenchRouterError] Target view outlet not found: ${extras.selfViewId}.`);
+          else {
+            return addView(layout.computeNextAvailableViewId(), layout);
           }
-
-          return ({
-            layout,
-            viewOutlets: {[extras.selfViewId!]: commands},
-            viewState: {[extras.selfViewId!]: extras.state},
-          });
         }
         default: {
-          throw Error(`[WorkbenchRouterError] Invalid routing target. Expected 'self' or 'blank', but received ${extras.target}'.`);
+          const viewId = extras.target!;
+          if (!viewId.startsWith(VIEW_REF_PREFIX)) {
+            throw Error(`[WorkbenchRouterError][IllegalArgumentError] The view identifier must start with '${VIEW_REF_PREFIX}' [viewId=${viewId}]`);
+          }
+          else if (layout.viewsIds.includes(viewId)) {
+            return updateView(viewId, layout);
+          }
+          else {
+            return addView(viewId, layout);
+          }
         }
       }
     }, extras);
+
+    /**
+     * Creates the navigation for adding the specified view to the workbench layout.
+     */
+    function addView(viewId: string, layout: PartsLayout): WorkbenchNavigation {
+      const activate = extras.activate ?? true;
+      if (extras.blankPartId) {
+        return {
+          layout: layout.addView(extras.blankPartId, viewId, {
+            position: layout.computeViewInsertionIndex(extras.blankInsertionIndex, extras.blankPartId),
+            activate,
+          }),
+          viewOutlets: {[viewId]: commands},
+          viewState: {[viewId]: extras.state},
+        };
+      }
+
+      // The view will be added to the layout in {WbAddViewToPartGuard} in order to resolve its preferred part.
+      return {
+        layout,
+        viewOutlets: {[viewId]: commands},
+        viewState: {[viewId]: {...extras.state, [NAVIGATION_EXTRAS]: {...extras, activate}}},
+      };
+    }
+
+    /**
+     * Creates the navigation for updating the path of the specified view.
+     */
+    function updateView(viewId: string, layout: WorkbenchNavigation | PartsLayout): WorkbenchNavigation {
+      const navigation = coerceNavigation(layout)!;
+      const activateView = extras.activate ?? true;
+      return {
+        layout: activateView ? navigation.layout.activateView(viewId) : navigation.layout,
+        viewOutlets: {...navigation.viewOutlets, [viewId]: commands},
+        viewState: {...navigation.viewState, [viewId]: extras.state},
+      };
+    }
   }
 
   /**
@@ -292,20 +315,16 @@ export class WorkbenchRouter implements OnDestroy {
    *
    * @internal
    */
-  public resolvePresentViewIds(commandList: Commands, relativeTo?: ActivatedRoute | null): string[] {
-    // Ensure to run in Angular zone.
-    if (!NgZone.isInAngularZone()) {
-      return this._zone.run(() => this.resolvePresentViewIds(commandList, relativeTo));
-    }
+  public resolvePresentViewIds(commandList: Commands, options?: {relativeTo?: ActivatedRoute | null; ignoreMatrixParams?: boolean}): string[] {
+    const ignoreMatrixParams = options?.ignoreMatrixParams ?? false;
+    const commands = this.normalizeCommands(commandList, options?.relativeTo);
+    const path = this.serializeCommands(commands, {skipMatrixParams: ignoreMatrixParams});
 
-    const commands = this.normalizeCommands(commandList, relativeTo);
-    const serializeCommands = this.serializeCommands(commands);
-    const urlTree = this._router.parseUrl(this._router.url);
-    const urlSegmentGroups = urlTree.root.children;
-
-    return Object.keys(urlSegmentGroups)
-      .filter(outletName => outletName.startsWith(VIEW_REF_PREFIX))
-      .filter(outletName => Arrays.isEqual(serializeCommands, urlSegmentGroups[outletName].segments.map((segment: UrlSegment) => segment.toString())));
+    return this._viewRegistry.viewIds.filter(viewId => {
+      const view = this._viewRegistry.getElseThrow(viewId);
+      const viewPath = view.urlSegments.map(segment => ignoreMatrixParams ? segment.path : segment.toString());
+      return Arrays.isEqual(viewPath, path);
+    });
   }
 
   /**
@@ -347,17 +366,21 @@ export class WorkbenchRouter implements OnDestroy {
 
   /**
    * Serializes given commands into valid URL segments.
+   *
+   * @internal
    */
-  private serializeCommands(commands: Commands): string[] {
+  public serializeCommands(commands: Commands, options?: {skipMatrixParams?: boolean}): string[] {
     const serializedCommands: string[] = [];
-
+    const skipMatrixParams = options?.skipMatrixParams ?? false;
     commands.forEach(cmd => {
       // if matrix param, append it to the last segment
-      if (typeof cmd === 'object') {
-        serializedCommands.push(new UrlSegment(serializedCommands.pop()!, cmd).toString());
-      }
-      else {
+      const isMatrixParam = typeof cmd === 'object';
+
+      if (!isMatrixParam) {
         serializedCommands.push(encodeURIComponent(cmd));
+      }
+      else if (!skipMatrixParams) {
+        serializedCommands.push(new UrlSegment(serializedCommands.pop()!, cmd).toString());
       }
     });
 
@@ -400,10 +423,9 @@ function coerceNavigation(navigation: PartsLayout | WorkbenchNavigation | null):
  */
 export interface WbNavigationExtras extends NavigationExtras {
   /**
-   * Activates the view if it is already present.
-   * If not present, the view is opened according to the specified 'target' strategy.
+   * Instructs the router to activate the view. Defaults to `true` if not specified.
    */
-  activateIfPresent?: boolean;
+  activate?: boolean;
   /**
    * Closes the view(s) that match the array of commands, if any.
    */
@@ -411,15 +433,17 @@ export interface WbNavigationExtras extends NavigationExtras {
   /**
    * Controls where to open the view.
    *
-   * 'blank': opens the view in a new view tab (which is by default)
-   * 'self':  opens the view in the current view tab
+   * One of:
+   * - 'auto':    Opens the view in a new view tab if no view is found that matches the specified path. Matrix parameters do not affect
+   *              view resolution. If one (or more) view(s) match the specified path, they are navigated instead of opening the view
+   *              in a new view tab, e.g., to update matrix parameters. This is the default behavior if not set.
+   * - 'blank':   Opens the view in a new view tab.
+   * - <view.id>: Navigates the specified view. If already opened, replaces it, or opens the view in a new view tab otherwise.
+   *              Note that the passed view identifier must start with `view.`, e.g., `view.5`.
+   *
+   * If not specified, defaults to `auto`.
    */
-  target?: 'blank' | 'self';
-  /**
-   * Specifies the view which to replace when using 'self' view target strategy.
-   * If not specified and if in the context of a workbench view, that view is used as the self target.
-   */
-  selfViewId?: string;
+  target?: string | 'blank' | 'auto';
   /**
    * Specifies the viewpart where to add the view when using 'blank' view target strategy.
    * If not specified, the currently active workbench viewpart is used.
@@ -445,23 +469,6 @@ export interface WbNavigationExtras extends NavigationExtras {
    * CSS class(es) will not be added to the browser URL, consequently will not survive a page reload.
    */
   cssClass?: string | string[];
-}
-
-/**
- * Specifies the target of a view in the layout tree.
- *
- * @internal
- * @see WbAddViewToPartGuard
- */
-export interface ViewTarget {
-  /**
-   * Specifies the part where to add a view. If not set, adds it to its preferred part, if defined on its route, or to the currently active part.
-   */
-  partId?: string;
-  /**
-   * Specifies the position where to add the view tab into the tabbar.
-   */
-  viewIndex?: number | 'start' | 'end';
 }
 
 /**

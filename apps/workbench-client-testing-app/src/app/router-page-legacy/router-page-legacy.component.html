@@ -14,11 +14,15 @@
   <header>Navigation Extras</header>
 
   <sci-form-field label="Target">
-    <input [formControlName]="TARGET" class="e2e-target" list="targets">
-    <datalist id="targets">
-      <option value="auto">auto</option>
+    <select [formControlName]="TARGET" class="e2e-target">
+      <option value="self">self</option>
       <option value="blank">blank</option>
-    </datalist>
+      <option value="">default</option>
+    </select>
+  </sci-form-field>
+
+  <sci-form-field label="SelfViewId">
+    <input [formControlName]="SELF_VIEW_ID" class="e2e-self-view-id">
   </sci-form-field>
 
   <sci-form-field label="InsertionIndex">
@@ -29,8 +33,8 @@
     </datalist>
   </sci-form-field>
 
-  <sci-form-field label="Activate">
-    <sci-checkbox [formControlName]="ACTIVATE" class="e2e-activate"></sci-checkbox>
+  <sci-form-field label="ActivateIfPresent">
+    <sci-checkbox [formControlName]="ACTIVATE_IF_PRESENT" class="e2e-activate-if-present"></sci-checkbox>
   </sci-form-field>
 
   <sci-form-field label="CloseIfPresent">

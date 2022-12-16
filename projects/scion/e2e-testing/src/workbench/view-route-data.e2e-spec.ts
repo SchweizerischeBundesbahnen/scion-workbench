@@ -26,7 +26,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-a`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee');
       await routerPagePO.clickNavigate();
 
@@ -41,7 +41,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-b`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee');
       await routerPagePO.clickNavigate();
 
@@ -57,7 +57,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-c`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee');
       await routerPagePO.clickNavigate();
 
@@ -72,7 +72,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-d`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee');
       await routerPagePO.clickNavigate();
 
@@ -88,7 +88,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-part/part-1`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART'/);
     });
 
@@ -97,7 +97,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-part/part-2`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART_2'/);
     });
 
@@ -106,7 +106,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-part/part-3`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART'/);
     });
 
@@ -115,7 +115,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-part/part-4`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART_4'/);
     });
   });
@@ -129,7 +129,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-a`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee');
       await routerPagePO.clickNavigate();
 
@@ -144,7 +144,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-b`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee');
       await routerPagePO.clickNavigate();
 
@@ -160,7 +160,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-c`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee');
       await routerPagePO.clickNavigate();
 
@@ -175,7 +175,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-d`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await routerPagePO.enterCssClass('testee');
       await routerPagePO.clickNavigate();
 
@@ -191,7 +191,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-part/part-1`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART'/);
     });
 
@@ -200,7 +200,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-part/part-2`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART_2'/);
     });
 
@@ -209,7 +209,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-part/part-3`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART'/);
     });
 
@@ -218,7 +218,7 @@ test.describe('View Route Data', () => {
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-part/part-4`);
-      await routerPagePO.selectTarget('blank');
+      await routerPagePO.enterTarget('blank');
       await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART_4'/);
     });
   });

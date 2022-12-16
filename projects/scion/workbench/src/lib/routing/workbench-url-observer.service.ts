@@ -193,7 +193,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
    * - For each removed view, destroys the {@link WorkbenchView} and unregisters it in {@link WorkbenchViewRegistry}
    */
   private updateViewRegistry(): void {
-    const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();
+    const {layoutDiff, partsLayout} = this._workbenchRouter.getCurrentNavigationContext();
 
     layoutDiff.addedViews.forEach(viewId => {
       this._logger.debug(() => `Constructing ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
@@ -202,6 +202,11 @@ export class WorkbenchUrlObserver implements OnDestroy {
     layoutDiff.removedViews.forEach(viewId => {
       this._logger.debug(() => `Destroying ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
       this._viewRegistry.remove(viewId);
+    });
+
+    // Update view properties.
+    partsLayout.viewsIds.forEach(viewId => {
+      this._viewRegistry.getElseThrow(viewId).setPartId(partsLayout.findPartByViewId(viewId, {orElseThrow: true}).partId);
     });
   }
 

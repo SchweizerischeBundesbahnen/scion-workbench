@@ -3,7 +3,6 @@ import {takeUntil} from 'rxjs/operators';
 import {ViewDragService, ViewMoveEvent} from '../view-dnd/view-drag.service';
 import {UUID} from '@scion/toolkit/uuid';
 import {Router} from '@angular/router';
-import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {LocationStrategy} from '@angular/common';
 import {Subject} from 'rxjs';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
@@ -19,7 +18,6 @@ export class ViewMoveHandler implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   constructor(private _workbench: ɵWorkbenchService,
-              private _viewRegistry: WorkbenchViewRegistry,
               private _viewDragService: ViewDragService,
               private _locationStrategy: LocationStrategy,
               private _router: Router,
@@ -77,21 +75,25 @@ export class ViewMoveHandler implements OnDestroy {
 
     const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
     if (addToNewViewPart) {
-      const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
       const newPartId = event.target.newPartId || UUID.randomUUID();
-      this._workbenchRouter.ɵnavigate(layout => ({
-        layout: layout
-          .addPart(newPartId, {relativeTo: event.target.partId ?? undefined, align: coerceLayoutAlignment(region)})
-          .addView(newPartId, newViewId),
-        viewOutlets: {[newViewId]: commands},
-      })).then();
+      this._workbenchRouter.ɵnavigate(layout => {
+        const newViewId = layout.computeNextAvailableViewId();
+        return {
+          layout: layout
+            .addPart(newPartId, {relativeTo: event.target.partId ?? undefined, align: coerceLayoutAlignment(region)})
+            .addView(newPartId, newViewId, {activate: true}),
+          viewOutlets: {[newViewId]: commands},
+        };
+      }).then();
     }
     else {
-      const newViewId = this._viewRegistry.computeNextViewOutletIdentity();
-      this._workbenchRouter.ɵnavigate(layout => ({
-        layout: layout.addView(event.target.partId!, newViewId, event.target.insertionIndex),
-        viewOutlets: {[newViewId]: commands},
-      })).then();
+      this._workbenchRouter.ɵnavigate(layout => {
+        const newViewId = layout.computeNextAvailableViewId();
+        return {
+          layout: layout.addView(event.target.partId!, newViewId, {position: event.target.insertionIndex, activate: true}),
+          viewOutlets: {[newViewId]: commands},
+        };
+      }).then();
     }
   }
 

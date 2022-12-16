@@ -22,7 +22,7 @@ Open the component template and model the action inside a `<ng-template>` decora
 
 ```typescript
   <ng-template wbViewPartAction align="end">
-    <button [wbRouterLink]="'/welcome'" class="material-icons" [wbRouterLinkExtras]="{activateIfPresent: false}">
+    <button [wbRouterLink]="'/welcome'" class="material-icons" [wbRouterLinkExtras]="{target: 'blank'}">
       add
     </button>
   </ng-template>

@@ -25,6 +25,10 @@ const routes: Routes = [
     loadChildren: (): any => import('./router-page/router-page.module').then(m => m.RouterPageModule),
   },
   {
+    path: 'test-router-legacy',
+    loadChildren: (): any => import('./router-page-legacy/router-page-legacy.module').then(m => m.RouterPageLegacyModule),
+  },
+  {
     path: 'test-view',
     loadChildren: (): any => import('./view-page/view-page.module').then(m => m.ViewPageModule),
   },

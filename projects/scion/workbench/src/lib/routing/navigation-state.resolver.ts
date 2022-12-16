@@ -13,6 +13,7 @@ import {Injectable} from '@angular/core';
 import {Dictionary} from '@scion/toolkit/util';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchRouteData} from './workbench-route-data';
+import {NAVIGATION_EXTRAS} from '../workbench.constants';
 
 /**
  * Makes navigational state available to the activated route via {@link ActivatedRoute#data} under the key {@link WorkbenchRouteData.state}.
@@ -34,9 +35,9 @@ export class NavigationStateResolver implements Resolve<Dictionary | undefined |
 
   public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Dictionary | undefined | null {
     const outletName = route.outlet;
-    const outletState = this._workbenchRouter.getCurrentNavigationViewState(outletName) || this.findActivatedRoute(outletName)?.data?.[WorkbenchRouteData.state];
-
-    return undefinedIfEmpty(outletState);
+    const outletState = {...this._workbenchRouter.getCurrentNavigationViewState(outletName) || this.findActivatedRoute(outletName)?.data?.[WorkbenchRouteData.state]};
+    removeRoutingState(outletState);
+    return isEmpty(outletState) ? undefined : outletState;
   }
 
   private findActivatedRoute(outlet: string): ActivatedRouteSnapshot | undefined {
@@ -45,17 +46,26 @@ export class NavigationStateResolver implements Resolve<Dictionary | undefined |
 }
 
 /**
- * Returns `undefined` if the passed dictionary is empty or contains only `undefined` or empty object values.
+ * Tests whether the passed dictionary is empty or contains only `undefined` or empty object values.
  */
-function undefinedIfEmpty(dictionary: Dictionary | undefined | null): Dictionary | null | undefined {
+function isEmpty(dictionary: Dictionary | undefined | null): boolean {
   if (dictionary === undefined || dictionary === null) {
-    return dictionary;
+    return true;
   }
   if (!Object.keys(dictionary).length) {
-    return undefined;
+    return true;
   }
   if (Object.values(dictionary).every(value => value === undefined || (typeof value === 'object' && !Object.keys(value).length))) {
-    return undefined;
+    return true;
   }
-  return dictionary;
+  return false;
+}
+
+/**
+ * Removes workbench-internal routing state.
+ */
+function removeRoutingState(dictionary: Dictionary | undefined | null): void {
+  if (dictionary) {
+    delete dictionary[NAVIGATION_EXTRAS];
+  }
 }
