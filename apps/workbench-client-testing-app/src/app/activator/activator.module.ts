@@ -79,6 +79,25 @@ export class ActivatorModule {
       },
     });
 
+    // Register view to navigate using the workbench router legacy API.
+    // @deprecated since version 14; API will be removed in version 16; used internally to test not to break old workbench clients
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
+      type: WorkbenchCapabilities.View,
+      qualifier: {
+        component: 'router-legacy',
+        app,
+      },
+      description: '[e2e] Allows opening a microfrontend in a workbench view using the "old" router API',
+      private: false,
+      properties: {
+        path: 'test-router-legacy',
+        pinToStartPage: true,
+        title: 'Workbench Router (legacy)',
+        heading,
+        cssClass: 'e2e-test-router-legacy',
+      },
+    });
+
     // Register view to register workbench capabilities dynamically at runtime.
     await this._manifestService.registerCapability<TestingAppViewCapability>({
       type: WorkbenchCapabilities.View,

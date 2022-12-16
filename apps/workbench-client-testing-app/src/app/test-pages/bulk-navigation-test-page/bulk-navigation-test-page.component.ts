@@ -60,7 +60,6 @@ export class BulkNavigationTestPageComponent {
   private navigateToViewPage(): Promise<boolean> {
     return this._router.navigate({component: 'view', app: this._appSymbolicName.split('-').pop()}, {
       target: 'blank',
-      activateIfPresent: false,
       cssClass: this.form.get(CSS_CLASS).value,
     });
   }

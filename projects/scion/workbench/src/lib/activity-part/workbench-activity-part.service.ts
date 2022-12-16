@@ -65,7 +65,7 @@ export class WorkbenchActivityPartService {
       });
     }
     else if (activity.target === 'view') {
-      return this._workbenchRouter.navigate(activity.commands, {activateIfPresent: false});
+      return this._workbenchRouter.navigate(activity.commands);
     }
     throw Error('[IllegalActivityTargetError] Target must be \'activity-panel\' or \'view\'');
   }

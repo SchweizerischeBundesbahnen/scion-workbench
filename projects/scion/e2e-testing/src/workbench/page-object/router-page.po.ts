@@ -57,24 +57,20 @@ export class RouterPagePO {
     await paramsEnterPO.enterParams(state);
   }
 
-  public async checkActivateIfPresent(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate-if-present')).toggle(check);
+  public async checkActivate(check: boolean): Promise<void> {
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate')).toggle(check);
   }
 
   public async checkCloseIfPresent(check: boolean): Promise<void> {
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-close-if-present')).toggle(check);
   }
 
-  public async selectTarget(target: 'self' | 'blank'): Promise<void> {
-    await this._locator.locator('select.e2e-target').selectOption(target);
+  public async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
+    await this._locator.locator('input.e2e-target').fill(target ?? '');
   }
 
   public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
     await this._locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
-  }
-
-  public async enterSelfViewId(selfViewId: string): Promise<void> {
-    await this._locator.locator('input.e2e-self-view-id').fill(selfViewId);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {

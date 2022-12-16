@@ -1,0 +1,27 @@
+:host {
+  display: grid;
+  grid-auto-rows: max-content;
+  row-gap: 1em;
+  padding: 1em;
+
+  > section, form {
+    display: grid;
+    grid-row-gap: .5em;
+    border: 1px solid var(--sci-color-P400);
+    border-radius: 5px;
+    padding: 1em;
+
+    > header {
+      margin-top: 0;
+      margin-bottom: 2em;
+      font-weight: bold;
+    }
+  }
+
+  > output.navigate-error {
+    border: 1px solid var(--sci-color-warn);
+    background-color: var(--sci-color-W100);
+    border-radius: 3px;
+    padding: 1em;
+  }
+}

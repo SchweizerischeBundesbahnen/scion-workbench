@@ -37,6 +37,7 @@ export class InputFieldTestPagePO {
     const cssClass = 'input-field-test-page';
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPagePO.enterPath('test-pages/input-field-test-page');
+    await routerPagePO.enterTarget(routerPagePO.viewId);
     await routerPagePO.enterCssClass(cssClass);
     await routerPagePO.clickNavigate();
 

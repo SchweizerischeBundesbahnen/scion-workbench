@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, HostListener, OnDestroy} from '@angular/core';
-import {combineLatest, Observable, Subject} from 'rxjs';
+import {Component, HostBinding, HostListener, Injector, OnDestroy} from '@angular/core';
+import {combineLatest, from, mergeMap, Observable, Subject} from 'rxjs';
 import {WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {takeUntil} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchViewPart} from './ɵworkbench-view-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {Logger, LoggerNames} from '../logging';
+import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 
 @Component({
@@ -47,6 +48,7 @@ export class ViewPartComponent implements OnDestroy {
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewDragService: ViewDragService,
               private _part: ɵWorkbenchViewPart,
+              private _injector: Injector,
               private _logger: Logger) {
     this._logger.debug(() => `Constructing ViewPartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
     combineLatest([this._workbench.viewPartActions$, this._part.actions$, this._part.viewIds$])
@@ -55,9 +57,6 @@ export class ViewPartComponent implements OnDestroy {
         this.hasViews = viewIds.length > 0;
         this.hasActions = globalActions.length > 0 || localActions.length > 0;
       });
-
-    // Construct view components of inactive views so they can initialize, e.g., to set the view tab title,
-    // important when loading an existing layout into the workbench.
     this.constructInactiveViewComponents();
   }
 
@@ -90,15 +89,17 @@ export class ViewPartComponent implements OnDestroy {
   }
 
   /**
-   * Constructs view components of inactive views so they can initialize, e.g., to set the view tab title.
+   * Constructs view components of inactive views, so they can initialize, e.g., to set the view tab title.
    */
   private constructInactiveViewComponents(): void {
-    this._part.viewIds
-      .map(viewId => this._viewRegistry.getElseThrow(viewId))
-      .filter(view => !view.active)
-      .forEach(inactiveView => {
-        inactiveView.portal.createComponentFromInjectionContext();
-        this._logger.debug(() => `Constructing view after initial navigation. [viewId=${inactiveView.viewId}]`, LoggerNames.LIFECYCLE);
+    this._part.viewIds$
+      .pipe(
+        mapArray(viewId => this._viewRegistry.getElseThrow(viewId)),
+        filterArray(view => !view.active && !view.portal.isConstructed),
+        mergeMap(views => from(views)),
+      )
+      .subscribe(inactiveView => {
+        inactiveView.portal.createComponentFromInjectionContext(this._injector);
         // Trigger manual change detection cycle because the view is not yet added to the Angular component tree. Otherwise, routed content would not be attached.
         inactiveView.portal.componentRef.changeDetectorRef.detectChanges();
       });

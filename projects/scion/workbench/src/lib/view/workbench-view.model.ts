@@ -20,7 +20,7 @@ export abstract class WorkbenchView {
    *
    * Note: the viewpart of a view can change, e.g. when the view is moved to another viewpart.
    */
-  public abstract readonly part: WorkbenchViewPart | null;
+  public abstract readonly part: WorkbenchViewPart;
 
   /**
    * Specifies the title to be displayed in the view tab.

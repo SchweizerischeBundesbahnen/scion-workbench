@@ -30,8 +30,8 @@ export class ɵWorkbenchService implements WorkbenchService {
 
   constructor(private _workbenchRouter: WorkbenchRouter,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _workbenchLayoutService: WorkbenchLayoutService) {
-    this.views$ = this._workbenchLayoutService.layout$.pipe(map(layout => layout.viewsIds));
+              workbenchLayoutService: WorkbenchLayoutService) {
+    this.views$ = workbenchLayoutService.layout$.pipe(map(layout => layout.viewsIds));
   }
 
   public destroyView(...viewIds: string[]): Promise<boolean> {
@@ -40,10 +40,6 @@ export class ɵWorkbenchService implements WorkbenchService {
 
   public activateView(viewId: string): Promise<boolean> {
     return this._workbenchRouter.ɵnavigate(layout => layout.activateView(viewId));
-  }
-
-  public resolveViewPart(viewId: string): string {
-    return this._workbenchLayoutService.layout!.findPartByViewId(viewId, {orElseThrow: true}).partId;
   }
 
   public getView(viewId: string): WorkbenchView | null {

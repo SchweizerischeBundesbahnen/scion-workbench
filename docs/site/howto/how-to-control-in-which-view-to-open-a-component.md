@@ -9,17 +9,17 @@
 
 When navigating to a component, by default, it is first checked if it is already opened in a view. If not opened yet, depending on the 'target' strategy, the content of the current view is replaced, or a new view tab opened otherwise.
 
-View activation is based on the routing path, meaning that if a view with a matching path is already opened, that view is activated. To never activate an already opened view, use `WbNavigationExtras` and set `activateIfPresent` to `false`.
+View activation is based on the routing path, meaning that if a view with a matching path is already opened, that view is activated. To never activate an already opened view, use `WbNavigationExtras` and set `target` to `blank`.
 
 ```html
-<a [wbRouterLink]="['/persons', person.id]" [wbRouterLinkExtras]="{activateIfPresent: false}">Open person</a>
+<a [wbRouterLink]="['/persons', person.id]" [wbRouterLinkExtras]="{target: 'blank'}">Open person</a>
 ```
 
 ```typescript
-wbRouter.navigate(['persons', id], {activateIfPresent: false});
+wbRouter.navigate(['persons', id], {target: 'blank'});
 ```
 
-With target strategy, you control whether to replace the content of an existing view, or to open a component  in a new view tab. If using `wbRouterLink` and in the context of a view, by default, the current view content is replaced, unless CTRL keystroke is pressed. However, this behavior can be overwritten via navigation extras, by setting `target` to 'blank' or 'self', respectively.
+With target strategy, you control whether to replace the content of an existing view, or to open a component in a new view tab. If using `wbRouterLink` and in the context of a view, by default, the current view content is replaced, unless CTRL keystroke is pressed. However, this behavior can be overwritten via navigation extras, by setting `target` to 'blank' or 'auto', respectively.
 
 ```html
 <a [wbRouterLink]="['/persons', person.id]" [wbRouterLinkExtras]="{target: 'blank'}">Open person in new view</a>

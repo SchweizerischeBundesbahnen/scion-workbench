@@ -9,7 +9,6 @@
  */
 
 import {Injectable, OnDestroy} from '@angular/core';
-import {VIEW_REF_PREFIX} from '../workbench.constants';
 import {Observable, Subject} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
@@ -35,22 +34,6 @@ export class WorkbenchViewRegistry implements OnDestroy {
     this.getElseThrow(viewId).destroy();
     this._viewRegistry.delete(viewId);
     this._viewRegistryChange$.next();
-  }
-
-  /**
-   * Computes a view outlet identity which is unique in this application.
-   */
-  public computeNextViewOutletIdentity(): string {
-    const ids = this.viewIds
-      .map(viewId => Number(viewId.substring(VIEW_REF_PREFIX.length)))
-      .reduce((set, viewId) => set.add(viewId), new Set<number>());
-
-    for (let i = 1; i <= ids.size; i++) {
-      if (!ids.has(i)) {
-        return `${VIEW_REF_PREFIX}${i}`;
-      }
-    }
-    return `${VIEW_REF_PREFIX}${ids.size + 1}`;
   }
 
   /**

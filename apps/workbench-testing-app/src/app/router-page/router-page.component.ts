@@ -23,8 +23,7 @@ const MATRIX_PARAMS = 'matrixParams';
 const NAVIGATIONAL_STATE = 'navigationalState';
 const TARGET = 'target';
 const INSERTION_INDEX = 'insertionIndex';
-const SELF_VIEW_ID = 'selfViewId';
-const ACTIVATE_IF_PRESENT = 'activateIfPresent';
+const ACTIVATE = 'activate';
 const CLOSE_IF_PRESENT = 'closeIfPresent';
 const CSS_CLASS = 'cssClass';
 
@@ -39,10 +38,9 @@ export class RouterPageComponent {
   public readonly MATRIX_PARAMS = MATRIX_PARAMS;
   public readonly NAVIGATIONAL_STATE = NAVIGATIONAL_STATE;
   public readonly TARGET = TARGET;
-  public readonly SELF_VIEW_ID = SELF_VIEW_ID;
   public readonly INSERTION_INDEX = INSERTION_INDEX;
   public readonly QUERY_PARAMS = QUERY_PARAMS;
-  public readonly ACTIVATE_IF_PRESENT = ACTIVATE_IF_PRESENT;
+  public readonly ACTIVATE = ACTIVATE;
   public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
   public readonly CSS_CLASS = CSS_CLASS;
 
@@ -62,10 +60,9 @@ export class RouterPageComponent {
       [MATRIX_PARAMS]: formBuilder.array([]),
       [NAVIGATIONAL_STATE]: formBuilder.array([]),
       [TARGET]: formBuilder.control(''),
-      [SELF_VIEW_ID]: formBuilder.control(view.viewId),
       [INSERTION_INDEX]: formBuilder.control(''),
       [QUERY_PARAMS]: formBuilder.array([]),
-      [ACTIVATE_IF_PRESENT]: formBuilder.control(undefined),
+      [ACTIVATE]: formBuilder.control(undefined),
       [CLOSE_IF_PRESENT]: formBuilder.control(undefined),
       [CSS_CLASS]: formBuilder.control(undefined),
     });
@@ -111,10 +108,9 @@ export class RouterPageComponent {
   private constructNavigationExtras(): WbNavigationExtras {
     return {
       queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUERY_PARAMS) as UntypedFormArray),
-      activateIfPresent: this.form.get(ACTIVATE_IF_PRESENT).value,
+      activate: this.form.get(ACTIVATE).value,
       closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
       target: this.form.get(TARGET).value || undefined,
-      selfViewId: this.form.get(SELF_VIEW_ID).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
       state: SciParamsEnterComponent.toParamsDictionary(this.form.get(NAVIGATIONAL_STATE) as UntypedFormArray),
       cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),

@@ -30,7 +30,7 @@ import {asapScheduler} from 'rxjs';
  * Usage:
  *
  * <ng-template wbViewPartAction>
- *   <button wbRouterLink="/entry-point" class="material-icons" [wbRouterLinkExtras]="{activateIfPresent: false}">
+ *   <button wbRouterLink="/entry-point" class="material-icons" [wbRouterLinkExtras]="{target: 'blank'}">
  *     add
  *   </button>
  * </ng-template>
