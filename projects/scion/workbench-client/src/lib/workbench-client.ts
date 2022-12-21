@@ -10,13 +10,12 @@
 
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchViewInitializer} from './view/workbench-view-initializer';
-import {MicrofrontendPlatform} from '@scion/microfrontend-platform';
+import {ConnectOptions, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {WorkbenchRouter} from './routing/workbench-router';
 import {WorkbenchPopupService} from './popup/workbench-popup-service';
 import {WorkbenchPopupInitializer} from './popup/workbench-popup-initializer';
 import {WorkbenchMessageBoxService} from './message-box/workbench-message-box-service';
 import {WorkbenchNotificationService} from './notification/workbench-notification-service';
-import {ConnectOptions} from '@scion/microfrontend-platform';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -94,7 +93,7 @@ export class WorkbenchClient {
    * micro application connects to the workbench during the bootstrapping. In Angular, for example, this can be done in
    * an app initializer.
    *
-   * See {@link @scion/microfrontend-platform!MicrofrontendPlatform.connectToHost} for more information about connecting to the platform host.
+   * See {@link @scion/microfrontend-platform!MicrofrontendPlatformClient.connect} for more information about connecting to the platform host.
    *
    * @param  symbolicName - Specifies the symbolic name of the micro application. The micro application needs to be registered
    *         in the workbench under that identity.
@@ -108,6 +107,6 @@ export class WorkbenchClient {
     Beans.register(WorkbenchNotificationService);
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
-    await MicrofrontendPlatform.connectToHost(symbolicName, connectOptions);
+    await MicrofrontendPlatformClient.connect(symbolicName, connectOptions);
   }
 }

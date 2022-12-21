@@ -9,7 +9,7 @@
  */
 
 import {Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
-import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, MicrofrontendPlatform, MicrofrontendPlatformConfig, ObservableDecorator, Runlevel} from '@scion/microfrontend-platform';
+import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, MicrofrontendPlatform, MicrofrontendPlatformConfig, MicrofrontendPlatformHost, ObservableDecorator} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
@@ -79,13 +79,13 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.
     Beans.registerInitializer({
       useFunction: () => this._zone.run(() => runWorkbenchInitializers(MICROFRONTEND_PLATFORM_POST_STARTUP, this._injector)),
-      runlevel: Runlevel.Two,
+      runlevel: 2,
     });
 
     // Start the SCION Microfrontend Platform.
     // We start the platform outside the Angular zone in order to avoid excessive change detection cycles
     // of platform-internal subscriptions to global DOM events.
-    await this._zone.runOutsideAngular(() => MicrofrontendPlatform.startHost(microfrontendPlatformConfig));
+    await this._zone.runOutsideAngular(() => MicrofrontendPlatformHost.start(microfrontendPlatformConfig));
 
     this._logger.debug('SCION Microfrontend Platform started.', LoggerNames.LIFECYCLE, microfrontendPlatformConfig);
   }
