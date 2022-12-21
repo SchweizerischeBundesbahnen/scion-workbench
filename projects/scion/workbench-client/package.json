@@ -20,7 +20,7 @@
   "peerDependencies": {
     "rxjs": "^7.5.0",
     "@scion/toolkit": "^1.0.0-0",
-    "@scion/microfrontend-platform": "^1.0.0-rc.11"
+    "@scion/microfrontend-platform": "^1.0.0-rc.12"
   },
   "keywords": [
     "scion",

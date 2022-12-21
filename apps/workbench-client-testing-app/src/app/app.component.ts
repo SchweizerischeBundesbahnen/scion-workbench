@@ -9,7 +9,7 @@
  */
 
 import {Component, HostBinding, Inject, Optional} from '@angular/core';
-import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatform, PlatformPropertyService} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatformClient, PlatformPropertyService} from '@scion/microfrontend-platform';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +18,7 @@ import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatform, PlatformPropertyServi
 })
 export class AppComponent {
 
-  public readonly workbenchContextActive = MicrofrontendPlatform.isConnectedToHost();
+  public readonly workbenchContextActive = MicrofrontendPlatformClient.isConnected();
 
   public appSymbolicName: string;
 
