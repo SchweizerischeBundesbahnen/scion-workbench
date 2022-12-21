@@ -1,3 +1,22 @@
+# [14.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.7...14.0.0-beta.8) (2022-12-21)
+
+
+### Bug Fixes
+
+* **workbench/popup:** attach popup to the DOM even if the view is inactive ([24d7d7c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/24d7d7c40c8e68ddb8b12fa6421d0d02d7ae772c))
+* **workbench/popup:** do not provide popup config for injection ([1656679](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/1656679247bdc435d80055405070ee5bcc430bff))
+
+
+### Features
+
+* **workbench/host:** enable popup opener to locate popup via CSS class ([73a4ee0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/73a4ee02cc8a6010956766f1e114a7791346031e)), closes [#358](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/358)
+
+
+### Dependencies
+
+* **workbench/host:** update `@scion/microfrontend-platform` to version `1.0.0-rc.12` ([1f674fa](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/1f674fa5b727003efdd99d845a401a0326290fb6))
+
+
 # [14.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.6...14.0.0-beta.7) (2022-12-07)
 
 
