@@ -1,3 +1,22 @@
+# [1.0.0-beta.16](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.15...workbench-client-1.0.0-beta.16) (2022-12-21)
+
+
+### Features
+
+* **workbench-client/popup:** enable popup opener to locate popup via CSS class ([73a4ee0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/73a4ee02cc8a6010956766f1e114a7791346031e)), closes [#358](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/358)
+
+### Dependencies
+
+* **workbench-client:** update `@scion/microfrontend-platform` to version `1.0.0-rc.12` ([1f674fa](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/1f674fa5b727003efdd99d845a401a0326290fb6))
+
+
+### BREAKING CHANGES
+
+
+* **workbench-client:** Updating `@scion/microfrontend-platform` to version `1.0.0-rc.12` introduced a breaking change.
+
+  More information on how to migrate can be found in the [changelog](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/docs/site/changelog/changelog.md) of the SCION Microfrontend Platform.
+
 # [1.0.0-beta.15](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.14...workbench-client-1.0.0-beta.15) (2022-12-07)
 
 
