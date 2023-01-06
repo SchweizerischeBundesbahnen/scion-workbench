@@ -18,7 +18,7 @@ import {convertValueFromUI} from '../util/util';
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';
 const ACTIVATE = 'activate';
-const CLOSE_IF_PRESENT = 'closeIfPresent';
+const CLOSE = 'close';
 const TARGET = 'target';
 const INSERTION_INDEX = 'insertionIndex';
 const CSS_CLASS = 'cssClass';
@@ -35,7 +35,7 @@ export class RouterPageComponent {
   public readonly TARGET = TARGET;
   public readonly INSERTION_INDEX = INSERTION_INDEX;
   public readonly ACTIVATE = ACTIVATE;
-  public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
+  public readonly CLOSE = CLOSE;
   public readonly CSS_CLASS = CSS_CLASS;
 
   public form: UntypedFormGroup;
@@ -49,7 +49,7 @@ export class RouterPageComponent {
       [TARGET]: formBuilder.control(''),
       [INSERTION_INDEX]: formBuilder.control(''),
       [ACTIVATE]: formBuilder.control(undefined),
-      [CLOSE_IF_PRESENT]: formBuilder.control(undefined),
+      [CLOSE]: formBuilder.control(undefined),
       [CSS_CLASS]: formBuilder.control(undefined),
     });
   }
@@ -65,7 +65,7 @@ export class RouterPageComponent {
 
     const extras: WorkbenchNavigationExtras = {
       activate: this.form.get(ACTIVATE).value,
-      closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
+      close: this.form.get(CLOSE).value,
       target: this.form.get(TARGET).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
       params: params || undefined,

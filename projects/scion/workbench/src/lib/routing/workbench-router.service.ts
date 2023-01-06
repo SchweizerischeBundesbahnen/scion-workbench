@@ -9,7 +9,7 @@
  */
 
 import {ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
-import {Arrays, Dictionary} from '@scion/toolkit/util';
+import {Dictionary} from '@scion/toolkit/util';
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ACTIVITY_OUTLET_NAME, NAVIGATION_EXTRAS, PARTS_LAYOUT_QUERY_PARAM, VIEW_REF_PREFIX} from '../workbench.constants';
@@ -55,7 +55,7 @@ export class WorkbenchRouter implements OnDestroy {
    * specified path. Matrix parameters do not affect view resolution. If one (or more) view(s) match the specified path, they are navigated
    * instead of opening the view in a new view tab, e.g., to update matrix parameters.
    *
-   * The router supports for closing views matching the routing commands by setting `closeIfPresent` in navigational extras.
+   * The router supports for closing views matching the routing commands by setting `close` in navigational extras.
    *
    * ### Commands
    * - Multiple static segments can be merged into one, e.g. `['/team/11/user', userName, {details: true}]`
@@ -80,8 +80,24 @@ export class WorkbenchRouter implements OnDestroy {
       return this._zone.run(() => this.navigate(commands, extras));
     }
 
-    if (extras.closeIfPresent) {
-      return this.closeViews(...this.resolvePresentViewIds(commands, {relativeTo: extras.relativeTo}));
+    if (extras.close) {
+      return this.ɵnavigate((layout: PartsLayout): WorkbenchNavigation | PartsLayout | null => {
+        if (extras.target) {
+          const viewId = extras.target;
+          if (!viewId.startsWith(VIEW_REF_PREFIX)) {
+            throw Error(`[WorkbenchRouterError][IllegalArgumentError] The view identifier must start with '${VIEW_REF_PREFIX}' [viewId=${viewId}]`);
+          }
+          if (commands.length) {
+            throw Error(`[WorkbenchRouterError][IllegalArgumentError] The commands must be empty if closing a view by viewId [commands=${commands}]`);
+          }
+          if (!layout.viewsIds.includes(viewId)) {
+            return null;
+          }
+          return removeView(viewId, layout);
+        }
+        const viewIds = this.resolvePresentViewIds(commands, {relativeTo: extras.relativeTo, matchWildcardSegments: true});
+        return viewIds.reduce((navigation, viewId) => removeView(viewId, navigation), {layout});
+      });
     }
 
     // Add CSS classes to navigational state in order to be added to view and view tab when activating the route.
@@ -96,7 +112,7 @@ export class WorkbenchRouter implements OnDestroy {
           return addView(layout.computeNextAvailableViewId(), layout);
         }
         case 'auto': {
-          const viewIds = this.resolvePresentViewIds(commands, {relativeTo: extras.relativeTo, ignoreMatrixParams: true});
+          const viewIds = this.resolvePresentViewIds(commands, {relativeTo: extras.relativeTo});
           if (viewIds.length) {
             return viewIds.reduce((navigation, viewId) => updateView(viewId, navigation), {layout});
           }
@@ -153,6 +169,18 @@ export class WorkbenchRouter implements OnDestroy {
         layout: activateView ? navigation.layout.activateView(viewId) : navigation.layout,
         viewOutlets: {...navigation.viewOutlets, [viewId]: commands},
         viewState: {...navigation.viewState, [viewId]: extras.state},
+      };
+    }
+
+    /**
+     * Creates the navigation for removing the specified view from the workbench layout.
+     */
+    function removeView(viewId: string, layout: WorkbenchNavigation | PartsLayout): WorkbenchNavigation {
+      const navigation = coerceNavigation(layout)!;
+      return {
+        layout: navigation.layout.removeView(viewId),
+        viewOutlets: {...navigation.viewOutlets, [viewId]: null},
+        viewState: navigation.viewState,
       };
     }
   }
@@ -284,6 +312,7 @@ export class WorkbenchRouter implements OnDestroy {
    * URL with all navigational symbols resolved. Then, we extract the URL segments of the resolved route and convert it back into commands.
    * The resulting commands are in their absolute form and may be used for the effective navigation to target a named router outlet.
    *
+   * TODO [Angular 16] Change to private when removed the Activity API
    * @internal
    */
   public normalizeCommands(commands: Commands, relativeTo?: ActivatedRoute | null): Commands {
@@ -313,17 +342,22 @@ export class WorkbenchRouter implements OnDestroy {
   /**
    * Resolves present views which match the given commands.
    *
+   * Allows matching wildcard segments by setting the option `matchWildcardSegments` to `true`.
+   *
    * @internal
    */
-  public resolvePresentViewIds(commandList: Commands, options?: {relativeTo?: ActivatedRoute | null; ignoreMatrixParams?: boolean}): string[] {
-    const ignoreMatrixParams = options?.ignoreMatrixParams ?? false;
+  public resolvePresentViewIds(commandList: Commands, options?: {relativeTo?: ActivatedRoute | null; matchWildcardSegments?: boolean}): string[] {
     const commands = this.normalizeCommands(commandList, options?.relativeTo);
-    const path = this.serializeCommands(commands, {skipMatrixParams: ignoreMatrixParams});
+    const commandPath = this.serializeCommands(commands, {skipMatrixParams: true});
+    const matchWildcardSegments = options?.matchWildcardSegments ?? false;
 
     return this._viewRegistry.viewIds.filter(viewId => {
       const view = this._viewRegistry.getElseThrow(viewId);
-      const viewPath = view.urlSegments.map(segment => ignoreMatrixParams ? segment.path : segment.toString());
-      return Arrays.isEqual(viewPath, path);
+      const viewPath = view.urlSegments.map(segment => segment.path);
+      if (commandPath.length !== viewPath.length) {
+        return false;
+      }
+      return commandPath.every((commandSegment, index) => (matchWildcardSegments && commandSegment === '*') || commandSegment === viewPath[index]);
     });
   }
 
@@ -366,10 +400,8 @@ export class WorkbenchRouter implements OnDestroy {
 
   /**
    * Serializes given commands into valid URL segments.
-   *
-   * @internal
    */
-  public serializeCommands(commands: Commands, options?: {skipMatrixParams?: boolean}): string[] {
+  private serializeCommands(commands: Commands, options?: {skipMatrixParams?: boolean}): string[] {
     const serializedCommands: string[] = [];
     const skipMatrixParams = options?.skipMatrixParams ?? false;
     commands.forEach(cmd => {
@@ -385,28 +417,6 @@ export class WorkbenchRouter implements OnDestroy {
     });
 
     return serializedCommands;
-  }
-
-  /**
-   * Instructs the routing to close given views.
-   *
-   * @internal
-   */
-  public closeViews(...viewIds: string[]): Promise<boolean> {
-    // Ensure to run in Angular zone.
-    if (!NgZone.isInAngularZone()) {
-      return this._zone.run(() => this.closeViews(...viewIds));
-    }
-
-    // Use a separate navigate command to remove each view separately. Otherwise, if a view would reject destruction,
-    // no view would be removed at all.
-    return viewIds.reduce((prevNavigation, viewId) => {
-      const closeViewFn = (): Promise<boolean> => this.ɵnavigate(layout => ({
-        layout: layout.removeView(viewId),
-        viewOutlets: {[viewId]: null},
-      }));
-      return prevNavigation.then(() => closeViewFn());
-    }, Promise.resolve(true));
   }
 
   public ngOnDestroy(): void {
@@ -427,9 +437,11 @@ export interface WbNavigationExtras extends NavigationExtras {
    */
   activate?: boolean;
   /**
-   * Closes the view(s) that match the array of commands, if any.
+   * Closes the view(s) that match the specified path. Matrix parameters do not affect view resolution.
+   * The path supports the asterisk wildcard segment (`*`) to match view(s) with any value in that segment.
+   * To close a specific view, set a view target instead of a path.
    */
-  closeIfPresent?: boolean;
+  close?: boolean;
   /**
    * Controls where to open the view.
    *

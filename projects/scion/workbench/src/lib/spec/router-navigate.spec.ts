@@ -248,7 +248,7 @@ describe('Router', () => {
     expect(fixture).toShow(FeatureA_EntryComponent, '(1a)');
 
     // Close /feature-a/view-1
-    workbenchRouter.navigate(['feature-a'], {closeIfPresent: true}).then();
+    workbenchRouter.navigate(['feature-a'], {close: true}).then();
     advance(fixture);
     expect(fixture).not.toShow(FeatureA_View1Component, '(1b)');
 
@@ -258,7 +258,7 @@ describe('Router', () => {
     expect(fixture).toShow(FeatureA_View1Component, '(2a)');
 
     // Close /feature-a/view-1
-    workbenchRouter.navigate(['feature-a/view-1'], {closeIfPresent: true}).then();
+    workbenchRouter.navigate(['feature-a/view-1'], {close: true}).then();
     advance(fixture);
     expect(fixture).not.toShow(FeatureA_View1Component, '(2b)');
 
@@ -268,12 +268,12 @@ describe('Router', () => {
     expect(fixture).toShow(FeatureB_View1Component, '(3a)');
 
     // Close /feature-a/feature-b/view-1
-    workbenchRouter.navigate(['feature-a/feature-b/view-1'], {closeIfPresent: true}).then();
+    workbenchRouter.navigate(['feature-a/feature-b/view-1'], {close: true}).then();
     advance(fixture);
     expect(fixture).not.toShow(FeatureB_View1Component, '(3b)');
 
     // Close not present view
-    workbenchRouter.navigate(['a/b/c'], {closeIfPresent: true}).then();
+    workbenchRouter.navigate(['a/b/c'], {close: true}).then();
 
     discardPeriodicTasks();
   })));

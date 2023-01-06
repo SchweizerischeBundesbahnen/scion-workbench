@@ -24,7 +24,7 @@ const NAVIGATIONAL_STATE = 'navigationalState';
 const TARGET = 'target';
 const INSERTION_INDEX = 'insertionIndex';
 const ACTIVATE = 'activate';
-const CLOSE_IF_PRESENT = 'closeIfPresent';
+const CLOSE = 'close';
 const CSS_CLASS = 'cssClass';
 
 @Component({
@@ -41,7 +41,7 @@ export class RouterPageComponent {
   public readonly INSERTION_INDEX = INSERTION_INDEX;
   public readonly QUERY_PARAMS = QUERY_PARAMS;
   public readonly ACTIVATE = ACTIVATE;
-  public readonly CLOSE_IF_PRESENT = CLOSE_IF_PRESENT;
+  public readonly CLOSE = CLOSE;
   public readonly CSS_CLASS = CSS_CLASS;
 
   public form: UntypedFormGroup;
@@ -63,7 +63,7 @@ export class RouterPageComponent {
       [INSERTION_INDEX]: formBuilder.control(''),
       [QUERY_PARAMS]: formBuilder.array([]),
       [ACTIVATE]: formBuilder.control(undefined),
-      [CLOSE_IF_PRESENT]: formBuilder.control(undefined),
+      [CLOSE]: formBuilder.control(undefined),
       [CSS_CLASS]: formBuilder.control(undefined),
     });
 
@@ -95,10 +95,11 @@ export class RouterPageComponent {
 
   private constructRouterLinkCommands(): any[] {
     const matrixParams: Params | null = SciParamsEnterComponent.toParamsDictionary(this.form.get(MATRIX_PARAMS) as UntypedFormArray);
-    const commands: any[] = this.form.get(PATH).value.split('/');
+    const path = this.form.get(PATH).value;
+    const commands: any[] = path === '<empty>' ? [] : path.split('/');
 
-    // Replace the first segment with a slash if empty
-    if (commands[0] === '') {
+    // When tokenizing the path into segments, an empty segment is created for the leading slash (if any).
+    if (path.startsWith('/')) {
       commands[0] = '/';
     }
 
@@ -109,7 +110,7 @@ export class RouterPageComponent {
     return {
       queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUERY_PARAMS) as UntypedFormArray),
       activate: this.form.get(ACTIVATE).value,
-      closeIfPresent: this.form.get(CLOSE_IF_PRESENT).value,
+      close: this.form.get(CLOSE).value,
       target: this.form.get(TARGET).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
       state: SciParamsEnterComponent.toParamsDictionary(this.form.get(NAVIGATIONAL_STATE) as UntypedFormArray),

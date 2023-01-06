@@ -62,8 +62,8 @@ export class RouterPagePO {
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate')).toggle(check);
   }
 
-  public async checkCloseIfPresent(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-close-if-present')).toggle(check);
+  public async checkClose(check: boolean): Promise<void> {
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-close')).toggle(check);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {

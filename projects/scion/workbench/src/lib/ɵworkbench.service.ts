@@ -34,8 +34,11 @@ export class ɵWorkbenchService implements WorkbenchService {
     this.views$ = workbenchLayoutService.layout$.pipe(map(layout => layout.viewsIds));
   }
 
-  public destroyView(...viewIds: string[]): Promise<boolean> {
-    return this._workbenchRouter.closeViews(...viewIds);
+  public async destroyView(...viewIds: string[]): Promise<boolean> {
+    const navigations = await Promise.all(viewIds.map(viewId => {
+      return this._workbenchRouter.navigate([], {target: viewId, close: true});
+    }));
+    return navigations.every(Boolean);
   }
 
   public activateView(viewId: string): Promise<boolean> {

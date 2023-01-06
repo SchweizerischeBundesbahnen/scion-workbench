@@ -53,21 +53,21 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
   private async navigate(message: IntentMessage<WorkbenchNavigationExtras | undefined>): Promise<boolean> {
     const viewCapability = message.capability as WorkbenchViewCapability;
     const intent = message.intent;
-    const extras = message.body ?? {};
+    const extras: WorkbenchNavigationExtras & Pick<ɵWorkbenchLegacyNavigationExtras, 'closeIfPresent'> = message.body ?? {};
 
     const intentParams = Dictionaries.withoutUndefinedEntries(Dictionaries.coerce(intent.params));
     const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
     const qualifier = Dictionaries.withoutUndefinedEntries(intent.qualifier!);
-
     const targets = this.resolveTargets(message, extras);
-    const routerNavigateCommand = MicrofrontendViewRoutes.buildRouterNavigateCommand(viewCapability.metadata!.id, qualifier, urlParams);
+    const close = extras.close || extras.closeIfPresent;
+    const routerNavigateCommand = close ? [] : MicrofrontendViewRoutes.buildRouterNavigateCommand(viewCapability.metadata!.id, qualifier, urlParams);
 
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, routerNavigateCommand, viewCapability, transientParams);
     const navigations = await Promise.all(Arrays.coerce(targets).map(target => {
       return this._workbenchRouter.navigate(routerNavigateCommand, {
         target,
         activate: extras.activate,
-        closeIfPresent: extras.closeIfPresent,
+        close: close,
         blankInsertionIndex: extras.blankInsertionIndex,
         cssClass: extras.cssClass,
         state: {
@@ -81,8 +81,15 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
   /**
    * Resolves the target(s) for this navigation.
    */
-  private resolveTargets(intentMessage: IntentMessage, extras: WorkbenchNavigationExtras & Pick<ɵWorkbenchLegacyNavigationExtras, 'activateIfPresent' | 'selfViewId'>): string | string[] {
+  private resolveTargets(intentMessage: IntentMessage, extras: WorkbenchNavigationExtras & Pick<ɵWorkbenchLegacyNavigationExtras, 'activateIfPresent' | 'selfViewId' | 'closeIfPresent'>): string | string[] {
     const target = this.mapLegacyTarget(extras, intentMessage.headers.get(MessageHeaders.AppSymbolicName));
+    if (extras.close || extras.closeIfPresent) {
+      // Closing a microfrontend view by viewId is not allowed, as this would violate the concept of intent-based view navigation.
+      if (target) {
+        throw Error(`[WorkbenchRouterError][IllegalArgumentError] The target must be empty if closing a view [target=${target}]`);
+      }
+      return this.resolvePresentViewIds(intentMessage, {matchWildcardParams: true}) ?? [];
+    }
     if (!target || target === 'auto') {
       return this.resolvePresentViewIds(intentMessage) ?? 'blank';
     }
@@ -91,11 +98,13 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
 
   /**
    * Resolves opened views which match the given view intent.
-   *
    * A view matches if its view capability and all its required parameters are equal.
+   *
+   * Allows matching wildcard parameters by setting the option `matchWildcardParameters` to `true`.
    */
-  private resolvePresentViewIds(intentMessage: IntentMessage): string[] | null {
+  private resolvePresentViewIds(intentMessage: IntentMessage, options?: {matchWildcardParams?: boolean}): string[] | null {
     const requiredParams = intentMessage.capability.params?.filter(param => param.required).map(param => param.name) ?? [];
+    const matchWildcardParams = options?.matchWildcardParams ?? false;
 
     const viewIds = this._viewRegistry.viewIds.filter(viewId => {
       const view = this._viewRegistry.getElseThrow(viewId);
@@ -110,7 +119,10 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
       }
 
       // Test whether all "navigational" params match.
-      return requiredParams.every(requiredParam => viewParams.urlParams[requiredParam] === intentMessage.intent.params!.get(requiredParam));
+      return requiredParams.every(name => {
+        const intentParam = intentMessage.intent.params!.get(name);
+        return (matchWildcardParams && intentParam === '*') || intentParam === viewParams.urlParams[name];
+      });
     });
 
     return viewIds.length ? viewIds : null;
@@ -121,8 +133,12 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
    *
    * @deprecated since version 14; API will be removed in version 16
    */
-  private mapLegacyTarget(extras: WorkbenchNavigationExtras & Pick<ɵWorkbenchLegacyNavigationExtras, 'activateIfPresent' | 'selfViewId'>, app: string): string | undefined {
+  private mapLegacyTarget(extras: WorkbenchNavigationExtras & Pick<ɵWorkbenchLegacyNavigationExtras, 'activateIfPresent' | 'selfViewId' | 'closeIfPresent'>, app: string): string | undefined {
     const target = extras.target;
+    if (extras.closeIfPresent) {
+      this._logger.warn(`[DEPRECATION][F7A3F38] Application '${app}' is using a deprecated Workbench Router API. The property 'WorkbenchNavigationExtras.closeIfPresent' is deprecated and will be removed in version 16. Closing views is now controlled by setting the property 'WorkbenchNavigationExtras.close'.`);
+      return undefined; // legacy API does not support target for closing views
+    }
     if (extras.activateIfPresent) {
       this._logger.warn(`[DEPRECATION][D952ED0] Application '${app}' is using a deprecated Workbench Router API. The property 'WorkbenchNavigationExtras.activateIfPresent' is deprecated and will be removed in version 16. View resolution is now controlled by setting the property 'WorkbenchNavigationExtras.target' and view activation by setting the property 'WorkbenchNavigationExtras.activate'. By default, the target is set to 'auto', resolving an already opened view in first priority before opening a new view.`);
       return 'auto';

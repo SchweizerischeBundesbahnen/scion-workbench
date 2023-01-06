@@ -31,16 +31,16 @@ export class PersonComponent {
 #### Closing view(s) via navigation
 Views can also be closed via router. This is useful if having to close views outside of a view context, e.g. when deleting some data to close related views.
 
-Navigate to the views to be closed with the flag `closeIfPresent` set to `true`.
+Navigate to the views to be closed with the flag `close` set to `true`.
 
 Similar to when opening a view, closing can be done from within a template or via router service.
 
  ```html
-<a [wbRouterLink]="[...]" [wbRouterLinkExtras]="{closeIfPresent: true}">
+<a [wbRouterLink]="[...]" [wbRouterLinkExtras]="{close: true}">
 ```
 
 ```typescript
-const extras: WbNavigationExtras = {closeIfPresent: true};
+const extras: WbNavigationExtras = {close: true};
 workbenchRouter.navigate([...], extras);
 ```
 
