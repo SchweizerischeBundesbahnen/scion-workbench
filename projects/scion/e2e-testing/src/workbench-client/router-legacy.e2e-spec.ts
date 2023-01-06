@@ -373,7 +373,6 @@ test.describe('Workbench Router Legacy (DEPRECATED: API will be removed in v16)'
 
     // navigate to the testee-2 view
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
     await routerPagePO.selectTarget('self');
     await routerPagePO.enterSelfViewId(testeeViewId);
@@ -389,7 +388,6 @@ test.describe('Workbench Router Legacy (DEPRECATED: API will be removed in v16)'
 
     // navigate to the testee-1 view
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-1'});
     await routerPagePO.enterSelfViewId(testeeViewId);
     await routerPagePO.selectTarget('self');
@@ -404,7 +402,6 @@ test.describe('Workbench Router Legacy (DEPRECATED: API will be removed in v16)'
     await expect(componentInstanceIds.add(await testeeViewPagePO.getComponentInstanceId()).size).toEqual(3);
 
     // navigate to the testee-2 view
-    await routerPagePO.viewTabPO.click();
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterQualifier({component: 'testee-2'});
     await routerPagePO.enterSelfViewId(testeeViewId);

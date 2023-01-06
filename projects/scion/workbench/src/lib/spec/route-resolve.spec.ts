@@ -56,13 +56,9 @@ describe('WorkbenchRouter', () => {
     workbenchRouter.navigate(['path', 'to', 'view-3']).then();
     advance(fixture);
 
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view-1']).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view-1'])).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
     expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view-2'])).toEqual(['view.3']);
     expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view-3'])).toEqual(['view.4']);
-
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view-1'], {ignoreMatrixParams: true}).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view-2'], {ignoreMatrixParams: true})).toEqual(['view.3']);
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view-3'], {ignoreMatrixParams: true})).toEqual(['view.4']);
 
     discardPeriodicTasks();
   })));
@@ -92,15 +88,60 @@ describe('WorkbenchRouter', () => {
     workbenchRouter.navigate(['path', 'to', 'view', {'matrixParam': 'C'}]).then();
     advance(fixture);
 
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view'])).toEqual([]);
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'A'}])).toEqual([]);
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual([]);
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'C'}]).sort()).toEqual(['view.1', 'view.2'].sort());
+    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view'])).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
+    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'A'}])).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
+    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'B'}])).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
+    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'C'}])).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
 
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view'], {ignoreMatrixParams: true}).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'A'}], {ignoreMatrixParams: true}).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'B'}], {ignoreMatrixParams: true}).sort()).toEqual(['view.1', 'view.2'].sort());
-    expect(workbenchRouter.resolvePresentViewIds(['path', 'to', 'view', {'matrixParam': 'C'}], {ignoreMatrixParams: true}).sort()).toEqual(['view.1', 'view.2'].sort());
+    discardPeriodicTasks();
+  })));
+
+  it('resolves present views by path containing wildcards', fakeAsync(inject([WorkbenchRouter], (workbenchRouter: WorkbenchRouter) => {
+    const fixture = TestBed.createComponent(PartsLayoutComponent);
+    fixture.debugElement.nativeElement.style.height = '500px';
+    advance(fixture);
+
+    // Add View 1
+    workbenchRouter.navigate(['path'], {target: 'blank'}).then();
+    advance(fixture);
+
+    // Add View 2
+    workbenchRouter.navigate(['path', 1], {target: 'blank'}).then();
+    advance(fixture);
+
+    // Add View 3
+    workbenchRouter.navigate(['path', 2], {target: 'blank'}).then();
+    advance(fixture);
+
+    // Add View 4
+    workbenchRouter.navigate(['path', 1, 1], {target: 'blank'}).then();
+    advance(fixture);
+
+    // Add View 5
+    workbenchRouter.navigate(['path', 1, 2], {target: 'blank'}).then();
+    advance(fixture);
+
+    // Add View 6
+    workbenchRouter.navigate(['path', 2, 1], {target: 'blank'}).then();
+    advance(fixture);
+
+    // Add View 7
+    workbenchRouter.navigate(['path', 2, 2], {target: 'blank'}).then();
+    advance(fixture);
+
+    // Wildcard match is disabled by default
+    expect(workbenchRouter.resolvePresentViewIds(['path'])).toEqual(['view.1']);
+    expect(workbenchRouter.resolvePresentViewIds(['path', '*'])).toEqual([]);
+    expect(workbenchRouter.resolvePresentViewIds(['path', 1, '*'])).toEqual([]);
+    expect(workbenchRouter.resolvePresentViewIds(['path', '*', 1])).toEqual([]);
+    expect(workbenchRouter.resolvePresentViewIds(['path', '*', '*'])).toEqual([]);
+
+    // Set `matchWildcardSegments` option to `true`
+    expect(workbenchRouter.resolvePresentViewIds(['path'], {matchWildcardSegments: true})).toEqual(['view.1']);
+    expect(workbenchRouter.resolvePresentViewIds(['path', '*'], {matchWildcardSegments: true})).toEqual(jasmine.arrayWithExactContents(['view.2', 'view.3']));
+    expect(workbenchRouter.resolvePresentViewIds(['path', 1, '*'], {matchWildcardSegments: true})).toEqual(jasmine.arrayWithExactContents(['view.4', 'view.5']));
+    expect(workbenchRouter.resolvePresentViewIds(['path', '*', 1], {matchWildcardSegments: true})).toEqual(jasmine.arrayWithExactContents(['view.4', 'view.6']));
+    expect(workbenchRouter.resolvePresentViewIds(['path', '*', '*'], {matchWildcardSegments: true})).toEqual(jasmine.arrayWithExactContents(['view.4', 'view.5', 'view.6', 'view.7']));
 
     discardPeriodicTasks();
   })));
@@ -125,6 +166,9 @@ class ViewComponent {
       {path: 'path/to/view-1', component: ViewComponent},
       {path: 'path/to/view-2', component: ViewComponent},
       {path: 'path/to/view-3', component: ViewComponent},
+      {path: 'path', component: ViewComponent},
+      {path: 'path/:segment1', component: ViewComponent},
+      {path: 'path/:segment1/:segment2', component: ViewComponent},
     ]),
   ],
 })

@@ -14,6 +14,8 @@ import {NavigationTestPageComponent} from './navigation-test-page.component';
 
 const routes: Routes = [
   {path: '', component: NavigationTestPageComponent},
+  {path: ':segment1', component: NavigationTestPageComponent},
+  {path: ':segment1/:segment2', component: NavigationTestPageComponent},
 ];
 
 @NgModule({

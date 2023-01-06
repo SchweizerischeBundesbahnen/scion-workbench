@@ -23,9 +23,11 @@ import {SciViewportModule} from '@scion/components/viewport';
 
 const routes: Routes = [
   {path: '', component: ViewPageComponent},
-  {path: ':segment1/segment2/:segment3', component: ViewPageComponent},
   {path: 'view1', component: ViewPageComponent},
   {path: 'view2', component: ViewPageComponent},
+  {path: ':segment1', component: ViewPageComponent},
+  {path: ':segment1/:segment2', component: ViewPageComponent},
+  {path: ':segment1/segment2/:segment3', component: ViewPageComponent},
 ];
 
 @NgModule({

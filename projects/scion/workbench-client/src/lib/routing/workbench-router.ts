@@ -134,9 +134,13 @@ export interface WorkbenchNavigationExtras {
    */
   activate?: boolean;
   /**
-   * Closes views matching the qualifier. Note that you can only close views for which you have an intention and which are visible to your app.
+   * Closes the view(s) that match the specified qualifier and required parameter(s). Optional parameters do not affect view resolution.
+   *
+   * To match views with any value for a specific required parameter, use the asterisk wildcard character (`*`) as the parameter value.
+   *
+   * Note that you can only close view(s) for which you have an intention and which are visible to your app.
    */
-  closeIfPresent?: boolean;
+  close?: boolean;
   /**
    * Controls where to open the view.
    *

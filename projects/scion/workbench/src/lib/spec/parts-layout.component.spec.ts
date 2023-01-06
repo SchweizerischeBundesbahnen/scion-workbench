@@ -1275,7 +1275,7 @@ describe('PartsLayoutComponent', () => {
     expect('view.4').toBeRegistered({partId: 'WEST-1', active: true, transientState: 'D'});
 
     // Close view 1
-    await wbRouter.navigate(['view-1'], {closeIfPresent: true});
+    await wbRouter.navigate(['view-1'], {close: true});
     await waitUntilLayoutChanged();
 
     expect(fixture).toEqualPartsLayout(new MTreeNode({
@@ -1295,7 +1295,7 @@ describe('PartsLayoutComponent', () => {
     expect('view.4').toBeRegistered({partId: 'WEST-1', active: true, transientState: 'D'});
 
     // Close view 3
-    await wbRouter.navigate(['view-3'], {closeIfPresent: true});
+    await wbRouter.navigate(['view-3'], {close: true});
     await waitUntilLayoutChanged();
 
     expect(fixture).toEqualPartsLayout(new MTreeNode({
@@ -1310,7 +1310,7 @@ describe('PartsLayoutComponent', () => {
     expect('view.4').toBeRegistered({partId: 'WEST-1', active: true, transientState: 'D'});
 
     // Close view 4
-    await wbRouter.navigate(['view-4'], {closeIfPresent: true});
+    await wbRouter.navigate(['view-4'], {close: true});
     await waitUntilLayoutChanged();
 
     expect(fixture).toEqualPartsLayout(new MPart({partId: 'NORTH-1', viewIds: ['view.2'], activeViewId: 'view.2'}));
