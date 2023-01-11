@@ -23,7 +23,6 @@ import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {ROUTER_OUTLET_NAME} from '../workbench.constants';
 import {inject} from '@angular/core';
 
 export class ɵWorkbenchView implements WorkbenchView {
@@ -71,7 +70,6 @@ export class ɵWorkbenchView implements WorkbenchView {
   private createPortal(viewComponent: ComponentType<any>): WbComponentPortal<any> {
     return new WbComponentPortal(viewComponent, {
       providers: [
-        {provide: ROUTER_OUTLET_NAME, useValue: this.viewId},
         {provide: ɵWorkbenchView, useValue: this},
         {provide: WorkbenchView, useExisting: ɵWorkbenchView},
         // Provide the root parent outlet context, crucial if the outlet is not instantiated at the time the route gets activated (e.g., if inside a `ngIf`, as it is in {ViewComponent}).

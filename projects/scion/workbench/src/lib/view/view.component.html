@@ -2,10 +2,11 @@
               [wbContentProjectionContent]="message_box_stack_template"
               [wbContentProjectionOverlayHost]="viewLocalMessageBoxHost"
               cdkTrapFocus>
-  <wb-router-outlet #router_outlet="outlet"
-                    (activate)="onActivateRoute(router_outlet.activatedRoute)"
-                    (deactivate)="onDeactivateRoute()">
-  </wb-router-outlet>
+  <router-outlet #router_outlet="outlet"
+                 [name]="viewId"
+                 (activate)="onActivateRoute(router_outlet.activatedRoute)"
+                 (deactivate)="onDeactivateRoute()">
+  </router-outlet>
 </sci-viewport>
 
 <ng-template #message_box_stack_template>

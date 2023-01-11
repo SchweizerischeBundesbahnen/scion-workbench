@@ -17,7 +17,7 @@ import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCo
 import {Popup} from '../../popup/popup.config';
 
 /**
- * Component displayed in a workbench popup for embedding the microfrontend of a popup capability.
+ * Displays the microfrontend of a popup capability inside a workbench popup.
  */
 @Component({
   selector: 'wb-microfrontend-popup',
@@ -46,11 +46,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.onInit().then();
-  }
-
-  private async onInit(): Promise<void> {
-
     // Obtain the capability provider.
     const application = this.lookupApplication(this.popupCapability.metadata!.appSymbolicName);
     if (!application) {
@@ -87,12 +82,12 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
     // Navigate to the microfrontend.
     this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
-    await this._outletRouter.navigate(this.popupCapability.properties.path, {
+    this._outletRouter.navigate(this.popupCapability.properties.path, {
       outlet: this.popupId,
       relativeTo: application.baseUrl,
       params: this._popupContext.params,
       pushStateToSessionHistoryStack: false,
-    });
+    }).then();
   }
 
   public onFocusWithin(event: Event): void {

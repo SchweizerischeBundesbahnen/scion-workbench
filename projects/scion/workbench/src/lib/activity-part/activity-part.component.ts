@@ -13,7 +13,7 @@ import {animate, AnimationBuilder, AnimationPlayer, style, transition, trigger} 
 import {WorkbenchActivityPartService} from './workbench-activity-part.service';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {noop, Observable, Subject} from 'rxjs';
-import {ACTIVITY_OUTLET_NAME, ROUTER_OUTLET_NAME} from '../workbench.constants';
+import {ACTIVITY_OUTLET_NAME} from '../workbench.constants';
 import {Activity} from './activity';
 
 /**
@@ -43,9 +43,6 @@ const PANEL_INITIAL_WIDTH = 500;
       ],
     ),
   ],
-  viewProviders: [
-    {provide: ROUTER_OUTLET_NAME, useValue: ACTIVITY_OUTLET_NAME},
-  ],
 })
 export class ActivityPartComponent {
 
@@ -54,6 +51,8 @@ export class ActivityPartComponent {
 
   @ViewChild('panel', {read: ElementRef})
   private _panelElementRef!: ElementRef;
+
+  public ACTIVITY_OUTLET_NAME = ACTIVITY_OUTLET_NAME;
 
   constructor(public host: ElementRef<HTMLElement>,
               public activityPartService: WorkbenchActivityPartService,

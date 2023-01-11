@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectFlags, InjectionToken, Injector} from '@angular/core';
+import {InjectionToken, Injector} from '@angular/core';
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -124,8 +124,7 @@ export interface WorkbenchInitializer {
  * Runs workbench initializers associated with the given DI token.
  */
 export async function runWorkbenchInitializers(token: InjectionToken<any>, injector: Injector): Promise<void> {
-  // TODO [Angular 15][https://github.com/angular/angular/issues/46943] Object-based flags for `Injector.get` will be added in v15
-  const initializers: WorkbenchInitializer[] = injector.get(token, undefined, InjectFlags.Optional) as WorkbenchInitializer[];
+  const initializers: WorkbenchInitializer[] = injector.get(token, undefined, {optional: true}) as WorkbenchInitializer[];
   if (!initializers || !initializers.length) {
     return;
   }

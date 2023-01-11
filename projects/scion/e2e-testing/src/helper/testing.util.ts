@@ -30,7 +30,7 @@ export async function getCssClasses(element: Locator): Promise<string[]> {
  * Returns if given element is the active element.
  */
 export async function isActiveElement(element: Locator): Promise<boolean> {
-  return await element.evaluate(el => el === document.activeElement);
+  return element.evaluate(el => el === document.activeElement);
 }
 
 /**
@@ -38,6 +38,13 @@ export async function isActiveElement(element: Locator): Promise<boolean> {
  */
 export async function isPresent(element: Locator): Promise<boolean> {
   return await waitUntilStable(() => element.count(), {probeInterval: 25}) > 0;
+}
+
+/**
+ * Returns true if the element is visible.
+ */
+export async function isVisible(element: Locator): Promise<boolean> {
+  return waitUntilStable(() => element.isVisible(), {probeInterval: 25});
 }
 
 /**

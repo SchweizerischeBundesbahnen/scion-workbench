@@ -11,9 +11,8 @@
 import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
 import {AsyncSubject, combineLatest, EMPTY, fromEvent, Subject} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {WbRouterOutletComponent} from '../routing/wb-router-outlet.component';
 import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing.constants';
 import {MessageBoxService} from '../message-box/message-box.service';
 import {ViewMenuService} from '../view-part/view-context-menu/view-menu.service';
@@ -56,7 +55,7 @@ export class ViewComponent implements OnDestroy {
   }
 
   @ViewChild('router_outlet')
-  public routerOutlet!: WbRouterOutletComponent; // specs
+  public routerOutlet!: RouterOutlet; // specs
 
   @HostBinding('attr.data-viewid')
   public get viewId(): string {

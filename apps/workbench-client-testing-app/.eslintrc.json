@@ -9,9 +9,7 @@
         "*.ts"
       ],
       "parserOptions": {
-        "project": [
-          "apps/workbench-client-testing-app/tsconfig.app.eslint.json"
-        ]
+        "project": "apps/workbench-client-testing-app/tsconfig.app.eslint.json"
       },
       "rules": {
         "@angular-eslint/directive-selector": [
