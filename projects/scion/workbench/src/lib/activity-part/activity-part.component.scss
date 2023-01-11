@@ -85,7 +85,7 @@ $diamond-height: 8;
     > sci-viewport {
       flex: auto;
 
-      wb-router-outlet {
+      router-outlet {
         position: absolute; // take router outlet out of the document flow
       }
     }

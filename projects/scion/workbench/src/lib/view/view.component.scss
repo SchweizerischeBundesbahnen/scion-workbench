@@ -13,7 +13,7 @@
     width: 100%;
     height: 100%;
 
-    wb-router-outlet {
+    router-outlet {
       position: absolute; // take router outlet out of the document flow
     }
   }

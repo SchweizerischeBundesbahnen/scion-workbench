@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, HostBinding, HostListener, inject, Input, OnChanges, Optional, SimpleChanges} from '@angular/core';
+import {ChangeDetectorRef, Directive, ElementRef, HostBinding, HostListener, Input, OnChanges, OnDestroy, Optional, SimpleChanges} from '@angular/core';
 import {WbNavigationExtras, WorkbenchRouter} from './workbench-router.service';
-import {noop} from 'rxjs';
+import {mergeWith, noop, Subject} from 'rxjs';
 import {LocationStrategy} from '@angular/common';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
+import {filter, takeUntil} from 'rxjs/operators';
 import {Defined} from '@scion/toolkit/util';
 
 /**
@@ -25,11 +26,19 @@ import {Defined} from '@scion/toolkit/util';
  * By default, navigation is relative to the currently activated route, if any.
  * Prepend the path with a forward slash '/' to navigate absolutely, or set `relativeTo` property in navigational extras to `null`.
  */
-@Directive({selector: ':not(a)[wbRouterLink]'})
-export class WbRouterLinkDirective {
+@Directive({
+  selector: '[wbRouterLink]',
+  standalone: true,
+})
+export class WbRouterLinkDirective implements OnChanges, OnDestroy {
 
-  protected _commands: any[] = [];
-  protected _extras: WbNavigationExtras = {};
+  private _commands: any[] = [];
+  private _extras: WbNavigationExtras = {};
+  private _ngOnChange$ = new Subject<void>();
+  private _ngOnDestroy$ = new Subject<void>();
+
+  @HostBinding('attr.href')
+  public href: string | null = null;
 
   @Input()
   public set wbRouterLink(commands: any[] | string | undefined | null) {
@@ -37,29 +46,39 @@ export class WbRouterLinkDirective {
   }
 
   @Input('wbRouterLinkExtras') // eslint-disable-line @angular-eslint/no-input-rename
-  public set extras(extras: WbNavigationExtras) {
+  public set extras(extras: WbNavigationExtras | undefined) {
     this._extras = extras || {};
   }
 
-  constructor(private _workbenchRouter: WorkbenchRouter = inject(WorkbenchRouter),
-              private _route: ActivatedRoute = inject(ActivatedRoute),
-              @Optional() private _view: WorkbenchView | null = inject(WorkbenchView, {optional: true})) {
+  constructor(private _workbenchRouter: WorkbenchRouter,
+              private _router: Router,
+              private _route: ActivatedRoute,
+              private _locationStrategy: LocationStrategy,
+              private _cd: ChangeDetectorRef,
+              host: ElementRef,
+              @Optional() private _view: WorkbenchView | null) {
+    if (host.nativeElement.tagName === 'A') {
+      this.installHrefUpdater();
+    }
   }
 
   @HostListener('click', ['$event.button', '$event.ctrlKey', '$event.metaKey'])
   public onClick(button: number, ctrlKey: boolean, metaKey: boolean): boolean {
-    if (button !== 0) { // not main button pressed
+    if (button !== 0) { // not primary mouse button pressed
       return true;
     }
 
-    const extras = this.createNavigationExtras(ctrlKey, metaKey);
+    const extras = this.computeNavigationExtras(ctrlKey, metaKey);
     this._workbenchRouter.navigate(this._commands, extras).then(noop);
     return false;
   }
 
-  protected createNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): WbNavigationExtras {
+  /**
+   * Computes navigation extras based on the given extras and this directive's injection context.
+   */
+  protected computeNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): WbNavigationExtras {
     const contextualViewId = this._view?.viewId;
-    const currentPartId = this._view?.part.partId;
+    const contextualPartId = this._view?.part.partId;
     const controlPressed = ctrlKey || metaKey;
 
     return {
@@ -78,26 +97,32 @@ export class WbRouterLinkDirective {
         return contextualViewId;
       }),
       activate: this._extras.activate ?? !controlPressed, // by default, the view is not activated if CTRL or META modifier key is pressed (same behavior as for browser links)
-      blankPartId: this._extras.blankPartId || currentPartId,
+      blankPartId: this._extras.blankPartId || contextualPartId,
     };
   }
-}
 
-@Directive({selector: 'a[wbRouterLink]'})
-export class WbRouterLinkWithHrefDirective extends WbRouterLinkDirective implements OnChanges {
-
-  @HostBinding('href')
-  public href: string | undefined;
-
-  constructor(private _router: Router, private _locationStrategy: LocationStrategy) {
-    super();
-  }
-
-  private updateTargetUrlAndHref(): void {
-    this.href = this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(this._router.createUrlTree(this._commands, this.createNavigationExtras())));
+  /**
+   * Updates the link's href based on given array of commands and navigation extras.
+   */
+  private installHrefUpdater(): void {
+    this._router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        mergeWith(this._ngOnChange$),
+        takeUntil(this._ngOnDestroy$),
+      )
+      .subscribe(() => {
+        const urlTree = this._commands.length && this._router.createUrlTree(this._commands, this.computeNavigationExtras());
+        this.href = urlTree ? this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree)) : null;
+        this._cd.markForCheck();
+      });
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    this.updateTargetUrlAndHref();
+    this._ngOnChange$.next();
+  }
+
+  public ngOnDestroy(): void {
+    this._ngOnDestroy$.next();
   }
 }

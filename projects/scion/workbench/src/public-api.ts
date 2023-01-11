@@ -16,7 +16,7 @@ export * from './lib/workbench-module-config';
 export {WorkbenchTestingModule} from './lib/spec/workbench-testing.module';
 export {WorkbenchService} from './lib/workbench.service';
 export {WbBeforeDestroy, WorkbenchViewPartAction} from './lib/workbench.model';
-export {WbRouterLinkDirective, WbRouterLinkWithHrefDirective} from './lib/routing/wb-router-link.directive';
+export {WbRouterLinkDirective} from './lib/routing/wb-router-link.directive';
 export {WorkbenchRouter, WbNavigationExtras} from './lib/routing/workbench-router.service';
 export {WorkbenchAuxiliaryRoutesRegistrator} from './lib/routing/workbench-auxiliary-routes-registrator.service';
 export {WorkbenchComponent} from './lib/workbench.component';

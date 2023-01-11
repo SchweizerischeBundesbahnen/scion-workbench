@@ -26,12 +26,11 @@ import {ViewDropZoneDirective} from './view-dnd/view-drop-zone.directive';
 import {PartsLayoutComponent} from './layout/parts-layout.component';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {ViewComponent} from './view/view.component';
-import {WbRouterOutletComponent} from './routing/wb-router-outlet.component';
 import {TreeNodeComponent} from './layout/tree-node.component';
 import {WbPortalOutletComponent} from './portal/wb-portal-outlet.component';
 import {RouteReuseStrategy, RouterModule} from '@angular/router';
 import {WorkbenchRouter} from './routing/workbench-router.service';
-import {WbRouterLinkDirective, WbRouterLinkWithHrefDirective} from './routing/wb-router-link.directive';
+import {WbRouterLinkDirective} from './routing/wb-router-link.directive';
 import {WorkbenchViewRegistry} from './view/workbench-view.registry';
 import {WorkbenchUrlObserver} from './routing/workbench-url-observer.service';
 import {WbActivityActionDirective} from './activity-part/wb-activity-action.directive';
@@ -99,6 +98,7 @@ import {WORKBENCH_POST_STARTUP} from './startup/workbench-initializer';
     A11yModule,
     MessageBoxModule,
     NotificationModule,
+    WbRouterLinkDirective,
   ],
   declarations: [
     WorkbenchComponent,
@@ -117,9 +117,6 @@ import {WORKBENCH_POST_STARTUP} from './startup/workbench-initializer';
     TreeNodeComponent,
     ViewDropZoneDirective,
     WbPortalOutletComponent,
-    WbRouterOutletComponent,
-    WbRouterLinkDirective,
-    WbRouterLinkWithHrefDirective,
     ContentProjectionDirective,
     ContentAsOverlayComponent,
     ViewPartActionDirective,
@@ -140,11 +137,10 @@ import {WORKBENCH_POST_STARTUP} from './startup/workbench-initializer';
     WorkbenchComponent,
     WbActivityDirective,
     WbActivityActionDirective,
-    WbRouterLinkDirective,
-    WbRouterLinkWithHrefDirective,
     ContentAsOverlayComponent,
     ViewPartActionDirective,
     ViewMenuItemDirective,
+    WbRouterLinkDirective,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a web component
 })

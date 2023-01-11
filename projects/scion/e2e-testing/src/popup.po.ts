@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {getCssClasses, hasCssClass, isPresent, waitUntilBoundingBoxStable} from './helper/testing.util';
+import {getCssClasses, hasCssClass, isPresent, isVisible, waitUntilBoundingBoxStable} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench popup.
@@ -27,7 +27,7 @@ export class PopupPO {
   }
 
   public async isVisible(): Promise<boolean> {
-    return this._popupLocator.isVisible();
+    return isVisible(this._popupLocator);
   }
 
   public async getBoundingBox(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<DOMRect> {

@@ -48,7 +48,8 @@ export class MTreeNode {
    * Returns `true` if the given object looks like a {@link MTreeNode}.
    */
   public static isNodeLike(object: any): boolean {
-    return object.hasOwnProperty('nodeId');
+    // TODO [Angular 16][https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/416] Replace with `Object.hasOwn(object, 'nodeId')` introduced in ES2022 when supported by Playwright
+    return object.hasOwnProperty('nodeId'); // eslint-disable-line no-prototype-builtins
   }
 }
 
@@ -95,7 +96,8 @@ export class MPart {
    * Returns `true` if the given object looks like a {@link MPart}.
    */
   public static isPartLike(object: any): boolean {
-    return object.hasOwnProperty('partId');
+    // TODO [Angular 16][https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/416] Replace with `Object.hasOwn(object, 'partId')` introduced in ES2022 when supported by Playwright
+    return object.hasOwnProperty('partId'); // eslint-disable-line no-prototype-builtins
   }
 }
 

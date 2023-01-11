@@ -9,10 +9,7 @@
         "*.ts"
       ],
       "parserOptions": {
-        "project": [
-          "projects/scion/workbench-client/tsconfig.lib.json",
-          "projects/scion/workbench-client/tsconfig.spec.json"
-        ]
+        "project": "projects/scion/workbench-client/tsconfig.(lib|spec).json"
       },
       "rules": {}
     },

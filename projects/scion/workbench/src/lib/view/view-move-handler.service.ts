@@ -143,6 +143,6 @@ function coerceLayoutAlignment(region: 'north' | 'east' | 'south' | 'west' | 'ce
     case 'south':
       return 'bottom';
     default:
-      throw Error(`[UnsupportedRegionError] Supported regions are: \'north\', \'east\', \'south\' or \'west\' [actual=${region}]`);
+      throw Error(`[UnsupportedRegionError] Supported regions are: 'north', 'east', 'south' or 'west' [actual=${region}]`);
   }
 }

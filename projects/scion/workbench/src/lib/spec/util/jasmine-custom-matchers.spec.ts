@@ -75,7 +75,7 @@ function createToShowMatcher(util: MatchersUtil): CustomMatcher {
       if (!(actualFixture instanceof ComponentFixture)) {
         return {
           pass: false,
-          message: msgFn(`Expected actual to be of type \'ComponentFixture\' [actual=${actualFixture.constructor.name}]`),
+          message: msgFn(`Expected actual to be of type 'ComponentFixture' [actual=${actualFixture.constructor.name}]`),
         };
       }
 
@@ -113,7 +113,7 @@ function createToEqualPartsLayoutMatcher(util: MatchersUtil): CustomMatcher {
       assertPartsLayoutDOM(expectedLayout, actual.debugElement.query(By.css('wb-tree-node')) || actual.debugElement);
     }
     else {
-      throw new PartsLayoutAssertError(`Expected testee to be of type \'MTreeNode\', \'MPart\' or \'ComponentFixture&lt;PartsLayoutComponent&gt;\' [actual=${actual.constructor.name}]`);
+      throw new PartsLayoutAssertError(`Expected testee to be of type 'MTreeNode', 'MPart' or 'ComponentFixture&lt;PartsLayoutComponent&gt;' [actual=${actual.constructor.name}]`);
     }
   }
 
@@ -136,7 +136,7 @@ function createToEqualPartsLayoutMatcher(util: MatchersUtil): CustomMatcher {
 
       const nodeid = actualDom.attributes['data-nodeid'];
       if (!nodeid) {
-        throw Error(`[AttributeNotFoundError] Attribute \'data-nodeid\' not found on element ${actualDom.name}`);
+        throw Error(`[AttributeNotFoundError] Attribute 'data-nodeid' not found on element ${actualDom.name}`);
       }
 
       const sash1DomElement = actualDom.query(By.css(`wb-tree-node[data-parentnodeid="${nodeid}"].sash-1, wb-portal-outlet[data-parentnodeid="${nodeid}"].sash-1`));
