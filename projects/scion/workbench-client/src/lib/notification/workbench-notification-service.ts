@@ -13,7 +13,7 @@ import {WorkbenchNotificationConfig} from './workbench-notification.config';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Maps} from '@scion/toolkit/util';
-import {lastValueFrom} from 'rxjs';
+import {isObservable, lastValueFrom, Observable} from 'rxjs';
 
 /**
  * Allows displaying a notification to the user.
@@ -56,8 +56,8 @@ export class WorkbenchNotificationService {
    *         the notification intention, or because no notification provider could be found that provides a notification under the specified
    *         qualifier.
    */
-  public async show(notification: string | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void> {
-    const config: WorkbenchNotificationConfig = typeof notification === 'string' ? {content: notification} : notification;
+  public async show(notification: string | Observable<string> | WorkbenchNotificationConfig, qualifier?: Qualifier): Promise<void> {
+    const config = WorkbenchNotificationService.getNotificationConfig(notification);
     const params = Maps.coerce(config.params);
 
     const showNotification$ = Beans.get(IntentClient).request$<void>({type: WorkbenchCapabilities.Notification, qualifier, params}, config);
@@ -66,6 +66,15 @@ export class WorkbenchNotificationService {
     }
     catch (error) {
       throw (error instanceof RequestError ? error.message : error);
+    }
+  }
+
+  private static getNotificationConfig(notification: string | Observable<string> | WorkbenchNotificationConfig): WorkbenchNotificationConfig {
+    if (isObservable(notification) || typeof notification === 'string') {
+      return {content: notification};
+    }
+    else {
+      return notification;
     }
   }
 }

@@ -9,7 +9,7 @@
  */
 
 import {Type} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, isObservable, Observable} from 'rxjs';
 import {Arrays} from '@scion/toolkit/util';
 import {Notification} from './notification';
 import {NotificationConfig} from './notification.config';
@@ -29,7 +29,7 @@ export class ɵNotification<T = any> implements Notification<T> {
     this.severity$ = new BehaviorSubject(this.config.severity ?? 'info');
     this.duration$ = new BehaviorSubject(this.config.duration ?? 'medium');
     this.cssClass$ = new BehaviorSubject(Arrays.coerce(this.config.cssClass));
-    if (this.config.content === undefined || typeof this.config.content === 'string') {
+    if (this.config.content === undefined || typeof this.config.content === 'string' || isObservable(this.config.content)) {
       this.component = TextNotificationComponent;
       this.input = this.config.content as any;
     }

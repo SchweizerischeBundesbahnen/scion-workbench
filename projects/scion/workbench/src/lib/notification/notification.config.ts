@@ -29,12 +29,12 @@ export interface NotificationConfig {
   title?: string | Observable<string>;
 
   /**
-   * Content of the notification, can be either a plain text message or a component.
+   * Content of the notification, can be either a plain text message, a text wrapped in an observable  or a component.
    *
    * Consider using a component when displaying structured content. You can pass data to the component using the
    * {@link componentInput} property or by providing a custom injector in {@link componentConstructOptions.injector}.
    */
-  content: string | ComponentType<any>;
+  content: string | Observable<string> | ComponentType<any>;
 
   /**
    * If using a component as the notification content, optionally instruct Angular how to construct the component.

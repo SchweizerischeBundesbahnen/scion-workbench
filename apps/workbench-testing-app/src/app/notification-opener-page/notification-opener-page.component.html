@@ -7,6 +7,10 @@
       </select>
     </sci-form-field>
 
+    <sci-form-field label="Observable">
+      <input type="checkbox" [formControlName]="OBSERVABLE" class="e2e-observable" *ngIf="!isUseComponent()">
+    </sci-form-field>
+
     <sci-form-field label="Content" *ngIf="!isUseComponent()">
       <input [formControlName]="CONTENT" class="e2e-content">
     </sci-form-field>

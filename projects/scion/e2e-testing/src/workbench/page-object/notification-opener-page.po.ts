@@ -33,6 +33,10 @@ export class NotificationOpenerPagePO {
     await this._locator.locator('input.e2e-content').fill(content);
   }
 
+  public async enterUseObservable(useObservable: boolean): Promise<void> {
+    await this._locator.locator('input.e2e-observable').setChecked(useObservable);
+  }
+
   public async enterComponentInput(componentInput: string): Promise<void> {
     await this._locator.locator('input.e2e-component-input').fill(componentInput);
   }

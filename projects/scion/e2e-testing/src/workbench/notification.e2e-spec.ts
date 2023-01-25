@@ -42,6 +42,32 @@ test.describe('Workbench Notification', () => {
     await expect(await textNotificationPO.getText()).toEqual('LINE 1\nLINE 2');
   });
 
+  test('should show a notification with an observable of the specified text', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPagePO = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPagePO.enterCssClass('testee');
+    await notificationOpenerPagePO.enterContent('TEXT');
+    await notificationOpenerPagePO.enterUseObservable(true);
+    await notificationOpenerPagePO.clickShow();
+
+    const textNotificationPO = new TextNotificationPO(appPO, 'testee');
+    await expect(await textNotificationPO.isVisible()).toBe(true);
+    await expect(await textNotificationPO.getText()).toEqual('TEXT');
+  });
+
+  test('should support observable in the notification text', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const notificationOpenerPagePO = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPagePO.enterCssClass('testee');
+    await notificationOpenerPagePO.clickShow();
+
+    const textNotificationPO = new TextNotificationPO(appPO, 'testee');
+    await expect(await textNotificationPO.isVisible()).toBe(true);
+    await expect(await textNotificationPO.getText()).toEqual('LINE 1\nLINE 2');
+  });
+
   test('should close the last notification when pressing the ESC key', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 

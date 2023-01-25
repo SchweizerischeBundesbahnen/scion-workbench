@@ -31,7 +31,7 @@ export interface WorkbenchNotificationConfig {
   /**
    * Specifies the content to be displayed in the notification.
    *
-   * The content may differ per notification provider, as dermined by the qualifier. For example, the built-in notification expects a
+   * The content may differ per notification provider, as determined by the qualifier. For example, the built-in notification expects a
    * text message in form of a string literal. Refer to the documentation of the notification capability provider for more information.
    */
   content?: any;
