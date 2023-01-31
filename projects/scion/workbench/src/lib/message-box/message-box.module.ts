@@ -14,7 +14,6 @@ import {MessageBoxStackComponent} from './message-box-stack.component';
 import {MessageBoxComponent} from './message-box.component';
 import {TextMessageComponent} from './text-message.component';
 import {MessageBoxCssClassesPipe} from './message-box-css-classes.pipe';
-import {MessageBoxService} from './message-box.service';
 import {A11yModule} from '@angular/cdk/a11y';
 import {PortalModule} from '@angular/cdk/portal';
 import {MoveDirective} from './move.directive';
@@ -42,9 +41,6 @@ import {CoerceObservablePipe} from './coerce-observable.pipe';
   ],
   exports: [
     MessageBoxStackComponent,
-  ],
-  providers: [
-    MessageBoxService,
   ],
 })
 export class MessageBoxModule {
