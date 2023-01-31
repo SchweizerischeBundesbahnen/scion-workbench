@@ -1,3 +1,12 @@
+# [14.0.0-beta.9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.8...14.0.0-beta.9) (2023-01-31)
+
+
+### Bug Fixes
+
+* **workbench/messagebox:** fix registration of MessageBoxService in root injector ([47beed6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/47beed631b6b553d1881873f7d5dca749e71aa74))
+
+
+
 # [14.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.7...14.0.0-beta.8) (2022-12-21)
 
 
