@@ -10,7 +10,7 @@
 
 import {ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
 import {expect, jasmineCustomMatchers} from './util/jasmine-custom-matchers.spec';
-import {Component, NgZone} from '@angular/core';
+import {Component} from '@angular/core';
 import {PartsLayoutComponent} from '../layout/parts-layout.component';
 import {Router, UrlSegment} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -53,7 +53,7 @@ describe('PartsLayoutComponent', () => {
     wbRouter = TestBed.inject(WorkbenchRouter);
     viewDragService = TestBed.inject(ViewDragService);
 
-    TestBed.inject(NgZone).run(() => TestBed.inject(Router).initialNavigation());
+    TestBed.inject(Router).initialNavigation();
     fixture = TestBed.createComponent(PartsLayoutComponent);
     fixture.debugElement.nativeElement.style.height = '500px';
     fixture.debugElement.nativeElement.style.background = 'lightgray';
