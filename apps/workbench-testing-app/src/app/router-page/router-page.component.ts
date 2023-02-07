@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, Injector} from '@angular/core';
 import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {WbNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
 import {Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
-import {Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import {BehaviorSubject, Observable, share} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 const PATH = 'path';
 const QUERY_PARAMS = 'queryParams';
@@ -26,6 +26,7 @@ const INSERTION_INDEX = 'insertionIndex';
 const ACTIVATE = 'activate';
 const CLOSE = 'close';
 const CSS_CLASS = 'cssClass';
+const VIEW_CONTEXT = 'viewContext';
 
 @Component({
   selector: 'app-router-page',
@@ -43,6 +44,7 @@ export class RouterPageComponent {
   public readonly ACTIVATE = ACTIVATE;
   public readonly CLOSE = CLOSE;
   public readonly CSS_CLASS = CSS_CLASS;
+  public readonly VIEW_CONTEXT = VIEW_CONTEXT;
 
   public form: UntypedFormGroup;
   public navigateError: string;
@@ -51,8 +53,10 @@ export class RouterPageComponent {
   public navigationExtras$: Observable<WbNavigationExtras>;
   public routes: Routes;
 
+  public nullViewInjector: Injector;
+
   constructor(formBuilder: UntypedFormBuilder,
-              view: WorkbenchView,
+              injector: Injector,
               private _router: Router,
               private _wbRouter: WorkbenchRouter) {
     this.form = formBuilder.group({
@@ -65,23 +69,31 @@ export class RouterPageComponent {
       [ACTIVATE]: formBuilder.control(undefined),
       [CLOSE]: formBuilder.control(undefined),
       [CSS_CLASS]: formBuilder.control(undefined),
+      [VIEW_CONTEXT]: formBuilder.control(true),
     });
 
     this.routerLinkCommands$ = this.form.valueChanges
       .pipe(
         map(() => this.constructRouterLinkCommands()),
-        startWith(this.constructRouterLinkCommands()),
+        share({connector: () => new BehaviorSubject(this.constructRouterLinkCommands())}),
       );
 
     this.navigationExtras$ = this.form.valueChanges
       .pipe(
         map(() => this.constructNavigationExtras()),
-        startWith(this.constructNavigationExtras()),
+        share({connector: () => new BehaviorSubject(this.constructNavigationExtras())}),
       );
 
     this.routes = this._router.config
       .filter(it => !it.outlet || it.outlet === PRIMARY_OUTLET)
       .filter(it => !it.path.startsWith('~')); // microfrontend route prefix
+
+    this.nullViewInjector = Injector.create({
+      parent: injector,
+      providers: [
+        {provide: WorkbenchView, useValue: undefined},
+      ],
+    });
   }
 
   public onRouterNavigate(): void {

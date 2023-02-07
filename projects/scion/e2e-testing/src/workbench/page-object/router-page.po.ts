@@ -77,6 +77,10 @@ export class RouterPagePO {
     await this._locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
   }
 
+  public async checkViewContext(check: boolean): Promise<void> {
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-view-context')).toggle(check);
+  }
+
   public async clickNavigate(): Promise<void> {
     await this._locator.locator('button.e2e-router-navigate').click();
 

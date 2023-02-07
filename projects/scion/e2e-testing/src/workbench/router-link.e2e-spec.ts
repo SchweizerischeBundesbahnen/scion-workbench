@@ -118,4 +118,147 @@ test.describe('Workbench RouterLink', () => {
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
+
+  test('should close view by path', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    // GIVEN
+    // Open test view 1 (but do not activate it)
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterCssClass('testee');
+    await routerPagePO.checkActivate(false);
+    await routerPagePO.clickNavigate();
+
+    const testView = appPO.view({cssClass: 'testee'});
+    await expect(await testView.viewTab.isPresent()).toBe(true);
+
+    // WHEN
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.checkClose(true);
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    // THEN
+    await expect(await testView.viewTab.isPresent()).toBe(false);
+    await expect(await routerPagePO.viewTabPO.isPresent()).toBe(true);
+  });
+
+  test('should close view by id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    // GIVEN
+    // Open test view 1 (but do not activate it)
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterCssClass('testee');
+    await routerPagePO.checkActivate(false);
+    await routerPagePO.clickNavigate();
+
+    const testView = appPO.view({cssClass: 'testee'});
+    await expect(await testView.viewTab.isPresent()).toBe(true);
+
+    // WHEN
+    await routerPagePO.enterPath('<empty>');
+    await routerPagePO.enterTarget(await testView.getViewId());
+    await routerPagePO.checkClose(true);
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    // THEN
+    await expect(await testView.viewTab.isPresent()).toBe(false);
+    await expect(await routerPagePO.viewTabPO.isPresent()).toBe(true);
+  });
+
+  test('should close matching views', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    // GIVEN
+    // Open test view 1 (but do not activate it)
+    await routerPagePO.enterPath('/test-navigation/1');
+    await routerPagePO.enterCssClass('testee-1');
+    await routerPagePO.checkActivate(false);
+    await routerPagePO.clickNavigate();
+
+    // Open test view 2 (but do not activate it)
+    await routerPagePO.enterPath('/test-navigation/2');
+    await routerPagePO.enterCssClass('testee-2');
+    await routerPagePO.checkActivate(false);
+    await routerPagePO.clickNavigate();
+
+    // Open test view 3 (but do not activate it)
+    await routerPagePO.enterPath('/test-navigation/3');
+    await routerPagePO.enterCssClass('testee-3');
+    await routerPagePO.checkActivate(false);
+    await routerPagePO.clickNavigate();
+
+    const testView1 = appPO.view({cssClass: 'testee-1'});
+    const testView2 = appPO.view({cssClass: 'testee-2'});
+    const testView3 = appPO.view({cssClass: 'testee-3'});
+
+    await expect(await testView1.viewTab.isPresent()).toBe(true);
+    await expect(await testView2.viewTab.isPresent()).toBe(true);
+    await expect(await testView3.viewTab.isPresent()).toBe(true);
+
+    // WHEN
+    await routerPagePO.enterPath('/test-navigation/*');
+    await routerPagePO.checkClose(true);
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    // THEN
+    await expect(await testView1.viewTab.isPresent()).toBe(false);
+    await expect(await testView2.viewTab.isPresent()).toBe(false);
+    await expect(await testView3.viewTab.isPresent()).toBe(false);
+    await expect(await routerPagePO.viewTabPO.isPresent()).toBe(true);
+  });
+
+  test('should always open a new view if navigating outside a view (and not activate a matching view)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    // GIVEN
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterCssClass('testee-1');
+    await routerPagePO.checkActivate(false);
+    await routerPagePO.clickNavigate();
+
+    // WHEN
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterCssClass('testee-2');
+    await routerPagePO.checkViewContext(false); // simulate navigating outside a view context
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    // THEN
+    await expect(await appPO.view({cssClass: 'testee-1'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.getViewId()).not.toEqual(routerPagePO.viewId);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
+  });
+
+  test('should replace the current view if navigating inside a view (and not activate a matching view)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    // GIVEN
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterCssClass('testee-1');
+    await routerPagePO.checkActivate(false);
+    await routerPagePO.clickNavigate();
+
+    // WHEN
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterCssClass('testee-2');
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    // THEN
+    await expect(await appPO.view({cssClass: 'testee-1'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(true);
+    await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.getViewId()).toEqual(routerPagePO.viewId);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+  });
 });
+

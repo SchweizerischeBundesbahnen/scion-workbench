@@ -48,6 +48,10 @@
     <sci-checkbox [formControlName]="CLOSE" class="e2e-close"></sci-checkbox>
   </sci-form-field>
 
+  <sci-form-field label="View Context" title="Controls whether to navigate outside the view context (only relevant if navigating via router link)">
+    <sci-checkbox [formControlName]="VIEW_CONTEXT" class="e2e-view-context"></sci-checkbox>
+  </sci-form-field>
+
   <sci-form-field label="CSS Class(es)">
     <input [formControlName]="CSS_CLASS" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
   </sci-form-field>
@@ -57,11 +61,14 @@
   Navigate via Router
 </button>
 
-<a [wbRouterLink]="routerLinkCommands$ | async"
-   [wbRouterLinkExtras]="navigationExtras$ | async"
-   class="e2e-router-link-navigate">
-  Navigate via Router Link
-</a>
+<ng-container *ngTemplateOutlet="router_link; injector: form.get(VIEW_CONTEXT).value ? undefined : nullViewInjector"></ng-container>
+<ng-template #router_link>
+  <a [wbRouterLink]="routerLinkCommands$ | async"
+     [wbRouterLinkExtras]="navigationExtras$ | async"
+     class="e2e-router-link-navigate">
+    Navigate via Router Link
+  </a>
+</ng-template>
 
 <output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
   {{navigateError}}
