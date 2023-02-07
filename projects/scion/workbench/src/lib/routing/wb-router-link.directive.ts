@@ -14,6 +14,7 @@ import {noop} from 'rxjs';
 import {LocationStrategy} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
+import {Defined} from '@scion/toolkit/util';
 
 /**
  * Like 'RouterLink' but with functionality to target a view outlet.
@@ -31,7 +32,7 @@ export class WbRouterLinkDirective {
   protected _extras: WbNavigationExtras = {};
 
   @Input()
-  public set wbRouterLink(commands: any[] | string) {
+  public set wbRouterLink(commands: any[] | string | undefined | null) {
     this._commands = (commands ? (Array.isArray(commands) ? commands : [commands]) : []);
   }
 
@@ -57,16 +58,25 @@ export class WbRouterLinkDirective {
   }
 
   protected createNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): WbNavigationExtras {
-    const currentViewId = this._view?.viewId;
+    const contextualViewId = this._view?.viewId;
     const currentPartId = this._view?.part.partId;
-    const isAbsolute = (typeof this._commands[0] === 'string') && this._commands[0].startsWith('/');
-    const relativeTo = (isAbsolute ? null : this._route);
     const controlPressed = ctrlKey || metaKey;
 
     return {
       ...this._extras,
-      relativeTo: this._extras.relativeTo === undefined ? relativeTo : this._extras.relativeTo,
-      target: this._extras.target ?? (currentViewId && !controlPressed ? currentViewId : 'blank'),
+      relativeTo: Defined.orElse(this._extras.relativeTo, () => {
+        const isAbsolute = (typeof this._commands[0] === 'string') && this._commands[0].startsWith('/');
+        return isAbsolute ? null : this._route;
+      }),
+      target: Defined.orElse(this._extras.target, () => {
+        if (this._extras.close) {
+          return undefined;
+        }
+        if (controlPressed || contextualViewId === undefined) {
+          return 'blank';
+        }
+        return contextualViewId;
+      }),
       activate: this._extras.activate ?? !controlPressed, // by default, the view is not activated if CTRL or META modifier key is pressed (same behavior as for browser links)
       blankPartId: this._extras.blankPartId || currentPartId,
     };
