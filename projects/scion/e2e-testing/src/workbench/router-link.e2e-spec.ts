@@ -170,6 +170,26 @@ test.describe('Workbench RouterLink', () => {
     await expect(await routerPagePO.viewTabPO.isPresent()).toBe(true);
   });
 
+  test('should close the current view without explicit target', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // GIVEN
+    const routerPagePO1 = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPagePO2 = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPagePO3 = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    // WHEN
+    await routerPagePO2.viewTabPO.click();
+    await routerPagePO2.enterPath('<empty>');
+    await routerPagePO2.checkClose(true);
+    await routerPagePO2.clickNavigateViaRouterLink();
+
+    // THEN
+    await expect(await routerPagePO1.viewTabPO.isPresent()).toBe(true);
+    await expect(await routerPagePO2.viewTabPO.isPresent()).toBe(false);
+    await expect(await routerPagePO3.viewTabPO.isPresent()).toBe(true);
+  });
+
   test('should close matching views', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 

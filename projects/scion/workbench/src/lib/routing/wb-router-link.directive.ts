@@ -69,8 +69,8 @@ export class WbRouterLinkDirective {
         return isAbsolute ? null : this._route;
       }),
       target: Defined.orElse(this._extras.target, () => {
-        if (this._extras.close) {
-          return undefined;
+        if (this._extras.close && this._commands.length) {
+          return undefined; // when closing a view, derive the target only if no path is set.
         }
         if (controlPressed || contextualViewId === undefined) {
           return 'blank';
