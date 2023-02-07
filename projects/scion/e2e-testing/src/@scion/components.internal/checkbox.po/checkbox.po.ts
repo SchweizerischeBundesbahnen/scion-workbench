@@ -24,6 +24,10 @@ export class SciCheckboxPO {
   public async toggle(check: boolean): Promise<void> {
     const isChecked = await this.isChecked();
 
+    // Ensure the value of the checkbox to be `false` when it is unchecked.
+    await this._locator.click();
+    await this._locator.click();
+
     if (check !== isChecked) {
       await this._locator.click();
     }
