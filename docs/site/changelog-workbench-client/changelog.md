@@ -6,6 +6,142 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.17](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.16...workbench-client-1.0.0-beta.17) (2023-02-10)
+
+
+### Bug Fixes
+
+* **workbench-client/router:** ignore matrix params to resolve views for navigation ([ce133bf](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ce133bf7efec1edb5bb078db28371969a3ed0208)), closes [#239](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239)
+
+
+### Features
+
+* **workbench-client/router:** support closing views that match a pattern ([4d39107](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4d391075d9e9e35a4ecf5497de6cfd03bc4ab67c)), closes [#240](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/240)
+
+
+### BREAKING CHANGES
+
+* **workbench-client/router:** adding support for closing views that match a pattern introduced a breaking change in the Workbench Router API.
+
+  The communication protocol between host and client is backward compatible, so you can upgrade the host and clients independently.
+
+  To migrate:
+  - Use `close=true` instead of `closeIfPresent=true` in navigation extras to instruct the router to close matching view(s).
+  - Parameters now support the asterisk wildcard value (`*`) to match views with any value for that parameter.
+
+  ### The following snippets illustrate how a migration could look like:
+
+  **Close views**
+  ```ts
+  // Capability
+  this.manifestService.registerCapability({
+    type: 'view',
+    qualifier: {component: 'user'},
+    params: [
+      {name: 'id', required: true},
+      {name: 'param', required: false},
+    ],
+    properties: {
+      path: 'user/:id',
+    },
+  });
+  
+  // Before migration: optional params affect view resolution
+  this.workbenchClientRouter.navigate({component: 'user'}, {target: 'blank', params: {id: 1, param: 1}}); // opens view 1
+  this.workbenchClientRouter.navigate({component: 'user'}, {target: 'blank', params: {id: 1, param: 2}}); // opens view 2
+  this.workbenchClientRouter.navigate({component: 'user'}, {close: true, params: {id: 1, param: 1}}); // closes view 1
+  this.workbenchClientRouter.navigate({component: 'user'}, {close: true, params: {id: 1, param: 2}}); // closes view 2
+  
+  // After migration: optional params do not affect view resolution
+  this.workbenchClientRouter.navigate({component: 'user'}, {target: 'blank', params: {id: 1, param: 1}}); // opens view 1
+  this.workbenchClientRouter.navigate({component: 'user'}, {target: 'blank', params: {id: 1, param: 2}}); // opens view 2
+  this.workbenchClientRouter.navigate({component: 'user'}, {close: true, params: {id: 1}}); // closes view 1 and view 2
+  ```
+  
+  **Close views matching a pattern (NEW)**
+  ```ts
+  // Capability
+  this.manifestService.registerCapability({
+    type: 'view',
+    qualifier: {component: 'team-member'},
+    params: [
+      {name: 'team', required: true},
+      {name: 'user', required: true},
+    ],
+    properties: {
+      path: 'team/:team/user/:user',
+    },
+  });
+  
+  // Open 4 views
+  this.workbenchClientRouter.navigate({component: 'team-member'}, {params: {team: 33, user: 11}});  // opens view 1
+  this.workbenchClientRouter.navigate({component: 'team-member'}, {params: {team: 33, user: 12}});  // opens view 2
+  this.workbenchClientRouter.navigate({component: 'team-member'}, {params: {team: 44, user: 11}});  // opens view 3
+  this.workbenchClientRouter.navigate({component: 'team-member'}, {params: {team: 44, user: 12}});  // opens view 4
+  
+  // Closes view 1
+  this.workbenchClientRouter.navigate({component: 'team-member'}, {close: true, params: {team: 33, user: 11}});
+  
+  // Closes view 1 and view 2
+  this.workbenchClientRouter.navigate({component: 'team-member'}, {close: true, params: {team: 33, user: '*'}});
+  
+  // Closes view 2 and view 4
+  this.workbenchClientRouter.navigate({component: 'team-member'}, {close: true, params: {team: '*', user: 12}});
+  
+  // Closes all views
+  this.workbenchClientRouter.navigate({component: 'team-member'}, {close: true, params: {team: '*', user: '*'}});
+  ```
+* **workbench-client/router:** ignoring matrix params to resolve views for navigation introduced a breaking change in the Workbench Router API.
+
+  The communication protocol between host and client is backward compatible, so you can upgrade the host and clients independently.
+
+  To migrate:
+  - Use `target=auto` instead of `activateIfPresent=true` in navigation extras.\
+    Using `auto` as the navigation target navigates existing view(s) that match the qualifier and required parameter(s), if any. If not finding a matching view, the navigation opens a new view. This is the default behavior if no target is specified.
+  - Use `target=blank` instead of `activateIfPresent=false` in navigation extras.\
+    Using `blank` as the navigation target always navigates in a new view.
+  - Use `target=<view.id>` instead of setting `target=self` and `selfViewId=<view.id>` in navigation extras.\
+    Setting a view id as the navigation target replaces the specified view, or creates a new view if not found.
+  - Use the property `activate`  in navigation extras to instruct the router to activate the view after navigation. Defaults to `true` if not specified.
+  - The router does not navigate the current view anymore. To navigate the current view, specify the current view as the navigation target in navigation extras.
+
+  ### The following snippets illustrate how a migration could look like:
+  
+  **Navigate existing view(s)**
+  ```ts
+  // Before migration
+  this.workbenchClientRouter.navigate({entity: 'person'}, {activateIfPresent: true});
+  
+  // After migration
+  this.workbenchClientRouter.navigate({entity: 'person'});
+  this.workbenchClientRouter.navigate({entity: 'person'}, {target: 'auto'}); // this is equivalent to the above statement
+  ```
+  
+  **Open view in new view tab**
+  ```ts
+  // Before migration
+  this.workbenchClientRouter.navigate({entity: 'person'}, {activateIfPresent: false});
+  
+  // After migration
+  this.workbenchClientRouter.navigate({entity: 'person'}, {target: 'blank'});
+  ```
+  
+  **Replace existing view**
+  ```ts
+  // Before migration
+  this.workbenchClientRouter.navigate({entity: 'person'}, {target: 'self', selfViewId: 'view.1'});
+  
+  // After migration
+  this.workbenchClientRouter.navigate({entity: 'person'}, {target: 'view.1'});
+  ```
+  
+  **Prevent view activation after navigation (NEW)**
+  ```ts
+  this.workbenchClientRouter.navigate({entity: 'person'}, {target: 'blank', activate: false});
+  ```
+
+
+
 # [1.0.0-beta.16](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.15...workbench-client-1.0.0-beta.16) (2022-12-21)
 
 
