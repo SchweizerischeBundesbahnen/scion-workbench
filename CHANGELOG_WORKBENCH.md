@@ -1,3 +1,134 @@
+# [15.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.9...15.0.0-beta.1) (2023-02-10)
+
+
+### Bug Fixes
+
+* **workbench/router:** do not throw error if closing a view via router link ([f0d4bde](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f0d4bde74640d0153ab173389d03e2afb41544d5))
+* **workbench/router:** ignore matrix params to resolve views for navigation ([ce133bf](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ce133bf7efec1edb5bb078db28371969a3ed0208)), closes [#239](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/239)
+
+
+### Dependencies
+
+* **workbench:** update @scion/workbench to Angular 15 ([f805faf](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f805faf5a637ea73ba68a168bd9d5f1bf37692be)), closes [#347](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/347)
+
+
+### Features
+
+* **workbench/router:** support closing the current view via router link without explicit target ([b9f03fd](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/b9f03fdadaa9a2d75ff8e8619dc0c446455d726c))
+* **workbench/router:** support closing views that match a pattern ([4d39107](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4d391075d9e9e35a4ecf5497de6cfd03bc4ab67c)), closes [#240](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/240)
+
+
+### BREAKING CHANGES
+
+* **workbench:** Updating `@scion/workbench` to Angular 15 introduced a breaking change.
+
+  To migrate:
+  - update your application to Angular 15.x; for detailed migration instructions, refer to https://v15.angular.io/guide/update-to-latest-version;
+  - update @scion/components to version 15; for detailed migration instructions, refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG_COMPONENTS.md;
+* **workbench/router:** adding support for closing views that match a pattern introduced a breaking change in the Workbench Router API.
+
+  The communication protocol between host and client is backward compatible, so you can upgrade the host and clients independently.
+
+  To migrate:
+  - Use `close=true` instead of `closeIfPresent=true` in navigation extras to instruct the router to close matching view(s).
+  - Matrix parameters do not affect view resolution anymore.
+  - The array of commands (path) now supports the asterisk wildcard segment (`*`) to match view(s) with any value in that segment.
+  - To close a specific view, set a view target instead of a path.
+
+  ### The following snippets illustrate how a migration could look like:
+
+  **Close views**
+  ```ts
+  // Before migration: matrix params affect view resolution
+  this.workbenchRouter.navigate(['/view', {param: 1}], {target: 'blank'}); // opens view 1
+  this.workbenchRouter.navigate(['/view', {param: 2}], {target: 'blank'}); // opens view 2
+  this.workbenchRouter.navigate(['/view', {param: 1}], {closeIfPresent: true}); // closes view 1
+  this.workbenchRouter.navigate(['/view', {param: 2}], {closeIfPresent: true}); // closes view 2
+  
+  // After migration: matrix params do not affect view resolution
+  this.workbenchRouter.navigate(['/view', {param: 1}], {target: 'blank'}); // opens view 1
+  this.workbenchRouter.navigate(['/view', {param: 2}], {target: 'blank'}); // opens view 2
+  this.workbenchRouter.navigate(['/view'], {close: true}); // closes view 1 and view 2
+  ```
+  
+  **Close views matching a pattern (NEW)**
+  ```ts
+  // Open 4 views
+  this.workbenchRouter.navigate(['team', 33, 'user', 11], {target: 'blank'});  // opens view 1
+  this.workbenchRouter.navigate(['team', 33, 'user', 12], {target: 'blank'});  // opens view 2
+  this.workbenchRouter.navigate(['team', 44, 'user', 11], {target: 'blank'});  // opens view 3
+  this.workbenchRouter.navigate(['team', 44, 'user', 12], {target: 'blank'});  // opens view 4
+  
+  // Closes view 1
+  this.workbenchRouter.navigate(['team', 33, 'user', 11], {close: true});
+  
+  // Closes view 1 and view 2
+  this.workbenchRouter.navigate(['team', 33, 'user', '*'], {close: true});
+  
+  // Closes view 2 and view 4
+  this.workbenchRouter.navigate(['team', '*', 'user', 12], {close: true});
+  
+  // Closes all views
+  this.workbenchRouter.navigate(['team', '*', 'user', '*'], {close: true});
+  ```
+  
+  **Close view by providing a viewId (NEW)**
+  ```ts
+  this.workbenchRouter.navigate([], {target: 'view.1', close: true});  // commands array has to be empty
+  ```
+  
+  > **_NOTE:_** The Workbench Router Link uses the exact same API as the Workbench Router, therefore the migration is identical.
+* **workbench/router:** ignoring matrix params to resolve views for navigation introduced a breaking change in the Workbench Router API.
+
+  The communication protocol between host and client is backward compatible, so you can upgrade the host and clients independently.
+
+  To migrate:
+  - Use `target=auto` instead of `activateIfPresent=true` in navigation extras.\
+    Using `auto` as the navigation target navigates existing view(s) that match the array of commands (path). If not finding a matching view, the navigation opens a new view. This is the default behavior if no target is specified.
+  - Use `target=blank` instead of `activateIfPresent=false` in navigation extras.\
+    Using `blank` as the navigation target always navigates in a new view.
+  - Use `target=<view.id>` instead of setting `target=self` and `selfViewId=<view.id>` in navigation extras.\
+    Setting a view id as the navigation target replaces the specified view, or creates a new view if not found.
+  - Use the property `activate` in navigation extras to instruct the router to activate the view after navigation. Defaults to `true` if not specified.
+  - If using WorkbenchRouterLink directive and pressing CTRL or META (Mac: ⌘, Windows: ⊞), the view is opened in a new view tab but not activated anymore. By setting the property `activate=true`, this behavior can be overwritten.
+
+  ### The following snippets illustrate how a migration could look like:
+
+  **Navigate existing view(s)**
+  ```ts
+  // Before migration
+  this.workbenchRouter.navigate(['/view'], {activateIfPresent: true});
+  
+  // After migration
+  this.workbenchRouter.navigate(['/view']);
+  this.workbenchRouter.navigate(['/view'], {target: 'auto'}); // this is equivalent to the above statement
+  ```
+  
+  **Open view in new view tab**
+  ```ts
+  // Before migration
+  this.workbenchRouter.navigate(['/view'], {activateIfPresent: false});
+  
+  // After migration
+  this.workbenchRouter.navigate(['/view'], {target: 'blank'});
+  ```
+  
+  **Replace existing view**
+  ```ts
+  // Before migration
+  this.workbenchRouter.navigate(['/view'], {target: 'self', selfViewId: 'view.1'});
+  
+  // After migration
+  this.workbenchRouter.navigate(['/view'], {target: 'view.1'});
+  ```
+  
+  **Prevent view activation after navigation (NEW)**
+  ```ts
+  this.workbenchRouter.navigate(['/view'], {target: 'blank', activate: false});
+  ```
+
+
+
 # [14.0.0-beta.9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/14.0.0-beta.8...14.0.0-beta.9) (2023-01-31)
 
 
