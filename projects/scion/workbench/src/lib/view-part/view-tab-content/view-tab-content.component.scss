@@ -65,7 +65,9 @@
     }
   }
 
-  &[context="tabbar"], &[context="drag-image"] {
+  // TODO [Angular 16] remove "is" selector when resolved issue https://github.com/angular/angular/issues/49100
+  // &[context="tabbar"], &[context="drag-image"] {
+  &:is([context="tabbar"], [context="drag-image"]) {
     > div.title {
       grid-column: 1/2;
       grid-row: 1/2;
@@ -87,7 +89,9 @@
     }
   }
 
-  &[context="tabbar-dropdown"] {
+  // TODO [Angular 16] remove "is" selector when resolved issue https://github.com/angular/angular/issues/49100
+  // &[context="tabbar-dropdown"] {
+  &:is([context="tabbar-dropdown"]) {
     column-gap: 1.5em;
 
     > div.title {
