@@ -65,20 +65,25 @@
     }
   }
 
-  // TODO [Angular 16] remove "is" selector when resolved issue https://github.com/angular/angular/issues/49100
-  // &[context="tabbar"], &[context="drag-image"] {
-  &:is([context="tabbar"], [context="drag-image"]) {
-    > div.title {
+
+  &[context="tabbar"], &[context="drag-image"] {
+    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    //> div.title {
+    div.title {
       grid-column: 1/2;
       grid-row: 1/2;
     }
 
-    > div.heading {
+    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    //> div.heading {
+    div.heading {
       grid-column: 1/3;
       grid-row: 2/3;
     }
 
-    > button.close {
+    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    //> button.close {
+    button.close {
       grid-column: 2/3;
       grid-row: 1/-1;
       justify-self: end;
@@ -89,22 +94,26 @@
     }
   }
 
-  // TODO [Angular 16] remove "is" selector when resolved issue https://github.com/angular/angular/issues/49100
-  // &[context="tabbar-dropdown"] {
-  &:is([context="tabbar-dropdown"]) {
+  &[context="tabbar-dropdown"] {
     column-gap: 1.5em;
 
-    > div.title {
+    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    //> div.title {
+    div.title {
       grid-column: 1/2;
       grid-row: 1/2;
     }
 
-    > div.heading {
+    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    //> div.heading {
+    div.heading {
       grid-column: 1/2;
       grid-row: 2/3;
     }
 
-    > button.close {
+    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    //> button.close {
+    button.close {
       grid-column: 2/3;
       grid-row: 1/-1;
       justify-self: end;
