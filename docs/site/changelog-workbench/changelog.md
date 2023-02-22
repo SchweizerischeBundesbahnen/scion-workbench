@@ -6,6 +6,15 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [15.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.2...15.0.0-beta.3) (2023-02-22)
+
+
+### Bug Fixes
+
+* **workbench/view:** fix position of close button in view tabs in development build ([34de1e9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/34de1e942a0ea395c95d13155a6349bea265bae7))
+
+
+
 # [15.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.1...15.0.0-beta.2) (2023-02-16)
 
 
