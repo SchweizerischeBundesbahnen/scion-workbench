@@ -26,9 +26,7 @@
 
   @font-face {
     font-family: 'scion-workbench-icons';
-    src: url($font-path +  'scion-workbench-icons.eot'); /* IE9 Compat Modes */
-    src: url($font-path + 'scion-workbench-icons.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-    url($font-path + 'scion-workbench-icons.woff') format('woff'), /* Pretty Modern Browsers */
+    src: url($font-path + 'scion-workbench-icons.woff') format('woff'), /* Pretty Modern Browsers */
     url($font-path + 'scion-workbench-icons.ttf') format('truetype'), /* Safari, Android, iOS */
     url($font-path + 'scion-workbench-icons.svg#scion-workbench-icons') format('svg'); /* Legacy iOS */
     font-weight: normal;
