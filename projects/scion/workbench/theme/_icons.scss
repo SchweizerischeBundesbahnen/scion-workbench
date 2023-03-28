@@ -26,11 +26,11 @@
 
   @font-face {
     font-family: 'scion-workbench-icons';
-    src: url($font-path +  'wb-icon.eot'); /* IE9 Compat Modes */
-    src: url($font-path + 'wb-icon.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-    url($font-path + 'wb-icon.woff') format('woff'), /* Pretty Modern Browsers */
-    url($font-path + 'wb-icon.ttf') format('truetype'), /* Safari, Android, iOS */
-    url($font-path + 'wb-icon.svg#wb-icon') format('svg'); /* Legacy iOS */
+    src: url($font-path +  'scion-workbench-icons.eot'); /* IE9 Compat Modes */
+    src: url($font-path + 'scion-workbench-icons.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url($font-path + 'scion-workbench-icons.woff') format('woff'), /* Pretty Modern Browsers */
+    url($font-path + 'scion-workbench-icons.ttf') format('truetype'), /* Safari, Android, iOS */
+    url($font-path + 'scion-workbench-icons.svg#scion-workbench-icons') format('svg'); /* Legacy iOS */
     font-weight: normal;
     font-style: normal;
     font-display: block;

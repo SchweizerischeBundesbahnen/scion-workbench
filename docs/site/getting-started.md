@@ -84,8 +84,8 @@ The workbench requires some global styles to be imported into `styles.scss`, as 
 
 ``` 
 
-Also, download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/wb-font/fonts.zip" download>here</a>, unzip it and put it into the folder `assets/fonts`.
-    
+Also, download the workbench icon files from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip" download>GitHub</a>, unzip them and place the extracted files in the `assets/fonts` folder.
+
 </details>
 
 <details>
