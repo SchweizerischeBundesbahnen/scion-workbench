@@ -40,11 +40,9 @@ export class ViewListButtonComponent {
   }
 
   @HostListener('click')
-  public openViewList(): void {
+  public onClick(): void {
     const config = new OverlayConfig({
       scrollStrategy: this._overlay.scrollStrategies.noop(),
-      hasBackdrop: true,
-      backdropClass: 'cdk-overlay-transparent-backdrop',
       disposeOnNavigation: true,
       positionStrategy: this._overlay.position()
         .flexibleConnectedTo(this._host)

@@ -45,7 +45,6 @@ export class ViewListComponent implements OnDestroy {
               private _overlayRef: OverlayRef,
               private _cd: ChangeDetectorRef) {
     this.installHiddenViewTabsListener();
-    this.installBackdropListener();
   }
 
   public onCloseViewTab(): void {
@@ -54,6 +53,16 @@ export class ViewListComponent implements OnDestroy {
 
   @HostListener('document:keydown.escape')
   public onEscape(): void {
+    this._overlayRef.dispose();
+  }
+
+  @HostListener('mousedown', ['$event'])
+  public onHostMouseDown(event: MouseEvent): void {
+    event.stopPropagation(); // Prevent closing the overlay when clicking an element of it.
+  }
+
+  @HostListener('document:mousedown')
+  public onDocumentMouseDown(): void {
     this._overlayRef.dispose();
   }
 
@@ -69,12 +78,6 @@ export class ViewListComponent implements OnDestroy {
           this._cd.markForCheck();
         }
       });
-  }
-
-  private installBackdropListener(): void {
-    this._overlayRef.backdropClick()
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(() => this._overlayRef.dispose());
   }
 
   public ngOnDestroy(): void {
