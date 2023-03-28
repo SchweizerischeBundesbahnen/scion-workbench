@@ -10,6 +10,11 @@
 
 @use 'sass:map';
 
+$default-icon-font-config: (
+  directory: '/assets/fonts',
+  filename: 'scion-workbench-icons'
+);
+
 /**
  * Installs icons used by the SCION Workbench as icon font named 'scion-workbench-icons'.
  *
@@ -21,14 +26,14 @@
  * ```
  */
 @mixin icon-font($theme) {
-  $font-path: map.get($theme, font-path);
-  $font-path: '/assets/fonts/' !default;
+  $icon-font-config: map.merge($default-icon-font-config, if(map.has-key($theme, icon-font), map.get($theme, icon-font), ()));
+  $path: map.get($icon-font-config, directory) + '/' + map.get($icon-font-config, filename);
 
   @font-face {
     font-family: 'scion-workbench-icons';
-    src: url($font-path + 'scion-workbench-icons.woff') format('woff'), /* Pretty Modern Browsers */
-    url($font-path + 'scion-workbench-icons.ttf') format('truetype'), /* Safari, Android, iOS */
-    url($font-path + 'scion-workbench-icons.svg#scion-workbench-icons') format('svg'); /* Legacy iOS */
+    src: url($path + '.ttf') format('truetype'),
+    url($path + '.woff') format('woff'),
+    url($path + '.svg' + '#scion-workbench-icons') format('svg');
     font-weight: normal;
     font-style: normal;
     font-display: block;

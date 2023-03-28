@@ -1,4 +1,28 @@
 /**
- * Public @scion/workbench SASS module entry point.
+ * Public SASS Module Entry Point for @scion/workbench
+ * ===================================================
+ *
+ * This module must be loaded by the application to style the workbench. Typically, this module is loaded from `styles.scss` file, as follows:
+ *
+ * ```scss
+ * @use '@scion/workbench';
+ * ```
+ *
+ * ## Theming
+ * By passing a config when loading this module, theme and styles of the workbench can be customized.
+ *
+ * #### Configure path to the workbench icon font
+ * The workbench requires some icons to be loaded. Directory and filename can be customized, as follows:
+ *
+ * ```scss
+ * @use '@scion/workbench' with (
+ *   $theme: (
+ *     icon-font: (
+ *       directory: '/path/to/font', // defaults to '/assets/fonts' if omitted
+ *       filename: 'icons' // defaults to 'scion-workbench-icons' if omitted
+ *     )
+ *   )
+ * );
+ * ```
  */
 @forward './theme';
