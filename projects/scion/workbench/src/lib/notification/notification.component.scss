@@ -56,10 +56,6 @@ $border-radius: 4px;
     padding: .25em .5em 0 0;
     font-size: 1.1em;
 
-    &::before {
-      content: '\e5cd';
-    }
-
     &:hover::before {
       font-weight: bold;
     }

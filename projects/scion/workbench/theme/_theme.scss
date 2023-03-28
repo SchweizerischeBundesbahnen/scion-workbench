@@ -13,7 +13,7 @@
  */
 
 @use '@angular/cdk';
-@use 'icon-font-theme' as wb-icon-font-theme;
+@use 'icons' as wb-icons;
 @use 'popup-theme' as wb-popup-theme;
 @use 'view-drag-theme' as wb-drag-theme;
 
@@ -21,6 +21,6 @@ $theme: () !default; // use default theme if not provided a theme
 
 @include cdk.a11y-visually-hidden();
 @include cdk.overlay();
-@include wb-icon-font-theme.icon-font($theme);
+@include wb-icons.icon-font($theme);
 @include wb-popup-theme.popup($theme);
 @include wb-drag-theme.view-tab-drag-image($theme);
