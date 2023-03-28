@@ -10,9 +10,17 @@
 
 @use 'sass:map';
 
+/**
+ * Current version of the icon font.
+ * This version is appended to the HTTP request as query parameter when fetching the icon font to support cache busting.
+ * Update this version when adding, removing or changing icons.
+ */
+$version: 1;
+
 $default-icon-font-config: (
   directory: '/assets/fonts',
-  filename: 'scion-workbench-icons'
+  filename: 'scion-workbench-icons',
+  version: $version,
 );
 
 /**
@@ -26,14 +34,15 @@ $default-icon-font-config: (
  * ```
  */
 @mixin icon-font($theme) {
-  $icon-font-config: map.merge($default-icon-font-config, if(map.has-key($theme, icon-font), map.get($theme, icon-font), ()));
-  $path: map.get($icon-font-config, directory) + '/' + map.get($icon-font-config, filename);
+  $effective-config: map.merge($default-icon-font-config, if(map.has-key($theme, icon-font), map.get($theme, icon-font), ()));
+  $path: map.get($effective-config, directory) + '/' + map.get($effective-config, filename);
+  $version: map.get($effective-config, version);
 
   @font-face {
     font-family: 'scion-workbench-icons';
-    src: url($path + '.ttf') format('truetype'),
-    url($path + '.woff') format('woff'),
-    url($path + '.svg' + '#scion-workbench-icons') format('svg');
+    src: url($path + '.ttf?' + $version) format('truetype'),
+    url($path + '.woff?' + $version) format('woff'),
+    url($path + '.svg?' + $version + '#scion-workbench-icons') format('svg');
     font-weight: normal;
     font-style: normal;
     font-display: block;

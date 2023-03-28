@@ -24,5 +24,21 @@
  *   )
  * );
  * ```
+ *
+ * #### Caching of the workbench icon font
+ * By default, when loading icon files, the workbench appends a version query parameter to the HTTP request, enabling browser cache invalidation when icons change.
+ * If using a project-specific workbench icon font, you can configure a custom version when importing the workbench sass module. Increment this version each time
+ * you change the icon font, as follows:
+ *
+ * ```scss
+ * @use '@scion/workbench' with (
+ *   $theme: (
+ *     icon-font: (
+ *       filename: 'custom-workbench-icons',
+ *       version: '1.0.0'
+ *     )
+ *   )
+ * );
+ * ```
  */
 @forward './theme';
