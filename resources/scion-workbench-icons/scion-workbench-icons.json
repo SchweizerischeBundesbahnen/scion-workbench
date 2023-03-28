@@ -1,0 +1,168 @@
+{
+  "metadata": {
+    "name": "scion-workbench-icons",
+    "lastOpened": 0,
+    "created": 1679390485415
+  },
+  "iconSets": [
+    {
+      "icons": [
+        {
+          "paths": [
+            "M406 598c106 0 192-86 192-192s-86-192-192-192-192 86-192 192 86 192 192 192zM662 598l212 212-64 64-212-212v-34l-12-12c-48 42-112 66-180 66-154 0-278-122-278-276s124-278 278-278 276 124 276 278c0 68-24 132-66 180l12 12h34z"
+          ],
+          "attrs": [
+            {}
+          ],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "search"
+          ],
+          "grid": 24,
+          "id": 1,
+          "defaultCode": 59648
+        },
+        {
+          "paths": [
+            "M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z"
+          ],
+          "attrs": [],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "close"
+          ],
+          "defaultCode": 58829,
+          "grid": 24,
+          "id": 2
+        },
+        {
+          "paths": [
+            "M884 300l-78 78-160-160 78-78c16-16 44-16 60 0l100 100c16 16 16 44 0 60zM128 736l472-472 160 160-472 472h-160v-160z"
+          ],
+          "attrs": [],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "mode_edit"
+          ],
+          "defaultCode": 57940,
+          "grid": 24,
+          "id": 3
+        }
+      ],
+      "height": 1024,
+      "metadata": {
+        "name": "scion-workbench-icons"
+      },
+      "preferences": {
+        "showGlyphs": true,
+        "showCodes": true,
+        "showQuickUse": true,
+        "showQuickUse2": true,
+        "showSVGs": true,
+        "fontPref": {
+          "prefix": "scion-workbench-icons",
+          "metadata": {
+            "fontFamily": "scion-workbench-icons",
+            "majorVersion": 1,
+            "minorVersion": 0
+          },
+          "metrics": {
+            "emSize": 1024,
+            "baseline": 6.25,
+            "whitespace": 50
+          },
+          "embed": false,
+          "showSelector": false,
+          "showMetrics": false,
+          "showMetadata": false,
+          "showVersion": false,
+          "noie8": true,
+          "ie7": false
+        },
+        "imagePref": {
+          "prefix": "icon-",
+          "png": true,
+          "useClassSelector": true,
+          "color": 0,
+          "bgColor": 16777215,
+          "classSelector": ".icon"
+        },
+        "historySize": 50,
+        "showLiga": true
+      },
+      "selection": [
+        {
+          "order": 30,
+          "id": 1,
+          "name": "search",
+          "prevSize": 24,
+          "code": 59648,
+          "tempChar": "",
+          "ligatures": "search, filter"
+        },
+        {
+          "ligatures": "close",
+          "id": 2,
+          "order": 31,
+          "prevSize": 24,
+          "code": 58829,
+          "name": "close",
+          "tempChar": ""
+        },
+        {
+          "ligatures": "dirty",
+          "id": 3,
+          "order": 32,
+          "prevSize": 24,
+          "code": 57940,
+          "name": "edit",
+          "tempChar": ""
+        }
+      ],
+      "prevSize": 24,
+      "id": 1,
+      "colorThemes": []
+    }
+  ],
+  "preferences": {
+    "showGlyphs": true,
+    "showCodes": true,
+    "showQuickUse": true,
+    "showQuickUse2": true,
+    "showSVGs": true,
+    "fontPref": {
+      "prefix": "scion-workbench-icons",
+      "metadata": {
+        "fontFamily": "scion-workbench-icons",
+        "majorVersion": 1,
+        "minorVersion": 0
+      },
+      "metrics": {
+        "emSize": 1024,
+        "baseline": 6.25,
+        "whitespace": 50
+      },
+      "embed": false,
+      "showSelector": false,
+      "showMetrics": false,
+      "showMetadata": false,
+      "showVersion": false,
+      "noie8": true,
+      "ie7": false
+    },
+    "imagePref": {
+      "prefix": "icon-",
+      "png": true,
+      "useClassSelector": true,
+      "color": 0,
+      "bgColor": 16777215,
+      "classSelector": ".icon"
+    },
+    "historySize": 50,
+    "showLiga": true
+  },
+  "uid": -1
+}

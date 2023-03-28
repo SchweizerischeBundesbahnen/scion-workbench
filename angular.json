@@ -122,8 +122,8 @@
                 "output": "/"
               },
               {
-                "glob": "wb-icon.*",
-                "input": "resources/wb-font/icomoon_generated/fonts",
+                "glob": "scion-workbench-icons.*",
+                "input": "resources/scion-workbench-icons/fonts",
                 "output": "/assets/fonts"
               },
               {
