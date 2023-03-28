@@ -35,7 +35,7 @@ export class ViewListButtonComponent {
               private _injector: Injector) {
   }
 
-  public get hiddenViewTabCount(): number {
+  public get count(): number {
     return this._viewPart.hiddenViewTabCount;
   }
 

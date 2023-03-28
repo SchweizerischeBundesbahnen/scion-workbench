@@ -1,60 +1,19 @@
-@use '../../../../theme/colors';
-
-$fgcolor: colors.$viewpart_tab-fgcolor;
-$bgcolor: colors.$viewpart_tabbar-bgcolor;
-$size: 14px;
-
 :host {
   display: flex;
-  align-items: center;
-  background-color: $bgcolor;
-  padding-left: .8em;
+  flex-direction: column;
   cursor: pointer;
+  padding: .5em;
+  align-items: center;
+  justify-content: center;
   user-select: none;
-  border-left: 1px solid colors.$viewpart_tabbar_separator-color;
 
-  > div.view-list-icon {
-    display: flex;
+  > span.chevron {
+    flex: none;
+  }
 
-    > div.menu-icon {
-      flex: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: $size;
-      width: $size;
-
-      > div.line {
-        border: 1px solid $fgcolor;
-        border-left: none;
-        border-right: none;
-        width: 100%;
-      }
-    }
-
-    > div.triangle-and-count {
-      flex: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      height: $size;
-      width: $size;
-
-      > div.triangle {
-        flex: none;
-        border: 4px solid transparent;
-        border-bottom-width: 0;
-        border-top-color: $fgcolor;
-      }
-
-      > span.hidden-view-count {
-        flex: none;
-        line-height: .7em;
-        font-size: .7em;
-        color: $fgcolor;
-      }
-    }
+  > span.count {
+    flex: none;
+    font-size: smaller;
   }
 }
 
