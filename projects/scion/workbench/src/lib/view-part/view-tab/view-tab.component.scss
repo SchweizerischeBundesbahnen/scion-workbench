@@ -28,9 +28,13 @@
     }
   }
 
-  &[context="tabbar-dropdown"]:hover {
-    background-color: rgba(239, 239, 239, .5);
-    box-shadow: 0 0 0 1px colors.$viewlistitem-border-color;
+  &[context="tabbar-dropdown"] {
+    padding: .25em 0;
+
+    &:hover {
+      background-color: rgba(239, 239, 239, .5);
+      box-shadow: 0 0 0 1px colors.$viewlistitem-border-color;
+    }
   }
 
   // disable pointer events on direct children if the view is blocked (not on the host element to allow dragging the viewtab)
