@@ -11,8 +11,8 @@
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {mergeMap, startWith, switchMap, takeUntil, tap} from 'rxjs/operators';
-import {BehaviorSubject, combineLatest, EMPTY, from, Observable, Subject, timer} from 'rxjs';
+import {mergeMap, startWith, switchMap, takeUntil} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, from, Observable, Subject} from 'rxjs';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {WorkbenchService} from '../../workbench.service';
@@ -20,7 +20,6 @@ import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {Arrays} from '@scion/toolkit/util';
 import {setCssVariable, unsetCssVariable} from '../../dom.util';
 import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
-import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 
 /**
  * Renders the view tabbar and viewpart actions, if any.
@@ -40,9 +39,6 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
 
   @ViewChild(SciViewportComponent, {static: true})
   private _viewport!: SciViewportComponent;
-
-  @ViewChild(ViewListButtonComponent, {static: true, read: ElementRef})
-  private _viewListButtonElement!: ElementRef<HTMLElement>;
 
   @ViewChildren(ViewTabComponent)
   public set injectViewTabs(queryList: QueryList<ViewTabComponent>) {
@@ -88,11 +84,6 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   public isTabDropSlotDragOver = false;
 
   /**
-   * Indicates if the user is auto scrolling the viewtabs.
-   */
-  public isAutoScroll = false;
-
-  /**
    * Locks the y-axis of the viewtab drag image to snap it to the tabbar while dragging over.
    */
   private constrainFn: ConstrainFn = (rect: ViewDragImageRect): ViewDragImageRect => {
@@ -118,7 +109,6 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     this.installActiveViewScroller();
     this.installScrolledIntoViewUpdater();
     this.installViewDragListener();
-    this.installAutoScroller();
   }
 
   @HostListener('dblclick', ['$event'])
@@ -299,18 +289,6 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
             this.onTabbarDrop();
             break;
         }
-      });
-  }
-
-  private installAutoScroller(): void {
-    this._viewDragService.viewDrag$(this._viewListButtonElement.nativeElement, {eventType: ['dragenter', 'dragleave', 'drop']})
-      .pipe(
-        tap(event => this.isAutoScroll = (event.type === 'dragenter')),
-        switchMap(() => this.isAutoScroll ? timer(0, 3) : EMPTY), // start or stop auto scroller
-        takeUntil(this._destroy$),
-      )
-      .subscribe(() => {
-        this._viewport.scrollLeft += 3;
       });
   }
 

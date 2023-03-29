@@ -43,9 +43,17 @@
 
   > wb-view-part-action-bar {
     flex: auto;
+
+    &.drag-over {
+      display: none;
+    }
   }
 
   > wb-view-list-button {
     flex: none;
+
+    &.drag-over {
+      display: none;
+    }
   }
 }

@@ -83,6 +83,7 @@ import {MicrofrontendPopupComponent} from './microfrontend-platform/microfronten
 import {MessageBoxModule} from './message-box/message-box.module';
 import {NotificationModule} from './notification/notification.module';
 import {WORKBENCH_POST_STARTUP} from './startup/workbench-initializer';
+import {HiddenViewTabCountPipe} from './view-part/view-part-bar/hidden-view-tab-count.pipe';
 
 @NgModule({
   imports: [
@@ -132,6 +133,7 @@ import {WORKBENCH_POST_STARTUP} from './startup/workbench-initializer';
     MicrofrontendPopupComponent,
     SplashComponent,
     PopupComponent,
+    HiddenViewTabCountPipe,
   ],
   exports: [
     WorkbenchComponent,
