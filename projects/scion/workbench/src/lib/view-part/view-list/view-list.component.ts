@@ -11,9 +11,12 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {combineLatest, Subject, switchMap} from 'rxjs';
+import {map, takeUntil} from 'rxjs/operators';
 import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {filterArray, mapArray} from '@scion/toolkit/operators';
 
 @Component({
   selector: 'wb-view-list',
@@ -21,13 +24,7 @@ import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
   styleUrls: ['./view-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
-    trigger('viewtabLeave', [
-      transition(':leave', [
-        style({height: '*'}),
-        animate('.25s ease-out', style({height: 0})),
-      ]),
-    ]),
-    trigger('showPopup', [
+    trigger('open', [
       transition(':enter', [
         style({height: 0}),
         animate('.25s ease-out', style({height: '*'})),
@@ -39,15 +36,17 @@ export class ViewListComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  public hiddenViewTabs: string[] = [];
+  public views = new Array<ɵWorkbenchView>();
 
   constructor(private _viewPart: ɵWorkbenchViewPart,
+              private _viewRegistry: WorkbenchViewRegistry,
               private _overlayRef: OverlayRef,
               private _cd: ChangeDetectorRef) {
-    this.installHiddenViewTabsListener();
+    this.installHiddenViewTabCollector();
   }
 
-  public onCloseViewTab(): void {
+  public onActivateView(): void {
+    // The view is activated in 'wb-view-tab' component.
     this._overlayRef.dispose();
   }
 
@@ -66,17 +65,25 @@ export class ViewListComponent implements OnDestroy {
     this._overlayRef.dispose();
   }
 
-  private installHiddenViewTabsListener(): void {
-    this._viewPart.hiddenViewTabs$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((hiddenViewTabs: string[]) => {
-        this.hiddenViewTabs = hiddenViewTabs;
-        if (hiddenViewTabs.length === 0) {
+  /**
+   * Collects views not scrolled into view in the tabbar of the current part.
+   */
+  private installHiddenViewTabCollector(): void {
+    this._viewPart.viewIds$
+      .pipe(
+        mapArray(viewId => this._viewRegistry.getElseThrow(viewId)),
+        switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),
+        filterArray(view => !view.scrolledIntoView),
+        takeUntil(this._destroy$),
+      )
+      .subscribe((views: ɵWorkbenchView[]) => {
+        if (!views.length) {
           this._overlayRef.dispose();
+          return;
         }
-        else {
-          this._cd.markForCheck();
-        }
+
+        this.views = views;
+        this._cd.markForCheck();
       });
   }
 

@@ -29,11 +29,12 @@ export class ɵWorkbenchView implements WorkbenchView {
 
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private _partId: string | null = null;
+  private _scrolledIntoView$ = new BehaviorSubject<boolean>(true);
 
   public title: string | null = null;
   public heading: string | null = null;
-  public dirty: boolean;
-  public closable: boolean;
+  public dirty = false;
+  public closable = true;
 
   public scrollTop = 0;
   public scrollLeft = 0;
@@ -54,8 +55,6 @@ export class ɵWorkbenchView implements WorkbenchView {
               private _viewActivationInstantProvider: ViewActivationInstantProvider = inject(ViewActivationInstantProvider)) {
     this.active$ = new BehaviorSubject<boolean>(false);
     this.cssClasses$ = new BehaviorSubject<string[]>([]);
-    this.dirty = false;
-    this.closable = true;
 
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbench.viewMenuItemProviders$])
       .pipe(
@@ -115,6 +114,30 @@ export class ɵWorkbenchView implements WorkbenchView {
       this.activationInstant = this._viewActivationInstantProvider.instant;
     }
     this.active$.next(activate);
+  }
+
+  /**
+   * Sets whether the tab of this view is scrolled into view in the tabbar.
+   */
+  public set scrolledIntoView(scrolledIntoView: boolean) {
+    if (scrolledIntoView !== this._scrolledIntoView$.value) {
+      this._scrolledIntoView$.next(scrolledIntoView);
+    }
+  }
+
+  /**
+   * Returns whether the tab of this view is scrolled into view in the tabbar.
+   */
+  public get scrolledIntoView(): boolean {
+    return this._scrolledIntoView$.value;
+  }
+
+  /**
+   * Informs whether the tab of this view is scrolled into view in the tabbar.
+   * Emits the current state upon subscription, and then continuously when the state changes.
+   */
+  public get scrolledIntoView$(): Observable<boolean> {
+    return this._scrolledIntoView$;
   }
 
   public get part(): WorkbenchViewPart {

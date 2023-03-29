@@ -172,17 +172,17 @@ export class ViewTabComponent implements OnDestroy {
   }
 
   /**
-   * Returns 'true' if this viewtab is fully scrolled into the viewport.
+   * Returns whether this tab is fully scrolled into view.
    */
-  public isVisibleInViewport(): boolean {
+  public isScrolledIntoView(): boolean {
     return this._viewport.isElementInView(this.host, 'full');
   }
 
   /**
-   * Scrolls this viewtab into the viewport if not fully visible in the viewport.
+   * Scrolls this tab into view.
    */
-  public scrollIntoViewport(): void {
-    if (!this.isVisibleInViewport()) {
+  public scrollIntoView(): void {
+    if (!this.isScrolledIntoView()) {
       this._viewport.scrollIntoView(this.host);
     }
   }

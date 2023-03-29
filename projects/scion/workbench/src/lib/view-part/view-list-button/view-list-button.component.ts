@@ -8,35 +8,43 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostBinding, HostListener, Injector} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, HostListener, Injector, OnDestroy} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewListComponent} from '../view-list/view-list.component';
+import {combineLatest, Subject, switchMap} from 'rxjs';
+import {map, takeUntil} from 'rxjs/operators';
 import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
+import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {mapArray} from '@scion/toolkit/operators';
 
 @Component({
   selector: 'wb-view-list-button',
   templateUrl: './view-list-button.component.html',
   styleUrls: ['./view-list-button.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewListButtonComponent {
+export class ViewListButtonComponent implements OnDestroy {
 
   private static readonly SOUTH: ConnectedPosition = {originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top'};
   private static readonly NORTH: ConnectedPosition = {originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom'};
 
+  private _destroy$ = new Subject<void>();
+
+  public count = 0;
+
   @HostBinding('class.visible')
   public get visible(): boolean {
-    return this._viewPart.hiddenViewTabCount > 0;
+    return this.count > 0;
   }
 
   constructor(private _viewPart: ɵWorkbenchViewPart,
               private _host: ElementRef,
               private _overlay: Overlay,
-              private _injector: Injector) {
-  }
-
-  public get count(): number {
-    return this._viewPart.hiddenViewTabCount;
+              private _injector: Injector,
+              private _viewRegistry: WorkbenchViewRegistry,
+              private _cd: ChangeDetectorRef) {
+    this.installHiddenViewTabCollector();
   }
 
   @HostListener('click')
@@ -57,5 +65,23 @@ export class ViewListButtonComponent {
     });
 
     overlayRef.attach(new ComponentPortal(ViewListComponent, null, injector));
+  }
+
+  private installHiddenViewTabCollector(): void {
+    this._viewPart.viewIds$
+      .pipe(
+        mapArray(viewId => this._viewRegistry.getElseThrow(viewId)),
+        switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),
+        map(views => views.reduce((count, view) => view.scrolledIntoView ? count : count + 1, 0)),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(count => {
+        this.count = count;
+        this._cd.markForCheck();
+      });
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }
