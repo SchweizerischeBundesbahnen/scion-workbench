@@ -11,16 +11,16 @@
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {switchMap, takeUntil, tap} from 'rxjs/operators';
-import {EMPTY, Observable, Subject, timer} from 'rxjs';
+import {mergeMap, startWith, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, EMPTY, from, Observable, Subject, timer} from 'rxjs';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {WorkbenchService} from '../../workbench.service';
-import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {Arrays} from '@scion/toolkit/util';
 import {setCssVariable, unsetCssVariable} from '../../dom.util';
 import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
+import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 
 /**
  * Renders the view tabbar and viewpart actions, if any.
@@ -35,15 +35,21 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
   private _host: HTMLElement;
-
-  @ViewChildren(ViewTabComponent)
-  private _viewTabs!: QueryList<ViewTabComponent>;
+  private _viewportChange$ = new Subject<void>();
+  private _viewTabs$ = new BehaviorSubject<ViewTabComponent[]>([]);
 
   @ViewChild(SciViewportComponent, {static: true})
   private _viewport!: SciViewportComponent;
 
   @ViewChild(ViewListButtonComponent, {static: true, read: ElementRef})
   private _viewListButtonElement!: ElementRef<HTMLElement>;
+
+  @ViewChildren(ViewTabComponent)
+  public set injectViewTabs(queryList: QueryList<ViewTabComponent>) {
+    queryList.changes
+      .pipe(startWith(queryList), takeUntil(this._destroy$))
+      .subscribe(queryList => this._viewTabs$.next(queryList.toArray()));
+  }
 
   /**
    * Transfer data of the view being dragged over this tabbar.
@@ -109,7 +115,8 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.installLayoutChangeListener();
+    this.installActiveViewScroller();
+    this.installScrolledIntoViewUpdater();
     this.installViewDragListener();
     this.installAutoScroller();
   }
@@ -125,30 +132,15 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
   }
 
   public onTabbarViewportDimensionChange(): void {
-    this.computeHiddenViewTabs();
+    this._viewportChange$.next();
   }
 
   public onTabbarViewportClientDimensionChange(): void {
-    this.computeHiddenViewTabs();
+    this._viewportChange$.next();
   }
 
   public onScroll(): void {
-    this.computeHiddenViewTabs();
-  }
-
-  /**
-   * Computes tabs which are not visible in the viewtabs viewport.
-   */
-  private computeHiddenViewTabs(): void {
-    this._viewTabs && this._viewPart.setHiddenViewTabs(this._viewTabs
-      .filter(viewTab => !viewTab.isDragSource())
-      .filter(viewTab => !viewTab.isVisibleInViewport())
-      .map(viewTab => viewTab.viewId));
-  }
-
-  private scrollActiveViewTabIntoViewport(): void {
-    // There may be no active view in the tabbar, e.g., when dragging the last view out of the tabbar.
-    this._viewTabs.find(viewTab => viewTab.active)?.scrollIntoViewport();
+    this._viewportChange$.next();
   }
 
   /**
@@ -195,7 +187,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
 
     // Compute if the user is dragging over a viewtab drop slot. A drop slot is some valid drop target within the tabbar,
     // which is either when dragging over a viewtab or the tabbar tail.
-    const lastViewTab = Arrays.last(this._viewTabs.toArray(), viewTab => viewTab !== this.dragSourceViewTab);
+    const lastViewTab = Arrays.last(this._viewTabs, viewTab => viewTab !== this.dragSourceViewTab);
     const viewTabsWidth = lastViewTab ? (lastViewTab.host.offsetLeft + lastViewTab.host.offsetWidth) : 0;
     this.isTabDropSlotDragOver = pointerOffsetX <= viewTabsWidth + this.dragData!.viewTabWidth;
   }
@@ -222,7 +214,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const dropIndex = this._viewTabs.toArray().indexOf(this.dropTargetViewTab!);
+    const dropIndex = this._viewTabs.indexOf(this.dropTargetViewTab!);
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: this.dragData!.appInstanceId,
@@ -256,10 +248,37 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
     unsetCssVariable(this._host, '--drag-source-width');
   }
 
-  private installLayoutChangeListener(): void {
-    this._workbenchLayoutService.onLayoutChange$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(() => this.scrollActiveViewTabIntoViewport());
+  private get _viewTabs(): ViewTabComponent[] {
+    return this._viewTabs$.value;
+  }
+
+  /**
+   * Scrolls the tab of the active view into view.
+   */
+  private installActiveViewScroller(): void {
+    this._viewTabs$
+      .pipe(
+        switchMap(viewTabs => combineLatest(viewTabs.map(viewTab => viewTab.view.active$))),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        // There may be no active view in the tabbar, e.g., when dragging the last view out of the tabbar.
+        this._viewTabs.find(viewTab => viewTab.active)?.scrollIntoView();
+      });
+  }
+
+  /**
+   * Updates {@link ɵWorkbenchView} when its tab is scrolled into view.
+   */
+  private installScrolledIntoViewUpdater(): void {
+    this._viewportChange$
+      .pipe(
+        mergeMap(() => from(this._viewTabs)),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(viewTab => {
+        viewTab.view.scrolledIntoView = (viewTab.isScrolledIntoView() || viewTab.isDragSource());
+      });
   }
 
   private installViewDragListener(): void {

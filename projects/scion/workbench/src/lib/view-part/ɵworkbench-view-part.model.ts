@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {MPart} from '../layout/parts-layout.model';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WbComponentPortal} from '../portal/wb-component-portal';
 import {inject} from '@angular/core';
@@ -23,8 +23,6 @@ import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 export class ɵWorkbenchViewPart implements WorkbenchViewPart {
 
   private _part!: MPart;
-  private _hiddenViewTabs = new Set<string>();
-  private _hiddenViewTabs$ = new BehaviorSubject<string[]>([]);
 
   public readonly viewIds$ = new BehaviorSubject<string[]>([]);
   public readonly actions$ = new BehaviorSubject<WorkbenchViewPartAction[]>([]);
@@ -127,20 +125,6 @@ export class ɵWorkbenchViewPart implements WorkbenchViewPart {
 
   public isActive(): boolean {
     return (this._workbenchLayoutService.layout?.activePart.partId === this.partId);
-  }
-
-  public setHiddenViewTabs(viewIds: string[]): void {
-    this._hiddenViewTabs.clear();
-    viewIds.forEach(viewId => this._hiddenViewTabs.add(viewId));
-    this._hiddenViewTabs$.next(viewIds);
-  }
-
-  public get hiddenViewTabCount(): number {
-    return this._hiddenViewTabs.size;
-  }
-
-  public get hiddenViewTabs$(): Observable<string[]> {
-    return this._hiddenViewTabs$;
   }
 
   public destroy(): void {

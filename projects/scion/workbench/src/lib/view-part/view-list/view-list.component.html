@@ -1,7 +1,7 @@
 <sci-viewport>
-  <ul @showPopup>
-    <li @viewtabLeave *ngFor="let hiddenViewTab of hiddenViewTabs">
-      <wb-view-tab [viewId]="hiddenViewTab" context="tabbar-dropdown" (click)="onCloseViewTab()"></wb-view-tab>
+  <ul @open>
+    <li *ngFor="let view of views">
+      <wb-view-tab [viewId]="view.viewId" context="tabbar-dropdown" (click)="onActivateView()"></wb-view-tab>
     </li>
   </ul>
 </sci-viewport>
