@@ -16,7 +16,3 @@
     font-size: smaller;
   }
 }
-
-:host-context:not(.visible) {
-  display: none;
-}
