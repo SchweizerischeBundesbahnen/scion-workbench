@@ -65,6 +65,11 @@
     }
   }
 
+  &.active[context="tabbar-dropdown"] {
+    > div.title, div.heading {
+      font-weight: bold;
+    }
+  }
 
   &[context="tabbar"], &[context="drag-image"] {
     // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
