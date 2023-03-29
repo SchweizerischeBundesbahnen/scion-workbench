@@ -59,7 +59,7 @@
     }
   }
 
-  &.active:not(.blocked), &:hover:not(.blocked) {
+  &.active:not(.blocked):not([context="tabbar-dropdown"]), &:hover:not(.blocked) {
     > button.close {
       visibility: visible;
     }
