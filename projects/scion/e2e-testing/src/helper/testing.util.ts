@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {filter, firstValueFrom, map, noop, pairwise, switchMap, timer} from 'rxjs';
+import {exhaustMap, filter, firstValueFrom, map, noop, pairwise, timer} from 'rxjs';
 
 /**
  * Returns if given CSS class is present on given element.
@@ -68,7 +68,7 @@ export async function waitUntilStable<A>(value: () => Promise<A> | A, options?: 
 
   const value$ = timer(0, options?.probeInterval ?? 100)
     .pipe(
-      switchMap(async () => await value()),
+      exhaustMap(async () => await value()),
       pairwise(),
       filter(([previous, current]) => options?.isStable ? options.isStable(previous, current) : previous === current),
       map(([previous]) => previous),
