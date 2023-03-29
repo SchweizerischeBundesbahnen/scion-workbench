@@ -1,3 +1,37 @@
+# [15.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.3...15.0.0-beta.4) (2023-04-04)
+
+
+### Bug Fixes
+
+* **workbench/theme:** remove Internet Explorer specific icon files ([02866e1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/02866e11796b511f8986e69ce106eaa5b4c61d98))
+* **workbench:** do not display close button of active view in the viewlist menu ([de07443](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/de074432709fc7703051f9ec3d867a8b5e10718f))
+* **workbench:** do not display viewlist menu button while dragging views ([3495d63](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3495d63f7d592a70717a7feef33051ff159549fd))
+* **workbench:** focus element which the user clicked to close the viewlist menu ([ac2a124](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ac2a124bd6cc7d474f27e31b34aff2ffeab780d0))
+* **workbench:** render larger gap between items  in the viewlist menu ([ecfe8a4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ecfe8a4e8f3879e76b802b5cd0370219fddb5e9a))
+* **workbench:** update @scion/components to display viewlist menu button only on tab overflow ([f169a72](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f169a723372fd3e02decf4e1a66e2e53d7381a70)), closes [scion-toolkit@22baab7](https://github.com/SchweizerischeBundesbahnen/scion-toolkit/commit/22baab78c4bdf34caeb99c750079cd415aca046)
+
+
+### Code Refactoring
+
+* **workbench/theme:** rename workbench icon files ([a7cbf6b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a7cbf6bcd876e655f53ea07077f743661741ee3f))
+
+
+### Features
+
+* **workbench/theme:** invalidate browser cache when workbench icons change ([1291bba](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/1291bba06f7e2f89145d5dd450892104132a9bdb))
+* **workbench/theme:** support configuration of a custom path to load workbench icon files ([bee949c](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/bee949c0e85fe431710e6d2a70bfaef74103bc70))
+* **workbench:** change icon of viewlist menu button to "chevron down" ([b7135e5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/b7135e5bf46e995b7d44fd766120c234a3a57ecb))
+* **workbench:** highlight active view in the viewlist menu ([6589db8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6589db87e4f1806cd757543f17e2b1da7e3fb6d1))
+
+
+### BREAKING CHANGES
+
+* **workbench/theme:** renaming workbench icon files introduced a breaking change.
+
+  To migrate, download the workbench icon files from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip" download>GitHub</a>, unzip them and place the extracted files in the `assets/fonts` folder.
+
+
+
 # [15.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.2...15.0.0-beta.3) (2023-02-22)
 
 
