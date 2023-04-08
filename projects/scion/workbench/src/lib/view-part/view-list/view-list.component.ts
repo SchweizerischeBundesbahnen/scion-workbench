@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,15 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {animate, style, transition, trigger} from '@angular/animations';
-import {combineLatest, Subject, switchMap} from 'rxjs';
-import {map, takeUntil} from 'rxjs/operators';
-import {ɵWorkbenchViewPart} from '../ɵworkbench-view-part.model';
+import {combineLatest, Observable, switchMap} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {filterArray, mapArray} from '@scion/toolkit/operators';
+import {WorkbenchView} from '../../view/workbench-view.model';
+import {mapArray} from '@scion/toolkit/operators';
+import {FormControl} from '@angular/forms';
+import {FilterFieldComponent} from '../../filter-field/filter-field.component';
+import {WorkbenchViewPart} from '../workbench-view-part.model';
 
 @Component({
   selector: 'wb-view-list',
@@ -32,17 +34,26 @@ import {filterArray, mapArray} from '@scion/toolkit/operators';
     ]),
   ],
 })
-export class ViewListComponent implements OnDestroy {
+export class ViewListComponent implements OnInit {
 
-  private _destroy$ = new Subject<void>();
+  public views$: Observable<WorkbenchView[]>;
+  public filterFormControl = new FormControl<string>('', {nonNullable: true});
 
-  public views = new Array<ɵWorkbenchView>();
+  @ViewChild(FilterFieldComponent, {static: true})
+  private _filterFieldComponent!: FilterFieldComponent;
 
-  constructor(private _viewPart: ɵWorkbenchViewPart,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _overlayRef: OverlayRef,
-              private _cd: ChangeDetectorRef) {
-    this.installHiddenViewTabCollector();
+  constructor(viewPart: WorkbenchViewPart,
+              viewRegistry: WorkbenchViewRegistry,
+              private _overlayRef: OverlayRef) {
+    this.views$ = viewPart.viewIds$
+      .pipe(
+        mapArray(viewId => viewRegistry.getElseThrow(viewId)),
+        switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),
+      );
+  }
+
+  public ngOnInit(): void {
+    this._filterFieldComponent.focus();
   }
 
   public onActivateView(): void {
@@ -66,28 +77,23 @@ export class ViewListComponent implements OnDestroy {
   }
 
   /**
-   * Collects views not scrolled into view in the tabbar of the current part.
+   * Returns the filter text of given view.
    */
-  private installHiddenViewTabCollector(): void {
-    this._viewPart.viewIds$
-      .pipe(
-        mapArray(viewId => this._viewRegistry.getElseThrow(viewId)),
-        switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),
-        filterArray(view => !view.scrolledIntoView),
-        takeUntil(this._destroy$),
-      )
-      .subscribe((views: ɵWorkbenchView[]) => {
-        if (!views.length) {
-          this._overlayRef.dispose();
-          return;
-        }
+  public viewTextFn = (view: WorkbenchView): string => {
+    return `${view.title ?? ''} ${view.heading ?? ''}`;
+  };
 
-        this.views = views;
-        this._cd.markForCheck();
-      });
-  }
+  /**
+   * Tests if given view is scrolled into view.
+   */
+  public scrolledIntoViewFilterFn = (view: WorkbenchView): boolean => {
+    return view.scrolledIntoView;
+  };
 
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
+  /**
+   * Tests if given view is scrolled out of view.
+   */
+  public scrolledOutOfViewFilterFn = (view: WorkbenchView): boolean => {
+    return !view.scrolledIntoView;
+  };
 }

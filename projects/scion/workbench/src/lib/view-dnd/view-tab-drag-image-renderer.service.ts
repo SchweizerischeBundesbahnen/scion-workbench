@@ -9,7 +9,7 @@
  */
 
 import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
-import {EMPTY, of, Subject} from 'rxjs';
+import {of, Subject} from 'rxjs';
 import {take, takeUntil} from 'rxjs/operators';
 import {createElement, setStyle} from '../dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
@@ -217,10 +217,10 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly blocked = false;
   public readonly cssClasses = [];
   public readonly urlSegments: UrlSegment[];
-  public readonly viewMenuItems$ = EMPTY;
   public readonly first = true;
   public readonly last = true;
   public readonly position = 0;
+  public readonly scrolledIntoView = true;
 
   constructor(dragData: ViewDragData) {
     this.viewId = dragData.viewId;

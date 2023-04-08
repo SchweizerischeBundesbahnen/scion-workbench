@@ -126,7 +126,7 @@ export class ɵWorkbenchView implements WorkbenchView {
   }
 
   /**
-   * Returns whether the tab of this view is scrolled into view in the tabbar.
+   * @inheritDoc
    */
   public get scrolledIntoView(): boolean {
     return this._scrolledIntoView$.value;

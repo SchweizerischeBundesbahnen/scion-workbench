@@ -26,6 +26,7 @@
   grid-template-columns: 1fr;
   grid-template-rows: 1.5em auto;
   padding: .5em 1em;
+  border-left: 3px solid transparent;
 
   &:not(.has-heading) {
     grid-template-rows: 1fr;
@@ -66,8 +67,16 @@
   }
 
   &.active[context="tabbar-dropdown"] {
+    border-left-color: black;
     > div.title, div.heading {
       font-weight: bold;
+    }
+  }
+
+  &:not(.scrolled-into-view)[context="tabbar-dropdown"] {
+    > div.title, div.heading {
+      opacity: .85;
+      font-style: italic;
     }
   }
 

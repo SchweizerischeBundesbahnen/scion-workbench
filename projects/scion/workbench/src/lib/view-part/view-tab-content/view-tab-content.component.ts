@@ -41,6 +41,11 @@ export class ViewTabContentComponent {
     return this.view.blocked;
   }
 
+  @HostBinding('class.scrolled-into-view')
+  public get isScrolledIntoView(): boolean {
+    return this.view.scrolledIntoView;
+  }
+
   public onClose(event: Event): void {
     event.stopPropagation(); // prevent the view from being activated
     this.view.close().then();

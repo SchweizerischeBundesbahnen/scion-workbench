@@ -85,6 +85,11 @@ export abstract class WorkbenchView {
   public abstract readonly last: boolean;
 
   /**
+   * Inidcates whether the tab of this view is scrolled into view in the tabbar.
+   */
+  public abstract readonly scrolledIntoView: boolean;
+
+  /**
    * Indicates whether this view is destroyed.
    */
   public abstract readonly destroyed: boolean;
