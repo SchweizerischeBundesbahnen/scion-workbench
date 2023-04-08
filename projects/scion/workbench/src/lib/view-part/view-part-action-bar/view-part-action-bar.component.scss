@@ -1,16 +1,25 @@
 :host {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 1em 0 1em;
+  gap: .5em;
 
   > ul {
+    flex: auto;
+    gap: .5em;
     display: flex;
-    flex-direction: row;
     align-items: center;
     list-style: none;
     margin: 0;
     padding: 0;
+
+    &.start {
+      padding-left: .75em;
+      place-content: flex-start;
+    }
+
+    &.end {
+      padding-right: .75em;
+      place-content: flex-end;
+    }
 
     > li {
       flex: none;
