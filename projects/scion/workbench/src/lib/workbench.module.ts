@@ -84,6 +84,7 @@ import {MessageBoxModule} from './message-box/message-box.module';
 import {NotificationModule} from './notification/notification.module';
 import {WORKBENCH_POST_STARTUP} from './startup/workbench-initializer';
 import {HiddenViewTabCountPipe} from './view-part/view-part-bar/hidden-view-tab-count.pipe';
+import {FilterFieldComponent} from './filter-field/filter-field.component';
 
 @NgModule({
   imports: [
@@ -134,6 +135,7 @@ import {HiddenViewTabCountPipe} from './view-part/view-part-bar/hidden-view-tab-
     SplashComponent,
     PopupComponent,
     HiddenViewTabCountPipe,
+    FilterFieldComponent,
   ],
   exports: [
     WorkbenchComponent,

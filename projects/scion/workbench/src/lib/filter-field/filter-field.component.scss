@@ -1,0 +1,48 @@
+@use '../../../theme/styles';
+
+:host {
+  display: inline-flex;
+  flex-direction: row;
+  gap: .5em;
+  padding: .25em .5em;
+
+  > label.filter-icon {
+    flex: none;
+    align-self: center;
+    user-select: none;
+    font-size: 1.5em;
+    opacity: .75;
+  }
+
+  > input {
+    flex: auto;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    padding: 0;
+    width: 0; // allows the input to shrink past UA minimal width
+  }
+
+  > button.clear {
+    flex: none;
+    @include styles.unset-button-default-style();
+    align-self: center;
+    opacity: .75;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &:focus-within:not(.disabled) {
+    > label.filter-icon {
+      opacity: 1;
+    }
+  }
+
+  &.disabled, &.empty {
+    > button.clear {
+      visibility: hidden;
+    }
+  }
+}
