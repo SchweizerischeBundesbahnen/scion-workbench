@@ -83,8 +83,10 @@ import {MicrofrontendPopupComponent} from './microfrontend-platform/microfronten
 import {MessageBoxModule} from './message-box/message-box.module';
 import {NotificationModule} from './notification/notification.module';
 import {WORKBENCH_POST_STARTUP} from './startup/workbench-initializer';
-import {HiddenViewTabCountPipe} from './view-part/view-part-bar/hidden-view-tab-count.pipe';
+import {FilterByTextPipe} from './filter-by-text.pipe';
+import {FilterByPredicatePipe} from './filter-by-predicate.pipe';
 import {FilterFieldComponent} from './filter-field/filter-field.component';
+import {EmptyIfNullPipe} from './empty-if-null.pipe';
 
 @NgModule({
   imports: [
@@ -134,7 +136,9 @@ import {FilterFieldComponent} from './filter-field/filter-field.component';
     MicrofrontendPopupComponent,
     SplashComponent,
     PopupComponent,
-    HiddenViewTabCountPipe,
+    FilterByTextPipe,
+    FilterByPredicatePipe,
+    EmptyIfNullPipe,
     FilterFieldComponent,
   ],
   exports: [
