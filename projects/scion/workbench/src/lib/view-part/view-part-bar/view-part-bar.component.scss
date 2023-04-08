@@ -5,55 +5,58 @@
   background-color: colors.$viewpart_tabbar-bgcolor;
   color: colors.$viewpart_tab-fgcolor;
   --drag-source-width: 0;
+  --drag-source-placeholder-width: 0;
 
   > sci-viewport.tabbar {
     // Use 'flex: initial' instead of 'flex: auto' to not grow to absorb any extra free space in the partbar,
     // so that left-aligned actions will directly follow the viewtabs.
     flex: initial;
 
-    div.viewport-client {
+    > div.viewport-client {
       display: flex;
       flex-flow: row nowrap;
-      position: relative; // positioning context for viewtabs to compute their position inside the tabbar
 
       > wb-view-tab {
         flex: none;
+
+        &.drag-source {
+          display: none;
+        }
       }
 
-      > wb-view-tab.drag-source:not(.drop-target) {
-        display: none;
+      > div.drag-image-placeholder {
+        flex: none;
+        width: var(--drag-source-placeholder-width);
       }
 
-      &.drag-over {
-        > wb-view-tab {
-          transition: transform 175ms cubic-bezier(0, 0, 0.2, 1);
-        }
+      // Shift drop target and subsequent tabs to the right.
+      > wb-view-tab.drop-target, wb-view-tab.drop-target ~ :is(wb-view-tab, div.drag-image-placeholder) {
+        transform: translateX(var(--drag-source-width));
+      }
+    }
+  }
 
-        > wb-view-tab.drop-target:not(.drag-source), > wb-view-tab.drop-target:not(.drag-source) ~ wb-view-tab {
-          transform: translateX(var(--drag-source-width));
-        }
+  &:not(.calculating-max-viewport-width) {
+    // Animate shifting tabs during drag and drop.
+    &.drag-enter, &.drag-over, &.drag-leave {
+      wb-view-tab {
+        transition: transform 175ms cubic-bezier(0, 0, 0.2, 1);
+      }
+    }
 
-        // do not animate views right to the drop-target if the drop-target is immediately following the drag-source
-        > wb-view-tab.drag-source + wb-view-tab.drop-target ~ wb-view-tab {
-          transition: none;
-        }
+    // Animate the drag image placeholder when entering or leaving the tabbar, but not when dragging over the tabbar, for instant feedback.
+    &.drag-enter, &.drag-leave {
+      div.drag-image-placeholder {
+        transition: width 175ms cubic-bezier(0, 0, 0.2, 1);
       }
     }
   }
 
   > wb-view-part-action-bar {
     flex: auto;
-
-    &.drag-over {
-      display: none;
-    }
   }
 
   > wb-view-list-button {
     flex: none;
-
-    &.drag-over {
-      display: none;
-    }
   }
 }

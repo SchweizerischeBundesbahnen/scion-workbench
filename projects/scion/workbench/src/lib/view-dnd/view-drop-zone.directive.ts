@@ -13,6 +13,7 @@ import {asapScheduler, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {createElement, ElementCreateOptions, setStyle} from '../dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
+import {subscribeInside} from '@scion/toolkit/operators';
 
 const DROP_REGION_MAX_SIZE = 150;
 const DROP_REGION_GAP = 20;
@@ -166,22 +167,23 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
   }
 
   private installDragListeners(): void {
-    this._viewDragService.viewDrag$(window, {capture: true, eventType: ['dragenter', 'dragleave', 'drop'], emitOutsideAngular: true})
+    // Activate the drop zone in `dragstart` (and not in `dragenter`) to have it installed on `dragenter`.
+    // Otherwise, when quickly dragging a tab out of the tabbar, activating the "next" view might destroy the
+    // related event target of `dragenter` (since it refers to an element of the view that is being deactivated)
+    // and thus corrupt the drag operation.
+    this._viewDragService.viewDragStart$
       .pipe(takeUntil(this._destroy$))
-      .subscribe((event: DragEvent) => {
-        switch (event.type) {
-          case 'dragenter':
-            this.activateDropZone();
-            break;
-          case 'dragleave':
-          case 'drop':
-            this.deactivateDropZone();
-            break;
-        }
-      });
+      .subscribe(() => this.activateDropZone());
 
-    this._viewDragService.viewDrag$(this._dropZoneOverlay, {emitOutsideAngular: true})
+    this._viewDragService.viewDragEnd$
       .pipe(takeUntil(this._destroy$))
+      .subscribe(() => this.deactivateDropZone());
+
+    this._viewDragService.viewDrag$(this._dropZoneOverlay)
+      .pipe(
+        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        takeUntil(this._destroy$),
+      )
       .subscribe((event: DragEvent) => {
         switch (event.type) {
           case 'dragover':
