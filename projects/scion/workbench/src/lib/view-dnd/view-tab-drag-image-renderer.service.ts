@@ -22,6 +22,7 @@ import {UrlSegment} from '@angular/router';
 import {Disposable} from '../disposable';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
+import {subscribeInside} from '@scion/toolkit/operators';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 
@@ -65,34 +66,22 @@ export class ViewTabDragImageRenderer implements OnDestroy {
     }
   }
 
+  private onWindowDragStart(event: DragEvent): void {
+    this.createDragImage(event);
+  }
+
   /**
-   * Method invoked when dragging a view into the current window. It is invoked ouside of the Angular zone.
+   * Method invoked when dragging a view into the current window. It is invoked outside the Angular zone.
    *
    * If the user starts the drag operation in the current window, this method is invoked immediately,
    * or when dragging the view tab into this window if started the drag operation in another window.
    */
   private onWindowDragEnter(event: DragEvent): void {
-    this._dragData = this._viewDragService.getViewDragData()!;
-    const dragPosition = this.computeDragImageRect(this._dragData, event);
-
-    // create the drag image
-    const outletElement = createElement('div', {
-      parent: document.body,
-      cssClass: 'wb-view-tab-drag-image',
-      style: {
-        left: `${dragPosition.x}px`,
-        top: `${dragPosition.y}px`,
-        width: `${dragPosition.width}px`,
-        height: `${dragPosition.height}px`,
-      },
-    });
-    this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._componentFactoryResolver, this._applicationRef, this._injector);
-    const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(this.createViewTabContentPortal());
-    componentRef.changeDetectorRef.detectChanges();
+    this.createDragImage(event);
   }
 
   /**
-   * Method invoked while dragging a view over the current window. It is invoked ouside of the Angular zone.
+   * Method invoked while dragging a view over the current window. It is invoked outside the Angular zone.
    */
   private onWindowDragOver(event: DragEvent): void {
     const dragPosition = this.computeDragImageRect(this._dragData!, event);
@@ -125,6 +114,30 @@ export class ViewTabDragImageRenderer implements OnDestroy {
       });
   }
 
+  private createDragImage(event: DragEvent): void {
+    if (this._viewDragImagePortalOutlet) {
+      return;
+    }
+
+    this._dragData = this._viewDragService.getViewDragData()!;
+    const dragPosition = this.computeDragImageRect(this._dragData, event);
+
+    // create the drag image
+    const outletElement = createElement('div', {
+      parent: document.body,
+      cssClass: 'wb-view-tab-drag-image',
+      style: {
+        left: `${dragPosition.x}px`,
+        top: `${dragPosition.y}px`,
+        width: `${dragPosition.width}px`,
+        height: `${dragPosition.height}px`,
+      },
+    });
+    this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._componentFactoryResolver, this._applicationRef, this._injector);
+    const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(this.createViewTabContentPortal(this._dragData));
+    componentRef.changeDetectorRef.detectChanges();
+  }
+
   private disposeDragImage(): void {
     this._viewDragImagePortalOutlet!.dispose();
     this._viewDragImagePortalOutlet = null;
@@ -132,23 +145,29 @@ export class ViewTabDragImageRenderer implements OnDestroy {
   }
 
   /**
-   * Gets the drag image client position and dimension, accounting for any constraints.
+   * Computes the drag image client position and dimension, accounting for any constraints.
    */
-  private computeDragImageRect(dragData: ViewDragData, event: DragEvent): ViewDragImageRect {
-    const rect: ViewDragImageRect = {
+  public computeDragImageRect(dragData: ViewDragData, event: DragEvent): ViewDragImageRect {
+    const rect = new ViewDragImageRect({
       x: event.clientX - dragData.viewTabPointerOffsetX,
       y: event.clientY - dragData.viewTabPointerOffsetY,
       height: dragData.viewTabHeight,
       width: dragData.viewTabWidth,
-    };
+    });
     return this._constrainDragImageRectFn ? this._constrainDragImageRectFn(rect) : rect;
   }
 
   private installWindowViewDragListener(): void {
-    this._viewDragService.viewDrag$(window, {emitOutsideAngular: true})
-      .pipe(takeUntil(this._destroy$))
+    this._viewDragService.viewDrag$(window)
+      .pipe(
+        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        takeUntil(this._destroy$),
+      )
       .subscribe((event: DragEvent) => {
         switch (event.type) {
+          case 'dragstart':
+            this.onWindowDragStart(event);
+            break;
           case 'dragenter':
             this.onWindowDragEnter(event);
             break;
@@ -165,11 +184,11 @@ export class ViewTabDragImageRenderer implements OnDestroy {
       });
   }
 
-  private createViewTabContentPortal(): ComponentPortal<any> {
+  private createViewTabContentPortal(viewDragData: ViewDragData): ComponentPortal<any> {
     const injector = Injector.create({
       parent: this._injector,
       providers: [
-        {provide: WorkbenchView, useValue: new DragImageWorkbenchView(this._dragData!)},
+        {provide: WorkbenchView, useValue: new DragImageWorkbenchView(viewDragData)},
         {provide: VIEW_TAB_CONTEXT, useValue: 'drag-image'},
       ],
     });
@@ -185,23 +204,36 @@ export class ViewTabDragImageRenderer implements OnDestroy {
 /**
  * Represents the position and dimension of the drag image.
  */
-export interface ViewDragImageRect {
+export class ViewDragImageRect {
+
   /**
    * Coordinate of the top left corner of the drag image in the "client" coordinate system.
    */
-  x: number;
+  public readonly x!: number;
   /**
    * Coordinate of the top left corner of the drag image in the "client" coordinate system.
    */
-  y: number;
+  public readonly y!: number;
   /**
    * Height of the drag image.
    */
-  height: number;
+  public readonly height!: number;
   /**
    * Width of the drag image.
    */
-  width: number;
+  public readonly width!: number;
+
+  constructor(rect: Omit<ViewDragImageRect, 'left' | 'right'>) {
+    Object.assign(this, rect);
+  }
+
+  public get left(): number {
+    return this.x;
+  }
+
+  public get right(): number {
+    return this.x + this.width;
+  }
 }
 
 class DragImageWorkbenchView implements WorkbenchView {

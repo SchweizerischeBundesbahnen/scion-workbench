@@ -1,22 +1,19 @@
 <sci-viewport class="tabbar" scrollbarStyle="hidden"
               sciDimension (sciDimensionChange)="onTabbarViewportDimensionChange()"
               (scroll)="onScroll()">
-  <div class="viewport-client" [class.drag-over]="isDragOver"
-       sciDimension (sciDimensionChange)="onTabbarViewportClientDimensionChange()">
+  <div class="viewport-client" sciDimension (sciDimensionChange)="onTabbarViewportClientDimensionChange()">
     <wb-view-tab *ngFor="let viewId of viewIds$ | async"
                  #viewtab
                  [viewId]="viewId"
                  context="tabbar"
-                 [class.drop-target]="viewtab === dropTargetViewTab"
-                 [class.drag-source]="viewtab === dragSourceViewTab">
+                 [class.drag-source]="viewtab === dragSourceViewTab"
+                 [class.drop-target]="viewtab === dropTargetViewTab">
     </wb-view-tab>
 
-    <!-- add a placeholder element to the tabbar end while the user is dragging a viewtab over this tabbar -->
-    <div *ngIf="isTabDropSlotDragOver && !isDragSourceDragOver"
-         [style.flex]="'none'"
-         [style.width.px]="dragData!.viewTabWidth">
-    </div>
+    <!-- Add a placeholder element to grow the viewport to fit the drag image. -->
+    <div class="drag-image-placeholder"></div>
   </div>
 </sci-viewport>
-<wb-view-part-action-bar [class.drag-over]="isDragOver"></wb-view-part-action-bar>
-<wb-view-list-button [class.drag-over]="isDragOver"></wb-view-list-button>
+
+<wb-view-part-action-bar/>
+<wb-view-list-button/>

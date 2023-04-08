@@ -23,6 +23,10 @@ export class PartActionPO {
     return isPresent(this._locator);
   }
 
+  public async isVisible(): Promise<boolean> {
+    return this._locator.isVisible();
+  }
+
   public async click(): Promise<void> {
     return this._locator.click();
   }

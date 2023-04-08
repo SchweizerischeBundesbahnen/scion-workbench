@@ -74,9 +74,7 @@ export class AppPO {
    * Handle to the specified part in the workbench layout.
    *
    * @param locateBy - Specifies how to locate the part.
-   *        <ul>
-   *          <li>partId: Identifies the part by its id</li>
-   *        </ul>
+   *        @property partId - Identifies the part by its id
    */
   public part(locateBy: {partId: string}): PartPO {
     return new PartPO(this.page.locator(`wb-view-part[data-partid="${locateBy.partId}"]`));
@@ -86,10 +84,8 @@ export class AppPO {
    * Handle to the specified view in the workbench layout.
    *
    * @param locateBy - Specifies how to locate the view. Either `viewId` or `cssClass` must be set.
-   *        <ul>
-   *          <li>viewId?: Identifies the view by its id</li>
-   *          <li>cssClass?: Identifies the view by its CSS class</li>
-   *        </ul>
+   *        @property viewId? - Identifies the view by its id
+   *        @property cssClass? - Identifies the view by its CSS class
    */
   public view(locateBy: {viewId?: string; cssClass?: string}): ViewPO {
     if (locateBy.viewId !== undefined) {

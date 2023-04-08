@@ -9,16 +9,17 @@
  */
 
 import {Injectable, NgZone} from '@angular/core';
-import {EMPTY, fromEvent, merge, Observable, Observer, of, Subject, TeardownLogic} from 'rxjs';
-import {filter, take, takeUntil} from 'rxjs/operators';
+import {EMPTY, fromEvent, merge, Observable, Observer, of, TeardownLogic, zip} from 'rxjs';
+import {filter, map, take} from 'rxjs/operators';
 import {BroadcastChannelService} from '../broadcast-channel.service';
-import {Arrays, Defined} from '@scion/toolkit/util';
+import {Arrays} from '@scion/toolkit/util';
 import {UrlSegment} from '@angular/router';
+import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 
 /**
  * Events fired during view drag and drop operation.
  */
-export type ViewDragEventType = 'dragenter' | 'dragover' | 'dragleave' | 'drop';
+export type ViewDragEventType = 'dragstart' | 'dragend' | 'dragenter' | 'dragover' | 'dragleave' | 'drop';
 /**
  * Transfer type for dragging a view.
  */
@@ -65,67 +66,100 @@ export class ViewDragService {
   }
 
   /**
-   * Allows listening natively for same-origin view drag events on the given target element.
+   * Listens for same-origin view drag events on the given target element.
+   *
+   * Unlike when installing a "native" event handler for `dragenter` and/or `dragleave` events,
+   * this observable does not emit when dragging over child elements of the target element.
    *
    * Following drag events are emitted:
+   * - dragstart: when start dragging a view tab
+   * - dragend: when end dragging a view tab
    * - dragenter: when entering the target element while dragging a view tab
    * - dragover: when dragging a view tab over the target element, every few hundred milliseconds
    * - dragleave: when leaving the target element while dragging a view tab
    * - drop: when dropping a view tab on a valid drop target
    *
-   * As by design of native drag and drop, the 'dragleave' event is not fired on drop action.
-   * Therefore, always handle both events, 'dragleave' and 'drop' events, respectively.
+   * As by design of native drag and drop, the `dragleave` event is not fired on drop action.
+   * Therefore, always handle both events, `dragleave` and `drop` events, respectively.
    *
-   * Unlike when registering natively an event listener for 'dragenter' or 'dragleave' events,
-   * the observable does not emit 'dragenter' or 'dragleave' events when dragging over the target's child elements.
+   * @param target - Specifies the element on which to subscribe for drag events.
+   * @param options - Controls how to subscribe for drag events.
+   *        @property eventType - Filters for specified drag events; defaults to any event.
+   *        @property capture - Controls whether to subscribe for drag events in the capturing phase; defaults to `false`, i.e., `bubbling` phase.
    */
   public viewDrag$(target: Element | Window, options?: ViewDragEventListenerOptions): Observable<DragEvent> {
-    const emitOutsideAngular = Defined.orElse(options && options.emitOutsideAngular, false);
-
-    const fromEvent$ = (eventName: ViewDragEventType): Observable<DragEvent> => {
-      if (!options || !options.eventType || Arrays.coerce(options.eventType).includes(eventName)) {
-        return fromEvent<DragEvent>(target, eventName, options ?? {});
-      }
-      return EMPTY;
-    };
+    const filteredEventTypes = new Set<string>(Arrays.coerce(options?.eventType));
+    const isViewDragEvent = this.isViewDragEvent.bind(this);
 
     return new Observable((observer: Observer<DragEvent>): TeardownLogic => {
-      const destroy$ = new Subject<void>();
+      const insideAngular = NgZone.isInAngularZone();
 
-      let dragEnterCount = 0;
-      this._zone.runOutsideAngular(() => {
-        merge(fromEvent$('dragenter'), fromEvent$('dragover'), fromEvent$('dragleave'), fromEvent$('drop'))
-          .pipe(
-            filter(event => this.isViewDragEvent(event)),
-            filter((event: DragEvent) => {
-              switch (event.type) {
-                case 'dragenter': {
-                  return (++dragEnterCount === 1);
-                }
-                case 'dragleave':
-                case 'drop': {
-                  return (--dragEnterCount === 0);
-                }
-                default:
-                  return true;
-              }
-            }),
-            takeUntil(destroy$),
-          )
-          .subscribe(event => {
-            NgZone.assertNotInAngularZone();
+      const subscription = merge(
+        shouldSubscribe('dragstart') ? dragstart$() : EMPTY,
+        shouldSubscribe('dragend') ? dragend$() : EMPTY,
+        shouldSubscribe('dragover') ? dragover$() : EMPTY,
+        shouldSubscribe('dragenter') || shouldSubscribe('dragleave') || shouldSubscribe('drop') ? dragenterOrDragleaveOrDrop$() : EMPTY,
+      )
+        .pipe(
+          subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+          observeInside(fn => insideAngular ? this._zone.run(fn) : this._zone.runOutsideAngular(fn)),
+        )
+        .subscribe(observer);
 
-            if (emitOutsideAngular) {
-              observer.next(event);
-            }
-            else {
-              this._zone.run(() => observer.next(event));
-            }
-          });
-      });
-
-      return (): void => destroy$.next();
+      return (): void => subscription.unsubscribe();
     });
+
+    function dragstart$(): Observable<DragEvent> {
+      return fromEvent<DragEvent>(target, 'dragstart', options ?? {})
+        .pipe(filter(event => isViewDragEvent(event)));
+    }
+
+    function dragend$(): Observable<DragEvent> {
+      // The `dragend` event does not contain a drag transfer type. To still filter view-related `dragend` events,
+      // we combine `dragstart` and `dragend` events, i.e., when a view-related `dragstart` event occurs, we expect
+      // the next `dragend` event to be view-related.
+      return zip(
+        fromEvent<DragEvent>(target, 'dragstart', options ?? {}).pipe(filter(event => isViewDragEvent(event))),
+        fromEvent<DragEvent>(target, 'dragend', options ?? {}),
+      ).pipe(map(([_, dragendEvent]) => dragendEvent));
+    }
+
+    function dragover$(): Observable<DragEvent> {
+      return fromEvent<DragEvent>(target, 'dragover', options ?? {})
+        .pipe(filter(event => isViewDragEvent(event)));
+    }
+
+    function dragenterOrDragleaveOrDrop$(): Observable<DragEvent> {
+      // We emit `dragenter` only when entering the target element (or any child element) for the first time
+      // and only again after entering it again. The same applies for `dragleave`.
+      let dragEnterCount = 0;
+      return merge(
+        fromEvent<DragEvent>(target, 'dragenter', options ?? {}),
+        fromEvent<DragEvent>(target, 'dragleave', options ?? {}),
+        fromEvent<DragEvent>(target, 'drop', options ?? {}),
+      )
+        .pipe(
+          filter(event => isViewDragEvent(event)),
+          filter((event: DragEvent) => {
+            switch (event.type) {
+              case 'dragenter': {
+                return (++dragEnterCount === 1);
+              }
+              case 'dragleave':
+              case 'drop': {
+                return (--dragEnterCount === 0);
+              }
+              default:
+                return true;
+            }
+          }),
+          filter(event => shouldSubscribe(event.type)),
+        );
+    }
+
+    function shouldSubscribe(eventType: string): boolean {
+      return !filteredEventTypes.size || filteredEventTypes.has(eventType);
+    }
   }
 
   /**
@@ -262,8 +296,4 @@ export interface ViewDragEventListenerOptions extends EventListenerOptions {
    * Allows filtering for given drag event types.
    */
   eventType?: ViewDragEventType | ViewDragEventType[];
-  /**
-   * Controls if to emit the event outside of the Angular zone which, by default, is false.
-   */
-  emitOutsideAngular?: boolean;
 }

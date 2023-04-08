@@ -20,30 +20,68 @@ export function createElement(tag: string, options: ElementCreateOptions): HTMLE
  * Specify styles to be modified by passing a dictionary containing CSS property names (hyphen case).
  * To remove a style, set its value to `null`.
  */
-export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, style: {[style: string]: any | null}): void {
+export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, styles: {[style: string]: any | null}): void {
   const target = coerceElement(element);
-  Object.keys(style).forEach(key => target.style.setProperty(key, style[key]));
+  Object.keys(styles).forEach(key => target.style.setProperty(key, styles[key]));
 }
 
 /**
- * Sets the given CSS variable to the given element.
+ * Sets specified CSS variable(s) to the given element.
  *
- * If not providing a value the variable is removed.
+ * To remove a CSS variable, set its value to `null`, or use {@link unsetCssVariable}.
  */
-export function setCssVariable(element: HTMLElement | ElementRef<HTMLElement>, key: string, value?: any): void {
-  if (value === undefined || value === null) {
-    unsetCssVariable(element, key);
-  }
-  else {
-    coerceElement(element).style.setProperty(key, value);
-  }
+export function setCssVariable(element: HTMLElement | ElementRef<HTMLElement>, variables: {[name: string]: any | null}): void {
+  const target = coerceElement(element);
+  Object.entries(variables).forEach(([name, value]) => {
+    if (value === null) {
+      target.style.removeProperty(name);
+    }
+    else {
+      target.style.setProperty(name, value);
+    }
+  });
 }
 
 /**
- * Removes the CSS variable of the given key.
+ * Removes specified CSS variable(s) from the given element.
  */
-export function unsetCssVariable(element: HTMLElement | ElementRef<HTMLElement>, key: string): void {
-  coerceElement(element).style.removeProperty(key);
+export function unsetCssVariable(element: HTMLElement | ElementRef<HTMLElement>, ...names: string[]): void {
+  const target = coerceElement(element);
+  names.forEach(name => target.style.removeProperty(name));
+}
+
+/**
+ * Sets specified CSS class(es) to the given element.
+ */
+export function setCssClass(element: HTMLElement | ElementRef<HTMLElement>, ...classes: string[]): void {
+  coerceElement(element).classList.add(...classes);
+}
+
+/**
+ * Removes specified CSS class(es) from the given element.
+ */
+export function unsetCssClass(element: HTMLElement | ElementRef<HTMLElement>, ...classes: string[]): void {
+  coerceElement(element).classList.remove(...classes);
+}
+
+/**
+ * Reads the current vertical and horizontal translation of given element.
+ */
+export function getCssTranslation(element: Element): {translateX: string | 'none'; translateY: string | 'none'} {
+  const transformStyle = getComputedStyle(element).getPropertyValue('transform');
+  if (transformStyle === 'none' || transformStyle === undefined) {
+    return {
+      translateX: 'none',
+      translateY: 'none',
+    };
+  }
+
+  // The transform property returns a matrix in the form `matrix(a, b, c, d, tx, ty)`, where `tx` is the horizontal translation and `ty` is the vertical translation.
+  const matrix = transformStyle.slice('matrix('.length, -1).split(/,\s+/);
+  return {
+    translateX: matrix[4],
+    translateY: matrix[5],
+  };
 }
 
 /**

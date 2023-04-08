@@ -77,4 +77,172 @@ test.describe('Viewpart Action', () => {
     await viewPagePO1.viewTabPO.close();
     await expect(await testeeActionButtonPO.isPresent()).toBe(false);
   });
+
+  test('should display actions when dragging view to the center', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'center'}, {performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view quickly to the center', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'center'}, {steps: 1, performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view to the north', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'north'}, {performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view quickly to the north', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'north'}, {steps: 1, performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view to the east', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'east'}, {performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view quickly to the east', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'east'}, {steps: 1, performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view to the south', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'south'}, {performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view quickly to the south', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'south'}, {steps: 1, performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view to the west', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'west'}, {performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions when dragging view quickly to the west', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'west'}, {steps: 1, performDrop: false});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions after drop', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'south'});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
+
+  test('should display actions after drop when dragging quickly', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
+
+    // Open a view
+    const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag the view
+    await viewPO.viewTabPO.dragToPart({region: 'south'}, {steps: 1});
+
+    // Expect action to display
+    await expect(await openNewTabActionButtonPO.isVisible()).toBe(true);
+  });
 });
