@@ -2,7 +2,7 @@
   "metadata": {
     "name": "scion-workbench-icons",
     "lastOpened": 0,
-    "created": 1679390485415
+    "created": 1680895759388
   },
   "iconSets": [
     {
@@ -119,15 +119,16 @@
           "ligatures": "chevron_down"
         },
         {
-          "order": 23,
+          "order": 26,
           "id": 1,
           "name": "search",
           "prevSize": 24,
           "code": 59648,
-          "tempChar": ""
+          "tempChar": "",
+          "ligatures": "search"
         },
         {
-          "ligatures": "close",
+          "ligatures": "close, clear",
           "id": 2,
           "order": 24,
           "prevSize": 24,
