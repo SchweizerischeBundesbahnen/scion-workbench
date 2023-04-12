@@ -38,7 +38,6 @@ export class ViewTabDragImageRenderer implements OnDestroy {
   private _destroy$ = new Subject<void>();
   private _viewDragImagePortalOutlet: DomPortalOutlet | null = null;
   private _constrainDragImageRectFn: ((rect: ViewDragImageRect) => ViewDragImageRect) | null = null;
-  private _dragData: ViewDragData | null = null;
 
   constructor(private _viewDragService: ViewDragService,
               private _workbenchModuleConfig: WorkbenchModuleConfig,
@@ -84,7 +83,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
    * Method invoked while dragging a view over the current window. It is invoked outside the Angular zone.
    */
   private onWindowDragOver(event: DragEvent): void {
-    const dragPosition = this.computeDragImageRect(this._dragData!, event);
+    const dragPosition = this.computeDragImageRect(this._viewDragService.viewDragData!, event);
 
     // update the drag image position
     setStyle(this._viewDragImagePortalOutlet!.outletElement as HTMLElement, {
@@ -119,8 +118,8 @@ export class ViewTabDragImageRenderer implements OnDestroy {
       return;
     }
 
-    this._dragData = this._viewDragService.getViewDragData()!;
-    const dragPosition = this.computeDragImageRect(this._dragData, event);
+    const dragData = this._viewDragService.viewDragData!;
+    const dragPosition = this.computeDragImageRect(dragData, event);
 
     // create the drag image
     const outletElement = createElement('div', {
@@ -134,14 +133,13 @@ export class ViewTabDragImageRenderer implements OnDestroy {
       },
     });
     this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._componentFactoryResolver, this._applicationRef, this._injector);
-    const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(this.createViewTabContentPortal(this._dragData));
+    const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(this.createViewTabContentPortal(dragData));
     componentRef.changeDetectorRef.detectChanges();
   }
 
   private disposeDragImage(): void {
     this._viewDragImagePortalOutlet!.dispose();
     this._viewDragImagePortalOutlet = null;
-    this._dragData = null;
   }
 
   /**

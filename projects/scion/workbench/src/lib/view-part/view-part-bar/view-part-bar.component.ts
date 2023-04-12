@@ -27,22 +27,22 @@ import {SciViewportComponent} from '@scion/components/viewport';
  * Tabs are added to a viewport, which the user can scroll if not enough space. The viewport grows with its tabs,
  * allowing actions to be placed directly after the last tab or on the right side.
  *
- * ## Drag And Drop Events
+ * ## Drag Events
  * We use native drag and drop to support dragging views to other windows.
  *
- * By listening to drag events, the tabbar visualizes tabs during a drag operation.
- * - The view drag operation is initiated in {@link ViewTabComponent}.
- * - The `dragstart` and `dragend` events are fired in the tabbar where the drag operation was initiated.
- * - The `dragenter` and `dragover` events are fired when dragging a tab over the tabbar.
- * - The `dragleave` event is fired when a tab leaves the tabbar.
- * - The `drop` event is fired when the user drops a tab in the tabbar.
- * - The `dragleave` event is not fired on drop action. Therefore, always handle both events, `dragleave` and `drop` events, respectively.
+ * By listening to drag events, the tabbar visualizes tabs during a drag operation. The drag operation is initiated in {@link ViewTabComponent}.
+ * - `dragstart` and `dragend` events are fired in the tabbar where the drag operation was initiated.
+ * - `dragenter` event is fired when a tab enters the tabbar.
+ * - `dragover` events are fired when dragging a tab over the tabbar.
+ * - `dragleave` event is fired when a tab leaves the tabbar.
+ * - `drop` event is fired when the user drops a tab in the tabbar.
+ * - Note that `dragleave` event is not fired on drop action. Therefore, always handle both events, `dragleave` and `drop` events, respectively.
  *
  * ## Terminology
- * - Drag Source: Tab that is being dragged.
- * - Drop Target: Tab before which to insert the drag source on drop, or `end` if dropping it after the last tab.
- * - Drag Image: Image for the tab to be dragged. We do not use the native drag image support to control drag image position and size,
- *               e.g., to snap the drag image to the tabbar when dragging near it.
+ * - Drag source: Tab that is being dragged.
+ * - Drop target: Tab before which to insert the drag source on drop, or `end` if dropping it after the last tab.
+ * - Drag image:  Image for the tab to be dragged. We do not use the native drag image support to control drag image position and size,
+ *                e.g., to snap the drag image to the tabbar when dragging near it.
  */
 @Component({
   selector: 'wb-view-part-bar',
@@ -148,7 +148,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const dragData = this._viewDragService.getViewDragData()!;
+    const dragData = this._viewDragService.viewDragData!;
     const dragSourceIndex = this._viewTabs.findIndex(viewTab => viewTab.viewId === dragData.viewId);
     const dragSourceViewTab = this._viewTabs[dragSourceIndex];
     const dropTargetViewTab = this._viewTabs[dragSourceIndex + 1] ?? 'end';
@@ -193,7 +193,7 @@ export class ViewPartBarComponent implements OnInit, OnDestroy {
    */
   private onTabbarDragEnter(event: DragEvent): void {
     this._dragenter$.next();
-    this._dragData = this._viewDragService.getViewDragData()!;
+    this._dragData = this._viewDragService.viewDragData!;
 
     // Inject constrain function into the drag image renderer to snap the drag image to the tabbar when dragging near it.
     this._constrainFn = this.computeDragImageConstrainFn();
