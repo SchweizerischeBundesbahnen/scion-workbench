@@ -148,7 +148,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
   private onDrop(event: DragEvent): void {
     const dropEvent: WbViewDropEvent = {
       dropRegion: this._dropRegion!,
-      dragData: this._viewDragService.getViewDragData()!,
+      dragData: this._viewDragService.viewDragData!,
       sourceEvent: event,
     };
 

@@ -54,8 +54,8 @@ export class WorkbenchLayoutService {
 
   constructor(viewDragService: ViewDragService) {
     this.dragging$ = merge(
-      merge(this._dragStart$, viewDragService.viewDragStart$).pipe(map<void, 'start'>(() => 'start')),
-      merge(this._dragEnd$, viewDragService.viewDragEnd$).pipe(map<void, 'end'>(() => 'end')),
+      merge(this._dragStart$, viewDragService.viewDragStart$).pipe(map((): 'start' => 'start')),
+      merge(this._dragEnd$, viewDragService.viewDragEnd$).pipe(map((): 'end' => 'end')),
     );
   }
 

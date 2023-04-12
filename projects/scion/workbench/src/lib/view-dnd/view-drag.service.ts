@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, NgZone} from '@angular/core';
-import {EMPTY, fromEvent, merge, Observable, Observer, of, TeardownLogic, zip} from 'rxjs';
-import {filter, map, take} from 'rxjs/operators';
-import {BroadcastChannelService} from '../broadcast-channel.service';
+import {Injectable, NgZone, OnDestroy} from '@angular/core';
+import {EMPTY, fromEvent, merge, Observable, Observer, of, Subject, TeardownLogic, zip} from 'rxjs';
+import {filter, map, take, takeUntil} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegment} from '@angular/router';
+import {WorkbenchBroadcastChannel} from '../workbench-broadcast-channel';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 
 /**
@@ -24,45 +24,57 @@ export type ViewDragEventType = 'dragstart' | 'dragend' | 'dragenter' | 'dragove
  * Transfer type for dragging a view.
  */
 export const VIEW_DRAG_TRANSFER_TYPE = 'workbench/view';
-/**
- * The view move event is fired when a view is being moved.
- */
-const VIEW_MOVE_EVENT_TYPE = 'workbench/view/move';
-/**
- * The view dragstart event is fired when the user starts dragging a viewtab.
- */
-const VIEW_DRAGSTART_EVENT_TYPE = 'workbench/view/dragstart';
-/**
- * The view dragend event is fired when the user ends dragging a viewtab.
- */
-const VIEW_DRAGEND_EVENT_TYPE = 'workbench/view/dragend';
-/**
- * Key to register drag data in local storage during a view drag operation.
- */
-const VIEW_DRAG_DATA_STORAGE_KEY = 'workbench/view-drag-data';
 
 /**
  * Manages the drag & drop behavior when the user drags a view.
  */
 @Injectable()
-export class ViewDragService {
+export class ViewDragService implements OnDestroy {
 
   /**
-   * Indicates if this app is the drag source for the ongoing drag operation (if any).
+   * Reference to the view drag data of the ongoing view drag operation, if any, or `null` otherwise.
    */
-  private _isDragSource = false;
+  private _viewDragData: ViewDragData | null = null;
 
-  constructor(private _broadcastChannel: BroadcastChannelService, private _zone: NgZone) {
-    fromEvent(window, 'unload')
-      .pipe(take(1))
-      .subscribe(() => this.unsetViewDragData());
+  private _viewDragStartBroadcastChannel = new WorkbenchBroadcastChannel<ViewDragData>('workbench/view/dragstart');
+  private _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
+  private _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
+
+  private _destroy$ = new Subject<void>();
+
+  /**
+   * Emits when the user starts dragging a viewtab. The event is received across app instances of the same origin.
+   */
+  public readonly viewDragStart$: Observable<ViewDragData> = this._viewDragStartBroadcastChannel.observe$;
+
+  /**
+   * Emits when the user ends dragging a viewtab. The event is received across app instances of the same origin.
+   */
+  public readonly viewDragEnd$: Observable<void> = this._viewDragEndBroadcastChannel.observe$;
+
+  /**
+   * Emits when the user moves a view. The event is received across app instances of the same origin.
+   */
+  public readonly viewMove$: Observable<ViewMoveEvent> = this._viewMoveBroadcastChannel.observe$;
+
+  constructor(private _zone: NgZone) {
+    this.viewDragStart$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(viewDragData => {
+        this._viewDragData = viewDragData;
+      });
+    this.viewDragEnd$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(() => {
+        this._viewDragData = null;
+      });
   }
 
   /**
    * Checks if the given event is a view drag event with the same origin.
    */
   public isViewDragEvent(event: DragEvent): boolean {
-    return !!event.dataTransfer && event.dataTransfer.types.includes(VIEW_DRAG_TRANSFER_TYPE) && this.getViewDragData() !== null;
+    return !!event.dataTransfer && event.dataTransfer.types.includes(VIEW_DRAG_TRANSFER_TYPE) && this.viewDragData !== null;
   }
 
   /**
@@ -169,33 +181,11 @@ export class ViewDragService {
     // Wait to dispatch the event until the drag operation finished, if any, because if the drag source element
     // is destroyed during the drag operation, e.g. if moved to another viewpart, the drag operation would not
     // ordinarily complete, meaning 'dragend' or 'dragleave' would not be called.
-    const isDragging = this.getViewDragData() !== null;
+    const isDragging = this.viewDragData !== null;
     (isDragging ? this.viewDragEnd$ : of(undefined))
       .pipe(take(1))
-      .subscribe(() => {
-        this._broadcastChannel.postMessage(VIEW_MOVE_EVENT_TYPE, event);
-      });
-  }
+      .subscribe(() => this._viewMoveBroadcastChannel.postMessage(event));
 
-  /**
-   * Emits when the user moves a view. The event is received across app instances of the same origin.
-   */
-  public get viewMove$(): Observable<ViewMoveEvent> {
-    return this._broadcastChannel.message$(VIEW_MOVE_EVENT_TYPE);
-  }
-
-  /**
-   * Emits when the user starts dragging a viewtab. The event is received across app instances of the same origin.
-   */
-  public get viewDragStart$(): Observable<void> {
-    return this._broadcastChannel.message$(VIEW_DRAGSTART_EVENT_TYPE);
-  }
-
-  /**
-   * Emits when the user ends dragging a viewtab. The event is received across app instances of the same origin.
-   */
-  public get viewDragEnd$(): Observable<void> {
-    return this._broadcastChannel.message$(VIEW_DRAGEND_EVENT_TYPE);
   }
 
   /**
@@ -204,9 +194,7 @@ export class ViewDragService {
    * Invoke this method inside 'dragstart' event handler of the element where the drag operation started.
    */
   public setViewDragData(viewDragData: ViewDragData): void {
-    localStorage.setItem(VIEW_DRAG_DATA_STORAGE_KEY, JSON.stringify(viewDragData));
-    this._isDragSource = true;
-    this._broadcastChannel.postMessage(VIEW_DRAGSTART_EVENT_TYPE);
+    this._viewDragStartBroadcastChannel.postMessage(viewDragData);
   }
 
   /**
@@ -215,19 +203,21 @@ export class ViewDragService {
    * Invoke this method inside 'dragend' event handler of the element where the drag operation started.
    */
   public unsetViewDragData(): void {
-    if (this._isDragSource) {
-      localStorage.removeItem(VIEW_DRAG_DATA_STORAGE_KEY);
-      this._isDragSource = false;
-      this._broadcastChannel.postMessage(VIEW_DRAGEND_EVENT_TYPE);
-    }
+    this._viewDragEndBroadcastChannel.postMessage();
   }
 
   /**
-   * Returns the view drag data of the ongoing view drag operation, if any, or `null` otherwise.
+   * Returns the view drag data of the ongoing view drag operation or `null` if no drag operation is in progress.
    */
-  public getViewDragData(): ViewDragData | null {
-    const viewDragData = localStorage.getItem(VIEW_DRAG_DATA_STORAGE_KEY);
-    return viewDragData ? JSON.parse(viewDragData) : null;
+  public get viewDragData(): ViewDragData | null {
+    return this._viewDragData;
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
+    this._viewMoveBroadcastChannel.destroy();
+    this._viewDragStartBroadcastChannel.destroy();
+    this._viewDragEndBroadcastChannel.destroy();
   }
 }
 
