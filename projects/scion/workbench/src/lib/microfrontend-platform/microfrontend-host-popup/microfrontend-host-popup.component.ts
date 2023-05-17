@@ -16,6 +16,7 @@ import {Router, RouterOutlet} from '@angular/router';
 import {Popup} from '../../popup/popup.config';
 import {NgTemplateOutlet} from '@angular/common';
 import {Defined} from '@scion/toolkit/util';
+import {POPUP_ID_PREFIX} from '../../workbench.constants';
 
 /**
  * Displays the microfrontend of a popup capability provided by the host inside a workbench popup.
@@ -45,7 +46,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
     const capability = popupContext.capability;
     const path = Defined.orElseThrow(capability.properties.path, () => Error(`[PopupProviderError] Missing required path for popup capability: ${JSON.stringify(capability)}`));
     const params = popupContext.params;
-    this.outletName = `popup.${popupContext.popupId}`;
+    this.outletName = POPUP_ID_PREFIX.concat(popupContext.popupId);
     this.outletInjector = Injector.create({
       parent: injector,
       providers: [provideWorkbenchPopupHandle(popupContext)],
@@ -68,7 +69,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
 
     const outletCommands: Commands | null = (path !== null ? RouterUtils.segmentsToCommands(RouterUtils.parsePath(this._router, path)) : null);
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
-    return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'merge'});
+    return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'});
   }
 
   public ngOnDestroy(): void {

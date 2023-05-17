@@ -3,48 +3,46 @@
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
 | --- | --- | --- | --- | --- |
 
-<p align="center">
-  <a href="https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md">
-      <img src="/docs/site/images/microfrontend-platform-promotion.svg" alt="Microfrontend Platform Promotion" height="250">
-  </a>
-</p>
-
 ## SCION Workbench
 
-**The SCION Workbench provides a workbench layout for Angular applications.**
+SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop. The workbench layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel. Examples include specialized business applications, scientific or development tools, as well as command & control interfaces.
 
-Workbench layouts are useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel. Examples include specialized business applications, scientific or development tools, as well as command & control interfaces.
-
-The SCION Workbench supports tabbed views that enable users to arrange content to fit their individual needs. Fixed areas can be defined to display additional information or context-sensitive assistance. In addition, typical workbench controls such as overlays, message boxes, and notification ribbons are available.
-
-
-[<img src="/docs/site/images/workbench-layout.svg">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout.svg)
-
-Although SCION Workbench is designed for use in Angular applications, its workbench layout is particularly well suited for implementing a framework-agnostic microfrontend architecture, as different web applications can contribute views in the form of microfrontends. SCION Workbench has built-in microfrontend support from the [SCION Microfrontend Platform][link-scion-microfrontend-platform], a lightweight library for embedding microfrontends. Microfrontends embedded as views can interact seamlessly with the workbench using the [SCION Workbench Client][link-scion-workbench-client] or communicate with other microfrontends via the SCION Microfrontend Platform. Any web application can be integrated as a workbench view. Likewise, a workbench view can embed further microfrontends, and so on.
+[Learn more about the SCION Workbench.][link-overview]
 
 ***
 
 #### Quickstart
 
-- [**How SCION Workbench can help you**][link-about]\
-  Get an overview of the SCION Workbench.
+- [**Getting Started**][link-getting-started]\
+  Follow these steps to install the SCION Workbench in your project and start with a basic introduction to the SCION Workbench.
+
+- [**How To Guides**][link-howto]\
+  Get answers to the most common questions when developing an application with the SCION Workbench.
+
+#### Workbench Applications
+
+- [**SCION Workbench Demo**][link-demo-app]\
+  See a live demo of the SCION Workbench.
+
+- [**SCION Workbench Testing App**][link-testing-app]\
+  Visit our technical testing application to explore the workbench and experiment with its features.
+
+- [**SCION Workbench Getting Started App**][link-getting-started-app]\
+  Open the application developed in the [Getting Started][link-getting-started] guide.
+
+#### Documentation
+
+- [**About SCION Workbench**][link-overview]\
+  Learn more about the SCION Workbench.
+
+- [**Workbench and Microfrontends**][link-microfrontend-integration]\
+  Consider adopting a microfrontend architecture with SCION Workbench.
 
 - [**Features**][link-features]\
   Get an overview of existing and planned features of the SCION Workbench.
- 
-- [**Installation and Getting Started**][link-getting-started]\
-  Follow these steps to install the SCION Workbench in your project and start with a gentle introduction to the essentials of the SCION Workbench.
 
-#### Miscellaneous  
+#### Announcements  
 
-- [**SCION Workbench Demo**][link-demo]\
-  See a live demo of the SCION Workbench.
-  
-  To explore the workbench and experiment with its features, you can play around with our technical demo app, available at the following URL: https://scion-workbench-testing-app.vercel.app.
-  
-- [**How To Guides**][link-howto]\
-  Get answers to the most common questions when developing an application with SCION Workbench.
-  
 - [**Announcements**][link-announcements]\
   Get the latest news about the further development of the SCION Workbench.
 
@@ -70,12 +68,13 @@ Although SCION Workbench is designed for use in Angular applications, its workbe
 [link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions
 [link-github-actions-workflow:status]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/workflows/Continuous%20Integration%20and%20Delivery/badge.svg?branch=master&event=push
 
-[link-scion-microfrontend-platform]: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md
-[link-scion-workbench-client]: https://www.npmjs.com/package/@scion/workbench-client
-[link-about]: /docs/site/about.md
+[link-overview]: /docs/site/overview.md
+[link-microfrontend-integration]: /docs/site/microfrontend-integration.md
 [link-getting-started]: /docs/site/getting-started.md
 [link-howto]: /docs/site/howto/how-to.md
-[link-demo]: https://schweizerischebundesbahnen.github.io/scion-workbench-demo/#/(view.24:person/64//view.22:person/32//view.5:person/79//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuMjQiLCJ2aWV3LjI0Il0sInNhc2gyIjpbInZpZXdwYXJ0LjMiLCJ2aWV3LjIyIiwidmlldy41Iiwidmlldy4yMiJdLCJzcGxpdHRlciI6MC41MTk0Mzg0NDQ5MjQ0MDY2LCJoc3BsaXQiOmZhbHNlfSwic3BsaXR0ZXIiOjAuNTU5NDI0MzI2ODMzNzk3NSwiaHNwbGl0Ijp0cnVlfSwic3BsaXR0ZXIiOjAuMzIyNjI3NzM3MjI2Mjc3MywiaHNwbGl0IjpmYWxzZX0%3D
+[link-demo-app]: https://schweizerischebundesbahnen.github.io/scion-workbench-demo/#/(view.24:person/64//view.22:person/32//view.5:person/79//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuMjQiLCJ2aWV3LjI0Il0sInNhc2gyIjpbInZpZXdwYXJ0LjMiLCJ2aWV3LjIyIiwidmlldy41Iiwidmlldy4yMiJdLCJzcGxpdHRlciI6MC41MTk0Mzg0NDQ5MjQ0MDY2LCJoc3BsaXQiOmZhbHNlfSwic3BsaXR0ZXIiOjAuNTU5NDI0MzI2ODMzNzk3NSwiaHNwbGl0Ijp0cnVlfSwic3BsaXR0ZXIiOjAuMzIyNjI3NzM3MjI2Mjc3MywiaHNwbGl0IjpmYWxzZX0%3D
+[link-testing-app]: https://scion-workbench-testing-app.vercel.app
+[link-getting-started-app]: https://scion-workbench-getting-started.vercel.app
 [link-features]: /docs/site/features.md
 [link-announcements]: /docs/site/announcements.md
 

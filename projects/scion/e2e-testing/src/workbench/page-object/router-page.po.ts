@@ -14,7 +14,7 @@ import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
-import {Locator, Page} from '@playwright/test';
+import {Locator} from '@playwright/test';
 import {Params} from '@angular/router';
 
 /**
@@ -22,15 +22,13 @@ import {Params} from '@angular/router';
  */
 export class RouterPagePO {
 
-  private readonly _page: Page;
   private readonly _locator: Locator;
 
   public readonly viewPO: ViewPO;
   public readonly viewTabPO: ViewTabPO;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this._page = appPO.page;
-    this.viewPO = appPO.view({viewId});
+  constructor(private _appPO: AppPO, public viewId: string) {
+    this.viewPO = this._appPO.view({viewId});
     this.viewTabPO = this.viewPO.viewTab;
     this._locator = this.viewPO.locator('app-router-page');
   }
@@ -73,6 +71,10 @@ export class RouterPagePO {
     await this._locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
   }
 
+  public async enterBlankPartId(blankPartId: string): Promise<void> {
+    await this._locator.locator('input.e2e-blank-part-id').fill(blankPartId);
+  }
+
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
     await this._locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
   }
@@ -86,7 +88,7 @@ export class RouterPagePO {
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitUntilStable(() => this._page.url()),
+      waitUntilStable(() => this._appPO.getCurrentNavigationId()),
       rejectWhenAttached(this._locator.locator('output.e2e-navigate-error')),
     ]);
   }
@@ -97,6 +99,10 @@ export class RouterPagePO {
   public async clickNavigateViaRouterLink(modifiers?: Array<'Alt' | 'Control' | 'Meta' | 'Shift'>): Promise<void> {
     await this._locator.locator('a.e2e-router-link-navigate').click({modifiers});
     // Wait until navigation completed.
-    await waitUntilStable(() => this._page.url());
+    await waitUntilStable(() => this._appPO.getCurrentNavigationId());
+  }
+
+  public isVisible(): Promise<boolean> {
+    return this._locator.isVisible();
   }
 }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray} from './helper/testing.util';
+import {coerceArray, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
@@ -17,6 +17,7 @@ import {ViewTabPO} from './view-tab.po';
 import {PopupPO} from './popup.po';
 import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
+import {PerspectiveTogglePO} from './perspective-toggle-button.po';
 
 export class AppPO {
 
@@ -25,7 +26,7 @@ export class AppPO {
   /**
    * Handle for interacting with the currently active workbench part.
    */
-  public readonly activePart = new PartPO(this.page.locator('wb-view-part.active'));
+  public readonly activePart = new PartPO(this.page.locator('wb-part.active'));
 
   constructor(public readonly page: Page) {
   }
@@ -41,6 +42,7 @@ export class AppPO {
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(features?.microfrontendSupport ?? true) === false}`);
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${features?.confirmStartup ?? false}`);
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${features?.simulateSlowCapabilityLookup ?? false}`);
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${(features?.perspectives ?? []).join(';')}`);
 
     const featureQueryParams = new URLSearchParams();
     if (features?.stickyStartViewTab !== undefined) {
@@ -68,6 +70,33 @@ export class AppPO {
     await this.page.goto(reloadUrl.toString());
     // Wait until the workbench completed startup.
     await this.waitUntilWorkbenchStarted();
+    await waitUntilStable(() => this.getCurrentNavigationId());
+  }
+
+  /**
+   * Instructs the browser to move back one page in the session history.
+   */
+  public async navigateBack(): Promise<void> {
+    await this.page.goBack();
+    await waitUntilStable(() => this.getCurrentNavigationId());
+  }
+
+  /**
+   * Instructs the browser to move forward one page in the session history.
+   */
+  public async navigateForward(): Promise<void> {
+    await this.page.goForward();
+    await waitUntilStable(() => this.getCurrentNavigationId());
+  }
+
+  /**
+   * Handle to the specified perspective toggle button.
+   *
+   * @param locateBy - Specifies how to locate the perspective toggle button.
+   *        @property perspectiveId - Identifies the toggle button by the perspective id
+   */
+  public perspectiveToggleButton(locateBy: {perspectiveId: string}): PerspectiveTogglePO {
+    return new PerspectiveTogglePO(this.page.locator('header.e2e-application-header').locator(`button.e2e-perspective[data-perspectiveid="${locateBy.perspectiveId}"]`));
   }
 
   /**
@@ -77,7 +106,23 @@ export class AppPO {
    *        @property partId - Identifies the part by its id
    */
   public part(locateBy: {partId: string}): PartPO {
-    return new PartPO(this.page.locator(`wb-view-part[data-partid="${locateBy.partId}"]`));
+    return new PartPO(this.page.locator(`wb-part[data-partid="${locateBy.partId}"]`));
+  }
+
+  /**
+   * Returns parts visible in the layout.
+   */
+  public async partIds(): Promise<string[]> {
+    const partLocators = await this.page.locator(`wb-part`).all();
+    return Promise.all(partLocators.map(async locator => (await locator.getAttribute('data-partid'))!));
+  }
+
+  /**
+   * Returns views visible in the layout.
+   */
+  public async viewIds(): Promise<string[]> {
+    const viewLocators = await this.page.locator(`wb-view`).all();
+    return Promise.all(viewLocators.map(async locator => (await locator.getAttribute('data-viewid'))!));
   }
 
   /**
@@ -91,13 +136,13 @@ export class AppPO {
     if (locateBy.viewId !== undefined) {
       const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"]`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"]`);
-      const partLocator = this.page.locator('wb-view-part', {has: viewTabLocator});
+      const partLocator = this.page.locator('wb-part', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.cssClass !== undefined) {
       const viewLocator = this.page.locator(`wb-view.${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab.${locateBy.cssClass}`);
-      const partLocator: Locator = this.page.locator('wb-view-part', {has: viewTabLocator});
+      const partLocator: Locator = this.page.locator('wb-part', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass' must be set.`);
@@ -114,17 +159,19 @@ export class AppPO {
   /**
    * Handle to the specified notification.
    */
-  public notification(locateBy?: {cssClass?: string | string[]}): NotificationPO {
+  public notification(locateBy?: {cssClass?: string | string[]; nth?: number}): NotificationPO {
     const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
-    return new NotificationPO(this.page.locator(['wb-notification'].concat(cssClasses).join('.')));
+    const locator = this.page.locator(['wb-notification'].concat(cssClasses).join('.'));
+    return new NotificationPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }
 
   /**
    * Handle to the specified message box.
    */
-  public messagebox(locateBy?: {cssClass?: string | string[]}): MessageBoxPO {
+  public messagebox(locateBy?: {cssClass?: string | string[]; nth?: number}): MessageBoxPO {
     const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
-    return new MessageBoxPO(this.page.locator(['wb-message-box'].concat(cssClasses).join('.')));
+    const locator = this.page.locator(['wb-message-box'].concat(cssClasses).join('.'));
+    return new MessageBoxPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }
 
   /**
@@ -145,11 +192,11 @@ export class AppPO {
    * Opens a new view tab.
    */
   public async openNewViewTab(): Promise<StartPagePO> {
-    const newTabViewPartActionPO = this.activePart.action({cssClass: 'e2e-open-new-tab'});
-    if (!await newTabViewPartActionPO.isPresent()) {
+    const newTabPartActionPO = this.activePart.action({cssClass: 'e2e-open-new-tab'});
+    if (!await newTabPartActionPO.isPresent()) {
       throw Error('Opening a new view tab requires the part action \'e2e-open-new-tab\' to be present, but it could not be found. Have you disabled the \'showNewTabAction\' feature?');
     }
-    await newTabViewPartActionPO.click();
+    await newTabPartActionPO.click();
     return new StartPagePO(this, await this.activePart.activeView.getViewId());
   }
 
@@ -158,6 +205,17 @@ export class AppPO {
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {
     await this.page.locator('wb-workbench:not(.starting)').waitFor({state: 'visible'});
+  }
+
+  /**
+   * Returns a unique id set after a navigation has been performed.
+   *
+   * This identifier should be used to detect when the current navigation has completed.
+   *
+   * This flag is set in `app.component.ts` in the 'workbench-testing-app'.
+   */
+  public getCurrentNavigationId(): Promise<string | null> {
+    return this.page.locator('app-root').getAttribute('attr.data-navigationid');
   }
 }
 
@@ -191,12 +249,16 @@ export interface Features {
    * Simulates the slow retrieval of the microfrontend's current view capability by delaying capability lookups by 2000ms.
    */
   simulateSlowCapabilityLookup?: boolean;
+  /**
+   * Specifies perspectives to be registered in the testing app. Separate multiple perspectives by semicolon.
+   */
+  perspectives?: string[];
 }
 
 /**
  * Query params to instrument the workbench startup.
  */
-enum WorkenchStartupQueryParams {
+export enum WorkenchStartupQueryParams {
   /**
    * Query param to set the workbench launch strategy.
    */
@@ -216,4 +278,9 @@ enum WorkenchStartupQueryParams {
    * Query param to throttle capability lookups to simulate slow capability retrievals.
    */
   SIMULATE_SLOW_CAPABILITY_LOOKUP = 'simulateSlowCapabilityLookup',
+
+  /**
+   * Query param to register perspectives. Multiple perspectives are separated by semicolon.
+   */
+  PERSPECTIVES = 'perspectives',
 }

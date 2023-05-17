@@ -7,6 +7,12 @@
 
 On this page you will find the latest news about the development of the SCION Workbench.
 
+- **2023-05: Support Perspectives**\
+  A perspective is an arrangement of views around the main area. Multiple perspectives are supported. Different perspectives provide a different perspective on the application while sharing the main area. Only one perspective can be active at a time.
+ 
+- **2023-05: Support Arranging Views Around the Main Area**\
+  The workbench has a main area and a peripheral area for placing views. The main area is the primary place for views to interact with the application. The peripheral area arranges views around the main area. Peripheral views can be used to provide entry points to the application, tools or context-sensitive assistance to support the user's workflow.
+
 - **2021-01: Built-in Microfrontend Support**\
 We have added microfrontend support to the SCION Workbench.
 
@@ -26,7 +32,7 @@ We are working on the integration of the new [SCION Microfrontend Platform][link
 While the SCION Application Platform did many things right, there was a strong push to rewrite the project so that it no longer depends on the SCION Workbench. A separation would provide non-workbench projects with proven concepts and solid tools to implement a microfrontend architecture on their own. That way, the [SCION Microfrontend Platform][link-scion-microfrontend-platform] was born, a lightweight, web stack agnostic library that has no user-facing components and does not dictate any form of application structure. It focuses on cross-origin communication, routing, and embedding of microfrontends.
 
 - **2020-06: Deprecation of Activities in SCION Workbench**\
-On the way to a true workbench layout, we deprecate activities to introduce the more powerful and flexible border panes. Border panes are placed at the edges of the view area, allowing the display of auxiliary content or context-sensitive assistance. We have not yet started with the implementation, so the naming and behaviour may change at any time.
+On the way to a true workbench layout, we deprecate activities to introduce the more powerful and flexible workbench layout.
 
 
 [link-scion-microfrontend-platform]: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md 

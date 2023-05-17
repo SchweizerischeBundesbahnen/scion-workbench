@@ -11,26 +11,26 @@
 import {TestBed} from '@angular/core/testing';
 import {PlatformRef} from '@angular/core';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
+import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
+import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
-import {WorkbenchTestingModule} from '../spec/workbench-testing.module';
 
 describe('Microfrontend Platform Lifecycle', () => {
 
   it('should destroy SCION Microfrontend Platform when destroying the Angular platform', async () => {
-    // Configure Testbed to start SCION Workbench
     TestBed.configureTestingModule({
-      imports: [WorkbenchTestingModule.forRoot({
-        startup: {launcher: 'LAZY'},
-        microfrontendPlatform: {
-          applications: [],
-        },
-      })],
+      imports: [
+        WorkbenchTestingModule.forTest({
+          microfrontendPlatform: {applications: []},
+        }),
+        RouterTestingModule.withRoutes([]),
+      ],
     });
 
     // Expect SCION Microfrontend Platform to be stopped.
     expect(MicrofrontendPlatform.state).toEqual(PlatformState.Stopped);
 
-    // Start SCION Workbench.
+    // Start the workbench.
     await TestBed.inject(WorkbenchLauncher).launch();
 
     // Expect SCION Microfrontend Platform to be started.

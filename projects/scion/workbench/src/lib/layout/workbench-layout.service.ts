@@ -8,36 +8,35 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {animationFrameScheduler, BehaviorSubject, firstValueFrom, merge, Observable, Subject, timer} from 'rxjs';
+import {animationFrameScheduler, firstValueFrom, merge, Observable, Subject, timer} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {debounce, filter, map, startWith} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {PartsLayout} from './parts-layout';
+import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 
 /**
- * Provides access to the current parts layout.
+ * Provides access to the workbench layout.
  */
 @Injectable()
 export class WorkbenchLayoutService {
 
-  private _layout: PartsLayout | null = null;
+  private _layout: ɵWorkbenchLayout | null = null;
   private _layoutChange$ = new Subject<void>();
-  private _maximized$ = new BehaviorSubject<boolean>(false);
   private _dragStart$ = new Subject<void>();
   private _dragEnd$ = new Subject<void>();
 
   /**
-   * Emits the current {@link PartsLayout}.
+   * Emits the current {@link WorkbenchLayout}.
    *
    * Upon subscription, the current layout is emitted, and then emits continuously when the layout changes.
    * If Angular's initial navigation is not performed yet, blocks until the initial navigation is complete. It never
    * emits `null` and never completes.
    */
-  public readonly layout$: Observable<PartsLayout> = this._layoutChange$
+  public readonly layout$: Observable<ɵWorkbenchLayout> = this._layoutChange$
     .pipe(
       startWith(undefined as void),
-      map<void, PartsLayout | null>(() => this.layout),
-      filter((layout: PartsLayout | null): layout is PartsLayout => layout !== null),
+      map<void, ɵWorkbenchLayout | null>(() => this.layout),
+      filter((layout: ɵWorkbenchLayout | null): layout is ɵWorkbenchLayout => layout !== null),
     );
 
   /**
@@ -47,7 +46,7 @@ export class WorkbenchLayoutService {
     .pipe(debounce(() => timer(0, animationFrameScheduler)));
 
   /**
-   * Notifies when the user starts or ends modifying the parts layout using drag and drop, e.g., moving the splitter between parts,
+   * Notifies when the user starts or ends modifying the layout using drag and drop, e.g., moving the splitter between parts,
    * moving a message box, or moving a view.
    */
   public readonly dragging$: Observable<'start' | 'end'>;
@@ -82,46 +81,17 @@ export class WorkbenchLayoutService {
   }
 
   /**
-   * Sets the given {@link PartsLayout}.
+   * Sets the given {@link WorkbenchLayout}.
    */
-  public setLayout(layout: PartsLayout): void {
+  public setLayout(layout: ɵWorkbenchLayout): void {
     this._layout = layout;
     this._layoutChange$.next();
   }
 
   /**
-   * Returns a reference to current {@link PartsLayout}, if any. Is `null` until the initial navigation is performed.
+   * Returns a reference to current {@link WorkbenchLayout}, if any. Is `null` until the initial navigation is performed.
    */
-  public get layout(): PartsLayout | null {
+  public get layout(): ɵWorkbenchLayout | null {
     return this._layout;
-  }
-
-  /**
-   * Displays the main content in full viewport width.
-   *
-   * @param maximize
-   *   If not specified, maximize mode is toggled. If 'true', the application is maximized or minimized otherwise.
-   */
-  public toggleMaximized(maximize?: boolean): void {
-    if (maximize === undefined) {
-      this._maximized$.next(!this.maximized);
-    }
-    else {
-      this._maximized$.next(maximize);
-    }
-  }
-
-  /**
-   * Indicates whether the main content is displayed in full viewport width.
-   */
-  public get maximized(): boolean {
-    return this._maximized$.getValue();
-  }
-
-  /**
-   * Emits upon change of main content full viewport mode.
-   */
-  public get maximized$(): Observable<boolean> {
-    return this._maximized$;
   }
 }

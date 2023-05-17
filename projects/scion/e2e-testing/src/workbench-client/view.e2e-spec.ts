@@ -645,6 +645,7 @@ test.describe('Workbench View', () => {
    * the new microfrontend should get its own capability and not the capability of the previous loaded microfrontend.
    */
   test('should emit the navigation\'s effective capability when navigating to another microfrontend of the same app', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+    test.slow(); // increase timeout because this test simulates slow capability lookup
     await appPO.navigateTo({microfrontendSupport: true, simulateSlowCapabilityLookup: true});
 
     // register testee-1 view in app1

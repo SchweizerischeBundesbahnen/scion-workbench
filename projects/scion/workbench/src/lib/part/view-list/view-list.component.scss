@@ -1,0 +1,33 @@
+@use '../../../../theme/colors';
+@use '../../../../theme/styles';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: .75em;
+  width: styles.$viewtab-max-width + 75px;
+  border: 1px solid colors.$viewlistitem-border-color;
+  background-color: colors.$part_tab-active-bgcolor;
+
+  > wb-filter-field {
+    flex: none;
+    margin: .5em .25em;
+  }
+
+  > sci-viewport {
+    flex: auto;
+    max-height: 350px;
+
+    > ul {
+      display: flex;
+      flex-direction: column;
+      list-style: none;
+      padding: 1px 0 0 0;
+      margin: 0;
+
+      > li.separator {
+        border-top: 1px solid colors.$viewlistitem-border-color;
+      }
+    }
+  }
+}

@@ -9,19 +9,23 @@
  */
 
 import {Component, Injector} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
-import {WbNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {WorkbenchNavigationExtras, WorkbenchRouterLinkDirective, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {BehaviorSubject, Observable, share} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {AsyncPipe, NgFor, NgIf, NgTemplateOutlet} from '@angular/common';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 
 const PATH = 'path';
 const QUERY_PARAMS = 'queryParams';
 const MATRIX_PARAMS = 'matrixParams';
 const NAVIGATIONAL_STATE = 'navigationalState';
 const TARGET = 'target';
+const BLANK_PART_ID = 'blankPartId';
 const INSERTION_INDEX = 'insertionIndex';
 const ACTIVATE = 'activate';
 const CLOSE = 'close';
@@ -32,13 +36,26 @@ const VIEW_CONTEXT = 'viewContext';
   selector: 'app-router-page',
   templateUrl: './router-page.component.html',
   styleUrls: ['./router-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgFor,
+    NgIf,
+    AsyncPipe,
+    NgTemplateOutlet,
+    WorkbenchRouterLinkDirective,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+    SciCheckboxModule,
+  ],
 })
-export class RouterPageComponent {
+export default class RouterPageComponent {
 
   public readonly PATH = PATH;
   public readonly MATRIX_PARAMS = MATRIX_PARAMS;
   public readonly NAVIGATIONAL_STATE = NAVIGATIONAL_STATE;
   public readonly TARGET = TARGET;
+  public readonly BLANK_PART_ID = BLANK_PART_ID;
   public readonly INSERTION_INDEX = INSERTION_INDEX;
   public readonly QUERY_PARAMS = QUERY_PARAMS;
   public readonly ACTIVATE = ACTIVATE;
@@ -50,7 +67,7 @@ export class RouterPageComponent {
   public navigateError: string;
 
   public routerLinkCommands$: Observable<any[]>;
-  public navigationExtras$: Observable<WbNavigationExtras>;
+  public navigationExtras$: Observable<WorkbenchNavigationExtras>;
   public routes: Routes;
 
   public nullViewInjector: Injector;
@@ -58,12 +75,14 @@ export class RouterPageComponent {
   constructor(formBuilder: UntypedFormBuilder,
               injector: Injector,
               private _router: Router,
-              private _wbRouter: WorkbenchRouter) {
+              private _wbRouter: WorkbenchRouter,
+              public workbenchService: WorkbenchService) {
     this.form = formBuilder.group({
       [PATH]: formBuilder.control(''),
       [MATRIX_PARAMS]: formBuilder.array([]),
       [NAVIGATIONAL_STATE]: formBuilder.array([]),
       [TARGET]: formBuilder.control(''),
+      [BLANK_PART_ID]: formBuilder.control(''),
       [INSERTION_INDEX]: formBuilder.control(''),
       [QUERY_PARAMS]: formBuilder.array([]),
       [ACTIVATE]: formBuilder.control(undefined),
@@ -99,9 +118,10 @@ export class RouterPageComponent {
   public onRouterNavigate(): void {
     this.navigateError = null;
     const commands: any[] = this.constructRouterLinkCommands();
-    const extras: WbNavigationExtras = this.constructNavigationExtras();
+    const extras: WorkbenchNavigationExtras = this.constructNavigationExtras();
 
     this._wbRouter.navigate(commands, extras)
+      .then(success => success ? Promise.resolve() : Promise.reject('Navigation failed'))
       .catch(error => this.navigateError = error);
   }
 
@@ -118,12 +138,13 @@ export class RouterPageComponent {
     return commands.concat(matrixParams ? matrixParams : []);
   }
 
-  private constructNavigationExtras(): WbNavigationExtras {
+  private constructNavigationExtras(): WorkbenchNavigationExtras {
     return {
       queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUERY_PARAMS) as UntypedFormArray),
       activate: this.form.get(ACTIVATE).value,
       close: this.form.get(CLOSE).value,
       target: this.form.get(TARGET).value || undefined,
+      blankPartId: this.form.get(BLANK_PART_ID).value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
       state: SciParamsEnterComponent.toParamsDictionary(this.form.get(NAVIGATIONAL_STATE) as UntypedFormArray),
       cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),

@@ -13,6 +13,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {StartPageComponent} from './start-page/start-page.component';
 import {WorkbenchComponent} from './workbench/workbench.component';
 import {WorkbenchRouteData} from '@scion/workbench';
+import {topLevelTestPageRoutes} from './test-pages/routes';
 
 const routes: Routes = [
   {
@@ -23,13 +24,18 @@ const routes: Routes = [
   {path: 'start-page', component: StartPageComponent, data: {[WorkbenchRouteData.title]: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'}},
   {
     path: 'test-router',
-    loadChildren: (): any => import('./router-page/router-page.module').then(m => m.RouterPageModule),
+    loadComponent: () => import('./router-page/router-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench Router', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-router', pinToStartPage: true},
   },
   {
     path: 'test-view',
-    loadChildren: (): any => import('./view-page/view-page.module').then(m => m.ViewPageModule),
+    loadComponent: () => import('./view-page/view-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench View', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view', pinToStartPage: true},
+  },
+  {
+    path: 'test-layout',
+    loadComponent: () => import('./layout-page/layout-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Layout', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-layout', pinToStartPage: true},
   },
   {
     path: 'test-message-box',
@@ -47,6 +53,11 @@ const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Workbench Popup', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-popup', pinToStartPage: true},
   },
   {
+    path: 'route-register',
+    loadComponent: () => import('./route-register-page/route-register-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Route Registrator', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-route-registrator', pinToStartPage: true},
+  },
+  {
     path: 'host-popup',
     loadChildren: (): any => import('./host-popup-page/host-popup-page.module').then(m => m.HostPopupPageModule),
   },
@@ -57,8 +68,9 @@ const routes: Routes = [
   },
   {
     path: 'test-pages',
-    loadChildren: (): any => import('./test-pages/routes').then(m => m.routes),
+    loadChildren: (): any => import('./test-pages/routes'),
   },
+  ...topLevelTestPageRoutes,
 ];
 
 @NgModule({

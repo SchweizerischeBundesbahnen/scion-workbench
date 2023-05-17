@@ -127,11 +127,10 @@ function provideMicrofrontendRoutes(): Provider[] {
      * parameters to the URL but passed via navigational state to the component by {@link NavigationStateResolver}. The component can
      * access transient params as resolved data via `ActivatedRoute.data[WorkbenchRouteData.state][MicrofrontendNavigationalStates.transientParams]`.
      *
-     * However, by default, the Angular router resolves data only when matrix or URL parameters of the route change. For this reason,
-     * we configure the microfrontend route to evaluate resolvers also on query parameter change, which allows updating transient parameters
-     * without changed matrix or URL parameters.
+     * However, by default, the Angular router only runs resolvers when the route's path or matrix parameters change. For this reason, we configure
+     * the microfrontend route to always run resolvers, allowing the update of transient parameters without URL change.
      */
-    runGuardsAndResolvers: 'paramsOrQueryParamsChange',
+    runGuardsAndResolvers: 'always',
   };
 
   return [

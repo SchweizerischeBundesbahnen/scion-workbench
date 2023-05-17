@@ -73,21 +73,5 @@
         }
       }
     }
-
-    section.miscellaneous {
-      display: grid;
-      grid-auto-rows: max-content;
-      row-gap: .75em;
-      margin: 1em;
-
-      > header {
-        font-weight: bold;
-        margin-bottom: 1em;
-
-        &:not(:first-child) {
-          margin-top: 1em;
-        }
-      }
-    }
   }
 }

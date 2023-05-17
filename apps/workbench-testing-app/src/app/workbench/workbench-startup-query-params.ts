@@ -29,6 +29,11 @@ export namespace WorkbenchStartupQueryParams {
   export const STANDALONE_QUERY_PARAM = 'standalone';
 
   /**
+   * Query param to register perspectives. Multiple perspectives are separated by semicolon.
+   */
+  export const PERSPECTIVES_QUERY_PARAM = 'perspectives';
+
+  /**
    * Query param to display an alert dialog during workbench startup to pause the workbench startup until the user confirms the alert.
    */
   export const CONFIRM_STARTUP_QUERY_PARAM = 'confirmStartup';
@@ -50,6 +55,13 @@ export namespace WorkbenchStartupQueryParams {
    */
   export function standalone(): boolean {
     return coerceBooleanProperty(new URL(window.location.href).searchParams.get(STANDALONE_QUERY_PARAM));
+  }
+
+  /**
+   * Reads perspectives to register from query params.
+   */
+  export function perspectives(): string[] {
+    return new URL(window.location.href).searchParams.get(PERSPECTIVES_QUERY_PARAM)?.split(';').filter(Boolean) ?? [];
   }
 
   /**

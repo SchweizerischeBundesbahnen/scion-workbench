@@ -106,24 +106,25 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
     const requiredParams = intentMessage.capability.params?.filter(param => param.required).map(param => param.name) ?? [];
     const matchWildcardParams = options?.matchWildcardParams ?? false;
 
-    const viewIds = this._viewRegistry.viewIds.filter(viewId => {
-      const view = this._viewRegistry.getElseThrow(viewId);
-      if (!MicrofrontendViewRoutes.isMicrofrontendRoute(view.urlSegments)) {
-        return false;
-      }
+    const viewIds = this._viewRegistry.views
+      .filter(view => {
+        if (!MicrofrontendViewRoutes.isMicrofrontendRoute(view.urlSegments)) {
+          return false;
+        }
 
-      // Test whether the capability matches.
-      const viewParams = MicrofrontendViewRoutes.parseParams(view.urlSegments);
-      if (viewParams.viewCapabilityId !== intentMessage.capability.metadata!.id) {
-        return false;
-      }
+        // Test whether the capability matches.
+        const viewParams = MicrofrontendViewRoutes.parseParams(view.urlSegments);
+        if (viewParams.viewCapabilityId !== intentMessage.capability.metadata!.id) {
+          return false;
+        }
 
-      // Test whether all "navigational" params match.
-      return requiredParams.every(name => {
-        const intentParam = intentMessage.intent.params!.get(name);
-        return (matchWildcardParams && intentParam === '*') || intentParam === viewParams.urlParams[name];
-      });
-    });
+        // Test whether all "navigational" params match.
+        return requiredParams.every(name => {
+          const intentParam = intentMessage.intent.params!.get(name);
+          return (matchWildcardParams && intentParam === '*') || intentParam === viewParams.urlParams[name];
+        });
+      })
+      .map(view => view.id);
 
     return viewIds.length ? viewIds : null;
   }

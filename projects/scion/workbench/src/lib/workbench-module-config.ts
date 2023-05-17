@@ -13,18 +13,13 @@ import {Type} from '@angular/core';
 import {LogAppender, LogLevel} from './logging';
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
+import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
+import {WorkbenchStorage} from './storage/workbench-storage';
 
 /**
  * Configures the SCION Workbench module.
  */
 export abstract class WorkbenchModuleConfig {
-
-  /**
-   * Specifies whether to reuse routes of activities.
-   * If set to 'true', which is by default, activity components are not destroyed when toggling the activity.
-   */
-  public abstract reuseActivityRoutes?: boolean;
-
   /**
    * Allows customizing the appearance of a view tab by providing a custom view tab component.
    *
@@ -120,6 +115,36 @@ export abstract class WorkbenchModuleConfig {
    * under the DI token {@link MICROFRONTEND_PLATFORM_POST_STARTUP}.
    */
   public abstract microfrontendPlatform?: MicrofrontendPlatformConfig | Type<MicrofrontendPlatformConfigLoader>;
+
+  /**
+   * Defines the arrangement of views in the peripheral area. Multiple arrangements, called perspectives, are supported.
+   * Different perspectives provide a different perspective on the application while sharing the main area.
+   * Only one perspective can be active at a time.
+   *
+   * ## Example of an initial arrangement of views
+   *
+   * ```ts
+   * WorkbenchModule.forRoot({
+   *   layout: layout => layout
+   *     .addPart('topLeft', {align: 'left', ratio: .25})
+   *     .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+   *     .addPart('bottom', {align: 'bottom', ratio: .3})
+   *     .addView('navigator', {partId: 'topLeft', activateView: true})
+   *     .addView('explorer', {partId: 'topLeft'})
+   *     .addView('repositories', {partId: 'bottomLeft', activateView: true})
+   *     .addView('console', {partId: 'bottom', activateView: true})
+   *     .addView('problems', {partId: 'bottom'})
+   *     .addView('search', {partId: 'bottom'})
+   * });
+   * ```
+   */
+  public abstract layout?: WorkbenchLayoutFn | WorkbenchPerspectives;
+  /**
+   * Provides persistent storage to the SCION Workbench.
+   *
+   * If not set, the workbench uses the browser's local storage as persistent storage.
+   */
+  public abstract storage?: Type<WorkbenchStorage>;
 }
 
 /**

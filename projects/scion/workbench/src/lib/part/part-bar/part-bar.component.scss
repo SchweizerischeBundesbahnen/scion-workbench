@@ -1,0 +1,62 @@
+@use '../../../../theme/colors';
+
+:host {
+  display: flex;
+  background-color: colors.$part_tabbar-bgcolor;
+  color: colors.$part_tab-fgcolor;
+  --drag-source-width: 0;
+  --drag-source-placeholder-width: 0;
+
+  > sci-viewport.tabbar {
+    // Use 'flex: initial' instead of 'flex: auto' to not grow to absorb any extra free space in the partbar,
+    // so that left-aligned actions will directly follow the viewtabs.
+    flex: initial;
+
+    > div.viewport-client {
+      display: flex;
+      flex-flow: row nowrap;
+
+      > wb-view-tab {
+        flex: none;
+
+        &.drag-source {
+          display: none;
+        }
+      }
+
+      > div.drag-image-placeholder {
+        flex: none;
+        width: var(--drag-source-placeholder-width);
+      }
+
+      // Shift drop target and subsequent tabs to the right.
+      > wb-view-tab.drop-target, wb-view-tab.drop-target ~ :is(wb-view-tab, div.drag-image-placeholder) {
+        transform: translateX(var(--drag-source-width));
+      }
+    }
+  }
+
+  &:not(.calculating-max-viewport-width) {
+    // Animate shifting tabs during drag and drop.
+    &.drag-enter, &.drag-over, &.drag-leave {
+      wb-view-tab {
+        transition: transform 175ms cubic-bezier(0, 0, 0.2, 1);
+      }
+    }
+
+    // Animate the drag image placeholder when entering or leaving the tabbar, but not when dragging over the tabbar, for instant feedback.
+    &.drag-enter, &.drag-leave {
+      div.drag-image-placeholder {
+        transition: width 175ms cubic-bezier(0, 0, 0.2, 1);
+      }
+    }
+  }
+
+  > wb-part-action-bar {
+    flex: auto;
+  }
+
+  > wb-view-list-button {
+    flex: none;
+  }
+}

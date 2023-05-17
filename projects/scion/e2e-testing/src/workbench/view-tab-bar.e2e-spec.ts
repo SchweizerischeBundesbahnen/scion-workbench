@@ -15,7 +15,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('View Tabbar', () => {
 
-  test('should not show if no views are open and no viewpart actions present', async ({appPO}) => {
+  test('should not show if no views are open and no part actions present', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false, showNewTabAction: false});
     const startPagePO = new StartPagePO(appPO);
 

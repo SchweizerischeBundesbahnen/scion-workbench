@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {TestBed} from '@angular/core/testing';
-import {WorkbenchLauncher} from '../../startup/workbench-launcher.service';
-import {WorkbenchTestingModule} from '../../spec/workbench-testing.module';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Handler, IntentInterceptor, IntentMessage} from '@scion/microfrontend-platform';
 import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-intent-interceptor.service';
 import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microfrontend-popup-intent-interceptor.service';
 import {MICROFRONTEND_PLATFORM_PRE_STARTUP, WorkbenchInitializer} from '../../startup/workbench-initializer';
+import {TestBed} from '@angular/core/testing';
+import {WorkbenchTestingModule} from '../../testing/workbench-testing.module';
+import {RouterTestingModule} from '@angular/router/testing';
+import {WorkbenchLauncher} from '../../startup/workbench-launcher.service';
 
 describe('Microfrontend Platform Initializer', () => {
 
@@ -34,13 +35,11 @@ describe('Microfrontend Platform Initializer', () => {
       }
     }
 
-    // Configure testbed to start the workbench.
+    // Configure and start the SCION Workbench.
     TestBed.configureTestingModule({
       imports: [
-        WorkbenchTestingModule.forRoot({
-          startup: {launcher: 'LAZY'},
-          microfrontendPlatform: {applications: []},
-        }),
+        WorkbenchTestingModule.forTest({microfrontendPlatform: {applications: []}}),
+        RouterTestingModule.withRoutes([]),
       ],
       providers: [
         {provide: MICROFRONTEND_PLATFORM_PRE_STARTUP, multi: true, useClass: CustomIntentInterceptorRegisterer},

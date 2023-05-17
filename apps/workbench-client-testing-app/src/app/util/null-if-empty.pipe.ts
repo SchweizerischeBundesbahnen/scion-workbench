@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Returns `null` if the given object is empty.
  */
-@Pipe({name: 'wbNullIfEmpty'})
+@Pipe({name: 'appNullIfEmpty', standalone: true})
 export class NullIfEmptyPipe implements PipeTransform {
 
   public transform<T>(value: T): T {
@@ -21,19 +21,13 @@ export class NullIfEmptyPipe implements PipeTransform {
       return null;
     }
     else if (value instanceof Map || value instanceof Set) {
-      if (!value.size) {
-        return null;
-      }
+      return value.size ? value : null;
     }
     else if (Array.isArray(value) || typeof value === 'string') {
-      if (!value.length) {
-        return null;
-      }
+      return value.length ? value : null;
     }
     else if (typeof value === 'object') {
-      if (!Object.keys(value).length) {
-        return null;
-      }
+      return Object.keys(value).length ? value : null;
     }
     return value;
   }

@@ -5,32 +5,35 @@ import {UUID} from '@scion/toolkit/uuid';
 import {Router} from '@angular/router';
 import {LocationStrategy} from '@angular/common';
 import {Subject} from 'rxjs';
-import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {RouterUtils} from '../routing/router.util';
+import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
+import {MPart} from '../layout/workbench-layout.model';
+import {ɵWorkbenchService} from '../ɵworkbench.service';
 
 /**
- * Subscribes to view move requests for moving views in the {@link PartsLayout} when the user arranges views via drag and drop or view context menu.
+ * Updates the workbench layout when the user moves a view.
  */
 @Injectable()
 export class ViewMoveHandler implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  constructor(private _workbench: ɵWorkbenchService,
+  constructor(private _workbenchService: ɵWorkbenchService,
+              private _workbenchRouter: WorkbenchRouter,
+              private _workbenchLayoutFactory: WorkbenchLayoutFactory,
               private _viewDragService: ViewDragService,
-              private _locationStrategy: LocationStrategy,
               private _router: Router,
-              private _workbenchRouter: WorkbenchRouter) {
+              private _locationStrategy: LocationStrategy) {
     this.installViewMoveListener();
   }
 
   private installViewMoveListener(): void {
-    const appInstanceId = this._workbench.appInstanceId;
+    const appInstanceId = this._workbenchService.appInstanceId;
 
     this._viewDragService.viewMove$
       .pipe(takeUntil(this._destroy$))
-      .subscribe((event: ViewMoveEvent) => {
+      .subscribe(async (event: ViewMoveEvent) => { // eslint-disable-line rxjs/no-async-subscribe
         // Check if this app instance takes part in the view drag operation. If not, do nothing.
         if (event.source.appInstanceId !== appInstanceId && event.target.appInstanceId !== appInstanceId) {
           return;
@@ -40,7 +43,7 @@ export class ViewMoveHandler implements OnDestroy {
 
         // Check if the user dropped the viewtab at the same location. If so, do nothing.
         if (!crossAppInstanceViewDrag && event.source.partId === event.target.partId && event.target.region === 'center') {
-          this.activateView(event.source.viewId);
+          await this.activateView(event.source.viewId);
           return;
         }
 
@@ -48,82 +51,96 @@ export class ViewMoveHandler implements OnDestroy {
         if (crossAppInstanceViewDrag && event.source.appInstanceId === appInstanceId) {
           // Check if to add the view to a new browser window.
           if (event.target.appInstanceId === 'new') {
-            this.moveViewToNewWindow(event);
+            await this.moveViewToNewWindow(event);
           }
           else {
-            this.removeView(event);
+            await this.removeView(event);
           }
         }
         // Check if to add the view to this app instance if being moved from another app instance to this app instance.
         else if (crossAppInstanceViewDrag && event.target.appInstanceId === appInstanceId) {
-          this.addView(event);
+          await this.addView(event);
         }
         // Move the view within the same app instance.
         else {
-          this.moveView(event);
+          await this.moveView(event);
         }
       });
   }
 
-  private activateView(viewId: string): void {
-    this._workbenchRouter.ɵnavigate(layout => layout.activateView(viewId)).then();
+  private async activateView(viewId: string): Promise<void> {
+    await this._workbenchRouter.ɵnavigate(layout => layout.activateView(viewId, {activatePart: true}));
   }
 
-  private addView(event: ViewMoveEvent): void {
+  private async addView(event: ViewMoveEvent): Promise<void> {
     const region = event.target.region || 'center';
-    const addToNewViewPart = region !== 'center';
-
+    const addToNewPart = region !== 'center';
     const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
-    if (addToNewViewPart) {
-      const newPartId = event.target.newPartId || UUID.randomUUID();
-      this._workbenchRouter.ɵnavigate(layout => {
-        const newViewId = layout.computeNextAvailableViewId();
+
+    await this._workbenchRouter.ɵnavigate(layout => {
+      const newViewId = RouterUtils.isPrimaryRouteTarget(event.source.viewId) ? layout.computeNextViewId() : event.source.viewId;
+      if (addToNewPart) {
+        const newPartId = event.target.newPartId || UUID.randomUUID();
         return {
           layout: layout
-            .addPart(newPartId, {relativeTo: event.target.partId ?? undefined, align: coerceLayoutAlignment(region)})
-            .addView(newPartId, newViewId, {activate: true}),
+            .addPart(newPartId, {relativeTo: event.target.partId!, align: coerceLayoutAlignment(region)}, {structural: false})
+            .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true}),
           viewOutlets: {[newViewId]: commands},
         };
-      }).then();
-    }
-    else {
-      this._workbenchRouter.ɵnavigate(layout => {
-        const newViewId = layout.computeNextAvailableViewId();
+      }
+      else {
         return {
-          layout: layout.addView(event.target.partId!, newViewId, {position: event.target.insertionIndex, activate: true}),
+          layout: layout.addView(newViewId, {partId: event.target.partId!, position: event.target.insertionIndex, activateView: true, activatePart: true}),
           viewOutlets: {[newViewId]: commands},
         };
-      }).then();
-    }
+      }
+    });
   }
 
   private async moveViewToNewWindow(event: ViewMoveEvent): Promise<void> {
-    const urlTree = await this._workbenchRouter.createUrlTree(layout => ({
-      layout: layout.clear(),
-      viewOutlets: layout.viewsIds
-        .filter(viewId => viewId !== event.source.viewId)
-        .reduce((acc, viewId) => ({...acc, [viewId]: null}), {}),
-    }));
+    const urlTree = await this._workbenchRouter.createUrlTree(layout => {
+      const viewId = event.source.viewId;
+      const partId = UUID.randomUUID();
+
+      return {
+        layout: this._workbenchLayoutFactory.create({mainGrid: {root: new MPart({id: partId}), activePartId: partId}})
+          .addView(viewId, {partId, activateView: true, activatePart: true}),
+        viewOutlets: layout.views()
+          .map(view => view.id)
+          .filter(viewId => viewId !== event.source.viewId)
+          .reduce((acc, viewId) => ({...acc, [viewId]: null}), {}),
+      };
+    });
     if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree)))) {
-      this.removeView(event);
+      await this.removeView(event);
     }
   }
 
-  private removeView(event: ViewMoveEvent): void {
-    this._workbench.destroyView(event.source.viewId).then();
+  private async removeView(event: ViewMoveEvent): Promise<void> {
+    const viewId = event.source.viewId;
+    await this._workbenchRouter.ɵnavigate(layout => {
+      return {
+        layout: layout.removeView(viewId),
+        viewOutlets: {[viewId]: null},
+      };
+    });
   }
 
-  private moveView(event: ViewMoveEvent): void {
+  private async moveView(event: ViewMoveEvent): Promise<void> {
     const addToNewPart = (event.target.region || 'center') !== 'center';
     if (addToNewPart) {
       const newPartId = event.target.newPartId || UUID.randomUUID();
-      this._workbenchRouter.ɵnavigate(layout => layout
-        .addPart(newPartId, {relativeTo: event.target.partId!, align: coerceLayoutAlignment(event.target.region!)})
-        .moveView(event.source.viewId, newPartId),
-      ).then();
+      await this._workbenchRouter.ɵnavigate(layout => layout
+        .addPart(newPartId, {relativeTo: event.target.partId!, align: coerceLayoutAlignment(event.target.region!)}, {structural: false})
+        .moveView(event.source.viewId, newPartId, {activatePart: true, activateView: true}),
+      );
     }
     else {
-      this._workbenchRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, event.target.partId!, event.target.insertionIndex)).then();
+      await this._workbenchRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, event.target.partId!, {
+        position: event.target.insertionIndex,
+        activateView: true,
+        activatePart: true,
+      }));
     }
   }
 

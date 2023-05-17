@@ -14,7 +14,7 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 /**
  * Represents a microfrontend for display in a workbench view.
  *
- * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.
+ * A view is a visual workbench component for displaying content stacked or side-by-side.
  *
  * @category View
  */

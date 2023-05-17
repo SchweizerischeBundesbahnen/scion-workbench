@@ -43,11 +43,11 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     params: new Map<string, any>(),
   };
 
-  constructor(public viewId: string) {
-    this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.viewId))
+  constructor(public id: string) {
+    this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.id))
       .pipe(map(() => undefined));
 
-    this.params$ = Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.viewId))
+    this.params$ = Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.id))
       .pipe(
         mapToBody(),
         coerceMap(),
@@ -64,7 +64,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
         takeUntil(this._beforeUnload$),
       );
 
-    this.active$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.viewActiveTopic(this.viewId))
+    this.active$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.viewActiveTopic(this.id))
       .pipe(
         mapToBody(),
         distinctUntilChanged(),
@@ -98,7 +98,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
     Observables.coerce(title)
       .pipe(
-        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewTitleTopic(this.viewId), it)),
+        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewTitleTopic(this.id), it)),
         takeUntil(merge(this._propertyChange$.pipe(filter(prop => prop === 'title')), this._beforeInAppNavigation$, this._beforeUnload$, this._destroy$)),
       )
       .subscribe();
@@ -112,7 +112,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
     Observables.coerce(heading)
       .pipe(
-        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewHeadingTopic(this.viewId), it)),
+        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewHeadingTopic(this.id), it)),
         takeUntil(merge(this._propertyChange$.pipe(filter(prop => prop === 'heading')), this._beforeInAppNavigation$, this._beforeUnload$, this._destroy$)),
       )
       .subscribe();
@@ -126,7 +126,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
     Observables.coerce(dirty ?? true)
       .pipe(
-        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewDirtyTopic(this.viewId), it)),
+        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewDirtyTopic(this.id), it)),
         takeUntil(merge(this._propertyChange$.pipe(filter(prop => prop === 'dirty')), this._beforeInAppNavigation$, this._beforeUnload$, this._destroy$)),
       )
       .subscribe();
@@ -140,7 +140,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
     Observables.coerce(closable)
       .pipe(
-        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewClosableTopic(this.viewId), it)),
+        mergeMap(it => Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewClosableTopic(this.id), it)),
         takeUntil(merge(this._propertyChange$.pipe(filter(prop => prop === 'closable')), this._beforeInAppNavigation$, this._beforeUnload$, this._destroy$)),
       )
       .subscribe();
@@ -150,7 +150,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
    * @inheritDoc
    */
   public close(): void {
-    Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewCloseTopic(this.viewId));
+    Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewCloseTopic(this.id));
   }
 
   /**
@@ -178,7 +178,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
    * Installs a handler to be invoked by the workbench before closing this view.
    */
   private installClosingHandler(): Subscription {
-    return Beans.get(MessageClient).observe$(ɵWorkbenchCommands.viewClosingTopic(this.viewId))
+    return Beans.get(MessageClient).observe$(ɵWorkbenchCommands.viewClosingTopic(this.id))
       .pipe(
         switchMap(async (closeRequest: Message) => {
           // Do not move the publishing of the response to a subsequent handler, because the subscription gets canceled when the last closing listener unsubscribes.

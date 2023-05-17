@@ -28,6 +28,13 @@
     </datalist>
   </sci-form-field>
 
+  <sci-form-field label="Part ID" *ngIf="form.get(TARGET).value === 'blank'">
+    <input [formControlName]="BLANK_PART_ID" class="e2e-blank-part-id" list="parts">
+    <datalist id="parts">
+      <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
+    </datalist>
+  </sci-form-field>
+
   <sci-form-field label="InsertionIndex">
     <input [formControlName]="INSERTION_INDEX" list="insertionIndexHints" class="e2e-insertion-index">
     <datalist id="insertionIndexHints">

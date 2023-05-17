@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,10 +11,10 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {ViewComponent} from '../view/view.component';
+import type {ViewComponent} from '../view/view.component';
 
 /**
- * Resolves the portal for a given view id, or `null` if not found.
+ * Resolves the portal for the given view, or throws an error if the view is not registered.
  */
 @Pipe({name: 'wbViewPortal'})
 export class ViewPortalPipe implements PipeTransform {
@@ -26,6 +26,6 @@ export class ViewPortalPipe implements PipeTransform {
     if (!viewId) {
       return null;
     }
-    return this._viewRegistry.getElseNull(viewId)?.portal ?? null;
+    return this._viewRegistry.get(viewId).portal;
   }
 }

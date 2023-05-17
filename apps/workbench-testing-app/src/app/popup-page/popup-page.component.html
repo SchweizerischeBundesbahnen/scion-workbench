@@ -41,7 +41,7 @@
     </sci-form-field>
   </section>
 
-  <sci-accordion *ngIf="popup.size | wbNullIfEmpty as preferredSize"
+  <sci-accordion *ngIf="popup.size | appNullIfEmpty as preferredSize"
                  title="Preferred Overlay Size"
                  class="preferred-overlay-size e2e-preferred-overlay-size"
                  variant="solid">

@@ -1,0 +1,5 @@
+<ol>
+  <li *ngFor="let todo of todoService.todos">
+    <a [wbRouterLink]="['/todos', todo.id]">{{todo.task}}</a>
+  </li>
+</ol>

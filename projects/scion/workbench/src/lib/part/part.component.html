@@ -1,0 +1,13 @@
+<wb-part-bar *ngIf="hasViews || hasActions"></wb-part-bar>
+
+<div *ngIf="hasViews; else no_views_template" class="active-view" wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)">
+  <ng-template [wbPortalOutlet]="activeViewId$ | async | wbViewPortal"></ng-template>
+</div>
+
+<ng-template #no_views_template>
+  <sci-viewport class="no-view e2e-no-view"
+                wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)"
+                [wbViewDropZoneRegions]="['center']">
+    <router-outlet></router-outlet>
+  </sci-viewport>
+</ng-template>

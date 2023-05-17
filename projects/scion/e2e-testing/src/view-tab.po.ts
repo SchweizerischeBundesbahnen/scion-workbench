@@ -102,7 +102,7 @@ export class ViewTabPO {
 
     // 3. Move the mouse cursor to the specified region of the target part, or "this" part if not specified.
     const targetPartId = target.partId ?? await this.part.getPartId();
-    const targetPartLocator = this._locator.page().locator(`wb-view-part[data-partid="${targetPartId}"]`);
+    const targetPartLocator = this._locator.page().locator(`wb-part[data-partid="${targetPartId}"]`);
     const targetPartDropZoneBounds = fromRect(await targetPartLocator.locator('[wbviewdropzone]').boundingBox()); /* ViewDropZoneDirective */
 
     const steps = options?.steps ?? 2;

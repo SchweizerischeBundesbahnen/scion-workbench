@@ -77,7 +77,7 @@ export class WorkbenchMessageBoxService {
 
     config.context = {
       ...config.context,
-      viewId: config.context?.viewId ?? Beans.opt(WorkbenchView)?.viewId,
+      viewId: config.context?.viewId ?? Beans.opt(WorkbenchView)?.id,
     };
     const openMessageBox$ = Beans.get(IntentClient).request$<R>({type: WorkbenchCapabilities.MessageBox, qualifier, params}, config);
     try {

@@ -5,34 +5,36 @@
 
 ## [SCION Workbench][menu-home] > How To Guides
 
-This section provides answers to some common questions when developing an application with SCION Workbench.
+This section provides answers to some common questions when developing an application with the SCION Workbench.
 
+We are working on a comprehensive guide that explains the features and concepts of the SCION Workbench in more detail.
 
 ***
 
+#### Installation
+- [How to install the SCION Workbench](how-to-install-workbench.md)
+
+#### Layout and Perspective
+- [How to configure a start page](how-to-configure-start-page.md)
+- [How to define an initial layout](how-to-define-initial-layout.md)
+- [How to provide a perspective](how-to-provide-perspective.md)
+- [How to query, switch and reset perspectives](how-to-perspective.md)
+
+
 #### View
-
-- [How to specify a default page or default view](how-to-specify-a-default-page-or-default-view.md)
-- [How to open a view](how-to-open-a-view.md)
-- [How to control in which view to open a component](how-to-control-in-which-view-to-open-a-component.md)
-- [How to set a title of a view tab](how-to-set-a-title-of-a-view-tab.md)
-- [How to close a view](how-to-close-a-view.md)
-- [How to prevent a view from being closed](how-to-prevent-a-view-from-being-closed.md)
-- [How to provide a viewpart action](how-to-provide-a-viewpart-action.md)
-  
-#### Activity
-
-- [How to add an activity](how-to-add-an-activity.md)
-- [How to add an action to an activity](how-to-add-an-action-to-an-activity.md)
-- [How to set an icon for an activity](how-to-set-an-icon-for-an-activity.md)
-
+- [How to provide a view](how-to-provide-view.md)
+- [How to open a view](how-to-open-view.md)
+- [How to open an initial view in the main area](how-to-open-initial-view.md)
+- [How to set a view title](how-to-set-view-title.md)
+- [How to close a view](how-to-close-view.md)
+- [How to prevent a view from being closed](how-to-prevent-view-closing.md)
+- [How to provide a part action](how-to-provide-part-action.md)
 
 #### Miscellaneous
 
-- [How to open a popup](how-to-open-a-popup.md)
-- [How to show a message box](how-to-show-a-message-box.md)
-- [How to show a notification](how-to-show-a-notification.md)
-- [How to open activities or views of lazy loaded modules](how-to-open-activities-or-views-of-lazy-loaded-modules.md)
+- [How to open a popup](how-to-open-popup.md)
+- [How to show a message box](how-to-show-message-box.md)
+- [How to show a notification](how-to-show-notification.md)
 
 
 ***

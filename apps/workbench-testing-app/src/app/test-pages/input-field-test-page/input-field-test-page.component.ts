@@ -20,5 +20,5 @@ import {SciFormFieldModule} from '@scion/components.internal/form-field';
     SciFormFieldModule,
   ],
 })
-export class InputFieldTestPageComponent {
+export default class InputFieldTestPageComponent {
 }

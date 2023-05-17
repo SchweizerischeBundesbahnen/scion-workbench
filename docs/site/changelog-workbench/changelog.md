@@ -36,7 +36,7 @@
 
 * **workbench/theme:** renaming workbench icon files introduced a breaking change.
 
-  To migrate, download the workbench icon files from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip" download>GitHub</a>, unzip them and place the extracted files in the `assets/fonts` folder.
+  To migrate, download the workbench icon files from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip">GitHub</a>, unzip them and place the extracted files in the `assets/fonts` folder.
 
 
 

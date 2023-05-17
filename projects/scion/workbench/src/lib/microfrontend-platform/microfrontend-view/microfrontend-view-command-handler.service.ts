@@ -48,14 +48,13 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Notifies microfrontends about the active state of the embedding view.
    */
   private installViewActiveStatePublisher(): void {
-    this._viewRegistry.viewIds$
+    this._viewRegistry.views$
       .pipe(
-        map(viewIds => viewIds.map(viewId => this._viewRegistry.getElseThrow(viewId))),
         switchMap(views => merge(...views.map(view => view.active$.pipe(map(() => view))))),
         takeUntil(this._destroy$),
       )
       .subscribe((view: WorkbenchView) => {
-        const commandTopic = ɵWorkbenchCommands.viewActiveTopic(view.viewId);
+        const commandTopic = ɵWorkbenchCommands.viewActiveTopic(view.id);
         this._messageClient.publish(commandTopic, view.active, {retain: true});
       });
   }
@@ -133,7 +132,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * thus preventing other apps from updating other apps' views.
    */
   private runIfPrivileged(viewId: string, message: Message, runnable: (view: WorkbenchView) => void): void {
-    const view = this._viewRegistry.getElseThrow(viewId);
+    const view = this._viewRegistry.get(viewId);
     const sender = message.headers.get(MessageHeaders.AppSymbolicName);
     if (this.isMicrofrontendProvider(sender, view)) {
       runnable(view);

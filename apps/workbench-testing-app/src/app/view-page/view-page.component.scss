@@ -25,7 +25,7 @@
       font-weight: bold;
     }
 
-    &.viewpart-actions input {
+    &.part-actions input {
       @include sci-ɵcomponents.theme-input-field();
     }
   }

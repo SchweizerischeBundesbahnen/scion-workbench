@@ -6,10 +6,10 @@ We use this app to run our e2e tests and experiment with features.
 </span>
 
 <sci-tabbar>
-  <ng-template sciTab label="Workbench Views" cssClass="e2e-workbench-views" *ngIf="workbenchViewRoutes$ | async | wbNullIfEmpty as workbenchViewRoutes">
+  <ng-template sciTab label="Workbench Views" cssClass="e2e-workbench-views" *ngIf="workbenchViewRoutes$ | async | appNullIfEmpty as workbenchViewRoutes">
     <section class="tiles e2e-workbench-view-tiles">
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
-      <a *ngFor="let route of workbenchViewRoutes | wbFilter$:filterControl:selectViewRouteText | async"
+      <a *ngFor="let route of workbenchViewRoutes | appFilter$:filterControl:selectViewRouteText | async"
          [wbRouterLink]="route.path"
          [ngClass]="route.data[WorkbenchRouteData.cssClass]"
          [wbRouterLinkExtras]="{relativeTo: null}">
@@ -21,10 +21,10 @@ We use this app to run our e2e tests and experiment with features.
     </section>
   </ng-template>
 
-  <ng-template sciTab label="Microfrontend Views" cssClass="e2e-microfrontend-views" *ngIf="microfrontendViewCapabilities$ | async | wbNullIfEmpty as microfrontendViewCapabilities">
+  <ng-template sciTab label="Microfrontend Views" cssClass="e2e-microfrontend-views" *ngIf="microfrontendViewCapabilities$ | async | appNullIfEmpty as microfrontendViewCapabilities">
     <section class="tiles e2e-microfrontend-view-tiles">
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
-      <a *ngFor="let viewCapability of microfrontendViewCapabilities | wbFilter$:filterControl:selectViewCapabilityText | async"
+      <a *ngFor="let viewCapability of microfrontendViewCapabilities | appFilter$:filterControl:selectViewCapabilityText | async"
          (click)="onMicrofrontendViewOpen(viewCapability)"
          [ngClass]="concat(viewCapability.metadata!.appSymbolicName, viewCapability.properties.cssClass)"
          class="microfrontend">
@@ -36,10 +36,10 @@ We use this app to run our e2e tests and experiment with features.
     </section>
   </ng-template>
 
-  <ng-template sciTab label="Test Capabilities" cssClass="e2e-test-capabilities" *ngIf="testCapabilities$ | async | wbNullIfEmpty as testCapabilities">
+  <ng-template sciTab label="Test Capabilities" cssClass="e2e-test-capabilities" *ngIf="testCapabilities$ | async | appNullIfEmpty as testCapabilities">
     <section class="tiles e2e-test-capability-tiles">
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
-      <a *ngFor="let testCapability of testCapabilities | wbFilter$:filterControl:selectTestCapabilityText | async"
+      <a *ngFor="let testCapability of testCapabilities | appFilter$:filterControl:selectTestCapabilityText | async"
          (click)="onTestCapabilityOpen(testCapability, $event)"
          [ngClass]="concat(testCapability.metadata!.appSymbolicName, testCapability.properties?.['cssClass'])"
          class="test-capability">
@@ -47,38 +47,6 @@ We use this app to run our e2e tests and experiment with features.
         <span class="description">
           {{testCapability.metadata!.appSymbolicName}}
         </span>
-      </a>
-    </section>
-  </ng-template>
-
-  <ng-template sciTab label="Miscellaneous" cssClass="e2e-miscellaneous">
-    <section class="miscellaneous e2e-miscellaneous">
-      <header>Open this app in a new browser tab, as follows:</header>
-      <a [href]="computeAppUrl({launcher: 'LAZY', standalone: true})" target="_blank">
-        Start the workbench lazy with microfrontend support disabled.
-      </a>
-      <a [href]="computeAppUrl({launcher: 'LAZY', standalone: false})" target="_blank">
-        Start the workbench lazy with microfrontend support enabled.
-      </a>
-      <a [href]="computeAppUrl({launcher: 'APP_INITIALIZER', standalone: true})" target="_blank">
-        Start the workbench in an 'APP_INITIALIZER' with microfrontend support disabled.
-      </a>
-      <a [href]="computeAppUrl({launcher: 'APP_INITIALIZER', standalone: false})" target="_blank">
-        Start the workbench in an 'APP_INITIALIZER' with microfrontend support enabled.
-      </a>
-
-      <header>Configure workbench logging:</header>
-      <a [routerLink]="[]" queryParamsHandling="merge" [queryParams]="{loglevel: 'debug'}">
-        Change log level to DEBUG
-      </a>
-      <a [routerLink]="[]" queryParamsHandling="merge" [queryParams]="{loglevel: 'info'}">
-        Change log level to INFO
-      </a>
-      <a [routerLink]="[]" queryParamsHandling="merge" [queryParams]="{loglevel: 'warn'}">
-        Change log level to WARN
-      </a>
-      <a [routerLink]="[]" queryParamsHandling="merge" [queryParams]="{loglevel: 'error'}">
-        Change log level to ERROR
       </a>
     </section>
   </ng-template>

@@ -14,14 +14,14 @@ import {take, takeUntil} from 'rxjs/operators';
 import {createElement, setStyle} from '../dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
-import {ViewTabContentComponent} from '../view-part/view-tab-content/view-tab-content.component';
+import {ViewTabContentComponent} from '../part/view-tab-content/view-tab-content.component';
 import {WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {VIEW_TAB_CONTEXT} from '../workbench.constants';
 import {UrlSegment} from '@angular/router';
 import {Disposable} from '../disposable';
 import {WorkbenchView} from '../view/workbench-view.model';
-import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
+import {WorkbenchPart} from '../part/workbench-part.model';
 import {subscribeInside} from '@scion/toolkit/operators';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
@@ -83,7 +83,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
    * Method invoked while dragging a view over the current window. It is invoked outside the Angular zone.
    */
   private onWindowDragOver(event: DragEvent): void {
-    const dragPosition = this.computeDragImageRect(this._viewDragService.viewDragData!, event);
+    const dragPosition = this.calculateDragImageRect(this._viewDragService.viewDragData!, event);
 
     // update the drag image position
     setStyle(this._viewDragImagePortalOutlet!.outletElement as HTMLElement, {
@@ -119,7 +119,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
     }
 
     const dragData = this._viewDragService.viewDragData!;
-    const dragPosition = this.computeDragImageRect(dragData, event);
+    const dragPosition = this.calculateDragImageRect(dragData, event);
 
     // create the drag image
     const outletElement = createElement('div', {
@@ -143,9 +143,9 @@ export class ViewTabDragImageRenderer implements OnDestroy {
   }
 
   /**
-   * Computes the drag image client position and dimension, accounting for any constraints.
+   * Calculates client position and dimension for the drag image, accounting for any constraints.
    */
-  public computeDragImageRect(dragData: ViewDragData, event: DragEvent): ViewDragImageRect {
+  public calculateDragImageRect(dragData: ViewDragData, event: DragEvent): ViewDragImageRect {
     const rect = new ViewDragImageRect({
       x: event.clientX - dragData.viewTabPointerOffsetX,
       y: event.clientY - dragData.viewTabPointerOffsetY,
@@ -236,7 +236,7 @@ export class ViewDragImageRect {
 
 class DragImageWorkbenchView implements WorkbenchView {
 
-  public readonly viewId: string;
+  public readonly id: string;
   public readonly title: string;
   public readonly heading: string;
   public readonly closable: boolean;
@@ -253,7 +253,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly scrolledIntoView = true;
 
   constructor(dragData: ViewDragData) {
-    this.viewId = dragData.viewId;
+    this.id = dragData.viewId;
     this.title = dragData.viewTitle;
     this.heading = dragData.viewHeading;
     this.closable = dragData.viewClosable;
@@ -277,7 +277,7 @@ class DragImageWorkbenchView implements WorkbenchView {
     throw Error('[UnsupportedOperationError]');
   }
 
-  public get part(): WorkbenchViewPart {
+  public get part(): WorkbenchPart {
     throw Error('[UnsupportedOperationError]');
   }
 }

@@ -9,14 +9,6 @@
  */
 
 import {InjectionToken} from '@angular/core';
-import {WbRouteReuseProvider} from './routing/wb-route-reuse-strategy.service';
-
-/**
- * Multi DI injection token to control which routes to reuse.
- *
- * @see WbRouteReuseProvider
- */
-export const ROUTE_REUSE_PROVIDER = new InjectionToken<WbRouteReuseProvider>('ROUTE_REUSE_PROVIDER');
 
 /**
  * DI injection token to ensure `WorkbenchModule.forRoot()` is not used in a lazy context.
@@ -24,39 +16,23 @@ export const ROUTE_REUSE_PROVIDER = new InjectionToken<WbRouteReuseProvider>('RO
 export const WORKBENCH_FORROOT_GUARD = new InjectionToken<void>('WORKBENCH_FORROOT_GUARD');
 
 /**
- * Represents the name of the activity router outlet.
+ * Prefix for views that are target of a primary route.
+ *
+ * Views with an id that begins with the view prefix can be the target of any primary route. A primary route does not declare an outlet.
+ * On the other hand, views with an id that does not begin with the view prefix can only be the target of secondary routes having the view
+ * id as their target outlet.
  */
-export const ACTIVITY_OUTLET_NAME = 'activity';
+export const VIEW_ID_PREFIX = 'view.';
 
 /**
- * Represents the key which the activity is associated in data params.
+ * Represents the id prefix of popups.
  */
-export const ACTIVITY_DATA_KEY = 'wb.activity';
+export const POPUP_ID_PREFIX = 'popup.';
 
 /**
- * Specifies the prefix used to name viewpart references.
+ * Name of the query parameter that contains the layout of the main area.
  */
-export const VIEW_PART_REF_PREFIX = 'viewpart.';
-
-/**
- * Specifies the prefix used to name views.
- */
-export const VIEW_REF_PREFIX = 'view.';
-
-/**
- * Specifies the prefix used to name popups.
- */
-export const POPUP_REF_PREFIX = 'popup.';
-
-/**
- * Name of the query parameter that contains the parts layout in the URL.
- */
-export const PARTS_LAYOUT_QUERY_PARAM = 'parts';
-
-/**
- * Property name of the navigation extras in navigational state.
- */
-export const NAVIGATION_EXTRAS = 'ɵscion.workbench.routing.navigationextras';
+export const MAIN_AREA_LAYOUT_QUERY_PARAM = 'main_area';
 
 /**
  * Defines the contexts in which a viewtab is rendered.

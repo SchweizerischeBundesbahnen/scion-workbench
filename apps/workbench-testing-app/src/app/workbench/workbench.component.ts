@@ -9,11 +9,15 @@
  */
 
 import {Component, OnDestroy} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {distinct, map, takeUntil} from 'rxjs/operators';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {combineLatest, Observable, Subject} from 'rxjs';
-import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {WorkbenchRouter, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
+import {MenuService} from '../menu/menu.service';
+import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
+import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
+import {PerspectiveData} from '../perspective-definitions';
 
 @Component({
   selector: 'app-workbench',
@@ -25,12 +29,86 @@ export class WorkbenchComponent implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   public showNewTabAction$: Observable<boolean>;
+  public PerspectiveData = PerspectiveData;
+  public whenWorkbenchStarted: Promise<boolean>;
 
   constructor(private _route: ActivatedRoute,
-              private _workbench: WorkbenchService,
-              private _wbRouter: WorkbenchRouter) {
+              private _wbRouter: WorkbenchRouter,
+              private _menuService: MenuService,
+              private _router: Router,
+              public workbenchService: WorkbenchService,
+              workbenchStartup: WorkbenchStartup) {
+    this.whenWorkbenchStarted = workbenchStartup.whenStarted.then(() => true);
     this.showNewTabAction$ = this._route.queryParamMap.pipe(map(params => !params.has('showNewTabAction') || coerceBooleanProperty(params.get('showNewTabAction'))));
     this.installStickyStartViewTab();
+  }
+
+  public async onPerspectiveActivate(id: string): Promise<void> {
+    await this.workbenchService.switchPerspective(id);
+  }
+
+  public onMenuOpen(event: MouseEvent): void {
+    this._menuService.openMenu(event, [
+        ...this.contributePerspectiveMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributeLoggerMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributeStartupMenuItems(),
+      ],
+    );
+  }
+
+  private contributePerspectiveMenuItems(): MenuItem[] {
+    return [
+      new MenuItem({
+          text: 'Reset Perspective',
+          disabled: !this.workbenchService.perspectives.length,
+          onAction: () => this.workbenchService.resetPerspective(),
+        },
+      ),
+    ];
+  }
+
+  private contributeLoggerMenuItems(): MenuItem[] {
+    return [
+      new MenuItem({
+        text: 'Change log level to DEBUG',
+        onAction: () => this._router.navigate([], {queryParams: {loglevel: 'debug'}, queryParamsHandling: 'merge'}),
+      }),
+      new MenuItem({
+        text: 'Change log level to INFO',
+        onAction: () => this._router.navigate([], {queryParams: {loglevel: 'info'}, queryParamsHandling: 'merge'}),
+      }),
+      new MenuItem({
+        text: 'Change log level to WARN',
+        onAction: () => this._router.navigate([], {queryParams: {loglevel: 'warn'}, queryParamsHandling: 'merge'}),
+      }),
+      new MenuItem({
+        text: 'Change log level to ERROR',
+        onAction: () => this._router.navigate([], {queryParams: {loglevel: 'error'}, queryParamsHandling: 'merge'}),
+      }),
+    ];
+  }
+
+  private contributeStartupMenuItems(): MenuItem[] {
+    return [
+      new MenuItem({
+        text: 'Open workbench in new tab (LAZY)',
+        onAction: () => this.openInNewWindow({standalone: false, launcher: 'LAZY'}),
+      }),
+      new MenuItem({
+        text: 'Open workbench in new tab (APP_INITIALIZER)',
+        onAction: () => this.openInNewWindow({standalone: false, launcher: 'APP_INITIALIZER'}),
+      }),
+      new MenuItem({
+        text: 'Open standalone workbench in new tab (LAZY)',
+        onAction: () => this.openInNewWindow({standalone: true, launcher: 'LAZY'}),
+      }),
+      new MenuItem({
+        text: 'Open standalone workbench in new tab (APP_INITIALIZER)',
+        onAction: () => this.openInNewWindow({standalone: true, launcher: 'APP_INITIALIZER'}),
+      }),
+    ];
   }
 
   /**
@@ -38,7 +116,7 @@ export class WorkbenchComponent implements OnDestroy {
    */
   private installStickyStartViewTab(): void {
     const stickyStartViewTab$ = this._route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get('stickyStartViewTab'))), distinct());
-    const views$ = this._workbench.views$;
+    const views$ = this.workbenchService.views$;
     combineLatest([stickyStartViewTab$, views$])
       .pipe(takeUntil(this._destroy$))
       .subscribe(([stickyStartViewTab, views]) => {
@@ -50,5 +128,15 @@ export class WorkbenchComponent implements OnDestroy {
 
   public ngOnDestroy(): void {
     this._destroy$.next();
+  }
+
+  /**
+   * Opens a new browser window with given startup options, preserving the current workbench layout.
+   */
+  private openInNewWindow(options: {launcher: 'APP_INITIALIZER' | 'LAZY'; standalone: boolean}): void {
+    const href = new URL(location.href);
+    href.searchParams.append(WorkbenchStartupQueryParams.LAUNCHER_QUERY_PARAM, options.launcher);
+    href.searchParams.append(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM, `${options.standalone}`);
+    window.open(href);
   }
 }

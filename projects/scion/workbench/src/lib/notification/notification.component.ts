@@ -16,7 +16,7 @@ import {ComponentPortal} from '@angular/cdk/portal';
 import {Notification} from './notification';
 
 /**
- * A notification is a closable message that appears in the top right corner and disappears automatically after a few seconds.
+ * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
  * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
  */
 @Component({

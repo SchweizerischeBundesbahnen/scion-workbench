@@ -26,7 +26,7 @@ const CSS_CLASS = 'cssClass';
     ReactiveFormsModule,
   ]
 })
-export class BulkNavigationTestPageComponent {
+export default class BulkNavigationTestPageComponent {
 
   public readonly VIEW_COUNT = VIEW_COUNT;
   public readonly CSS_CLASS = CSS_CLASS;

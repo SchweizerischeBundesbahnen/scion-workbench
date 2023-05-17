@@ -1,0 +1,7 @@
+:host {
+  padding: 1em;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .5em 2em;
+  place-content: start;
+}

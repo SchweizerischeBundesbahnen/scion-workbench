@@ -2063,6 +2063,7 @@ test.describe('Workbench Router', () => {
    * in microfrontend-2 upon its construction, the router should not navigate back to microfrontend 1.
    */
   test('should not navigate back to the previous microfrontend when self-navigating upon microfrontend construction', async ({appPO, microfrontendNavigator}) => {
+    test.slow(); // increase timeout because this test simulates slow capability lookup
     await appPO.navigateTo({microfrontendSupport: true, simulateSlowCapabilityLookup: true});
 
     // register microfrontend-1 view

@@ -14,22 +14,26 @@ import {NullIfEmptyPipe} from './null-if-empty.pipe';
 import {StringifyPipe} from './stringify.pipe';
 import {PluckPipe} from './pluck.pipe';
 import {FilterPipe} from './filter.pipe';
+import {JoinPipe} from './join.pipe';
+import {InstanceofPipe} from './instanceof.pipe';
 
 @NgModule({
   imports: [
     CommonModule,
-  ],
-  declarations: [
+    JoinPipe,
     NullIfEmptyPipe,
     StringifyPipe,
     PluckPipe,
     FilterPipe,
+    InstanceofPipe,
   ],
   exports: [
     NullIfEmptyPipe,
     StringifyPipe,
     PluckPipe,
     FilterPipe,
+    JoinPipe,
+    InstanceofPipe,
   ],
 })
 export class UtilModule {

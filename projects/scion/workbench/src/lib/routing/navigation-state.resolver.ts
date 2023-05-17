@@ -11,18 +11,14 @@
 import {ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot} from '@angular/router';
 import {Injectable} from '@angular/core';
 import {Dictionary} from '@scion/toolkit/util';
-import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchRouteData} from './workbench-route-data';
-import {NAVIGATION_EXTRAS} from '../workbench.constants';
+import {WorkbenchNavigationalState, WorkbenchNavigationalStates} from './workbench-navigational-states';
 
 /**
  * Makes navigational state available to the activated route via {@link ActivatedRoute#data} under the key {@link WorkbenchRouteData.state}.
  *
- * We read the navigation state from {@link WorkbenchRouter#getCurrentNavigationViewState} instead of {@link Router#getCurrentNavigation#extras}
- * because the Angular router discards passed state if a guard performs a redirect. See Angular issue https://github.com/angular/angular/issues/27148.
- *
- * Depending on the route configuration, the Angular router invokes this resolver also if only query parameters change.
- * See {@link Route#runGuardsAndResolvers}. Then, we resolve to the current state of the activated route.
+ * Depending on the route configuration, the Angular router runs this resolver on every navigation. See {@link Route#runGuardsAndResolvers}. Then,
+ * we resolve to the current state of the activated route.
  *
  * Note that Angular performs a reference equality check to decide whether resolved data has changed. For that reason, we resolve to `undefined` if the
  * state object is empty.
@@ -30,14 +26,20 @@ import {NAVIGATION_EXTRAS} from '../workbench.constants';
 @Injectable({providedIn: 'root'})
 export class NavigationStateResolver implements Resolve<Dictionary | undefined | null> {
 
-  constructor(private _workbenchRouter: WorkbenchRouter, private _router: Router) {
+  constructor(private _router: Router) {
   }
 
-  public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Dictionary | undefined | null {
-    const outletName = route.outlet;
-    const outletState = {...this._workbenchRouter.getCurrentNavigationViewState(outletName) || this.findActivatedRoute(outletName)?.data?.[WorkbenchRouteData.state]};
-    removeRoutingState(outletState);
-    return isEmpty(outletState) ? undefined : outletState;
+  public resolve(route: ActivatedRouteSnapshot, routerState: RouterStateSnapshot): Dictionary | undefined | null {
+    const navigationalViewState = this.getNavigationalViewState(route.outlet);
+    return isEmpty(navigationalViewState) ? undefined : navigationalViewState;
+  }
+
+  private getNavigationalViewState(viewId: string): WorkbenchNavigationalState | undefined {
+    const navigationalViewState = WorkbenchNavigationalStates.fromNavigation(this._router.getCurrentNavigation()!)?.viewStates?.[viewId];
+    if (navigationalViewState) {
+      return navigationalViewState;
+    }
+    return this.findActivatedRoute(viewId)?.data?.[WorkbenchRouteData.state];
   }
 
   private findActivatedRoute(outlet: string): ActivatedRouteSnapshot | undefined {
@@ -59,13 +61,4 @@ function isEmpty(dictionary: Dictionary | undefined | null): boolean {
     return true;
   }
   return false;
-}
-
-/**
- * Removes workbench-internal routing state.
- */
-function removeRoutingState(dictionary: Dictionary | undefined | null): void {
-  if (dictionary) {
-    delete dictionary[NAVIGATION_EXTRAS];
-  }
 }

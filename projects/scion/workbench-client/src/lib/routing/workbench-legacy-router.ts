@@ -19,7 +19,7 @@ import {lastValueFrom} from 'rxjs';
 /**
  * Allows navigating to a microfrontend in a workbench view.
  *
- * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.
+ * A view is a visual workbench component for displaying content stacked or side-by-side.
  *
  * In SCION Workbench Client, routing means instructing a workbench view to display the microfrontend of a registered view capability.
  * A qualifier is used to differentiate view capabilities. A micro application can provide multiple view capabilities and make them
@@ -66,7 +66,7 @@ export class ɵWorkbenchLegacyRouter {
   private async issueViewIntent(qualifier: Qualifier | {}, extras?: ɵWorkbenchLegacyNavigationExtras): Promise<boolean> {
     const navigationExtras: ɵWorkbenchLegacyNavigationExtras = {
       ...extras,
-      selfViewId: extras?.selfViewId ?? Beans.opt(WorkbenchView)?.viewId,
+      selfViewId: extras?.selfViewId ?? Beans.opt(WorkbenchView)?.id,
       params: undefined,         // included in the intent
       paramsHandling: undefined, // only applicable for self-navigation
     };
@@ -89,7 +89,7 @@ export class ɵWorkbenchLegacyRouter {
       params: Dictionaries.coerce(extras?.params),
       paramsHandling: extras?.paramsHandling,
     };
-    const updateParams$ = Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.viewParamsUpdateTopic(Beans.get(WorkbenchView).viewId, viewCapabilityId), command);
+    const updateParams$ = Beans.get(MessageClient).request$<boolean>(ɵWorkbenchCommands.viewParamsUpdateTopic(Beans.get(WorkbenchView).id, viewCapabilityId), command);
     try {
       return await lastValueFrom(updateParams$.pipe(mapToBody()));
     }

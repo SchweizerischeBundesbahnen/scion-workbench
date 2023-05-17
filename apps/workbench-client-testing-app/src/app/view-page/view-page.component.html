@@ -1,6 +1,6 @@
 <section>
   <sci-form-field label="View ID">
-    <span class="e2e-view-id">{{view.viewId}}</span>
+    <span class="e2e-view-id">{{view.id}}</span>
   </sci-form-field>
 
   <sci-form-field label="App Instance" title="Unique identifier of this app instance">
@@ -27,16 +27,16 @@
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="e2e-view-params" variant="solid" *ngIf="view.params$ | async | wbNullIfEmpty as params">
+<sci-accordion class="e2e-view-params" variant="solid" *ngIf="view.params$ | async | appNullIfEmpty as params">
   <ng-template sciAccordionItem [panel]="panel_view_params">
     <header>View Params</header>
   </ng-template>
   <ng-template #panel_view_params>
-    <sci-property [properties]="params | wbAppendParamDataType" class="e2e-view-params"></sci-property>
+    <sci-property [properties]="params | appAppendParamDataType" class="e2e-view-params"></sci-property>
   </ng-template>
 </sci-accordion>
 
-<sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | wbNullIfEmpty as params">
+<sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | appNullIfEmpty as params">
   <ng-template sciAccordionItem [panel]="panel_route_params">
     <header>Route Params</header>
   </ng-template>
@@ -45,7 +45,7 @@
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | wbNullIfEmpty as params">
+<sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | appNullIfEmpty as params">
   <ng-template sciAccordionItem [panel]="panel_query_params">
     <header>Route Query Params</header>
   </ng-template>
@@ -54,7 +54,7 @@
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="e2e-route-fragment" variant="solid" *ngIf="route.fragment | async | wbNullIfEmpty as fragment">
+<sci-accordion class="e2e-route-fragment" variant="solid" *ngIf="route.fragment | async | appNullIfEmpty as fragment">
   <ng-template sciAccordionItem [panel]="panel_route_fragment">
     <header>Route Fragment</header>
   </ng-template>

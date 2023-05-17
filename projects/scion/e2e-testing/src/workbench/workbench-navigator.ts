@@ -14,6 +14,8 @@ import {NotificationOpenerPagePO} from './page-object/notification-opener-page.p
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {LayoutPagePO} from './page-object/layout-page.po';
+import {RouteRegisterPagePO} from './page-object/router-register-page.po';
 
 export interface Type<T> extends Function {
   new(...args: any[]): T;
@@ -44,9 +46,17 @@ export class WorkbenchNavigator {
    */
   public openInNewTab(page: Type<RouterPagePO>): Promise<RouterPagePO>;
   /**
+   * Opens the page to change the layout in a new workbench tab.
+   */
+  public openInNewTab(page: Type<LayoutPagePO>): Promise<LayoutPagePO>;
+  /**
    * Opens the page to inspect view properties in a new workbench tab.
    */
   public openInNewTab(page: Type<ViewPagePO>): Promise<ViewPagePO>;
+  /**
+   * Opens the page to register an Angular route in a new workbench tab.
+   */
+  public openInNewTab(page: Type<RouteRegisterPagePO>): Promise<RouteRegisterPagePO>;
 
   public async openInNewTab(page: Type<any>): Promise<any> {
     const startPO = await this._appPO.openNewViewTab();
@@ -69,9 +79,17 @@ export class WorkbenchNavigator {
         await startPO.openWorkbenchView('e2e-test-router');
         return new RouterPagePO(this._appPO, viewId);
       }
+      case LayoutPagePO: {
+        await startPO.openWorkbenchView('e2e-test-layout');
+        return new LayoutPagePO(this._appPO, viewId);
+      }
       case ViewPagePO: {
         await startPO.openWorkbenchView('e2e-test-view');
         return new ViewPagePO(this._appPO, viewId);
+      }
+      case RouteRegisterPagePO: {
+        await startPO.openWorkbenchView('e2e-route-registrator');
+        return new RouteRegisterPagePO(this._appPO, viewId);
       }
       default: {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);

@@ -1,0 +1,9 @@
+:host {
+  display: block;
+
+  > wb-grid-element {
+    width: 100%;
+    height: 100%;
+  }
+}
+

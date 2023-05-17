@@ -89,6 +89,15 @@ The following is a summary of commands useful for development of `scion-workbenc
 - `npm run workbench-client-testing-app:lint`\
   Lints the `workbench-client-testing-app`.
 
+### Commands for working on the getting started application
+
+- `npm run workbench-getting-started-app:serve`\
+  Serves the `workbench-getting-started-app` on http://localhost:4500.\
+  Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support.
+
+- `npm run workbench-getting-started-app:lint`\
+  Lints the `workbench-testing-app`.
+
 ### Commands for generating the project documentation
 
 We generate separate changelogs for the packages `@scion/workbench` and `@scion/workbench-client` because of their independent release cycles.
@@ -246,6 +255,7 @@ We have the following workbench related projects:
 - https://vercel.com/scion/scion-workbench-client-api
 - https://vercel.com/scion/scion-workbench-testing-app
 - https://vercel.com/scion/scion-workbench-client-testing-app
+- https://vercel.com/scion/scion-workbench-getting-started-app
 
 </details>
 
@@ -294,6 +304,7 @@ This chapter describes the tasks to publish a new release for `@scion/workbench`
 1. Verify that: 
    - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
    - **Testing Apps** are deployed to:
+      - https://scion-workbench-getting-started.vercel.app
       - https://scion-workbench-testing-app.vercel.app
       - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
       - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
@@ -314,6 +325,7 @@ This chapter describes the tasks to publish a new release for `@scion/workbench-
 1. Verify that: 
    - **@scion/workbench-client** is published to: https://www.npmjs.com/package/@scion/workbench-client.
    - **Testing Apps** are deployed to:
+      - https://scion-workbench-getting-started.vercel.app 
       - https://scion-workbench-testing-app.vercel.app
       - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
       - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)

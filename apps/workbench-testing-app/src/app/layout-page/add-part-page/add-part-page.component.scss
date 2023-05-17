@@ -1,0 +1,41 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+  > form {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    > section {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: .5em;
+      border: 1px solid var(--sci-color-P400);
+      border-radius: 5px;
+      padding: 1em;
+
+      > header {
+        margin-top: 0;
+        margin-bottom: 2em;
+        font-weight: bold;
+      }
+    }
+  }
+
+  > output.navigate-success {
+    flex: none;
+    display: none;
+  }
+
+  > output.navigate-error {
+    flex: none;
+    border: 1px solid var(--sci-color-warn);
+    background-color: var(--sci-color-W100);
+    border-radius: 3px;
+    padding: 1em;
+  }
+}

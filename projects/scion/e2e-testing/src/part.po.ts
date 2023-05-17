@@ -33,7 +33,7 @@ export class PartPO {
   public readonly sash: PartSashPO;
 
   constructor(private readonly _locator: Locator) {
-    this._partBarLocator = this._locator.locator('wb-view-part-bar');
+    this._partBarLocator = this._locator.locator('wb-part-bar');
     this.activeView = new ViewPO(this._locator.locator('wb-view'), new ViewTabPO(this._locator.locator('wb-view-tab.active'), this));
     this.sash = new PartSashPO(this._locator);
   }
@@ -68,10 +68,17 @@ export class PartPO {
   }
 
   /**
-   * Returns whether this part is displaying the default page because no view is present.
+   * Indicates if this part is contained in the main area.
+   */
+  public isInMainArea(): Promise<boolean> {
+    return isPresent(this._locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this._locator}));
+  }
+
+  /**
+   * Returns whether this part is displaying the default page because the part contains no view.
    */
   public async isDefaultPagePresent(componentSelector: string): Promise<boolean> {
-    return isPresent(this._locator.locator('sci-viewport.views-absent-outlet').locator(componentSelector));
+    return isPresent(this._locator.locator('sci-viewport.e2e-no-view').locator(componentSelector));
   }
 
   /**

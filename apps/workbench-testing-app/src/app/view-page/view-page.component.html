@@ -1,18 +1,22 @@
 <section>
   <sci-form-field label="View ID">
-    <span class="e2e-view-id">{{view.viewId}}</span>
+    <span class="e2e-view-id">{{view.id}}</span>
   </sci-form-field>
 
   <sci-form-field label="Part ID">
-    <span class="e2e-part-id">{{view.part.partId}}</span>
+    <span class="e2e-part-id">{{view.part.id}}</span>
   </sci-form-field>
 
   <sci-form-field label="Component Instance" title="Unique identifier of this component instance">
     <span class="e2e-component-instance-id">{{uuid}}</span>
   </sci-form-field>
+
+  <sci-form-field label="Path">
+    <span>{{view.urlSegments | appJoin:'/'}}</span>
+  </sci-form-field>
 </section>
 
-<sci-accordion class="e2e-route-params" variant="solid" *ngIf="route.params | async | wbNullIfEmpty as params">
+<sci-accordion class="e2e-route-params" variant="solid" *ngIf="route.params | async | appNullIfEmpty as params">
   <ng-template sciAccordionItem [panel]="panel_route_params">
     <header>Route Params</header>
   </ng-template>
@@ -21,7 +25,7 @@
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | wbNullIfEmpty as params">
+<sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | appNullIfEmpty as params">
   <ng-template sciAccordionItem [panel]="panel_route_query_params">
     <header>Route Query Params</header>
   </ng-template>
@@ -30,7 +34,7 @@
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="e2e-navigational-state" variant="solid" *ngIf="route.data | async | wbPluck:WorkbenchRouteData.state as state">
+<sci-accordion class="e2e-navigational-state" variant="solid" *ngIf="route.data | async | appPluck:WorkbenchRouteData.state as state">
   <ng-template sciAccordionItem [panel]="panel_navigational_state">
     <header>Navigational State</header>
   </ng-template>
@@ -72,19 +76,27 @@
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="e2e-viewpart-actions viewpart-actions" variant="solid">
-  <ng-template sciAccordionItem [panel]="panel_viewpart_actions">
-    <header>Viewpart Actions</header>
+<sci-accordion class="e2e-part-actions part-actions" variant="solid">
+  <ng-template sciAccordionItem [panel]="panel_part_actions">
+    <header>Part Actions</header>
   </ng-template>
-  <ng-template #panel_viewpart_actions>
-    <input class="e2e-viewpart-actions"
-           [formControl]="viewpartActionsFormControl"
+  <ng-template #panel_part_actions>
+    <input class="e2e-part-actions"
+           [formControl]="partActionsFormControl"
            placeholder='Enter action(s) as JSON array: [{"icon":"open_in_new","align":"end","cssClass":"e2e-open-in-new"}]'>
   </ng-template>
 </sci-accordion>
 
-<ng-template wbViewPartAction
-             *ngFor="let action of viewpartActions$ | async"
+<section>
+  <header>Miscellaneous</header>
+
+  <sci-form-field label="Text Field">
+    <input placeholder="Text that should be preserved when the layout changes.">
+  </sci-form-field>
+</section>
+
+<ng-template wbPartAction
+             *ngFor="let action of partActions$ | async"
              [align]="action.align">
   <button class="material-icons" [ngClass]="action.cssClass">
     {{action.icon}}

@@ -36,8 +36,7 @@ import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
  *   when opening the message box in the context of a view, it is opened as a view-modal message box. When opened outside of a
  *   view, setting the modality to 'view' has no effect, unless setting {@link MessageBoxConfig.context.viewId}.
  *
- * By default, the message box supports the display of a plain text message. To display structured content or prompting the user for
- * input, consider passing a component to {@link MessageBoxConfig#content} instead.
+ * To display structured content, consider passing a component to {@link MessageBoxConfig#content} instead of plain text.
  *
  * Unlike views, message boxes are not part of the persistent workbench navigation, meaning that message boxes do not survive a page reload.
  */
@@ -91,7 +90,7 @@ export class MessageBoxService implements OnDestroy {
       return Arrays.last(this._messageBoxServiceHierarchy)!.addMessageBox(config);
     }
     else if (config.context?.viewId) {
-      const view = this._viewRegistry.getElseThrow(config.context.viewId);
+      const view = this._viewRegistry.get(config.context.viewId);
       const viewInjector = view.portal.componentRef.injector;
       return viewInjector.get(MessageBoxService).addMessageBox(config);
     }
