@@ -9,26 +9,52 @@
  */
 
 import {Component, OnDestroy} from '@angular/core';
-import {WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {WorkbenchModule, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {Observable, Subject} from 'rxjs';
 import {map, startWith, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {UntypedFormControl} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule, UntypedFormControl} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {PluckPipe} from '../util/pluck.pipe';
+import {SciPropertyModule} from '@scion/components.internal/property';
+import {NullIfEmptyPipe} from '../util/null-if-empty.pipe';
+import {JoinPipe} from '../util/join.pipe';
 
 @Component({
   selector: 'app-view-page',
   templateUrl: './view-page.component.html',
   styleUrls: ['./view-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    NgClass,
+    AsyncPipe,
+    FormsModule,
+    ReactiveFormsModule,
+    WorkbenchModule,
+    SciFormFieldModule,
+    SciCheckboxModule,
+    SciAccordionModule,
+    SciPropertyModule,
+    PluckPipe,
+    PluckPipe,
+    NullIfEmptyPipe,
+    JoinPipe,
+  ],
 })
-export class ViewPageComponent implements OnDestroy {
+export default class ViewPageComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
   public uuid = UUID.randomUUID();
-  public viewpartActions$: Observable<ViewpartAction[]>;
-  public viewpartActionsFormControl = new UntypedFormControl('');
+  public partActions$: Observable<PartAction[]>;
+  public partActionsFormControl = new UntypedFormControl('');
 
   public WorkbenchRouteData = WorkbenchRouteData;
 
@@ -39,23 +65,26 @@ export class ViewPageComponent implements OnDestroy {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
 
-    this.viewpartActions$ = this.viewpartActionsFormControl.valueChanges
+    this.partActions$ = this.partActionsFormControl.valueChanges
       .pipe(
-        map(() => this.parseViewpartActions()),
-        startWith(this.parseViewpartActions()),
+        map(() => this.parsePartActions()),
+        startWith(this.parsePartActions()),
       );
 
     this.installViewActiveStateLogger();
     this.installNavigationalStateLogger();
+
+    // Some tests need to pass CSS classes as matrix parameters because CSS classes passed via the router are not preserved on page reload or browser back/forward navigation.
+    view.cssClass = view.cssClasses.concat(route.snapshot.paramMap.get('cssClass') ?? []);
   }
 
-  private parseViewpartActions(): ViewpartAction[] {
-    if (!this.viewpartActionsFormControl.value) {
+  private parsePartActions(): PartAction[] {
+    if (!this.partActionsFormControl.value) {
       return [];
     }
 
     try {
-      return Arrays.coerce(JSON.parse(this.viewpartActionsFormControl.value));
+      return Arrays.coerce(JSON.parse(this.partActionsFormControl.value));
     }
     catch {
       return [];
@@ -79,7 +108,7 @@ export class ViewPageComponent implements OnDestroy {
     this.route.data
       .pipe(takeUntil(this._destroy$))
       .subscribe(data => {
-        console.debug(`[ActivatedRouteDataChange] [viewId=${this.view.viewId}, state=${JSON.stringify(data[WorkbenchRouteData.state])}]`);
+        console.debug(`[ActivatedRouteDataChange] [viewId=${this.view.id}, state=${JSON.stringify(data[WorkbenchRouteData.state])}]`);
       });
   }
 
@@ -88,7 +117,7 @@ export class ViewPageComponent implements OnDestroy {
   }
 }
 
-export interface ViewpartAction {
+export interface PartAction {
   icon: string;
   align: 'start' | 'end';
   cssClass: string;

@@ -74,7 +74,7 @@ export class WorkbenchPopupService {
       closeStrategy: config.closeStrategy,
       cssClass: config.cssClass,
       context: {
-        viewId: Defined.orElse(config.context?.viewId, () => Beans.opt(WorkbenchView)?.viewId),
+        viewId: Defined.orElse(config.context?.viewId, () => Beans.opt(WorkbenchView)?.id),
       },
     };
     const popupOriginReporter = this.observePopupOrigin$(config)

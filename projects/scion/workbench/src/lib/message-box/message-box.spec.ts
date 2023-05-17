@@ -8,72 +8,61 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {Component, DebugElement} from '@angular/core';
-import {Router, RouterOutlet} from '@angular/router';
-import {RouterTestingModule} from '@angular/router/testing';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {RouterOutlet} from '@angular/router';
 import {By} from '@angular/platform-browser';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {WorkbenchTestingModule} from '../spec/workbench-testing.module';
 import {MessageBoxService} from './message-box.service';
 import {WorkbenchModule} from '../workbench.module';
-import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
+import {styleFixture, waitForInitialWorkbenchLayout, waitForWorkbenchLayoutChange} from '../testing/testing.util';
+import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('MessageBox', () => {
 
   describe('Workbench in a Router Outlet (Angular sets up a separate injector for standalone components loaded via router)', () => {
 
-    beforeEach(() => {
+    it('should display application-modal message box', async () => {
       TestBed.configureTestingModule({
         imports: [
-          WorkbenchTestingModule.forRoot({startup: {launcher: 'LAZY'}}),
+          WorkbenchTestingModule.forTest(),
           RouterTestingModule.withRoutes([
             {path: '', component: WorkbenchTestComponent},
-            {path: 'view', component: ViewTestComponent},
           ]),
-          NoopAnimationsModule,
-        ],
-        providers: [
-          {provide: ComponentFixtureAutoDetect, useValue: true},
         ],
       });
-      TestBed.inject(Router).initialNavigation();
-    });
-
-    it('should display application-modal message box', async () => {
-      // Create fixture
-      const fixture = TestBed.createComponent(RootTestComponent);
-      fixture.debugElement.nativeElement.style.border = '1px solid black';
-
-      // Launch workbench
-      await TestBed.inject(WorkbenchLauncher).launch();
+      const fixture = styleFixture(TestBed.createComponent(RootTestComponent));
+      await waitForInitialWorkbenchLayout();
 
       // Open application-modal message box
       TestBed.inject(MessageBoxService).open({content: 'message', cssClass: 'testee'}).then();
 
       // Expect message box to show
-      await fixture.whenStable();
       expect(querySelector(fixture, 'wb-message-box.testee')).toBeDefined();
     });
 
     it('should display view-local message box', async () => {
-      // Create fixture
-      const fixture = TestBed.createComponent(RootTestComponent);
-      fixture.debugElement.nativeElement.style.border = '1px solid black';
-
-      // Launch workbench
-      await TestBed.inject(WorkbenchLauncher).launch();
+      TestBed.configureTestingModule({
+        imports: [
+          WorkbenchTestingModule.forTest(),
+          RouterTestingModule.withRoutes([
+            {path: '', component: WorkbenchTestComponent},
+            {path: 'view', component: ViewTestComponent},
+          ]),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(RootTestComponent));
+      await waitForInitialWorkbenchLayout();
 
       // Open view
       await TestBed.inject(WorkbenchRouter).navigate(['view']);
-      await fixture.whenStable();
+      await waitForWorkbenchLayoutChange();
 
       // Open view-local message box
       const viewDebugElement = debugElement(fixture, ViewTestComponent);
       viewDebugElement.injector.get(MessageBoxService).open({content: 'Message from View', cssClass: 'testee'}).then();
-      await fixture.whenStable();
 
       // Expect message box to show
       expect(querySelector(fixture, 'wb-message-box.testee')).toBeDefined();

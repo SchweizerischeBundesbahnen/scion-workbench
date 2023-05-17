@@ -39,28 +39,4 @@ export const featureRoutes: Routes = [
       [WorkbenchRouteData.cssClass]: 'e2e-feature-d',
     },
   },
-  {
-    path: 'feature-part',
-    children: [
-      {
-        path: 'part-1',
-        component: BlankComponent,
-      },
-      {
-        path: 'part-2',
-        component: BlankComponent,
-        data: {[WorkbenchRouteData.part]: 'PREFERRED_PART_2'},
-      },
-      {
-        path: 'part-3',
-        loadComponent: (): any => import('../../blank/blank.component').then(m => m.BlankComponent),
-      },
-      {
-        path: 'part-4',
-        loadComponent: (): any => import('../../blank/blank.component').then(m => m.BlankComponent),
-        data: {[WorkbenchRouteData.part]: 'PREFERRED_PART_4'},
-      },
-    ],
-    data: {[WorkbenchRouteData.part]: 'PREFERRED_PART'},
-  },
 ];

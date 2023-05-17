@@ -1,0 +1,26 @@
+@use '../../../theme/styles';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  outline: none;
+
+  > wb-part-bar {
+    flex: none;
+    height: styles.$viewtab-height;
+  }
+
+  > div.active-view {
+    flex: auto;
+    display: grid;
+    position: relative; // positioning context for view and drop zone
+  }
+
+  > sci-viewport.no-view {
+    flex: 1 1 0;
+
+    > router-outlet {
+      position: absolute; // take router outlet out of the document flow
+    }
+  }
+}

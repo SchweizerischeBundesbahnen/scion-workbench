@@ -71,7 +71,9 @@ export class RouterPageComponent {
       params: params || undefined,
       cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
     };
-    await this._router.navigate(qualifier, extras).catch(error => this.navigateError = error);
+    await this._router.navigate(qualifier, extras)
+      .then(success => success ? Promise.resolve() : Promise.reject('Navigation failed'))
+      .catch(error => this.navigateError = error);
   }
 }
 

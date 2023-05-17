@@ -288,7 +288,7 @@ test.describe('Workbench Message Box', () => {
     await expect(await textMessagePO.isContentSelectable()).toBe(true);
   });
 
-  test('should hide a \'view-modal\' message box when activating another view of the viewpart', async ({appPO, microfrontendNavigator}) => {
+  test('should hide a \'view-modal\' message box when activating another view of the part', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register message box intention
@@ -342,7 +342,7 @@ test.describe('Workbench Message Box', () => {
       await expect(await inspectorPO.isVisible()).toBe(true);
     });
 
-    test('should hide a \'view-modal\' message box when activating another view of the viewpart', async ({appPO, microfrontendNavigator}) => {
+    test('should hide a \'view-modal\' message box when activating another view of the part', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register message box intention

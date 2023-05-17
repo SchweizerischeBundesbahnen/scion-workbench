@@ -126,13 +126,13 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
       return {};
     }
 
-    const view = this._viewRegistry.getElseThrow(command.context.viewId);
+    const view = this._viewRegistry.get(command.context.viewId);
     if (!MicrofrontendViewRoutes.isMicrofrontendRoute(view.urlSegments)) {
-      return {viewId: view.viewId};
+      return {viewId: view.id};
     }
 
     return {
-      viewId: view.viewId,
+      viewId: view.id,
       viewCapabilityId: MicrofrontendViewRoutes.parseParams(view.urlSegments).viewCapabilityId,
     };
   }

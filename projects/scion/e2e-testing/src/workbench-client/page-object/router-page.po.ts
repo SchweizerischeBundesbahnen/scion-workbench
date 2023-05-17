@@ -28,10 +28,10 @@ export class RouterPagePO {
 
   public readonly viewTabPO: ViewTabPO;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this._viewPO = appPO.view({viewId});
+  constructor(private _appPO: AppPO, public viewId: string) {
+    this._viewPO = _appPO.view({viewId});
     this.viewTabPO = this._viewPO.viewTab;
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-router-page');
+    this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-router-page');
   }
 
   public async isVisible(): Promise<boolean> {
@@ -75,7 +75,7 @@ export class RouterPagePO {
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitUntilStable(() => this._locator.page().url()),
+      waitUntilStable(() => this._appPO.getCurrentNavigationId()),
       rejectWhenAttached(this._locator.locator('output.e2e-navigate-error')),
     ]);
   }

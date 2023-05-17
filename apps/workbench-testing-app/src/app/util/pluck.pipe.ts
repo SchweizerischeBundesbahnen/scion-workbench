@@ -14,7 +14,7 @@ import {Dictionary} from '@scion/toolkit/util';
 /**
  * Continues the pipe with specified value of the dictionary.
  */
-@Pipe({name: 'wbPluck'})
+@Pipe({name: 'appPluck', standalone: true})
 export class PluckPipe implements PipeTransform {
 
   public transform<T>(data: Dictionary, name: string): T {

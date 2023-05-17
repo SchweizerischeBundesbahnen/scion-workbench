@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Creates a textual representation from a given object.
  */
-@Pipe({name: 'wbStringify'})
+@Pipe({name: 'appStringify', standalone: true})
 export class StringifyPipe implements PipeTransform {
 
   public transform(object: any): string {

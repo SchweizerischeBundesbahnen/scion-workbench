@@ -79,18 +79,18 @@ export class ViewPagePO {
     await this._locator.locator('button.e2e-close').click();
   }
 
-  public async addViewAction(viewpartAction: ViewpartAction, options?: {append?: boolean}): Promise<void> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-viewpart-actions'));
+  public async addViewAction(partAction: WorkbenchPartAction, options?: {append?: boolean}): Promise<void> {
+    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-part-actions'));
     await accordionPO.expand();
     try {
-      const inputLocator = this._locator.locator('input.e2e-viewpart-actions');
+      const inputLocator = this._locator.locator('input.e2e-part-actions');
       if (options?.append ?? true) {
         const input = await inputLocator.inputValue() || null;
-        const presentActions: ViewpartAction[] = coerceArray(input ? JSON.parse(input) : null);
-        await inputLocator.fill(JSON.stringify(presentActions.concat(viewpartAction)));
+        const presentActions: WorkbenchPartAction[] = coerceArray(input ? JSON.parse(input) : null);
+        await inputLocator.fill(JSON.stringify(presentActions.concat(partAction)));
       }
       else {
-        await inputLocator.fill(JSON.stringify(new Array<ViewpartAction>().concat(viewpartAction)));
+        await inputLocator.fill(JSON.stringify(new Array<WorkbenchPartAction>().concat(partAction)));
       }
     }
     finally {
@@ -99,7 +99,7 @@ export class ViewPagePO {
   }
 }
 
-export interface ViewpartAction {
+export interface WorkbenchPartAction {
   icon: string;
   align?: 'start' | 'end';
   cssClass?: string;

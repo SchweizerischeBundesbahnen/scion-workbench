@@ -1,13 +1,11 @@
 SCION Workbench
 ===============
 
-**The SCION Workbench provides a workbench layout for Angular applications similar to the Eclipse Workbench for Eclipse RCP applications.**
+SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.
 
-Workbench layouts are useful for applications with non-linear workflows where users want to flexibly view and edit content in parallel. Examples include specialized business applications, scientific or development tools, as well as command & control interfaces.
+The workbench layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel. Examples include specialized business applications, scientific or development tools, as well as command & control interfaces.
 
-A workbench layout allows the user to arrange and resize parts of the application using drag and drop. The layout consists of a view area and can define border panes. In the view area, the user can view or edit content in views. A view has a handle which the user can grab to arrange views side by side in a grid or move views to other locations in the grid. Border panes provide the user with additional information or context-sensitive assistance.
-
-Although SCION Workbench is designed for use in Angular applications, its workbench layout is particularly well suited for implementing a framework-agnostic microfrontend architecture, as different web applications can contribute views in the form of microfrontends. SCION Workbench has built-in microfrontend support from the [SCION Microfrontend Platform](https://www.npmjs.com/package/@scion/microfrontend-platform), a lightweight library for embedding microfrontends. Microfrontends embedded as views can interact seamlessly with the workbench using the [SCION Workbench Client](https://www.npmjs.com/package/@scion/workbench-client) or communicate with other microfrontends via the SCION Microfrontend Platform. Any web application can be integrated as a workbench view. Likewise, a workbench view can embed further microfrontends, and so on.
+In the workbench, content is displayed in views. The workbench has a main area and a peripheral area for placing views. The main area is the primary place for views to interact with the application. Typically, it is initially blank or displays a start page. The peripheral area arranges views around the main area. Peripheral views can be used to provide entry points to the application, tools or context-sensitive assistance to support the user's workflow. Multiple arrangements of peripheral views, called perspectives, are supported. Different perspectives provide a different perspective on the application while sharing the main area. Only one perspective can be active at a time.
 
 The sources for this package are in [SCION Workbench](https://github.com/SchweizerischeBundesbahnen/scion-workbench) repo. Please file issues and pull requests against that repo.
 

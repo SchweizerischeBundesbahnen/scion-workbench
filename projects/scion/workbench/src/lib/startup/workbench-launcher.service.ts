@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchModuleConfig} from '../workbench-module-config';
-import {APP_INITIALIZER, ApplicationInitStatus, Injectable, Injector, Provider} from '@angular/core';
+import {APP_INITIALIZER, ApplicationInitStatus, Injectable, Injector, NgZone, Provider} from '@angular/core';
 import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
 
@@ -44,6 +44,7 @@ export class WorkbenchLauncher {
 
   constructor(private _startup: WorkbenchStartup,
               private _logger: Logger,
+              private _zone: NgZone,
               private _injector: Injector) {
   }
 
@@ -62,10 +63,10 @@ export class WorkbenchLauncher {
    * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
    * Hooks are called at defined points during startup, enabling the application's controlled initialization.
    *
-   * The application can associate one or more initializers with any of these DI tokens. An initializer can be any object and is to be
-   * provided by a multi-provider. If the initializer implements the interface {@link WorkbenchInitializer}, which defines a single
-   * method, `init`, the workbench waits for its returned Promise to resolve before proceeding with the startup. Initializers associated
-   * with the same DI token may run in parallel.
+   * The application can associate one or more initializers with any of these DI tokens. An initializer can be any object and is to
+   * be provided as a multi-provider. If the initializer is a function or instance of {@link WorkbenchInitializer} and returns a Promise,
+   * the workbench waits for the Promise to be resolved before proceeding with the startup. Initializers can call `inject` to get any
+   * required dependencies. Initializers associated with the same DI token may run in parallel.
    *
    * Following DI tokens are available as hooks into the workbench's startup process, listed in the order in which they are injected and
    * executed.
@@ -78,31 +79,22 @@ export class WorkbenchLauncher {
    *
    * ### Example of how to hook into the startup process.
    *
-   * ```typescript
-   * @NgModule({
-   *   ...
-   *   providers: [
-   *     {
-   *       provide: WORKBENCH_PRE_STARTUP,
-   *       multi: true,
-   *       useClass: SomeInitializer,
-   *     }
-   *   ]
-   * })
-   * export class AppModule {}
-   *
-   * @Injectable()
-   * export class SomeInitializer implements WorkbenchInitializer {
-   *
-   *   public init(): Promise<void> {
-   *     ...
-   *   }
+   * ```ts
+   * {
+   *   provide: WORKBENCH_STARTUP,
+   *   multi: true,
+   *   useValue: () => inject(Initializer).init(),
    * }
    * ```
    *
    * @return A Promise that resolves when the workbench has completed the startup or that rejects if the startup failed.
    */
   public async launch(): Promise<void> {
+    // Ensure to run in the Angular zone to check the workbench for changes even if called from outside the Angular zone, e.g. in unit tests.
+    if (!NgZone.isInAngularZone()) {
+      return this._zone.run(() => this.launch());
+    }
+
     switch (this._state) {
       case StartupState.Stopped: {
         this._logger.debug(() => `Starting Workbench. Waiting for workbench initializers to complete. [launcher=${this._injector.get(ApplicationInitStatus).done ? 'LAZY' : 'APP_INITIALIZER'}]`, LoggerNames.LIFECYCLE);
@@ -185,4 +177,3 @@ export function provideWorkbenchLauncher(workbenchModuleConfig: WorkbenchModuleC
 export function launchWorkbench(workbenchLauncher: WorkbenchLauncher): () => Promise<void> {
   return () => workbenchLauncher.launch();
 }
-

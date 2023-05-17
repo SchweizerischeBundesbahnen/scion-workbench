@@ -15,7 +15,7 @@ export enum WorkbenchCapabilities {
   /**
    * Allows contributing a microfrontend for display in workbench view.
    *
-   * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.
+   * A view is a visual workbench component for displaying content stacked or side-by-side.
    */
   View = 'view',
   /**
@@ -34,7 +34,7 @@ export enum WorkbenchCapabilities {
   /**
    * Allows contributing a notification provider in the host app.
    *
-   * A notification is a closable message that appears in the top right corner and disappears automatically after a few seconds.
+   * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
    * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
    */
   Notification = 'notification',

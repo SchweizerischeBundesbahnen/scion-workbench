@@ -12,7 +12,7 @@ import {Observable} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
 
 /**
- * A view is a visual workbench component for displaying content stacked or arranged side by side in the workbench layout.
+ * A view is a visual workbench component for displaying content stacked or side-by-side.
  *
  * If a microfrontend lives in the context of a workbench view, regardless of its embedding level, it can inject an instance
  * of this class to interact with the workbench view, such as setting view tab properties or closing the view. It further
@@ -30,7 +30,7 @@ export abstract class WorkbenchView {
   /**
    * Represents the identity of this workbench view.
    */
-  public abstract readonly viewId: string;
+  public abstract readonly id: string;
 
   /**
    * Observable containing the view capability that represents the microfrontend loaded into this workbench view.
@@ -58,7 +58,7 @@ export abstract class WorkbenchView {
   public abstract readonly snapshot: ViewSnapshot;
 
   /**
-   * Indicates whether this is the active view in its view part.
+   * Indicates whether this is the active view in its part.
    *
    * Upon subscription, it emits the current active state of this view, and then emits continuously when it changes. The Observable does not
    * complete when navigating to another microfrontend of the same app. It only completes before unloading the web app, e.g., when closing

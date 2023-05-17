@@ -9,10 +9,15 @@
  */
 
 /**
- * Returns a new instance with `undefined` entries removed,
- * or returns `undefined` if all entries are `undefined`.
+ * Returns `undefined` if given object is empty.
  */
-export function undefinedIfEmpty<T>(object: T): T {
+export function undefinedIfEmpty<T>(object: T | null | undefined): T | undefined {
+  if (object === undefined || object === null) {
+    return undefined;
+  }
+  if (typeof object === 'string' && !object.length) {
+    return undefined;
+  }
   return Object.entries(object).reduce((acc, [key, value]) => {
     if (value === undefined) {
       return acc;

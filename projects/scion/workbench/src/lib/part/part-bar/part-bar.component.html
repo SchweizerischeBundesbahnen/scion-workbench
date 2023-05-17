@@ -1,0 +1,19 @@
+<sci-viewport class="tabbar" scrollbarStyle="hidden"
+              sciDimension (sciDimensionChange)="onTabbarViewportDimensionChange()"
+              (scroll)="onScroll()">
+  <div class="viewport-client" sciDimension (sciDimensionChange)="onTabbarViewportClientDimensionChange()">
+    <wb-view-tab *ngFor="let viewId of viewIds$ | async"
+                 #viewtab
+                 [viewId]="viewId"
+                 context="tabbar"
+                 [class.drag-source]="viewtab === dragSourceViewTab"
+                 [class.drop-target]="viewtab === dropTargetViewTab">
+    </wb-view-tab>
+
+    <!-- Add a placeholder element to grow the viewport to fit the drag image. -->
+    <div class="drag-image-placeholder"></div>
+  </div>
+</sci-viewport>
+
+<wb-part-action-bar/>
+<wb-view-list-button/>

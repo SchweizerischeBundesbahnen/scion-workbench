@@ -16,17 +16,17 @@ import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, 
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
-import {WbBeforeDestroy} from '../../workbench.model';
+import {WorkbenchViewPreDestroy} from '../../workbench.model';
 import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
 import {serializeExecution} from '../../operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
-import {ViewMenuService} from '../../view-part/view-context-menu/view-menu.service';
+import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../messaging.util';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
-import {WorkbenchNavigationalStates} from '../../routing/workbench-navigational-states';
+import {WorkbenchNavigationalViewStates} from '../../routing/workbench-navigational-states';
 import {MicrofrontendNavigationalStates} from '../routing/microfrontend-navigational-states';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../../routing/routing.constants';
@@ -39,7 +39,7 @@ import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../../routing/routing.
   styleUrls: ['./microfrontend-view.component.scss'],
   templateUrl: './microfrontend-view.component.html',
 })
-export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDestroy {
+export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchViewPreDestroy {
 
   private _destroy$ = new Subject<void>();
   private _unsubscribeParamsUpdater$ = new Subject<void>();
@@ -67,7 +67,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
               private _viewContextMenuService: ViewMenuService,
               private _workbenchRouter: WorkbenchRouter,
               @Inject(IFRAME_HOST) iframeHost: ViewContainerReference) {
-    this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.viewId}]`, LoggerNames.MICROFRONTEND_ROUTING);
+    this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.iframeHost = iframeHost.get();
     this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
       .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
@@ -143,7 +143,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     }
 
     // Navigate to the microfrontend.
-    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.viewId}, app=${viewCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(viewCapability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, viewCapability);
+    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this._view.id}, app=${viewCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(viewCapability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, viewCapability);
     await this._outletRouter.navigate(viewCapability.properties.path, {
       outlet: this.viewId,
       relativeTo: application.baseUrl,
@@ -181,7 +181,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
             return {
               layout,
               viewOutlets: {[this.viewId]: [urlParams]},
-              viewState: {[this.viewId]: {[MicrofrontendNavigationalStates.transientParams]: transientParams}},
+              viewStates: {[this.viewId]: {[MicrofrontendNavigationalStates.transientParams]: transientParams}},
             };
           }, {relativeTo: this._route});
 
@@ -201,7 +201,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
     this._view.heading = activatedRoute.params[WB_VIEW_HEADING_PARAM] ?? substituteNamedParameters(viewCapability.properties.heading, params) ?? null;
     this._view.cssClass = new Array<string>()
       .concat(Arrays.coerce(viewCapability.properties.cssClass))
-      .concat(Arrays.coerce(activatedRoute.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));
+      .concat(Arrays.coerce(activatedRoute.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalViewStates.cssClass]));
     this._view.closable = viewCapability.properties.closable ?? true;
     this._view.dirty = false;
   }
@@ -217,7 +217,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * Unique identity of this view.
    */
   public get viewId(): string {
-    return this._view.viewId;
+    return this._view.id;
   }
 
   public get viewCssClasses(): string[] {
@@ -242,7 +242,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WbBeforeDe
    * If the embedded microfrontend has a listener installed to be notified when closing this view,
    * initiates a request-reply communication, allowing the microfrontend to prevent this view from closing.
    */
-  public async wbBeforeDestroy(): Promise<boolean> {
+  public async onWorkbenchViewPreDestroy(): Promise<boolean> {
     const closingTopic = ɵWorkbenchCommands.viewClosingTopic(this.viewId);
 
     // Allow the microfrontend to prevent this view from closing.

@@ -11,6 +11,8 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
+import {LayoutPagePO} from './page-object/layout-page.po';
+import {RouteRegisterPagePO} from './page-object/router-register-page.po';
 
 test.describe('Workbench RouterLink', () => {
 
@@ -234,7 +236,7 @@ test.describe('Workbench RouterLink', () => {
     await expect(await routerPagePO.viewTabPO.isPresent()).toBe(true);
   });
 
-  test('should always open a new view if navigating outside a view (and not activate a matching view)', async ({appPO, workbenchNavigator}) => {
+  test('should navigate present view(s) if navigating outside a view and not setting a target', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -253,9 +255,8 @@ test.describe('Workbench RouterLink', () => {
 
     // THEN
     await expect(await appPO.view({cssClass: 'testee-1'}).viewTab.isPresent()).toBe(true);
-    await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(true);
-    await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.getViewId()).not.toEqual(routerPagePO.viewId);
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
+    await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(false);
+    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
   });
 
   test('should replace the current view if navigating inside a view (and not activate a matching view)', async ({appPO, workbenchNavigator}) => {
@@ -280,5 +281,63 @@ test.describe('Workbench RouterLink', () => {
     await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.getViewId()).toEqual(routerPagePO.viewId);
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
   });
-});
 
+  test('should not navigate current view if not the target of primary routes', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Add router page to the peripheral grid as named view
+    const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPagePO.addPart('left', {relativeTo: 'main-area', align: 'left', ratio: .25});
+    await layoutPagePO.addView('router', {partId: 'left', activateView: true});
+    const routeRegisterPagePO = await workbenchNavigator.openInNewTab(RouteRegisterPagePO);
+    await routeRegisterPagePO.registerRoute({path: '', component: 'router-page', outlet: 'router'}, {title: 'Workbench Router'});
+
+    // Navigate in the router page via router link
+    const routerPagePO = new RouterPagePO(appPO, 'router');
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterCssClass('e2e-testee');
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    // Expect the test view to be opened in the main area
+    const testeeViewPO = appPO.view({cssClass: 'e2e-testee'});
+    await expect(await testeeViewPO.isVisible()).toBe(true);
+    await expect(await testeeViewPO.isInMainArea()).toBe(true);
+
+    // Expect the router page to be still opened in the peripheral grid
+    await expect(await routerPagePO.viewPO.part.getPartId()).toEqual('left');
+    await expect(await routerPagePO.isVisible()).toBe(true);
+    await expect(await routerPagePO.viewPO.isInMainArea()).toBe(false);
+  });
+
+  test('should navigate current view if the target of primary routes', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Add part to peripheral grid
+    const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPagePO.addPart('left', {relativeTo: 'main-area', align: 'left', ratio: .25});
+
+    // Add router page to the peripheral part as unnamed view
+    {
+      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPagePO.enterPath('/test-router');
+      await routerPagePO.enterTarget('blank');
+      await routerPagePO.enterCssClass('e2e-router');
+      await routerPagePO.enterBlankPartId('left');
+      await routerPagePO.clickNavigate();
+      await routerPagePO.viewPO.viewTab.close();
+    }
+
+    // Navigate in the router page via router link
+    const routerPagePO = new RouterPagePO(appPO, await appPO.view({cssClass: 'e2e-router'}).getViewId());
+    await routerPagePO.enterPath('/test-view');
+    await routerPagePO.enterCssClass('e2e-testee');
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    // Expect the test view to replace the router view
+    const testeeViewPO = appPO.view({cssClass: 'e2e-testee'});
+    await expect(await testeeViewPO.isVisible()).toBe(true);
+    await expect(await testeeViewPO.isInMainArea()).toBe(false);
+    await expect(await testeeViewPO.getViewId()).toEqual(routerPagePO.viewId);
+    await expect(await routerPagePO.isVisible()).toBe(false);
+  });
+});

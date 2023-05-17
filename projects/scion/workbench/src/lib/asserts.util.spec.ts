@@ -50,12 +50,12 @@ describe('Asserts', () => {
 
     it('should throw for `null` values', () => {
       expect(() => assertNotNullish(null)).toThrowError(/AssertError/);
-      expect(() => assertNotNullish(null, {orElseThrow: () => Error('ERROR')})).toThrowError(/ERROR/);
+      expect(() => assertNotNullish(null, () => Error('ERROR'))).toThrowError(/ERROR/);
     });
 
     it('should throw for `undefined` values', () => {
       expect(() => assertNotNullish(undefined)).toThrowError(/AssertError/);
-      expect(() => assertNotNullish(undefined, {orElseThrow: () => Error('ERROR')})).toThrowError(/ERROR/);
+      expect(() => assertNotNullish(undefined, () => Error('ERROR'))).toThrowError(/ERROR/);
     });
 
     it('should not throw for falsy values', () => {

@@ -1,3 +1,50 @@
 :host {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+
+  > header {
+    flex: none;
+    display: flex;
+    place-content: flex-end;
+    background: #333333;
+    padding: .5em;
+
+    > div.toggle-buttons {
+      display: flex;
+      border-radius: .25em;
+      overflow: hidden;
+
+      > button {
+        border: none;
+        border-radius: 0;
+        user-select: none;
+
+        &:active, &:focus {
+          box-shadow: none;
+          outline: none;
+        }
+      }
+
+      > button:not(:first-child):not(.active) {
+        border-left: 1px solid var(--sci-color-primary-darker);
+      }
+
+      > button.active + button {
+        border-left: none;
+      }
+
+      > button.active {
+        background-color: var(--sci-color-accent-lighter);
+        color: var(--sci-color-background);
+      }
+    }
+
+    > button.menu-button {
+      color: var(--sci-color-background);
+    }
+  }
+
+  > wb-workbench {
+    flex: auto;
+  }
 }

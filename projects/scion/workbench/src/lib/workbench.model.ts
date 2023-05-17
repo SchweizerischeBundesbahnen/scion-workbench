@@ -18,14 +18,14 @@ import {WorkbenchView} from './view/workbench-view.model';
  *
  * The return value controls whether destruction should be continued.
  */
-export interface WbBeforeDestroy {
+export interface WorkbenchViewPreDestroy {
 
   /**
    * Lifecycle hook which is called upon view destruction.
    *
    * Return a falsy value to prevent view destruction, either as a boolean value or as an observable which emits a boolean value.
    */
-  wbBeforeDestroy(): Observable<boolean> | Promise<boolean> | boolean;
+  onWorkbenchViewPreDestroy(): Observable<boolean> | Promise<boolean> | boolean;
 }
 
 /**
@@ -44,13 +44,13 @@ export interface WorkbenchAction {
 }
 
 /**
- * Represents a viewpart action added to the viewpart action bar. Viewpart actions are displayed next to the view tabs.
+ * Represents a part action added to the part action bar. Part actions are displayed next to the view tabs.
  */
-export interface WorkbenchViewPartAction extends WorkbenchAction {
+export interface WorkbenchPartAction extends WorkbenchAction {
   /**
    * Sticks this action to given view.
    *
-   * If set, the action is only visible if the specified view is the active view in the viewpart.
+   * If set, the action is only visible if the specified view is the active view in the part.
    */
   viewId?: string;
 }

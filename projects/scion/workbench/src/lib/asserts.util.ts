@@ -23,11 +23,11 @@ export function assertType(object: any, assert: {toBeOneOf: Type<any>[] | Type<a
 /**
  * Asserts the given object not to be `null` or `undefined.
  */
-export function assertNotNullish(value: any, options?: {orElseThrow: () => Error}): void {
+export function assertNotNullish(value: any, errorFn?: () => Error): void {
   if (value === null) {
-    throw options?.orElseThrow() || Error('[AssertError] Value expected not to be `null`, but was `null`.');
+    throw errorFn?.() ?? Error('[AssertError] Value expected not to be `null`, but was `null`.');
   }
   if (value === undefined) {
-    throw options?.orElseThrow() || Error('[AssertError] Value expected not to be `undefined`, but was `undefined`.');
+    throw errorFn?.() ?? Error('[AssertError] Value expected not to be `undefined`, but was `undefined`.');
   }
 }

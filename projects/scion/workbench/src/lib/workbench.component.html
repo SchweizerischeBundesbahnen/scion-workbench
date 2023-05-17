@@ -8,8 +8,7 @@
 <!-- workbench that is rendered after workbench startup completed -->
 <ng-template #workbench_template>
   <div class="stacking-context-barrier">
-    <wb-activity-part *ngIf="activitiesVisible$ | async"></wb-activity-part>
-    <wb-parts-layout></wb-parts-layout>
+    <wb-workbench-layout></wb-workbench-layout>
     <!-- iframes -->
     <ng-container #iframe_host></ng-container>
   </div>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,21 +13,22 @@ import {ComponentRef, createComponent, EnvironmentInjector, inject, Injector, St
 import {Logger, LoggerNames} from '../logging';
 
 /**
- * Like Angular CDK 'ComponentPortal' but with functionality to detach the portal from its outlet without destroying the component.
+ * Like the Angular CDK 'ComponentPortal' but does not destroy the component on detach.
  *
- * IMPORTANT: In order for the component to have the "correct" injection context, we construct it the time attaching it to the Angular component tree,
- * or by calling {@link createComponentFromInjectionContext} with the passed context. The "correct" injection context is crucial, for example, when the
- * portal is displayed in a router outlet, so that child outlets can register with their logical parent outlet. The Angular router uses the logical outlet
- * hierarchy to resolve and activate child routes.
+ * IMPORTANT: In order for the component to have the "correct" injection context, construct it the time attaching it to the Angular component tree,
+ * or by calling {@link createComponentFromInjectionContext}. The "correct" injection context is crucial, for example, if the portal is displayed
+ * in a router outlet, so that child outlets can register with their logical parent outlet. The Angular router uses the logical outlet hierarchy to
+ * resolve and activate child routes.
+ *
+ * @see WbComponentPortal
  */
-export class WbComponentPortal<T> {
+export class WbComponentPortal<T = any> {
 
   private _viewContainerRef: ViewContainerRef | null | undefined;
   private _componentRef: ComponentRef<T> | null | undefined;
+  private _logger = inject(Logger);
 
-  constructor(private componentType: ComponentType<T>,
-              private _options?: PortalOptions,
-              private _logger: Logger = inject(Logger)) {
+  constructor(private _componentType: ComponentType<T>, private _options?: PortalOptions) {
     // Do not construct the component here but the time attaching it to the Angular component tree. See the comment above.
   }
 
@@ -35,7 +36,7 @@ export class WbComponentPortal<T> {
    * Constructs the portal's component using given injection context.
    */
   private createComponent(elementInjector: Injector): ComponentRef<T> {
-    const componentRef = createComponent(this.componentType, {
+    const componentRef = createComponent(this._componentType, {
       elementInjector: Injector.create({
         name: 'WbComponentPortalInjector',
         parent: elementInjector,
@@ -52,7 +53,7 @@ export class WbComponentPortal<T> {
    */
   public createComponentFromInjectionContext(injectionContext: Injector): void {
     if (this.isConstructed) {
-      throw Error('[PortalError] Component already constructed.');
+      throw Error(`[PortalConstructError] Component already constructed. [component=${this._componentType}]`);
     }
     this._componentRef = this.createComponent(injectionContext);
   }
@@ -114,10 +115,10 @@ export class WbComponentPortal<T> {
 
   public get componentRef(): ComponentRef<T> {
     if (this._componentRef === null) {
-      throw Error('[NullPortalComponentError] Portal destroyed.');
+      throw Error('[NullPortalError] Portal destroyed.');
     }
     if (this._componentRef === undefined) {
-      throw Error('[NullPortalComponentError] Component not constructed yet.');
+      throw Error('[NullPortalError] Component not constructed yet.');
     }
     return this._componentRef;
   }
@@ -128,7 +129,7 @@ export class WbComponentPortal<T> {
   }
 
   /**
-   * Destroys the component instance and all of the data structures associated with it.
+   * Destroys the component instance and all the data structures associated with it.
    */
   public destroy(): void {
     this._componentRef?.destroy();
@@ -144,4 +145,3 @@ export interface PortalOptions {
    */
   providers?: StaticProvider[];
 }
-

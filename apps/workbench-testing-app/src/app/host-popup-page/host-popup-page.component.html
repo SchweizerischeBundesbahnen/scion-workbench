@@ -44,7 +44,7 @@
     </ng-template>
   </sci-accordion>
 
-  <sci-accordion class="e2e-popup-params" variant="solid" *ngIf="popup.params | wbNullIfEmpty as params">
+  <sci-accordion class="e2e-popup-params" variant="solid" *ngIf="popup.params | appNullIfEmpty as params">
     <ng-template sciAccordionItem [panel]="panel_popup_params">
       <header>Popup Params</header>
     </ng-template>
@@ -55,7 +55,7 @@
     </ng-template>
   </sci-accordion>
 
-  <sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | wbNullIfEmpty as params">
+  <sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | appNullIfEmpty as params">
     <ng-template sciAccordionItem [panel]="panel_route_params">
       <header>Route Params</header>
     </ng-template>
@@ -64,7 +64,7 @@
     </ng-template>
   </sci-accordion>
 
-  <sci-accordion *ngIf="popup.capability.properties.size | wbNullIfEmpty as preferredSize"
+  <sci-accordion *ngIf="popup.capability.properties.size | appNullIfEmpty as preferredSize"
                  title="Preferred Overlay Size"
                  class="preferred-overlay-size e2e-preferred-overlay-size"
                  variant="solid">

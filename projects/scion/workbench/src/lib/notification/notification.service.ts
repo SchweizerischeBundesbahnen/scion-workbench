@@ -20,14 +20,13 @@ import {Arrays} from '@scion/toolkit/util';
 /**
  * Allows displaying a notification to the user.
  *
- * A notification is a closable message that appears in the top right corner and disappears automatically after a few seconds.
+ * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
  * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
  *
  * Multiple notifications are stacked vertically. Notifications can be grouped. For each group, only the last notification is
- * displayed at any given time.
+ * displayed.
  *
- * By default, the workbench notification supports the display of a plain text message. To display structured content, consider
- * passing a component to {@link NotificationConfig#content} instead.
+ * To display structured content, consider passing a component to {@link NotificationConfig#content} instead of plain text.
  */
 @Injectable({providedIn: 'root'})
 export class NotificationService implements OnDestroy {
@@ -40,7 +39,7 @@ export class NotificationService implements OnDestroy {
   }
 
   /**
-   * Presents the user with a notification that is displayed in the top right corner based on the given config.
+   * Presents the user with a notification that is displayed in the upper-right corner based on the given config.
    *
    * To display structured content, consider passing a component to {@link NotificationConfig#content}.
    *
@@ -76,7 +75,7 @@ export class NotificationService implements OnDestroy {
   /**
    * Constructs the notification based on the given config and computes its insertion index.
    */
-  private constructNotification(config: NotificationConfig, notifications: ReadonlyArray<ɵNotification>): {notification: ɵNotification; insertionIndex: number} {
+  private constructNotification(config: NotificationConfig, notifications: ɵNotification[]): {notification: ɵNotification; insertionIndex: number} {
     config = {...config};
 
     // Check whether the notification belongs to a group. If so, replace any present notification of that group.

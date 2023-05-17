@@ -97,6 +97,8 @@ jobs:
             cmd: npm run workbench-client-testing-app:ci:build
           - name: workbench-client-testing-app-vercel
             cmd: npm run workbench-client-testing-app:vercel:build
+          - name: workbench-getting-started-app
+            cmd: npm run workbench-getting-started-app:build
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -227,9 +229,9 @@ jobs:
           release-commit-message-pattern: 'release\(workbench-client\): v(.*)'
           expected-version: ${{ needs.build-libs.outputs.workbench-client-version }}
           git-tag: workbench-client-%v
-  release-testing-app:
-    name: 'Releasing testing app'
-    if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' || needs.workbench-client-release-guard.outputs.should-release == 'true' }}
+  publish-apps:
+    name: 'Publishing testing app'
+    if: github.ref == 'refs/heads/master'
     needs: [ workbench-release-guard, workbench-client-release-guard ]
     runs-on: ubuntu-latest
     steps:
@@ -244,6 +246,11 @@ jobs:
         with:
           name: workbench-client-testing-app-vercel
           path: dist/workbench-client-testing-app-vercel
+      - name: 'Downloading app: workbench-getting-started-app (dist)'
+        uses: actions/download-artifact@v2
+        with:
+          name: workbench-getting-started-app
+          path: dist/workbench-getting-started-app
       - name: 'Deploying workbench-testing-app to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
@@ -262,10 +269,18 @@ jobs:
           aliases: |
             scion-workbench-client-testing-app1.vercel.app,
             scion-workbench-client-testing-app2.vercel.app,
+      - name: 'Deploying workbench-getting-started-app to Vercel'
+        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
+        with:
+          dist-folder: dist/workbench-getting-started-app
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          org-id: ${{ secrets.VERCEL_ORG_ID }}
+          project-id: ${{ secrets.VERCEL_WORKBENCH_GETTING_STARTED_APP_PROJECT_ID }}
+          aliases: scion-workbench-getting-started.vercel.app
   release-workbench:
     name: 'Releasing @scion/workbench'
     if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' }}
-    needs: [ workbench-release-guard, build-libs, release-testing-app ]
+    needs: [ workbench-release-guard ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -283,7 +298,7 @@ jobs:
   release-workbench-client:
     name: 'Releasing @scion/workbench-client'
     if: ${{ needs.workbench-client-release-guard.outputs.should-release == 'true' }}
-    needs: [ workbench-client-release-guard, build-libs, release-testing-app ]
+    needs: [ workbench-client-release-guard ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

@@ -1,0 +1,48 @@
+<form [formGroup]="form" autocomplete="off">
+  <section class="e2e-part">
+    <sci-form-field label="Part ID">
+      <input [formControlName]="PART_ID" class="e2e-part-id">
+    </sci-form-field>
+
+    <sci-form-field label="Activate">
+      <sci-checkbox [formControlName]="ACTIVATE" class="e2e-activate"></sci-checkbox>
+    </sci-form-field>
+  </section>
+
+  <section [formGroupName]="RELATIVE_TO" class="e2e-reference-part">
+    <header>Relative To</header>
+
+    <sci-form-field label="Part ID">
+      <input [formControlName]="PART_ID" class="e2e-part-id" list="parts">
+      <datalist id="parts">
+        <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Align">
+      <input [formControlName]="ALIGN" class="e2e-align" list="align">
+      <datalist id="align">
+        <option value="left">left</option>
+        <option value="right">right</option>
+        <option value="top">top</option>
+        <option value="bottom">bottom</option>
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Ratio">
+      <input [formControlName]="RATIO" class="e2e-ratio" type="number">
+    </sci-form-field>
+  </section>
+
+  <button (click)="onNavigate()" [disabled]="form.invalid" class="e2e-navigate">
+    Navigate
+  </button>
+</form>
+
+<output class="navigate-success e2e-navigate-success" *ngIf="navigateError === false">
+  Success
+</output>
+
+<output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
+  {{navigateError}}
+</output>

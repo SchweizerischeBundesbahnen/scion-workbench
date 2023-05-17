@@ -31,6 +31,8 @@ import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-c
 import {UtilModule} from './util/util.module';
 import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
 import {DevtoolsViewCapabilityInterceptor} from './devtools/devtools-capability-interceptor.service';
+import {ROUTES} from '@angular/router';
+import {PerspectiveDefinitions} from './perspective-definitions';
 
 @NgModule({
   declarations: [
@@ -48,6 +50,13 @@ import {DevtoolsViewCapabilityInterceptor} from './devtools/devtools-capability-
         launcher: WorkbenchStartupQueryParams.launcher(),
       },
       microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendPlatformConfig,
+      layout: {
+        perspectives: [
+          ...PerspectiveDefinitions.perspectives,
+          ...PerspectiveDefinitions.perspectivesFromQueryParam,
+        ],
+        initialPerspective: PerspectiveDefinitions.initialPerspective,
+      },
     }),
     ReactiveFormsModule,
     SciViewportModule,
@@ -68,6 +77,11 @@ import {DevtoolsViewCapabilityInterceptor} from './devtools/devtools-capability-
       provide: MICROFRONTEND_PLATFORM_PRE_STARTUP,
       useClass: DevtoolsViewCapabilityInterceptor,
       multi: true,
+    },
+    {
+      provide: ROUTES,
+      multi: true,
+      useValue: PerspectiveDefinitions.routes,
     },
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

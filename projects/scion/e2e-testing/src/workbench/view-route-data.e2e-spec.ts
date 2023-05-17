@@ -82,42 +82,6 @@ test.describe('View Route Data', () => {
       await expect(await viewTabPO.getCssClasses()).toContain('e2e-feature-d');
       await expect(await viewTabPO.getCssClasses()).not.toContain('e2e-features');
     });
-
-    test('should resolve view properties from route data of route "feature-part/part-1"', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath(`${basePath}/feature-part/part-1`);
-      await routerPagePO.enterTarget('blank');
-      await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART'/);
-    });
-
-    test('should resolve view properties from route data of route "feature-part/part-2"', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath(`${basePath}/feature-part/part-2`);
-      await routerPagePO.enterTarget('blank');
-      await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART_2'/);
-    });
-
-    test('should resolve view properties from route data of route "feature-part/part-3"', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath(`${basePath}/feature-part/part-3`);
-      await routerPagePO.enterTarget('blank');
-      await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART'/);
-    });
-
-    test('should resolve view properties from route data of route "feature-part/part-4"', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath(`${basePath}/feature-part/part-4`);
-      await routerPagePO.enterTarget('blank');
-      await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART_4'/);
-    });
   });
 
   test.describe('test-pages/view-route-data-test-page/features/lazy', () => {
@@ -184,42 +148,6 @@ test.describe('View Route Data', () => {
       await expect(await viewTabPO.getHeading()).toEqual('Feature D Heading');
       await expect(await viewTabPO.getCssClasses()).toContain('e2e-feature-d');
       await expect(await viewTabPO.getCssClasses()).not.toContain('e2e-features');
-    });
-
-    test('should resolve view properties from route data of route "feature-part/part-1"', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath(`${basePath}/feature-part/part-1`);
-      await routerPagePO.enterTarget('blank');
-      await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART'/);
-    });
-
-    test('should resolve view properties from route data of route "feature-part/part-2"', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath(`${basePath}/feature-part/part-2`);
-      await routerPagePO.enterTarget('blank');
-      await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART_2'/);
-    });
-
-    test('should resolve view properties from route data of route "feature-part/part-3"', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath(`${basePath}/feature-part/part-3`);
-      await routerPagePO.enterTarget('blank');
-      await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART'/);
-    });
-
-    test('should resolve view properties from route data of route "feature-part/part-4"', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath(`${basePath}/feature-part/part-4`);
-      await routerPagePO.enterTarget('blank');
-      await expect(routerPagePO.clickNavigate()).rejects.toThrowError(/\[ViewPreferredPartError] Cannot find the view's preferred part 'PREFERRED_PART_4'/);
     });
   });
 });

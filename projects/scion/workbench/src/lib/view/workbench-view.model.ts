@@ -2,25 +2,28 @@ import {Observable} from 'rxjs';
 import {UrlSegment} from '@angular/router';
 import {Disposable} from '../disposable';
 import {WorkbenchMenuItem} from '../workbench.model';
-import {WorkbenchViewPart} from '../view-part/workbench-view-part.model';
+import {WorkbenchPart} from '../part/workbench-part.model';
 
 /**
- * A view is a visual component within the Workbench to present content,
- * and which can be arranged in a parts layout.
+ * A view is a visual workbench component for displaying content stacked or side-by-side.
+ *
+ * Any component registered as a primary Angular route can be opened as a view using the {@link WorkbenchRouter}.
+ *
+ * @see WorkbenchPart
  */
 export abstract class WorkbenchView {
 
   /**
-   * View outlet identity which is unique in this application.
+   * Unique identity of this view.
    */
-  public abstract readonly viewId: string;
+  public abstract readonly id: string;
 
   /**
-   * The viewpart which contains this view.
+   * Reference to the part which contains this view.
    *
-   * Note: the viewpart of a view can change, e.g. when the view is moved to another viewpart.
+   * Note: the part of a view can change, e.g. when the view is moved to another part.
    */
-  public abstract readonly part: WorkbenchViewPart;
+  public abstract readonly part: WorkbenchPart;
 
   /**
    * Specifies the title to be displayed in the view tab.
@@ -59,13 +62,14 @@ export abstract class WorkbenchView {
   public abstract closable: boolean;
 
   /**
-   * Indicates whether this view is the active viewpart view.
+   * Indicates whether this view is active or inactive.
    */
   public abstract readonly active: boolean;
 
   /**
-   * Indicates whether this view is the active viewpart view.
-   * Emits the current state upon subscription.
+   * Notifies when this view becomes active or inactive.
+   *
+   * Upon subscription, emits the current state, and then each time the state changes. The observable never completes.
    */
   public abstract readonly active$: Observable<boolean>;
 
@@ -110,8 +114,8 @@ export abstract class WorkbenchView {
    *        Allows to control which view(s) to close:
    *
    *        - self: closes this view
-   *        - all-views: closes all views of this viewpart
-   *        - other-views: closes the other views of this viewpart
+   *        - all-views: closes all views of this part
+   *        - other-views: closes the other views of this part
    *        - views-to-the-right: closes the views to the right of this view
    *        - views-to-the-left: closes the views to the left of this view
    *

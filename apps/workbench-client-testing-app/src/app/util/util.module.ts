@@ -16,8 +16,6 @@ import {AppendParamDataTypePipe} from './append-param-data-type.pipe';
 @NgModule({
   imports: [
     CommonModule,
-  ],
-  declarations: [
     NullIfEmptyPipe,
     AppendParamDataTypePipe,
   ],

@@ -20,7 +20,7 @@ import {Pipe, PipeTransform} from '@angular/core';
  * - `null [null]`
  * - `undefined [undefined]`
  */
-@Pipe({name: 'wbAppendParamDataType'})
+@Pipe({name: 'appAppendParamDataType', standalone: true})
 export class AppendParamDataTypePipe implements PipeTransform {
 
   public transform(params: ReadonlyMap<string, any> | null): ReadonlyMap<string, any> {

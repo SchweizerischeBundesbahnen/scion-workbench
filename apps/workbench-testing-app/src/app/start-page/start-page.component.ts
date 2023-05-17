@@ -14,7 +14,6 @@ import {Capability, IntentClient, ManifestService, PlatformPropertyService} from
 import {Observable, of, Subject} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
-import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {filter, takeUntil} from 'rxjs/operators';
 import {UntypedFormControl} from '@angular/forms';
@@ -80,14 +79,14 @@ export class StartPageComponent implements OnDestroy {
   }
 
   public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability): void {
-    this._workbenchClientRouter.navigate(viewCapability.qualifier, {target: this._view?.viewId});
+    this._workbenchClientRouter.navigate(viewCapability.qualifier, {target: this._view?.id});
   }
 
   public async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {
     // TODO [#343] Remove switch-case after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/343
     switch (testCapability.type) {
       case WorkbenchCapabilities.View: {
-        await this._workbenchClientRouter.navigate(testCapability.qualifier, {target: this._view?.viewId});
+        await this._workbenchClientRouter.navigate(testCapability.qualifier, {target: this._view?.id});
         break;
       }
       case WorkbenchCapabilities.Popup: {
@@ -104,16 +103,6 @@ export class StartPageComponent implements OnDestroy {
   @HostListener('keydown', ['$event'])
   public onKeyDown(event: KeyboardEvent): void {
     this._filterField.focusAndApplyKeyboardEvent(event);
-  }
-
-  /**
-   * Computes the URL to launch a new app instance with given startup options, preserving the current workbench layout.
-   */
-  public computeAppUrl(options: {launcher: 'APP_INITIALIZER' | 'LAZY'; standalone: boolean}): string {
-    const href = new URL(location.href);
-    href.searchParams.append(WorkbenchStartupQueryParams.LAUNCHER_QUERY_PARAM, options.launcher);
-    href.searchParams.append(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM, `${options.standalone}`);
-    return href.toString();
   }
 
   public concat(...cssClass: Array<undefined | string | string[]>): string[] {

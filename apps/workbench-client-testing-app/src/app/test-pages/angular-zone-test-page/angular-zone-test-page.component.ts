@@ -67,7 +67,7 @@ export class AngularZoneTestPageComponent {
       .pipe(take(2))
       .subscribe(() => model.addEmission('Received capability'));
 
-    const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic(workbenchViewTestee.viewId);
+    const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic(workbenchViewTestee.id);
 
     // Simulate first emission
     await Beans.get(MessageClient).publish(viewParamsTopic, new Map().set(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID, viewCapabilityId1));
@@ -85,7 +85,7 @@ export class AngularZoneTestPageComponent {
       .pipe(take(2))
       .subscribe(() => model.addEmission('Received parms'));
 
-    const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic(workbenchViewTestee.viewId);
+    const viewParamsTopic = ɵWorkbenchCommands.viewParamsTopic(workbenchViewTestee.id);
 
     // Simulate emission
     await Beans.get(MessageClient).publish(viewParamsTopic, new Map());
@@ -103,7 +103,7 @@ export class AngularZoneTestPageComponent {
       .pipe(take(2))
       .subscribe(() => model.addEmission('Received active state'));
 
-    const viewActiveTopic = ɵWorkbenchCommands.viewActiveTopic(workbenchViewTestee.viewId);
+    const viewActiveTopic = ɵWorkbenchCommands.viewActiveTopic(workbenchViewTestee.id);
 
     // Simulate first emission
     await Beans.get(MessageClient).publish(viewActiveTopic, true);

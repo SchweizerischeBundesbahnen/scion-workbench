@@ -35,6 +35,16 @@
                 "projects/scion/workbench"
               ]
             },
+            "styles": [
+              "projects/scion/workbench/_index.scss"
+            ],
+            "assets": [
+              {
+                "glob": "scion-workbench-icons.*",
+                "input": "resources/scion-workbench-icons/fonts",
+                "output": "/assets/fonts"
+              }
+            ],
             "polyfills": [
               "zone.js",
               "zone.js/testing"
@@ -87,6 +97,101 @@
             "lintFilePatterns": [
               "projects/scion/workbench-client/**/*.ts",
               "projects/scion/workbench-client/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "workbench-getting-started-app": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "apps/workbench-getting-started-app",
+      "sourceRoot": "apps/workbench-getting-started-app/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/workbench-getting-started-app",
+            "index": "apps/workbench-getting-started-app/src/index.html",
+            "main": "apps/workbench-getting-started-app/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "apps/workbench-getting-started-app/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "apps/workbench-getting-started-app/src/assets",
+              {
+                "glob": "favicon.ico",
+                "input": "resources/branding",
+                "output": "/"
+              },
+              {
+                "glob": "scion-workbench-icons.*",
+                "input": "resources/scion-workbench-icons/fonts",
+                "output": "/assets/fonts"
+              }
+            ],
+            "styles": [
+              "apps/workbench-getting-started-app/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/scion/workbench"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "workbench-getting-started-app:build:production-ci"
+            },
+            "development": {
+              "browserTarget": "workbench-getting-started-app:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/workbench-getting-started-app/**/*.ts",
+              "apps/workbench-getting-started-app/**/*.html"
             ]
           }
         }

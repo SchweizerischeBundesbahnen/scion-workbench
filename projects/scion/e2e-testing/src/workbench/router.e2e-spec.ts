@@ -282,41 +282,6 @@ test.describe('Workbench Router', () => {
     expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(true);
   });
 
-  test('should reject closing a view with an invalid viewId via router', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-
-    // open the test view in a new view tab
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterCssClass('testee-1');
-    await routerPagePO.clickNavigate();
-
-    // open the test view in a new view tab
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterCssClass('testee-2');
-    await routerPagePO.clickNavigate();
-
-    // expect the test views to be opened
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
-
-    // try closing an invalid viewId
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('<empty>');
-    await routerPagePO.enterTarget('invalid');
-    await routerPagePO.checkClose(true);
-
-    // expect closing to be rejected
-    await expect(routerPagePO.clickNavigate()).rejects.toThrow(/\[WorkbenchRouterError]\[IllegalArgumentError]/);
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
-    expect(await appPO.view({cssClass: 'testee-1'}).viewTab.isPresent()).toBe(true);
-    expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(true);
-  });
-
   test('should reject closing a view by viewId via router if a path is also given', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 

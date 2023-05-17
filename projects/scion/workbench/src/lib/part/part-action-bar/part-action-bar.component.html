@@ -1,0 +1,21 @@
+<ng-container *ngIf="{start: startActions$ | async | wbEmptyIfNull, end: endActions$ | async | wbEmptyIfNull} as actions">
+  <ul class="e2e-view-actions start" *ngIf="actions.start.length">
+    <li *ngFor="let action of actions.start">
+      <ng-container *ngTemplateOutlet="action_template; context: {$implicit: action}"></ng-container>
+    </li>
+  </ul>
+  <ul class="e2e-view-actions end" *ngIf="actions.end.length">
+    <li *ngFor="let action of actions.end">
+      <ng-container *ngTemplateOutlet="action_template; context: {$implicit: action}"></ng-container>
+    </li>
+  </ul>
+</ng-container>
+
+<ng-template #action_template let-action>
+  <ng-container *ngIf="isTemplate(action)">
+    <ng-container *ngTemplateOutlet="action.templateOrComponent"></ng-container>
+  </ng-container>
+  <ng-container *ngIf="!isTemplate(action)">
+    <ng-container *ngComponentOutlet="action.templateOrComponent.component; injector: addPartToInjector(action.templateOrComponent.injector)"></ng-container>
+  </ng-container>
+</ng-template>

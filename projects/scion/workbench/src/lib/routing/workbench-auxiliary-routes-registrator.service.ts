@@ -1,9 +1,9 @@
 import {Injectable, Type} from '@angular/core';
-import {CanActivate, CanDeactivate, Data, ɵEmptyOutletComponent, PRIMARY_OUTLET, ResolveData, Router, Routes} from '@angular/router';
+import {CanActivate, CanDeactivate, Data, PRIMARY_OUTLET, ResolveData, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
 
 /**
- * Registers auxiliary routes for views and activities.
+ * Registers auxiliary routes for views.
  */
 @Injectable()
 export class WorkbenchAuxiliaryRoutesRegistrator {
@@ -27,17 +27,16 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
     const primaryRoutes = this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
     const outletAuxRoutes: Routes = [];
     primaryRoutes
-      .filter(primaryRoute => primaryRoute.path !== '') // skip empty path routes because not supported in named outlets
+      .filter(primaryRoute => primaryRoute.path !== '') // skip root route(s)
       .forEach(primaryRoute => outletNames.forEach(outlet => {
-        outletAuxRoutes.push({
+        outletAuxRoutes.push(standardizeConfig({
           ...primaryRoute,
           outlet: outlet,
-          component: primaryRoute.component || ɵEmptyOutletComponent, // EmptyOutletComponent is used for lazy loading of aux routes; see 'router/src/utils/config.ts#standardizeConfig' and Angular PR #23459.
           canActivate: [...(config.canActivate || []), ...(primaryRoute.canActivate || [])],
           canDeactivate: [...(config.canDeactivate || []), ...(primaryRoute.canDeactivate || [])],
           data: {...primaryRoute.data, ...config.data},
           resolve: {...primaryRoute.resolve, ...config.resolve},
-        });
+        }));
       }));
 
     this.replaceRouterConfig([
@@ -81,4 +80,18 @@ export interface OutletAuxiliaryRouteConfig {
   canActivate?: Type<CanActivate>[];
   data?: Data;
   resolve?: ResolveData;
+}
+
+/**
+ * Standardizes given route for registration. Copied from Angular 'router/src/utils/config.ts#standardizeConfig'.
+ *
+ * Performs the following steps:
+ * - Sets the `component` property to {@link ɵEmptyOutletComponent} if given route is a component-less parent route; see Angular PR #23459.
+ */
+function standardizeConfig(route: Route): Route {
+  if (!route.component && !route.loadComponent && (route.children || route.loadChildren)) {
+    route.component = ɵEmptyOutletComponent;
+  }
+  route.children?.forEach(standardizeConfig);
+  return route;
 }

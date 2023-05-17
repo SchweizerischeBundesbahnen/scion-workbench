@@ -8,12 +8,46 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, HostBinding, OnDestroy} from '@angular/core';
+import {filter, takeUntil} from 'rxjs/operators';
+import {NavigationCancel, NavigationEnd, NavigationError, Router} from '@angular/router';
+import {Subject} from 'rxjs';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
+
+  private _destroy$ = new Subject<void>();
+
+  /**
+   * Unique id that is set after a navigation has been performed.
+   *
+   * Used in end-to-end tests to detect when the navigation has completed.
+   * @see RouterPagePO
+   */
+  @HostBinding('attr.data-navigationid')
+  public navigationId: string | undefined;
+
+  constructor(private _router: Router) {
+    this.installRouterEventListeners();
+  }
+
+  private installRouterEventListeners(): void {
+    this._router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        this.navigationId = UUID.randomUUID();
+      });
+  }
+
+  public ngOnDestroy(): void {
+    this._destroy$.next();
+  }
 }

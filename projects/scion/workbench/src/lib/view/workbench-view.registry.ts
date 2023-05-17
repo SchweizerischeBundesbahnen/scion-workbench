@@ -9,9 +9,9 @@
  */
 
 import {Injectable, OnDestroy} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
+import {WorkbenchObjectRegistry} from '../workbench-object-registry';
 
 /**
  * Registry for {@link WorkbenchView} model objects.
@@ -19,62 +19,44 @@ import {ɵWorkbenchView} from './ɵworkbench-view.model';
 @Injectable()
 export class WorkbenchViewRegistry implements OnDestroy {
 
-  private readonly _viewRegistry = new Map<string, ɵWorkbenchView>();
-  private readonly _viewRegistryChange$ = new Subject<void>();
+  private _registry = new WorkbenchObjectRegistry<ɵWorkbenchView>({
+    keyFn: view => view.id,
+    nullObjectErrorFn: viewId => Error(`[NullViewError] View '${viewId}' not found.`),
+  });
 
+  /**
+   * Registers given view.
+   */
   public register(view: ɵWorkbenchView): void {
-    this._viewRegistry.set(view.viewId, view);
-    this._viewRegistryChange$.next();
+    this._registry.register(view);
   }
 
   /**
-   * Destroys the view of the given id and removes it from this registry.
+   * Unregisters specified view and destroys it.
    */
-  public remove(viewId: string): void {
-    this.getElseThrow(viewId).destroy();
-    this._viewRegistry.delete(viewId);
-    this._viewRegistryChange$.next();
+  public unregister(viewId: string): void {
+    this._registry.unregister(viewId)?.destroy();
   }
 
   /**
-   * Returns the {@link WorkbenchView} of the given identity, or throws an Error if not found.
+   * Returns the {@link WorkbenchView} of the given identity. If not found, by default, throws an error unless setting the `orElseNull` option.
    */
-  public getElseThrow(viewId: string): ɵWorkbenchView {
-    const view = this._viewRegistry.get(viewId);
-    if (!view) {
-      throw Error(`[NullViewError] No view for '${viewId}' found.`);
-    }
-    return view;
+  public get(viewId: string): ɵWorkbenchView;
+  public get(viewId: string, options: {orElse: null}): ɵWorkbenchView | null;
+  public get(viewId: string, options?: {orElse: null}): ɵWorkbenchView | null {
+    return this._registry.get(viewId, options);
   }
 
-  /**
-   * Returns the {@link WorkbenchView} of the given identity, or returns `null` if not found.
-   */
-  public getElseNull(viewId: string): ɵWorkbenchView | null {
-    return this._viewRegistry.get(viewId) ?? null;
+  public get views(): readonly ɵWorkbenchView[] {
+    return this._registry.objects;
   }
 
-  public get viewIds(): string[] {
-    return Array.from(this._viewRegistry.keys());
-  }
-
-  /**
-   * Emits the views opened in the workbench.
-   *
-   * Upon subscription, the currently opened views are emitted, and then emits continuously
-   * when new views are opened or existing views closed. It never completes.
-   */
-  public get viewIds$(): Observable<string[]> {
-    return this._viewRegistryChange$
-      .pipe(
-        startWith(undefined as void),
-        map(() => this.viewIds),
-      );
+  public get views$(): Observable<readonly ɵWorkbenchView[]> {
+    return this._registry.objects$;
   }
 
   public ngOnDestroy(): void {
-    this._viewRegistry.forEach(view => view.destroy());
-    this._viewRegistry.clear();
-    this._viewRegistryChange$.next();
+    this._registry.objects.forEach(view => view.destroy());
+    this._registry.clear();
   }
 }

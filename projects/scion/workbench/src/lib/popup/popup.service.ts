@@ -84,7 +84,7 @@ export class PopupService {
     const align = config.align || 'north';
     const contextualView = this.resolveContextualView(config);
     const referrer: PopupReferrer = Dictionaries.withoutUndefinedEntries({
-      viewId: contextualView?.viewId,
+      viewId: contextualView?.id,
     });
 
     // Set up the popup positioning strategy.
@@ -225,10 +225,10 @@ export class PopupService {
 
     // Close the popup when closing the view.
     if (contextualView) {
-      this._viewRegistry.viewIds$
+      this._viewRegistry.views$
         .pipe(takeUntilClose())
-        .subscribe(viewIds => {
-          if (!viewIds.includes(contextualView.viewId)) {
+        .subscribe(views => {
+          if (!views.some(view => view.id === contextualView.id)) {
             popupHandle.close();
           }
         });
@@ -317,7 +317,7 @@ export class PopupService {
    */
   private resolveContextualView(config: PopupConfig): ɵWorkbenchView | null {
     if (config.context?.viewId) {
-      return this._viewRegistry.getElseThrow(config.context.viewId);
+      return this._viewRegistry.get(config.context.viewId);
     }
     if (config.context?.viewId === undefined) { // `null` means to open the popup outside of the contextual view
       return this._view ?? null;

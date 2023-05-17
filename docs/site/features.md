@@ -14,14 +14,15 @@ This page gives you an overview of existing and planned workbench features. Deve
 
 |Feature|Category|Status|Note
 |-|-|-|-|
-|Viewgrid|layout|[![][done]](#)|Grid for the flexible arrangement of views.
-|Viewdrag|layout|[![][done]](#)|The user can drag views to different locations in the grid or display views side by side, both vertically and horizontally. Viewdrag also works across browser windows of the same web application.
+|Workbench Layout|layout|[![][done]](#)|Layout for the flexible arrangement of views side-by-side or stacked, all personalizable by the user via drag & drop.
+|Compact Layout|layout|[![][planned]](#)|Compact presentation of views around the main area, similar to activities known from Visual Studio Code or IntelliJ.
+|Perspective|layout|[![][done]](#)|Arrangement of views around the main area. Multiple perspectives are supported. Different perspectives provide a different perspective on the application while sharing the main area. Only one perspective can be active at a time. [#305](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/305).
+|View|layout|[![][done]](#)|Visual component for displaying content stacked or side-by-side in the workbench layout.
 |Multi-Window|layout|[![][done]](#)|Views can be opened in new browser windows.
-|Viewpart Actions|layout|[![][done]](#)|Actions that are displayed in the tabbar of a viewpart after the last visible viewtab. Actions can stick to a view, so they are only visible when the view is active.
+|Part Actions|layout|[![][done]](#)|Actions that are displayed in the tabbar of a part. Actions can stick to a view, so they are only visible when the view is active.
 |View Context Menu|layout|[![][done]](#)|A viewtab has a context menu. By default, the workbench adds some workbench-specific menu items to the context menu, such as for closing other views. Custom menu items can be added to the context menu as well.
-|Perspective|layout|[![][planned]](#)|A perspective defines the arrangement of views. Multiple perspectives are possible, useful if having different application contexts. [#305](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/305).
-|Persistent Navigation|navigation|[![][done]](#)|The arrangement of the views and displayed routes are added to the browser URL; thus, a page refresh restores the workbench layout.
-|Default Page|layout|[![][done]](#)|The workbench adds a primary router outlet when no view is opened, displaying the empty path route.
+|Persistent Navigation|navigation|[![][done]](#)|The arrangement of the views is added to the browser URL or local storage, enabling persistent navigation.
+|Default Page|layout|[![][done]](#)|The workbench adds a primary router outlet to the main area when no view is open, enabling the display of a start page.
 |Microfrontend Support|microfrontend|[![][done]](#)|Microfrontends can be opened in views. Embedded microfrontends can interact with the workbench using a framework-angostic workbench API. The documentation is still missing. [#304](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/304).
 |Theming|customization|[![][planned]](#)|A custom theme can be applied to change the look of the workbench. [#110](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/110)
 |Responsive Design|layout|[![][planned]](#)|The workbench adapts its layout to the current display size and device. [#112](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/112) 
@@ -29,10 +30,8 @@ This page gives you an overview of existing and planned workbench features. Deve
 |Localization (l10n)|env|[![][planned]](#)|The workbench allows the localization of built-in texts such as texts in context menus and manifest entries. [#255](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/255)
 |Browser Support|env|[![][planned]](#)|The workbench works with most modern browsers. As of now, the workbench is optimized and tested on browsers based on the Chromium rendering engine (Google Chrome, Microsoft Edge). However, the workbench should work fine on other modern browsers as well. [#111](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/111)
 |Message Box|control|[![][done]](#)|The workbench allows displaying content in a message box. The message box can be either view or application modal.
-|Notification Ribbon|control|[![][done]](#)|The workbench allows showing content in notifications ribbons. Notifications slide in at the top right corner. Multiple notifications are displayed one below the other.
+|Notification Ribbon|control|[![][done]](#)|The workbench allows showing content in notifications ribbons. Notifications slide in at the upper-right corner. Multiple notifications are displayed one below the other.
 |Popup|control|[![][done]](#)|The workbench allows displaying content in a popup overlay.
-|Activity|layout|[![][done]](#)&nbsp;&nbsp;[![][deprecated]](#)|Visual workbench element on the left side of the workbench layout. (We will drop support for activities once supporting perspectives) 
-|Activity Actions|layout|[![][done]](#)&nbsp;&nbsp;[![][deprecated]](#)|Actions in the header of an activity. (We will drop support for activities once supporting perspectives)
 |Developer guide|doc|[![][planned]](#)|Developer Guide describing the workbench layout, its conceptsm fundamental APIs and built-in microfrontend support. [#304](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/304)
 |Viewtab|customization|[![][done]](#)|The built-in viewtab can be replaced with a custom viewtab implementation, e.g., to add additional functionality. 
 

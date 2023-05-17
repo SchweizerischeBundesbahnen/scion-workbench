@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
+import {ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlSegmentGroup} from '@angular/router';
+import {Commands} from './workbench-router.service';
+import {VIEW_ID_PREFIX} from '../workbench.constants';
 
 export namespace RouterUtils {
 
@@ -34,8 +36,8 @@ export namespace RouterUtils {
   /**
    * Converts URL segments into an array of routable commands to be passed to the Angular router for navigation.
    */
-  export function segmentsToCommands(segments: UrlSegment[]): any[] {
-    return segments.reduce((acc: any[], segment: UrlSegment) => {
+  export function segmentsToCommands(segments: UrlSegment[]): Commands[] {
+    return segments.reduce((acc: Commands, segment: UrlSegment) => {
       return acc.concat(
         segment.path || [],
         segment.parameters && Object.keys(segment.parameters).length ? segment.parameters : [],
@@ -44,11 +46,25 @@ export namespace RouterUtils {
   }
 
   /**
+   * Reads specified outlets from the current URL, optionally applying a `replacer` function to replace the commands of an outlet.
+   */
+  export function outletsFromCurrentUrl(router: Router, outletNames: string[], replacer?: (outlet: string, commands: Commands) => Commands | null): {[viewId: string]: Commands} {
+    const urlTree = router.parseUrl(router.url);
+    return outletNames.reduce((acc, outletName) => {
+      if (urlTree.root.children[outletName]) {
+        const commands = RouterUtils.segmentsToCommands(urlTree.root.children[outletName].segments);
+        return {...acc, [outletName]: replacer ? replacer(outletName, commands) : commands};
+      }
+      return acc;
+    }, {});
+  }
+
+  /**
    * Parses the given path including any matrix parameters into URL segments.
    */
   export function parsePath(router: Router, path: string): UrlSegment[] {
-    const tree: UrlTree = router.parseUrl(path);
-    const segmentGroup: UrlSegmentGroup = tree.root.children[PRIMARY_OUTLET];
+    const urlTree = router.parseUrl(path);
+    const segmentGroup: UrlSegmentGroup = urlTree.root.children[PRIMARY_OUTLET];
     if (!segmentGroup) {
       throw Error(`[RouteMatchError] Cannot match any route for '${path}'.`);
     }
@@ -71,5 +87,13 @@ export namespace RouterUtils {
    */
   export function lookupRouteData<T>(activatedRoute: ActivatedRouteSnapshot, dataKey: string): T | undefined {
     return activatedRoute.pathFromRoot.reduceRight((resolvedData, route) => resolvedData ?? route.data[dataKey], undefined);
+  }
+
+  /**
+   * Tests if the given view can be the target of a primary route.
+   * Such views have an id that begins with the view prefix.
+   */
+  export function isPrimaryRouteTarget(viewId: string): boolean {
+    return viewId.startsWith(VIEW_ID_PREFIX);
   }
 }

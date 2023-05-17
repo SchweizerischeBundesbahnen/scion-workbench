@@ -1,0 +1,5 @@
+<ng-container *ngIf="todo$ | async as todo">
+  <label>Task:</label>{{todo.task}}
+  <label>Due Date:</label>{{todo.dueDate | date:'short'}}
+  <label>Notes:</label>{{todo.notes}}
+</ng-container>

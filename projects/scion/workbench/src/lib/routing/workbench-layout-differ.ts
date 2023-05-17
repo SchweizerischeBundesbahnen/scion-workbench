@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,70 +9,53 @@
  */
 
 import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
-import {UrlTree} from '@angular/router';
-import {POPUP_REF_PREFIX, VIEW_REF_PREFIX} from '../workbench.constants';
-import {PartsLayout} from '../layout/parts-layout';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 
 /**
- * Stateful differ for finding workbench layout changes, e.g., to find parts or named outlets that were added or removed.
+ * Stateful differ for finding added/removed workbench layout elements.
  */
 @Injectable()
 export class WorkbenchLayoutDiffer {
 
-  private _viewOutletDiffer: IterableDiffer<string>;
-  private _popupOutletDiffer: IterableDiffer<string>;
-  private _viewPartDiffer: IterableDiffer<string>;
+  private _partsDiffer: IterableDiffer<string>;
+  private _viewsDiffer: IterableDiffer<string>;
 
   constructor(differs: IterableDiffers) {
-    this._viewOutletDiffer = differs.find([]).create<string>();
-    this._popupOutletDiffer = differs.find([]).create<string>();
-    this._viewPartDiffer = differs.find([]).create<string>();
+    this._partsDiffer = differs.find([]).create<string>();
+    this._viewsDiffer = differs.find([]).create<string>();
   }
 
   /**
-   * Computes differences between the given layout and the layout as given in the last invocation.
+   * Computes differences in the layout since last time {@link WorkbenchLayoutDiffer#diff} was invoked.
    */
-  public diff(urlTree: UrlTree, partsLayout?: PartsLayout): WorkbenchLayoutDiff {
-    const viewOutletNames = Object.keys(urlTree.root.children).filter(outlet => outlet.startsWith(VIEW_REF_PREFIX));
-    const popupOutletNames = Object.keys(urlTree.root.children).filter(outlet => outlet.startsWith(POPUP_REF_PREFIX));
-    const partIds = partsLayout?.parts.map(part => part.partId) || [];
+  public diff(workbenchLayout?: ɵWorkbenchLayout): WorkbenchLayoutDiff {
+    const partIds = workbenchLayout?.parts().map(part => part.id) || [];
+    const viewIds = workbenchLayout?.views().map(view => view.id) || [];
 
-    return new WorkbenchLayoutDiff(
-      this._viewOutletDiffer.diff(viewOutletNames),
-      this._popupOutletDiffer.diff(popupOutletNames),
-      this._viewPartDiffer.diff(partIds),
-    );
+    return new WorkbenchLayoutDiff({
+      parts: this._partsDiffer.diff(partIds),
+      views: this._viewsDiffer.diff(viewIds),
+    });
   }
 }
 
 /**
- * Describes changes in the layout since last time {@link WorkbenchLayoutDiffer#diff} was invoked.
+ * Lists the layout elements added/removed in the current navigation.
  */
 export class WorkbenchLayoutDiff {
 
-  public addedViews: string[];
-  public removedViews: string[];
+  public readonly addedParts = new Array<string>();
+  public readonly removedParts = new Array<string>();
 
-  public addedPopups: string[];
-  public removedPopups: string[];
+  public readonly addedViews = new Array<string>();
+  public readonly removedViews = new Array<string>();
 
-  public addedParts: string[];
-  public removedParts: string[];
+  constructor(changes: {parts: IterableChanges<string> | null; views: IterableChanges<string> | null}) {
+    changes.parts?.forEachAddedItem(({item}) => this.addedParts.push(item));
+    changes.parts?.forEachRemovedItem(({item}) => this.removedParts.push(item));
 
-  constructor(viewChanges: IterableChanges<string> | null,
-              popupChanges: IterableChanges<string> | null,
-              partChanges: IterableChanges<string> | null) {
-    ({addedItems: this.addedViews, removedItems: this.removedViews} = this.collectChangedItems(viewChanges));
-    ({addedItems: this.addedPopups, removedItems: this.removedPopups} = this.collectChangedItems(popupChanges));
-    ({addedItems: this.addedParts, removedItems: this.removedParts} = this.collectChangedItems(partChanges));
-  }
-
-  private collectChangedItems(changes: IterableChanges<string> | null): {addedItems: string[]; removedItems: string[]} {
-    const addedItems: string[] = [];
-    const removedItems: string[] = [];
-    changes?.forEachAddedItem(({item}) => addedItems.push(item));
-    changes?.forEachRemovedItem(({item}) => removedItems.push(item));
-    return {addedItems, removedItems};
+    changes.views?.forEachAddedItem(({item}) => this.addedViews.push(item));
+    changes.views?.forEachRemovedItem(({item}) => this.removedViews.push(item));
   }
 
   public toString(): string {
@@ -81,8 +64,6 @@ export class WorkbenchLayoutDiff {
       .concat(this.removedParts.length ? `removedParts=[${this.removedParts}]` : [])
       .concat(this.addedViews.length ? `addedViews=[${this.addedViews}]` : [])
       .concat(this.removedViews.length ? `removedViews=[${this.removedViews}]` : [])
-      .concat(this.addedPopups.length ? `addedPopups=[${this.addedPopups}]` : [])
-      .concat(this.removedPopups.length ? `removedPopups=[${this.removedPopups}]` : [])
       .join(', ')}`;
   }
 }

@@ -10,34 +10,86 @@
 
 import {Observable} from 'rxjs';
 import {Disposable} from './disposable';
-import {WorkbenchMenuItemFactoryFn, WorkbenchViewPartAction} from './workbench.model';
+import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction} from './workbench.model';
 import {WorkbenchView} from './view/workbench-view.model';
+import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
+import {WorkbenchPart} from './part/workbench-part.model';
 
 /**
- * Root object for the SCION Workbench.
+ * The central class of the SCION Workbench.
  *
- * It consists of one or more viewparts containing views which can be flexibly arranged and dragged around by the user.
+ * SCION Workbench enables the creation of Angular web applications that require a flexible layout
+ * to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.
  *
- * The Workbench provides core features of a modern rich web application.
+ * The workbench layout is ideal for applications with non-linear workflows, enabling users to work
+ * on content in parallel.
  *
- * - tabbed, movable and stackable views
- * - notifications
- * - message boxes (view or application modal)
- * - popups
- * - persistent view navigation (via browser URL)
- * - microfrontend support for embedding microfrontends in views or popups
- *
- * Activities are modelled in `app.component.html` as content children of <wb-workbench> in the form of <wb-activity> elements.
- *
- * Views are opened via Angular routing mechanism. To open a component in a view, it has to be registered as a route in the routing module.
- * Use `wbRouterLink` directive or `WorkbenchRouter` service for view-based navigation.
+ * The workbench has a main area and a peripheral area for placing views. The main area is the primary
+ * place for views to interact with the application. The peripheral area arranges views around the main
+ * area to support the user's workflow. Multiple arrangements of peripheral views, called perspectives,
+ * are supported. Different perspectives provide a different perspective on the application while sharing
+ * the main area. Only one perspective can be active at a time.
  */
 export abstract class WorkbenchService {
 
   /**
-   * A unique ID per instance of the app. If opened in a different browser tab, it has a different instance ID.
+   * Perspectives registered with the workbench.
    */
-  public abstract readonly appInstanceId: string;
+  public abstract readonly perspectives: readonly WorkbenchPerspective[];
+
+  /**
+   * Emits the perspectives registered with the workbench.
+   *
+   * Upon subscription, the currently registered perspectives are emitted, and then emits continuously
+   * when new perspectives are registered or existing perspectives unregistered. It never completes.
+   */
+  public abstract readonly perspectives$: Observable<readonly WorkbenchPerspective[]>;
+
+  /**
+   * Returns a reference to the specified {@link WorkbenchPerspective}, or `null` if not found.
+   */
+  public abstract getPerspective(perspectiveId: string): WorkbenchPerspective | null;
+
+  /**
+   * Registers the given perspective to arrange views around the main area.
+   * The perspective can be activated via the {@link WorkbenchService#switchPerspective} method.
+   *
+   * @see WorkbenchPerspective
+   */
+  public abstract registerPerspective(perspective: WorkbenchPerspectiveDefinition): Promise<void>;
+
+  /**
+   * Switches to the specified perspective. Layout and views of the main area do not change.
+   */
+  public abstract switchPerspective(id: string): Promise<boolean>;
+
+  /**
+   * Resets the currently active perspective to its initial layout. Layout and views of the main area do not change.
+   */
+  public abstract resetPerspective(): Promise<void>;
+
+  /**
+   * Parts in the workbench layout.
+   */
+  public abstract readonly parts: readonly WorkbenchPart[];
+
+  /**
+   * Emits the parts in the workbench layout.
+   *
+   * Upon subscription, the current parts are emitted, and then emits continuously
+   * when new parts are added or existing parts removed. It never completes.
+   */
+  public abstract readonly parts$: Observable<readonly WorkbenchPart[]>;
+
+  /**
+   * Returns a reference to the specified {@link WorkbenchPart}, or `null` if not found.
+   */
+  public abstract getPart(partId: string): WorkbenchPart | null;
+
+  /**
+   * Views opened in the workbench.
+   */
+  public abstract readonly views: readonly WorkbenchView[];
 
   /**
    * Emits the views opened in the workbench.
@@ -45,7 +97,7 @@ export abstract class WorkbenchService {
    * Upon subscription, the currently opened views are emitted, and then emits continuously
    * when new views are opened or existing views closed. It never completes.
    */
-  public abstract readonly views$: Observable<string[]>;
+  public abstract readonly views$: Observable<readonly WorkbenchView[]>;
 
   /**
    * Returns a reference to the specified {@link WorkbenchView}, or `null` if not found.
@@ -53,28 +105,20 @@ export abstract class WorkbenchService {
   public abstract getView(viewId: string): WorkbenchView | null;
 
   /**
-   * Destroys the specified workbench view(s) and associated routed component.
-   * If it is the last view in the viewpart, the viewpart is removed as well.
+   * Closes the specified workbench views.
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public abstract destroyView(...viewIds: string[]): Promise<boolean>;
+  public abstract closeViews(...viewIds: string[]): Promise<boolean>;
 
   /**
-   * Activates the specified view.
+   * Registers an action which is added to every part.
    *
-   * Note: This instruction runs asynchronously via URL routing.
-   */
-  public abstract activateView(viewId: string): Promise<boolean>;
-
-  /**
-   * Registers an action which is added to every viewpart.
-   *
-   * Viewpart actions are displayed next to the opened view tabs.
+   * Part actions are displayed next to the opened view tabs.
    *
    * @return handle to unregister the action.
    */
-  public abstract registerViewPartAction(action: WorkbenchViewPartAction): Disposable;
+  public abstract registerPartAction(action: WorkbenchPartAction): Disposable;
 
   /**
    * Registers a view menu item which is added to the context menu of every view tab.

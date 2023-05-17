@@ -15,14 +15,14 @@ import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing.constants';
 import {MessageBoxService} from '../message-box/message-box.service';
-import {ViewMenuService} from '../view-part/view-context-menu/view-menu.service';
+import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
 import {VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference} from '../content-projection/view-container.reference';
 import {PopupService} from '../popup/popup.service';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
-import {WorkbenchNavigationalStates} from '../routing/workbench-navigational-states';
+import {WorkbenchNavigationalViewStates} from '../routing/workbench-navigational-states';
 import {RouterUtils} from '../routing/router.util';
 
 /**
@@ -59,7 +59,7 @@ export class ViewComponent implements OnDestroy {
 
   @HostBinding('attr.data-viewid')
   public get viewId(): string {
-    return this._view.viewId;
+    return this._view.id;
   }
 
   @HostBinding('attr.class')
@@ -128,7 +128,8 @@ export class ViewComponent implements OnDestroy {
 
     this._view.cssClass = new Array<string>()
       .concat(Arrays.coerce(RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.cssClass)))
-      .concat(Arrays.coerce(route.snapshot.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalStates.cssClass]));
+      .concat(Arrays.coerce(route.snapshot.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalViewStates.cssClass]))
+      .concat(this._view.cssClasses);
     if (!this._view.active) {
       this._cd.detectChanges();
     }

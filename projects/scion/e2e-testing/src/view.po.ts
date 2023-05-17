@@ -62,6 +62,13 @@ export class ViewPO {
     return fromRect(await this._locator.boundingBox());
   }
 
+  /**
+   * Indicates if this view is contained in the main area.
+   */
+  public isInMainArea(): Promise<boolean> {
+    return isPresent(this._locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this._locator}));
+  }
+
   public locator(selector: string): Locator {
     return this._locator.locator(selector);
   }

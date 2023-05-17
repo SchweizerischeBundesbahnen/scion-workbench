@@ -12,9 +12,9 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 
-test.describe('Viewpart Action', () => {
+test.describe('Part Action', () => {
 
-  test('should be added to all viewparts (global action)', async ({appPO, workbenchNavigator}) => {
+  test('should be added to all parts (global action)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const openNewTabActionButtonPO = appPO.activePart.action({cssClass: 'e2e-open-new-tab'});
 
@@ -52,7 +52,7 @@ test.describe('Viewpart Action', () => {
     await appPO.navigateTo({microfrontendSupport: false});
     const testeeActionButtonPO = appPO.activePart.action({cssClass: 'e2e-testee'});
 
-    // Open view-1 and register a view-local viewpart action
+    // Open view-1 and register a view-local part action
     const viewPagePO1 = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPagePO1.addViewAction({icon: 'open_in_new', cssClass: 'e2e-testee'});
     await expect(await testeeActionButtonPO.isPresent()).toBe(true);

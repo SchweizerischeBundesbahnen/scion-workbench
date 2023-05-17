@@ -179,7 +179,7 @@ export class ViewDragService implements OnDestroy {
    */
   public dispatchViewMoveEvent(event: ViewMoveEvent): void {
     // Wait to dispatch the event until the drag operation finished, if any, because if the drag source element
-    // is destroyed during the drag operation, e.g. if moved to another viewpart, the drag operation would not
+    // is destroyed during the drag operation, e.g. if moved to another part, the drag operation would not
     // ordinarily complete, meaning 'dragend' or 'dragleave' would not be called.
     const isDragging = this.viewDragData !== null;
     (isDragging ? this.viewDragEnd$ : of(undefined))
