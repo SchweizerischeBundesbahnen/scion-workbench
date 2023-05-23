@@ -6,6 +6,22 @@
 ## [Changelog][menu-changelog] > Workbench Client (@scion/workbench-client)
 
 
+# [1.0.0-beta.18](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.17...workbench-client-1.0.0-beta.18) (2023-05-23)
+
+
+### Features
+
+* **workbench-client:** consolidate workbench view handle ([3f6fb22](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3f6fb22e27b597f3c4a83f9cc1cb74fde4493f73))
+
+
+### BREAKING CHANGES
+
+* **workbench-client:** consolidating workbench view handle introduced a breaking change.
+
+  The following APIs have changed:
+    - `WorkbenchView.viewId` => `WorkbenchView.id`
+
+
 # [1.0.0-beta.17](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.16...workbench-client-1.0.0-beta.17) (2023-02-10)
 
 
