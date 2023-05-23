@@ -27,7 +27,7 @@ import {BrowserModule} from '@angular/platform-browser';
       {path: '', loadComponent: () => import('./welcome/welcome.component')},
       {path: '', outlet: 'todos', loadComponent: () => import('./todos/todos.component')},
       {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
-    ]),
+    ], {useHash: true}),
     BrowserModule,
     BrowserAnimationsModule,
   ],

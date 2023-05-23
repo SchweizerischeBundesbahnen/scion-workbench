@@ -185,6 +185,7 @@ The following scopes are allowed:
 - `workbench-client`: If the change affects the `@scion/workbench-client` NPM package.
 - `workbench-testing-app`: If the change affects the internal testing app for the workbench.
 - `workbench-client-testing-app`: If the change affects the internal testing app for the workbench client.
+- `workbench-getting-started-app`: If the change affects the getting started app for the workbench.
 </details>
 
 
