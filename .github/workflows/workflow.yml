@@ -280,7 +280,9 @@ jobs:
   release-workbench:
     name: 'Releasing @scion/workbench'
     if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' }}
-    needs: [ workbench-release-guard ]
+    needs:
+      - build-libs
+      - workbench-release-guard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -298,7 +300,9 @@ jobs:
   release-workbench-client:
     name: 'Releasing @scion/workbench-client'
     if: ${{ needs.workbench-client-release-guard.outputs.should-release == 'true' }}
-    needs: [ workbench-client-release-guard ]
+    needs:
+      - build-libs
+      - workbench-client-release-guard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -312,7 +316,7 @@ jobs:
         with:
           name: workbench-client-api
           path: dist/workbench-client-api
-      - name: 'Deploying API Documentation (TypeDoc) to Vercel'
+      - name: 'Publishing API Documentation (TypeDoc) to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
           dist-folder: dist/workbench-client-api
