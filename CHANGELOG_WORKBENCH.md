@@ -1,3 +1,48 @@
+# [15.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.4...15.0.0-beta.5) (2023-05-23)
+
+
+### Features
+
+* **workbench:** contribute filter field to filter views in the viewlist menu ([4bb2781](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4bb27817bd8541fd700589086499e2256503c771))
+* **workbench:** list all views in the viewlist menu ([bce8fdf](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/bce8fdf230b9cd5d5799391e67e568dc5d89d103))
+* **workbench:** do not clip view tabs if there are no part actions ([86f5412](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/86f541220f7299bf829954a737eecf8e295a6976))
+* **workbench:** provide better user experience when dragging view tabs ([23ade70](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/23ade70ddea70d294f3ef39c3124d7025cf560a8)), closes [#303](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/303)
+* **workbench:** support perspectives and initial view arrangement ([3f6fb22](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3f6fb22e27b597f3c4a83f9cc1cb74fde4493f73)), closes [#305](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/305) [#231](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/231)
+
+
+### BREAKING CHANGES
+
+* **workbench:** adding support for perspectives introduced a breaking change.
+
+  The following APIs have changed:
+    - `WorkbenchViewPart` => `WorkbenchPart`
+    - `WorkbenchViewPartAction` => `WorkbenchPartAction`
+    - `ViewPartActionDirective` => `WorkbenchPartActionDirective`
+    - `WbBeforeDestroy` => `WorkbenchViewPreDestroy`
+    - `WbBeforeDestroy.wbBeforeDestroy` => `WorkbenchViewPreDestroy.onWorkbenchViewPreDestroy`
+    - `ViewMenuItemDirective` => `WorkbenchViewMenuItemDirective`
+    - `WbRouterLinkDirective` => `WorkbenchRouterLinkDirective`
+    - `WbNavigationExtras` => `WorkbenchNavigationExtras`
+    - `WorkbenchService.views$ ` was changed to emit a readonly array of `WorkbenchView` objects instead of a string array of view ids.
+    - `WorkbenchService.destroyView` => `WorkbenchService.closeViews`
+    - `WorkbenchService.registerViewPartAction` => `WorkbenchService.registerPartAction`
+    - `WorkbenchViewPart.partId` => `WorkbenchPart.id`
+    - `WorkbenchViewPart.registerViewPartAction` => `WorkbenchPart.registerPartAction`
+    - `WorkbenchView.viewId` => `WorkbenchView.id`
+    - `WorkbenchTestingModule.forRoot` => `WorkbenchTestingModule.forTest`
+    - `WorkbenchTestingModule.forChild` => `WorkbenchTestingModule`
+    -  Internal DOM structure of SCION Workbench has changed. To migrate custom workbench styling, inspect the new DOM structure.
+  
+  The following APIs have been removed:
+    - Deprecated `Activity API` was removed. There is no replacement. Instead, define an initial layout. See the How-To Guide for more information.
+    - Method `WorkbenchService.activateView` was removed. Instead, use the `WorkbenchRouter` to activate the view.
+    - Route data `WorkbenchRouteData.part` was removed. There is no replacement.
+  
+  The selector of the following directives have changed:
+    - `wbViewPartAction` => `wbPartAction`
+
+
+
 # [15.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.3...15.0.0-beta.4) (2023-04-04)
 
 
