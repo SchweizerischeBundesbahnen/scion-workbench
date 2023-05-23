@@ -59,12 +59,12 @@ SCION Workbench enables the creation of Angular web applications that require a 
 - `v0.0.0-beta.33` and newer are compatible with Angular version 9.x.
 - `v0.0.0-beta.23` to `v0.0.0-beta.32` is only compatible with Angular version 8.x.
 
-[![Project version](https://img.shields.io/npm/v/@scion/workbench.svg)][link-download]
-[![Project version](https://img.shields.io/npm/v/@scion/workbench/next.svg)][link-download]
+[![@scion/workbench version](https://img.shields.io/npm/v/@scion/workbench/latest?label=%40scion%2Fworkbench)][link-workbench-download]
+[![@scion/workbench-client version](https://img.shields.io/npm/v/@scion/workbench-client/latest?label=%40scion%2Fworkbench-client)][link-workbench-client-download]
 [![Continuous Integration and Delivery][link-github-actions-workflow:status]][link-github-actions-workflow]
 
-
-[link-download]: https://www.npmjs.com/package/@scion/workbench
+[link-workbench-download]: https://www.npmjs.com/package/@scion/workbench
+[link-workbench-client-download]: https://www.npmjs.com/package/@scion/workbench-client
 [link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions
 [link-github-actions-workflow:status]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/workflows/Continuous%20Integration%20and%20Delivery/badge.svg?branch=master&event=push
 
