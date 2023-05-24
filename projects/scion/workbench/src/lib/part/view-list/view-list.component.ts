@@ -10,7 +10,6 @@
 
 import {ChangeDetectionStrategy, Component, HostBinding, HostListener, Input, OnInit, ViewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
-import {animate, style, transition, trigger} from '@angular/animations';
 import {combineLatest, Observable, switchMap} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
@@ -32,14 +31,6 @@ export const ViewListComponentInputs = {
   templateUrl: './view-list.component.html',
   styleUrls: ['./view-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('open', [
-      transition(':enter', [
-        style({height: 0}),
-        animate('.25s ease-out', style({height: '*'})),
-      ]),
-    ]),
-  ],
 })
 export class ViewListComponent implements OnInit {
 
