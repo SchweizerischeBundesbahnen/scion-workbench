@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, HostListener, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostBinding, HostListener, Input, OnInit, ViewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {animate, style, transition, trigger} from '@angular/animations';
 import {combineLatest, Observable, switchMap} from 'rxjs';
@@ -19,6 +19,13 @@ import {mapArray} from '@scion/toolkit/operators';
 import {FormControl} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
 import {WorkbenchPart} from '../workbench-part.model';
+
+/**
+ * Reference to inputs of {@link ViewListComponent}.
+ */
+export const ViewListComponentInputs = {
+  POSITION: 'position',
+};
 
 @Component({
   selector: 'wb-view-list',
@@ -41,6 +48,14 @@ export class ViewListComponent implements OnInit {
 
   @ViewChild(FilterFieldComponent, {static: true})
   private _filterFieldComponent!: FilterFieldComponent;
+
+  @Input(ViewListComponentInputs.POSITION)
+  public position: 'north' | 'south' | undefined;
+
+  @HostBinding('class.south')
+  public get isSouthPosition(): boolean {
+    return this.position === 'south';
+  }
 
   constructor(part: WorkbenchPart,
               viewRegistry: WorkbenchViewRegistry,
