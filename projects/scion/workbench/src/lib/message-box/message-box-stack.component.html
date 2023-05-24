@@ -1,11 +1,11 @@
 <div *ngFor="let messageBox of messageBoxes$ | async; index as i"
      class="glasspane"
-     [@leave]
-     (mousedown)="onGlasspaneClick($event, messageBox)">
+     (mousedown)="onGlasspaneClick($event, messageBox)"
+     @leave>
   <wb-message-box [messageBox]="messageBox"
                   [positionDelta]="i * 10"
                   [ngClass]="messageBox | wbMessageBoxCssClasses$ | async"
-                  [@enter]
-                  (mousedown)="$event.stopPropagation()">
+                  (mousedown)="$event.stopPropagation()"
+                  @enter>
   </wb-message-box>
 </div>
