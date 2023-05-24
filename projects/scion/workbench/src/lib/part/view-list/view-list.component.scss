@@ -9,6 +9,10 @@
   border: 1px solid colors.$viewlistitem-border-color;
   background-color: colors.$part_tab-active-bgcolor;
 
+  &.south {
+    border-top: none;
+  }
+
   > wb-filter-field {
     flex: none;
     margin: .5em .25em;
