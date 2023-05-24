@@ -30,10 +30,15 @@
 
   &[context="tabbar-dropdown"] {
     padding: .25em 0;
+    border-left: 3px solid transparent;
 
     &:hover {
       background-color: rgba(239, 239, 239, .5);
       box-shadow: 0 0 0 1px colors.$viewlistitem-border-color;
+    }
+
+    &.active {
+      border-left-color: black;
     }
   }
 
