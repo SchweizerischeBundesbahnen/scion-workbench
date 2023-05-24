@@ -4,29 +4,11 @@
   white-space: nowrap;
 }
 
-@mixin unsetButtonUserAgentStyle {
-  padding: 0;
-  margin: 0;
-  border: none;
-  outline: none;
-  color: inherit;
-  background-color: inherit;
-  font-family: inherit;
-  font-size: 1em;
-  border-radius: 0;
-
-  &:active, &:hover, &:focus {
-    box-shadow: none;
-    color: inherit;
-  }
-}
-
 :host {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1.5em auto;
   padding: .5em 1em;
-  border-left: 3px solid transparent;
 
   &:not(.has-heading) {
     grid-template-rows: 1fr;
@@ -49,8 +31,7 @@
   }
 
   > button.close {
-    @include unsetButtonUserAgentStyle;
-
+    all: unset;
     cursor: pointer;
     visibility: hidden;
     opacity: .75;
@@ -67,7 +48,6 @@
   }
 
   &.active[context="tabbar-dropdown"] {
-    border-left-color: black;
     > div.title, div.heading {
       font-weight: bold;
     }

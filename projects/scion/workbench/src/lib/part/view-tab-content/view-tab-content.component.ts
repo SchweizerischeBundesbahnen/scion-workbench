@@ -27,10 +27,6 @@ export class ViewTabContentComponent {
     return !!this.view.heading;
   }
 
-  constructor(public view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {
-    this.context = context;
-  }
-
   @HostBinding('class.active')
   public get active(): boolean {
     return this.view.active;
@@ -44,6 +40,10 @@ export class ViewTabContentComponent {
   @HostBinding('class.scrolled-into-view')
   public get isScrolledIntoView(): boolean {
     return this.view.scrolledIntoView;
+  }
+
+  constructor(public view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {
+    this.context = context;
   }
 
   public onClose(event: Event): void {
