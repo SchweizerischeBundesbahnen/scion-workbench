@@ -229,8 +229,8 @@ jobs:
           release-commit-message-pattern: 'release\(workbench-client\): v(.*)'
           expected-version: ${{ needs.build-libs.outputs.workbench-client-version }}
           git-tag: workbench-client-%v
-  publish-apps:
-    name: 'Publishing testing app'
+  deploy-apps:
+    name: 'Deploying Applications'
     if: github.ref == 'refs/heads/master'
     needs: [ workbench-release-guard, workbench-client-release-guard ]
     runs-on: ubuntu-latest
