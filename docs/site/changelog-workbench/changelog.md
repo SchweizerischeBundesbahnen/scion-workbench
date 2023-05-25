@@ -6,6 +6,18 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [15.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.5...15.0.0-beta.6) (2023-05-25)
+
+
+### Bug Fixes
+
+* **workbench/notification:** highlight close button on hover ([5714503](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5714503176ff413a7888870590afa5f4f251c800))
+* **workbench/viewlist:** do not animate opening the menu ([d35de9a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d35de9a2674ad3de8ef94cc3c91e2486fcc7852a))
+* **workbench/viewlist:** do not render top border if opened in the south ([cddac34](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/cddac3430d39132d3f49b6ef1032acc90faea267))
+* **workbench/viewlist:** render active view marker in full height ([d68e860](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d68e8600dac6e6cdaf61920b81d9e43c89e842dc))
+
+
+
 # [15.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.4...15.0.0-beta.5) (2023-05-23)
 
 
