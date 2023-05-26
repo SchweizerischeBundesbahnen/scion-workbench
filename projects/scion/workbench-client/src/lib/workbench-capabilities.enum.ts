@@ -18,6 +18,8 @@ export enum WorkbenchCapabilities {
    * A view is a visual workbench component for displaying content stacked or side-by-side.
    */
   View = 'view',
+  Perspective = 'perspective',
+  PerspectiveExtension = 'perspective-extension',
   /**
    * Allows contributing a microfrontend for display in workbench popup.
    *
