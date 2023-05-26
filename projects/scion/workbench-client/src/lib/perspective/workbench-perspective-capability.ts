@@ -16,16 +16,12 @@ export interface WorkbenchPerspectiveCapability extends Capability {
 
   type: WorkbenchCapabilities.Perspective;
 
-  qualifier: PerspectiveQualifier;
+  qualifier: Qualifier;
 
   properties: {
    layout: LayoutDefinition;
    data: Dictionary;
   };
-}
-
-export interface PerspectiveQualifier extends Qualifier {
-  id: string;
 }
 
 export interface LayoutDefinition {

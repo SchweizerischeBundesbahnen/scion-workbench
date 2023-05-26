@@ -13,48 +13,44 @@ import {ManifestService} from '@scion/microfrontend-platform';
 import {LayoutDefinition, WorkbenchCapabilities, WorkbenchPerspectiveCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchService} from '../../workbench.service';
-import {WorkbenchPerspectiveDefinition} from '../../perspective/workbench-perspective.model';
 import {WorkbenchLayout} from '../../layout/workbench-layout';
 import {Logger} from '../../logging';
+import {Crypto} from '@scion/toolkit/crypto';
+import {WorkbenchInitializer} from '../../startup/workbench-initializer';
 
 @Injectable()
-export class MicrofrontendPerspectiveDefinitionHandler {
+export class MicrofrontendPerspectiveDefinitionHandler implements WorkbenchInitializer {
 
   constructor(private _manifestService: ManifestService,
               private _workbenchService: WorkbenchService,
               private _logger: Logger) {
-    this.registerPerspectives().then();
   }
 
-  private async registerPerspectives(): Promise<void> {
+  public async init(): Promise<void> {
     const workbenchPerspectiveCapabilities: WorkbenchPerspectiveCapability[] = await this.lookupWorkbenchPerspectiveCapabilities();
-
-    const wbPerspectives: WorkbenchPerspectiveDefinition[] = [];
-    workbenchPerspectiveCapabilities.forEach(perspectiveCapability => this.addToPerspectiveDefinition(perspectiveCapability, wbPerspectives));
-
-    wbPerspectives.forEach(wbPerspective => {
-      this._workbenchService.registerPerspective(wbPerspective);
-      this._logger.info(() => `Registered workbench perspective ${wbPerspective}`);
-    });
-  }
-
-  private addToPerspectiveDefinition(perspectiveCapability: WorkbenchPerspectiveCapability, wbPerspectives: WorkbenchPerspectiveDefinition[]): void {
-    const wbPerspective: WorkbenchPerspectiveDefinition = {
-      id: perspectiveCapability.qualifier.id,
-      data: perspectiveCapability.properties.data,
-      layout: (layout: WorkbenchLayout) => this.mapLayout(layout, perspectiveCapability.properties.layout),
-    };
-
-    wbPerspectives.push(wbPerspective);
-  }
-
-  private mapLayout(layout: WorkbenchLayout, layoutDef: LayoutDefinition): WorkbenchLayout {
-    for (const partDef of layoutDef.parts) {
-      layout = layout.addPart(partDef.id, {relativeTo: partDef.relativeTo, align: partDef.align, ratio: partDef.ratio}, {activate: true});
+    for (const perspectiveCapability of workbenchPerspectiveCapabilities) {
+      await this.registerPerspective(perspectiveCapability);
     }
+  }
 
-    // TODO testing replace with perspective extension
-    return layout.addView('todos', {partId: 'left', activateView: true});
+  private async registerPerspective(perspectiveCapability: WorkbenchPerspectiveCapability): Promise<void> {
+    await this._workbenchService.registerPerspective({
+      id: await Crypto.digest(JSON.stringify(perspectiveCapability.qualifier)),
+      data: perspectiveCapability.properties.data,
+      layout: layout => this.mapLayout(layout, perspectiveCapability.properties.layout),
+    });
+    this._logger.info(() => 'Registered workbench perspective', perspectiveCapability);
+  }
+
+  private mapLayout(layout: WorkbenchLayout, perspectiveLayoutDefinition: LayoutDefinition): WorkbenchLayout {
+    return perspectiveLayoutDefinition.parts.reduce((acc, partDef) => layout.addPart(partDef.id, {
+        relativeTo: partDef.relativeTo,
+        align: partDef.align,
+        ratio: partDef.ratio,
+      }, {activate: true}),
+      layout)
+      // TODO testing replace with perspective extension
+      .addView('todos', {partId: 'left', activateView: true});
   }
 
   private lookupWorkbenchPerspectiveCapabilities(): Promise<WorkbenchPerspectiveCapability[]> {
