@@ -28,6 +28,7 @@ import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-vie
 import {MicrofrontendViewRoutes} from './routing/microfrontend-routes';
 import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from './microfrontend-popup/microfrontend-popup-capability-interceptor.service';
+import {MicrofrontendPerspectiveDefinitionHandler} from './initialization/microfrontend-perspective-definition-handler.service';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -60,6 +61,11 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
     {
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
       useClass: MicrofrontendNotificationIntentHandler,
+      multi: true,
+    },
+    {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useClass: MicrofrontendPerspectiveDefinitionHandler,
       multi: true,
     },
     MicrofrontendViewIntentInterceptor,

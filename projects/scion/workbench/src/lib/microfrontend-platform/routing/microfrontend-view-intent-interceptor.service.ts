@@ -69,6 +69,7 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
         close: extras.close,
         blankInsertionIndex: extras.blankInsertionIndex,
         cssClass: extras.cssClass,
+        blankPartId: extras.blankPartId,
         state: {
           [MicrofrontendNavigationalStates.transientParams]: transientParams,
         },

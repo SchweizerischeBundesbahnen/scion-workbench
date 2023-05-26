@@ -14,6 +14,8 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
     hostManifest.intentions = [
       ...hostManifest.intentions || [],
       provideViewIntention(),
+      providePerspectiveIntention(),
+      providePerspectiveExtensionIntention(),
     ];
     hostManifest.capabilities = [
       ...hostManifest.capabilities || [],
@@ -32,6 +34,21 @@ function provideViewIntention(): Intention {
     qualifier: {'*': '*'},
   };
 }
+
+function providePerspectiveIntention(): Intention {
+  return {
+    type: WorkbenchCapabilities.Perspective,
+    qualifier: {'id': '*'},
+  };
+}
+
+function providePerspectiveExtensionIntention(): Intention {
+  return {
+    type: WorkbenchCapabilities.PerspectiveExtension,
+    qualifier: {'perspective-id': '*'},
+  };
+}
+
 
 /**
  * Provides the built-in notification capability.
