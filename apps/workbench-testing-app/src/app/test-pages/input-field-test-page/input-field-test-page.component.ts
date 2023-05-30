@@ -16,9 +16,7 @@ import {SciFormFieldModule} from '@scion/components.internal/form-field';
   templateUrl: './input-field-test-page.component.html',
   styleUrls: ['./input-field-test-page.component.scss'],
   standalone: true,
-  imports: [
-    SciFormFieldModule,
-  ],
+  imports: [SciFormFieldModule],
 })
 export default class InputFieldTestPageComponent {
 }

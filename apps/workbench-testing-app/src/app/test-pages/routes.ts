@@ -13,23 +13,28 @@ import {WorkbenchRouteData} from '@scion/workbench';
 import StandaloneViewTestPageComponent from './standalone-view-test-page/standalone-view-test-page.component';
 import {NonStandaloneViewTestPageComponent} from './non-standalone-view-test-page/non-standalone-view-test-page.component';
 
-const routes: Routes = [
+export default [
   {
     path: 'bulk-navigation-test-page',
-    loadComponent: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.component'),
+    loadComponent: () => import('./bulk-navigation-test-page/bulk-navigation-test-page.component'),
     data: {[WorkbenchRouteData.title]: 'Bulk Navigation Test', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-bulk-navigation'},
   },
   {
     path: 'view-route-data-test-page',
-    loadChildren: (): any => import('./view-route-data-test-page/view-route-data-test-page.module').then(m => m.ViewRouteDataTestPageModule),
+    loadChildren: () => import('./view-route-data-test-page/view-route-data-test-page.module'),
     data: {[WorkbenchRouteData.title]: 'View Route Data Test', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view-route-data'},
   },
   {
     path: 'input-field-test-page',
-    loadComponent: (): any => import('./input-field-test-page/input-field-test-page.component'),
+    loadComponent: () => import('./input-field-test-page/input-field-test-page.component'),
     data: {[WorkbenchRouteData.title]: 'Input Field Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-input-field'},
   },
-];
+  {
+    path: 'navigation-test-page',
+    loadChildren: () => import('./navigation-test-page/routes'),
+    data: {[WorkbenchRouteData.title]: 'Navigation Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage'},
+  },
+] satisfies Routes;
 
 /**
  * Routes for standalone component test pages.
@@ -42,17 +47,17 @@ const standaloneComponentTestPagesRoutes: Routes = [
   },
   {
     path: 'test-pages/standalone-view-test-page/load-component',
-    loadComponent: (): any => import('./standalone-view-test-page/standalone-view-test-page.component'),
+    loadComponent: () => import('./standalone-view-test-page/standalone-view-test-page.component'),
     data: {[WorkbenchRouteData.title]: 'Standalone View Test Page', [WorkbenchRouteData.heading]: 'Route: {loadComponent: () => component}'},
   },
   {
     path: 'test-pages/standalone-view-test-page/load-children/module',
-    loadChildren: (): any => import('./standalone-view-test-page/standalone-view-test-page.module').then(m => m.StandaloneViewTestPageModule),
+    loadChildren: () => import('./standalone-view-test-page/standalone-view-test-page.module'),
     data: {[WorkbenchRouteData.title]: 'Standalone View Test Page', [WorkbenchRouteData.heading]: 'Route: {loadChildren: () => module}'},
   },
   {
     path: 'test-pages/standalone-view-test-page/load-children/routes',
-    loadChildren: (): any => import('./standalone-view-test-page/standalone-view-test-page.module').then(m => m.routes),
+    loadChildren: () => import('./standalone-view-test-page/standalone-view-test-page.module').then(m => m.routes),
     data: {[WorkbenchRouteData.title]: 'Standalone View Test Page', [WorkbenchRouteData.heading]: 'Route: {loadChildren: () => routes}'},
   },
   {
@@ -75,7 +80,7 @@ const nonStandaloneComponentTestPagesRoutes: Routes = [
   },
   {
     path: 'test-pages/non-standalone-view-test-page/load-children/module',
-    loadChildren: (): any => import('./non-standalone-view-test-page/non-standalone-view-test-page.module').then(m => m.NonStandaloneViewTestPageModule),
+    loadChildren: () => import('./non-standalone-view-test-page/non-standalone-view-test-page.module'),
     data: {[WorkbenchRouteData.title]: 'Non Standalone View Test Page', [WorkbenchRouteData.heading]: 'Route: {loadChildren: () => module}'},
   },
   {
@@ -95,4 +100,3 @@ export const topLevelTestPageRoutes: Routes = [
   ...nonStandaloneComponentTestPagesRoutes,
 ];
 
-export default routes;

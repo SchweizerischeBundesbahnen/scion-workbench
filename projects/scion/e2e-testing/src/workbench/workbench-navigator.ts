@@ -64,15 +64,15 @@ export class WorkbenchNavigator {
 
     switch (page) {
       case MessageBoxOpenerPagePO: {
-        await startPO.openWorkbenchView('e2e-test-message-box');
+        await startPO.openWorkbenchView('e2e-test-message-box-opener');
         return new MessageBoxOpenerPagePO(this._appPO, viewId);
       }
       case NotificationOpenerPagePO: {
-        await startPO.openWorkbenchView('e2e-test-notification');
+        await startPO.openWorkbenchView('e2e-test-notification-opener');
         return new NotificationOpenerPagePO(this._appPO, viewId);
       }
       case PopupOpenerPagePO: {
-        await startPO.openWorkbenchView('e2e-test-popup');
+        await startPO.openWorkbenchView('e2e-test-popup-opener');
         return new PopupOpenerPagePO(this._appPO, viewId);
       }
       case RouterPagePO: {
@@ -88,7 +88,7 @@ export class WorkbenchNavigator {
         return new ViewPagePO(this._appPO, viewId);
       }
       case RouteRegisterPagePO: {
-        await startPO.openWorkbenchView('e2e-route-registrator');
+        await startPO.openWorkbenchView('e2e-register-route');
         return new RouteRegisterPagePO(this._appPO, viewId);
       }
       default: {

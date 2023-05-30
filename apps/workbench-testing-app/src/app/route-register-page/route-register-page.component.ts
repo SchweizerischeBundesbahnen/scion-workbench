@@ -12,7 +12,7 @@ import {Component, Type} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchRouteData} from '@scion/workbench';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {KeyValuePipe, NgForOf, NgIf} from '@angular/common';
+import {KeyValuePipe, NgFor, NgIf} from '@angular/common';
 import {DefaultExport, Router, Routes} from '@angular/router';
 
 const PATH = 'path';
@@ -29,10 +29,10 @@ const CSS_CLASS = 'cssClass';
   standalone: true,
   imports: [
     NgIf,
+    NgFor,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    NgForOf,
     KeyValuePipe,
+    SciFormFieldModule,
   ],
 })
 export default class RouteRegisterPageComponent {

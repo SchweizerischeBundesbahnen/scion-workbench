@@ -13,8 +13,8 @@ import {OverlayRef} from '@angular/cdk/overlay';
 import {fromEvent, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {MenuItem, MenuItemSeparator} from './menu-item';
-import {KeyValuePipe, NgClass, NgForOf, NgIf} from '@angular/common';
-import {InstanceofPipe} from '../util/instanceof.pipe';
+import {KeyValuePipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {InstanceofPipe} from '../common/instanceof.pipe';
 
 /**
  * DI token to provide menu items to the menu.
@@ -27,7 +27,7 @@ export const MENU_ITEMS = new InjectionToken<Array<MenuItem | MenuItemSeparator>
   standalone: true,
   imports: [
     NgIf,
-    NgForOf,
+    NgFor,
     NgClass,
     KeyValuePipe,
     InstanceofPipe,

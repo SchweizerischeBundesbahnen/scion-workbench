@@ -29,7 +29,7 @@ export class PopupOpenerPagePO {
     this._locator = this.view.locator('app-popup-opener-page');
   }
 
-  public async selectPopupComponent(component: 'popup-page' | 'popup-focus-page' | 'blank-component'): Promise<void> {
+  public async selectPopupComponent(component: 'popup-page' | 'focus-test-page' | 'blank-test-page'): Promise<void> {
     await this._locator.locator('select.e2e-popup-component').selectOption(component);
   }
 

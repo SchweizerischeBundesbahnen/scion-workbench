@@ -15,5 +15,5 @@ import {featureRoutes} from './feature-routes';
 @NgModule({
   imports: [RouterModule.forChild(featureRoutes)],
 })
-export class FeaturesLazyModule {
+export default class FeaturesLazyModule {
 }

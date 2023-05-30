@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Provider} from '@angular/core';
+import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {WORKBENCH_STARTUP, WorkbenchInitializer} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
 import {asyncScheduler} from 'rxjs';
@@ -18,8 +18,8 @@ import {asyncScheduler} from 'rxjs';
  *
  * This initializer is only installed if the query parameter {@link WorkbenchStartupQueryParams#CONFIRM_STARTUP_QUERY_PARAM} is set.
  */
-@Injectable()
-export class ConfirmWorkbenchStartupInitializer implements WorkbenchInitializer {
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
+class ConfirmWorkbenchStartupInitializer implements WorkbenchInitializer {
 
   public async init(): Promise<void> {
     // Do not open the alert dialog until the next macrotask so that Angular can complete the initial navigation to create routed view components.
@@ -31,19 +31,21 @@ export class ConfirmWorkbenchStartupInitializer implements WorkbenchInitializer 
 }
 
 /**
+ * Provides a set of DI providers to configure startup of the workbench.
+ *
  * Provides a {@link WorkbenchInitializer} to display an alert dialog during workbench startup to pause the workbench startup until the user confirms the alert.
  *
  * Returns an empty provider array if the query parameter {@link WorkbenchStartupQueryParams#CONFIRM_STARTUP_QUERY_PARAM} is not set.
  */
-export function provideConfirmWorkbenchStartupInitializer(): Provider[] {
+export function provideConfirmWorkbenchStartupInitializer(): EnvironmentProviders | [] {
   if (WorkbenchStartupQueryParams.confirmStartup()) {
-    return [
+    return makeEnvironmentProviders([
       {
         provide: WORKBENCH_STARTUP,
         multi: true,
         useClass: ConfirmWorkbenchStartupInitializer,
       },
-    ];
+    ]);
   }
   return [];
 }

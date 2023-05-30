@@ -61,7 +61,7 @@ test.describe('Workbench Popup Position', () => {
     await centerViewTab.part.sash.drag('bottom', .1 * height);
 
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.selectPopupComponent('blank-component');
+    await popupOpenerPage.selectPopupComponent('blank-test-page');
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
 
     popup = appPO.popup({cssClass: 'testee'});

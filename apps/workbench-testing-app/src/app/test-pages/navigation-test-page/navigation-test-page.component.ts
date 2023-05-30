@@ -17,6 +17,7 @@ import {Subject} from 'rxjs';
 @Component({
   selector: 'app-navigation-test-page',
   template: '',
+  standalone: true,
 })
 export class NavigationTestPageComponent implements OnDestroy {
 

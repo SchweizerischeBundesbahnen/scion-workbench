@@ -20,10 +20,10 @@ import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {SciAccordionModule} from '@scion/components.internal/accordion';
 import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
-import {PluckPipe} from '../util/pluck.pipe';
+import {PluckPipe} from '../common/pluck.pipe';
 import {SciPropertyModule} from '@scion/components.internal/property';
-import {NullIfEmptyPipe} from '../util/null-if-empty.pipe';
-import {JoinPipe} from '../util/join.pipe';
+import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {JoinPipe} from '../common/join.pipe';
 
 @Component({
   selector: 'app-view-page',

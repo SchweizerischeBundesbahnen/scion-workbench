@@ -8,22 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {isActiveElement, isPresent} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
+import {isActiveElement, isPresent} from '../../../helper/testing.util';
+import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {PopupPO} from '../../popup.po';
+import {PopupPO} from '../../../popup.po';
+import {ViewPO} from '../../../view.po';
 
 /**
- * Page object to interact {@link PopupFocusPageComponent}.
+ * Page object to interact {@link FocusTestPageComponent}.
  */
-export class PopupFocusPagePO {
+export class FocusTestPagePO {
 
   private readonly _locator: Locator;
-  public readonly popupPO: PopupPO;
 
-  constructor(appPO: AppPO, cssClass: string) {
-    this.popupPO = appPO.popup({cssClass});
-    this._locator = this.popupPO.locator('app-popup-focus-page');
+  constructor(appPO: AppPO, locateBy: ViewPO | PopupPO) {
+    this._locator = locateBy.locator('app-focus-test-page');
   }
 
   public async isPresent(): Promise<boolean> {

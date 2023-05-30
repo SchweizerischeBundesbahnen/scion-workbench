@@ -12,8 +12,12 @@ import {Component, OnDestroy} from '@angular/core';
 import {Notification} from '@scion/workbench';
 import {Subject} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
-import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {takeUntil} from 'rxjs/operators';
+import {NgIf} from '@angular/common';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciViewportModule} from '@scion/components/viewport';
+import {StringifyPipe} from '../common/stringify.pipe';
 
 const TITLE = 'title';
 const SEVERITY = 'severity';
@@ -24,6 +28,14 @@ const CSS_CLASS = 'cssClass';
   selector: 'app-inspect-notification',
   templateUrl: './inspect-notification.component.html',
   styleUrls: ['./inspect-notification.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    StringifyPipe,
+    SciFormFieldModule,
+    SciViewportModule,
+  ],
 })
 export class InspectNotificationComponent implements OnDestroy {
 

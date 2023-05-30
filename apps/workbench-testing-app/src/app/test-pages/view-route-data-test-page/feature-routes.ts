@@ -10,16 +10,16 @@
 
 import {Routes} from '@angular/router';
 import {WorkbenchRouteData} from '@scion/workbench';
-import {BlankComponent} from '../../blank/blank.component';
+import BlankTestPageComponent from '../blank-test-page/blank-test-page.component';
 
 export const featureRoutes: Routes = [
   {
     path: 'feature-a',
-    component: BlankComponent,
+    component: BlankTestPageComponent,
   },
   {
     path: 'feature-b',
-    component: BlankComponent,
+    component: BlankTestPageComponent,
     data: {
       [WorkbenchRouteData.title]: 'Feature B Title',
       [WorkbenchRouteData.heading]: 'Feature B Heading',
@@ -28,11 +28,11 @@ export const featureRoutes: Routes = [
   },
   {
     path: 'feature-c',
-    loadComponent: (): any => import('../../blank/blank.component').then(m => m.BlankComponent),
+    loadComponent: () => import('../blank-test-page/blank-test-page.component'),
   },
   {
     path: 'feature-d',
-    loadComponent: (): any => import('../../blank/blank.component').then(m => m.BlankComponent),
+    loadComponent: () => import('../blank-test-page/blank-test-page.component'),
     data: {
       [WorkbenchRouteData.title]: 'Feature D Title',
       [WorkbenchRouteData.heading]: 'Feature D Heading',

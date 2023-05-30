@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,23 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
 import {NavigationTestPageComponent} from './navigation-test-page.component';
+import {Routes} from '@angular/router';
 
-const routes: Routes = [
+export default [
   {path: '', component: NavigationTestPageComponent},
   {path: ':segment1', component: NavigationTestPageComponent},
   {path: ':segment1/:segment2', component: NavigationTestPageComponent},
-];
-
-@NgModule({
-  imports: [
-    RouterModule.forChild(routes),
-  ],
-  declarations: [
-    NavigationTestPageComponent,
-  ],
-})
-export class NavigationTestPageModule {
-}
+] satisfies Routes;

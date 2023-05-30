@@ -11,11 +11,27 @@
 import {Component, HostBinding} from '@angular/core';
 import {Popup} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
+import {SciViewportModule} from '@scion/components/viewport';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {FormsModule} from '@angular/forms';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {JsonPipe, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-popup-page',
   templateUrl: './popup-page.component.html',
   styleUrls: ['./popup-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    JsonPipe,
+    FormsModule,
+    NullIfEmptyPipe,
+    SciViewportModule,
+    SciFormFieldModule,
+    SciAccordionModule,
+  ],
 })
 export class PopupPageComponent {
 

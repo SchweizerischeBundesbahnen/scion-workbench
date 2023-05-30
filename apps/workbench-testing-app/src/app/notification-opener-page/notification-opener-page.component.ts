@@ -9,9 +9,12 @@
  */
 
 import {Component, Type} from '@angular/core';
-import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {NotificationService} from '@scion/workbench';
 import {InspectNotificationComponent} from '../inspect-notification-provider/inspect-notification.component';
+import {NgIf} from '@angular/common';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 
 const TITLE = 'title';
 const CONTENT = 'content';
@@ -27,8 +30,15 @@ const CSS_CLASS = 'cssClass';
   selector: 'app-notification-opener-page',
   templateUrl: './notification-opener-page.component.html',
   styleUrls: ['./notification-opener-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciCheckboxModule,
+  ],
 })
-export class NotificationOpenerPageComponent {
+export default class NotificationOpenerPageComponent {
 
   public readonly TITLE = TITLE;
   public readonly CONTENT = CONTENT;

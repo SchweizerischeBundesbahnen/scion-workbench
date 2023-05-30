@@ -8,15 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, InjectionToken, Provider} from '@angular/core';
+import {EnvironmentProviders, inject, InjectionToken, makeEnvironmentProviders} from '@angular/core';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP, WorkbenchInitializer, WorkbenchStartup} from '@scion/workbench';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 
 /**
- * Enables logging of invocations of workbench-specific lifecycle hooks.
+ * Provides a set of DI providers to enable logging of workbench lifecycle hooks.
  */
-export function provideWorkbenchLifecycleHookLoggers(): Provider[] {
-  return [
+export function provideWorkbenchLifecycleHookLoggers(): EnvironmentProviders {
+  return makeEnvironmentProviders([
     {
       provide: WORKBENCH_PRE_STARTUP,
       multi: true,
@@ -42,13 +42,13 @@ export function provideWorkbenchLifecycleHookLoggers(): Provider[] {
       multi: true,
       useFactory: () => new WorkbenchLifecycleHookLogger(MICROFRONTEND_PLATFORM_POST_STARTUP),
     },
-  ];
+  ]);
 }
 
 /**
  * Represents an initializer that logs its construction and invocation.
  */
-export class WorkbenchLifecycleHookLogger implements WorkbenchInitializer {
+class WorkbenchLifecycleHookLogger implements WorkbenchInitializer {
 
   private _workbenchStartup: WorkbenchStartup;
 

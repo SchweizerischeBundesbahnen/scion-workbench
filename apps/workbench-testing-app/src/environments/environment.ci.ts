@@ -9,7 +9,7 @@
  */
 
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
-import {workbenchManifest} from '../app/workbench-manifest';
+import {workbenchManifest} from '../app/workbench.manifest';
 
 /**
  * Environment used when packaging the app for CI on GitHub.
