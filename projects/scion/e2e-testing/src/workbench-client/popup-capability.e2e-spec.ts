@@ -22,7 +22,7 @@ test.describe('Workbench Popup Capability', () => {
       type: 'popup',
       qualifier: undefined!,
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
       },
     });
     await expect(registeredCapability).rejects.toThrow(/NullQualifierError/);
@@ -36,7 +36,7 @@ test.describe('Workbench Popup Capability', () => {
       type: 'popup',
       qualifier: {},
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
       },
     });
     await expect(registeredCapability).rejects.toThrow(/NullQualifierError/);

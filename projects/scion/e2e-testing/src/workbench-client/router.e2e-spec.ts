@@ -821,7 +821,7 @@ test.describe('Workbench Router', () => {
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: 'test-view/view1',
+        path: 'test-pages/view-test-page/view1',
         title: 'Testee 1',
         cssClass: 'testee-1',
       },
@@ -833,7 +833,7 @@ test.describe('Workbench Router', () => {
       type: 'view',
       qualifier: {component: 'testee-2'},
       properties: {
-        path: 'test-view/view2',
+        path: 'test-pages/view-test-page/view2',
         title: 'Testee 2',
         cssClass: 'testee-2',
       },
@@ -1627,7 +1627,7 @@ test.describe('Workbench Router', () => {
         {name: 'seg1', required: true},
       ],
       properties: {
-        path: 'test-view/:seg1',
+        path: 'test-pages/view-test-page/:seg1',
         title: 'testee',
       },
     });
@@ -1678,7 +1678,7 @@ test.describe('Workbench Router', () => {
         {name: 'seg1', required: true},
       ],
       properties: {
-        path: 'test-view/:seg1',
+        path: 'test-pages/view-test-page/:seg1',
         title: 'testee',
         cssClass: 'testee',
       },
@@ -1727,7 +1727,7 @@ test.describe('Workbench Router', () => {
         {name: 'seg2', required: true},
       ],
       properties: {
-        path: 'test-view/:seg1/:seg2',
+        path: 'test-pages/view-test-page/:seg1/:seg2',
         title: 'testee',
       },
     });
@@ -1797,7 +1797,7 @@ test.describe('Workbench Router', () => {
         {name: 'seg2', required: true},
       ],
       properties: {
-        path: 'test-view/:seg1/:seg2',
+        path: 'test-pages/view-test-page/:seg1/:seg2',
         title: 'testee',
       },
     });
@@ -1867,7 +1867,7 @@ test.describe('Workbench Router', () => {
         {name: 'seg2', required: true},
       ],
       properties: {
-        path: 'test-view/:seg1/:seg2',
+        path: 'test-pages/view-test-page/:seg1/:seg2',
         title: 'testee',
       },
     });
@@ -1937,7 +1937,7 @@ test.describe('Workbench Router', () => {
         {name: 'seg2', required: true},
       ],
       properties: {
-        path: 'test-view/:seg1/:seg2',
+        path: 'test-pages/view-test-page/:seg1/:seg2',
         title: 'testee-1',
       },
     });
@@ -1949,7 +1949,7 @@ test.describe('Workbench Router', () => {
         {name: 'seg2', required: true},
       ],
       properties: {
-        path: 'test-view/:seg1/:seg2',
+        path: 'test-pages/view-test-page/:seg1/:seg2',
         title: 'testee-2',
       },
     });
@@ -2019,7 +2019,7 @@ test.describe('Workbench Router', () => {
         {name: 'opt', required: false},
       ],
       properties: {
-        path: 'test-view/:seg1',
+        path: 'test-pages/view-test-page/:seg1',
         title: 'testee',
       },
     });
@@ -2072,7 +2072,7 @@ test.describe('Workbench Router', () => {
       type: 'view',
       qualifier: {component: 'microfrontend-1'},
       properties: {
-        path: 'test-view/view1',
+        path: 'test-pages/view-test-page/view1',
         title: 'Microfrontend 1',
         cssClass: 'microfrontend-1',
       },
@@ -2083,7 +2083,7 @@ test.describe('Workbench Router', () => {
       type: 'view',
       qualifier: {component: 'microfrontend-2'},
       properties: {
-        path: 'test-view/view2',
+        path: 'test-pages/view-test-page/view2',
         title: 'Microfrontend 2',
         cssClass: 'microfrontend-2',
       },
@@ -2101,7 +2101,7 @@ test.describe('Workbench Router', () => {
     const viewPagePO = new ViewPagePO(appPO, viewId);
 
     // Assert the correct capability to be loaded
-    await expect(await viewPagePO.getPath()).toEqual('/test-view/view1');
+    await expect(await viewPagePO.getPath()).toEqual('/test-pages/view-test-page/view1');
 
     // navigate to microfrontend-2 view
     await routerPagePO.viewTabPO.click();
@@ -2112,7 +2112,7 @@ test.describe('Workbench Router', () => {
     // self-navigate in microfrontend-2 view
     await viewTabPO.click();
     await viewPagePO.navigateSelf({param: 'PARAM'});
-    await expect(await viewPagePO.getPath()).toEqual('/test-view/view2');
+    await expect(await viewPagePO.getPath()).toEqual('/test-pages/view-test-page/view2');
   });
 
   test('should propagate navigation error back to caller if navigation fails', async ({appPO, microfrontendNavigator}) => {
@@ -2175,7 +2175,7 @@ test.describe('Workbench Router', () => {
         {name: 'wb.title', required: false},
       ],
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
         title: 'Capability Title',
         cssClass: 'testee',
       },
@@ -2204,7 +2204,7 @@ test.describe('Workbench Router', () => {
         {name: 'wb.heading', required: false},
       ],
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
         heading: 'Capability Heading',
         cssClass: 'testee',
       },
@@ -2234,7 +2234,7 @@ test.describe('Workbench Router', () => {
         {name: 'heading', required: false},
       ],
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
         title: ':title',
         heading: ':heading',
         cssClass: 'testee',
@@ -2266,7 +2266,7 @@ test.describe('Workbench Router', () => {
         {name: 'param2', required: false},
       ],
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
         title: ':param1/:param2/:param3 [component=:component]',
         heading: ':param1 :param2 :param3 [component=:component]',
         cssClass: 'testee',

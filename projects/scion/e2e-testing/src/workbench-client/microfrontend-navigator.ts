@@ -76,7 +76,7 @@ export class MicrofrontendNavigator {
 
     switch (page) {
       case MessageBoxOpenerPagePO: {
-        await startPO.openMicrofrontendView('e2e-test-message-box', app);
+        await startPO.openMicrofrontendView('e2e-test-message-box-opener', app);
         return new MessageBoxOpenerPagePO(this._appPO, viewId);
       }
       case RegisterWorkbenchIntentionPagePO: {
@@ -96,7 +96,7 @@ export class MicrofrontendNavigator {
         return new UnregisterWorkbenchCapabilityPagePO(this._appPO, viewId);
       }
       case NotificationOpenerPagePO: {
-        await startPO.openMicrofrontendView('e2e-test-notification', app);
+        await startPO.openMicrofrontendView('e2e-test-notification-opener', app);
         return new NotificationOpenerPagePO(this._appPO, viewId);
       }
       case RouterPagePO: {
@@ -108,7 +108,7 @@ export class MicrofrontendNavigator {
         return new RouterPageLegacyPO(this._appPO, viewId);
       }
       case PopupOpenerPagePO: {
-        await startPO.openMicrofrontendView('e2e-test-popup', app);
+        await startPO.openMicrofrontendView('e2e-test-popup-opener', app);
         return new PopupOpenerPagePO(this._appPO, viewId);
       }
       default: {

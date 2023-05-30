@@ -28,7 +28,7 @@ test.describe('Popup', () => {
         {name: 'id', required: true},
       ],
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -53,7 +53,7 @@ test.describe('Popup', () => {
       type: 'popup',
       qualifier: {entity: 'products'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -80,7 +80,7 @@ test.describe('Popup', () => {
         {name: 'mode', required: true},
       ],
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -111,7 +111,7 @@ test.describe('Popup', () => {
         {name: 'fragment', required: true},
       ],
       properties: {
-        path: 'popup/:seg1/segment2/:seg3;mp1=:mp1;mp2=:mp2?qp1=:qp1&qp2=:qp2#:fragment',
+        path: 'test-pages/popup-test-page/:seg1/segment2/:seg3;mp1=:mp1;mp2=:mp2?qp1=:qp1&qp2=:qp2#:fragment',
       },
     });
 

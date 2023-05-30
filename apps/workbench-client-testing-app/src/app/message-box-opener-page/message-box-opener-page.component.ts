@@ -9,10 +9,13 @@
  */
 
 import {Component} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {NgIf} from '@angular/common';
 
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';
@@ -29,8 +32,16 @@ const VIEW_CONTEXT = 'viewContext';
   selector: 'app-message-box-opener-page',
   templateUrl: './message-box-opener-page.component.html',
   styleUrls: ['./message-box-opener-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+    SciCheckboxModule,
+  ],
 })
-export class MessageBoxOpenerPageComponent {
+export default class MessageBoxOpenerPageComponent {
 
   public readonly QUALIFIER = QUALIFIER;
   public readonly PARAMS = PARAMS;

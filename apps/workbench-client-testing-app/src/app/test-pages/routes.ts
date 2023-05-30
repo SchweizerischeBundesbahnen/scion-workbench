@@ -10,7 +10,7 @@
 
 import {Routes} from '@angular/router';
 
-export const routes: Routes = [
+const routes: Routes = [
   {
     path: 'bulk-navigation-test-page',
     loadComponent: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.component').then(m => m.BulkNavigationTestPageComponent),
@@ -27,4 +27,52 @@ export const routes: Routes = [
     path: 'angular-zone-test-page',
     loadComponent: (): any => import('./angular-zone-test-page/angular-zone-test-page.component').then(m => m.AngularZoneTestPageComponent),
   },
+  {
+    path: 'microfrontend-test-page',
+    loadComponent: () => import('./microfrontend-test-page/microfrontend-test-page.component'),
+  },
+  {
+    path: 'popup-test-page',
+    children: [
+      {
+        path: 'popup1',
+        loadComponent: () => import('../popup-page/popup-page.component'),
+      },
+      {
+        path: 'popup2',
+        loadComponent: () => import('../popup-page/popup-page.component'),
+      },
+      {
+        path: ':segment1/segment2/:segment3',
+        loadComponent: () => import('../popup-page/popup-page.component'),
+      },
+    ],
+  },
+  {
+    path: 'view-test-page',
+    children: [
+      {
+        path: 'view1',
+        loadComponent: () => import('../view-page/view-page.component'),
+      },
+      {
+        path: 'view2',
+        loadComponent: () => import('../view-page/view-page.component'),
+      },
+      {
+        path: ':segment1',
+        loadComponent: () => import('../view-page/view-page.component'),
+      },
+      {
+        path: ':segment1/:segment2',
+        loadComponent: () => import('../view-page/view-page.component'),
+      },
+      {
+        path: ':segment1/segment2/:segment3',
+        loadComponent: () => import('../view-page/view-page.component'),
+      },
+    ],
+  },
 ];
+
+export default routes;

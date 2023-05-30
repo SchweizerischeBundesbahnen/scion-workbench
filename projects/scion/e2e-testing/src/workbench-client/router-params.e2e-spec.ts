@@ -134,7 +134,7 @@ test.describe('Workbench Router', () => {
         {name: 'fragment', required: true},
       ],
       properties: {
-        path: 'test-view/:seg1/segment2/:seg3;mp1=:mp1;mp2=:mp2?qp1=:qp1&qp2=:qp2#:fragment',
+        path: 'test-pages/view-test-page/:seg1/segment2/:seg3;mp1=:mp1;mp2=:mp2?qp1=:qp1&qp2=:qp2#:fragment',
         title: 'testee',
         cssClass: 'testee',
       },

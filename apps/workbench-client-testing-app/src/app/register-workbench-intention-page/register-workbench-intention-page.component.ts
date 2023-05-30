@@ -9,10 +9,12 @@
  */
 
 import {Component} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {NgIf} from '@angular/common';
 
 const TYPE = 'type';
 const QUALIFIER = 'qualifier';
@@ -21,8 +23,15 @@ const QUALIFIER = 'qualifier';
   selector: 'app-register-workbench-intention-page',
   templateUrl: './register-workbench-intention-page.component.html',
   styleUrls: ['./register-workbench-intention-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+  ],
 })
-export class RegisterWorkbenchIntentionPageComponent {
+export default class RegisterWorkbenchIntentionPageComponent {
 
   public readonly TYPE = TYPE;
   public readonly QUALIFIER = QUALIFIER;

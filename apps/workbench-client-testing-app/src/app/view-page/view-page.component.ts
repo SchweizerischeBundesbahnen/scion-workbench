@@ -9,16 +9,23 @@
  */
 
 import {Component, Inject, OnDestroy} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {ViewClosingEvent, ViewClosingListener, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {MonoTypeOperatorFunction, NEVER, Subject} from 'rxjs';
 import {finalize, startWith, take, takeUntil} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
-import {Location} from '@angular/common';
-import {convertValueFromUI} from '../util/util';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {AsyncPipe, JsonPipe, Location, NgIf} from '@angular/common';
+import {convertValueFromUI} from '../common/convert-value-from-ui.util';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {SciPropertyModule} from '@scion/components.internal/property';
+import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciViewportModule} from '@scion/components/viewport';
 
 const TITLE = 'title';
 const HEADING = 'heading';
@@ -33,8 +40,23 @@ const NAVIGATE_PER_PARAM = 'navigatePerParam';
   selector: 'app-view-page',
   templateUrl: './view-page.component.html',
   styleUrls: ['./view-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    AsyncPipe,
+    JsonPipe,
+    ReactiveFormsModule,
+    AppendParamDataTypePipe,
+    NullIfEmptyPipe,
+    SciFormFieldModule,
+    SciAccordionModule,
+    SciPropertyModule,
+    SciCheckboxModule,
+    SciParamsEnterModule,
+    SciViewportModule,
+  ],
 })
-export class ViewPageComponent implements ViewClosingListener, OnDestroy {
+export default class ViewPageComponent implements ViewClosingListener, OnDestroy {
 
   public readonly TITLE = TITLE;
   public readonly HEADING = HEADING;

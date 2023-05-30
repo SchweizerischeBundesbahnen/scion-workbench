@@ -9,8 +9,10 @@
  */
 
 import {Component} from '@angular/core';
-import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {ManifestService} from '@scion/microfrontend-platform';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {NgIf} from '@angular/common';
 
 const ID = 'id';
 
@@ -21,8 +23,14 @@ const ID = 'id';
   selector: 'app-unregister-workbench-capability-page',
   templateUrl: './unregister-workbench-capability-page.component.html',
   styleUrls: ['./unregister-workbench-capability-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+  ],
 })
-export class UnregisterWorkbenchCapabilityPageComponent {
+export default class UnregisterWorkbenchCapabilityPageComponent {
 
   public readonly ID = ID;
 

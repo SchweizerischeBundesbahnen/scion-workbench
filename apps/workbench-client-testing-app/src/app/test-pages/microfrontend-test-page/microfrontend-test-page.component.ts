@@ -11,12 +11,12 @@
 import {Component} from '@angular/core';
 
 /**
- * NOOP Microfrontend that can be used in end-to-end tests.
+ * Microfrontend that can be used in end-to-end tests.
  */
 @Component({
   selector: 'app-microfrontend-test-page',
   template: 'Microfrontend',
   standalone: true,
 })
-export class MicrofrontendPageComponent {
+export default class MicrofrontendTestPageComponent {
 }

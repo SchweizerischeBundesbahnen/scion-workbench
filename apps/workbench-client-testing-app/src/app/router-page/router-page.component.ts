@@ -9,11 +9,14 @@
  */
 
 import {Component} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
-import {convertValueFromUI} from '../util/util';
+import {convertValueFromUI} from '../common/convert-value-from-ui.util';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {NgIf} from '@angular/common';
 
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';
@@ -27,8 +30,16 @@ const CSS_CLASS = 'cssClass';
   selector: 'app-router-page',
   templateUrl: './router-page.component.html',
   styleUrls: ['./router-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+    SciCheckboxModule,
+  ],
 })
-export class RouterPageComponent {
+export default class RouterPageComponent {
 
   public readonly QUALIFIER = QUALIFIER;
   public readonly PARAMS = PARAMS;

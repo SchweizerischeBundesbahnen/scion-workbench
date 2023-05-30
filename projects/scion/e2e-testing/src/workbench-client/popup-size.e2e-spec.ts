@@ -27,7 +27,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {test: 'popup'},
         properties: {
-          path: 'microfrontend',
+          path: 'test-pages/microfrontend-test-page',
           size: {
             width: '350px',
             height: '450px',
@@ -64,7 +64,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {test: 'popup'},
         properties: {
-          path: 'microfrontend',
+          path: 'test-pages/microfrontend-test-page',
           cssClass: 'e2e-test-popup-size',
           pinToStartPage: true,
           size: {
@@ -96,7 +96,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
           size: {
             height: '400px',
           },
@@ -136,7 +136,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
           size: {
             width: '400px',
           },
@@ -176,7 +176,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
           size: {
             height: '400px',
           },
@@ -216,7 +216,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
           size: {
             width: '400px',
           },
@@ -258,7 +258,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
           size: {
             maxHeight: '400px',
           },
@@ -313,7 +313,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
           size: {
             maxWidth: '400px',
           },
@@ -371,7 +371,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
           size: {
             minHeight: '400px',
           },
@@ -426,7 +426,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
           size: {
             minWidth: '400px',
           },

@@ -27,7 +27,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
         size: {width: '100px', height: '100px'},
       },
     });
@@ -52,7 +52,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
         size: {width: '100px', height: '100px'},
       },
     });
@@ -78,7 +78,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
         size: {width: '100px', height: '100px'},
       },
     });
@@ -104,7 +104,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
         size: {width: '100px', height: '100px'},
       },
     });
@@ -130,7 +130,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
         size: {width: '100px', height: '100px'},
       },
     });
@@ -156,7 +156,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -180,7 +180,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -205,7 +205,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
         size: {width: '100px', height: '100px'},
       },
     });
@@ -258,7 +258,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
         size: {width: '100px', height: '100px'},
       },
     });
@@ -302,7 +302,7 @@ test.describe('Workbench Popup', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -318,7 +318,7 @@ test.describe('Workbench Popup', () => {
       qualifier: {component: 'testee'},
       type: 'popup',
       properties: expect.objectContaining({
-        path: 'popup',
+        path: 'test-popup',
       }),
     }));
   });
@@ -334,7 +334,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -369,7 +369,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -408,7 +408,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -455,7 +455,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -487,7 +487,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -516,7 +516,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -569,7 +569,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -601,7 +601,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -642,7 +642,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
