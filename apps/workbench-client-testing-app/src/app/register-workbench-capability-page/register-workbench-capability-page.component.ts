@@ -9,12 +9,16 @@
  */
 
 import {Component} from '@angular/core';
-import {AbstractControl, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
+import {AbstractControl, ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
 import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
-import {undefinedIfEmpty} from '../util/util';
 import {firstValueFrom} from 'rxjs';
+import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciViewportModule} from '@scion/components/viewport';
+import {JsonPipe, NgIf} from '@angular/common';
 
 const TYPE = 'type';
 const QUALIFIER = 'qualifier';
@@ -45,8 +49,18 @@ const MAX_WIDTH = 'maxWidth';
   selector: 'app-register-workbench-capability-page',
   templateUrl: './register-workbench-capability-page.component.html',
   styleUrls: ['./register-workbench-capability-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    JsonPipe,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+    SciCheckboxModule,
+    SciViewportModule,
+  ],
 })
-export class RegisterWorkbenchCapabilityPageComponent {
+export default class RegisterWorkbenchCapabilityPageComponent {
 
   public readonly TYPE = TYPE;
   public readonly QUALIFIER = QUALIFIER;

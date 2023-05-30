@@ -10,11 +10,23 @@
 
 import {Component, HostBinding, Inject, Optional} from '@angular/core';
 import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatformClient, PlatformPropertyService} from '@scion/microfrontend-platform';
+import {AsyncPipe, NgIf} from '@angular/common';
+import {SciViewportModule} from '@scion/components/viewport';
+import {RouterOutlet} from '@angular/router';
+import {A11yModule} from '@angular/cdk/a11y';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    AsyncPipe,
+    RouterOutlet,
+    A11yModule,
+    SciViewportModule,
+  ],
 })
 export class AppComponent {
 

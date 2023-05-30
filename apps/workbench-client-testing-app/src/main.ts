@@ -8,9 +8,30 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {bootstrapApplication} from '@angular/platform-browser';
+import {AppComponent} from './app/app.component';
+import {provideRouter, withHashLocation} from '@angular/router';
+import {provideWorkbenchClient} from './app/workbench-client/workbench-client.provider';
+import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
+import {environment} from './environments/environment';
+import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
+import {routes} from './app/app.routes';
 
-import {AppModule} from './app/app.module';
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter(routes, withHashLocation()),
+    provideWorkbenchClient(),
+    provideAnimationsIfEnabled(),
+  ],
+}).catch(err => console.error(err));
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+/**
+ * Provides a set of DI providers to enable/disable Angular animations based on the environment.
+ *
+ * Animations should be disabled end-to-end tests.
+ */
+function provideAnimationsIfEnabled(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    environment.animationEnabled ? provideAnimations() : provideNoopAnimations(),
+  ]);
+}

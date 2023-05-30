@@ -37,7 +37,7 @@ test.describe('Workbench Popup Position', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
         size: {width: '50px', height: '50px'},
       },
     });

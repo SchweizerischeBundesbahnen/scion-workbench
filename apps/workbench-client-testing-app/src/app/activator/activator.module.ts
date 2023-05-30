@@ -9,20 +9,14 @@
  */
 
 import {Inject, NgModule} from '@angular/core';
-import {RouterModule} from '@angular/router';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY, ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 
 declare type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage?: boolean}};
 
-@NgModule({
-  providers: [],
-  imports: [
-    RouterModule.forChild([]),
-  ],
-})
-export class ActivatorModule {
+@NgModule({})
+export default class ActivatorModule {
 
   constructor(private _manifestService: ManifestService, @Inject(APP_IDENTITY) symbolicName: string) {
     this.registerManifestObjects(symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
@@ -162,11 +156,11 @@ export class ActivatorModule {
       description: '[e2e] Allows opening a microfrontend in a workbench popup',
       private: false,
       properties: {
-        path: 'test-popup',
+        path: 'test-popup-opener',
         pinToStartPage: true,
         title: 'Workbench Popup',
         heading,
-        cssClass: 'e2e-test-popup',
+        cssClass: 'e2e-test-popup-opener',
       },
     });
 
@@ -180,7 +174,7 @@ export class ActivatorModule {
       description: '[e2e] Provides access to the workbench popup object',
       private: false,
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -194,11 +188,11 @@ export class ActivatorModule {
       description: '[e2e] Allows displaying a message in a workbench message box',
       private: false,
       properties: {
-        path: 'test-message-box',
+        path: 'test-message-box-opener',
         pinToStartPage: true,
         title: 'Workbench Message Box',
         heading,
-        cssClass: 'e2e-test-message-box',
+        cssClass: 'e2e-test-message-box-opener',
       },
     });
 
@@ -212,11 +206,11 @@ export class ActivatorModule {
       description: '[e2e] Allows displaying a notification to the user.',
       private: false,
       properties: {
-        path: 'test-notification',
+        path: 'test-notification-opener',
         pinToStartPage: true,
         title: 'Workbench Notification',
         heading,
-        cssClass: 'e2e-test-notification',
+        cssClass: 'e2e-test-notification-opener',
       },
     });
   }

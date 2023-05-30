@@ -14,6 +14,14 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {PreferredSizeService} from '@scion/microfrontend-platform';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
+import {SciViewportModule} from '@scion/components/viewport';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {FormsModule} from '@angular/forms';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {SciPropertyModule} from '@scion/components.internal/property';
+import {AsyncPipe, JsonPipe, NgIf} from '@angular/common';
+import {A11yModule} from '@angular/cdk/a11y';
 
 /**
  * Popup test component which can grow and shrink.
@@ -22,8 +30,21 @@ import {ActivatedRoute} from '@angular/router';
   selector: 'app-popup-page',
   templateUrl: './popup-page.component.html',
   styleUrls: ['./popup-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    AsyncPipe,
+    JsonPipe,
+    A11yModule,
+    FormsModule,
+    NullIfEmptyPipe,
+    SciViewportModule,
+    SciFormFieldModule,
+    SciAccordionModule,
+    SciPropertyModule,
+  ],
 })
-export class PopupPageComponent {
+export default class PopupPageComponent {
 
   public uuid = UUID.randomUUID();
 

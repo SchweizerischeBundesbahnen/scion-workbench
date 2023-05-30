@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {APP_INITIALIZER, inject, NgZone, Provider} from '@angular/core';
+import {APP_INITIALIZER, EnvironmentProviders, inject, makeEnvironmentProviders, NgZone} from '@angular/core';
 import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
 import {WorkbenchClient, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
@@ -16,14 +16,14 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {environment} from '../../environments/environment';
 
 /**
- * Registers a set of DI providers to set up microfrontend support and connect to the workbench.
+ * Registers a set of DI providers to set up SCION Workbench Client.
  */
-export function provideWorkbenchClientInitializer(): Provider[] {
+export function provideWorkbenchClient(): EnvironmentProviders | [] {
   if (window === window.parent) {
     return [];
   }
 
-  return [
+  return makeEnvironmentProviders([
     {
       provide: APP_INITIALIZER,
       useFactory: connectToWorkbenchFn,
@@ -44,13 +44,13 @@ export function provideWorkbenchClientInitializer(): Provider[] {
     {provide: WorkbenchPopup, useFactory: () => Beans.opt(WorkbenchPopup)},
     {provide: WorkbenchMessageBoxService, useFactory: () => Beans.get(WorkbenchMessageBoxService)},
     {provide: WorkbenchNotificationService, useFactory: () => Beans.get(WorkbenchNotificationService)},
-  ];
+  ]);
 }
 
 /**
  * Connects this app to the workbench in the host app.
  */
-export function connectToWorkbenchFn(): () => Promise<void> {
+function connectToWorkbenchFn(): () => Promise<void> {
   const zone = inject(NgZone);
   return (): Promise<void> => {
     Beans.register(ObservableDecorator, {useValue: new NgZoneObservableDecorator(zone)});

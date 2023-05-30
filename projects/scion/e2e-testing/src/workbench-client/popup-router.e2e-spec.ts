@@ -27,7 +27,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -52,7 +52,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: true, // PRIVATE
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -77,7 +77,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: true, // PRIVATE
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -106,7 +106,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -135,7 +135,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -159,14 +159,14 @@ test.describe('Popup Router', () => {
       type: 'popup',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
     await registerCapabilityPage1PO.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee-2'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
     const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
@@ -175,7 +175,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee-3'},
       private: false, // PUBLIC
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -257,7 +257,7 @@ test.describe('Popup Router', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
     const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
@@ -266,7 +266,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: true, // PRIVATE
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
     const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
@@ -298,7 +298,7 @@ test.describe('Popup Router', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
     const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
@@ -307,7 +307,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -334,7 +334,7 @@ test.describe('Popup Router', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
     const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
@@ -343,7 +343,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
     const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
@@ -375,14 +375,14 @@ test.describe('Popup Router', () => {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
     await registerCapabilityPagePO.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 
@@ -410,7 +410,7 @@ test.describe('Popup Router', () => {
       qualifier: {component: 'testee'},
       private: true, // PRIVATE
       properties: {
-        path: 'popup',
+        path: 'test-popup',
       },
     });
 

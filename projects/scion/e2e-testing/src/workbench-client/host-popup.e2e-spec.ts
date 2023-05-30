@@ -454,7 +454,7 @@ test.describe('Workbench Popup', () => {
         qualifier: {component: 'host-popup'},
         type: 'popup',
         properties: expect.objectContaining({
-          path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
+          path: 'test-host-popup;matrixParam1=:param1;matrixParam2=:component',
         }),
       }));
     });

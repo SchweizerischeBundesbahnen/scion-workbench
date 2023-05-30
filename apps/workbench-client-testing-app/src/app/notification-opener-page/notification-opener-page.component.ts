@@ -9,9 +9,11 @@
  */
 
 import {Component} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {WorkbenchNotificationService} from '@scion/workbench-client';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {NgIf} from '@angular/common';
 
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';
@@ -26,8 +28,15 @@ const CSS_CLASS = 'cssClass';
   selector: 'app-notification-opener-page',
   templateUrl: './notification-opener-page.component.html',
   styleUrls: ['./notification-opener-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+  ],
 })
-export class NotificationOpenerPageComponent {
+export default class NotificationOpenerPageComponent {
 
   public readonly QUALIFIER = QUALIFIER;
   public readonly PARAMS = PARAMS;

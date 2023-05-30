@@ -22,7 +22,7 @@ test.describe('Workbench View Capability', () => {
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
       },
     };
 
@@ -42,7 +42,7 @@ test.describe('Workbench View Capability', () => {
       type: 'view',
       qualifier: undefined!,
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
       },
     });
     await expect(registerCapability).rejects.toThrow(/NullQualifierError/);
@@ -56,7 +56,7 @@ test.describe('Workbench View Capability', () => {
       type: 'view',
       qualifier: {},
       properties: {
-        path: 'microfrontend',
+        path: 'test-pages/microfrontend-test-page',
       },
     });
     await expect(registerCapability).rejects.toThrow(/NullQualifierError/);

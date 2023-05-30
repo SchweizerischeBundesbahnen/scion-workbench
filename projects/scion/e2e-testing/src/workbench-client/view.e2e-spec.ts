@@ -30,7 +30,7 @@ test.describe('Workbench View', () => {
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: 'test-view/view1',
+        path: 'test-pages/view-test-page/view1',
         title: 'Testee 1',
         cssClass: 'testee-1',
       },
@@ -41,7 +41,7 @@ test.describe('Workbench View', () => {
       type: 'view',
       qualifier: {component: 'testee-2'},
       properties: {
-        path: 'test-view/view2',
+        path: 'test-pages/view-test-page/view2',
         title: 'Testee 2',
         cssClass: 'testee-2',
       },
@@ -654,7 +654,7 @@ test.describe('Workbench View', () => {
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: 'test-view/view1',
+        path: 'test-pages/view-test-page/view1',
         title: 'Testee 1',
         heading: 'app 1',
         cssClass: 'testee-1',
@@ -666,7 +666,7 @@ test.describe('Workbench View', () => {
       type: 'view',
       qualifier: {component: 'testee-2'},
       properties: {
-        path: 'test-view/view2',
+        path: 'test-pages/view-test-page/view2',
         title: 'Testee 2',
         heading: 'app 1',
         cssClass: 'testee-2',

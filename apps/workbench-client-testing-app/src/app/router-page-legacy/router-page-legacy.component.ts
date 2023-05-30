@@ -9,11 +9,14 @@
  */
 
 import {Component} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {ɵWorkbenchLegacyNavigationExtras, ɵWorkbenchLegacyRouter} from '@scion/workbench-client';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
-import {convertValueFromUI} from '../util/util';
+import {convertValueFromUI} from '../common/convert-value-from-ui.util';
+import {NgIf} from '@angular/common';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';
@@ -31,8 +34,16 @@ const CSS_CLASS = 'cssClass';
   selector: 'app-router-page-legacy',
   templateUrl: './router-page-legacy.component.html',
   styleUrls: ['./router-page-legacy.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+    SciCheckboxModule,
+  ],
 })
-export class RouterPageLegacyComponent {
+export default class RouterPageLegacyComponent {
 
   public readonly QUALIFIER = QUALIFIER;
   public readonly PARAMS = PARAMS;

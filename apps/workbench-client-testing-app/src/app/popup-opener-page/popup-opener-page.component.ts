@@ -9,12 +9,17 @@
  */
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
 import {CloseStrategy, PopupOrigin, WorkbenchPopupService} from '@scion/workbench-client';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
-import {undefinedIfEmpty} from '../util/util';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
+import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {PopupPositionLabelPipe} from './popup-position-label.pipe';
+import {NgIf} from '@angular/common';
 
 const QUALIFIER = 'qualifier';
 const PARAMS = 'params';
@@ -35,8 +40,18 @@ const VERTICAL_POSITION = 'verticalPosition';
   selector: 'app-popup-opener-page',
   templateUrl: './popup-opener-page.component.html',
   styleUrls: ['./popup-opener-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+    SciAccordionModule,
+    SciCheckboxModule,
+    PopupPositionLabelPipe,
+  ],
 })
-export class PopupOpenerPageComponent {
+export default class PopupOpenerPageComponent {
 
   public readonly QUALIFIER = QUALIFIER;
   public readonly PARAMS = PARAMS;

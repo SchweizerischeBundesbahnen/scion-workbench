@@ -28,7 +28,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -53,7 +53,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -84,7 +84,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
@@ -116,7 +116,7 @@ test.describe('Workbench Popup', () => {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
-          path: 'popup',
+          path: 'test-popup',
         },
       });
 
