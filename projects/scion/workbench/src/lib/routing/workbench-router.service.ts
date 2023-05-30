@@ -10,7 +10,7 @@
 
 import {ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
 import {Defined, Dictionary} from '@scion/toolkit/util';
-import {ApplicationRef, EnvironmentProviders, inject, Injectable, makeEnvironmentProviders, NgZone, OnDestroy} from '@angular/core';
+import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {WorkbenchLayoutDiff} from './workbench-layout-differ';
@@ -21,12 +21,11 @@ import {WorkbenchNavigationalStates, WorkbenchNavigationalViewStates} from './wo
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {RouterUtils} from './router.util';
-import {Location, LocationStrategy} from '@angular/common';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchRouter implements OnDestroy {
 
   private _singleTaskExecutor = new SingleTaskExecutor();
@@ -525,55 +524,4 @@ export interface WorkbenchNavigation {
    * State to be passed to the routed component as resolved data under the key {@link WorkbenchRouteData.state}.
    */
   viewStates?: {[outlet: string]: Dictionary};
-}
-
-/**
- * Sets up providers necessary to enable workbench routing functionality for the application.
- *
- * @internal
- */
-export function provideWorkbenchRouter(): EnvironmentProviders {
-  return makeEnvironmentProviders([
-    WorkbenchRouter,
-    // Override {@link Location} for the Angular router to always add workbench navigations to the browsing history, even if the URL does not change.
-    // Rationale: If only the layout of the peripheral grid is changed, the URL will not change because the grid is passed to the navigation as state
-    // and not as a query parameter. By default, an unchanged URL does not create a new entry in the browsing history, but replaces the current entry.
-    // See Angular router.ts#setBrowserUrl
-    {
-      provide: Location,
-      useFactory: () => new class extends Location {
-
-        private _appRef = inject(ApplicationRef);
-        private _router: Router | undefined;
-
-        constructor() {
-          super(inject(LocationStrategy));
-        }
-
-        public override isCurrentPathEqualTo(path: string, query?: string): boolean {
-          return super.isCurrentPathEqualTo(path, query) ? !this.isWorkbenchNavigation() : false;
-        }
-
-        /**
-         * Indicates whether the current navigation is a workbench navigation performed through the workbench router.
-         */
-        private isWorkbenchNavigation(): boolean {
-          const currentNavigation = this.router?.getCurrentNavigation() ?? null;
-          return currentNavigation !== null && WorkbenchNavigationalStates.fromNavigation(currentNavigation) !== null;
-        }
-
-        /**
-         * Reference to the Angular router.
-         */
-        private get router(): Router | undefined {
-          // Note that we cannot inject the `Router` in the constructor because the `Router` depends on `Location`,
-          // which would cause a circular dependency at construction time. Instead, we inject the router lazy.
-          // However, injecting the router will fail if the platform has already been destroyed, which happens
-          // in tests that tear down before the initial navigation has finished. To avoid this error, we inject
-          // the router only if the platform is still running.
-          return (this._router ??= !this._appRef.destroyed ? this._appRef.injector.get(Router) : undefined);
-        }
-      },
-    },
-  ]);
 }

@@ -35,7 +35,7 @@ export abstract class WorkbenchStorage {
  *
  * @internal
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered conditionally under `WorkbenchStorage` DI token. */)
 export class DefaultWorkbenchStorage implements WorkbenchStorage {
 
   private readonly STORAGE_KEY = '@scion/workbench';

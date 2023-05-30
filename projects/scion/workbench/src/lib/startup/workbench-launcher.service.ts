@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchModuleConfig} from '../workbench-module-config';
-import {APP_INITIALIZER, ApplicationInitStatus, Injectable, Injector, NgZone, Provider} from '@angular/core';
+import {APP_INITIALIZER, ApplicationInitStatus, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone} from '@angular/core';
 import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
 
@@ -37,7 +37,7 @@ import {Logger, LoggerNames} from '../logging';
  * {@link WorkbenchModuleConfig#startup#splash}. When launching the workbench in an Angular `APP_INITIALIZER`, no splash will
  * display since the workbench will start upfront.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchLauncher {
 
   private _state: StartupState = StartupState.Stopped;
@@ -125,7 +125,7 @@ enum StartupState {
 /**
  * Allows waiting for the workbench startup to complete.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchStartup {
 
   private _started = false;
@@ -150,30 +150,19 @@ export class WorkbenchStartup {
 }
 
 /**
- * Registers a set of DI providers for launching the workbench.
+ * Provides a set of DI providers for launching the workbench.
  */
-export function provideWorkbenchLauncher(workbenchModuleConfig: WorkbenchModuleConfig): Provider[] {
-  // Angular is very strict when compiling module definitions ahead-of-time (if enabled the AOT compilation).
-  // - use ES5 function instead of arrow function to specify the factory
-  // - export functions referenced in module metadata definition
-  // - use ternary check to conditionally provide a provider
-  return [
-    WorkbenchLauncher,
-    WorkbenchStartup,
-    workbenchModuleConfig.startup?.launcher === 'APP_INITIALIZER' ? [
-      {
-        provide: APP_INITIALIZER,
-        useFactory: launchWorkbench,
-        multi: true,
-        deps: [WorkbenchLauncher],
-      },
-    ] : [],
-  ];
-}
+export function provideWorkbenchLauncher(workbenchModuleConfig: WorkbenchModuleConfig): EnvironmentProviders | [] {
+  if (workbenchModuleConfig.startup?.launcher !== 'APP_INITIALIZER') {
+    return [];
+  }
 
-/**
- * @docs-private Not public API, intended for internal use only.
- */
-export function launchWorkbench(workbenchLauncher: WorkbenchLauncher): () => Promise<void> {
-  return () => workbenchLauncher.launch();
+  return makeEnvironmentProviders([{
+    provide: APP_INITIALIZER,
+    useFactory: () => {
+      const launcher = inject(WorkbenchLauncher);
+      return () => launcher.launch();
+    },
+    multi: true,
+  }]);
 }

@@ -16,7 +16,7 @@ import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 /**
  * Registry for {@link ɵWorkbenchPerspective} model objects.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveRegistry implements OnDestroy {
 
   private _registry = new WorkbenchObjectRegistry<ɵWorkbenchPerspective>({

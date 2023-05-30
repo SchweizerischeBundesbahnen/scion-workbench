@@ -23,7 +23,7 @@ import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
  *
  * This class is constructed after connected to the SCION Microfrontend Platform via {@link MICROFRONTEND_PLATFORM_POST_STARTUP} DI token.
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class MicrofrontendViewCommandHandler implements OnDestroy {
 
   private _destroy$ = new Subject<void>();

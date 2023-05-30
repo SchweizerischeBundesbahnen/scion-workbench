@@ -14,7 +14,7 @@ import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 /**
  * Stateful differ for finding added/removed workbench layout elements.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchLayoutDiffer {
 
   private _partsDiffer: IterableDiffer<string>;

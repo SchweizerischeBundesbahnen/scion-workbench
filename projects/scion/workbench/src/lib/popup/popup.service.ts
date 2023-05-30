@@ -38,7 +38,7 @@ const EAST: ConnectedPosition = {originX: 'end', originY: 'center', overlayX: 's
  *
  * Unlike views, popups are not part of the persistent Workbench navigation, meaning that popups do not survive a page reload.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class PopupService {
 
   constructor(private _injector: Injector,

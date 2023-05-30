@@ -9,10 +9,12 @@
  */
 
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
+import {Injectable} from '@angular/core';
 
 /**
  * Allows loading the configuration for the SCION Microfrontend Platform asynchronously, e.g., over the network or from a JSON file.
  */
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as used as DI token for the actual config. */)
 export abstract class MicrofrontendPlatformConfigLoader {
 
   /**

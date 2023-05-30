@@ -20,11 +20,12 @@ import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interc
 import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microfrontend-popup-intent-interceptor.service';
 import {MicrofrontendViewCapabilityInterceptor} from '../routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from '../microfrontend-popup/microfrontend-popup-capability-interceptor.service';
+import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, OnDestroy {
 
   constructor(private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
@@ -56,6 +57,12 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Inject services registered under {MICROFRONTEND_PLATFORM_PRE_STARTUP} DI token.
     await runWorkbenchInitializers(MICROFRONTEND_PLATFORM_PRE_STARTUP, this._injector);
+
+    // Register beans of @scion/workbench-client.
+    Beans.register(WorkbenchRouter);
+    Beans.register(WorkbenchPopupService);
+    Beans.register(WorkbenchMessageBoxService);
+    Beans.register(WorkbenchNotificationService);
 
     // Register host manifest interceptor for the workbench to register workbench-specific intentions and capabilities.
     Beans.register(HostManifestInterceptor, {useValue: this._hostManifestInterceptor, multi: true});

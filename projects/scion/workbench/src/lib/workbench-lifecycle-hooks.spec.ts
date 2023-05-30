@@ -120,7 +120,7 @@ describe('Workbench lifecycle hooks', () => {
   /**
    * Captures the zone in which this initializer was created and executed.
    */
-  @Injectable()
+  @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered only in this test. */)
   class NgZoneCaptorWorkbenchInitializer implements WorkbenchInitializer {
 
     public constructedInsideAngular: boolean;

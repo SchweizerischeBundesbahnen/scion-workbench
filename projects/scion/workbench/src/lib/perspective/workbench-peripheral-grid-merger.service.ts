@@ -16,7 +16,7 @@ import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service
 /**
  * Performs a three-way merge of the changes from the local and remote grid, using the base grid (common ancestor) as the base of the merge operation.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchPeripheralGridMerger {
 
   private _differs = inject(IterableDiffers).find([]);

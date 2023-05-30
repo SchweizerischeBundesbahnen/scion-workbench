@@ -16,7 +16,7 @@ import {Crypto} from '@scion/toolkit/crypto';
 /**
  * Asserts view capabilities to have required properties and assigns each view capability a stable identifer required for persistent navigation.
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendViewCapabilityInterceptor implements CapabilityInterceptor {
 
   public async intercept(capability: Capability): Promise<Capability> {

@@ -43,7 +43,7 @@ import {RouterUtils} from './router.util';
  * - For each removed part, destroys {@link WorkbenchPart}
  * - Parses the serialized layout and injects it into {@link WorkbenchLayoutService}.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchUrlObserver implements OnDestroy {
 
   private _destroy$ = new Subject<void>();

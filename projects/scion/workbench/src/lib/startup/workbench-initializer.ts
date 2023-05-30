@@ -21,7 +21,7 @@ import {EnvironmentInjector, InjectionToken, Injector} from '@angular/core';
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializer | any>('WORKBENCH_STARTUP');
+export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('WORKBENCH_STARTUP');
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -34,7 +34,7 @@ export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializer | any>(
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | any>('WORKBENCH_PRE_STARTUP');
+export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('WORKBENCH_PRE_STARTUP');
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -50,7 +50,7 @@ export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | a
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const MICROFRONTEND_PLATFORM_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | any>('MICROFRONTEND_PLATFORM_PRE_STARTUP');
+export const MICROFRONTEND_PLATFORM_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('MICROFRONTEND_PLATFORM_PRE_STARTUP');
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -66,7 +66,7 @@ export const MICROFRONTEND_PLATFORM_PRE_STARTUP = new InjectionToken<WorkbenchIn
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const MICROFRONTEND_PLATFORM_POST_STARTUP = new InjectionToken<WorkbenchInitializer | any>('MICROFRONTEND_PLATFORM_POST_STARTUP');
+export const MICROFRONTEND_PLATFORM_POST_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('MICROFRONTEND_PLATFORM_POST_STARTUP');
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -79,7 +79,7 @@ export const MICROFRONTEND_PLATFORM_POST_STARTUP = new InjectionToken<WorkbenchI
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const WORKBENCH_POST_STARTUP = new InjectionToken<WorkbenchInitializer | any>('WORKBENCH_POST_STARTUP');
+export const WORKBENCH_POST_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('WORKBENCH_POST_STARTUP');
 
 /**
  * Allows initializing the application during workbench startup.

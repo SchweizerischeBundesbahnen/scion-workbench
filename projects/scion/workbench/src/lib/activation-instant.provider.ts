@@ -13,7 +13,7 @@ import {Injectable} from '@angular/core';
 /**
  * Provides instants for the activation of workbench components like parts or views.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ActivationInstantProvider {
 
   /**

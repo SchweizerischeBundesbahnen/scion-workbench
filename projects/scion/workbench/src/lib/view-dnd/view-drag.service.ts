@@ -28,7 +28,7 @@ export const VIEW_DRAG_TRANSFER_TYPE = 'workbench/view';
 /**
  * Manages the drag & drop behavior when the user drags a view.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ViewDragService implements OnDestroy {
 
   /**

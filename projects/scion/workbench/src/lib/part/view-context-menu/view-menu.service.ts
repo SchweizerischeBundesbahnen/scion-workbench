@@ -28,7 +28,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ViewMenuService {
 
   private static readonly TOP_LEFT: ConnectedPosition = {originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'top'};

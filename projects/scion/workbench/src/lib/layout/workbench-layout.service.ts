@@ -17,7 +17,7 @@ import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 /**
  * Provides access to the workbench layout.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchLayoutService {
 
   private _layout: ɵWorkbenchLayout | null = null;
