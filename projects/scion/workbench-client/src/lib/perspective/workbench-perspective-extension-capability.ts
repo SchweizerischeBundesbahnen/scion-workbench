@@ -10,27 +10,21 @@
 
 import {Capability} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Dictionary} from '@scion/toolkit/util';
 
-export interface WorkbenchPerspectiveCapability extends Capability {
-  type: WorkbenchCapabilities.Perspective;
+export interface WorkbenchPerspectiveExtensionCapability extends Capability {
+  type: WorkbenchCapabilities.PerspectiveExtension;
 
   properties: {
-    id: string;
-    layout: LayoutDefinition;
-    data: Dictionary;
+    perspectiveId: string;
+    views: ViewDefinition[];
   };
 }
 
-export interface LayoutDefinition {
-  parts: PartDefinition[];
-}
-
-export interface PartDefinition {
+export interface ViewDefinition {
   id: string;
-  relativeTo?: string;
-  align: 'left' | 'right' | 'top' | 'bottom';
-  ratio?: number;
-  activate?: boolean;
+  partId: string;
+  position?: number;
+  activateView?: boolean;
+  activatePart?: boolean;
 }
 

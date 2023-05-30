@@ -16,6 +16,7 @@ export {WorkbenchRouter, WorkbenchNavigationExtras, ɵMicrofrontendRouteParams, 
 export {ɵWorkbenchLegacyRouter, ɵWorkbenchLegacyNavigationExtras} from './lib/routing/workbench-legacy-router';
 export {WorkbenchViewCapability, ViewParamDefinition} from './lib/view/workbench-view-capability';
 export {WorkbenchPerspectiveCapability, LayoutDefinition, PartDefinition} from './lib/perspective/workbench-perspective-capability';
+export {WorkbenchPerspectiveExtensionCapability, ViewDefinition} from './lib/perspective/workbench-perspective-extension-capability';
 export {WorkbenchView, ViewClosingListener, ViewClosingEvent, ViewSnapshot} from './lib/view/workbench-view';
 export {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './lib/view/ɵworkbench-view';
 export {WorkbenchCapabilities} from './lib/workbench-capabilities.enum';
