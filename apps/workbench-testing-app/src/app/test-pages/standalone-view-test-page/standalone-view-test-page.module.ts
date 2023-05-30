@@ -24,5 +24,5 @@ export const routes: Routes = [
     RouterModule.forChild(routes),
   ],
 })
-export class StandaloneViewTestPageModule {
+export default class StandaloneViewTestPageModule {
 }

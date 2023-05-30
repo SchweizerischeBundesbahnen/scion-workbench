@@ -39,7 +39,7 @@ export const workbenchManifest: Manifest = {
         {name: 'param1', required: false},
       ],
       properties: {
-        path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
+        path: 'test-host-popup;matrixParam1=:param1;matrixParam2=:component',
       },
     },
   ],

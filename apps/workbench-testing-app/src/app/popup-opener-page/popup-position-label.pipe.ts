@@ -12,7 +12,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 
 export type Position = 'point' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
-@Pipe({name: 'wbPopupPositionLabel'})
+@Pipe({name: 'wbPopupPositionLabel', standalone: true})
 export class PopupPositionLabelPipe implements PipeTransform {
 
   public transform(position: Position, axis: 'vertical' | 'horizontal'): string {

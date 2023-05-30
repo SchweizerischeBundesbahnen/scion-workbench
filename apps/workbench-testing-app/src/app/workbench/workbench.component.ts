@@ -13,16 +13,25 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {distinct, map, takeUntil} from 'rxjs/operators';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {combineLatest, Observable, Subject} from 'rxjs';
-import {WorkbenchRouter, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
+import {WorkbenchModule, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {MenuService} from '../menu/menu.service';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
-import {PerspectiveData} from '../perspective-definitions';
+import {PerspectiveData} from '../workbench.perspectives';
+import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-workbench',
   styleUrls: ['./workbench.component.scss'],
   templateUrl: './workbench.component.html',
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    AsyncPipe,
+    WorkbenchModule,
+    WorkbenchRouterLinkDirective,
+  ],
 })
 export class WorkbenchComponent implements OnDestroy {
 

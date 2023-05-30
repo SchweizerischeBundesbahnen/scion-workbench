@@ -9,9 +9,9 @@
  */
 
 import {Capability, CapabilityInterceptor, QualifierMatcher} from '@scion/microfrontend-platform';
-import {Injectable} from '@angular/core';
+import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
-import {WorkbenchInitializer} from '@scion/workbench';
+import {MICROFRONTEND_PLATFORM_PRE_STARTUP, WorkbenchInitializer} from '@scion/workbench';
 import {Beans} from '@scion/toolkit/bean-manager';
 
 /**
@@ -22,8 +22,8 @@ const DEVTOOLS_QUALIFIER_MATCHER = new QualifierMatcher({component: 'devtools', 
 /**
  * Intercepts the DevTools view capability to pin it to the start page.
  */
-@Injectable()
-export class DevtoolsViewCapabilityInterceptor implements CapabilityInterceptor, WorkbenchInitializer {
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
+class DevToolsViewCapabilityInterceptor implements CapabilityInterceptor, WorkbenchInitializer {
 
   public async init(): Promise<void> {
     // Register this interceptor in the microfrontend platform.
@@ -43,4 +43,17 @@ export class DevtoolsViewCapabilityInterceptor implements CapabilityInterceptor,
 
     return capability;
   }
+}
+
+/**
+ * Provides a set of DI providers to pin DevTools to the start page.
+ */
+export function provideDevToolsInterceptor(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: MICROFRONTEND_PLATFORM_PRE_STARTUP,
+      useClass: DevToolsViewCapabilityInterceptor,
+      multi: true,
+    },
+  ]);
 }

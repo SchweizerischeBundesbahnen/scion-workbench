@@ -13,7 +13,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 
 const PART_ID = 'partId';
 const RELATIVE_TO = 'relativeTo';
@@ -28,7 +28,7 @@ const ACTIVATE = 'activate';
   standalone: true,
   imports: [
     NgIf,
-    NgForOf,
+    NgFor,
     AsyncPipe,
     ReactiveFormsModule,
     SciFormFieldModule,

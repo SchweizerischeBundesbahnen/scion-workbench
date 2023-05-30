@@ -8,22 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {Component} from '@angular/core';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {PopupFocusPageComponent} from './popup-focus-page.component';
 
-@NgModule({
-  imports: [
-    CommonModule,
-    SciFormFieldModule,
-  ],
-  declarations: [
-    PopupFocusPageComponent,
-  ],
-  exports: [
-    PopupFocusPageComponent,
-  ],
+@Component({
+  selector: 'app-focus-test-page',
+  templateUrl: './focus-test-page.component.html',
+  styleUrls: ['./focus-test-page.component.scss'],
+  standalone: true,
+  imports: [SciFormFieldModule],
 })
-export class PopupFocusPageModule {
+export class FocusTestPageComponent {
 }

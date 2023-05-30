@@ -9,23 +9,40 @@
  */
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, Optional, ViewChild} from '@angular/core';
-import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchView} from '@scion/workbench';
+import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {Observable, of, Subject} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {filter, takeUntil} from 'rxjs/operators';
-import {UntypedFormControl} from '@angular/forms';
-import {SciFilterFieldComponent} from '@scion/components.internal/filter-field';
+import {ReactiveFormsModule, UntypedFormControl} from '@angular/forms';
+import {SciFilterFieldComponent, SciFilterFieldModule} from '@scion/components.internal/filter-field';
+import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {SciTabbarModule} from '@scion/components.internal/tabbar';
+import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {FilterPipe} from '../common/filter.pipe';
 
 @Component({
   selector: 'app-start-page',
   templateUrl: './start-page.component.html',
   styleUrls: ['./start-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    NgClass,
+    AsyncPipe,
+    ReactiveFormsModule,
+    NullIfEmptyPipe,
+    SciFilterFieldModule,
+    SciTabbarModule,
+    FilterPipe,
+    WorkbenchRouterLinkDirective,
+  ],
 })
-export class StartPageComponent implements OnDestroy {
+export default class StartPageComponent implements OnDestroy {
 
   private _destroy$ = new Subject<void>();
   @ViewChild(SciFilterFieldComponent)

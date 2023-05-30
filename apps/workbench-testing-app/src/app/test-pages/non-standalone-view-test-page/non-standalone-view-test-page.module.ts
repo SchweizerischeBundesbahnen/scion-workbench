@@ -12,7 +12,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {NonStandaloneViewTestPageComponent} from './non-standalone-view-test-page.component';
 
-export const routes: Routes = [
+const routes: Routes = [
   {
     path: '',
     component: NonStandaloneViewTestPageComponent,
@@ -27,5 +27,5 @@ export const routes: Routes = [
     RouterModule.forChild(routes),
   ],
 })
-export class NonStandaloneViewTestPageModule {
+export default class NonStandaloneViewTestPageModule {
 }

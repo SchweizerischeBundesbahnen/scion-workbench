@@ -10,7 +10,7 @@
 
 import {Component, HostBinding, OnDestroy} from '@angular/core';
 import {filter, takeUntil} from 'rxjs/operators';
-import {NavigationCancel, NavigationEnd, NavigationError, Router} from '@angular/router';
+import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {Subject} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
 
@@ -18,6 +18,8 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  standalone: true,
+  imports: [RouterOutlet],
 })
 export class AppComponent implements OnDestroy {
 

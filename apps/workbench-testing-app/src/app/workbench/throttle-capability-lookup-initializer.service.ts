@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Provider} from '@angular/core';
+import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {WORKBENCH_PRE_STARTUP, WorkbenchInitializer} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -20,8 +20,8 @@ import {firstValueFrom, timer} from 'rxjs';
  *
  * This initializer is only installed if the query parameter {@link WorkbenchStartupQueryParams#SIMULATE_SLOW_CAPABILITY_LOOKUP} is set.
  */
-@Injectable()
-export class ThrottleCapabilityLookupInitializer implements WorkbenchInitializer {
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
+class ThrottleCapabilityLookupInitializer implements WorkbenchInitializer {
 
   public async init(): Promise<void> {
     Beans.register(MessageInterceptor, {multi: true, useClass: CapabilityLookupMessageInterceptor});
@@ -45,22 +45,24 @@ class CapabilityLookupMessageInterceptor implements MessageInterceptor {
 }
 
 /**
+ * Provides a set of DI providers to configure the speed of capability lookups.
+ *
  * Provides a {@link WorkbenchInitializer} to throttle capability lookups to simulate slow capability retrievals.
  *
  * Returns an empty provider array if the query parameter {@link WorkbenchStartupQueryParams#SIMULATE_SLOW_CAPABILITY_LOOKUP} is not set.
  */
-export function provideThrottleCapabilityLookupInterceptor(): Provider[] {
+export function provideThrottleCapabilityLookupInterceptor(): EnvironmentProviders | [] {
   if (WorkbenchStartupQueryParams.standalone()) {
     return [];
   }
   if (WorkbenchStartupQueryParams.simulateSlowCapabilityLookup()) {
-    return [
+    return makeEnvironmentProviders([
       {
         provide: WORKBENCH_PRE_STARTUP,
         multi: true,
         useClass: ThrottleCapabilityLookupInitializer,
       },
-    ];
+    ]);
   }
   return [];
 }

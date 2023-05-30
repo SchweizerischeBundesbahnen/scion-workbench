@@ -9,15 +9,20 @@
  */
 
 import {Component, ElementRef, Type, ViewChild} from '@angular/core';
-import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {CloseStrategy, PopupService, PopupSize} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
-import {PopupFocusPageComponent} from '../popup-focus-page/popup-focus-page.component';
+import {FocusTestPageComponent} from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith} from 'rxjs/operators';
 import {Observable} from 'rxjs';
-import {BlankComponent} from '../blank/blank.component';
+import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import {PopupOrigin} from '@scion/workbench-client';
-import {undefinedIfEmpty} from '../util/util';
+import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
+import {NgIf} from '@angular/common';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {PopupPositionLabelPipe} from './popup-position-label.pipe';
 
 const POPUP_COMPONENT = 'popupComponent';
 const ANCHOR = 'anchor';
@@ -43,8 +48,17 @@ const VERTICAL_POSITION = 'verticalPosition';
   selector: 'app-popup-opener-page',
   templateUrl: './popup-opener-page.component.html',
   styleUrls: ['./popup-opener-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciAccordionModule,
+    SciCheckboxModule,
+    PopupPositionLabelPipe,
+  ],
 })
-export class PopupOpenerPageComponent {
+export default class PopupOpenerPageComponent {
 
   public readonly POPUP_COMPONENT = POPUP_COMPONENT;
   public readonly ANCHOR = ANCHOR;
@@ -140,10 +154,10 @@ export class PopupOpenerPageComponent {
     switch (this.form.get(POPUP_COMPONENT).value) {
       case 'popup-page':
         return PopupPageComponent;
-      case 'popup-focus-page':
-        return PopupFocusPageComponent;
-      case 'blank-component':
-        return BlankComponent;
+      case 'focus-test-page':
+        return FocusTestPageComponent;
+      case 'blank-test-page':
+        return BlankTestPageComponent;
       default:
         throw Error(`[IllegalPopupComponent] Popup component not supported: ${this.form.get(POPUP_COMPONENT).value}`);
     }

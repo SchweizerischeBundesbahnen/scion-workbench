@@ -8,13 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Injectable, Injector, OnDestroy, Type} from '@angular/core';
-import {UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {ApplicationRef, Component, OnDestroy, Type} from '@angular/core';
+import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {MessageBoxService} from '@scion/workbench';
-import {SciParamsEnterComponent} from '@scion/components.internal/params-enter';
+import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {InspectMessageBoxComponent} from '../inspect-message-box-provider/inspect-message-box.component';
 import {startWith, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
+import {NgIf} from '@angular/common';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 
 const TITLE = 'title';
 const CONTENT = 'content';
@@ -33,8 +36,16 @@ const VIEW_CONTEXT = 'viewContext';
   selector: 'app-message-box-opener-page',
   templateUrl: './message-box-opener-page.component.html',
   styleUrls: ['./message-box-opener-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciParamsEnterModule,
+    SciCheckboxModule,
+  ],
 })
-export class MessageBoxOpenerPageComponent implements OnDestroy {
+export default class MessageBoxOpenerPageComponent implements OnDestroy {
 
   public readonly TITLE = TITLE;
   public readonly CONTENT = CONTENT;
@@ -58,7 +69,7 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
 
   constructor(formBuilder: UntypedFormBuilder,
               private _messageBoxService: MessageBoxService,
-              private _rootService: RootService) {
+              private _appRef: ApplicationRef) {
     this.form = formBuilder.group({
       [TITLE]: formBuilder.control(''),
       [CONTENT]: formBuilder.control(''),
@@ -82,7 +93,7 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
     this.openError = null;
     this.closeAction = null;
 
-    const messageBoxService = unsetViewContext ? this._rootService.rootInjector.get(MessageBoxService) : this._messageBoxService;
+    const messageBoxService = unsetViewContext ? this._appRef.injector.get(MessageBoxService) : this._messageBoxService;
 
     const messageBoxes = [];
     for (let index = 0; index < Number(this.form.get(COUNT).value || 1); index++) {
@@ -151,12 +162,5 @@ export class MessageBoxOpenerPageComponent implements OnDestroy {
 
   public ngOnDestroy(): void {
     this._destroy$.next();
-  }
-}
-
-@Injectable({providedIn: 'root'})
-class RootService {
-
-  constructor(public rootInjector: Injector) {
   }
 }

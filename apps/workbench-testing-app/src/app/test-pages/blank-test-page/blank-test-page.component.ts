@@ -10,10 +10,13 @@
 
 import {Component} from '@angular/core';
 
+/**
+ * Component that does not display anything.
+ */
 @Component({
-  selector: 'app-popup-focus-page',
-  templateUrl: './popup-focus-page.component.html',
-  styleUrls: ['./popup-focus-page.component.scss'],
+  selector: 'app-blank-test-page',
+  template: 'blank',
+  standalone: true,
 })
-export class PopupFocusPageComponent {
+export default class BlankTestPageComponent {
 }

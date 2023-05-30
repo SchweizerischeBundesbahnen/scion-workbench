@@ -22,7 +22,7 @@ test.describe('Workbench Router', () => {
     await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
 
     // open test view 1
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view', param: '1'});
     await routerPagePO.checkActivate(true);
     await routerPagePO.enterTarget('auto');
@@ -33,7 +33,7 @@ test.describe('Workbench Router', () => {
 
     // open test view 2
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view', param: '2'});
     await routerPagePO.checkActivate(true);
     await routerPagePO.enterTarget('auto');
@@ -44,7 +44,7 @@ test.describe('Workbench Router', () => {
 
     // open test view 3
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view', param: '3'});
     await routerPagePO.checkActivate(true);
     await routerPagePO.enterTarget('auto');
@@ -61,7 +61,7 @@ test.describe('Workbench Router', () => {
     await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
 
     // open test view 1
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1'});
     await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
@@ -71,7 +71,7 @@ test.describe('Workbench Router', () => {
 
     // open test view 2
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2'});
     await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
@@ -81,7 +81,7 @@ test.describe('Workbench Router', () => {
 
     // open test view 3
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-3'});
     await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
@@ -91,7 +91,7 @@ test.describe('Workbench Router', () => {
 
     // close all test views
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget(undefined);
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1'});  // matrix param is ignored when closing views
     await routerPagePO.checkClose(true);
@@ -107,14 +107,14 @@ test.describe('Workbench Router', () => {
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open test view 1
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1', title: 'view-1-title', heading: 'view-1-heading'});
     await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
     // open test view 2
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2', title: 'view-2-title', heading: 'view-2-heading'});
     await routerPagePO.clickNavigate();
@@ -218,7 +218,7 @@ test.describe('Workbench Router', () => {
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
@@ -226,7 +226,7 @@ test.describe('Workbench Router', () => {
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
@@ -254,14 +254,14 @@ test.describe('Workbench Router', () => {
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
@@ -289,7 +289,7 @@ test.describe('Workbench Router', () => {
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
@@ -297,7 +297,7 @@ test.describe('Workbench Router', () => {
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
@@ -307,7 +307,7 @@ test.describe('Workbench Router', () => {
 
     // try closing view by providing viewId and path
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget(testeeViewId);
     await routerPagePO.checkClose(true);
 
@@ -318,28 +318,28 @@ test.describe('Workbench Router', () => {
     expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(true);
   });
 
-  test('should allow closing all views matching the path `test-navigation` via router', async ({appPO, workbenchNavigator}) => {
+  test('should allow closing all views matching the path `test-pages/navigation-test-page` via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-3');
     await routerPagePO.clickNavigate();
@@ -347,9 +347,9 @@ test.describe('Workbench Router', () => {
     // expect the test views to be opened
     await expect(await appPO.activePart.getViewIds()).toHaveLength(4);
 
-    // close the views with the path 'test-navigation'
+    // close the views with the path 'test-pages/navigation-test-page'
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget(undefined);
     await routerPagePO.checkClose(true);
     await routerPagePO.clickNavigate();
@@ -361,28 +361,28 @@ test.describe('Workbench Router', () => {
     expect(await appPO.view({cssClass: 'testee-3'}).viewTab.isPresent()).toBe(false);
   });
 
-  test('should allow closing all views matching the path `test-navigation/1` via router', async ({appPO, workbenchNavigator}) => {
+  test('should allow closing all views matching the path `test-pages/navigation-test-page/1` via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-3');
     await routerPagePO.clickNavigate();
@@ -390,9 +390,9 @@ test.describe('Workbench Router', () => {
     // expect the test views to be opened
     await expect(await appPO.activePart.getViewIds()).toHaveLength(4);
 
-    // close the views with the path 'test-navigation/1'
+    // close the views with the path 'test-pages/navigation-test-page/1'
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1');
     await routerPagePO.enterTarget(undefined);
     await routerPagePO.checkClose(true);
     await routerPagePO.clickNavigate();
@@ -404,28 +404,28 @@ test.describe('Workbench Router', () => {
     expect(await appPO.view({cssClass: 'testee-3'}).viewTab.isPresent()).toBe(false);
   });
 
-  test('should allow closing all views matching the path `test-navigation/*` via router', async ({appPO, workbenchNavigator}) => {
+  test('should allow closing all views matching the path `test-pages/navigation-test-page/*` via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/2');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/2');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-3');
     await routerPagePO.clickNavigate();
@@ -433,9 +433,9 @@ test.describe('Workbench Router', () => {
     // expect the test views to be opened
     await expect(await appPO.activePart.getViewIds()).toHaveLength(4);
 
-    // close the views with the path 'test-navigation/*'
+    // close the views with the path 'test-pages/navigation-test-page/*'
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/*');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/*');
     await routerPagePO.enterTarget(undefined);
     await routerPagePO.checkClose(true);
     await routerPagePO.clickNavigate();
@@ -447,49 +447,49 @@ test.describe('Workbench Router', () => {
     expect(await appPO.view({cssClass: 'testee-3'}).viewTab.isPresent()).toBe(false);
   });
 
-  test('should allow closing all views matching the path `test-navigation/1/1` via router', async ({appPO, workbenchNavigator}) => {
+  test('should allow closing all views matching the path `test-pages/navigation-test-page/1/1` via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-3');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1/2');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1/2');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-4');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/2/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/2/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-5');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/2/2');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/2/2');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-6');
     await routerPagePO.clickNavigate();
@@ -497,9 +497,9 @@ test.describe('Workbench Router', () => {
     // expect the test views to be opened
     await expect(await appPO.activePart.getViewIds()).toHaveLength(7);
 
-    // close the views with the path 'test-navigation/1/1'
+    // close the views with the path 'test-pages/navigation-test-page/1/1'
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1/1');
     await routerPagePO.enterTarget(undefined);
     await routerPagePO.checkClose(true);
     await routerPagePO.clickNavigate();
@@ -514,49 +514,49 @@ test.describe('Workbench Router', () => {
     expect(await appPO.view({cssClass: 'testee-6'}).viewTab.isPresent()).toBe(true);
   });
 
-  test('should allow closing all views matching the path `test-navigation/*/1` via router', async ({appPO, workbenchNavigator}) => {
+  test('should allow closing all views matching the path `test-pages/navigation-test-page/*/1` via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-3');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1/2');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1/2');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-4');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/2/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/2/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-5');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/2/2');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/2/2');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-6');
     await routerPagePO.clickNavigate();
@@ -564,9 +564,9 @@ test.describe('Workbench Router', () => {
     // expect the test views to be opened
     await expect(await appPO.activePart.getViewIds()).toHaveLength(7);
 
-    // close the views with the path 'test-navigation/*/1'
+    // close the views with the path 'test-pages/navigation-test-page/*/1'
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/*/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/*/1');
     await routerPagePO.enterTarget(undefined);
     await routerPagePO.checkClose(true);
     await routerPagePO.clickNavigate();
@@ -581,49 +581,49 @@ test.describe('Workbench Router', () => {
     expect(await appPO.view({cssClass: 'testee-6'}).viewTab.isPresent()).toBe(true);
   });
 
-  test('should allow closing all views matching the path `test-navigation/*/*` via router', async ({appPO, workbenchNavigator}) => {
+  test('should allow closing all views matching the path `test-pages/navigation-test-page/*/*` via router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation');
+    await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-3');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/1/2');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/1/2');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-4');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/2/1');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/2/1');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-5');
     await routerPagePO.clickNavigate();
 
     // open the test view in a new view tab
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/2/2');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/2/2');
     await routerPagePO.enterTarget('blank');
     await routerPagePO.enterCssClass('testee-6');
     await routerPagePO.clickNavigate();
@@ -631,9 +631,9 @@ test.describe('Workbench Router', () => {
     // expect the test views to be opened
     await expect(await appPO.activePart.getViewIds()).toHaveLength(7);
 
-    // close the views with the path 'test-navigation/*/*'
+    // close the views with the path 'test-pages/navigation-test-page/*/*'
     await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-navigation/*/*');
+    await routerPagePO.enterPath('test-pages/navigation-test-page/*/*');
     await routerPagePO.enterTarget(undefined);
     await routerPagePO.checkClose(true);
     await routerPagePO.clickNavigate();

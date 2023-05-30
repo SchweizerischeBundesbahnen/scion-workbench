@@ -10,7 +10,7 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {PopupFocusPagePO} from './page-object/popup-focus-page.po';
+import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {PopupPagePO} from './page-object/popup-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
@@ -424,7 +424,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.enterContextualViewId(startPagePO.viewId!);
       await popupOpenerPagePO.enterPosition({left: 0, top: 0});
-      await popupOpenerPagePO.selectPopupComponent('blank-component');
+      await popupOpenerPagePO.selectPopupComponent('blank-test-page');
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 
@@ -598,19 +598,20 @@ test.describe('Workbench Popup', () => {
 
       // Open popup
       await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.selectPopupComponent('popup-focus-page');
+      await popupOpenerPagePO.selectPopupComponent('focus-test-page');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: true});
       await popupOpenerPagePO.clickOpen();
 
       // Expect popup to have focus.
-      const popupFocusPagePO = new PopupFocusPagePO(appPO, 'testee');
-      await expect(await popupFocusPagePO.isActiveElement('first-field')).toBe(true);
+      const popupPO = appPO.popup({cssClass: 'testee'});
+      const focusTestPagePO = new FocusTestPagePO(appPO, popupPO);
+      await expect(await focusTestPagePO.isActiveElement('first-field')).toBe(true);
 
       // Click the input field to make popup lose focus
       await inputFieldPagePO.clickInputField();
 
       // Expect popup to be closed
-      await expect(await popupFocusPagePO.popupPO.isVisible()).toBe(false);
+      await expect(await popupPO.isVisible()).toBe(false);
 
       // Expect focus to remain in the input field that caused focus loss of the popup.
       await expect(await inputFieldPagePO.isActiveElement()).toBe(true);
@@ -624,11 +625,12 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.selectPopupComponent('popup-focus-page');
+      await popupOpenerPagePO.selectPopupComponent('focus-test-page');
       await popupOpenerPagePO.clickOpen();
 
-      const popupFocusPagePO = new PopupFocusPagePO(appPO, 'testee');
-      await expect(await popupFocusPagePO.isActiveElement('first-field')).toBe(true);
+      const popupPO = appPO.popup({cssClass: 'testee'});
+      const focusTestPagePO = new FocusTestPagePO(appPO, popupPO);
+      await expect(await focusTestPagePO.isActiveElement('first-field')).toBe(true);
     });
 
     test('should install a focus trap to cycle focus (pressing tab)', async ({page, appPO, workbenchNavigator}) => {
@@ -636,26 +638,27 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.selectPopupComponent('popup-focus-page');
+      await popupOpenerPagePO.selectPopupComponent('focus-test-page');
       await popupOpenerPagePO.clickOpen();
 
-      const popupFocusPagePO = new PopupFocusPagePO(appPO, 'testee');
-      await expect(await popupFocusPagePO.isActiveElement('first-field')).toBe(true);
+      const popupPO = appPO.popup({cssClass: 'testee'});
+      const focusTestPagePO = new FocusTestPagePO(appPO, popupPO);
+      await expect(await focusTestPagePO.isActiveElement('first-field')).toBe(true);
 
       await page.keyboard.press('Tab');
-      await expect(await popupFocusPagePO.isActiveElement('middle-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('middle-field')).toBe(true);
 
       await page.keyboard.press('Tab');
-      await expect(await popupFocusPagePO.isActiveElement('last-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('last-field')).toBe(true);
 
       await page.keyboard.press('Tab');
-      await expect(await popupFocusPagePO.isActiveElement('first-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('first-field')).toBe(true);
 
       await page.keyboard.press('Tab');
-      await expect(await popupFocusPagePO.isActiveElement('middle-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('middle-field')).toBe(true);
 
       await page.keyboard.press('Tab');
-      await expect(await popupFocusPagePO.isActiveElement('last-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('last-field')).toBe(true);
     });
 
     test('should install a focus trap to cycle focus (pressing shift-tab)', async ({page, appPO, workbenchNavigator}) => {
@@ -663,29 +666,30 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.selectPopupComponent('popup-focus-page');
+      await popupOpenerPagePO.selectPopupComponent('focus-test-page');
       await popupOpenerPagePO.clickOpen();
 
-      const popupFocusPagePO = new PopupFocusPagePO(appPO, 'testee');
-      await expect(await popupFocusPagePO.isActiveElement('first-field')).toBe(true);
+      const popupPO = appPO.popup({cssClass: 'testee'});
+      const focusTestPagePO = new FocusTestPagePO(appPO, popupPO);
+      await expect(await focusTestPagePO.isActiveElement('first-field')).toBe(true);
 
       await page.keyboard.press('Shift+Tab');
-      await expect(await popupFocusPagePO.isActiveElement('last-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('last-field')).toBe(true);
 
       await page.keyboard.press('Shift+Tab');
-      await expect(await popupFocusPagePO.isActiveElement('middle-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('middle-field')).toBe(true);
 
       await page.keyboard.press('Shift+Tab');
-      await expect(await popupFocusPagePO.isActiveElement('first-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('first-field')).toBe(true);
 
       await page.keyboard.press('Shift+Tab');
-      await expect(await popupFocusPagePO.isActiveElement('last-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('last-field')).toBe(true);
 
       await page.keyboard.press('Shift+Tab');
-      await expect(await popupFocusPagePO.isActiveElement('middle-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('middle-field')).toBe(true);
 
       await page.keyboard.press('Shift+Tab');
-      await expect(await popupFocusPagePO.isActiveElement('first-field')).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('first-field')).toBe(true);
     });
 
     test('should restore focus after re-activating its contextual view, if any', async ({appPO, workbenchNavigator}) => {
@@ -693,26 +697,27 @@ test.describe('Workbench Popup', () => {
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.selectPopupComponent('popup-focus-page');
+      await popupOpenerPagePO.selectPopupComponent('focus-test-page');
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const popupFocusPagePO = new PopupFocusPagePO(appPO, 'testee');
-      await popupFocusPagePO.clickField('middle-field');
-      await expect(await popupFocusPagePO.isActiveElement('middle-field')).toBe(true);
-      await expect(await popupFocusPagePO.isPresent()).toBe(true);
-      await expect(await popupFocusPagePO.isVisible()).toBe(true);
+      const popupPO = appPO.popup({cssClass: 'testee'});
+      const focusTestPagePO = new FocusTestPagePO(appPO, popupPO);
+      await focusTestPagePO.clickField('middle-field');
+      await expect(await focusTestPagePO.isActiveElement('middle-field')).toBe(true);
+      await expect(await focusTestPagePO.isPresent()).toBe(true);
+      await expect(await focusTestPagePO.isVisible()).toBe(true);
 
       // activate another view
       await appPO.openNewViewTab();
-      await expect(await popupFocusPagePO.isPresent()).toBe(true);
-      await expect(await popupFocusPagePO.isVisible()).toBe(false);
+      await expect(await focusTestPagePO.isPresent()).toBe(true);
+      await expect(await focusTestPagePO.isVisible()).toBe(false);
 
       // re-activate the view
       await popupOpenerPagePO.view.viewTab.click();
-      await expect(await popupFocusPagePO.isPresent()).toBe(true);
-      await expect(await popupFocusPagePO.isVisible()).toBe(true);
-      await expect(await popupFocusPagePO.isActiveElement('middle-field')).toBe(true);
+      await expect(await focusTestPagePO.isPresent()).toBe(true);
+      await expect(await focusTestPagePO.isVisible()).toBe(true);
+      await expect(await focusTestPagePO.isActiveElement('middle-field')).toBe(true);
     });
   });
 });

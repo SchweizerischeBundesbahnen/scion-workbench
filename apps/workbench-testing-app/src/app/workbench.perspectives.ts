@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Routes} from '@angular/router';
+import {ROUTES} from '@angular/router';
 import {WorkbenchLayout, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
+import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
 
 /**
  * Keys for data associated with perspectives.
@@ -59,26 +60,6 @@ export namespace PerspectiveDefinitions {
    */
   export const initialPerspective = 'empty';
 
-  /**
-   * Defines routes for views arranged in perspectives.
-   */
-  export const routes: Routes = [
-    {path: '', outlet: 'navigator', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Navigator'}},
-    {path: '', outlet: 'package-explorer', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Package Explorer'}},
-    {path: '', outlet: 'git-repositories', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Repositories'}},
-    {path: '', outlet: 'console', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Console'}},
-    {path: '', outlet: 'problems', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Problems'}},
-    {path: '', outlet: 'search', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Search'}},
-    {path: '', outlet: 'outline', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Outline'}},
-    {path: '', outlet: 'debug', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Debug'}},
-    {path: '', outlet: 'expressions', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Expressions'}},
-    {path: '', outlet: 'breakpoints', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Breakpoints'}},
-    {path: '', outlet: 'variables', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Variables'}},
-    {path: '', outlet: 'servers', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Servers'}},
-    {path: '', outlet: 'progress', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Progress'}},
-    {path: '', outlet: 'git-staging', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Staging'}},
-  ];
-
   function provideDeveloperPerspectiveLayout(layout: WorkbenchLayout): WorkbenchLayout { // eslint-disable-line no-inner-declarations
     return layout
       .addPart('right', {align: 'right', ratio: .2})
@@ -120,4 +101,32 @@ export namespace PerspectiveDefinitions {
       .activateView('console')
       .activateView('variables');
   }
+}
+
+/**
+ * Provides routes for views arranged in perspectives.
+ */
+export function providePerspectiveRoutes(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: ROUTES,
+      multi: true,
+      useValue: [
+        {path: '', outlet: 'navigator', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Navigator'}},
+        {path: '', outlet: 'package-explorer', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Package Explorer'}},
+        {path: '', outlet: 'git-repositories', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Repositories'}},
+        {path: '', outlet: 'console', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Console'}},
+        {path: '', outlet: 'problems', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Problems'}},
+        {path: '', outlet: 'search', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Search'}},
+        {path: '', outlet: 'outline', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Outline'}},
+        {path: '', outlet: 'debug', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Debug'}},
+        {path: '', outlet: 'expressions', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Expressions'}},
+        {path: '', outlet: 'breakpoints', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Breakpoints'}},
+        {path: '', outlet: 'variables', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Variables'}},
+        {path: '', outlet: 'servers', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Servers'}},
+        {path: '', outlet: 'progress', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Progress'}},
+        {path: '', outlet: 'git-staging', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Staging'}},
+      ],
+    },
+  ]);
 }

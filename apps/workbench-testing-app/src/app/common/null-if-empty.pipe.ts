@@ -9,6 +9,7 @@
  */
 
 import {Pipe, PipeTransform} from '@angular/core';
+import {undefinedIfEmpty} from './undefined-if-empty.util';
 
 /**
  * Returns `null` if the given object is empty.
@@ -17,18 +18,6 @@ import {Pipe, PipeTransform} from '@angular/core';
 export class NullIfEmptyPipe implements PipeTransform {
 
   public transform<T>(value: T): T {
-    if (value === null || value === undefined) {
-      return null;
-    }
-    else if (value instanceof Map || value instanceof Set) {
-      return value.size ? value : null;
-    }
-    else if (Array.isArray(value) || typeof value === 'string') {
-      return value.length ? value : null;
-    }
-    else if (typeof value === 'object') {
-      return Object.keys(value).length ? value : null;
-    }
-    return value;
+    return undefinedIfEmpty(value) ?? null;
   }
 }

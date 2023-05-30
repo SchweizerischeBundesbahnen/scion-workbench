@@ -65,10 +65,10 @@ import {featureRoutes} from './feature-routes';
           [WorkbenchRouteData.heading]: 'Features Lazy Heading',
           [WorkbenchRouteData.cssClass]: 'e2e-features-lazy',
         },
-        loadChildren: (): any => import('./features-lazy.module').then(m => m.FeaturesLazyModule),
+        loadChildren: (): any => import('./features-lazy.module'),
       },
     ]),
   ],
 })
-export class ViewRouteDataTestPageModule {
+export default class ViewRouteDataTestPageModule {
 }

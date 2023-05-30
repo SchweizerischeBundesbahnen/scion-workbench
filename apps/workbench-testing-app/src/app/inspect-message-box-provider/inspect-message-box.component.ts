@@ -12,8 +12,13 @@ import {Component, OnDestroy} from '@angular/core';
 import {MessageBox} from '@scion/workbench';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
-import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
+import {NgIf} from '@angular/common';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciViewportModule} from '@scion/components/viewport';
+import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {StringifyPipe} from '../common/stringify.pipe';
 
 const TITLE = 'title';
 const SEVERITY = 'severity';
@@ -25,6 +30,15 @@ const RETURN_VALUE = 'returnValue';
   selector: 'app-inspect-message-box',
   templateUrl: './inspect-message-box.component.html',
   styleUrls: ['./inspect-message-box.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    StringifyPipe,
+    ReactiveFormsModule,
+    SciFormFieldModule,
+    SciViewportModule,
+    SciParamsEnterModule,
+  ],
 })
 export class InspectMessageBoxComponent implements OnDestroy {
 

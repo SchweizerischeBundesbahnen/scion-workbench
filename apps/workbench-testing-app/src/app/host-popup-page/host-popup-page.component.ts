@@ -12,6 +12,14 @@ import {Component, HostBinding} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {WorkbenchPopup} from '@scion/workbench-client';
+import {AsyncPipe, JsonPipe, NgIf} from '@angular/common';
+import {A11yModule} from '@angular/cdk/a11y';
+import {FormsModule} from '@angular/forms';
+import {SciViewportModule} from '@scion/components/viewport';
+import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {SciPropertyModule} from '@scion/components.internal/property';
 
 /**
  * Popup component provided by the host app via a popup capability.
@@ -20,8 +28,21 @@ import {WorkbenchPopup} from '@scion/workbench-client';
   selector: 'app-host-popup-page',
   templateUrl: './host-popup-page.component.html',
   styleUrls: ['./host-popup-page.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    FormsModule,
+    AsyncPipe,
+    JsonPipe,
+    A11yModule,
+    NullIfEmptyPipe,
+    SciViewportModule,
+    SciFormFieldModule,
+    SciAccordionModule,
+    SciPropertyModule,
+  ],
 })
-export class HostPopupPageComponent {
+export default class HostPopupPageComponent {
 
   public uuid = UUID.randomUUID();
 

@@ -199,19 +199,19 @@ test.describe('Workbench RouterLink', () => {
 
     // GIVEN
     // Open test view 1 (but do not activate it)
-    await routerPagePO.enterPath('/test-navigation/1');
+    await routerPagePO.enterPath('/test-pages/navigation-test-page/1');
     await routerPagePO.enterCssClass('testee-1');
     await routerPagePO.checkActivate(false);
     await routerPagePO.clickNavigate();
 
     // Open test view 2 (but do not activate it)
-    await routerPagePO.enterPath('/test-navigation/2');
+    await routerPagePO.enterPath('/test-pages/navigation-test-page/2');
     await routerPagePO.enterCssClass('testee-2');
     await routerPagePO.checkActivate(false);
     await routerPagePO.clickNavigate();
 
     // Open test view 3 (but do not activate it)
-    await routerPagePO.enterPath('/test-navigation/3');
+    await routerPagePO.enterPath('/test-pages/navigation-test-page/3');
     await routerPagePO.enterCssClass('testee-3');
     await routerPagePO.checkActivate(false);
     await routerPagePO.clickNavigate();
@@ -225,7 +225,7 @@ test.describe('Workbench RouterLink', () => {
     await expect(await testView3.viewTab.isPresent()).toBe(true);
 
     // WHEN
-    await routerPagePO.enterPath('/test-navigation/*');
+    await routerPagePO.enterPath('/test-pages/navigation-test-page/*');
     await routerPagePO.checkClose(true);
     await routerPagePO.clickNavigateViaRouterLink();
 
