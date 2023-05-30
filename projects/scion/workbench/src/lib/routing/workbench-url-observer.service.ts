@@ -29,7 +29,7 @@ import {WorkbenchViewPreDestroyGuard} from '../view/workbench-view-pre-destroy.g
 import {NavigationStateResolver} from './navigation-state.resolver';
 import {WorkbenchRouteData} from './workbench-route-data';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
-import {MainAreaLayoutComponent} from '../main-area-layout/main-area-layout.component';
+import {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
 import {PartComponent} from '../part/part.component';
 import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
 import {RouterUtils} from './router.util';

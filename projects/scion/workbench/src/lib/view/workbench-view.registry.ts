@@ -11,7 +11,7 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {Observable} from 'rxjs';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
-import {WorkbenchObjectRegistry} from '../workbench-object-registry';
+import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
 
 /**
  * Registry for {@link WorkbenchView} model objects.

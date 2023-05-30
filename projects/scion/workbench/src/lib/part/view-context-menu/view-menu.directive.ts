@@ -1,5 +1,5 @@
 import {Directive, EventEmitter, Input, OnDestroy, Optional, Output, TemplateRef} from '@angular/core';
-import {Disposable} from '../../disposable';
+import {Disposable} from '../../common/disposable';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {WorkbenchService} from '../../workbench.service';
 import {TemplatePortal} from '@angular/cdk/portal';

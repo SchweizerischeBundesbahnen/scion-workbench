@@ -11,7 +11,7 @@
 import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
 import {of, Subject} from 'rxjs';
 import {take, takeUntil} from 'rxjs/operators';
-import {createElement, setStyle} from '../dom.util';
+import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
 import {ViewTabContentComponent} from '../part/view-tab-content/view-tab-content.component';
@@ -19,7 +19,7 @@ import {WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {VIEW_TAB_CONTEXT} from '../workbench.constants';
 import {UrlSegment} from '@angular/router';
-import {Disposable} from '../disposable';
+import {Disposable} from '../common/disposable';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {subscribeInside} from '@scion/toolkit/operators';

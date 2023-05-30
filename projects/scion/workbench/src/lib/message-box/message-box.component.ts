@@ -19,7 +19,7 @@ import {MoveDelta, MoveDirective} from './move.directive';
 import {coerceElement} from '@angular/cdk/coercion';
 import {A11yModule} from '@angular/cdk/a11y';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
-import {CoerceObservablePipe} from '../coerce-observable.pipe';
+import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
 
 /**
  * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text

@@ -9,7 +9,7 @@
  */
 
 import {Directive, Input, OnDestroy, OnInit, Optional, TemplateRef} from '@angular/core';
-import {Disposable} from '../../disposable';
+import {Disposable} from '../../common/disposable';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchPart} from '../workbench-part.model';

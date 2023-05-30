@@ -1,6 +1,6 @@
 import {Observable} from 'rxjs';
 import {UrlSegment} from '@angular/router';
-import {Disposable} from '../disposable';
+import {Disposable} from '../common/disposable';
 import {WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 

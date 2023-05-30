@@ -9,7 +9,7 @@
  */
 
 import {Observable} from 'rxjs';
-import {Disposable} from './disposable';
+import {Disposable} from './common/disposable';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction} from './workbench.model';
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
