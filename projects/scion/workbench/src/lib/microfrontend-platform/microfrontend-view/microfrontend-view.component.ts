@@ -18,7 +18,7 @@ import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchViewPreDestroy} from '../../workbench.model';
 import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
-import {serializeExecution} from '../../operators';
+import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';

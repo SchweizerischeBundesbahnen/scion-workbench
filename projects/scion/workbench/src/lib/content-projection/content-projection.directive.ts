@@ -13,7 +13,7 @@ import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {Dimension, fromDimension$} from '@scion/toolkit/observable';
-import {setStyle} from '../dom.util';
+import {setStyle} from '../common/dom.util';
 
 /**
  * Renders a given template as overlay. The template will stick to the bounding box of the host element of this directive.

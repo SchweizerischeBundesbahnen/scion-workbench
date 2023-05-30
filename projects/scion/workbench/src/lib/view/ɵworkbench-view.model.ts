@@ -15,7 +15,7 @@ import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Arrays} from '@scion/toolkit/util';
-import {Disposable} from '../disposable';
+import {Disposable} from '../common/disposable';
 import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
 import {WorkbenchView} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';

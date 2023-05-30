@@ -9,10 +9,10 @@
  */
 
 import {Component, HostBinding} from '@angular/core';
-import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
-import {MPart, MTreeNode} from '../layout/workbench-layout.model';
-import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {GridElementComponent} from '../layout/grid-element/grid-element.component';
+import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
+import {MPart, MTreeNode} from '../workbench-layout.model';
+import {WorkbenchLayoutService} from '../workbench-layout.service';
+import {GridElementComponent} from '../grid-element/grid-element.component';
 
 /**
  * Renders main area layout.

@@ -15,7 +15,7 @@ import {filter, map, mergeMap, startWith, switchMap, take, takeUntil} from 'rxjs
 import {animationFrameScheduler, BehaviorSubject, combineLatest, from, interval, merge, Observable, Subject} from 'rxjs';
 import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
-import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../dom.util';
+import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {SciViewportComponent, SciViewportModule} from '@scion/components/viewport';

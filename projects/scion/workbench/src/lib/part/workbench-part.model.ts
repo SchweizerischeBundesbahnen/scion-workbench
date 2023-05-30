@@ -1,5 +1,5 @@
 import {Observable} from 'rxjs';
-import {Disposable} from '../disposable';
+import {Disposable} from '../common/disposable';
 import {WorkbenchPartAction} from '../workbench.model';
 
 /**

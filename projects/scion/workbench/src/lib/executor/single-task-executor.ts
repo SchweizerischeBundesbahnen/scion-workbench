@@ -9,7 +9,7 @@
  */
 
 import {AsyncSubject, lastValueFrom, Subject} from 'rxjs';
-import {serializeExecution} from '../operators';
+import {serializeExecution} from '../common/operators';
 import {catchError, takeUntil} from 'rxjs/operators';
 
 /**

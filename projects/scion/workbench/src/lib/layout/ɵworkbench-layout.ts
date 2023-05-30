@@ -9,7 +9,7 @@
  */
 import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
 import {VIEW_ID_PREFIX} from '../workbench.constants';
-import {assertType} from '../asserts.util';
+import {assertType} from '../common/asserts.util';
 import {UUID} from '@scion/toolkit/uuid';
 import {MAIN_AREA_PART_ID, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';

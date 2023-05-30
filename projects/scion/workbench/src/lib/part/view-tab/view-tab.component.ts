@@ -14,7 +14,7 @@ import {fromEvent, merge, Subject, withLatestFrom} from 'rxjs';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
-import {createElement} from '../../dom.util';
+import {createElement} from '../../common/dom.util';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {VIEW_TAB_CONTEXT} from '../../workbench.constants';
 import {WorkbenchModuleConfig} from '../../workbench-module-config';

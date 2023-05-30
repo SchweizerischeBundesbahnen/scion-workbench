@@ -11,7 +11,7 @@ import {MPart} from '../layout/workbench-layout.model';
 import {BehaviorSubject} from 'rxjs';
 import {inject, Injector} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
-import {Disposable} from '../disposable';
+import {Disposable} from '../common/disposable';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
 import {WorkbenchRouter} from '../routing/workbench-router.service';

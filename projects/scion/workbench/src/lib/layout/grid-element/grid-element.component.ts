@@ -13,7 +13,7 @@ import {MPart, MTreeNode} from '../workbench-layout.model';
 import {MAIN_AREA_PART_ID} from '../workbench-layout';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
-import {InstanceofPipe} from '../../instanceof.pipe';
+import {InstanceofPipe} from '../../common/instanceof.pipe';
 import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {SciSashboxModule} from '@scion/components/sashbox';

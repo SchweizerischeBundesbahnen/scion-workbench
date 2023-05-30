@@ -10,10 +10,10 @@
 
 import {TestBed} from '@angular/core/testing';
 import {Injectable, NgZone} from '@angular/core';
-import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP, WorkbenchInitializer} from './startup/workbench-initializer';
-import {WorkbenchTestingModule} from './testing/workbench-testing.module';
+import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP, WorkbenchInitializer} from './workbench-initializer';
+import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
-import {WorkbenchLauncher} from './startup/workbench-launcher.service';
+import {WorkbenchLauncher} from './workbench-launcher.service';
 
 describe('Workbench lifecycle hooks', () => {
 

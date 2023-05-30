@@ -13,7 +13,7 @@ import {EMPTY, fromEvent, merge, Observable, Observer, of, Subject, TeardownLogi
 import {filter, map, take, takeUntil} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegment} from '@angular/router';
-import {WorkbenchBroadcastChannel} from '../workbench-broadcast-channel';
+import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 
 /**

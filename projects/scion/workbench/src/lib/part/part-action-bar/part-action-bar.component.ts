@@ -15,7 +15,7 @@ import {WorkbenchPartAction} from '../../workbench.model';
 import {WorkbenchPart} from '../workbench-part.model';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
 import {AsyncPipe, NgComponentOutlet, NgFor, NgIf, NgTemplateOutlet} from '@angular/common';
-import {EmptyIfNullPipe} from '../../empty-if-null.pipe';
+import {EmptyIfNullPipe} from '../../common/empty-if-null.pipe';
 
 @Component({
   selector: 'wb-part-action-bar',

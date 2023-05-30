@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertType} from '../asserts.util';
+import {assertType} from '../common/asserts.util';
 import {Defined} from '@scion/toolkit/util';
 import {UUID} from '@scion/toolkit/uuid';
 

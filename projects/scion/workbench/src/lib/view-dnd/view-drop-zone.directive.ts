@@ -11,7 +11,7 @@
 import {Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output} from '@angular/core';
 import {asapScheduler, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
-import {createElement, ElementCreateOptions, setStyle} from '../dom.util';
+import {createElement, ElementCreateOptions, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {subscribeInside} from '@scion/toolkit/operators';
 

@@ -10,7 +10,7 @@
 
 import {Injectable, OnDestroy} from '@angular/core';
 import {Observable} from 'rxjs';
-import {WorkbenchObjectRegistry} from '../workbench-object-registry';
+import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
 import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 
 /**
