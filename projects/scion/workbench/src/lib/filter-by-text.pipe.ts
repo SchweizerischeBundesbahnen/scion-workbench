@@ -18,7 +18,7 @@ import {Observable, of} from 'rxjs';
 /**
  * Filters items that match the text of the given {@link FormControl}.
  */
-@Pipe({name: 'wbFilterByText$'})
+@Pipe({name: 'wbFilterByText$', standalone: true})
 export class FilterByTextPipe implements PipeTransform {
 
   public transform<T>(items: T[] | null | undefined, filterControl: FormControl<string>, itemTextFn: (item: T) => string | undefined): Observable<T[]> {

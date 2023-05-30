@@ -8,6 +8,7 @@ import {MessageBox} from './message-box';
   selector: 'wb-text-message',
   template: `{{text ?? ''}}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class TextMessageComponent {
 

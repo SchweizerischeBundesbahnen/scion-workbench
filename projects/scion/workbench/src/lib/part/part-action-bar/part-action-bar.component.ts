@@ -14,12 +14,23 @@ import {map} from 'rxjs/operators';
 import {WorkbenchPartAction} from '../../workbench.model';
 import {WorkbenchPart} from '../workbench-part.model';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
+import {AsyncPipe, NgComponentOutlet, NgFor, NgIf, NgTemplateOutlet} from '@angular/common';
+import {EmptyIfNullPipe} from '../../empty-if-null.pipe';
 
 @Component({
   selector: 'wb-part-action-bar',
   templateUrl: './part-action-bar.component.html',
   styleUrls: ['./part-action-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    AsyncPipe,
+    NgTemplateOutlet,
+    NgComponentOutlet,
+    EmptyIfNullPipe,
+  ],
 })
 export class PartActionBarComponent {
 

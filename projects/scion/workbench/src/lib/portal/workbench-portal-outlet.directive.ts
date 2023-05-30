@@ -27,7 +27,7 @@ import {WbComponentPortal} from './wb-component-portal';
  *
  * @see WbComponentPortal
  */
-@Directive({selector: 'ng-template[wbPortalOutlet]'})
+@Directive({selector: 'ng-template[wbPortalOutlet]', standalone: true})
 export class WorkbenchPortalOutletDirective implements OnDestroy {
 
   private _portal: WbComponentPortal | null = null;

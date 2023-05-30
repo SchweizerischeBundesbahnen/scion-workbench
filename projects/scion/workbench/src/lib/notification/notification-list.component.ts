@@ -14,6 +14,9 @@ import {ChangeDetectionStrategy, Component, TrackByFunction} from '@angular/core
 import {NotificationService} from './notification.service';
 import {ɵNotification} from './ɵnotification';
 import {Observable} from 'rxjs';
+import {NotificationComponent} from './notification.component';
+import {AsyncPipe, NgClass, NgFor} from '@angular/common';
+import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
 
 /**
  * Displays notifications on the right side.  Multiple notifications are stacked vertically.
@@ -23,6 +26,14 @@ import {Observable} from 'rxjs';
   templateUrl: './notification-list.component.html',
   styleUrls: ['./notification-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    NgFor,
+    AsyncPipe,
+    NgClass,
+    NotificationComponent,
+    NotificationCssClassesPipe,
+  ],
   animations: [trigger('notification-enter-or-leave', NotificationListComponent.provideAnimation())],
 })
 export class NotificationListComponent {

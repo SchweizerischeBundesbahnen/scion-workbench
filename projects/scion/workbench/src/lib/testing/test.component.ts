@@ -21,8 +21,8 @@ import {NgIf} from '@angular/common';
   template: `
     <main *ngIf="content">{{content}}</main>
     <input *ngIf="withTransientStateInputElement" class="transient-state"/>`,
-  imports: [NgIf],
   standalone: true,
+  imports: [NgIf],
 })
 export default class _TestComponent {
 

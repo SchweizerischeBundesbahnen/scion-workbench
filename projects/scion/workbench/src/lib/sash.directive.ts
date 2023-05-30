@@ -16,9 +16,7 @@ import {first, takeUntil} from 'rxjs/operators';
 /**
  * Provides functionality to sash the host element.
  */
-@Directive({
-  selector: '[wbSash]',
-})
+@Directive({selector: '[wbSash]', standalone: true})
 export class SashDirective implements OnDestroy, OnChanges {
 
   private _destroy$ = new Subject<void>();

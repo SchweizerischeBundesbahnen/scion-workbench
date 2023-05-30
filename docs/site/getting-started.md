@@ -184,15 +184,15 @@ In this step, we will create a component to display the todos. We will use the `
         import {Component} from '@angular/core';
     [+] import {WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
     [+] import {TodoService} from '../todo.service';
-    [+] import {NgForOf} from '@angular/common';
+    [+] import {NgFor} from '@angular/common';
     
         @Component({
           selector: 'app-todos',
           templateUrl: './todos.component.html',
           standalone: true,
           imports: [
+    [+]     NgFor,
     [+]     WorkbenchRouterLinkDirective,
-    [+]     NgForOf,
           ],
         })
     [+] export default class TodosComponent {

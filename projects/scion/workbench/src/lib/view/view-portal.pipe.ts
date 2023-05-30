@@ -16,7 +16,7 @@ import type {ViewComponent} from '../view/view.component';
 /**
  * Resolves the portal for the given view, or throws an error if the view is not registered.
  */
-@Pipe({name: 'wbViewPortal'})
+@Pipe({name: 'wbViewPortal', standalone: true})
 export class ViewPortalPipe implements PipeTransform {
 
   constructor(private _viewRegistry: WorkbenchViewRegistry) {

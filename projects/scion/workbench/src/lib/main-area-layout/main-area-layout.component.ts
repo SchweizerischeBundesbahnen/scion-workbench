@@ -12,6 +12,7 @@ import {Component, HostBinding} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {GridElementComponent} from '../layout/grid-element/grid-element.component';
 
 /**
  * Renders main area layout.
@@ -35,6 +36,8 @@ import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
   selector: 'wb-main-area-layout',
   templateUrl: './main-area-layout.component.html',
   styleUrls: ['./main-area-layout.component.scss'],
+  standalone: true,
+  imports: [GridElementComponent],
 })
 export class MainAreaLayoutComponent {
 

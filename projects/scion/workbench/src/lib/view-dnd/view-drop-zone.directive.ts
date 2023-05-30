@@ -27,9 +27,7 @@ const NULL_BOUNDS: Bounds = null!;
  * The drop zone is aligned with the target's bounds, thus requires the element to define a positioning context.
  * If not positioned, the element is changed to be positioned relative.
  */
-@Directive({
-  selector: '[wbViewDropZone]',
-})
+@Directive({selector: '[wbViewDropZone]', standalone: true})
 export class ViewDropZoneDirective implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();

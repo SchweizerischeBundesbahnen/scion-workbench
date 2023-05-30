@@ -10,7 +10,7 @@
 
 import {ChangeDetectorRef, Component, ElementRef, HostBinding, inject, Injector, NgZone, OnInit} from '@angular/core';
 import {combineLatest, combineLatestWith, EMPTY, from, fromEvent, mergeMap, Observable, Subject, switchMap} from 'rxjs';
-import {WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
+import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {take, takeUntil} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
@@ -18,11 +18,28 @@ import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {Logger, LoggerNames} from '../logging';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {AsyncPipe, NgIf} from '@angular/common';
+import {RouterOutlet} from '@angular/router';
+import {PartBarComponent} from './part-bar/part-bar.component';
+import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
+import {ViewPortalPipe} from '../view/view-portal.pipe';
+import {SciViewportModule} from '@scion/components/viewport';
 
 @Component({
   selector: 'wb-part',
   templateUrl: './part.component.html',
   styleUrls: ['./part.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    AsyncPipe,
+    RouterOutlet,
+    PartBarComponent,
+    ViewDropZoneDirective,
+    WorkbenchPortalOutletDirective,
+    ViewPortalPipe,
+    SciViewportModule,
+  ],
 })
 export class PartComponent implements OnInit {
 

@@ -2986,11 +2986,11 @@ describe('WorkbenchLayout', () => {
       }
     `,
   ],
-  imports: [
-    WorkbenchModule,
-    RouterOutlet,
-  ],
   standalone: true,
+  imports: [
+    RouterOutlet,
+    WorkbenchModule,
+  ],
 })
 class RouterOutletPlusWorkbenchTestFixtureComponent {
 }

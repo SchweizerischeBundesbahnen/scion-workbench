@@ -10,9 +10,10 @@
 
 import {Component, HostBinding, Injector, OnInit, ViewChild} from '@angular/core';
 import {ɵPopup} from './popup.config';
-import {ComponentPortal} from '@angular/cdk/portal';
-import {CdkTrapFocus} from '@angular/cdk/a11y';
+import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
+import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
 import {noop} from 'rxjs';
+import {SciViewportModule} from '@scion/components/viewport';
 
 /**
  * Displays the configured popup component in the popup overlay.
@@ -24,6 +25,12 @@ import {noop} from 'rxjs';
   selector: 'wb-popup',
   templateUrl: './popup.component.html',
   styleUrls: ['./popup.component.scss'],
+  standalone: true,
+  imports: [
+    A11yModule,
+    PortalModule,
+    SciViewportModule,
+  ],
 })
 export class PopupComponent implements OnInit {
 

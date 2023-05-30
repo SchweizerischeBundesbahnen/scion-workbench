@@ -14,7 +14,7 @@ import {CustomMatchers} from './src/custom-matchers';
 const runInCI = !!process.env['CI'];
 const runHeadless = !!process.env['HEADLESS'];
 
-const config: PlaywrightTestConfig = {
+export default {
   forbidOnly: runInCI,
   fullyParallel: true,
   webServer: [
@@ -47,9 +47,7 @@ const config: PlaywrightTestConfig = {
   },
   maxFailures: runInCI ? 1 : undefined,
   testMatch: /.*\.e2e-spec\.js/,
-};
-
-export default config;
+} satisfies PlaywrightTestConfig;
 
 // Install SCION-specific matchers that can be used as expectations.
 CustomMatchers.install();

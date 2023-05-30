@@ -17,11 +17,17 @@ import {mapArray, subscribeInside} from '@scion/toolkit/operators';
 import {combineLatest, Observable, switchMap} from 'rxjs';
 import {debounceTime, map, takeUntil} from 'rxjs/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {AsyncPipe, NgIf} from '@angular/common';
 
 @Component({
   selector: 'wb-view-list-button',
   templateUrl: './view-list-button.component.html',
   styleUrls: ['./view-list-button.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    AsyncPipe,
+  ],
 })
 export class ViewListButtonComponent implements OnDestroy {
 

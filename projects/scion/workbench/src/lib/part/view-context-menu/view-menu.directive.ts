@@ -23,7 +23,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
  *   ...
  * </ng-template>
  */
-@Directive({selector: 'ng-template[wbViewMenuItem]'})
+@Directive({selector: 'ng-template[wbViewMenuItem]', standalone: true})
 export class WorkbenchViewMenuItemDirective implements OnDestroy {
 
   private _menuItemHandle: Disposable;

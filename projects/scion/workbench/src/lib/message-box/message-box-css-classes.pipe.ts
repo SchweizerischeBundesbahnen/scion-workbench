@@ -7,7 +7,7 @@ import {map} from 'rxjs/operators';
  * Collects CSS classes to be applied to the passed message box instance and returns them as
  * array in an Observable.
  */
-@Pipe({name: 'wbMessageBoxCssClasses$'})
+@Pipe({name: 'wbMessageBoxCssClasses$', standalone: true})
 export class MessageBoxCssClassesPipe implements PipeTransform {
 
   public transform(messageBox: ɵMessageBox): Observable<string[]> {

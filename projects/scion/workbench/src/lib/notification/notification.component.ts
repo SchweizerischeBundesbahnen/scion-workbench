@@ -12,8 +12,10 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Inj
 import {asapScheduler, EMPTY, merge, Subject, timer} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
-import {ComponentPortal} from '@angular/cdk/portal';
+import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {Notification} from './notification';
+import {AsyncPipe, NgIf} from '@angular/common';
+import {CoerceObservablePipe} from '../coerce-observable.pipe';
 
 /**
  * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
@@ -24,6 +26,13 @@ import {Notification} from './notification';
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    NgIf,
+    AsyncPipe,
+    PortalModule,
+    CoerceObservablePipe,
+  ],
 })
 export class NotificationComponent implements OnChanges, OnDestroy {
 

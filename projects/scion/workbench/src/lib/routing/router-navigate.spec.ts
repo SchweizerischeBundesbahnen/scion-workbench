@@ -19,6 +19,7 @@ import {advance, clickElement, styleFixture} from '../testing/testing.util';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {WorkbenchComponent} from '../workbench.component';
 import {RouterTestingModule} from '@angular/router/testing';
+import {WorkbenchRouterLinkDirective} from '../routing/workbench-router-link.directive';
 
 /**
  * Test setup:
@@ -312,6 +313,8 @@ describe('Router', () => {
       <li><a wbRouterLink="/feature-a/feature-b/view-2">feature-b/view-2</a></li>
     </ul>
   `,
+  standalone: true,
+  imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureA_EntryComponent {
 }
@@ -330,6 +333,8 @@ class FeatureA_EntryComponent {
       <li><a wbRouterLink="/feature-a/feature-b">/feature-a/feature-b</a></li>
     </ul>
   `,
+  standalone: true,
+  imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureA_View1Component {
 }
@@ -342,6 +347,9 @@ class FeatureA_View1Component {
       <li><a wbRouterLink="../view-1">view-1</a></li>
     </ul>
   `,
+  standalone: true,
+  imports: [WorkbenchRouterLinkDirective,
+  ],
 })
 class FeatureA_View2Component {
 }
@@ -357,7 +365,6 @@ class FeatureA_View2Component {
       {path: 'feature-b', loadChildren: () => FeatureBModule},
     ]),
   ],
-  declarations: [FeatureA_EntryComponent, FeatureA_View1Component, FeatureA_View2Component],
 })
 export class FeatureAModule {
 }
@@ -382,6 +389,8 @@ export class FeatureAModule {
       <li><a wbRouterLink="/feature-a/view-1">/feature-a/view-1</a></li>
     </ul>
   `,
+  standalone: true,
+  imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureB_EntryComponent {
 }
@@ -395,6 +404,8 @@ class FeatureB_EntryComponent {
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
   `,
+  standalone: true,
+  imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureB_View1Component {
 }
@@ -408,6 +419,8 @@ class FeatureB_View1Component {
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
   `,
+  standalone: true,
+  imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureB_View2Component {
 }
@@ -422,7 +435,6 @@ class FeatureB_View2Component {
       {path: 'view-2', component: FeatureB_View2Component},
     ]),
   ],
-  declarations: [FeatureB_EntryComponent, FeatureB_View1Component, FeatureB_View2Component],
 })
 export class FeatureBModule {
 }

@@ -28,10 +28,7 @@ import isPrimaryRouteTarget = RouterUtils.isPrimaryRouteTarget;
  * By default, navigation is relative to the currently activated route, if any.
  * Prepend the path with a forward slash '/' to navigate absolutely, or set `relativeTo` property in navigational extras to `null`.
  */
-@Directive({
-  selector: '[wbRouterLink]',
-  standalone: true,
-})
+@Directive({selector: '[wbRouterLink]', standalone: true})
 export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
 
   private _commands: any[] = [];

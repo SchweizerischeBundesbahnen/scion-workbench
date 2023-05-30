@@ -14,7 +14,7 @@ import {Arrays} from '@scion/toolkit/util';
 /**
  * Filters items that match the given predicate.
  */
-@Pipe({name: 'wbFilterByPredicate'})
+@Pipe({name: 'wbFilterByPredicate', standalone: true})
 export class FilterByPredicatePipe implements PipeTransform {
 
   public transform<T>(items: T[] | null | undefined, predicate: Predicate<T>): T[] {

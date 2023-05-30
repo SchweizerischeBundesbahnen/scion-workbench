@@ -21,7 +21,9 @@ import {AsyncPipe, DatePipe, formatDate, NgIf} from '@angular/common';
   styleUrls: ['./todo.component.scss'],
   standalone: true,
   imports: [
-    AsyncPipe, NgIf, DatePipe,
+    NgIf,
+    AsyncPipe,
+    DatePipe,
   ],
 })
 export default class TodoComponent {

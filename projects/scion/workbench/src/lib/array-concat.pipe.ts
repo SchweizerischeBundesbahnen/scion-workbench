@@ -15,7 +15,7 @@ import {Pipe, PipeTransform} from '@angular/core';
  *
  * Usage: `array | wbConcatArray:array1:array2:array3`
  */
-@Pipe({name: 'wbConcatArray'})
+@Pipe({name: 'wbConcatArray', standalone: true})
 export class ArrayConcatPipe implements PipeTransform {
 
   public transform(input: string[], ...arrays: string[][]): string[] {

@@ -14,9 +14,12 @@ import {ɵMessageBox} from './ɵmessage-box';
 import {asapScheduler, merge, Subject, timer} from 'rxjs';
 import {observeOn, takeUntil} from 'rxjs/operators';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {ComponentPortal} from '@angular/cdk/portal';
-import {MoveDelta} from './move.directive';
+import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
+import {MoveDelta, MoveDirective} from './move.directive';
 import {coerceElement} from '@angular/cdk/coercion';
+import {A11yModule} from '@angular/cdk/a11y';
+import {AsyncPipe, NgFor, NgIf} from '@angular/common';
+import {CoerceObservablePipe} from '../coerce-observable.pipe';
 
 /**
  * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
@@ -27,6 +30,16 @@ import {coerceElement} from '@angular/cdk/coercion';
   templateUrl: './message-box.component.html',
   styleUrls: ['./message-box.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    AsyncPipe,
+    PortalModule,
+    A11yModule,
+    MoveDirective,
+    CoerceObservablePipe,
+  ],
 })
 export class MessageBoxComponent implements OnInit, OnDestroy {
 

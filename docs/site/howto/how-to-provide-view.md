@@ -46,10 +46,9 @@ inject(WorkbenchRouter).navigate(['/path/to/module/path/to/view']);
 ```ts
 // file: module/routes.ts
 
-const routes: Routes = [
+export default [
   {path: 'path/to/view', component: ViewComponent},
-];
-export default routes;
+] satisfies Routes;
 ```
 
 ***

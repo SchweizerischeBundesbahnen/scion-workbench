@@ -75,9 +75,7 @@ describe('MessageBox', () => {
       selector: 'spec-root',
       template: '<router-outlet></router-outlet>',
       standalone: true,
-      imports: [
-        RouterOutlet,
-      ],
+      imports: [RouterOutlet],
     })
     class RootTestComponent {
     }
@@ -87,9 +85,7 @@ describe('MessageBox', () => {
       template: '<wb-workbench></wb-workbench>',
       styles: [':host {display: grid; height: 500px;}'],
       standalone: true,
-      imports: [
-        WorkbenchModule,
-      ],
+      imports: [WorkbenchModule],
     })
     class WorkbenchTestComponent {
     }

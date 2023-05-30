@@ -18,6 +18,10 @@ import {WorkbenchModuleConfig} from './workbench-module-config';
 import {ComponentType} from '@angular/cdk/portal';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
+import {NgComponentOutlet, NgIf} from '@angular/common';
+import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
+import {NotificationListComponent} from './notification/notification-list.component';
+import {MessageBoxStackComponent} from './message-box/message-box-stack.component';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -26,6 +30,14 @@ import {Logger, LoggerNames} from './logging';
   selector: 'wb-workbench',
   templateUrl: './workbench.component.html',
   styleUrls: ['./workbench.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    NgComponentOutlet,
+    WorkbenchLayoutComponent,
+    NotificationListComponent,
+    MessageBoxStackComponent,
+  ],
 })
 export class WorkbenchComponent implements OnDestroy {
 

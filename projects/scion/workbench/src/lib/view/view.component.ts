@@ -12,7 +12,7 @@ import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy
 import {AsyncSubject, combineLatest, EMPTY, fromEvent, Subject} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
-import {SciViewportComponent} from '@scion/components/viewport';
+import {SciViewportComponent, SciViewportModule} from '@scion/components/viewport';
 import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing.constants';
 import {MessageBoxService} from '../message-box/message-box.service';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -24,6 +24,9 @@ import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {WorkbenchNavigationalViewStates} from '../routing/workbench-navigational-states';
 import {RouterUtils} from '../routing/router.util';
+import {A11yModule} from '@angular/cdk/a11y';
+import {ContentProjectionDirective} from '../content-projection/content-projection.directive';
+import {MessageBoxStackComponent} from '../message-box/message-box-stack.component';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -39,6 +42,14 @@ import {RouterUtils} from '../routing/router.util';
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
   providers: [MessageBoxService, PopupService],
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    A11yModule,
+    SciViewportModule,
+    ContentProjectionDirective,
+    MessageBoxStackComponent,
+  ],
 })
 export class ViewComponent implements OnDestroy {
 

@@ -88,11 +88,11 @@ describe('Views', () => {
 /****************************************************************************************************
  * Definition of Feature Module A                                                                   *
  ****************************************************************************************************/
-@Component({template: 'Feature Module A - View 1'})
+@Component({template: 'Feature Module A - View 1', standalone: true})
 class FeatureA_View1_Component {
 }
 
-@Component({template: 'Feature Module A - View 1'})
+@Component({template: 'Feature Module A - View 1', standalone: true})
 class FeatureA_View2_Component {
 }
 
@@ -104,7 +104,6 @@ class FeatureA_View2_Component {
       {path: 'view-2', component: FeatureA_View2_Component},
     ]),
   ],
-  declarations: [FeatureA_View1_Component, FeatureA_View2_Component],
 })
 export class FeatureAModule {
 }
@@ -112,11 +111,11 @@ export class FeatureAModule {
 /****************************************************************************************************
  * Definition of Feature Module b                                                                   *
  ****************************************************************************************************/
-@Component({template: 'Feature Module B - View 1'})
+@Component({template: 'Feature Module B - View 1', standalone: true})
 class FeatureB_View1_Component {
 }
 
-@Component({template: 'Feature Module B - View 1'})
+@Component({template: 'Feature Module B - View 1', standalone: true})
 class FeatureB_View2_Component {
 }
 
@@ -128,7 +127,6 @@ class FeatureB_View2_Component {
       {path: 'view-2', component: FeatureB_View2_Component},
     ]),
   ],
-  declarations: [FeatureB_View1_Component, FeatureB_View2_Component],
 })
 export class FeatureBModule {
 }
