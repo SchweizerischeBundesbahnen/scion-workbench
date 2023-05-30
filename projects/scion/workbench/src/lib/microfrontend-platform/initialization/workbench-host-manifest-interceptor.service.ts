@@ -7,7 +7,7 @@ import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchNotificat
  *
  * @internal
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor {
 
   public intercept(hostManifest: Manifest): void {

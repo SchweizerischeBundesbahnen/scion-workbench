@@ -34,7 +34,7 @@ import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
  * A perspective defines the layout around the main area, which can be switched independently of the main area.
  * There can only be one perspective active at a time.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveService implements WorkbenchInitializer, OnDestroy {
 
   private _destroy$ = new Subject<void>();

@@ -11,38 +11,22 @@
 import {ENVIRONMENT_INITIALIZER, inject, Inject, ModuleWithProviders, NgModule, Optional, SkipSelf} from '@angular/core';
 import {WorkbenchComponent} from './workbench.component';
 import {WorkbenchService} from './workbench.service';
-import {WorkbenchLayoutService} from './layout/workbench-layout.service';
-import {provideWorkbenchRouter} from './routing/workbench-router.service';
 import {WorkbenchRouterLinkDirective} from './routing/workbench-router-link.directive';
-import {WorkbenchViewRegistry} from './view/workbench-view.registry';
 import {WorkbenchUrlObserver} from './routing/workbench-url-observer.service';
 import {WorkbenchModuleConfig} from './workbench-module-config';
 import {WORKBENCH_FORROOT_GUARD} from './workbench.constants';
-import {WorkbenchAuxiliaryRoutesRegistrator} from './routing/workbench-auxiliary-routes-registrator.service';
-import {PopupService} from './popup/popup.service';
 import {WorkbenchPartActionDirective} from './part/part-action-bar/part-action.directive';
-import {WorkbenchPartRegistry} from './part/workbench-part.registry';
 import {WorkbenchViewMenuItemDirective} from './part/view-context-menu/view-menu.directive';
 import {ViewMenuService} from './part/view-context-menu/view-menu.service';
-import {WorkbenchLayoutFactory} from './layout/workbench-layout-factory.service';
 import {ViewMoveHandler} from './view/view-move-handler.service';
-import {ɵWorkbenchService} from './ɵworkbench.service';
-import {WorkbenchLayoutDiffer} from './routing/workbench-layout-differ';
-import {WorkbenchPopupDiffer} from './routing/workbench-popup-differ';
 import {provideWorkbenchMicrofrontendSupport} from './microfrontend-platform/workbench-microfrontend-support';
 import {provideWorkbenchLauncher} from './startup/workbench-launcher.service';
 import {provideLogging} from './logging';
-import {IFRAME_HOST, VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference} from './content-projection/view-container.reference';
-import {WorkbenchViewPreDestroyGuard} from './view/workbench-view-pre-destroy.guard';
-import {ViewDragService} from './view-dnd/view-drag.service';
-import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.service';
 import {WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './startup/workbench-initializer';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
-import {ActivationInstantProvider} from './activation-instant.provider';
-import {WorkbenchPeripheralGridMerger} from './perspective/workbench-peripheral-grid-merger.service';
 import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-storage';
 import {WorkbenchStorageService} from './storage/workbench-storage.service';
-import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
+import {provideLocationPatch} from './routing/ɵlocation';
 
 /**
  * Module of the SCION Workbench.
@@ -98,36 +82,9 @@ export class WorkbenchModule {
     return {
       ngModule: WorkbenchModule,
       providers: [
-        {provide: WorkbenchModuleConfig, useValue: config},
-        ɵWorkbenchService,
         {
-          provide: WorkbenchService, useExisting: ɵWorkbenchService,
-        },
-        WorkbenchPerspectiveService,
-        WorkbenchLayoutService,
-        WorkbenchLayoutDiffer,
-        WorkbenchPopupDiffer,
-        WorkbenchAuxiliaryRoutesRegistrator,
-        WorkbenchUrlObserver,
-        WorkbenchPerspectiveRegistry,
-        WorkbenchViewRegistry,
-        WorkbenchPartRegistry,
-        provideWorkbenchRouter(),
-        PopupService,
-        ActivationInstantProvider,
-        WorkbenchLayoutFactory,
-        ViewMenuService,
-        ViewContainerReference,
-        ViewMoveHandler,
-        WorkbenchViewPreDestroyGuard,
-        ViewDragService,
-        ViewTabDragImageRenderer,
-        WorkbenchPeripheralGridMerger,
-        WorkbenchStorageService,
-        {
-          provide: WORKBENCH_PRE_STARTUP,
-          multi: true,
-          useExisting: WorkbenchStorageService,
+          provide: WorkbenchModuleConfig,
+          useValue: config,
         },
         {
           provide: WorkbenchStorage,
@@ -137,6 +94,11 @@ export class WorkbenchModule {
           provide: WORKBENCH_FORROOT_GUARD,
           useFactory: provideForRootGuard,
           deps: [[WorkbenchService, new Optional(), new SkipSelf()]],
+        },
+        {
+          provide: WORKBENCH_PRE_STARTUP,
+          multi: true,
+          useExisting: WorkbenchStorageService,
         },
         {
           provide: WORKBENCH_STARTUP,
@@ -149,16 +111,8 @@ export class WorkbenchModule {
           multi: true,
         },
         {
-          provide: IFRAME_HOST,
-          useClass: ViewContainerReference,
-        },
-        {
-          provide: VIEW_LOCAL_MESSAGE_BOX_HOST,
-          useClass: ViewContainerReference,
-        },
-        {
           provide: WORKBENCH_POST_STARTUP,
-          useExisting: ViewMoveHandler,
+          useClass: ViewMoveHandler,
           multi: true,
         },
         {
@@ -167,14 +121,17 @@ export class WorkbenchModule {
           useValue: () => inject(WorkbenchUrlObserver),
         },
         provideWorkbenchLauncher(config),
-        provideWorkbenchMicrofrontendSupport(config),
         provideLogging(config),
+        provideLocationPatch(),
+        provideWorkbenchMicrofrontendSupport(config),
       ],
     };
   }
 
   /**
    * To manifest a dependency to the 'workbench.module' from within a feature module.
+   *
+   * @deprecated since version 16.0.0-beta.1; Import {@link WorkbenchModule} or standalone directives directly; API will be removed in version 17.
    */
   public static forChild(): ModuleWithProviders<WorkbenchModule> {
     return {

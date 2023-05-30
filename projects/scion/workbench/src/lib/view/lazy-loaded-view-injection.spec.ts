@@ -103,8 +103,8 @@ describe('Lazily loaded view', () => {
 
 const DI_TOKEN = new InjectionToken<string>('TOKEN');
 
-@Injectable()
-export class FeatureService {
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered only in this test. */)
+class FeatureService {
 }
 
 @Component({template: 'Injected value: {{injectedValue}}', standalone: true})

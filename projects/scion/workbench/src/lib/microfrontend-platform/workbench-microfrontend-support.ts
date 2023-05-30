@@ -9,7 +9,7 @@
  */
 
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
-import {Injectable, Provider} from '@angular/core';
+import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-platform-initializer.service';
 import {APP_IDENTITY, IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup/workbench-initializer';
@@ -30,59 +30,54 @@ import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-vi
 import {MicrofrontendPopupCapabilityInterceptor} from './microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 
 /**
- * Registers a set of DI providers to set up microfrontend support in the workbench.
+ * Provides a set of DI providers to set up microfrontend support in the workbench.
  */
-export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: WorkbenchModuleConfig): Provider[] {
-  // Angular is very strict when compiling module definitions ahead-of-time (if enabled the AOT compilation).
-  // - use ES5 function instead of arrow function to specify the factory
-  // - export functions referenced in module metadata definition
-  // - use ternary check to conditionally provide a provider
-  return [
-    workbenchModuleConfig.microfrontendPlatform ? [
-      {
-        provide: WORKBENCH_STARTUP,
-        useClass: MicrofrontendPlatformInitializer,
-        multi: true,
-      },
-      {
-        provide: MicrofrontendPlatformConfigLoader,
-        useClass: typeof workbenchModuleConfig.microfrontendPlatform === 'function' ? workbenchModuleConfig.microfrontendPlatform : StaticMicrofrontendPlatformConfigLoader,
-      },
-      {
-        provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-        useClass: MicrofrontendViewCommandHandler,
-        multi: true,
-      },
-      {
-        provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-        useClass: MicrofrontendMessageBoxIntentHandler,
-        multi: true,
-      },
-      {
-        provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-        useClass: MicrofrontendNotificationIntentHandler,
-        multi: true,
-      },
-      MicrofrontendViewIntentInterceptor,
-      MicrofrontendPopupIntentInterceptor,
-      MicrofrontendViewCapabilityInterceptor,
-      MicrofrontendPopupCapabilityInterceptor,
-      WorkbenchRouter,
-      WorkbenchPopupService,
-      WorkbenchMessageBoxService,
-      WorkbenchNotificationService,
-      NgZoneObservableDecorator,
-      WorkbenchHostManifestInterceptor,
-      provideMicrofrontendRoutes(),
-      provideMicrofrontendPlatformBeans(),
-    ] : [],
-  ];
+export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: WorkbenchModuleConfig): EnvironmentProviders | [] {
+  if (!workbenchModuleConfig.microfrontendPlatform) {
+    return [];
+  }
+
+  return makeEnvironmentProviders([
+    {
+      provide: WORKBENCH_STARTUP,
+      useClass: MicrofrontendPlatformInitializer,
+      multi: true,
+    },
+    {
+      provide: MicrofrontendPlatformConfigLoader,
+      useClass: typeof workbenchModuleConfig.microfrontendPlatform === 'function' ? workbenchModuleConfig.microfrontendPlatform : StaticMicrofrontendPlatformConfigLoader,
+    },
+    {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useClass: MicrofrontendViewCommandHandler,
+      multi: true,
+    },
+    {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useClass: MicrofrontendMessageBoxIntentHandler,
+      multi: true,
+    },
+    {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useClass: MicrofrontendNotificationIntentHandler,
+      multi: true,
+    },
+    MicrofrontendViewIntentInterceptor,
+    MicrofrontendPopupIntentInterceptor,
+    MicrofrontendViewCapabilityInterceptor,
+    MicrofrontendPopupCapabilityInterceptor,
+    NgZoneObservableDecorator,
+    WorkbenchHostManifestInterceptor,
+    provideMicrofrontendRoutes(),
+    provideMicrofrontendPlatformBeans(),
+    provideWorkbenchClientBeans(),
+  ]);
 }
 
 /**
  * Provides {@link WorkbenchModuleConfig.microfrontendPlatform} config as passed to {@link WorkbenchModule.forRoot}.
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `MicrofrontendPlatformConfigLoader` DI token. */)
 class StaticMicrofrontendPlatformConfigLoader implements MicrofrontendPlatformConfigLoader {
 
   constructor(private _workbenchModuleConfig: WorkbenchModuleConfig) {
@@ -94,35 +89,45 @@ class StaticMicrofrontendPlatformConfigLoader implements MicrofrontendPlatformCo
 }
 
 /**
- * Provides beans of SCION Microfrontend Platform for DI.
+ * Provides beans of @scion/microfrontend-platform for DI.
  */
-function provideMicrofrontendPlatformBeans(): Provider[] {
-  return [
+function provideMicrofrontendPlatformBeans(): EnvironmentProviders {
+  return makeEnvironmentProviders([
     {provide: APP_IDENTITY, useFactory: () => Beans.get(APP_IDENTITY)},
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
     {provide: OutletRouter, useFactory: () => Beans.get(OutletRouter)},
     {provide: ManifestService, useFactory: () => Beans.get(ManifestService)},
     {provide: PlatformPropertyService, useFactory: () => Beans.get(PlatformPropertyService)},
-  ];
+  ]);
 }
 
 /**
- * Provides routes of the microfrontend integration.
+ * Provides beans of @scion/workbench-client for DI.
  */
-function provideMicrofrontendRoutes(): Provider[] {
-  /**
-   * Route for embedding the microfrontend of a view capability.
-   */
+function provideWorkbenchClientBeans(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {provide: WorkbenchRouter, useFactory: () => Beans.get(WorkbenchRouter)},
+    {provide: WorkbenchPopupService, useFactory: () => Beans.get(WorkbenchPopupService)},
+    {provide: WorkbenchMessageBoxService, useFactory: () => Beans.get(WorkbenchMessageBoxService)},
+    {provide: WorkbenchNotificationService, useFactory: () => Beans.get(WorkbenchNotificationService)},
+  ]);
+}
+
+/**
+ * Provides routes used for the integration of microfrontends.
+ */
+function provideMicrofrontendRoutes(): EnvironmentProviders {
+  // Define route for embedding the microfrontend of a view capability.
   const viewMicrofrontendRoute: Route = {
-    /**
+    /*
      * Format: '~;{qualifier}/<viewCapabilityId>;{params}'
      *  - '{qualifier}' as matrix params of the first URL segment (~)
      *  - '{params}' as matrix params of the second URL segment (viewCapabilityId)
      */
     path: `${MicrofrontendViewRoutes.ROUTE_PREFIX}/:${ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID}`,
     component: MicrofrontendViewComponent,
-    /**
+    /*
      * In the microfrontend view integration, parameters can be marked as 'transient'. Transient parameters are not added as matrix
      * parameters to the URL but passed via navigational state to the component by {@link NavigationStateResolver}. The component can
      * access transient params as resolved data via `ActivatedRoute.data[WorkbenchRouteData.state][MicrofrontendNavigationalStates.transientParams]`.
@@ -133,7 +138,7 @@ function provideMicrofrontendRoutes(): Provider[] {
     runGuardsAndResolvers: 'always',
   };
 
-  return [
+  return makeEnvironmentProviders([
     {provide: ROUTES, multi: true, useValue: viewMicrofrontendRoute},
-  ];
+  ]);
 }

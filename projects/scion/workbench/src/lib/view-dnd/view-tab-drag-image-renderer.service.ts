@@ -32,7 +32,7 @@ export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
  * Unlike when using the native drag image support, it allows controlling the drag image position and its size during the drag operation.
  * For instance, allows snapping the view tab into the view tab bar (drop zone) when being dragged over.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ViewTabDragImageRenderer implements OnDestroy {
 
   private _destroy$ = new Subject<void>();

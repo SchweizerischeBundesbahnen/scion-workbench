@@ -22,7 +22,7 @@ import {NotificationService} from '../../notification/notification.service';
  * @see WorkbenchHostManifestInterceptor
  * @see MICROFRONTEND_PLATFORM_POST_STARTUP
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class MicrofrontendNotificationIntentHandler {
 
   constructor(intentClient: IntentClient, notificationService: NotificationService, logger: Logger) {

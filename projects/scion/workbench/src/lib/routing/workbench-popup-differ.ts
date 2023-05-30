@@ -15,7 +15,7 @@ import {POPUP_ID_PREFIX} from '../workbench.constants';
 /**
  * Stateful differ for finding added/removed popups.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchPopupDiffer {
 
   private _popupsDiffer: IterableDiffer<string>;

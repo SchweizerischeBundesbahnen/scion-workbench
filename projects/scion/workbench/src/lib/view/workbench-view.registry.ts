@@ -16,7 +16,7 @@ import {WorkbenchObjectRegistry} from '../workbench-object-registry';
 /**
  * Registry for {@link WorkbenchView} model objects.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchViewRegistry implements OnDestroy {
 
   private _registry = new WorkbenchObjectRegistry<ɵWorkbenchView>({

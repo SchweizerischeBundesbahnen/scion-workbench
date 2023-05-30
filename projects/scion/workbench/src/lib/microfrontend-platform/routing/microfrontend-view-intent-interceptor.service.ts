@@ -24,7 +24,7 @@ import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
  *
  * View intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench. They are not transported to the providing application.
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
 
   constructor(private _workbenchRouter: WorkbenchRouter,

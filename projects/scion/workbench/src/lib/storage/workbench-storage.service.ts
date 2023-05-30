@@ -18,7 +18,7 @@ import {WorkbenchInitializer} from '../startup/workbench-initializer';
 /**
  * Provides API to read/write data from/to {@link WorkbenchStorage}.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchStorageService implements WorkbenchInitializer, OnDestroy {
 
   private _destroy$ = new Subject<void>();

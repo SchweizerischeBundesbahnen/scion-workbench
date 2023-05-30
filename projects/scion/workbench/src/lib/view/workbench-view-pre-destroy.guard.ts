@@ -17,7 +17,7 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 /**
  * Invokes 'WorkbenchViewPreDestroy' lifecycle hook, if applicable.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchViewPreDestroyGuard implements CanDeactivate<any | WorkbenchViewPreDestroy> {
 
   constructor(private _workbenchRouter: WorkbenchRouter) {

@@ -54,7 +54,7 @@ export class WorkbenchTestingModule {
   }
 }
 
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered only if using `WorkbenchTestingModule`. */)
 class SequenceInstantProvider implements ActivationInstantProvider {
 
   private _sequence = 0;

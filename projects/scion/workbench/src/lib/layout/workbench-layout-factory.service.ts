@@ -19,7 +19,7 @@ import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 /**
  * Factory for creating a layout instance.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchLayoutFactory {
 
   private readonly _workbenchAccessor: WorkbenchAccessor;

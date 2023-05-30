@@ -14,6 +14,8 @@ import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction} from './workbench.model
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WorkbenchPart} from './part/workbench-part.model';
+import {Injectable} from '@angular/core';
+import {ɵWorkbenchService} from './ɵworkbench.service';
 
 /**
  * The central class of the SCION Workbench.
@@ -30,6 +32,7 @@ import {WorkbenchPart} from './part/workbench-part.model';
  * are supported. Different perspectives provide a different perspective on the application while sharing
  * the main area. Only one perspective can be active at a time.
  */
+@Injectable({providedIn: 'root', useExisting: ɵWorkbenchService})
 export abstract class WorkbenchService {
 
   /**

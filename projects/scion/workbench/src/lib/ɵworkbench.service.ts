@@ -24,7 +24,7 @@ import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
 import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
 
   /**

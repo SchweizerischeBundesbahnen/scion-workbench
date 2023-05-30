@@ -14,7 +14,7 @@ import {ɵWorkbenchService} from '../ɵworkbench.service';
 /**
  * Updates the workbench layout when the user moves a view.
  */
-@Injectable()
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class ViewMoveHandler implements OnDestroy {
 
   private _destroy$ = new Subject<void>();

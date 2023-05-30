@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, InjectionToken, ViewContainerRef} from '@angular/core';
+import {InjectionToken, ViewContainerRef} from '@angular/core';
 
 /**
  * Handle holding a reference to a DOM location.
  */
-@Injectable()
 export class ViewContainerReference {
 
   private _resolve: ((host: ViewContainerRef) => void) | null = null;
@@ -41,9 +40,15 @@ export class ViewContainerReference {
 /**
  * DI token to inject the DOM location where to insert iframes.
  */
-export const IFRAME_HOST = new InjectionToken<string>('IFRAME_HOST');
+export const IFRAME_HOST = new InjectionToken<ViewContainerReference>('IFRAME_HOST', {
+  providedIn: 'root',
+  factory: () => new ViewContainerReference(),
+});
 
 /**
  * DI token to inject the DOM location where to insert view-modal message boxes.
  */
-export const VIEW_LOCAL_MESSAGE_BOX_HOST = new InjectionToken<string>('VIEW_LOCAL_MESSAGE_BOX_HOST');
+export const VIEW_LOCAL_MESSAGE_BOX_HOST = new InjectionToken<ViewContainerReference>('VIEW_LOCAL_MESSAGE_BOX_HOST', {
+  providedIn: 'root',
+  factory: () => new ViewContainerReference(),
+});

@@ -5,7 +5,7 @@ import {Arrays} from '@scion/toolkit/util';
 /**
  * Registers auxiliary routes for views.
  */
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class WorkbenchAuxiliaryRoutesRegistrator {
 
   constructor(private _router: Router) {
