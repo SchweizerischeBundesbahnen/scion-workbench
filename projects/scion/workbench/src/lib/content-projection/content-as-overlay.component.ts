@@ -9,6 +9,7 @@
  */
 
 import {Component, Input, ViewContainerRef} from '@angular/core';
+import {ContentProjectionDirective} from './content-projection.directive';
 
 /**
  * Structural component which adds its `ng-content` to a top-level workbench DOM element and projects it into this component's bounding box.
@@ -47,6 +48,8 @@ import {Component, Input, ViewContainerRef} from '@angular/core';
   selector: 'wb-content-as-overlay',
   templateUrl: './content-as-overlay.component.html',
   styleUrls: ['./content-as-overlay.component.scss'],
+  standalone: true,
+  imports: [ContentProjectionDirective],
 })
 export class ContentAsOverlayComponent {
 

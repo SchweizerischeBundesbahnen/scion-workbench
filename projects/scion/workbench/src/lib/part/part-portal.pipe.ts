@@ -18,7 +18,7 @@ import {ComponentPortal} from '@angular/cdk/portal';
  * Constructs the portal for the given part in the calling injection context,
  * or throws an error if the part is not registered.
  */
-@Pipe({name: 'wbPartPortal'})
+@Pipe({name: 'wbPartPortal', standalone: true})
 export class PartPortalPipe implements PipeTransform {
 
   constructor(private _partRegistry: WorkbenchPartRegistry, private _injector: Injector) {

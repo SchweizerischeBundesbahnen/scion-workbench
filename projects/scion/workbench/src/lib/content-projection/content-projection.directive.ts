@@ -18,7 +18,7 @@ import {setStyle} from '../dom.util';
 /**
  * Renders a given template as overlay. The template will stick to the bounding box of the host element of this directive.
  */
-@Directive({selector: '[wbContentProjection]'})
+@Directive({selector: '[wbContentProjection]', standalone: true})
 export class ContentProjectionDirective implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();

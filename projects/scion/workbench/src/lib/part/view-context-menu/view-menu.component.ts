@@ -14,6 +14,9 @@ import {fromEvent, Observable, OperatorFunction, Subject} from 'rxjs';
 import {map, takeUntil} from 'rxjs/operators';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {AsyncPipe, KeyValuePipe, NgClass, NgFor} from '@angular/common';
+import {PortalModule} from '@angular/cdk/portal';
+import {WbFormatAcceleratorPipe} from './accelerator-format.pipe';
 
 declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
 
@@ -24,6 +27,15 @@ declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
   selector: 'wb-view-menu',
   templateUrl: './view-menu.component.html',
   styleUrls: ['./view-menu.component.scss'],
+  standalone: true,
+  imports: [
+    NgFor,
+    NgClass,
+    AsyncPipe,
+    KeyValuePipe,
+    PortalModule,
+    WbFormatAcceleratorPipe,
+  ],
 })
 export class ViewMenuComponent implements OnInit, OnDestroy {
 

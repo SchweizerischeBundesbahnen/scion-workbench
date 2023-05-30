@@ -18,9 +18,13 @@ import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../dom.util';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
-import {SciViewportComponent} from '@scion/components/viewport';
+import {SciViewportComponent, SciViewportModule} from '@scion/components/viewport';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
+import {SciDimensionModule} from '@scion/components/dimension';
+import {AsyncPipe, NgFor} from '@angular/common';
+import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
+import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -49,6 +53,16 @@ import {ɵWorkbenchService} from '../../ɵworkbench.service';
   selector: 'wb-part-bar',
   templateUrl: './part-bar.component.html',
   styleUrls: ['./part-bar.component.scss'],
+  standalone: true,
+  imports: [
+    NgFor,
+    AsyncPipe,
+    SciViewportModule,
+    SciDimensionModule,
+    ViewTabComponent,
+    PartActionBarComponent,
+    ViewListButtonComponent,
+  ],
 })
 export class PartBarComponent implements OnInit, OnDestroy {
 

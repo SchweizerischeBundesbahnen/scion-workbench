@@ -107,7 +107,7 @@ const DI_TOKEN = new InjectionToken<string>('TOKEN');
 export class FeatureService {
 }
 
-@Component({template: 'Injected value: {{injectedValue}}'})
+@Component({template: 'Injected value: {{injectedValue}}', standalone: true})
 class Feature_View_Component {
   constructor(@Inject(DI_TOKEN) public injectedValue: string,
               @Optional() public featureService: FeatureService) {
@@ -120,9 +120,6 @@ class Feature_View_Component {
     RouterModule.forChild([
       {path: 'view', component: Feature_View_Component},
     ]),
-  ],
-  declarations: [
-    Feature_View_Component,
   ],
   providers: [
     {provide: DI_TOKEN, useValue: 'child-injector-value'},

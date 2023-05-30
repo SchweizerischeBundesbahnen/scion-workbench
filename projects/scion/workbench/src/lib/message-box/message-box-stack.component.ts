@@ -13,6 +13,9 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {MessageBoxService} from './message-box.service';
 import {ɵMessageBox} from './ɵmessage-box';
 import {Observable} from 'rxjs';
+import {AsyncPipe, NgClass, NgFor} from '@angular/common';
+import {MessageBoxComponent} from './message-box.component';
+import {MessageBoxCssClassesPipe} from './message-box-css-classes.pipe';
 
 /**
  * Stacks message boxes of the current context. Does not include message boxes of parent contexts.
@@ -22,6 +25,14 @@ import {Observable} from 'rxjs';
   templateUrl: './message-box-stack.component.html',
   styleUrls: ['./message-box-stack.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    NgFor,
+    NgClass,
+    AsyncPipe,
+    MessageBoxComponent,
+    MessageBoxCssClassesPipe,
+  ],
   animations: [
     trigger('enter', MessageBoxStackComponent.provideEnterAnimation()),
     trigger('leave', MessageBoxStackComponent.provideLeaveAnimation()),

@@ -148,7 +148,7 @@ describe('WorkbenchRouter', () => {
 /****************************************************************************************************
  * Definition of App Test Module                                                                    *
  ****************************************************************************************************/
-@Component({selector: 'spec-view', template: '{{view.id}}'})
+@Component({selector: 'spec-view', template: '{{view.id}}', standalone: true})
 class ViewComponent {
 
   constructor(public view: WorkbenchView) {

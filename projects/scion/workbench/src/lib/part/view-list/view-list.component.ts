@@ -15,9 +15,15 @@ import {map} from 'rxjs/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {mapArray} from '@scion/toolkit/operators';
-import {FormControl} from '@angular/forms';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
 import {WorkbenchPart} from '../workbench-part.model';
+import {AsyncPipe, NgFor, NgIf} from '@angular/common';
+import {FilterByPredicatePipe} from '../../filter-by-predicate.pipe';
+import {FilterByTextPipe} from '../../filter-by-text.pipe';
+import {EmptyIfNullPipe} from '../../empty-if-null.pipe';
+import {SciViewportModule} from '@scion/components/viewport';
+import {ViewTabComponent} from '../view-tab/view-tab.component';
 
 /**
  * Reference to inputs of {@link ViewListComponent}.
@@ -31,6 +37,19 @@ export const ViewListComponentInputs = {
   templateUrl: './view-list.component.html',
   styleUrls: ['./view-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    AsyncPipe,
+    ReactiveFormsModule,
+    FilterFieldComponent,
+    FilterByPredicatePipe,
+    FilterByTextPipe,
+    EmptyIfNullPipe,
+    ViewTabComponent,
+    SciViewportModule,
+  ],
 })
 export class ViewListComponent implements OnInit {
 

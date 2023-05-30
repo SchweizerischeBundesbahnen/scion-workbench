@@ -13,7 +13,7 @@ import {Pipe, PipeTransform, Type} from '@angular/core';
 /**
  * Tests if the object is of the specified type. If so, returns the object, otherwise returns `null`.
  */
-@Pipe({name: 'wbInstanceof'})
+@Pipe({name: 'wbInstanceof', standalone: true})
 export class InstanceofPipe implements PipeTransform {
 
   public transform<T>(object: any | undefined, type: Type<T>): T | null {

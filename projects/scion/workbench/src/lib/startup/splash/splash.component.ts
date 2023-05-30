@@ -9,6 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {SciThrobberModule} from '@scion/components/throbber';
 
 /**
  * Default splash displayed while starting the workbench.
@@ -18,6 +19,8 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
   templateUrl: './splash.component.html',
   styleUrls: ['./splash.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [SciThrobberModule],
 })
 export class SplashComponent {
 }

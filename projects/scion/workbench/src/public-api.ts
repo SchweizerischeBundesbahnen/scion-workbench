@@ -27,7 +27,6 @@ export {VIEW_TAB_CONTEXT, ViewTabContext} from './lib/workbench.constants';
 export {WorkbenchLauncher, WorkbenchStartup} from './lib/startup/workbench-launcher.service';
 export {WorkbenchInitializer, WORKBENCH_STARTUP, WORKBENCH_PRE_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_POST_STARTUP} from './lib/startup/workbench-initializer';
 export {Disposable} from './lib/disposable';
-export {ContentAsOverlayComponent} from './lib/content-projection/content-as-overlay.component';
 export {PopupService} from './lib/popup/popup.service';
 export {Popup, PopupConfig, CloseStrategy, PopupSize, PopupReferrer} from './lib/popup/popup.config';
 export {Point, TopLeftPoint, TopRightPoint, BottomLeftPoint, BottomRightPoint, PopupOrigin} from './lib/popup/popup.origin';

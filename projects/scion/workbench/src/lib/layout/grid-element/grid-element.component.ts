@@ -13,6 +13,11 @@ import {MPart, MTreeNode} from '../workbench-layout.model';
 import {MAIN_AREA_PART_ID} from '../workbench-layout';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
+import {InstanceofPipe} from '../../instanceof.pipe';
+import {PortalModule} from '@angular/cdk/portal';
+import {PartPortalPipe} from '../../part/part-portal.pipe';
+import {SciSashboxModule} from '@scion/components/sashbox';
+import {NgFor, NgIf} from '@angular/common';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -30,6 +35,15 @@ import {WorkbenchLayoutService} from '../workbench-layout.service';
   selector: 'wb-grid-element',
   templateUrl: './grid-element.component.html',
   styleUrls: ['./grid-element.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    InstanceofPipe,
+    PortalModule,
+    PartPortalPipe,
+    SciSashboxModule,
+  ],
 })
 export class GridElementComponent implements OnChanges {
 

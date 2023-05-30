@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Returns an empty array if the array is `null` or `undefined`.
  */
-@Pipe({name: 'wbEmptyIfNull'})
+@Pipe({name: 'wbEmptyIfNull', standalone: true})
 export class EmptyIfNullPipe implements PipeTransform {
 
   public transform<T>(value: T[] | null | undefined): T[] {

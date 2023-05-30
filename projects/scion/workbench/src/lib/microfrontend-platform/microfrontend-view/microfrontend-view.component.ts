@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
 import {asapScheduler, combineLatest, EMPTY, firstValueFrom, merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
@@ -30,6 +30,8 @@ import {WorkbenchNavigationalViewStates} from '../../routing/workbench-navigatio
 import {MicrofrontendNavigationalStates} from '../routing/microfrontend-navigational-states';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../../routing/routing.constants';
+import {AsyncPipe, NgClass} from '@angular/common';
+import {ContentAsOverlayComponent} from '../../content-projection/content-as-overlay.component';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -38,6 +40,13 @@ import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../../routing/routing.
   selector: 'wb-microfrontend-view',
   styleUrls: ['./microfrontend-view.component.scss'],
   templateUrl: './microfrontend-view.component.html',
+  standalone: true,
+  imports: [
+    NgClass,
+    AsyncPipe,
+    ContentAsOverlayComponent,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
 export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchViewPreDestroy {
 

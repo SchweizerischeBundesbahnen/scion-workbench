@@ -11,11 +11,14 @@
 import {Component, HostBinding, Inject} from '@angular/core';
 import {VIEW_TAB_CONTEXT, ViewTabContext} from '../../workbench.constants';
 import {WorkbenchView} from '../../view/workbench-view.model';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'wb-view-tab-content',
   templateUrl: './view-tab-content.component.html',
   styleUrls: ['./view-tab-content.component.scss'],
+  standalone: true,
+  imports: [NgIf],
 })
 export class ViewTabContentComponent {
 

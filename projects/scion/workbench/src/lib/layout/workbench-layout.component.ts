@@ -13,6 +13,8 @@ import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
+import {GridElementComponent} from './grid-element/grid-element.component';
+import {NgIf} from '@angular/common';
 
 /**
  * Renders the workbench layout.
@@ -46,6 +48,11 @@ import {ɵWorkbenchLayout} from './ɵworkbench-layout';
   selector: 'wb-workbench-layout',
   templateUrl: './workbench-layout.component.html',
   styleUrls: ['./workbench-layout.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    GridElementComponent,
+  ],
 })
 export class WorkbenchLayoutComponent implements OnDestroy {
 

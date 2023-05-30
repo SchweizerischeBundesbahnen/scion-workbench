@@ -18,6 +18,7 @@ export const TEXT = new InjectionToken<string[]>('TEXT');
 @Component({
   selector: 'wb-text',
   template: '{{text}}',
+  standalone: true,
 })
 export class TextComponent {
 

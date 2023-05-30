@@ -35,7 +35,7 @@ import {asapScheduler} from 'rxjs';
  *   </button>
  * </ng-template>
  */
-@Directive({selector: 'ng-template[wbPartAction]'})
+@Directive({selector: 'ng-template[wbPartAction]', standalone: true})
 export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
 
   private _action!: Disposable;
