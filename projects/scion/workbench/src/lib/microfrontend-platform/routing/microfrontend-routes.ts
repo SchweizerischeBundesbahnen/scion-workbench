@@ -14,6 +14,7 @@ import {Qualifier} from '@scion/microfrontend-platform';
 import {Dictionaries, Dictionary} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
+import {RouterUtils} from '../../routing/router.util';
 
 export namespace MicrofrontendViewRoutes {
 
@@ -33,10 +34,20 @@ export namespace MicrofrontendViewRoutes {
    * Note that transient parameters are not part of the URL segments and are only returned if passing a {@link ActivatedRouteSnapshot} object.
    */
   export function parseParams(route: ActivatedRouteSnapshot | UrlSegment[]): MicrofrontendRouteParams {
-    if (!isMicrofrontendRoute(route)) {
+    if (!isMicrofrontendRoute(route) && !isPerspectiveMicrofrontendRoute(route)) {
       throw Error(`[NullMicrofrontendRouteError] Given URL segments do not match a microfrontend route. [segments=${route.toString()}]`);
     }
 
+    if (isPerspectiveMicrofrontendRoute(route)) {
+      return {
+        viewCapabilityId: route.outlet,
+        qualifier: {},
+        urlParams: {},
+        transientParams: {},
+      };
+    }
+
+    route = route as ActivatedRouteSnapshot | UrlSegment[];
     const segments = Array.isArray(route) ? route : route.url;
     return {
       viewCapabilityId: segments[1].path,
@@ -51,7 +62,7 @@ export namespace MicrofrontendViewRoutes {
    *
    * URL params are passed with the URL, transient params via transient state. Transient params do not survive a page reload.
    */
-  export function splitParams(params: Map<string, any> | Dictionary | undefined, viewCapability: WorkbenchViewCapability): {urlParams: Dictionary; transientParams: Dictionary} {
+  export function splitParams(params: Map<string, any> | Dictionary | undefined, viewCapability: WorkbenchViewCapability): { urlParams: Dictionary; transientParams: Dictionary } {
     const transientParamNames = new Set(viewCapability.params?.filter(param => param.transient).map(param => param.name));
 
     return Object.entries(Dictionaries.coerce(params)).reduce((groups, [name, value]) => {
@@ -81,4 +92,12 @@ export interface MicrofrontendRouteParams {
   qualifier: Params;
   urlParams: Params;
   transientParams: Params;
+}
+
+function isPerspectiveMicrofrontendRoute(route: ActivatedRouteSnapshot | UrlSegment[]): route is ActivatedRouteSnapshot {
+  if (Array.isArray(route)) {
+    return false;
+  }
+
+  return !RouterUtils.isPrimaryRouteTarget(route.outlet);
 }

@@ -17,6 +17,7 @@ import {map, switchMap} from 'rxjs/operators';
 import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {merge, Subscription} from 'rxjs';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
+import {RouterUtils} from '../../routing/router.util';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
@@ -146,7 +147,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Tests whether the sender provides the microfrontend displayed in the view.
    */
   private isMicrofrontendProvider(sender: string, view: WorkbenchView): boolean {
-    const viewCapabilityId = MicrofrontendViewRoutes.parseParams(view.urlSegments).viewCapabilityId;
+    const viewCapabilityId = RouterUtils.isPrimaryRouteTarget(view.id) ? MicrofrontendViewRoutes.parseParams(view.urlSegments).viewCapabilityId : view.id;
     const viewCapability = this._viewCapabilities.get(viewCapabilityId);
     if (!viewCapability) {
       this._logger.error(`Unexpected Error: [NullCapabilityError] No view capability for '${viewCapabilityId}' found.`);
