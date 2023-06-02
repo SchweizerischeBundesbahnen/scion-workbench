@@ -38,12 +38,14 @@ function provideViewIntention(): Intention {
 function providePerspectiveIntention(): Intention {
   return {
     type: WorkbenchCapabilities.Perspective,
+    qualifier: {'*': '*'},
   };
 }
 
 function providePerspectiveExtensionIntention(): Intention {
   return {
     type: WorkbenchCapabilities.PerspectiveExtension,
+    qualifier: {'*': '*'},
   };
 }
 

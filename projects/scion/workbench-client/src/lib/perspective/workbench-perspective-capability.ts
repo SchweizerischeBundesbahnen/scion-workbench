@@ -10,27 +10,21 @@
 
 import {Capability} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {Dictionary} from '@scion/toolkit/util';
 
 export interface WorkbenchPerspectiveCapability extends Capability {
   type: WorkbenchCapabilities.Perspective;
 
   properties: {
-    id: string;
-    layout: LayoutDefinition;
-    data: Dictionary;
+    parts: WorkbenchPerspectivePart[];
+    data: {[key: string]: any};
   };
 }
 
-export interface LayoutDefinition {
-  parts: PartDefinition[];
-}
-
-export interface PartDefinition {
+// TODO [mfp-perspective] Consider using another name. Note that this symbol will by exported under @scion/workbench-client.
+export interface WorkbenchPerspectivePart {
   id: string;
   relativeTo?: string;
   align: 'left' | 'right' | 'top' | 'bottom';
   ratio?: number;
-  activate?: boolean;
 }
 

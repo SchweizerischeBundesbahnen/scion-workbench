@@ -8,23 +8,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Capability} from '@scion/microfrontend-platform';
+import {Capability, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 
 export interface WorkbenchPerspectiveExtensionCapability extends Capability {
   type: WorkbenchCapabilities.PerspectiveExtension;
 
   properties: {
-    perspectiveId: string;
-    views: ViewDefinition[];
+    perspective: Qualifier;
+    views: WorkbenchPerspectiveViewExtension[];
   };
 }
 
-export interface ViewDefinition {
-  id: string;
+export interface WorkbenchPerspectiveViewExtension {
+  qualifier: Qualifier;
   partId: string;
   position?: number;
-  activateView?: boolean;
-  activatePart?: boolean;
+  active?: boolean;
 }
 
