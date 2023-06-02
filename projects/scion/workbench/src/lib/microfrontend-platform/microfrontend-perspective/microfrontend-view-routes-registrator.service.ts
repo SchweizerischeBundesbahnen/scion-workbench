@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, IterableChangeRecord, IterableDiffer, IterableDiffers, OnDestroy} from '@angular/core';
+import {Injectable, IterableDiffer, IterableDiffers, OnDestroy} from '@angular/core';
 import {ManifestService} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchViewCapability} from '@scion/workbench-client';
 import {Subject} from 'rxjs';
 import {WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {takeUntil} from 'rxjs/operators';
-import {Router, Routes} from '@angular/router';
+import {Router} from '@angular/router';
 import {MicrofrontendViewComponent} from '../microfrontend-view/microfrontend-view.component';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Registers auxiliary routes for microfrontend view capabilities.
@@ -34,44 +35,32 @@ export class MicrofrontendViewRoutesRegistrator implements WorkbenchInitializer,
 
   public async init(): Promise<void> {
     this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
-      .pipe(
-        takeUntil(this._destroy$),
-      )
+      .pipe(takeUntil(this._destroy$))
       .subscribe(viewCapabilities => {
         this.registerAuxiliaryRoutes(viewCapabilities);
       });
   }
 
   private registerAuxiliaryRoutes(viewCapabilities: WorkbenchViewCapability[]): void {
-    const newRoutes = [...this._router.config];
+    const routes = [...this._router.config];
 
-    this._viewsDiffer.diff(viewCapabilities)?.forEachItem((record: IterableChangeRecord<WorkbenchViewCapability>) => {
-      // removed views
-      if (record.currentIndex === null) {
-        const start = newRoutes.findIndex(route => route.outlet === record.item.metadata!.id && route.path === '');
-        newRoutes.splice(start, 1);
-      }
-
-      // added views
-      if (record.previousIndex === null) {
-        newRoutes.push({
-          path: '',
-          outlet: record.item.metadata!.id,
-          component: MicrofrontendViewComponent,
-        });
-      }
+    const changes = this._viewsDiffer.diff(viewCapabilities);
+    changes?.forEachRemovedItem(({item: viewCapability}) => {
+      Arrays.remove(routes, route => route.outlet === viewCapability.metadata!.id);
     });
-    this.replaceRouterConfig(newRoutes);
-  }
 
-  /**
-   * Replaces the router configuration to install or uninstall auxiliary routes.
-   */
-  private replaceRouterConfig(config: Routes): void {
+    changes?.forEachAddedItem(({item: viewCapability}) => {
+      routes.push({
+        path: '',
+        outlet: viewCapability.metadata!.id,
+        component: MicrofrontendViewComponent,
+      });
+    });
+
     // Note:
     //   - Do not use Router.resetConfig(...) which would destroy any currently routed component because copying all routes
-    const newRoutes: Routes = [...config];
-    this._router.config.splice(0, this._router.config.length, ...newRoutes);
+    // TODO[mfp-perspective] make router util and replace with WorkbenchAuxiliaryRoutesRegistrator
+    this._router.config.splice(0, this._router.config.length, ...routes);
   }
 
   public ngOnDestroy(): void {

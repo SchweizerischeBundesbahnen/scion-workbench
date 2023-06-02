@@ -10,7 +10,7 @@
 
 import {Injectable} from '@angular/core';
 import {ManifestService, QualifierMatcher} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchPerspectiveCapability, WorkbenchPerspectiveExtensionCapability, WorkbenchPerspectivePartCommand, WorkbenchPerspectiveViewCommand} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchPerspectiveCapability, WorkbenchPerspectiveExtensionCapability, WorkbenchPerspectiveViewContribution} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchLayout} from '../../layout/workbench-layout';
@@ -30,9 +30,51 @@ export class MicrofrontendPerspectiveRegistrator implements WorkbenchInitializer
     const perspectives = await this.lookupPerspectiveCapabilities();
 
     // Register contributed perspectives.
-    for (const [perspectiveCapability, extensionCapabilities] of perspectives.entries()) {
-      await this.registerPerspective(perspectiveCapability, extensionCapabilities);
+    for (const [perspectiveCapability, perspectiveExtensionCapabilities] of perspectives.entries()) {
+      await this._workbenchService.registerPerspective({
+        id: perspectiveCapability.metadata!.id,
+        data: perspectiveCapability.properties.data,
+        layout: layout => this.createPerspectiveLayout(layout, perspectiveCapability, perspectiveExtensionCapabilities),
+      });
+
+      this._logger.info('Registered workbench perspective definition', perspectiveCapability.qualifier);
     }
+  }
+
+  private async createPerspectiveLayout(layout: WorkbenchLayout, perspectiveCapability: WorkbenchPerspectiveCapability, perspectiveExtensionCapabilities: WorkbenchPerspectiveExtensionCapability[]): Promise<WorkbenchLayout> {
+    // Add contributed parts to the layout.
+    for (const partContribution of perspectiveCapability.properties.parts) {
+      layout = layout.addPart(partContribution.id, {
+        relativeTo: partContribution.relativeTo,
+        align: partContribution.align,
+        ratio: partContribution.ratio,
+      });
+    }
+
+    // Add contributed views to the layout.
+    for (const perspectiveExtension of perspectiveExtensionCapabilities) {
+      for (const viewContribution of perspectiveExtension.properties.views) {
+        for (const viewId of await this.resolveViewIds(viewContribution, perspectiveExtension.metadata!.appSymbolicName)) {
+          layout = layout.addView(viewId, {
+            partId: viewContribution.partId,
+            position: viewContribution.position,
+            activateView: viewContribution.active,
+          });
+        }
+      }
+    }
+    return layout;
+  }
+
+  private async resolveViewIds(view: WorkbenchPerspectiveViewContribution, providerSymbolicName: string): Promise<string[]> {
+    // TODO [mfp-perspective] Filter views which the provider has a fulfilling intention for, i.e., visible to the provider and having declared a matching intention
+    //                        Idea: this._manifestService.isQualified(app, {for: capabilityId})
+    const viewCapabilities = await firstValueFrom(this._manifestService.lookupCapabilities$({
+      type: WorkbenchCapabilities.View,
+      qualifier: view.qualifier,
+    }));
+
+    return viewCapabilities.map(viewCapability => viewCapability.metadata!.id);
   }
 
   private async lookupPerspectiveCapabilities(): Promise<Map<WorkbenchPerspectiveCapability, WorkbenchPerspectiveExtensionCapability[]>> {
@@ -46,53 +88,6 @@ export class MicrofrontendPerspectiveRegistrator implements WorkbenchInitializer
       result.set(perspectiveCapability, filterExtensionsByPerspective(perspectiveCapability, perspectiveExtensionCapabilities));
     }
     return result;
-  }
-
-  private async registerPerspective(perspective: WorkbenchPerspectiveCapability, extensions: WorkbenchPerspectiveExtensionCapability[]): Promise<void> {
-    const parts = perspective.properties.parts;
-    const views = extensions.flatMap(perspectiveExtensionCapability => perspectiveExtensionCapability.properties.views);
-
-    await this._workbenchService.registerPerspective({
-      id: perspective.metadata!.id,
-      data: perspective.properties.data,
-      layout: layout => this.createPerspectiveLayout(layout, parts, views),
-    });
-
-    this._logger.info('Registered workbench perspective definition', parts, views);
-  }
-
-  private async createPerspectiveLayout(layout: WorkbenchLayout, parts: WorkbenchPerspectivePartCommand[], views: WorkbenchPerspectiveViewCommand[]): Promise<WorkbenchLayout> {
-    // Add contributed parts to the layout.
-    for (const part of parts) {
-      layout = layout.addPart(part.id, {
-        relativeTo: part.relativeTo,
-        align: part.align,
-        ratio: part.ratio,
-      });
-    }
-
-    // Add contributed views to the layout.
-    for (const view of views) {
-      for (const viewId of await this.resolveViewIds(view)) {
-        layout = layout.addView(viewId, {
-          partId: view.partId,
-          position: view.position,
-          activateView: view.active,
-        });
-      }
-    }
-    return layout;
-  }
-
-  private async resolveViewIds(view: WorkbenchPerspectiveViewCommand): Promise<string[]> {
-    // TODO [mfp-perspective] Filter views which the provider has a fulfilling intention for, i.e., visible to the provider and having declared a matching intention
-    //                        Idea: this._manifestService.isQualified(app, {for: capabilityId})
-    const viewCapabilities = await firstValueFrom(this._manifestService.lookupCapabilities$({
-      type: WorkbenchCapabilities.View,
-      qualifier: view.qualifier,
-    }));
-
-    return viewCapabilities.map(viewCapability => viewCapability.metadata!.id);
   }
 }
 
