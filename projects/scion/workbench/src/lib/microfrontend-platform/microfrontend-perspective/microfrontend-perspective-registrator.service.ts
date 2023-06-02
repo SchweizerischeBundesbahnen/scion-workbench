@@ -10,7 +10,7 @@
 
 import {Injectable} from '@angular/core';
 import {ManifestService, QualifierMatcher} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchPerspectiveCapability, WorkbenchPerspectiveExtensionCapability, WorkbenchPerspectivePart, WorkbenchPerspectiveViewExtension} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchPerspectiveCapability, WorkbenchPerspectiveExtensionCapability, WorkbenchPerspectivePartCommand, WorkbenchPerspectiveViewCommand} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchLayout} from '../../layout/workbench-layout';
@@ -61,7 +61,7 @@ export class MicrofrontendPerspectiveRegistrator implements WorkbenchInitializer
     this._logger.info('Registered workbench perspective definition', parts, views);
   }
 
-  private async createPerspectiveLayout(layout: WorkbenchLayout, parts: WorkbenchPerspectivePart[], views: WorkbenchPerspectiveViewExtension[]): Promise<WorkbenchLayout> {
+  private async createPerspectiveLayout(layout: WorkbenchLayout, parts: WorkbenchPerspectivePartCommand[], views: WorkbenchPerspectiveViewCommand[]): Promise<WorkbenchLayout> {
     // Add contributed parts to the layout.
     for (const part of parts) {
       layout = layout.addPart(part.id, {
@@ -84,7 +84,7 @@ export class MicrofrontendPerspectiveRegistrator implements WorkbenchInitializer
     return layout;
   }
 
-  private async resolveViewIds(view: WorkbenchPerspectiveViewExtension): Promise<string[]> {
+  private async resolveViewIds(view: WorkbenchPerspectiveViewCommand): Promise<string[]> {
     // TODO [mfp-perspective] Filter views which the provider has a fulfilling intention for, i.e., visible to the provider and having declared a matching intention
     //                        Idea: this._manifestService.isQualified(app, {for: capabilityId})
     const viewCapabilities = await firstValueFrom(this._manifestService.lookupCapabilities$({
