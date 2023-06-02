@@ -10,6 +10,53 @@
         "path": "activator",
         "readinessTopics": "activator-ready"
       }
+    },
+    {
+      "type": "perspective",
+      "qualifier": {
+        "name": "mfp-poc"
+      },
+      "description": "[mfp-perspective] Contribute perspective capability to workbench host",
+      "private": false,
+      "properties": {
+        "parts": [
+          {
+            "id": "left",
+            "relativeTo": "main-area",
+            "align": "left",
+            "ratio": 0.25
+          },
+          {
+            "id": "bottom",
+            "align": "bottom",
+            "ratio": 0.5
+          }
+        ],
+        "data": {
+          "label": "MFP-Perspective-PoC"
+        }
+      }
+    },
+    {
+      "type": "perspective-extension",
+      "description": "[mfp-perspective] add own microfrontend view capability to own mfp-perspective",
+      "private": false,
+      "properties": {
+        "perspective": {
+          "name": "mfp-poc"
+        },
+        "views": [
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app1"
+            },
+            "partId": "left",
+            "position": 100,
+            "active": false
+          }
+        ]
+      }
     }
   ],
   "intentions": [

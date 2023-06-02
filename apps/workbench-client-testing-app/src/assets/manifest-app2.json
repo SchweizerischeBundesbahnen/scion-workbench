@@ -10,6 +10,27 @@
         "path": "activator",
         "readinessTopics": "activator-ready"
       }
+    },
+    {
+      "type": "perspective-extension",
+      "description": "[mfp-perspective] add own microfrontend view capability to mfp-perspective from app1",
+      "private": false,
+      "properties": {
+        "perspective": {
+          "name": "mfp-poc"
+        },
+        "views": [
+          {
+            "qualifier": {
+              "component": "view",
+              "app": "app2"
+            },
+            "partId": "left",
+            "position": 100,
+            "active": true
+          }
+        ]
+      }
     }
   ],
   "intentions": [
