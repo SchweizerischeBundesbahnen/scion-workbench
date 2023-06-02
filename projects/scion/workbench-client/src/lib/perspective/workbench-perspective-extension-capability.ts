@@ -16,11 +16,11 @@ export interface WorkbenchPerspectiveExtensionCapability extends Capability {
 
   properties: {
     perspective: Qualifier;
-    views: WorkbenchPerspectiveViewExtension[];
+    views: WorkbenchPerspectiveViewCommand[];
   };
 }
 
-export interface WorkbenchPerspectiveViewExtension {
+export interface WorkbenchPerspectiveViewCommand {
   qualifier: Qualifier;
   partId: string;
   position?: number;
