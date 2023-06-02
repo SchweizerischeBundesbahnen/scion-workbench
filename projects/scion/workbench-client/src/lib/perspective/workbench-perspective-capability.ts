@@ -15,13 +15,13 @@ export interface WorkbenchPerspectiveCapability extends Capability {
   type: WorkbenchCapabilities.Perspective;
 
   properties: {
-    parts: WorkbenchPerspectivePartCommand[];
+    parts: WorkbenchPerspectivePartContribution[];
     data: {[key: string]: any};
   };
 }
 
 // TODO [mfp-perspective] Consider using another name. Note that this symbol will by exported under @scion/workbench-client.
-export interface WorkbenchPerspectivePartCommand {
+export interface WorkbenchPerspectivePartContribution {
   id: string;
   relativeTo?: string;
   align: 'left' | 'right' | 'top' | 'bottom';
