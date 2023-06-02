@@ -42,6 +42,23 @@ export const workbenchManifest: Manifest = {
         path: 'host-popup;matrixParam1=:param1;matrixParam2=:component',
       },
     },
+    {
+      type: 'perspective-extension',
+      description: '[mfp-perspective] Contribute devtools view capability to mfp-perspective from app1',
+      properties: {
+        perspective: {
+          name: 'mfp-poc',
+        },
+        views: [
+          {
+            qualifier: {component: 'devtools', vendor: 'scion'},
+            partId: 'bottom',
+            position: 100,
+            active: true,
+          },
+        ],
+      },
+    },
   ],
   intentions: [
     // allow opening test views
