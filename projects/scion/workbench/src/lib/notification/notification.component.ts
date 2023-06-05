@@ -41,7 +41,7 @@ export class NotificationComponent implements OnChanges, OnDestroy {
 
   public portal: ComponentPortal<any> | undefined;
 
-  @Input()
+  @Input({required: true})
   public notification!: ɵNotification;
 
   @Output()

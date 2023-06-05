@@ -29,13 +29,13 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   /**
    * Reference to the view container where to insert the overlay.
    */
-  @Input('wbContentProjectionOverlayHost') // eslint-disable-line @angular-eslint/no-input-rename
+  @Input({alias: 'wbContentProjectionOverlayHost', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
   public overlayHost!: ViewContainerRef | Promise<ViewContainerRef>;
 
   /**
    * Template which to render as overlay. The template will stick to the bounding box of the host element of this directive.
    */
-  @Input('wbContentProjectionContent') // eslint-disable-line @angular-eslint/no-input-rename
+  @Input({alias: 'wbContentProjectionContent', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
   public contentTemplateRef!: TemplateRef<void>;
 
   constructor(host: ElementRef<HTMLElement>, @Optional() private _view: WorkbenchView) {
@@ -43,14 +43,6 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    if (!this.overlayHost) {
-      throw Error('[ContentProjectionError] Missing required overlay host.');
-
-    }
-    if (!this.contentTemplateRef) {
-      throw Error('[ContentProjectionError] Missing required content template.');
-    }
-
     this.createAndProjectEmbeddedView().then();
   }
 

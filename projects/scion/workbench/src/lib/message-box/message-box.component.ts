@@ -63,7 +63,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
   @HostBinding('attr.tabindex')
   public tabindex = -1;
 
-  @Input()
+  @Input({required: true})
   public messageBox!: ɵMessageBox;
 
   @Input()
