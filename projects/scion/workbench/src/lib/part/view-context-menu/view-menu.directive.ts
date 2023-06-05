@@ -34,13 +34,13 @@ export class WorkbenchViewMenuItemDirective implements OnDestroy {
    * Supported modifiers are 'ctrl', 'shift', 'alt' and 'meta'.
    */
   @Input()
-  public accelerator?: string[];
+  public accelerator?: string[] | undefined;
 
   /**
    * Allows grouping menu items of the same group.
    */
   @Input()
-  public group?: string;
+  public group?: string | undefined;
 
   /**
    * Allows disabling the menu item based on a condition.
@@ -52,7 +52,7 @@ export class WorkbenchViewMenuItemDirective implements OnDestroy {
    * Specifies CSS class(es) to be added to the menu item, useful in end-to-end tests for locating the menu item.
    */
   @Input()
-  public cssClass?: string | string[];
+  public cssClass?: string | string[] | undefined;
 
   /**
    * Emits when the user performs the menu action, either by clicking the menu or via keyboard accelerator, if any.

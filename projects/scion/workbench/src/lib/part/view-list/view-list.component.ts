@@ -58,7 +58,7 @@ export class ViewListComponent implements OnInit {
   private _filterFieldComponent!: FilterFieldComponent;
 
   @Input(ViewListComponentInputs.POSITION)
-  public position: 'north' | 'south' | undefined;
+  public position?: 'north' | 'south' | undefined;
 
   @HostBinding('class.south')
   public get isSouthPosition(): boolean {
