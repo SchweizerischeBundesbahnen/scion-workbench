@@ -43,7 +43,7 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
    * Specifies which drop regions to allow. If not specified, all regions are allowed.
    */
   @Input()
-  public wbViewDropZoneRegions?: Region[];
+  public wbViewDropZoneRegions?: Region[] | undefined;
 
   /**
    * Emits upon a view drop action.
