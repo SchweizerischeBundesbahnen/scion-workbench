@@ -39,7 +39,7 @@ export class WorkbenchPortalOutletDirective implements OnDestroy {
     this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => this.detach());
   }
 
-  @Input('wbPortalOutlet') // eslint-disable-line @angular-eslint/no-input-rename
+  @Input({alias: 'wbPortalOutlet', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
   public set portal(portal: WbComponentPortal | null) {
     this.detach();
     this._portal = portal;

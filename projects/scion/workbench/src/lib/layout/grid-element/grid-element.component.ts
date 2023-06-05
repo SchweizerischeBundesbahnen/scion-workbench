@@ -61,7 +61,7 @@ export class GridElementComponent implements OnChanges {
   @HostBinding('attr.data-partid')
   public partId: string | undefined;
 
-  @Input()
+  @Input({required: true})
   public element!: MTreeNode | MPart;
 
   constructor(private _workbenchRouter: WorkbenchRouter, private _workbenchLayoutService: WorkbenchLayoutService) {

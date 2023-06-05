@@ -49,7 +49,7 @@ export class ViewTabComponent implements OnDestroy {
   public view!: ɵWorkbenchView;
   public viewTabContentPortal!: ComponentPortal<any>;
 
-  @Input()
+  @Input({required: true})
   @HostBinding('attr.data-viewid')
   public set viewId(viewId: string) {
     this.view = this._viewRegistry.get(viewId);
