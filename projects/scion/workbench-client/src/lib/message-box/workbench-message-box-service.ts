@@ -31,7 +31,7 @@ import {lastValueFrom} from 'rxjs';
  * - **View-modal:**
  *   A view-modal message box blocks only the view in which it was opened. In contrast to application-modal message boxes, the user
  *   can interact with other views, close them or open new views, or arrange them any other way. A view-modal message box sticks to
- *   its view; that is, it is displayed only when the view is visible. By default, when opening the message box in the context of a
+ *   its view; that is, it is displayed only when the view is visible. By default, if opening the message box in the context of a
  *   view, it is opened as a view-modal message box. When opened outside of a view, setting the modality to 'view' has no effect.
  *
  * The built-in message box supports the display of a plain text message and is available as 'messagebox' capability without a qualifier.

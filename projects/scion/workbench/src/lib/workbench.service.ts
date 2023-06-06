@@ -115,11 +115,11 @@ export abstract class WorkbenchService {
   public abstract closeViews(...viewIds: string[]): Promise<boolean>;
 
   /**
-   * Registers an action which is added to every part.
+   * Registers a part action. Part actions are displayed to the right of the view tabs,
+   * either left- or right-aligned. Actions can be associated with specific view(s),
+   * part(s), and/or an area.
    *
-   * Part actions are displayed next to the opened view tabs.
-   *
-   * @return handle to unregister the action.
+   * @return handle to unregister the part action.
    */
   public abstract registerPartAction(action: WorkbenchPartAction): Disposable;
 

@@ -19,7 +19,7 @@ import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
 @Injectable({providedIn: 'root'})
 export class WorkbenchViewRegistry implements OnDestroy {
 
-  private _registry = new WorkbenchObjectRegistry<ɵWorkbenchView>({
+  private _registry = new WorkbenchObjectRegistry<string, ɵWorkbenchView>({
     keyFn: view => view.id,
     nullObjectErrorFn: viewId => Error(`[NullViewError] View '${viewId}' not found.`),
   });

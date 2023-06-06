@@ -23,9 +23,9 @@ const TITLE = 'title';
 const CSS_CLASS = 'cssClass';
 
 @Component({
-  selector: 'app-route-register-page',
-  templateUrl: './route-register-page.component.html',
-  styleUrls: ['./route-register-page.component.scss'],
+  selector: 'app-register-route-page',
+  templateUrl: './register-route-page.component.html',
+  styleUrls: ['./register-route-page.component.scss'],
   standalone: true,
   imports: [
     NgIf,
@@ -35,7 +35,7 @@ const CSS_CLASS = 'cssClass';
     SciFormFieldModule,
   ],
 })
-export default class RouteRegisterPageComponent {
+export default class RegisterRoutePageComponent {
 
   public readonly PATH = PATH;
   public readonly COMPONENT = COMPONENT;
@@ -45,8 +45,8 @@ export default class RouteRegisterPageComponent {
   public readonly CSS_CLASS = CSS_CLASS;
 
   public readonly componentRefs = new Map<string, () => Promise<DefaultExport<Type<unknown>>>>()
-    .set('view-page', () => import('../view-page/view-page.component'))
-    .set('router-page', () => import('../router-page/router-page.component'));
+    .set('view-page', () => import('../../view-page/view-page.component'))
+    .set('router-page', () => import('../../router-page/router-page.component'));
 
   public form: FormGroup;
 

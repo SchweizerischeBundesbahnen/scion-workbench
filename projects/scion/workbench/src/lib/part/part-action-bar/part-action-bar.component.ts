@@ -8,14 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, Injector, TemplateRef} from '@angular/core';
-import {combineLatest, Observable, OperatorFunction} from 'rxjs';
-import {map} from 'rxjs/operators';
-import {WorkbenchPartAction} from '../../workbench.model';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {WorkbenchPart} from '../workbench-part.model';
-import {ɵWorkbenchService} from '../../ɵworkbench.service';
-import {AsyncPipe, NgComponentOutlet, NgFor, NgIf, NgTemplateOutlet} from '@angular/common';
-import {EmptyIfNullPipe} from '../../common/empty-if-null.pipe';
+import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {PartActionFilterPipe} from './part-action-filter.pipe';
+import {NullIfEmptyPipe} from '../../common/null-if-empty.pipe';
+import {PortalModule} from '@angular/cdk/portal';
 
 @Component({
   selector: 'wb-part-action-bar',
@@ -27,38 +25,14 @@ import {EmptyIfNullPipe} from '../../common/empty-if-null.pipe';
     NgIf,
     NgFor,
     AsyncPipe,
-    NgTemplateOutlet,
-    NgComponentOutlet,
-    EmptyIfNullPipe,
+    NgClass,
+    PortalModule,
+    PartActionFilterPipe,
+    NullIfEmptyPipe,
   ],
 })
 export class PartActionBarComponent {
 
-  public startActions$: Observable<WorkbenchPartAction[]>;
-  public endActions$: Observable<WorkbenchPartAction[]>;
-
-  constructor(private _part: WorkbenchPart, workbenchService: ɵWorkbenchService) {
-    this.startActions$ = combineLatest([this._part.actions$, workbenchService.partActions$, this._part.activeViewId$]).pipe(combineAndFilterPartActions('start'));
-    this.endActions$ = combineLatest([this._part.actions$, workbenchService.partActions$, this._part.activeViewId$]).pipe(combineAndFilterPartActions('end'));
+  constructor(public part: WorkbenchPart) {
   }
-
-  public isTemplate(action: WorkbenchPartAction): boolean {
-    return action.templateOrComponent instanceof TemplateRef;
-  }
-
-  public addPartToInjector(injector: Injector): Injector {
-    return Injector.create({
-      parent: injector,
-      providers: [{provide: WorkbenchPart, useValue: this._part}],
-    });
-  }
-}
-
-function combineAndFilterPartActions(align: 'start' | 'end'): OperatorFunction<[WorkbenchPartAction[], WorkbenchPartAction[], string | null], WorkbenchPartAction[]> {
-  return map(([localActions, globalActions, activeViewId]: [WorkbenchPartAction[], WorkbenchPartAction[], string | null]): WorkbenchPartAction[] => {
-      return [...localActions, ...globalActions]
-        .filter(action => (action.align || 'start') === align)
-        .filter(action => !action.viewId || action.viewId === activeViewId);
-    },
-  );
 }

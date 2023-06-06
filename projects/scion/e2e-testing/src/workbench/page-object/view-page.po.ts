@@ -79,18 +79,18 @@ export class ViewPagePO {
     await this._locator.locator('button.e2e-close').click();
   }
 
-  public async addViewAction(partAction: WorkbenchPartAction, options?: {append?: boolean}): Promise<void> {
+  public async addViewAction(partAction: WorkbenchPartActionDescriptor, options?: {append?: boolean}): Promise<void> {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-part-actions'));
     await accordionPO.expand();
     try {
       const inputLocator = this._locator.locator('input.e2e-part-actions');
       if (options?.append ?? true) {
         const input = await inputLocator.inputValue() || null;
-        const presentActions: WorkbenchPartAction[] = coerceArray(input ? JSON.parse(input) : null);
+        const presentActions: WorkbenchPartActionDescriptor[] = coerceArray(input ? JSON.parse(input) : null);
         await inputLocator.fill(JSON.stringify(presentActions.concat(partAction)));
       }
       else {
-        await inputLocator.fill(JSON.stringify(new Array<WorkbenchPartAction>().concat(partAction)));
+        await inputLocator.fill(JSON.stringify(new Array<WorkbenchPartActionDescriptor>().concat(partAction)));
       }
     }
     finally {
@@ -99,8 +99,8 @@ export class ViewPagePO {
   }
 }
 
-export interface WorkbenchPartAction {
-  icon: string;
+export interface WorkbenchPartActionDescriptor {
+  content: string;
   align?: 'start' | 'end';
   cssClass?: string;
 }

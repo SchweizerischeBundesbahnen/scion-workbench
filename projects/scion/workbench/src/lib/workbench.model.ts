@@ -9,8 +9,7 @@
  */
 
 import {Observable} from 'rxjs';
-import {Injector, TemplateRef} from '@angular/core';
-import {ComponentPortal, ComponentType, TemplatePortal} from '@angular/cdk/portal';
+import {ComponentPortal, Portal, TemplatePortal} from '@angular/cdk/portal';
 import {WorkbenchView} from './view/workbench-view.model';
 
 /**
@@ -29,30 +28,45 @@ export interface WorkbenchViewPreDestroy {
 }
 
 /**
- * Action to be added to an action bar.
+ * Represents an action displayed to the right of the view tabs, either left- or right-aligned.
+ * Actions can be associated with specific view(s), part(s), and/or an area.
  */
-export interface WorkbenchAction {
+export interface WorkbenchPartAction {
   /**
-   * Specifies either a template or a component to render this action.
+   * Specifies the portal to render the action.
+   *
+   * Specify a {@link ComponentPortal} to render a component, or a {@link TemplatePortal} to render a template,
+   * optionally passing an injector to control the injection context.
    */
-  templateOrComponent: TemplateRef<void> | {component: ComponentType<any>; injector: Injector};
-
+  portal: Portal<unknown>;
   /**
-   * Specifies where to place this action.
+   * Specifies where to place this action in the part bar.
    */
   align?: 'start' | 'end';
-}
-
-/**
- * Represents a part action added to the part action bar. Part actions are displayed next to the view tabs.
- */
-export interface WorkbenchPartAction extends WorkbenchAction {
   /**
-   * Sticks this action to given view.
-   *
-   * If set, the action is only visible if the specified view is the active view in the part.
+   * Associates this action with specific target(s).
    */
-  viewId?: string;
+  target?: {
+    /**
+     * Identifies the views(s) to associate this action with.
+     *
+     * If not specified, associates it with any view, or with the contextual view if modeled in the context of a view.
+     * Passing `null` or any other view(s) overrides the contextual view default behavior.
+     */
+    viewId?: string | string[];
+    /**
+     * Identifies the part(s) to associate this action with. If not specified, associates it with any part.
+     */
+    partId?: string | string[];
+    /**
+     * Identifies the area to associate this action with. If not specified, associates it with any area.
+     */
+    area?: 'main' | 'peripheral';
+  };
+  /**
+   * Specifies CSS class(es) to be associated with the action, useful in end-to-end tests for locating it.
+   */
+  cssClass?: string | string[];
 }
 
 /**

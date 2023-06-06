@@ -1,7 +1,7 @@
-<wb-part-bar *ngIf="hasViews || hasActions"></wb-part-bar>
+<wb-part-bar *ngIf="(part.viewIds$ | async)?.length || (part.actions$ | async)?.length"></wb-part-bar>
 
-<div *ngIf="hasViews; else no_views_template" class="active-view" wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)">
-  <ng-template [wbPortalOutlet]="activeViewId$ | async | wbViewPortal"></ng-template>
+<div *ngIf="(part.viewIds$ | async)?.length; else no_views_template" class="active-view" wbViewDropZone (wbViewDropZoneDrop)="onDrop($event)">
+  <ng-template [wbPortalOutlet]="part.activeViewId$ | async | wbViewPortal"></ng-template>
 </div>
 
 <ng-template #no_views_template>

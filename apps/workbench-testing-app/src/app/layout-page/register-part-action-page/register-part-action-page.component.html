@@ -1,0 +1,58 @@
+<form [formGroup]="form" autocomplete="off">
+  <section>
+    <sci-form-field label="Content">
+      <input [formControlName]="CONTENT" class="e2e-content">
+    </sci-form-field>
+
+    <sci-form-field label="Align">
+      <select [formControlName]="ALIGN" class="e2e-align">
+        <option value="">--</option>
+        <option value="start">start</option>
+        <option value="end">end</option>
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="CSS Class(es)">
+      <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+    </sci-form-field>
+  </section>
+
+  <section [formGroupName]="TARGET" class="e2e-target">
+    <header>Target</header>
+
+    <sci-form-field label="View(s)">
+      <input [formControlName]="VIEW" class="e2e-view-id" list="views" placeholder="Separate multiple views by space">
+      <datalist id="views">
+        <option *ngFor="let view of workbenchService.views$ | async" [value]="view.id">{{view.id}}</option>
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Part(s)">
+      <input [formControlName]="PART" class="e2e-part-id" list="parts" placeholder="Separate multiple parts by space">
+      <datalist id="parts">
+        <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Area">
+      <input [formControlName]="AREA" class="e2e-area" list="areas">
+      <datalist id="areas">
+        <option value="">--</option>
+        <option value="main">Main Area</option>
+        <option value="peripheral">Peripheral Area</option>
+      </datalist>
+    </sci-form-field>
+  </section>
+
+  <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register">
+    Register
+  </button>
+</form>
+
+<output class="register-success e2e-register-success" *ngIf="registerError === false">
+  Success
+</output>
+
+<output class="register-error e2e-register-error" *ngIf="registerError">
+  {{registerError}}
+</output>

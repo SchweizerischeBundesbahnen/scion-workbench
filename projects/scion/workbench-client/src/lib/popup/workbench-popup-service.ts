@@ -58,8 +58,8 @@ export class WorkbenchPopupService {
    *
    * By default, the popup will close on focus loss, or when the user hits the escape key.
    *
-   * When opening the popup in the context of a view, the popup is bound to the lifecycle of the view, that is, the popup
-   * is displayed only when the view is active and is closed when the view is closed.
+   * If opening the popup in the context of a view, the popup is bound to the lifecycle of the view, that is, the popup
+   * is displayed only if the view is active and is closed when the view is closed.
    *
    * @param  qualifier - Identifies the popup capability that provides the microfrontend for display as popup.
    * @param  config - Controls popup behavior.

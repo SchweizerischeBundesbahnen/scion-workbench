@@ -27,7 +27,7 @@ export class PartActionPO {
     return this._locator.isVisible();
   }
 
-  public async click(): Promise<void> {
-    return this._locator.click();
+  public locate(selector: string): Locator {
+    return this._locator.locator(selector);
   }
 }

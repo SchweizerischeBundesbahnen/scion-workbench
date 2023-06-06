@@ -196,7 +196,7 @@ export class AppPO {
     if (!await newTabPartActionPO.isPresent()) {
       throw Error('Opening a new view tab requires the part action \'e2e-open-new-tab\' to be present, but it could not be found. Have you disabled the \'showNewTabAction\' feature?');
     }
-    await newTabPartActionPO.click();
+    await newTabPartActionPO.locate('button').click();
     return new StartPagePO(this, await this.activePart.activeView.getViewId());
   }
 

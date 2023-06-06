@@ -64,11 +64,6 @@ export const routes: Routes = [
     loadComponent: () => import('./host-popup-page/host-popup-page.component'),
   },
   {
-    path: 'register-route',
-    loadComponent: () => import('./route-register-page/route-register-page.component'),
-    data: {[WorkbenchRouteData.title]: 'Route Registrator', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-register-route', pinToStartPage: true},
-  },
-  {
     path: 'test-pages',
     loadChildren: () => import('./test-pages/routes'),
   },

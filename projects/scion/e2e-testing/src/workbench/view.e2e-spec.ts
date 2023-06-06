@@ -230,33 +230,6 @@ test.describe('Workbench View', () => {
     ]);
   });
 
-  test('should allow to register view actions', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTabPO1 = viewPagePO1.viewTabPO;
-    await viewPagePO1.addViewAction({icon: 'search', cssClass: 'view-1-search-action'});
-
-    const viewPagePO2 = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTabPO2 = viewPagePO2.viewTabPO;
-    await viewPagePO2.addViewAction({icon: 'settings', cssClass: 'view-2-settings-action'});
-    await viewPagePO2.addViewAction({icon: 'launch', cssClass: 'view-2-launch-action'});
-
-    await viewTabPO1.click();
-    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(true);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
-
-    await viewTabPO2.click();
-    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(true);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(true);
-
-    await appPO.activePart.closeViewTabs();
-    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
-  });
-
   test('should allow to close the view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);

@@ -8,16 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {MPart} from '../layout/workbench-layout.model';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable, switchMap} from 'rxjs';
 import {inject, Injector} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
-import {Disposable} from '../common/disposable';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
+import {WorkbenchPartActionRegistry} from './workbench-part-action.registry';
+import {filterArray} from '@scion/toolkit/operators';
+import {distinctUntilChanged, map} from 'rxjs/operators';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -27,17 +29,19 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
+  private readonly _partActionRegistry = inject(WorkbenchPartActionRegistry);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaLayoutComponent>;
 
   public readonly active$ = new BehaviorSubject<boolean>(false);
   public readonly viewIds$ = new BehaviorSubject<string[]>([]);
-  public readonly actions$ = new BehaviorSubject<WorkbenchPartAction[]>([]);
   public readonly activeViewId$ = new BehaviorSubject<string | null>(null);
+  public readonly actions$: Observable<readonly WorkbenchPartAction[]>;
   public readonly isInMainArea: boolean;
 
   constructor(public readonly id: string, options: {component: ComponentType<PartComponent | MainAreaLayoutComponent>; isInMainArea: boolean}) {
     this._partComponent = options.component;
     this.isInMainArea = options.isInMainArea;
+    this.actions$ = this.observePartActions$();
   }
 
   /**
@@ -84,15 +88,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     return this.activeViewId$.value;
   }
 
-  public registerPartAction(action: WorkbenchPartAction): Disposable {
-    this.actions$.next(this.actions$.value.concat(action));
-    return {
-      dispose: (): void => {
-        this.actions$.next(this.actions$.value.filter(it => it !== action));
-      },
-    };
-  }
-
   /**
    * Makes the associated part the active workbench part.
    *
@@ -129,6 +124,32 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
   public get activationInstant(): number | undefined {
     return this._activationInstant;
+  }
+
+  /**
+   * Emits actions that have contributed to this part and the currently active view.
+   */
+  private observePartActions$(): Observable<WorkbenchPartAction[]> {
+    return this._partActionRegistry.actions$
+      .pipe(
+        switchMap(actions => this.activeViewId$.pipe(map(() => actions))),
+        filterArray((action: WorkbenchPartAction): boolean => {
+          const actionPartId = action.target?.partId;
+          if (actionPartId && !Arrays.coerce(actionPartId).includes(this.id)) {
+            return false;
+          }
+          const actionViewId = action.target?.viewId;
+          if (actionViewId && this.activeViewId && !Arrays.coerce(actionViewId).includes(this.activeViewId)) {
+            return false;
+          }
+          const actionArea = action.target?.area;
+          if (actionArea && actionArea !== (this.isInMainArea ? 'main' : 'peripheral')) {
+            return false;
+          }
+          return true;
+        }),
+        distinctUntilChanged(),
+      );
   }
 
   public destroy(): void {

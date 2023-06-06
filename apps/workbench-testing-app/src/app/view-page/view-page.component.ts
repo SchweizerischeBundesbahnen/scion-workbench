@@ -53,7 +53,7 @@ export default class ViewPageComponent implements OnDestroy {
   private _destroy$ = new Subject<void>();
 
   public uuid = UUID.randomUUID();
-  public partActions$: Observable<PartAction[]>;
+  public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
   public partActionsFormControl = new UntypedFormControl('');
 
   public WorkbenchRouteData = WorkbenchRouteData;
@@ -78,7 +78,7 @@ export default class ViewPageComponent implements OnDestroy {
     view.cssClass = view.cssClasses.concat(route.snapshot.paramMap.get('cssClass') ?? []);
   }
 
-  private parsePartActions(): PartAction[] {
+  private parsePartActions(): WorkbenchPartActionDescriptor[] {
     if (!this.partActionsFormControl.value) {
       return [];
     }
@@ -117,8 +117,8 @@ export default class ViewPageComponent implements OnDestroy {
   }
 }
 
-export interface PartAction {
-  icon: string;
+export interface WorkbenchPartActionDescriptor {
+  content: string;
   align: 'start' | 'end';
   cssClass: string;
 }

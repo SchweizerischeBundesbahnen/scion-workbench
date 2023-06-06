@@ -25,7 +25,7 @@ import {Dictionary} from '@scion/toolkit/util';
  * - **View-modal:**
  *   A view-modal message box blocks only the view in which it was opened. In contrast to application-modal message boxes, the user
  *   can interact with other views, close them or open new views, or arrange them any other way. A view-modal message box sticks to
- *   its view; that is, it is displayed only when the view is visible. By default, when opening the message box in the context of a
+ *   its view; that is, it is displayed only when the view is visible. By default, if opening the message box in the context of a
  *   view, it is opened as a view-modal message box. When opened outside of a view, setting the modality to 'view' has no effect.
  *
  * @category MessageBox
@@ -79,7 +79,7 @@ export interface WorkbenchMessageBoxConfig {
    * - **View-modal:**
    *   A view-modal message box blocks only the view in which it was opened. In contrast to application-modal message boxes, the user
    *   can interact with other views, close them or open new views, or arrange them any other way. A view-modal message box sticks to
-   *   its view; that is, it is displayed only when the view is visible. By default, when opening the message box in the context of a
+   *   its view; that is, it is displayed only when the view is visible. By default, if opening the message box in the context of a
    *   view, it is opened as a view-modal message box. When opened outside of a view, setting the modality to 'view' has no effect.
    */
   modality?: 'application' | 'view';
@@ -101,7 +101,7 @@ export interface WorkbenchMessageBoxConfig {
     /**
      * Allows controlling which view to block when opening a view-modal message box.
      *
-     * By default, when opening the message box in the context of a view, that view is used as the contextual view.
+     * By default, if opening the message box in the context of a view, that view is used as the contextual view.
      */
     viewId?: string;
   };

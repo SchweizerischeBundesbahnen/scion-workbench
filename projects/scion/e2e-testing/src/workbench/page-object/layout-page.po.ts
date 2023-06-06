@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
@@ -39,6 +39,7 @@ export class LayoutPagePO {
   public async addPart(partId: string, relativeTo: ReferencePart, options?: {activate?: boolean}): Promise<void> {
     const locator = this._locator.locator('app-add-part-page');
 
+    await this.viewPO.viewTab.click();
     await this._tabbarPO.selectTab('e2e-add-part');
     await locator.locator('section.e2e-part').locator('input.e2e-part-id').fill(partId);
     await new SciCheckboxPO(locator.locator('section.e2e-part').locator('sci-checkbox.e2e-activate')).toggle(options?.activate ?? false);
@@ -57,6 +58,7 @@ export class LayoutPagePO {
   public async addView(viewId: string, options: {partId: string; position?: number; activateView?: boolean; activatePart?: boolean}): Promise<void> {
     const locator = this._locator.locator('app-add-view-page');
 
+    await this.viewPO.viewTab.click();
     await this._tabbarPO.selectTab('e2e-add-view');
     await locator.locator('section.e2e-view').locator('input.e2e-view-id').fill(viewId);
     await locator.locator('section.e2e-view-options').locator('input.e2e-part-id').fill(options.partId);
@@ -75,6 +77,7 @@ export class LayoutPagePO {
   public async activateView(viewId: string, options?: {activatePart?: boolean}): Promise<void> {
     const locator = this._locator.locator('app-activate-view-page');
 
+    await this.viewPO.viewTab.click();
     await this._tabbarPO.selectTab('e2e-activate-view');
     await locator.locator('section.e2e-view').locator('input.e2e-view-id').fill(viewId);
     await new SciCheckboxPO(locator.locator('section.e2e-view-options').locator('sci-checkbox.e2e-activate-part')).toggle(options?.activatePart ?? false);
@@ -85,5 +88,38 @@ export class LayoutPagePO {
       waitUntilAttached(this._locator.locator('output.e2e-navigate-success')),
       rejectWhenAttached(this._locator.locator('output.e2e-navigate-error')),
     ]);
+  }
+
+  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: string | string[]; partId?: string | string[]; area?: 'main' | 'peripheral'; cssClass?: string | string[]}): Promise<void> {
+    const locator = this._locator.locator('app-register-part-action-page');
+
+    await this.viewPO.viewTab.click();
+    await this._tabbarPO.selectTab('e2e-register-part-action');
+    await locator.locator('section').locator('input.e2e-content').fill(content);
+    await locator.locator('section').locator('select.e2e-align').selectOption(options?.align ?? '');
+    await locator.locator('section').locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
+    await locator.locator('section.e2e-target').locator('input.e2e-view-id').fill(coerceArray(options?.viewId).join(' '));
+    await locator.locator('section.e2e-target').locator('input.e2e-part-id').fill(coerceArray(options?.partId).join(' '));
+    await locator.locator('section.e2e-target').locator('input.e2e-area').fill(options?.area ?? '');
+    await locator.locator('button.e2e-register').click();
+
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    await Promise.race([
+      waitUntilAttached(this._locator.locator('output.e2e-register-success')),
+      rejectWhenAttached(this._locator.locator('output.e2e-register-error')),
+    ]);
+  }
+
+  public async registerRoute(route: {path: string; component: 'view-page' | 'router-page'; outlet?: string}, routeData?: {title?: string; cssClass?: string | string[]}): Promise<void> {
+    const locator = this._locator.locator('app-register-route-page');
+
+    await this._tabbarPO.selectTab('e2e-register-route');
+
+    await locator.locator('input.e2e-path').fill(route.path);
+    await locator.locator('input.e2e-component').fill(route.component);
+    await locator.locator('input.e2e-outlet').fill(route.outlet ?? '');
+    await locator.locator('section.e2e-route-data').locator('input.e2e-title').fill(routeData?.title ?? '');
+    await locator.locator('section.e2e-route-data').locator('input.e2e-css-class').fill(coerceArray(routeData?.cssClass).join(' '));
+    await locator.locator('button.e2e-register').click();
   }
 }

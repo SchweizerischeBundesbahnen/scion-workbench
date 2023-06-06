@@ -65,9 +65,9 @@ export interface WorkbenchPopupConfig {
     /**
      * Specifies the view the popup belongs to.
      *
-     * Binds the popup to the lifecycle of a view so that it displays only when the view is active and closes when the view is closed.
+     * Binds the popup to the lifecycle of a view so that it displays only if the view is active and closes when the view is closed.
      *
-     * By default, when opening the popup in the context of a view, that view is used as the popup's contextual view.
+     * By default, if opening the popup in the context of a view, that view is used as the popup's contextual view.
      * If you set the view id to `null`, the popup will open without referring to the contextual view.
      */
     viewId?: string | null;

@@ -5,13 +5,13 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
-Part actions are displayed to the right of the view tabs, either left- or right-aligned. An action can be any content and is either global, associated with a part, or stick to a view. Global actions are displayed in every part. View actions are displayed only if the view is the active view in the part.
+Part actions are displayed to the right of the view tabs, either left- or right-aligned. A part action can have any content and be associated with specific view(s), part(s), and/or an area. For example, if associated with a view, the action is only displayed when that view is active.
 
-### How to provide an action to a part
-Actions can be modelled in an HTML template or contributed programmatically via `WorkbenchPart` or `WorkbenchService`.
+### How to provide a part action
+Actions can be modelled in an HTML template or contributed programmatically via `WorkbenchService`.
 
-#### Contribute action via HTML template
-Add a `<ng-template>` to an HTML template and decorate it with the `wbPartAction` directive. The template content is used as the action content. The action shares the lifecycle of the template.
+#### Contribute an action via HTML template
+Add a `<ng-template>` to an HTML template and decorate it with the `wbPartAction` directive. The template content is used as the action content. The action shares the lifecycle of the respective component.
 
 ```html
 <ng-template wbPartAction align="end">
@@ -21,25 +21,54 @@ Add a `<ng-template>` to an HTML template and decorate it with the `wbPartAction
 </ng-template>
 ```
 
-If modelled in a view template, the action sticks to that view, i.e., is only displayed if the view is active.
+By default, if modeled in a view template, the action is associated with the view, i.e., it is displayed only if the view is active. To contribute an action to any part, model the action in the body of `wb-workbench` element.
 
-#### Add action to every part
-To add an action to every part, model the action in `app.component.html`, or add it programmatically via `WorkbenchService`. To add it programmatically, inject  `WorkbenchService` and register the action by calling `registerPartAction` and passing the action.
-
-```ts
-const workbenchService = inject(WorkbenchService);
-
-workbenchService.registerPartAction({templateOrComponent: {component: MenuComponent, injector: inject(Injector)}});
+```html
+<wb-workbench>
+  <ng-template wbPartAction align="end">
+    <button [wbRouterLink]="'/path/to/view'">
+      Open View
+    </button>
+  </ng-template>
+</wb-workbench>
 ```
 
-#### Add action to a specific part
-To add an action to a specific part, get a reference to the part to which to add the action. Then register the action by calling `registerPartAction` method and passing the action.
+#### Contribute an action via WorkbenchService
+As an alternative to modeling an action in HTML templates, actions can be contributed programmatically using the `WorkbenchService.registerPartAction` method. The content is specified in the form of a CDK portal, i.e., a component portal or a template portal.
 
 ```ts
 const workbenchService = inject(WorkbenchService);
-const part = workbenchService.getPart('part');
 
-part.registerPartAction({templateOrComponent: {component: MenuComponent, injector: inject(Injector)}});
+workbenchService.registerPartAction({
+  portal: new ComponentPortal(YourComponent),
+  align: 'end',
+});
+```
+
+#### Control where to contribute an action
+Actions can be associated with specific view(s), part(s), and/or an area. By default, if not modeled in the context of a view, an action is contributed to all parts.
+
+```html
+<wb-workbench>
+  <ng-template wbPartAction [part]="['console', 'navigator']">
+    <button [wbRouterLink]="'/path/to/view'">
+      Open View
+    </button>
+  </ng-template>
+</wb-workbench>
+```
+
+Or if registering the action programmatically:
+
+```ts
+const workbenchService = inject(WorkbenchService);
+
+workbenchService.registerPartAction({
+  portal: new ComponentPortal(YourComponent),
+  target: {
+    part: ['console', 'navigator'],
+  },
+});
 ```
 
 [menu-how-to]: /docs/site/howto/how-to.md

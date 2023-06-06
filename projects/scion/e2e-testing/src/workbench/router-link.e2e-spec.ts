@@ -12,7 +12,6 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
-import {RouteRegisterPagePO} from './page-object/router-register-page.po';
 
 test.describe('Workbench RouterLink', () => {
 
@@ -289,8 +288,7 @@ test.describe('Workbench RouterLink', () => {
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPagePO.addPart('left', {relativeTo: 'main-area', align: 'left', ratio: .25});
     await layoutPagePO.addView('router', {partId: 'left', activateView: true});
-    const routeRegisterPagePO = await workbenchNavigator.openInNewTab(RouteRegisterPagePO);
-    await routeRegisterPagePO.registerRoute({path: '', component: 'router-page', outlet: 'router'}, {title: 'Workbench Router'});
+    await layoutPagePO.registerRoute({path: '', component: 'router-page', outlet: 'router'}, {title: 'Workbench Router'});
 
     // Navigate in the router page via router link
     const routerPagePO = new RouterPagePO(appPO, 'router');

@@ -14,8 +14,8 @@
   </button>
 </header>
 <wb-workbench>
-  <ng-template wbPartAction *ngIf="showNewTabAction$ | async">
-    <button [wbRouterLink]="'/start-page'" class="material-icons e2e-open-new-tab" [wbRouterLinkExtras]="{target: 'blank', blankInsertionIndex: 'end'}">
+  <ng-template wbPartAction *ngIf="showNewTabAction$ | async" area="main" cssClass="e2e-open-new-tab">
+    <button [wbRouterLink]="'/start-page'" class="material-icons" [wbRouterLinkExtras]="{target: 'blank', blankInsertionIndex: 'end'}">
       add
     </button>
   </ng-template>

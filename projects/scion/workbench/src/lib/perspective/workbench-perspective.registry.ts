@@ -19,7 +19,7 @@ import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 @Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveRegistry implements OnDestroy {
 
-  private _registry = new WorkbenchObjectRegistry<ɵWorkbenchPerspective>({
+  private _registry = new WorkbenchObjectRegistry<string, ɵWorkbenchPerspective>({
     keyFn: perspective => perspective.id,
     nullObjectErrorFn: perspectiveId => Error(`[NullPerspectiveError] Perspective '${perspectiveId}' not found.`),
   });

@@ -13,10 +13,10 @@ import {ObserveCaptor} from '@scion/toolkit/testing';
 
 describe('WorkbenchObjectRegistry', () => {
 
-  let registry: WorkbenchObjectRegistry<TestObject>;
+  let registry: WorkbenchObjectRegistry<string, TestObject>;
 
   beforeEach(() => {
-    registry = new WorkbenchObjectRegistry<TestObject>({
+    registry = new WorkbenchObjectRegistry<string, TestObject>({
       keyFn: object => object.id,
       nullObjectErrorFn: id => Error(`[NullObjectError] Object '${id}' not found.`),
     });

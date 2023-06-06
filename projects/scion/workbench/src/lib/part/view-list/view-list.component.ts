@@ -21,7 +21,6 @@ import {WorkbenchPart} from '../workbench-part.model';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {FilterByPredicatePipe} from '../../common/filter-by-predicate.pipe';
 import {FilterByTextPipe} from '../../common/filter-by-text.pipe';
-import {EmptyIfNullPipe} from '../../common/empty-if-null.pipe';
 import {SciViewportModule} from '@scion/components/viewport';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 
@@ -46,7 +45,6 @@ export const ViewListComponentInputs = {
     FilterFieldComponent,
     FilterByPredicatePipe,
     FilterByTextPipe,
-    EmptyIfNullPipe,
     ViewTabComponent,
     SciViewportModule,
   ],

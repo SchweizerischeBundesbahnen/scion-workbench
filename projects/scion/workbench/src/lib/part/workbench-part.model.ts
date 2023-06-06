@@ -1,5 +1,4 @@
 import {Observable} from 'rxjs';
-import {Disposable} from '../common/disposable';
 import {WorkbenchPartAction} from '../workbench.model';
 
 /**
@@ -56,18 +55,10 @@ export abstract class WorkbenchPart {
   public abstract readonly viewIds: string[];
 
   /**
-   * Emits the actions of this part.
+   * Emits actions associated with this part.
    *
-   * Upon subscription, emits the current actions, and then each time the actions change. The observable never completes.
+   * Upon subscription, the currently associated actions are emitted, and then emits continuously
+   * when new actions are registered or unregistered. It never completes.
    */
-  public abstract readonly actions$: Observable<WorkbenchPartAction[]>;
-
-  /**
-   * Registers an action with this part.
-   *
-   * Part actions are displayed next to the opened view tabs.
-   *
-   * @return handle to unregister the action.
-   */
-  public abstract registerPartAction(action: WorkbenchPartAction): Disposable;
+  public abstract readonly actions$: Observable<readonly WorkbenchPartAction[]>;
 }
