@@ -1,3 +1,32 @@
+# [15.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.6...15.0.0-beta.7) (2023-06-06)
+
+
+### Features
+
+* **workbench:** enable action contribution to specific part or area ([10b5f6a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/10b5f6a12e9f3d9b2cccacad1061a9c45e3f4fdf))
+
+
+### BREAKING CHANGES
+
+* **workbench:** Programmatic contribution of part actions has changed.
+
+  To migrate:
+  - Specify `Portal` instead of `ComponentRef` or `TemplateRef`.
+  - Replace `WorkbenchPart.registerPartAction` with `WorkbenchService.registerPartAction`.
+
+    ```ts
+    const workbenchService = inject(WorkbenchService);
+    
+    workbenchService.registerPartAction({
+      portal: new ComponentPortal(YourComponent),
+      target: {
+        partId: ['console', 'navigator'],
+      },
+    });
+    ```
+
+
+
 # [15.0.0-beta.6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.5...15.0.0-beta.6) (2023-05-25)
 
 
