@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectorRef, Component, ElementRef, HostBinding, inject, Injector, NgZone, OnInit} from '@angular/core';
-import {combineLatest, combineLatestWith, EMPTY, from, fromEvent, mergeMap, Observable, Subject, switchMap} from 'rxjs';
+import {combineLatestWith, EMPTY, from, fromEvent, mergeMap, Subject, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {take, takeUntil} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
@@ -45,31 +45,27 @@ export class PartComponent implements OnInit {
 
   private _destroy$ = new Subject<void>();
 
-  public hasViews = false;
-  public hasActions = false;
-
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
 
   @HostBinding('attr.data-partid')
   public get partId(): string {
-    return this._part.id;
+    return this.part.id;
   }
 
   @HostBinding('class.active')
   public get isActive(): boolean {
-    return this._part.active;
+    return this.part.active;
   }
 
   constructor(private _workbenchService: ɵWorkbenchService,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewDragService: ViewDragService,
-              private _part: ɵWorkbenchPart,
               private _injector: Injector,
               private _logger: Logger,
-              private _cd: ChangeDetectorRef) {
+              private _cd: ChangeDetectorRef,
+              public part: ɵWorkbenchPart) {
     this._logger.debug(() => `Constructing PartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
-    this.installPropertyResolver();
     this.installPartActivator();
     this.constructInactiveViewComponents();
   }
@@ -95,21 +91,17 @@ export class PartComponent implements OnInit {
       },
       target: {
         appInstanceId: this._workbenchService.appInstanceId,
-        partId: this._part.id,
+        partId: this.part.id,
         region: event.dropRegion,
       },
     });
-  }
-
-  public get activeViewId$(): Observable<string | null> {
-    return this._part.activeViewId$;
   }
 
   /**
    * Constructs view components of inactive views, so they can initialize, e.g., to set the view tab title.
    */
   private constructInactiveViewComponents(): void {
-    this._part.viewIds$
+    this.part.viewIds$
       .pipe(
         mapArray(viewId => this._viewRegistry.get(viewId)),
         filterArray(view => !view.active && !view.portal.isConstructed),
@@ -128,7 +120,7 @@ export class PartComponent implements OnInit {
   private installPartActivator(): void {
     const host = inject(ElementRef).nativeElement;
 
-    this._part.active$
+    this.part.active$
       .pipe(
         // Wait until the zone has stabilized to not activate the part on creation, but only on user interaction.
         // For example, if the view sets the initial focus, the related `focusin` event should not activate the part.
@@ -138,16 +130,7 @@ export class PartComponent implements OnInit {
         takeUntil(this._destroy$),
       )
       .subscribe(() => {
-        this._part.activate();
-      });
-  }
-
-  private installPropertyResolver(): void {
-    combineLatest([this._workbenchService.partActions$, this._part.actions$, this._part.viewIds$])
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(([globalActions, localActions, viewIds]) => {
-        this.hasViews = viewIds.length > 0;
-        this.hasActions = globalActions.length > 0 || localActions.length > 0;
+        this.part.activate();
       });
   }
 

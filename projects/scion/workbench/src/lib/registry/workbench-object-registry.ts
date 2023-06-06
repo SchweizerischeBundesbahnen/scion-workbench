@@ -14,13 +14,13 @@ import {map, startWith} from 'rxjs/operators';
 /**
  * Provides a registry for workbench model objects.
  */
-export class WorkbenchObjectRegistry<T> {
+export class WorkbenchObjectRegistry<KEY, T> {
 
   private readonly _objects = new Array<T>();
-  private readonly _objectsById = new Map<string, T>();
+  private readonly _objectsById = new Map<KEY, T>();
 
-  private readonly _keyFn: (object: T) => string;
-  private readonly _nullObjectErrorFn: (key: string) => Error;
+  private readonly _keyFn: (object: T) => KEY;
+  private readonly _nullObjectErrorFn: (key: KEY) => Error;
   private readonly _change$ = new Subject<void>();
 
   public readonly objects$: Observable<readonly T[]>;
@@ -32,7 +32,7 @@ export class WorkbenchObjectRegistry<T> {
    *        @property keyFn - Function to extract the key of an object.
    *        @property nullObjectErrorFn - Function to provide an error when looking up an object not contained in the registry.
    */
-  constructor(config: {keyFn: (object: T) => string; nullObjectErrorFn: (key: string) => Error}) {
+  constructor(config: {keyFn: (object: T) => KEY; nullObjectErrorFn: (key: KEY) => Error}) {
     this._keyFn = config.keyFn;
     this._nullObjectErrorFn = config.nullObjectErrorFn;
     this.objects$ = this._change$
@@ -56,7 +56,7 @@ export class WorkbenchObjectRegistry<T> {
   /**
    * Unregisters specified object.
    */
-  public unregister(key: string): T | null {
+  public unregister(key: KEY): T | null {
     const object = this._objectsById.get(key);
     if (!object) {
       return null;
@@ -71,9 +71,9 @@ export class WorkbenchObjectRegistry<T> {
   /**
    * Returns the object of the given identity. If not found, by default, throws an error unless setting the `orElseNull` option.
    */
-  public get(key: string): T;
-  public get(key: string, options?: {orElse: null}): T | null;
-  public get(key: string, options?: {orElse: null}): T | null {
+  public get(key: KEY): T;
+  public get(key: KEY, options?: {orElse: null}): T | null;
+  public get(key: KEY, options?: {orElse: null}): T | null {
     const object = this._objectsById.get(key);
     if (!object && !options) {
       throw this._nullObjectErrorFn(key);

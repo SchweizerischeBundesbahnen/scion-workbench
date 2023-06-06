@@ -19,7 +19,7 @@ import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
 @Injectable({providedIn: 'root'})
 export class WorkbenchPartRegistry implements OnDestroy {
 
-  private _registry = new WorkbenchObjectRegistry<ɵWorkbenchPart>({
+  private _registry = new WorkbenchObjectRegistry<string, ɵWorkbenchPart>({
     keyFn: part => part.id,
     nullObjectErrorFn: partId => Error(`[NullPartError] Part '${partId}' not found.`),
   });

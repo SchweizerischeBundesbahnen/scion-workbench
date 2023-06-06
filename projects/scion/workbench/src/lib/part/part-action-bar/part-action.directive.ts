@@ -12,60 +12,90 @@ import {Directive, Input, OnDestroy, OnInit, Optional, TemplateRef} from '@angul
 import {Disposable} from '../../common/disposable';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {WorkbenchPart} from '../workbench-part.model';
-import {asapScheduler} from 'rxjs';
+import {TemplatePortal} from '@angular/cdk/portal';
 
 /**
- * Use this directive to model an action contributed to the part action bar located to the right of the view tabs.
- * The host element of this modelling directive must be a <ng-template>. The action shares the lifecycle of the host element.
+ * Use this directive to model a part action. Part actions are displayed to the right of the view tabs, either left- or
+ * right-aligned. Actions can be associated with specific view(s), part(s), and/or an area.
  *
- * An action is scope aware, that is, if contributed in the context of a view, the action is added to the containing part
- * and is only visible when the view is active.
+ * The host element of this modeling directive must be a <ng-template>. The action shares the lifecycle of the host element.
  *
- * To contribute an action to every part, the action is typically modelled in `app.component.html`.
- *
- * Use the property 'align' to control alignment of the action, either to the left or to the right.
- *
- * ---
- * Usage:
- *
+ * ```html
  * <ng-template wbPartAction>
- *   <button wbRouterLink="/entry-point" class="material-icons" [wbRouterLinkExtras]="{target: 'blank'}">
+ *   <button wbRouterLink="/path/to/view" [wbRouterLinkExtras]="{target: 'blank'}" class="material-icons">
  *     add
  *   </button>
  * </ng-template>
+ * ```
+ *
+ * By default, if modeled in a view template, the action is associated with the view, i.e., it is displayed only
+ * if the view is active. To contribute an action to any view, model the action in the body of `wb-workbench` element.
+ *
+ * ```html
+ * <wb-workbench>
+ *   <button wbRouterLink="/path/to/view" [wbRouterLinkExtras]="{target: 'blank'}" class="material-icons">
+ *     add
+ *   </button>
+ * </wb-workbench>
+ * ```
  */
 @Directive({selector: 'ng-template[wbPartAction]', standalone: true})
 export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
 
-  private _action!: Disposable;
+  private _action: Disposable | undefined;
 
+  /**
+   * Specifies where to place this action in the part bar.
+   */
   @Input()
   public align: 'start' | 'end' = 'start';
 
+  /**
+   * Identifies the views(s) to associate this action with.
+   *
+   * If not specified, associates it with any view, or with the contextual view if modeled in the context of a view.
+   * Passing `null` or any other view(s) overrides the contextual view default behavior.
+   */
+  @Input()
+  public view?: string | string [] | undefined | null;
+
+  /**
+   * Identifies the part(s) to associate this action with. If not specified, associates it with any part.
+   */
+  @Input()
+  public part?: string | string[] | undefined;
+
+  /**
+   * Identifies the area to associate this action with. If not specified, associates it with any area.
+   */
+  @Input()
+  public area?: 'main' | 'peripheral' | undefined;
+
+  /**
+   * Specifies CSS class(es) to be associated with the action, useful in end-to-end tests for locating it.
+   */
+  @Input()
+  public cssClass?: string | string[] | undefined;
+
   constructor(private _template: TemplateRef<void>,
-              @Optional() private _part: WorkbenchPart,
-              @Optional() private _view: WorkbenchView,
-              private _workbenchService: WorkbenchService) {
+              private _workbenchService: WorkbenchService,
+              @Optional() private _view: WorkbenchView) {
   }
 
   public ngOnInit(): void {
-    // Register this action in a subsequent microtask, as the action may be added to a parent component that has already been checked for changes.
-    // Otherwise, Angular would throw an `ExpressionChangedAfterItHasBeenCheckedError`.
-    asapScheduler.schedule(() => {
-      this._action = (this._part || this._workbenchService).registerPartAction({
-        templateOrComponent: this._template,
-        align: this.align,
-        viewId: this._view?.id,
-      });
+    this._action = this._workbenchService.registerPartAction({
+      portal: new TemplatePortal(this._template, null!),
+      align: this.align,
+      target: {
+        viewId: this.view === null ? undefined : (this.view ?? this._view?.id),
+        partId: this.part,
+        area: this.area,
+      },
+      cssClass: this.cssClass,
     });
   }
 
   public ngOnDestroy(): void {
-    // Unregister this action in a subsequent microtask, as the action may be removed from a parent component that has already been checked for changes.
-    // Otherwise, Angular would throw an `ExpressionChangedAfterItHasBeenCheckedError`.
-    if (this._action) {
-      asapScheduler.schedule(() => this._action.dispose());
-    }
+    this._action?.dispose();
   }
 }

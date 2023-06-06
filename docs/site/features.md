@@ -19,7 +19,7 @@ This page gives you an overview of existing and planned workbench features. Deve
 |Perspective|layout|[![][done]](#)|Arrangement of views around the main area. Multiple perspectives are supported. Different perspectives provide a different perspective on the application while sharing the main area. Only one perspective can be active at a time. [#305](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/305).
 |View|layout|[![][done]](#)|Visual component for displaying content stacked or side-by-side in the workbench layout.
 |Multi-Window|layout|[![][done]](#)|Views can be opened in new browser windows.
-|Part Actions|layout|[![][done]](#)|Actions that are displayed in the tabbar of a part. Actions can stick to a view, so they are only visible when the view is active.
+|Part Actions|layout|[![][done]](#)|Actions that are displayed in the tabbar of a part. Actions can stick to a view, so they are only visible if the view is active.
 |View Context Menu|layout|[![][done]](#)|A viewtab has a context menu. By default, the workbench adds some workbench-specific menu items to the context menu, such as for closing other views. Custom menu items can be added to the context menu as well.
 |Persistent Navigation|navigation|[![][done]](#)|The arrangement of the views is added to the browser URL or local storage, enabling persistent navigation.
 |Default Page|layout|[![][done]](#)|The workbench adds a primary router outlet to the main area when no view is open, enabling the display of a start page.

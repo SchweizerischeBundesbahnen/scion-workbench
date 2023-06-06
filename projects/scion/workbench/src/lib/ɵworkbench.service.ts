@@ -23,6 +23,7 @@ import {ɵWorkbenchView} from './view/ɵworkbench-view.model';
 import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
 import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
+import {WorkbenchPartActionRegistry} from './part/workbench-part-action.registry';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -36,12 +37,12 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly parts$: Observable<readonly ɵWorkbenchPart[]>;
   public readonly views$: Observable<readonly ɵWorkbenchView[]>;
 
-  public readonly partActions$ = new BehaviorSubject<WorkbenchPartAction[]>([]);
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
 
   constructor(private _workbenchRouter: WorkbenchRouter,
               private _perspectiveRegistry: WorkbenchPerspectiveRegistry,
               private _partRegistry: WorkbenchPartRegistry,
+              private _partActionRegistry: WorkbenchPartActionRegistry,
               private _viewRegistry: WorkbenchViewRegistry,
               private _perspectiveService: WorkbenchPerspectiveService) {
     this.perspectives$ = this._perspectiveRegistry.perspectives$;
@@ -114,10 +115,7 @@ export class ɵWorkbenchService implements WorkbenchService {
 
   /** @inheritDoc */
   public registerPartAction(action: WorkbenchPartAction): Disposable {
-    this.partActions$.next([...this.partActions$.value, action]);
-    return {
-      dispose: (): void => this.partActions$.next(this.partActions$.value.filter(it => it !== action)),
-    };
+    return this._partActionRegistry.register(action);
   }
 
   /** @inheritDoc */

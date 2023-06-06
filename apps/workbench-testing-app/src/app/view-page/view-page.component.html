@@ -83,7 +83,7 @@
   <ng-template #panel_part_actions>
     <input class="e2e-part-actions"
            [formControl]="partActionsFormControl"
-           placeholder='Enter action(s) as JSON array: [{"icon":"open_in_new","align":"end","cssClass":"e2e-open-in-new"}]'>
+           placeholder='Enter action(s) as JSON array: [{"content":"...","align":"end","cssClass":"e2e-open-in-new"}]'>
   </ng-template>
 </sci-accordion>
 
@@ -97,8 +97,7 @@
 
 <ng-template wbPartAction
              *ngFor="let action of partActions$ | async"
-             [align]="action.align">
-  <button class="material-icons" [ngClass]="action.cssClass">
-    {{action.icon}}
-  </button>
+             [align]="action.align"
+             [cssClass]="action.cssClass">
+  {{action.content}}
 </ng-template>

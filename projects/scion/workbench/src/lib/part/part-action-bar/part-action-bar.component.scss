@@ -3,13 +3,11 @@
   gap: .5em;
 
   > ul {
+    all: unset;
     flex: auto;
-    gap: .5em;
     display: flex;
+    gap: .5em;
     align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
 
     &.start {
       padding-left: .75em;
