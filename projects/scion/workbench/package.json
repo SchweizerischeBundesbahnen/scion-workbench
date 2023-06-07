@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench",
-  "version": "15.0.0-beta.8",
+  "version": "16.0.0-beta.1",
   "description": "SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.",
   "license": "EPL-2.0",
   "private": false,
@@ -20,20 +20,20 @@
     }
   },
   "dependencies": {
-    "tslib": "^2.4.0"
+    "tslib": "^2.5.0"
   },
   "peerDependencies": {
-    "@angular/common": "^15.0.0",
-    "@angular/core": "^15.0.0",
-    "@angular/cdk": "^15.0.0",
-    "@angular/animations": "^15.0.0",
-    "@angular/forms": "^15.0.0",
-    "@angular/router": "^15.0.0",
-    "@scion/components": "^15.0.2",
+    "@angular/common": "^16.0.0",
+    "@angular/core": "^16.0.0",
+    "@angular/cdk": "^16.0.0",
+    "@angular/animations": "^16.0.0",
+    "@angular/forms": "^16.0.0",
+    "@angular/router": "^16.0.0",
+    "@scion/components": "^16.0.0",
     "@scion/toolkit": "^1.4.0",
-    "@scion/microfrontend-platform": "^1.0.0-rc.12",
-    "@scion/workbench-client": "^1.0.0-beta.17",
-    "rxjs": "^7.5.0"
+    "@scion/microfrontend-platform": "^1.0.0",
+    "@scion/workbench-client": "^1.0.0-beta.18",
+    "rxjs": "^7.8.0"
   },
   "peerDependenciesMeta": {
     "@scion/microfrontend-platform": {

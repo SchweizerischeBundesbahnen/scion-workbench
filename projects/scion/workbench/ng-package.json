@@ -5,7 +5,7 @@
     "entryFile": "src/public-api.ts"
   },
   "assets": [
-    "./{!(@scion)/**/,./}_*.scss"
+    "{,!(@scion)/**/}_*.scss"
   ],
   "allowedNonPeerDependencies": [
     "@scion"

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EnvironmentInjector, Injectable, OnDestroy} from '@angular/core';
+import {EnvironmentInjector, Injectable, OnDestroy, runInInjectionContext} from '@angular/core';
 import {Router} from '@angular/router';
 import {WorkbenchNavigation, WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
@@ -90,12 +90,12 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer, OnDest
     if (this._perspectiveRegistry.get(perspectiveId, {orElse: null}) !== null) {
       throw Error(`Failed to register perspective '${perspectiveId}'. Another perspective is already registered under that identity.`);
     }
-    if (definition.canActivate && !(await this._environmentInjector.runInContext(() => definition.canActivate!()))) {
+    if (definition.canActivate && !(await runInInjectionContext(this._environmentInjector, () => definition.canActivate!()))) {
       return;
     }
 
     const storedPerspectiveData: Dictionary<ɵStoredPerspectiveData> | null = this._workbenchStorageService.get(PERSPECTIVES_STORAGE_KEY);
-    const perspective = this._environmentInjector.runInContext(() => new ɵWorkbenchPerspective(definition, storedPerspectiveData?.[perspectiveId]));
+    const perspective = runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchPerspective(definition, storedPerspectiveData?.[perspectiveId]));
     this._perspectiveRegistry.register(perspective);
   }
 
@@ -194,7 +194,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer, OnDest
         return initialPerspective;
       }
       if (typeof initialPerspective === 'function') {
-        return (await this._environmentInjector.runInContext(() => initialPerspective([...this._perspectiveRegistry.perspectives])))?.id;
+        return (await runInInjectionContext(this._environmentInjector, () => initialPerspective([...this._perspectiveRegistry.perspectives])))?.id;
       }
       return undefined;
     })();

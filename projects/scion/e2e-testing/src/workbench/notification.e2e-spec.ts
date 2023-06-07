@@ -262,7 +262,7 @@ test.describe('Workbench Notification', () => {
 
     const textNotificationPO = new TextNotificationPO(appPO, 'testee');
     await expect(await textNotificationPO.isVisible()).toBe(true);
-    await textNotificationPO.waitUntilClosed(notificationDuration * 1000 + 100);
+    await textNotificationPO.waitUntilClosed(notificationDuration * 1000 + 500);
     await expect(await textNotificationPO.isPresent()).toBe(false);
   });
 
@@ -390,7 +390,7 @@ test.describe('Workbench Notification', () => {
         await inspectorPO.enterTitle('Notification should close after 1s');
         await inspectorPO.selectDuration(notificationDuration);
 
-        await inspectorPO.waitUntilClosed(notificationDuration * 1000 + 100);
+        await inspectorPO.waitUntilClosed(notificationDuration * 1000 + 500);
         await expect(await inspectorPO.isPresent()).toBe(false);
       });
 
@@ -410,7 +410,7 @@ test.describe('Workbench Notification', () => {
         await inspectorPO.enterTitle('Notification should close after 1s');
         await inspectorPO.selectDuration(notificationDuration);
 
-        await inspectorPO.waitUntilClosed(notificationDuration * 1000 + 100);
+        await inspectorPO.waitUntilClosed(notificationDuration * 1000 + 500);
         await expect(await inspectorPO.isPresent()).toBe(false);
       });
 

@@ -22,7 +22,7 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
   applications: [
     {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'https://scion-workbench-client-testing-app1.vercel.app/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
     {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'https://scion-workbench-client-testing-app2.vercel.app/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
-    {symbolicName: 'devtools', manifestUrl: 'https://scion-microfrontend-platform-devtools-v1-0-0-rc-12.vercel.app/assets/manifest.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
+    {symbolicName: 'devtools', manifestUrl: 'https://scion-microfrontend-platform-devtools-v1-0-0.vercel.app/assets/manifest.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
   ],
   properties: {
     'workbench-client-testing-app1': {
