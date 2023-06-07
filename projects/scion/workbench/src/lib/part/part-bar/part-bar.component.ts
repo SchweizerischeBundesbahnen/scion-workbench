@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostListener, NgZone, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, DestroyRef, ElementRef, HostListener, NgZone, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {filter, map, mergeMap, startWith, switchMap, take, takeUntil} from 'rxjs/operators';
-import {animationFrameScheduler, BehaviorSubject, combineLatest, from, interval, merge, Observable, Subject} from 'rxjs';
+import {animationFrameScheduler, BehaviorSubject, combineLatest, from, interval, Observable, Subject} from 'rxjs';
 import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
@@ -25,6 +25,7 @@ import {SciDimensionModule} from '@scion/components/dimension';
 import {AsyncPipe, NgFor} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -64,9 +65,8 @@ import {ViewListButtonComponent} from '../view-list-button/view-list-button.comp
     ViewListButtonComponent,
   ],
 })
-export class PartBarComponent implements OnInit, OnDestroy {
+export class PartBarComponent implements OnInit {
 
-  private readonly _destroy$ = new Subject<void>();
   private readonly _host: HTMLElement;
   private readonly _viewportChange$ = new Subject<void>();
   private readonly _viewTabs$ = new BehaviorSubject<ViewTabComponent[]>([]);
@@ -80,7 +80,7 @@ export class PartBarComponent implements OnInit, OnDestroy {
   @ViewChildren(ViewTabComponent)
   public set injectViewTabs(queryList: QueryList<ViewTabComponent>) {
     queryList.changes
-      .pipe(startWith(queryList), takeUntil(this._destroy$))
+      .pipe(startWith(queryList), takeUntilDestroyed(this._destroyRef))
       .subscribe(queryList => this._viewTabs$.next(queryList.toArray()));
   }
 
@@ -123,6 +123,7 @@ export class PartBarComponent implements OnInit, OnDestroy {
               private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
               private _part: ɵWorkbenchPart,
               private _viewDragService: ViewDragService,
+              private _destroyRef: DestroyRef,
               private _zone: NgZone) {
     this._host = host.nativeElement;
   }
@@ -185,7 +186,7 @@ export class PartBarComponent implements OnInit, OnDestroy {
     // When dragging a tab very quickly out of this tabbar, only the `dragstart` event gets fired, but not the `dragenter` event.
     // Therefore, we subscribe to global `dragenter` events and manually invoke `onTabbarDragLeave` to correctly display the tabs and the active view.
     this._viewDragService.viewDrag$(window, {eventType: ['dragenter']})
-      .pipe(take(1), takeUntil(merge(this._dragend$, this._destroy$)))
+      .pipe(take(1), takeUntil(this._dragend$), takeUntilDestroyed(this._destroyRef))
       .subscribe(event => {
         // Check if the user continues dragging over this tabbar.
         // If not, the user has quickly dragged the tab out of the tabbar and we  manually call `onTabbarDragLeave`.
@@ -223,7 +224,7 @@ export class PartBarComponent implements OnInit, OnDestroy {
     // Set the CSS class 'drag-enter' to indicate entering the tabbar.
     setCssClass(this._host, 'drag-enter', 'drag-over');
     this._dragAnimationStable$
-      .pipe(take(1), takeUntil(merge(this._dragenter$, this._destroy$)))
+      .pipe(take(1), takeUntil(this._dragenter$), takeUntilDestroyed(this._destroyRef))
       .subscribe({complete: () => unsetCssClass(this._host, 'drag-enter')});
 
     setCssVariable(this._host, {
@@ -241,7 +242,7 @@ export class PartBarComponent implements OnInit, OnDestroy {
     // Set the CSS class 'drag-leave' to indicate leaving the tabbar.
     setCssClass(this._host, 'drag-leave');
     this._dragAnimationStable$
-      .pipe(take(1), takeUntil(merge(this._dragleave$, this._destroy$)))
+      .pipe(take(1), takeUntil(this._dragleave$), takeUntilDestroyed(this._destroyRef))
       .subscribe({complete: () => unsetCssClass(this._host, 'drag-leave')});
 
     this.unsetDragState({unsetDragSource: false});
@@ -414,7 +415,7 @@ export class PartBarComponent implements OnInit, OnDestroy {
     this._viewTabs$
       .pipe(
         switchMap(viewTabs => combineLatest(viewTabs.map(viewTab => viewTab.view.active$))),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => {
         // There may be no active view in the tabbar, e.g., when dragging the last view out of the tabbar.
@@ -429,7 +430,7 @@ export class PartBarComponent implements OnInit, OnDestroy {
     this._viewportChange$
       .pipe(
         mergeMap(() => from(this._viewTabs)),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(viewTab => {
         viewTab.view.scrolledIntoView = (viewTab.isScrolledIntoView() || viewTab.isDragSource());
@@ -438,7 +439,7 @@ export class PartBarComponent implements OnInit, OnDestroy {
 
   private installViewDragListener(): void {
     this._viewDragService.viewDrag$(this._host)
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((event: DragEvent) => {
         switch (event.type) {
           case 'dragenter':
@@ -455,9 +456,5 @@ export class PartBarComponent implements OnInit, OnDestroy {
             break;
         }
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

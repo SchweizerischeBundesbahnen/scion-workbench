@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EnvironmentInjector, Injectable, OnDestroy, runInInjectionContext} from '@angular/core';
+import {DestroyRef, EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
 import {Router} from '@angular/router';
 import {WorkbenchNavigation, WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
@@ -19,14 +19,13 @@ import {WorkbenchInitializer} from '../startup/workbench-initializer';
 import {Logger} from '../logging/logger';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
-import {Subject} from 'rxjs';
 import {WorkbenchLayoutSerializer} from '../layout/workench-layout-serializer.service';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {takeUntil} from 'rxjs/operators';
 import {WorkbenchStorageService} from '../storage/workbench-storage.service';
 import {Dictionary} from '@scion/toolkit/util';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Provides access to perspectives.
@@ -35,9 +34,7 @@ import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
  * There can only be one perspective active at a time.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchPerspectiveService implements WorkbenchInitializer, OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
   constructor(private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _perspectiveRegistry: WorkbenchPerspectiveRegistry,
@@ -49,6 +46,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer, OnDest
               private _workbenchStorageService: WorkbenchStorageService,
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _workbenchLayoutSerializer: WorkbenchLayoutSerializer,
+              private _destroyRef: DestroyRef,
               workbenchStartup: WorkbenchStartup,
               logger: Logger) {
     workbenchStartup.whenStarted
@@ -231,7 +229,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer, OnDest
    */
   private installStorageSynchronizer(): void {
     this._workbenchLayoutService.layout$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => {
         // Memoize layout and outlets of the active perspective.
         this.memoizeActivePerspectiveLayout();
@@ -251,10 +249,6 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer, OnDest
         this._workbenchStorageService.set(PERSPECTIVES_STORAGE_KEY, storedPerspectiveData);
         this._workbenchStorageService.set(ACTIVE_PERSPECTIVE_ID_STORAGE_KEY, this.getActivePerspective()?.id);
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

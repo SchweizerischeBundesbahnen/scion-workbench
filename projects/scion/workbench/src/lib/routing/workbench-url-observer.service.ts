@@ -9,9 +9,8 @@
 */
 
 import {Event, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
-import {filter, takeUntil} from 'rxjs/operators';
-import {EnvironmentInjector, inject, Injectable, OnDestroy, runInInjectionContext} from '@angular/core';
-import {Subject} from 'rxjs';
+import {filter} from 'rxjs/operators';
+import {EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
 import {WorkbenchAuxiliaryRoutesRegistrator} from './workbench-auxiliary-routes-registrator.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
@@ -33,6 +32,7 @@ import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
 import {RouterUtils} from './router.util';
 import {canDeactivateWorkbenchView} from '../view/workbench-view-pre-destroy.guard';
 import {resolveWorkbenchNavigationState} from './navigation-state.resolver';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -44,9 +44,7 @@ import {resolveWorkbenchNavigationState} from './navigation-state.resolver';
  * - Parses the serialized layout and injects it into {@link WorkbenchLayoutService}.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchUrlObserver implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class WorkbenchUrlObserver {
 
   constructor(private _router: Router,
               private _auxRoutesRegistrator: WorkbenchAuxiliaryRoutesRegistrator,
@@ -310,7 +308,7 @@ export class WorkbenchUrlObserver implements OnDestroy {
     this._router.events
       .pipe(
         filter((event: Event | RouterEvent): event is RouterEvent => event instanceof RouterEvent),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe((event: RouterEvent) => {
         if (event instanceof NavigationStart) {
@@ -329,9 +327,5 @@ export class WorkbenchUrlObserver implements OnDestroy {
           this.onGuardsCheckEnd(event);
         }
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

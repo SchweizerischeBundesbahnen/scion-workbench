@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, OnDestroy} from '@angular/core';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {Component} from '@angular/core';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {GridElementComponent} from './grid-element/grid-element.component';
 import {NgIf} from '@angular/common';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Renders the workbench layout.
@@ -54,21 +53,15 @@ import {NgIf} from '@angular/common';
     GridElementComponent,
   ],
 })
-export class WorkbenchLayoutComponent implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class WorkbenchLayoutComponent {
 
   public layout: ɵWorkbenchLayout | undefined;
 
   constructor(workbenchLayoutService: WorkbenchLayoutService) {
     workbenchLayoutService.layout$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(layout => {
         this.layout = layout;
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

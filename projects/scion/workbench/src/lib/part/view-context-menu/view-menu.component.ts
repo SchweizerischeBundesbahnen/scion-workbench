@@ -8,15 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {Component, DestroyRef, HostListener, OnInit} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
-import {fromEvent, Observable, OperatorFunction, Subject} from 'rxjs';
-import {map, takeUntil} from 'rxjs/operators';
+import {fromEvent, Observable, OperatorFunction} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {AsyncPipe, KeyValuePipe, NgClass, NgFor} from '@angular/common';
 import {PortalModule} from '@angular/cdk/portal';
 import {WbFormatAcceleratorPipe} from './accelerator-format.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
 
@@ -37,18 +38,19 @@ declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
     WbFormatAcceleratorPipe,
   ],
 })
-export class ViewMenuComponent implements OnInit, OnDestroy {
+export class ViewMenuComponent implements OnInit {
 
-  private _destroy$ = new Subject<void>();
   public menuItemGroups$: Observable<MenuItemGroups>;
 
-  constructor(private _overlayRef: OverlayRef, private _view: ɵWorkbenchView) {
+  constructor(private _overlayRef: OverlayRef,
+              private _destroyRef: DestroyRef,
+              private _view: ɵWorkbenchView) {
     this.menuItemGroups$ = this._view.menuItems$.pipe(groupMenuItems());
   }
 
   public ngOnInit(): void {
     fromEvent(this._overlayRef.backdropElement!, 'mousedown')
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.closeContextMenu());
   }
 
@@ -67,10 +69,6 @@ export class ViewMenuComponent implements OnInit, OnDestroy {
 
   private closeContextMenu(): void {
     this._overlayRef.dispose();
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

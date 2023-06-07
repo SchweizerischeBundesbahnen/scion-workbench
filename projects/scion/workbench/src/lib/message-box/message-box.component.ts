@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, HostListener, Injector, Input, OnDestroy, OnInit, QueryList, ViewChildren} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, HostBinding, HostListener, Injector, Input, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {MessageBox, MessageBoxAction} from './message-box';
 import {ɵMessageBox} from './ɵmessage-box';
-import {asapScheduler, merge, Subject, timer} from 'rxjs';
+import {asapScheduler, Subject, timer} from 'rxjs';
 import {observeOn, takeUntil} from 'rxjs/operators';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
@@ -20,6 +20,7 @@ import {coerceElement} from '@angular/cdk/coercion';
 import {A11yModule} from '@angular/cdk/a11y';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
@@ -41,11 +42,10 @@ import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
     CoerceObservablePipe,
   ],
 })
-export class MessageBoxComponent implements OnInit, OnDestroy {
+export class MessageBoxComponent implements OnInit {
 
   private _accDeltaX = 0;
   private _accDeltaY = 0;
-  private _destroy$ = new Subject<void>();
   private _cancelBlinkTimer$ = new Subject<void>();
   private _activeActionButton: HTMLElement | undefined;
 
@@ -76,6 +76,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
 
   constructor(private _injector: Injector,
               private _cd: ChangeDetectorRef,
+              private _destroyRef: DestroyRef,
               private _workbenchLayoutService: WorkbenchLayoutService) {
   }
 
@@ -141,7 +142,10 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
     this._cd.markForCheck();
 
     timer(500)
-      .pipe(takeUntil(merge(this._cancelBlinkTimer$, this._destroy$)))
+      .pipe(
+        takeUntil(this._cancelBlinkTimer$),
+        takeUntilDestroyed(this._destroyRef),
+      )
       .subscribe(() => {
         this.blinking = false;
         this._cd.markForCheck();
@@ -150,7 +154,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
 
   private installBlinkRequestHandler(): void {
     this.messageBox.blink$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.blink());
   }
 
@@ -158,7 +162,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
     this.messageBox.requestFocus$
       .pipe(
         observeOn(asapScheduler), // ensures the message box to be displayed
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => {
         coerceElement(this._activeActionButton || this.actionButtons.first)?.focus();
@@ -174,9 +178,5 @@ export class MessageBoxComponent implements OnInit, OnDestroy {
 
   public onActionButtonFocus(actionButton: HTMLButtonElement): void {
     this._activeActionButton = actionButton;
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

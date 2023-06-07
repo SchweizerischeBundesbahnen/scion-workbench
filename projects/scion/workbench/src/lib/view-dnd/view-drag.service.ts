@@ -9,12 +9,13 @@
  */
 
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
-import {EMPTY, fromEvent, merge, Observable, Observer, of, Subject, TeardownLogic, zip} from 'rxjs';
-import {filter, map, take, takeUntil} from 'rxjs/operators';
+import {EMPTY, fromEvent, merge, Observable, Observer, of, TeardownLogic, zip} from 'rxjs';
+import {filter, map, take} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Events fired during view drag and drop operation.
@@ -40,8 +41,6 @@ export class ViewDragService implements OnDestroy {
   private _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
   private _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
 
-  private _destroy$ = new Subject<void>();
-
   /**
    * Emits when the user starts dragging a viewtab. The event is received across app instances of the same origin.
    */
@@ -59,12 +58,12 @@ export class ViewDragService implements OnDestroy {
 
   constructor(private _zone: NgZone) {
     this.viewDragStart$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(viewDragData => {
         this._viewDragData = viewDragData;
       });
     this.viewDragEnd$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(() => {
         this._viewDragData = null;
       });
@@ -214,7 +213,6 @@ export class ViewDragService implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._destroy$.next();
     this._viewMoveBroadcastChannel.destroy();
     this._viewDragStartBroadcastChannel.destroy();
     this._viewDragEndBroadcastChannel.destroy();

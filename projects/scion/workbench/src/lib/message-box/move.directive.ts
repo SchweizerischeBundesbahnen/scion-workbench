@@ -8,18 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, EventEmitter, HostBinding, HostListener, Inject, OnDestroy, Output} from '@angular/core';
-import {fromEvent, Subject} from 'rxjs';
+import {DestroyRef, Directive, EventEmitter, HostBinding, HostListener, Inject, Output} from '@angular/core';
+import {fromEvent} from 'rxjs';
 import {DOCUMENT} from '@angular/common';
-import {first, takeUntil} from 'rxjs/operators';
+import {first} from 'rxjs/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Allows moving the host element while holding down the primary mouse button, e.g. to move a message box.
  */
 @Directive({selector: '[wbMove]', standalone: true})
-export class MoveDirective implements OnDestroy {
+export class MoveDirective {
 
-  private _destroy$ = new Subject<void>();
   private _x = 0;
   private _y = 0;
 
@@ -35,7 +35,7 @@ export class MoveDirective implements OnDestroy {
   @HostBinding('style.cursor')
   public cursor = 'move';
 
-  constructor(@Inject(DOCUMENT) private _document: Document) {
+  constructor(@Inject(DOCUMENT) private _document: Document, private _destroyRef: DestroyRef) {
   }
 
   @HostListener('mousedown', ['$event'])
@@ -54,7 +54,7 @@ export class MoveDirective implements OnDestroy {
 
     // Listen for 'mousemove' events
     const mousemoveListener = fromEvent<MouseEvent>(this._document, 'mousemove')
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((mousemoveEvent: MouseEvent) => {
         mousemoveEvent.preventDefault(); // prevent drag and drop
 
@@ -69,7 +69,7 @@ export class MoveDirective implements OnDestroy {
     fromEvent(this._document, 'mouseup')
       .pipe(
         first(),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => {
         mousemoveListener.unsubscribe();
@@ -78,10 +78,6 @@ export class MoveDirective implements OnDestroy {
       });
 
     this.wbMoveStart.next();
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

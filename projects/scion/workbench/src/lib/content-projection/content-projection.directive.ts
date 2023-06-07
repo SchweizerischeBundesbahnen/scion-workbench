@@ -8,20 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, ElementRef, EmbeddedViewRef, Input, OnDestroy, OnInit, Optional, TemplateRef, ViewContainerRef} from '@angular/core';
-import {takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs';
+import {DestroyRef, Directive, ElementRef, EmbeddedViewRef, Input, OnDestroy, OnInit, Optional, TemplateRef, ViewContainerRef} from '@angular/core';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {Dimension, fromDimension$} from '@scion/toolkit/observable';
 import {setStyle} from '../common/dom.util';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Renders a given template as overlay. The template will stick to the bounding box of the host element of this directive.
  */
 @Directive({selector: '[wbContentProjection]', standalone: true})
 export class ContentProjectionDirective implements OnInit, OnDestroy {
-
-  private _destroy$ = new Subject<void>();
 
   private _boundingBoxElement: HTMLElement;
   private _contentViewRef!: EmbeddedViewRef<any>;
@@ -38,7 +35,9 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   @Input({alias: 'wbContentProjectionContent', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
   public contentTemplateRef!: TemplateRef<void>;
 
-  constructor(host: ElementRef<HTMLElement>, @Optional() private _view: WorkbenchView) {
+  constructor(host: ElementRef<HTMLElement>,
+              private _destroyRef: DestroyRef,
+              @Optional() private _view: WorkbenchView) {
     this._boundingBoxElement = host.nativeElement;
   }
 
@@ -55,7 +54,7 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
 
     // (Re-)position visible content each time the bounding box element changes its size.
     fromDimension$(this._boundingBoxElement)
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(dimension => {
         if (isNullDimension(dimension)) {
           // When removing the bounding box element (this directive's host) from the DOM, its dimension drops to 0.
@@ -69,7 +68,7 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
 
     // Hide content of inactive views.
     this._view && this._view.active$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(active => {
         this.setVisible(active);
       });
@@ -97,7 +96,6 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._destroy$.next();
     this._contentViewRef?.destroy();
   }
 }

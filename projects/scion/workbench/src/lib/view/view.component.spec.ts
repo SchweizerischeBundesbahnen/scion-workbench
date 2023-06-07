@@ -16,14 +16,14 @@ import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchView} from './workbench-view.model';
 import {WorkbenchViewPreDestroy} from '../workbench.model';
-import {Observable, Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {advance, styleFixture} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 describe('ViewComponent', () => {
 
@@ -510,8 +510,6 @@ function cssClasses(fixture: ComponentFixture<any>, selector: string): string[] 
 })
 class SpecViewComponent implements OnDestroy, WorkbenchViewPreDestroy {
 
-  private _destroy$ = new Subject<void>();
-
   public destroyed = false;
   public activated: boolean;
   public checked = false;
@@ -527,7 +525,7 @@ class SpecViewComponent implements OnDestroy, WorkbenchViewPreDestroy {
       view.heading = heading;
     }
     view.active$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(active => this.activated = active);
   }
 
@@ -537,7 +535,6 @@ class SpecViewComponent implements OnDestroy, WorkbenchViewPreDestroy {
 
   public ngOnDestroy(): void {
     this.destroyed = true;
-    this._destroy$.next();
   }
 
   public checkFromTemplate(): boolean {

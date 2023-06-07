@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Subject} from 'rxjs';
-import {filter, takeUntil} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
 import {Application, ManifestService, MessageClient, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {Popup} from '../../popup/popup.config';
 import {NgClass} from '@angular/common';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Displays the microfrontend of a popup capability inside a workbench popup.
@@ -30,7 +31,6 @@ import {NgClass} from '@angular/common';
 })
 export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
-  private _destroy$ = new Subject<void>();
   private _focusWithin$ = new Subject<boolean>();
   private _popupContext: ɵPopupContext;
 
@@ -43,6 +43,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
               private _messageClient: MessageClient,
+              private _destroyRef: DestroyRef,
               private _logger: Logger) {
     this._popupContext = this.popup.input!;
     this.popupCapability = this._popupContext.capability;
@@ -59,7 +60,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
     // Listen to popup close requests.
     this._messageClient.observe$<any>(ɵWorkbenchCommands.popupCloseTopic(this.popupId))
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(closeRequest => {
         if (closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) === true) {
           this.popup.closeWithError(closeRequest.body);
@@ -74,7 +75,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       this._focusWithin$
         .pipe(
           filter(focusWithin => !focusWithin),
-          takeUntil(this._destroy$),
+          takeUntilDestroyed(this._destroyRef),
         )
         .subscribe(() => {
           this.popup.close();
@@ -114,6 +115,5 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this._outletRouter.navigate(null, {outlet: this.popupId});
-    this._destroy$.next();
   }
 }

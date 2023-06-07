@@ -8,26 +8,26 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Inject, Injectable, OnDestroy, Optional} from '@angular/core';
+import {Inject, Injectable, Optional} from '@angular/core';
 import {NavigationStart, ParamMap, Router, RouterEvent} from '@angular/router';
-import {filter, map, startWith, takeUntil} from 'rxjs/operators';
-import {Observable, Subject} from 'rxjs';
+import {filter, map, startWith} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 import {LogAppender, LogEvent, LoggerName, LogLevel} from './logging.model';
 import {Logger} from './logger';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 type LogLevelStrings = keyof typeof LogLevel;
 
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `Logger` DI token. */)
-export class ɵLogger implements Logger, OnDestroy {
+export class ɵLogger implements Logger {
 
-  private _destroy$ = new Subject<void>();
   private _logLevel!: LogLevel;
 
   constructor(@Inject(LogAppender) @Optional() private _logAppenders: LogAppender[],
               router: Router,
               logLevel: LogLevel) {
     this.observeLogLevelQueryParam$(router)
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe((queryParamLogLevel: LogLevel | undefined) => {
         this._logLevel = queryParamLogLevel ?? logLevel;
       });
@@ -70,10 +70,6 @@ export class ɵLogger implements Logger, OnDestroy {
         map(queryParamMap => queryParamMap.get('loglevel')?.toUpperCase() as LogLevelStrings | undefined),
         map(logLevelString => logLevelString ? LogLevel[logLevelString] : undefined),
       );
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

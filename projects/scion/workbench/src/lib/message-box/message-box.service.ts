@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, NgZone, OnDestroy, Optional, SkipSelf} from '@angular/core';
-import {BehaviorSubject, combineLatest, Observable, Subject} from 'rxjs';
+import {Injectable, NgZone, Optional, SkipSelf} from '@angular/core';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {MessageBoxConfig} from './message-box.config';
 import {ɵMessageBox} from './ɵmessage-box';
 import {Arrays} from '@scion/toolkit/util';
-import {filter, map, takeUntil} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Allows displaying a message to the user in a workbench message box.
@@ -41,9 +42,8 @@ import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
  * Unlike views, message boxes are not part of the persistent workbench navigation, meaning that message boxes do not survive a page reload.
  */
 @Injectable({providedIn: 'root'})
-export class MessageBoxService implements OnDestroy {
+export class MessageBoxService {
 
-  private _destroy$ = new Subject<void>();
   private _messageBoxes$ = new BehaviorSubject<ɵMessageBox[]>([]);
   private _messageBoxServiceHierarchy: [MessageBoxService, ...MessageBoxService[]]; // minItems: 1
 
@@ -155,15 +155,10 @@ export class MessageBoxService implements OnDestroy {
     view.active$
       .pipe(
         filter(Boolean),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(() => {
         this.focusTop();
       });
-  }
-
-  /* @docs-private */
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

@@ -13,10 +13,11 @@ import {ManifestService, Message, MessageClient, MessageHeaders} from '@scion/mi
 import {Logger} from '../../logging';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {map, switchMap, takeUntil} from 'rxjs/operators';
+import {map, switchMap} from 'rxjs/operators';
 import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {merge, Subject, Subscription} from 'rxjs';
+import {merge, Subscription} from 'rxjs';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Handles commands of microfrontends loaded into workbench views, such as setting view tab properties or closing the view.
@@ -26,7 +27,6 @@ import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class MicrofrontendViewCommandHandler implements OnDestroy {
 
-  private _destroy$ = new Subject<void>();
   private _viewCapabilities = new Map<string, WorkbenchViewCapability>();
   private _subscriptions = new Set<Subscription>();
 
@@ -51,7 +51,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
     this._viewRegistry.views$
       .pipe(
         switchMap(views => merge(...views.map(view => view.active$.pipe(map(() => view))))),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe((view: WorkbenchView) => {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(view.id);
@@ -121,7 +121,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
 
   private installViewCapabilityObserver(): void {
     this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(viewCapabilities => {
         this._viewCapabilities = viewCapabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map<string, WorkbenchViewCapability>());
       });
@@ -157,7 +157,6 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._destroy$.next();
     this._subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 }

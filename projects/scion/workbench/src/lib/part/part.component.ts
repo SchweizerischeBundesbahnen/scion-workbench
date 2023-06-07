@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, HostBinding, inject, Injector, NgZone, OnInit} from '@angular/core';
-import {combineLatestWith, EMPTY, from, fromEvent, mergeMap, Subject, switchMap} from 'rxjs';
+import {ChangeDetectorRef, Component, ElementRef, HostBinding, inject, Injector, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {combineLatestWith, EMPTY, from, fromEvent, mergeMap, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
-import {take, takeUntil} from 'rxjs/operators';
+import {take} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
@@ -24,6 +24,7 @@ import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {ViewPortalPipe} from '../view/view-portal.pipe';
 import {SciViewportModule} from '@scion/components/viewport';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'wb-part',
@@ -41,9 +42,7 @@ import {SciViewportModule} from '@scion/components/viewport';
     SciViewportModule,
   ],
 })
-export class PartComponent implements OnInit {
-
-  private _destroy$ = new Subject<void>();
+export class PartComponent implements OnInit, OnDestroy {
 
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
@@ -127,7 +126,7 @@ export class PartComponent implements OnInit {
         combineLatestWith(inject(NgZone).onStable.pipe(take(1))),
         // Suspend listening for `focusin` events while this part is active.
         switchMap(([active]) => active ? EMPTY : fromEvent<FocusEvent>(host, 'focusin', {once: true})),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(() => {
         this.part.activate();
@@ -136,6 +135,5 @@ export class PartComponent implements OnInit {
 
   public ngOnDestroy(): void {
     this._logger.debug(() => `Destroying PartComponent [partId=${this.partId}]'`, LoggerNames.LIFECYCLE);
-    this._destroy$.next();
   }
 }

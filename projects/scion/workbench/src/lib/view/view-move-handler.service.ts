@@ -1,23 +1,20 @@
-import {Injectable, OnDestroy} from '@angular/core';
-import {takeUntil} from 'rxjs/operators';
+import {Injectable} from '@angular/core';
 import {ViewDragService, ViewMoveEvent} from '../view-dnd/view-drag.service';
 import {UUID} from '@scion/toolkit/uuid';
 import {Router} from '@angular/router';
 import {LocationStrategy} from '@angular/common';
-import {Subject} from 'rxjs';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {RouterUtils} from '../routing/router.util';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
 import {MPart} from '../layout/workbench-layout.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Updates the workbench layout when the user moves a view.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
-export class ViewMoveHandler implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class ViewMoveHandler {
 
   constructor(private _workbenchService: ɵWorkbenchService,
               private _workbenchRouter: WorkbenchRouter,
@@ -32,7 +29,7 @@ export class ViewMoveHandler implements OnDestroy {
     const appInstanceId = this._workbenchService.appInstanceId;
 
     this._viewDragService.viewMove$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(async (event: ViewMoveEvent) => { // eslint-disable-line rxjs/no-async-subscribe
         // Check if this app instance takes part in the view drag operation. If not, do nothing.
         if (event.source.appInstanceId !== appInstanceId && event.target.appInstanceId !== appInstanceId) {
@@ -142,10 +139,6 @@ export class ViewMoveHandler implements OnDestroy {
         activatePart: true,
       }));
     }
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

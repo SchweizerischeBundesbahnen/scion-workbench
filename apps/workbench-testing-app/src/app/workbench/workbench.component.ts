@@ -8,17 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {distinct, map, takeUntil} from 'rxjs/operators';
+import {distinct, map} from 'rxjs/operators';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
-import {combineLatest, Observable, Subject} from 'rxjs';
+import {combineLatest, Observable} from 'rxjs';
 import {WorkbenchModule, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {MenuService} from '../menu/menu.service';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
 import {PerspectiveData} from '../workbench.perspectives';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-workbench',
@@ -33,9 +34,7 @@ import {AsyncPipe, NgFor, NgIf} from '@angular/common';
     WorkbenchRouterLinkDirective,
   ],
 })
-export class WorkbenchComponent implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class WorkbenchComponent {
 
   public showNewTabAction$: Observable<boolean>;
   public PerspectiveData = PerspectiveData;
@@ -127,16 +126,12 @@ export class WorkbenchComponent implements OnDestroy {
     const stickyStartViewTab$ = this._route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get('stickyStartViewTab'))), distinct());
     const views$ = this.workbenchService.views$;
     combineLatest([stickyStartViewTab$, views$])
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(([stickyStartViewTab, views]) => {
         if (stickyStartViewTab && views.length === 0) {
           this._wbRouter.navigate(['/start-page']).then();
         }
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 
   /**
