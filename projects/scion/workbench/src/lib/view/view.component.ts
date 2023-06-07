@@ -13,7 +13,6 @@ import {AsyncSubject, combineLatest, EMPTY, fromEvent, Subject} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent, SciViewportModule} from '@scion/components/viewport';
-import {WB_VIEW_HEADING_PARAM, WB_VIEW_TITLE_PARAM} from '../routing/routing.constants';
 import {MessageBoxService} from '../message-box/message-box.service';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
@@ -124,19 +123,8 @@ export class ViewComponent implements OnDestroy {
 
   public onActivateRoute(route: ActivatedRoute): void {
     const actualRouteSnapshot = RouterUtils.resolveActualRouteSnapshot(route.snapshot);
-
-    this._view.title ??= (
-      route.snapshot.params[WB_VIEW_TITLE_PARAM] ??
-      RouterUtils.lookupRouteData(actualRouteSnapshot, WB_VIEW_TITLE_PARAM) ??
-      RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.title) ??
-      null);
-
-    this._view.heading ??= (
-      route.snapshot.params[WB_VIEW_HEADING_PARAM] ??
-      RouterUtils.lookupRouteData(actualRouteSnapshot, WB_VIEW_HEADING_PARAM) ??
-      RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.heading) ??
-      null);
-
+    this._view.title ??= RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.title) ?? null;
+    this._view.heading ??= RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.heading) ?? null;
     this._view.cssClass = new Array<string>()
       .concat(Arrays.coerce(RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.cssClass)))
       .concat(Arrays.coerce(route.snapshot.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalViewStates.cssClass]))

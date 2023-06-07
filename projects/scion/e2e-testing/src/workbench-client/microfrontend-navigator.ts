@@ -16,7 +16,6 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-workbench-capability-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
-import {RouterPageLegacyPO} from './page-object/router-page-legacy.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 
 export interface Type<T> extends Function {
@@ -60,12 +59,6 @@ export class MicrofrontendNavigator {
    */
   public openInNewTab(page: Type<RouterPagePO>, app: 'app1' | 'app2'): Promise<RouterPagePO>;
   /**
-   * Opens the page to navigate to microfrontends in a new workbench tab using the "old" router API.
-   *
-   * @deprecated since version 14; API will be removed in version 16; used internally to test not to break old workbench clients
-   */
-  public openInNewTab(page: Type<RouterPageLegacyPO>, app: 'app1' | 'app2'): Promise<RouterPageLegacyPO>;
-  /**
    * Opens the page to open popups in a new workbench tab.
    */
   public openInNewTab(page: Type<PopupOpenerPagePO>, app: 'app1' | 'app2'): Promise<PopupOpenerPagePO>;
@@ -102,10 +95,6 @@ export class MicrofrontendNavigator {
       case RouterPagePO: {
         await startPO.openMicrofrontendView('e2e-test-router', app);
         return new RouterPagePO(this._appPO, viewId);
-      }
-      case RouterPageLegacyPO: {
-        await startPO.openMicrofrontendView('e2e-test-router-legacy', app);
-        return new RouterPageLegacyPO(this._appPO, viewId);
       }
       case PopupOpenerPagePO: {
         await startPO.openMicrofrontendView('e2e-test-popup-opener', app);

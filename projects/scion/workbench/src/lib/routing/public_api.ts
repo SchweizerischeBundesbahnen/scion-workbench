@@ -11,5 +11,4 @@
 export {WorkbenchRouter, WorkbenchNavigationExtras, Commands} from './workbench-router.service';
 export {WorkbenchRouterLinkDirective} from './workbench-router-link.directive';
 export {WorkbenchAuxiliaryRoutesRegistrator} from './workbench-auxiliary-routes-registrator.service';
-export {WB_VIEW_TITLE_PARAM, WB_VIEW_HEADING_PARAM, WB_STATE_DATA} from './routing.constants';
 export {WorkbenchRouteData} from './workbench-route-data';

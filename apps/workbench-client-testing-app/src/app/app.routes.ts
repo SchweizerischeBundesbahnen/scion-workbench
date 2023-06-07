@@ -20,10 +20,6 @@ export const routes: Routes = [
     loadComponent: () => import('./router-page/router-page.component'),
   },
   {
-    path: 'test-router-legacy',
-    loadComponent: () => import('./router-page-legacy/router-page-legacy.component'),
-  },
-  {
     path: 'test-view',
     loadComponent: () => import('./view-page/view-page.component'),
   },
