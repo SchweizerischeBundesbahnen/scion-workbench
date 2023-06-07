@@ -2163,64 +2163,6 @@ test.describe('Workbench Router', () => {
     await expect(await activeViewPO.viewTab.getCssClasses()).toEqual(expect.arrayContaining(['testee']));
   });
 
-  test('should allow setting view title via "wb.title" param (DEPRECATED: API will be removed in v16)', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register testee microfrontend
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
-      type: 'view',
-      qualifier: {component: 'testee'},
-      params: [
-        {name: 'wb.title', required: false},
-      ],
-      properties: {
-        path: 'test-pages/microfrontend-test-page',
-        title: 'Capability Title',
-        cssClass: 'testee',
-      },
-    });
-
-    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({component: 'testee'});
-    await routerPagePO.enterParams({'wb.title': 'Param Title'}); // deprecated API
-    await routerPagePO.enterCssClass('testee');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.clickNavigate();
-
-    const testeeViewTab = appPO.view({cssClass: 'testee'}).viewTab;
-    await expect(await testeeViewTab.getTitle()).toEqual('Param Title');
-  });
-
-  test('should allow setting view heading via "wb.heading" param (DEPRECATED: API will be removed in v16)', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register testee microfrontend
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
-      type: 'view',
-      qualifier: {component: 'testee'},
-      params: [
-        {name: 'wb.heading', required: false},
-      ],
-      properties: {
-        path: 'test-pages/microfrontend-test-page',
-        heading: 'Capability Heading',
-        cssClass: 'testee',
-      },
-    });
-
-    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({component: 'testee'});
-    await routerPagePO.enterParams({'wb.heading': 'Param Heading'}); // deprecated API
-    await routerPagePO.enterCssClass('testee');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.clickNavigate();
-
-    const testeeViewTab = appPO.view({cssClass: 'testee'}).viewTab;
-    await expect(await testeeViewTab.getHeading()).toEqual('Param Heading');
-  });
-
   test('should substitute named parameter in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
