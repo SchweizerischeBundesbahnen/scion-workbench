@@ -4,6 +4,7 @@
 
   > ul {
     all: unset;
+    list-style: none;
     flex: auto;
     display: flex;
     gap: .5em;
@@ -20,6 +21,7 @@
     }
 
     > li {
+      all: unset;
       flex: none;
     }
   }
