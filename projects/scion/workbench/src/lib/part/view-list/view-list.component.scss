@@ -23,14 +23,18 @@
     max-height: 350px;
 
     > ul {
+      all: unset;
+      list-style: none;
       display: flex;
       flex-direction: column;
-      list-style: none;
-      padding: 1px 0 0 0;
-      margin: 0;
+      padding-top: 1px;
 
-      > li.separator {
-        border-top: 1px solid colors.$viewlistitem-border-color;
+      > li {
+        all: unset;
+
+        &.separator {
+          border-top: 1px solid colors.$viewlistitem-border-color;
+        }
       }
     }
   }
