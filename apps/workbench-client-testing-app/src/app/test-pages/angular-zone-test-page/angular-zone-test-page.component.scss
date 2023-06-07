@@ -12,14 +12,14 @@
       flex-direction: column;
       gap: .5em;
 
-      label {
+      > div.run-in-angular-checkbox {
         display: flex;
         gap: .75em;
         align-items: center;
         user-select: none;
       }
 
-      output.zone {
+      > output.zone {
         padding: 1em;
         border-width: 1px;
         border-style: solid;

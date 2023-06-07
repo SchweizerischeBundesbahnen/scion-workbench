@@ -29,10 +29,10 @@
 
 <ng-template #test_template let-test>
   <section class="panel">
-    <label>
+    <div class="run-in-angular-checkbox">
       <sci-checkbox [(ngModel)]="test.runInAngular" class="e2e-run-inside-angular"></sci-checkbox>
       <span>Subscribe in NgZone</span>
-    </label>
+    </div>
     <button (click)="test.onTestClick()" class="e2e-subscribe">Subscribe</button>
     <output *ngFor="let emission of test.emissions" class="zone e2e-emission" [attr.data-zone]="emission.insideAngular ? 'inside-angular' : 'outside-angular'">{{emission.label}}</output>
   </section>

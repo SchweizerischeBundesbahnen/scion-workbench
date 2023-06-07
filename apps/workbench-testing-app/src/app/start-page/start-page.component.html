@@ -24,8 +24,9 @@ We use this app to run our e2e tests and experiment with features.
     <section class="tiles e2e-microfrontend-view-tiles">
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
       <a *ngFor="let viewCapability of microfrontendViewCapabilities | appFilter$:filterControl:selectViewCapabilityText | async"
-         (click)="onMicrofrontendViewOpen(viewCapability)"
+         (click)="onMicrofrontendViewOpen(viewCapability, $event)"
          [ngClass]="concat(viewCapability.metadata!.appSymbolicName, viewCapability.properties.cssClass)"
+         href=""
          class="microfrontend">
         {{viewCapability.properties.title}}
         <span class="description">
@@ -41,6 +42,7 @@ We use this app to run our e2e tests and experiment with features.
       <a *ngFor="let testCapability of testCapabilities | appFilter$:filterControl:selectTestCapabilityText | async"
          (click)="onTestCapabilityOpen(testCapability, $event)"
          [ngClass]="concat(testCapability.metadata!.appSymbolicName, testCapability.properties?.['cssClass'])"
+         href=""
          class="test-capability">
         {{testCapability.properties?.['cssClass']}}
         <span class="description">
