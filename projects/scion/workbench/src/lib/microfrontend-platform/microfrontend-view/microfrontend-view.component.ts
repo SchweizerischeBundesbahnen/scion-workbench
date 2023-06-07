@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
-import {asapScheduler, combineLatest, EMPTY, firstValueFrom, merge, Observable, of, OperatorFunction, Subject} from 'rxjs';
+import {asapScheduler, combineLatest, EMPTY, firstValueFrom, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
 import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
@@ -31,6 +31,7 @@ import {MicrofrontendNavigationalStates} from '../routing/microfrontend-navigati
 import {Beans} from '@scion/toolkit/bean-manager';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {ContentAsOverlayComponent} from '../../content-projection/content-as-overlay.component';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -49,7 +50,6 @@ import {ContentAsOverlayComponent} from '../../content-projection/content-as-ove
 })
 export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchViewPreDestroy {
 
-  private _destroy$ = new Subject<void>();
   private _unsubscribeParamsUpdater$ = new Subject<void>();
   private _universalKeystrokes = [
     'keydown.escape', // allows closing notifications
@@ -71,6 +71,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
               private _messageClient: MessageClient,
+              private _destroyRef: DestroyRef,
               private _logger: Logger,
               private _viewContextMenuService: ViewMenuService,
               private _workbenchRouter: WorkbenchRouter,
@@ -89,7 +90,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
     // menu of this view do not work, so we install the accelerators on the router outlet as well.
     this._viewContextMenuService.installMenuItemAccelerators$(this.routerOutletElement.nativeElement, this._view)
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe();
 
     combineLatest([this._route.params, this._route.data])
@@ -104,7 +105,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
           this._logger.error(() => '[MicrofrontendLoadError] An unexpected error occurred.', LoggerNames.MICROFRONTEND_ROUTING, error);
           return caught; // re-subscribe to the params Observable
         }),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
   }
@@ -166,7 +167,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
   private installParamsUpdater(viewCapability: WorkbenchViewCapability): void {
     this._unsubscribeParamsUpdater$.next();
     const subscription = this._messageClient.observe$<ɵViewParamsUpdateCommand>(ɵWorkbenchCommands.viewParamsUpdateTopic(this.viewId, viewCapability.metadata!.id))
-      .pipe(takeUntil(merge(this._unsubscribeParamsUpdater$, this._destroy$)))
+      .pipe(takeUntil(this._unsubscribeParamsUpdater$), takeUntilDestroyed(this._destroyRef))
       .subscribe(async (request: TopicMessage<ɵViewParamsUpdateCommand>) => { // eslint-disable-line rxjs/no-async-subscribe
         // We DO NOT navigate if the subscription was closed, e.g., because closed the view or navigated to another capability.
         const replyTo = request.headers.get(MessageHeaders.ReplyTo);
@@ -292,7 +293,6 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     // Instruct the message broker to delete retained messages to free resources.
     this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.viewId), undefined, {retain: true}).then();
     this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.viewId), undefined, {retain: true}).then();
-    this._destroy$.next();
   }
 }
 

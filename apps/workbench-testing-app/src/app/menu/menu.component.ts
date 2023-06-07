@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostListener, Inject, InjectionToken, OnDestroy, OnInit} from '@angular/core';
+import {Component, DestroyRef, HostListener, Inject, InjectionToken, OnInit} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
-import {fromEvent, Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {fromEvent} from 'rxjs';
 import {MenuItem, MenuItemSeparator} from './menu-item';
 import {KeyValuePipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {InstanceofPipe} from '../common/instanceof.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * DI token to provide menu items to the menu.
@@ -33,18 +33,18 @@ export const MENU_ITEMS = new InjectionToken<Array<MenuItem | MenuItemSeparator>
     InstanceofPipe,
   ],
 })
-export class MenuComponent implements OnInit, OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class MenuComponent implements OnInit {
 
   public MenuItem = MenuItem;
 
-  constructor(private _overlayRef: OverlayRef, @Inject(MENU_ITEMS) public menuItems: Array<MenuItem | MenuItemSeparator>) {
+  constructor(private _overlayRef: OverlayRef,
+              private _destroyRef: DestroyRef,
+              @Inject(MENU_ITEMS) public menuItems: Array<MenuItem | MenuItemSeparator>) {
   }
 
   public ngOnInit(): void {
     fromEvent(this._overlayRef.backdropElement!, 'mousedown')
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.closeMenu());
   }
 
@@ -63,9 +63,5 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   private closeMenu(): void {
     this._overlayRef.dispose();
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

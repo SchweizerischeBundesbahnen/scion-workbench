@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output} from '@angular/core';
-import {asapScheduler, Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {DestroyRef, Directive, ElementRef, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
+import {asapScheduler} from 'rxjs';
 import {createElement, ElementCreateOptions, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {subscribeInside} from '@scion/toolkit/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 const DROP_REGION_MAX_SIZE = 150;
 const DROP_REGION_GAP = 20;
@@ -28,9 +28,8 @@ const NULL_BOUNDS: Bounds = null!;
  * If not positioned, the element is changed to be positioned relative.
  */
 @Directive({selector: '[wbViewDropZone]', standalone: true})
-export class ViewDropZoneDirective implements OnInit, OnDestroy {
+export class ViewDropZoneDirective implements OnInit {
 
-  private _destroy$ = new Subject<void>();
   private _host: HTMLElement;
 
   private _dropZoneOverlay!: HTMLElement;
@@ -51,7 +50,10 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
   @Output()
   public wbViewDropZoneDrop = new EventEmitter<WbViewDropEvent>();
 
-  constructor(host: ElementRef<HTMLElement>, private _viewDragService: ViewDragService, private _zone: NgZone) {
+  constructor(host: ElementRef<HTMLElement>,
+              private _viewDragService: ViewDragService,
+              private _destroyRef: DestroyRef,
+              private _zone: NgZone) {
     this._host = host.nativeElement;
 
     // Ensure the host element to define a positioning context (after element creation)
@@ -170,17 +172,17 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
     // related event target of `dragenter` (since it refers to an element of the view that is being deactivated)
     // and thus corrupt the drag operation.
     this._viewDragService.viewDragStart$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.activateDropZone());
 
     this._viewDragService.viewDragEnd$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.deactivateDropZone());
 
     this._viewDragService.viewDrag$(this._dropZoneOverlay)
       .pipe(
         subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((event: DragEvent) => {
         switch (event.type) {
@@ -278,10 +280,6 @@ export class ViewDropZoneDirective implements OnInit, OnDestroy {
 
   private supportsRegion(region: Region): boolean {
     return !this.wbViewDropZoneRegions || this.wbViewDropZoneRegions.includes(region);
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

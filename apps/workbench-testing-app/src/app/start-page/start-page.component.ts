@@ -8,20 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, Optional, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, Optional, ViewChild} from '@angular/core';
 import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService, PlatformPropertyService} from '@scion/microfrontend-platform';
-import {Observable, of, Subject} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
-import {filter, takeUntil} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
 import {ReactiveFormsModule, UntypedFormControl} from '@angular/forms';
 import {SciFilterFieldComponent, SciFilterFieldModule} from '@scion/components.internal/filter-field';
 import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {SciTabbarModule} from '@scion/components.internal/tabbar';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {FilterPipe} from '../common/filter.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-start-page',
@@ -42,9 +43,8 @@ import {FilterPipe} from '../common/filter.pipe';
     WorkbenchRouterLinkDirective,
   ],
 })
-export default class StartPageComponent implements OnDestroy {
+export default class StartPageComponent {
 
-  private _destroy$ = new Subject<void>();
   @ViewChild(SciFilterFieldComponent)
   private _filterField: SciFilterFieldComponent;
 
@@ -132,7 +132,7 @@ export default class StartPageComponent implements OnDestroy {
     router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(() => {
         cd.markForCheck();
@@ -166,14 +166,10 @@ export default class StartPageComponent implements OnDestroy {
    */
   private installFilterFieldDisplayTextSynchronizer(): void {
     this.filterControl.valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(value => {
         this.filterControl.setValue(value, {emitEvent: false});
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 
   public selectViewCapabilityText = (viewCapability: WorkbenchViewCapability): string | undefined => {

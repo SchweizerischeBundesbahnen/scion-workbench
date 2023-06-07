@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
-import {of, Subject} from 'rxjs';
-import {take, takeUntil} from 'rxjs/operators';
+import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone} from '@angular/core';
+import {of} from 'rxjs';
+import {take} from 'rxjs/operators';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
@@ -23,6 +23,7 @@ import {Disposable} from '../common/disposable';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {subscribeInside} from '@scion/toolkit/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 
@@ -33,9 +34,8 @@ export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
  * For instance, allows snapping the view tab into the view tab bar (drop zone) when being dragged over.
  */
 @Injectable({providedIn: 'root'})
-export class ViewTabDragImageRenderer implements OnDestroy {
+export class ViewTabDragImageRenderer {
 
-  private _destroy$ = new Subject<void>();
   private _viewDragImagePortalOutlet: DomPortalOutlet | null = null;
   private _constrainDragImageRectFn: ((rect: ViewDragImageRect) => ViewDragImageRect) | null = null;
 
@@ -159,7 +159,7 @@ export class ViewTabDragImageRenderer implements OnDestroy {
     this._viewDragService.viewDrag$(window)
       .pipe(
         subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe((event: DragEvent) => {
         switch (event.type) {
@@ -192,10 +192,6 @@ export class ViewTabDragImageRenderer implements OnDestroy {
     });
 
     return new ComponentPortal(this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent, null, injector);
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

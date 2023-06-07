@@ -13,8 +13,8 @@ import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGr
 import {ViewClosingEvent, ViewClosingListener, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {MonoTypeOperatorFunction, NEVER, Subject} from 'rxjs';
-import {finalize, startWith, take, takeUntil} from 'rxjs/operators';
+import {MonoTypeOperatorFunction, NEVER} from 'rxjs';
+import {finalize, startWith, take} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {AsyncPipe, JsonPipe, Location, NgIf} from '@angular/common';
@@ -26,6 +26,7 @@ import {SciPropertyModule} from '@scion/components.internal/property';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {SciViewportModule} from '@scion/components/viewport';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 const TITLE = 'title';
 const HEADING = 'heading';
@@ -70,8 +71,6 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
   public form: UntypedFormGroup;
   public uuid = UUID.randomUUID();
 
-  private _destroy$ = new Subject<void>();
-
   constructor(formBuilder: UntypedFormBuilder,
               public view: WorkbenchView,
               public route: ActivatedRoute,
@@ -104,7 +103,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
     this.view.capability$
       .pipe(
         take(1),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(capability => {
         console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata.id}]`);
@@ -163,7 +162,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
     this.form.get(CONFIRM_CLOSING).valueChanges
       .pipe(
         startWith(this.form.get(CONFIRM_CLOSING).value as boolean),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(confirmClosing => {
         if (confirmClosing) {
@@ -189,7 +188,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
 
   private installViewActiveStateLogger(): void {
     this.view.active$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(active => {
         if (active) {
           console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`);
@@ -221,6 +220,5 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
 
   public ngOnDestroy(): void {
     this.view.removeClosingListener(this);
-    this._destroy$.next();
   }
 }

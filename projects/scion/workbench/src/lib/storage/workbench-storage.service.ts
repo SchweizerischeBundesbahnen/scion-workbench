@@ -8,20 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, OnDestroy} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {WorkbenchStorage} from './workbench-storage';
 import {DOCUMENT} from '@angular/common';
-import {fromEvent, Subject} from 'rxjs';
-import {filter, takeUntil} from 'rxjs/operators';
+import {fromEvent} from 'rxjs';
+import {filter} from 'rxjs/operators';
 import {WorkbenchInitializer} from '../startup/workbench-initializer';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Provides API to read/write data from/to {@link WorkbenchStorage}.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchStorageService implements WorkbenchInitializer, OnDestroy {
+export class WorkbenchStorageService implements WorkbenchInitializer {
 
-  private _destroy$ = new Subject<void>();
   private _data = new Map<string, unknown>();
   private _lastSerializedData: string | null = null;
 
@@ -64,13 +64,9 @@ export class WorkbenchStorageService implements WorkbenchInitializer, OnDestroy 
     fromEvent(document, 'visibilitychange')
       .pipe(
         filter(() => document.visibilityState === 'hidden'),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(() => callback());
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

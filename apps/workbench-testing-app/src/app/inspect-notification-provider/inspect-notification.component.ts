@@ -8,16 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import {Notification} from '@scion/workbench';
-import {Subject} from 'rxjs';
 import {UUID} from '@scion/toolkit/uuid';
 import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
-import {takeUntil} from 'rxjs/operators';
 import {NgIf} from '@angular/common';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciViewportModule} from '@scion/components/viewport';
 import {StringifyPipe} from '../common/stringify.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 const TITLE = 'title';
 const SEVERITY = 'severity';
@@ -37,14 +36,12 @@ const CSS_CLASS = 'cssClass';
     SciViewportModule,
   ],
 })
-export class InspectNotificationComponent implements OnDestroy {
+export class InspectNotificationComponent {
 
   public readonly TITLE = TITLE;
   public readonly SEVERITY = SEVERITY;
   public readonly DURATION = DURATION;
   public readonly CSS_CLASS = CSS_CLASS;
-
-  private _destroy$ = new Subject<void>();
 
   public uuid = UUID.randomUUID();
   public form: UntypedFormGroup;
@@ -58,25 +55,25 @@ export class InspectNotificationComponent implements OnDestroy {
     });
 
     this.form.get(TITLE).valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(title => {
         this.notification.setTitle(title || undefined);
       });
 
     this.form.get(SEVERITY).valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(severity => {
         this.notification.setSeverity(severity || undefined);
       });
 
     this.form.get(DURATION).valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(duration => {
         this.notification.setDuration(this.parseDurationFromUI(duration));
       });
 
     this.form.get(CSS_CLASS).valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(cssClass => {
         this.notification.setCssClass(cssClass.split(/\s+/).filter(Boolean));
       });
@@ -90,9 +87,5 @@ export class InspectNotificationComponent implements OnDestroy {
       return duration;
     }
     return Number(duration);
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Attribute, Component, ElementRef, HostBinding, HostListener, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnDestroy} from '@angular/core';
+import {Attribute, Component, ElementRef, HostBinding, HostListener, Injector, Input, IterableChanges, IterableDiffers, NgZone} from '@angular/core';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {fromEvent, merge, Subject, withLatestFrom} from 'rxjs';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
+import {filter, map, switchMap} from 'rxjs/operators';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
@@ -26,6 +26,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
@@ -39,9 +40,8 @@ const AUXILARY_MOUSE_BUTTON = 4;
   standalone: true,
   imports: [PortalModule],
 })
-export class ViewTabComponent implements OnDestroy {
+export class ViewTabComponent {
 
-  private _destroy$: Subject<void> = new Subject<void>();
   private _viewIdChange$ = new Subject<void>();
   private _context: 'tabbar' | 'tabbar-dropdown';
 
@@ -206,7 +206,7 @@ export class ViewTabComponent implements OnDestroy {
     fromEvent(this.host, 'dblclick')
       .pipe(
         withLatestFrom(enabled$),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(([event, enabled]) => {
         event.stopPropagation(); // prevent `PartBarComponent` handling the dblclick event which would undo maximization/minimization
@@ -227,7 +227,7 @@ export class ViewTabComponent implements OnDestroy {
         switchMap(() => this.view.cssClasses$),
         map(cssClasses => differ.diff(cssClasses)),
         filter((diff): diff is IterableChanges<string> => diff !== null),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe((diff: IterableChanges<string>) => {
         diff.forEachAddedItem(({item}) => this.host.classList.add(item));
@@ -239,7 +239,7 @@ export class ViewTabComponent implements OnDestroy {
     this._viewIdChange$
       .pipe(
         switchMap(() => this._viewContextMenuService.installMenuItemAccelerators$(this.host, this.view)),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe();
   }
@@ -253,9 +253,5 @@ export class ViewTabComponent implements OnDestroy {
       ],
     });
     return new ComponentPortal(this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent, null, injector);
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

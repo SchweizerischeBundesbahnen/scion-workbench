@@ -9,8 +9,8 @@
  */
 
 import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
-import {AsyncSubject, combineLatest, EMPTY, fromEvent, Subject} from 'rxjs';
-import {switchMap, takeUntil} from 'rxjs/operators';
+import {AsyncSubject, combineLatest, EMPTY, fromEvent} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent, SciViewportModule} from '@scion/components/viewport';
 import {MessageBoxService} from '../message-box/message-box.service';
@@ -26,6 +26,7 @@ import {RouterUtils} from '../routing/router.util';
 import {A11yModule} from '@angular/cdk/a11y';
 import {ContentProjectionDirective} from '../content-projection/content-projection.directive';
 import {MessageBoxStackComponent} from '../message-box/message-box-stack.component';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -52,7 +53,6 @@ import {MessageBoxStackComponent} from '../message-box/message-box-stack.compone
 })
 export class ViewComponent implements OnDestroy {
 
-  private _destroy$ = new Subject<void>();
   private _viewport$ = new AsyncSubject<SciViewportComponent>();
   public viewLocalMessageBoxHost: Promise<ViewContainerRef>;
 
@@ -93,15 +93,15 @@ export class ViewComponent implements OnDestroy {
     this.viewLocalMessageBoxHost = viewLocalMessageBoxHost.get();
 
     messageBoxService.messageBoxes$({includeParents: true})
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(messageBoxes => this._view.blocked = messageBoxes.length > 0);
 
     viewContextMenuService.installMenuItemAccelerators$(this._host, this._view)
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe();
 
     combineLatest([this._view.active$, this._viewport$])
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(([active, viewport]) => active ? this.onActivateView(viewport) : this.onDeactivateView(viewport));
 
     // Prevent this view from getting the focus when it is blocked, for example, when displaying a message box.
@@ -143,6 +143,5 @@ export class ViewComponent implements OnDestroy {
 
   public ngOnDestroy(): void {
     this._logger.debug(() => `Destroying ViewComponent [viewId=${this.viewId}]'`, LoggerNames.LIFECYCLE);
-    this._destroy$.next();
   }
 }

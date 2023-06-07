@@ -10,11 +10,11 @@
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostBinding, HostListener, Input, OnDestroy, Output, ViewChild} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
-import {takeUntil} from 'rxjs/operators';
-import {noop, Subject} from 'rxjs';
+import {noop} from 'rxjs';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {UUID} from '@scion/toolkit/uuid';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Provides a filter control.
@@ -32,7 +32,6 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
 
-  private _destroy$ = new Subject<void>();
   private _cvaChangeFn: (value: any) => void = noop;
   private _cvaTouchedFn: () => void = noop;
 
@@ -86,14 +85,14 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
               private _cd: ChangeDetectorRef) {
     this.formControl = new FormControl('', {updateOn: 'change', nonNullable: true});
     this.formControl.valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(value => {
         this._cvaChangeFn(value);
         this.filter.emit(value);
       });
 
     this._focusManager.monitor(this._host.nativeElement, true)
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe((focusOrigin: FocusOrigin) => {
         if (!focusOrigin) {
           this._cvaTouchedFn(); // triggers form field validation and signals a blur event
@@ -146,7 +145,6 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._destroy$.next();
     this._focusManager.stopMonitoring(this._host.nativeElement);
   }
 }

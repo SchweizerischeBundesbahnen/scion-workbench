@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import {WorkbenchModule, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
-import {Observable, Subject} from 'rxjs';
-import {map, startWith, takeUntil} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {FormsModule, ReactiveFormsModule, UntypedFormControl} from '@angular/forms';
@@ -24,6 +24,7 @@ import {PluckPipe} from '../common/pluck.pipe';
 import {SciPropertyModule} from '@scion/components.internal/property';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JoinPipe} from '../common/join.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-view-page',
@@ -48,9 +49,7 @@ import {JoinPipe} from '../common/join.pipe';
     JoinPipe,
   ],
 })
-export default class ViewPageComponent implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export default class ViewPageComponent {
 
   public uuid = UUID.randomUUID();
   public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
@@ -93,7 +92,7 @@ export default class ViewPageComponent implements OnDestroy {
 
   private installViewActiveStateLogger(): void {
     this.view.active$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(active => {
         if (active) {
           console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`);
@@ -106,14 +105,10 @@ export default class ViewPageComponent implements OnDestroy {
 
   private installNavigationalStateLogger(): void {
     this.route.data
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(data => {
         console.debug(`[ActivatedRouteDataChange] [viewId=${this.view.id}, state=${JSON.stringify(data[WorkbenchRouteData.state])}]`);
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }
 

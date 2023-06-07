@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
-import {asapScheduler, EMPTY, merge, Subject, timer} from 'rxjs';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {asapScheduler, EMPTY, Subject, timer} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {Notification} from './notification';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
@@ -34,9 +35,8 @@ import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
     CoerceObservablePipe,
   ],
 })
-export class NotificationComponent implements OnChanges, OnDestroy {
+export class NotificationComponent implements OnChanges {
 
-  private _destroy$ = new Subject<void>();
   private _closeTimerChange$ = new Subject<void>();
 
   public portal: ComponentPortal<any> | undefined;
@@ -47,7 +47,9 @@ export class NotificationComponent implements OnChanges, OnDestroy {
   @Output()
   public closeNotification = new EventEmitter<void>();
 
-  constructor(private _injector: Injector, private _cd: ChangeDetectorRef) {
+  constructor(private _injector: Injector,
+              private _destroyRef: DestroyRef,
+              private _cd: ChangeDetectorRef) {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -100,14 +102,12 @@ export class NotificationComponent implements OnChanges, OnDestroy {
               return EMPTY;
           }
         }),
-        takeUntil(merge(this._closeTimerChange$, this._destroy$)),
+        takeUntil(this._closeTimerChange$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => {
         this.closeNotification.emit();
       });
   }
 
-  public ngOnDestroy(): void {
-    this._destroy$.next();
-  }
 }

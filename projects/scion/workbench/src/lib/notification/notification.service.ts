@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Inject, Injectable, NgZone, OnDestroy} from '@angular/core';
-import {BehaviorSubject, fromEvent, Observable, Subject} from 'rxjs';
+import {Inject, Injectable, NgZone} from '@angular/core';
+import {BehaviorSubject, fromEvent, Observable} from 'rxjs';
 import {ɵNotification} from './ɵnotification';
 import {NotificationConfig} from './notification.config';
 import {DOCUMENT} from '@angular/common';
-import {filter, map, takeUntil} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {Arrays} from '@scion/toolkit/util';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Allows displaying a notification to the user.
@@ -29,10 +30,9 @@ import {Arrays} from '@scion/toolkit/util';
  * To display structured content, consider passing a component to {@link NotificationConfig#content} instead of plain text.
  */
 @Injectable({providedIn: 'root'})
-export class NotificationService implements OnDestroy {
+export class NotificationService {
 
   private _notifications$ = new BehaviorSubject<ɵNotification[]>([]);
-  private _destroy$ = new Subject<void>();
 
   constructor(private _zone: NgZone, @Inject(DOCUMENT) private _document: Document) {
     this.installEscapeHandler();
@@ -136,15 +136,10 @@ export class NotificationService implements OnDestroy {
         filter((notification): notification is ɵNotification => !!notification),
         subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
         observeInside(continueFn => this._zone.run(continueFn)),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(lastNotification => {
         this.closeNotification(lastNotification);
       });
-  }
-
-  /* @docs-private */
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

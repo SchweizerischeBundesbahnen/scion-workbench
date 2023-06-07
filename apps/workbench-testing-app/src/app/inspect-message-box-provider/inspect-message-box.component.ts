@@ -8,10 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import {MessageBox} from '@scion/workbench';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
 import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 import {NgIf} from '@angular/common';
@@ -19,6 +17,7 @@ import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciViewportModule} from '@scion/components/viewport';
 import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {StringifyPipe} from '../common/stringify.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 const TITLE = 'title';
 const SEVERITY = 'severity';
@@ -40,15 +39,13 @@ const RETURN_VALUE = 'returnValue';
     SciParamsEnterModule,
   ],
 })
-export class InspectMessageBoxComponent implements OnDestroy {
+export class InspectMessageBoxComponent {
 
   public readonly TITLE = TITLE;
   public readonly SEVERITY = SEVERITY;
   public readonly CSS_CLASS = CSS_CLASS;
   public readonly ACTIONS = ACTIONS;
   public readonly RETURN_VALUE = RETURN_VALUE;
-
-  private _destroy$ = new Subject<void>();
 
   public uuid = UUID.randomUUID();
   public form: UntypedFormGroup;
@@ -63,25 +60,25 @@ export class InspectMessageBoxComponent implements OnDestroy {
     });
 
     this.form.get(TITLE).valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(title => {
         this.messageBox.setTitle(title || undefined);
       });
 
     this.form.get(SEVERITY).valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(severity => {
         this.messageBox.setSeverity(severity || undefined);
       });
 
     this.form.get(CSS_CLASS).valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(cssClass => {
         this.messageBox.setCssClass(cssClass.split(/\s+/).filter(Boolean));
       });
 
     this.form.get(ACTIONS).valueChanges
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe((actions: Array<{paramName: string; paramValue: string}>) => {
         this.messageBox.setActions(actions.map(action => ({
             key: action.paramName,
@@ -90,9 +87,5 @@ export class InspectMessageBoxComponent implements OnDestroy {
           })),
         );
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

@@ -8,16 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, Component, OnDestroy, Type} from '@angular/core';
+import {ApplicationRef, Component, Type} from '@angular/core';
 import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {MessageBoxService} from '@scion/workbench';
 import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {InspectMessageBoxComponent} from '../inspect-message-box-provider/inspect-message-box.component';
-import {startWith, takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs';
+import {startWith} from 'rxjs/operators';
 import {NgIf} from '@angular/common';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 const TITLE = 'title';
 const CONTENT = 'content';
@@ -45,7 +45,7 @@ const VIEW_CONTEXT = 'viewContext';
     SciCheckboxModule,
   ],
 })
-export default class MessageBoxOpenerPageComponent implements OnDestroy {
+export default class MessageBoxOpenerPageComponent {
 
   public readonly TITLE = TITLE;
   public readonly CONTENT = CONTENT;
@@ -59,8 +59,6 @@ export default class MessageBoxOpenerPageComponent implements OnDestroy {
   public readonly COUNT = COUNT;
   public readonly ACTIONS = ACTIONS;
   public readonly VIEW_CONTEXT = VIEW_CONTEXT;
-
-  private _destroy$ = new Subject<void>();
 
   public form: UntypedFormGroup;
 
@@ -147,7 +145,7 @@ export default class MessageBoxOpenerPageComponent implements OnDestroy {
     this.form.get(MODALITY).valueChanges
       .pipe(
         startWith(this.form.get(MODALITY).value as string),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(modality => {
         if (modality === 'view') {
@@ -158,9 +156,5 @@ export default class MessageBoxOpenerPageComponent implements OnDestroy {
           this.form.get(CONTEXTUAL_VIEW_ID).disable();
         }
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

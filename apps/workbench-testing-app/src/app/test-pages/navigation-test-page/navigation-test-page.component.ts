@@ -8,24 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {takeUntil} from 'rxjs/operators';
 import {WorkbenchView} from '@scion/workbench';
-import {Subject} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-navigation-test-page',
   template: '',
   standalone: true,
 })
-export class NavigationTestPageComponent implements OnDestroy {
-
-  private _destroy$ = new Subject<void>();
+export class NavigationTestPageComponent {
 
   constructor(route: ActivatedRoute, view: WorkbenchView) {
     route.paramMap
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntilDestroyed())
       .subscribe(params => {
         if (params.has('title')) {
           view.title = params.get('title');
@@ -37,9 +34,5 @@ export class NavigationTestPageComponent implements OnDestroy {
           view.cssClass = params.get('cssClass');
         }
       });
-  }
-
-  public ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

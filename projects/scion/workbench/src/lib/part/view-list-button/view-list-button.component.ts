@@ -8,16 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ComponentRef, ElementRef, HostListener, Injector, NgZone, OnDestroy} from '@angular/core';
+import {Component, ComponentRef, DestroyRef, ElementRef, HostListener, Injector, NgZone, OnDestroy} from '@angular/core';
 import {ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewListComponent, ViewListComponentInputs} from '../view-list/view-list.component';
 import {WorkbenchPart} from '../workbench-part.model';
 import {mapArray, subscribeInside} from '@scion/toolkit/operators';
 import {combineLatest, Observable, switchMap} from 'rxjs';
-import {debounceTime, map, takeUntil} from 'rxjs/operators';
+import {debounceTime, map} from 'rxjs/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {AsyncPipe, NgIf} from '@angular/common';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'wb-view-list-button',
@@ -83,8 +84,7 @@ export class ViewListButtonComponent implements OnDestroy {
         // Run inside Angular as Angular CDK emits position changes outside the Angular zone.
         // Otherwise, Angular would not invoke the `ngOnChanges` lifecycle hook when updating component input.
         subscribeInside(fn => this._zone.run(fn)),
-        // TODO [Angular 16] Replace with `takeUntilDestroyed` operator and pass the `DestroyRef` of `ComponentRef`.
-        takeUntil(new Observable(observer => componentRef.onDestroy(() => observer.next()))),
+        takeUntilDestroyed(componentRef.injector.get(DestroyRef)),
       )
       .subscribe(positionChange => {
         switch (positionChange.connectionPair) {
