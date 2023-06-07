@@ -7,7 +7,7 @@ The SASS CSS loader allows to reference Sass modules of packages installed in th
 ## ng-package.json of "@scion/workbench"
 {
   "assets": [
-    "./{!(@scion)/**/,./}_*.scss" // include all SASS files starting with a leading underscore, but only if they are not contained in the directory /@scion/
+    "{,!(@scion)/**/}_*.scss" // include all SASS files starting with a leading underscore, but only if they are not contained in the directory /@scion/ or its subdirectories
   ]
 }
 

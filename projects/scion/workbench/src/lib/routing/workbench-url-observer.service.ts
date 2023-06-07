@@ -8,9 +8,9 @@
 * SPDX-License-Identifier: EPL-2.0
 */
 
-import {GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
+import {Event, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
 import {filter, takeUntil} from 'rxjs/operators';
-import {EnvironmentInjector, Injectable, OnDestroy} from '@angular/core';
+import {EnvironmentInjector, inject, Injectable, OnDestroy, runInInjectionContext} from '@angular/core';
 import {Subject} from 'rxjs';
 import {WorkbenchAuxiliaryRoutesRegistrator} from './workbench-auxiliary-routes-registrator.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
@@ -25,14 +25,14 @@ import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service
 import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
 import {WorkbenchPopupDiffer} from './workbench-popup-differ';
 import {Logger, LoggerNames} from '../logging';
-import {WorkbenchViewPreDestroyGuard} from '../view/workbench-view-pre-destroy.guard';
-import {NavigationStateResolver} from './navigation-state.resolver';
 import {WorkbenchRouteData} from './workbench-route-data';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
 import {PartComponent} from '../part/part.component';
 import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
 import {RouterUtils} from './router.util';
+import {canDeactivateWorkbenchView} from '../view/workbench-view-pre-destroy.guard';
+import {resolveWorkbenchNavigationState} from './navigation-state.resolver';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -153,8 +153,8 @@ export class WorkbenchUrlObserver implements OnDestroy {
     const addedViewIds = navigationContext.layoutDiff.addedViews.filter(RouterUtils.isPrimaryRouteTarget);
 
     const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewIds, {
-      canDeactivate: [WorkbenchViewPreDestroyGuard],
-      resolve: {[WorkbenchRouteData.state]: NavigationStateResolver},
+      canDeactivate: [canDeactivateWorkbenchView],
+      resolve: {[WorkbenchRouteData.state]: resolveWorkbenchNavigationState},
     });
     if (newAuxiliaryRoutes.length) {
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewIds}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
@@ -296,20 +296,20 @@ export class WorkbenchUrlObserver implements OnDestroy {
   }
 
   private createWorkbenchPart(partId: string, isInMainArea: boolean): ɵWorkbenchPart {
-    return this._environmentInjector.runInContext(() => new ɵWorkbenchPart(partId, {
+    return runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchPart(partId, {
       component: partId === MAIN_AREA_PART_ID ? MainAreaLayoutComponent : PartComponent,
       isInMainArea,
     }));
   }
 
   private createWorkbenchView(viewId: string): ɵWorkbenchView {
-    return this._environmentInjector.runInContext(() => new ɵWorkbenchView(viewId, {component: ViewComponent}));
+    return runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchView(viewId, {component: ViewComponent}));
   }
 
   private installRouterEventListeners(): void {
     this._router.events
       .pipe(
-        filter((event): event is RouterEvent => event instanceof RouterEvent),
+        filter((event: Event | RouterEvent): event is RouterEvent => event instanceof RouterEvent),
         takeUntil(this._destroy$),
       )
       .subscribe((event: RouterEvent) => {

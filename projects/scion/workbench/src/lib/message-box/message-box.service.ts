@@ -33,7 +33,7 @@ import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
  *   A view-modal message box blocks only the view in which it was opened, or the contextual view if specified. In contrast to
  *   application-modal message boxes, the user can interact with other views, close them or open new views, or arrange them any
  *   other way. A view-modal message box sticks to its view; that is, it is displayed only when the view is visible. By default,
- *   if opening the message box in the context of a view, it is opened as a view-modal message box. When opened outside of a
+ *   if opening the message box in the context of a view, it is opened as a view-modal message box. If opened outside a
  *   view, setting the modality to 'view' has no effect, unless setting {@link MessageBoxConfig.context.viewId}.
  *
  * To display structured content, consider passing a component to {@link MessageBoxConfig#content} instead of plain text.
@@ -79,7 +79,7 @@ export class MessageBoxService implements OnDestroy {
    *         enter data.
    */
   public open(message: string | MessageBoxConfig): Promise<any> {
-    // Ensure to run in Angular zone to display the message box even when called from outside of the Angular zone, e.g. from an error handler.
+    // Ensure to run in Angular zone to display the message box even if called from outside the Angular zone, e.g. from an error handler.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.open(message));
     }

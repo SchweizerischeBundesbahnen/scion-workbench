@@ -61,21 +61,21 @@
   }
 
   &[context="tabbar"], &[context="drag-image"] {
-    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
     //> div.title {
     div.title {
       grid-column: 1/2;
       grid-row: 1/2;
     }
 
-    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
     //> div.heading {
     div.heading {
       grid-column: 1/3;
       grid-row: 2/3;
     }
 
-    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
     //> button.close {
     button.close {
       grid-column: 2/3;
@@ -91,21 +91,21 @@
   &[context="tabbar-dropdown"] {
     column-gap: 1.5em;
 
-    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
     //> div.title {
     div.title {
       grid-column: 1/2;
       grid-row: 1/2;
     }
 
-    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
     //> div.heading {
     div.heading {
       grid-column: 1/2;
       grid-row: 2/3;
     }
 
-    // TODO [Angular 16] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
+    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
     //> button.close {
     button.close {
       grid-column: 2/3;

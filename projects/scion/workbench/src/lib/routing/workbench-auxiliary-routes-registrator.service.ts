@@ -1,5 +1,5 @@
-import {Injectable, Type} from '@angular/core';
-import {CanActivate, CanDeactivate, Data, PRIMARY_OUTLET, ResolveData, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
+import {Injectable} from '@angular/core';
+import {CanActivateFn, CanDeactivateFn, Data, PRIMARY_OUTLET, ResolveData, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
 
 /**
@@ -76,8 +76,8 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
  * Controls the creation of auxiliary routes for a named router outlet.
  */
 export interface OutletAuxiliaryRouteConfig {
-  canDeactivate?: Type<CanDeactivate<any>>[];
-  canActivate?: Type<CanActivate>[];
+  canDeactivate?: CanDeactivateFn<any>[];
+  canActivate?: CanActivateFn[];
   data?: Data;
   resolve?: ResolveData;
 }

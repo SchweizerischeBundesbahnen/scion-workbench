@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentInjector, InjectionToken, Injector} from '@angular/core';
+import {EnvironmentInjector, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -151,10 +151,10 @@ export async function runWorkbenchInitializers(token: InjectionToken<any>, injec
   // Invoke and await initializer functions.
   await Promise.all(initializers.reduce((acc, initializer) => {
     if (typeof initializer === 'function') {
-      return acc.concat(injector.get(EnvironmentInjector).runInContext(() => initializer()));
+      return acc.concat(runInInjectionContext(injector.get(EnvironmentInjector), initializer));
     }
     else if (typeof initializer?.init === 'function') {
-      return acc.concat(injector.get(EnvironmentInjector).runInContext(() => initializer.init()));
+      return acc.concat(runInInjectionContext(injector.get(EnvironmentInjector), () => initializer.init()));
     }
     return acc;
   }, new Array<Promise<unknown>>()));

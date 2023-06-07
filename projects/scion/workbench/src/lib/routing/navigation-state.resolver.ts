@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot} from '@angular/router';
-import {Injectable} from '@angular/core';
+import {ResolveFn, Router} from '@angular/router';
+import {inject} from '@angular/core';
 import {Dictionary} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from './workbench-route-data';
 import {WorkbenchNavigationalState, WorkbenchNavigationalStates} from './workbench-navigational-states';
@@ -17,34 +17,30 @@ import {WorkbenchNavigationalState, WorkbenchNavigationalStates} from './workben
 /**
  * Makes navigational state available to the activated route via {@link ActivatedRoute#data} under the key {@link WorkbenchRouteData.state}.
  *
- * Depending on the route configuration, the Angular router runs this resolver on every navigation. See {@link Route#runGuardsAndResolvers}. Then,
- * we resolve to the current state of the activated route.
+ * Depending on the route configuration, the Angular router runs this resolver on every navigation. See {@link Route#runGuardsAndResolvers}.
+ * Then, we resolve to the current state of the activated route.
  *
- * Note that Angular performs a reference equality check to decide whether resolved data has changed. For that reason, we resolve to `undefined` if the
- * state object is empty.
+ * Note that Angular performs a reference equality check to decide whether resolved data has changed.
+ * Therefore, we resolve to `undefined` if the state object is empty.
  */
-@Injectable({providedIn: 'root'})
-export class NavigationStateResolver implements Resolve<Dictionary | undefined | null> {
+export const resolveWorkbenchNavigationState: ResolveFn<Dictionary | undefined | null> = route => {
+  const navigationalViewState = getNavigationalViewState(route.outlet);
+  return isEmpty(navigationalViewState) ? undefined : navigationalViewState;
+};
 
-  constructor(private _router: Router) {
+/**
+ * Returns navigational view state from either the navigation or the activated route.
+ */
+function getNavigationalViewState(viewId: string): WorkbenchNavigationalState | undefined {
+  const router = inject(Router);
+
+  const navigationalViewState = WorkbenchNavigationalStates.fromNavigation(router.getCurrentNavigation()!)?.viewStates?.[viewId];
+  if (navigationalViewState) {
+    return navigationalViewState;
   }
 
-  public resolve(route: ActivatedRouteSnapshot, routerState: RouterStateSnapshot): Dictionary | undefined | null {
-    const navigationalViewState = this.getNavigationalViewState(route.outlet);
-    return isEmpty(navigationalViewState) ? undefined : navigationalViewState;
-  }
-
-  private getNavigationalViewState(viewId: string): WorkbenchNavigationalState | undefined {
-    const navigationalViewState = WorkbenchNavigationalStates.fromNavigation(this._router.getCurrentNavigation()!)?.viewStates?.[viewId];
-    if (navigationalViewState) {
-      return navigationalViewState;
-    }
-    return this.findActivatedRoute(viewId)?.data?.[WorkbenchRouteData.state];
-  }
-
-  private findActivatedRoute(outlet: string): ActivatedRouteSnapshot | undefined {
-    return this._router.routerState.snapshot.root.children.find(it => it.outlet === outlet);
-  }
+  const activatedRoute = router.routerState.snapshot.root.children.find(child => child.outlet === viewId);
+  return activatedRoute?.data?.[WorkbenchRouteData.state];
 }
 
 /**

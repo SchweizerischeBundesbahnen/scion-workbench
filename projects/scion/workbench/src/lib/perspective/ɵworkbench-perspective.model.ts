@@ -9,7 +9,7 @@
  */
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
 import {MPartGrid} from '../layout/workbench-layout.model';
-import {EnvironmentInjector, inject} from '@angular/core';
+import {EnvironmentInjector, inject, runInInjectionContext} from '@angular/core';
 import {ɵStoredPerspectiveData, WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {BehaviorSubject} from 'rxjs';
 import {Commands} from '../routing/workbench-router.service';
@@ -83,7 +83,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   private async createInitialGrid(): Promise<MPartGrid> {
-    const layout = await this._environmentInjector.runInContext(() => this._initialLayoutFn(this._workbenchLayoutFactory.create()));
+    const layout = await runInInjectionContext(this._environmentInjector, () => this._initialLayoutFn(this._workbenchLayoutFactory.create()));
     return (layout as ɵWorkbenchLayout).peripheralGrid;
   }
 }

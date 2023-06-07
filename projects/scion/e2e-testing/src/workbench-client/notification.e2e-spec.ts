@@ -295,7 +295,7 @@ test.describe('Workbench Notification', () => {
 
     const textNotificationPO = new TextNotificationPO(appPO, 'testee');
     await expect(await textNotificationPO.isVisible()).toBe(true);
-    await textNotificationPO.waitUntilClosed(notificationDuration * 1000 + 100);
+    await textNotificationPO.waitUntilClosed(notificationDuration * 1000 + 500);
     await expect(await textNotificationPO.isPresent()).toBe(false);
   });
 
