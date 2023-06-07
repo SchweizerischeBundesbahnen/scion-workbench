@@ -355,9 +355,9 @@ In this step, we will create a component to open a todo in a view.
 
     ```html
     <ng-container *ngIf="todo$ | async as todo">
-      <label>Task:</label>{{todo.task}}
-      <label>Due Date:</label>{{todo.dueDate | date:'short'}}
-      <label>Notes:</label>{{todo.notes}}
+      <span>Task:</span>{{todo.task}}
+      <span>Due Date:</span>{{todo.dueDate | date:'short'}}
+      <span>Notes:</span>{{todo.notes}}
     </ng-container>
     ```
     Using Angular's `async` pipe, we subscribe to the `todo$` observable and assign its emitted value to the template variable `todo`. Then, we render the todo.   

@@ -95,11 +95,13 @@ export default class StartPageComponent implements OnDestroy {
     this.installFilterFieldDisplayTextSynchronizer();
   }
 
-  public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability): void {
+  public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability, event: MouseEvent): void {
+    event.preventDefault(); // Prevent href navigation imposed by accessibility rules
     this._workbenchClientRouter.navigate(viewCapability.qualifier, {target: this._view?.id});
   }
 
   public async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {
+    event.preventDefault(); // Prevent href navigation imposed by accessibility rules
     // TODO [#343] Remove switch-case after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/343
     switch (testCapability.type) {
       case WorkbenchCapabilities.View: {

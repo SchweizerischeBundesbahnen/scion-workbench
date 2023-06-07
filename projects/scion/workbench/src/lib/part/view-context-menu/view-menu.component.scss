@@ -19,11 +19,11 @@
       border-bottom: 1px solid colors.$viewlistitem-border-color;
     }
 
-    > div.menu-item {
+    > button.menu-item {
+      all: unset;
       display: flex;
       flex-flow: row nowrap;
       padding: .6em 1.5em;
-      cursor: default;
       font-size: smaller;
 
       > div.text {

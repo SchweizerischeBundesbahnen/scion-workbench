@@ -5,9 +5,9 @@
   background-color: var(--sci-color-P50);
   box-shadow: 8px 8px 9px -9px rgba(var(--sci-color-primary-rgb), .2);
 
-  > div.menu-item {
+  > button.menu-item {
+    all: unset;
     padding: .6em 1.5em;
-    cursor: default;
     font-size: smaller;
     user-select: none;
 
