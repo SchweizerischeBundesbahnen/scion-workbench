@@ -6,6 +6,15 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [15.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.7...15.0.0-beta.8) (2023-06-08)
+
+
+### Bug Fixes
+
+* **workbench:** reset part action list styling ([dde93b6](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/dde93b6758be547c581e59762620997e6d82edc8))
+
+
+
 # [15.0.0-beta.7](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.6...15.0.0-beta.7) (2023-06-06)
 
 
