@@ -6,6 +6,36 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [16.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.8...16.0.0-beta.1) (2023-06-08)
+
+
+### Dependencies
+
+* **workbench:** update @scion/workbench to Angular 16 ([98af801](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/98af80190e5893698b7102bde5e3cd03fc1a3f50)), closes [#429](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/429)
+
+
+### Features
+
+* **workbench:** accept passing `undefined` in optional inputs ([b19f428](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/b19f42834b2cb85daa580f519da82ce3afa746ab))
+* **workbench:** comply with basic accessibility rules ([ed52668](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ed526684d432e02380341c4f55e828d13846207d))
+* **workbench:** mark required inputs as required ([e8ccb94](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e8ccb94e91ba7dcb90118933554f707fba653d42))
+
+
+### BREAKING CHANGES
+
+* **workbench:** Removing compatibility of deprecated router API introduced a breaking change in client applications.
+
+  To migrate applications using @scion/workbench-client:
+  - update @scion/workbench-client to version `1.0.0-beta.17` or greater
+
+* **workbench:** Updating `@scion/workbench` to Angular 16 introduced a breaking change.
+  
+  To migrate:
+  - update your application to Angular 16.x; for detailed migration instructions, refer to https://v16.angular.io/guide/update-to-latest-version;
+  - update @scion/components to version 16; for detailed migration instructions, refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG_COMPONENTS.md;
+
+
+
 # [15.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.7...15.0.0-beta.8) (2023-06-08)
 
 
