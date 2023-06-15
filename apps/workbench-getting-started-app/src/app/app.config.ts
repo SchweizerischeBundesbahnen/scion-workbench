@@ -8,30 +8,27 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {NgModule} from '@angular/core';
-import {AppComponent} from './app.component';
-import {MAIN_AREA_PART_ID, WorkbenchLayout, WorkbenchModule} from '@scion/workbench';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {RouterModule} from '@angular/router';
-import {BrowserModule} from '@angular/platform-browser';
+import {provideWorkbench} from './workbench.provider';
+import {ApplicationConfig} from '@angular/core';
+import {MAIN_AREA_PART_ID, WorkbenchLayout} from '@scion/workbench';
+import {provideRouter, withHashLocation} from '@angular/router';
+import {provideAnimations} from '@angular/platform-browser/animations';
 
-@NgModule({
-  declarations: [AppComponent],
-  imports: [
-    WorkbenchModule.forRoot({
+/**
+ * Central place to configure the workbench-getting-started-app.
+ */
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideWorkbench({
       layout: (layout: WorkbenchLayout) => layout
         .addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left', ratio: .25})
         .addView('todos', {partId: 'left', activateView: true}),
     }),
-    RouterModule.forRoot([
+    provideRouter([
       {path: '', loadComponent: () => import('./welcome/welcome.component')},
       {path: '', outlet: 'todos', loadComponent: () => import('./todos/todos.component')},
       {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
-    ], {useHash: true}),
-    BrowserModule,
-    BrowserAnimationsModule,
+    ], withHashLocation()),
+    provideAnimations(),
   ],
-  bootstrap: [AppComponent],
-})
-export class AppModule {
-}
+};

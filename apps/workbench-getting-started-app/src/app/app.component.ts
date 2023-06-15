@@ -9,11 +9,14 @@
  */
 
 import {Component} from '@angular/core';
+import {WorkbenchComponent} from '@scion/workbench';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  standalone: true,
+  imports: [WorkbenchComponent],
 })
 export class AppComponent {
 }
