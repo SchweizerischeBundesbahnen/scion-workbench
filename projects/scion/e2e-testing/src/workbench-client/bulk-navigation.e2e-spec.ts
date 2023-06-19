@@ -20,7 +20,8 @@ test.describe('Bulk Navigation', () => {
     const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.openInNewTab(appPO, microfrontendNavigator);
     await bulkNavigationTestPagePO.enterViewCount(10);
     await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
-    await bulkNavigationTestPagePO.clickNavigateAwait();
+    // Since waiting for microfrontends to load takes some time, an interval of 500ms is used.
+    await bulkNavigationTestPagePO.clickNavigateAwait({probeInterval: 500});
 
     await expect(await appPO.activePart.getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
   });

@@ -1471,7 +1471,7 @@ test.describe('Workbench Router', () => {
     await routerPage1PO.enterTarget(undefined);
     await routerPage1PO.enterQualifier({component: 'testee'});
     await routerPage1PO.checkClose(true);
-    await routerPage1PO.clickNavigate();
+    await routerPage1PO.clickNavigate({probeInterval: 250}); // Closing multiple views simultaneously can result in longer navigation times.
 
     // expect the views to be closed
     await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
@@ -1658,7 +1658,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterQualifier({component: 'testee'});
     await routerPagePO.enterParams({seg1: '1'});
     await routerPagePO.checkClose(true);
-    await routerPagePO.clickNavigate();
+    await routerPagePO.clickNavigate({probeInterval: 250}); // Closing multiple views simultaneously can result in longer navigation times.
 
     // expect the view 1 to be closed
     await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
@@ -1708,7 +1708,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterQualifier({component: 'testee'});
     await routerPagePO.enterParams({seg1: '*'});
     await routerPagePO.checkClose(true);
-    await routerPagePO.clickNavigate();
+    await routerPagePO.clickNavigate({probeInterval: 250}); // Closing multiple views simultaneously can result in longer navigation times.
 
     // expect the views to be closed
     await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
@@ -1844,7 +1844,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterQualifier({component: 'testee'});
     await routerPagePO.enterParams({seg1: '*', seg2: '1'});
     await routerPagePO.checkClose(true);
-    await routerPagePO.clickNavigate();
+    await routerPagePO.clickNavigate({probeInterval: 250}); // Closing multiple views simultaneously can result in longer navigation times.
 
     // expect the view to be closed
     await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
@@ -1914,7 +1914,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.enterQualifier({component: 'testee'});
     await routerPagePO.enterParams({seg1: '*', seg2: '*'});
     await routerPagePO.checkClose(true);
-    await routerPagePO.clickNavigate();
+    await routerPagePO.clickNavigate({probeInterval: 250}); // Closing multiple views simultaneously can result in longer navigation times.
 
     // expect the view to be closed
     await expect(await appPO.activePart.getViewIds()).toHaveLength(1);

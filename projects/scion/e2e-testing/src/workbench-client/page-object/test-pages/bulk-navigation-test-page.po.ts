@@ -31,17 +31,28 @@ export class BulkNavigationTestPagePO {
     await this._locator.locator('input.e2e-css-class').fill(cssClass);
   }
 
-  public async clickNavigateNoAwait(): Promise<void> {
+  /**
+   * Clicks on a button to navigate via {@link WorkbenchRouter}.
+   *
+   * @param options - Controls how to navigate.
+   *        @property probeInternal - Time to wait in ms until navigation is stable. Useful when performing many navigations simultaneously.
+   */
+  public async clickNavigateNoAwait(options?: {probeInterval?: number}): Promise<void> {
     await this._locator.locator('button.e2e-navigate').click();
     // Wait for the URL to become stable after navigating.
-    await waitUntilStable(() => this._appPO.page.url());
+    await waitUntilStable(() => this._appPO.getCurrentNavigationId(), options);
   }
 
-  public async clickNavigateAwait(): Promise<void> {
+  /**
+   * Clicks on a button to navigate via {@link WorkbenchRouter}.
+   *
+   * @param options - Controls how to navigate.
+   *        @property probeInternal - Time to wait in ms until navigation is stable. Useful when performing many navigations simultaneously.
+   */
+  public async clickNavigateAwait(options?: {probeInterval?: number}): Promise<void> {
     await this._locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
-    // Since waiting for microfrontends to load takes some time, an interval of 500ms is used.
-    await waitUntilStable(() => this._appPO.page.url(), {probeInterval: 500});
+    await waitUntilStable(() => this._appPO.getCurrentNavigationId(), options);
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
