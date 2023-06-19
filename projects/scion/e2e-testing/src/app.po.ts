@@ -215,7 +215,7 @@ export class AppPO {
    * This flag is set in `app.component.ts` in the 'workbench-testing-app'.
    */
   public getCurrentNavigationId(): Promise<string | null> {
-    return this.page.locator('app-root').getAttribute('attr.data-navigationid');
+    return this.page.locator('app-root').getAttribute('data-navigationid');
   }
 }
 

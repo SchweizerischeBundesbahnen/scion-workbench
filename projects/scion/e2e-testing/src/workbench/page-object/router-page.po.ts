@@ -83,12 +83,18 @@ export class RouterPagePO {
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-view-context')).toggle(check);
   }
 
-  public async clickNavigate(): Promise<void> {
+  /**
+   * Clicks on a button to navigate via {@link WorkbenchRouter}.
+   *
+   * @param options - Controls how to navigate.
+   *        @property probeInternal - Time to wait in ms until navigation is stable. Useful when performing many navigations simultaneously.
+   */
+  public async clickNavigate(options?: {probeInterval?: number}): Promise<void> {
     await this._locator.locator('button.e2e-router-navigate').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitUntilStable(() => this._appPO.getCurrentNavigationId()),
+      waitUntilStable(() => this._appPO.getCurrentNavigationId(), options),
       rejectWhenAttached(this._locator.locator('output.e2e-navigate-error')),
     ]);
   }
