@@ -33,13 +33,13 @@ export class BulkNavigationTestPagePO {
   public async clickNavigateNoAwait(): Promise<void> {
     await this._locator.locator('button.e2e-navigate').click();
     // Wait for the URL to become stable after navigating.
-    await waitUntilStable(() => this._appPO.page.url());
+    await waitUntilStable(() => this._appPO.getCurrentNavigationId());
   }
 
   public async clickNavigateAwait(): Promise<void> {
     await this._locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
-    await waitUntilStable(() => this._appPO.page.url());
+    await waitUntilStable(() => this._appPO.getCurrentNavigationId());
   }
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
