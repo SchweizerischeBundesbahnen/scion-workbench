@@ -52,8 +52,8 @@ export class ɵMessageBox<T = any> implements MessageBox<T> {
     this.title$.next(title);
   }
 
-  public setSeverity(severity: 'info' | 'warn' | 'error' | undefined): void {
-    this.severity$.next(severity ?? 'info');
+  public setSeverity(severity: 'info' | 'warn' | 'error'): void {
+    this.severity$.next(severity);
   }
 
   public setCssClass(cssClass: string | string[]): void {
