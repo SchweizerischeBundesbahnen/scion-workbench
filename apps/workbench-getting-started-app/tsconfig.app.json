@@ -3,7 +3,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/workbench-getting-started-app",
-    "types": []
+    "types": [],
+    "strict": true
   },
   "files": [
     "src/main.ts",
