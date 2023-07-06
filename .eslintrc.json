@@ -90,13 +90,6 @@
           }
         ],
         "@typescript-eslint/semi": "error",
-        "@typescript-eslint/typedef": [
-          "error",
-          {
-            "parameter": true,
-            "propertyDeclaration": true
-          }
-        ],
         "array-bracket-spacing": [
           "error"
         ],
