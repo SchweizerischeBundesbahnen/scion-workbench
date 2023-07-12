@@ -10,7 +10,6 @@
 
 import {ActivatedRouteSnapshot, Params, UrlSegment} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
-import {Qualifier} from '@scion/microfrontend-platform';
 import {Dictionaries, Dictionary} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
@@ -40,7 +39,6 @@ export namespace MicrofrontendViewRoutes {
     const segments = Array.isArray(route) ? route : route.url;
     return {
       viewCapabilityId: segments[1].path,
-      qualifier: segments[0].parameters,
       urlParams: segments[1].parameters,
       transientParams: Array.isArray(route) ? {} : route.data[WorkbenchRouteData.state]?.[MicrofrontendNavigationalStates.transientParams] || {},
     };
@@ -68,17 +66,16 @@ export namespace MicrofrontendViewRoutes {
   /**
    * Builds the command array to be passed to the workbench router for navigating to a microfrontend view.
    *
-   * Format: ['~', {qualifier}, '<viewCapabilityId>', {params}]
+   * Format: ['~', '<viewCapabilityId>', {params}]
    */
-  export function buildRouterNavigateCommand(viewCapabilityId: string, qualifier: Qualifier, params: Params): any[] {
+  export function buildRouterNavigateCommand(viewCapabilityId: string, params: Params): any[] {
     const paramsCommand = Object.keys(params).length > 0 ? [params] : [];
-    return [ROUTE_PREFIX, qualifier, viewCapabilityId, ...paramsCommand];
+    return [ROUTE_PREFIX, viewCapabilityId, ...paramsCommand];
   }
 }
 
 export interface MicrofrontendRouteParams {
   viewCapabilityId: string;
-  qualifier: Params;
   urlParams: Params;
   transientParams: Params;
 }

@@ -16,7 +16,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Workbench Router', () => {
 
-  test('should contain the qualifier in view params', async ({appPO, microfrontendNavigator}) => {
+  test('should not contain the qualifier in view params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee view
@@ -42,7 +42,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
 
     await expect(await testeeViewPage.getViewParams()).toEqual(
-      expect.objectContaining({
+      expect.not.objectContaining({
         entity: 'products [string]',
       }));
   });
@@ -78,63 +78,26 @@ test.describe('Workbench Router', () => {
 
     await expect(await testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
-        entity: 'product [string]',
         id: '123 [string]',
       }));
   });
 
-  test('should not overwrite qualifier values with param values', async ({appPO, microfrontendNavigator}) => {
+  test('should substitute named URL params with values of the params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee view
     const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     await registerCapabilityPage.registerCapability({
       type: 'view',
-      qualifier: {entity: 'product', mode: 'new'},
+      qualifier: {component: 'testee'},
       params: [
-        {name: 'mode', required: true},
-      ],
-      properties: {
-        path: 'test-view',
-        title: 'testee',
-        cssClass: 'testee',
-      },
-    });
-
-    // navigate
-    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({entity: 'product', mode: 'new'});
-    await routerPage.enterParams({mode: 'edit'}); // should be ignored
-    await routerPage.enterTarget('blank');
-    await routerPage.clickNavigate();
-
-    // expect qualifier values not to be overwritten by params
-    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
-
-    await expect(await testeeViewPage.getViewParams()).toEqual(
-      expect.objectContaining({
-        entity: 'product [string]',
-        mode: 'new [string]',
-      }));
-  });
-
-  test('should substitute named URL params with values of the qualifier and params', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register testee view
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
-      type: 'view',
-      qualifier: {component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'},
-      params: [
-        {name: 'seg3', required: true},
-        {name: 'mp2', required: true},
-        {name: 'qp2', required: true},
+        {name: 'seg', required: true},
+        {name: 'mp', required: true},
+        {name: 'qp', required: true},
         {name: 'fragment', required: true},
       ],
       properties: {
-        path: 'test-pages/view-test-page/:seg1/segment2/:seg3;mp1=:mp1;mp2=:mp2?qp1=:qp1&qp2=:qp2#:fragment',
+        path: 'test-pages/view-test-page/:seg;mp=:mp?qp=:qp#:fragment',
         title: 'testee',
         cssClass: 'testee',
       },
@@ -142,8 +105,8 @@ test.describe('Workbench Router', () => {
 
     // navigate
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'});
-    await routerPage.enterParams({seg3: 'SEG3', mp2: 'MP2', qp2: 'QP2', fragment: 'FRAGMENT'});
+    await routerPage.enterQualifier({component: 'testee'});
+    await routerPage.enterParams({seg: 'SEG', mp: 'MP', qp: 'QP', fragment: 'FRAGMENT'});
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
@@ -153,17 +116,13 @@ test.describe('Workbench Router', () => {
 
     await expect(await testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
-        component: 'testee [string]',
-        seg1: 'SEG1 [string]',
-        seg3: 'SEG3 [string]',
-        mp1: 'MP1 [string]',
-        mp2: 'MP2 [string]',
-        qp1: 'QP1 [string]',
-        qp2: 'QP2 [string]',
+        seg: 'SEG [string]',
+        mp: 'MP [string]',
+        qp: 'QP [string]',
         fragment: 'FRAGMENT [string]',
       }));
-    await expect(await testeeViewPage.getRouteParams()).toEqual({segment1: 'SEG1', segment3: 'SEG3', mp1: 'MP1', mp2: 'MP2'});
-    await expect(await testeeViewPage.getRouteQueryParams()).toEqual({qp1: 'QP1', qp2: 'QP2'});
+    await expect(await testeeViewPage.getRouteParams()).toEqual({segment1: 'SEG', mp: 'MP'});
+    await expect(await testeeViewPage.getRouteQueryParams()).toEqual({qp: 'QP'});
     await expect(await testeeViewPage.getRouteFragment()).toEqual('FRAGMENT');
   });
 
@@ -210,7 +169,6 @@ test.describe('Workbench Router', () => {
     // expect the view's params to be updated
     await expect(await testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
-        entity: 'product [string]',
         id: '456 [string]',
       }));
     // expect no new view instance to be constructed
@@ -251,7 +209,6 @@ test.describe('Workbench Router', () => {
 
     await expect(await testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
-        entity: 'product [string]',
         id: 'null [string]',
       }));
   });
@@ -295,7 +252,6 @@ test.describe('Workbench Router', () => {
     const params = await testeeViewPage.getViewParams();
     await expect(params).toEqual(
       expect.objectContaining({
-        entity: 'product [string]',
         id: '123 [string]',
       }));
     await expect(params).not.toEqual(expect.objectContaining({param1: expect.anything()}));
@@ -597,7 +553,6 @@ test.describe('Workbench Router', () => {
 
       await expect(await testeeViewPage.getViewParams()).toEqual(
         expect.objectContaining({
-          entity: 'product [string]',
           id: '123 [string]',
           param1: 'transient param1 [string]',
           param2: 'transient param2 [string]',
@@ -882,8 +837,6 @@ test.describe('Workbench Router', () => {
       const testeeViewPage1 = new ViewPagePO(appPO, viewId);
       await expect(await testeeViewPage1.getViewParams()).toEqual(
         expect.objectContaining({
-          entity: 'product [string]',
-          app: 'app1 [string]',
           param: 'param app1 [string]',
           transientParam: 'transient param app1 [string]',
         }));
@@ -901,8 +854,6 @@ test.describe('Workbench Router', () => {
       const testeeViewPage2 = new ViewPagePO(appPO, viewId);
       await expect(await testeeViewPage2.getViewParams()).toEqual(
         expect.objectContaining({
-          entity: 'product [string]',
-          app: 'app2 [string]',
           param: 'param app2 [string]',
           transientParam: 'transient param app2 [string]',
         }));
@@ -962,8 +913,6 @@ test.describe('Workbench Router', () => {
       const testeeViewPage1 = new ViewPagePO(appPO, viewId);
       await expect(await testeeViewPage1.getViewParams()).toEqual(
         expect.objectContaining({
-          entity: 'product [string]',
-          app: 'app1 [string]',
           transientParam: 'transient param app1 [string]',
         }));
 
@@ -973,15 +922,13 @@ test.describe('Workbench Router', () => {
       await routerPage2.enterTarget(viewId);
       await routerPage2.clickNavigate();
 
-      // expect transient param to be contained in view params
+      // expect transient param not to be contained in view params
       const testeeViewTab2 = appPO.view({cssClass: 'testee2'}).viewTab;
       await testeeViewTab2.click();
       const testeeViewPage2 = new ViewPagePO(appPO, viewId);
-      await expect(await testeeViewPage2.getViewParams()).toEqual(
-        expect.objectContaining({
-          entity: 'product [string]',
-          app: 'app2 [string]',
-        }));
+      await expect(await testeeViewPage2.getViewParams()).toEqual(expect.not.objectContaining({
+        transientParam: 'transient param app1 [string]',
+      }));
     });
   });
 });

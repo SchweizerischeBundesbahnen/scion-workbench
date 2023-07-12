@@ -817,7 +817,7 @@ test.describe('Workbench Router', () => {
 
     // register testee-1 view
     const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage1.registerCapability({
+    const view1CapabilityId = (await registerCapabilityPage1.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
@@ -825,11 +825,11 @@ test.describe('Workbench Router', () => {
         title: 'Testee 1',
         cssClass: 'testee-1',
       },
-    });
+    })).metadata!.id;
 
     // register testee-2 view
     const registerCapabilityPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage2.registerCapability({
+    const view2CapabilityId = (await registerCapabilityPage2.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-2'},
       properties: {
@@ -837,7 +837,7 @@ test.describe('Workbench Router', () => {
         title: 'Testee 2',
         cssClass: 'testee-2',
       },
-    });
+    })).metadata!.id;
 
     // navigate to testee-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
@@ -863,7 +863,7 @@ test.describe('Workbench Router', () => {
     await testeeViewPage.view.viewTab.click();
 
     // expect the correct view to display
-    await expect(await testeeViewPage.getViewParams()).toEqual(expect.objectContaining({component: 'testee-2 [string]'}));
+    await expect(await testeeViewPage.getViewParams()).toEqual(expect.objectContaining({ɵViewCapabilityId: `${view2CapabilityId} [string]`}));
     // expect no new view instance to be constructed
     await expect(await testeeViewPage.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
@@ -877,7 +877,7 @@ test.describe('Workbench Router', () => {
     await testeeViewPage.view.viewTab.click();
 
     // expect the correct view to display
-    await expect(await testeeViewPage.getViewParams()).toEqual(expect.objectContaining({component: 'testee-1 [string]'}));
+    await expect(await testeeViewPage.getViewParams()).toEqual(expect.objectContaining({ɵViewCapabilityId: `${view1CapabilityId} [string]`}));
     // expect no new view instance to be constructed
     await expect(await testeeViewPage.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
@@ -891,7 +891,7 @@ test.describe('Workbench Router', () => {
     await testeeViewPage.view.viewTab.click();
 
     // expect the correct view to display
-    await expect(await testeeViewPage.getViewParams()).toEqual(expect.objectContaining({component: 'testee-2 [string]'}));
+    await expect(await testeeViewPage.getViewParams()).toEqual(expect.objectContaining({ɵViewCapabilityId: `${view2CapabilityId} [string]`}));
     // expect no new view instance to be constructed
     await expect(await testeeViewPage.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
@@ -2215,8 +2215,8 @@ test.describe('Workbench Router', () => {
       ],
       properties: {
         path: 'test-pages/microfrontend-test-page',
-        title: ':param1/:param2/:param3 [component=:component]',
-        heading: ':param1 :param2 :param3 [component=:component]',
+        title: ':param1/:param2/:param3',
+        heading: ':param1 :param2 :param3',
         cssClass: 'testee',
       },
     });
@@ -2229,7 +2229,7 @@ test.describe('Workbench Router', () => {
     await routerPage.clickNavigate();
 
     const testeeViewTab = appPO.view({cssClass: 'testee'}).viewTab;
-    await expect(await testeeViewTab.getTitle()).toEqual('value1/value2/:param3 [component=testee]');
-    await expect(await testeeViewTab.getHeading()).toEqual('value1 value2 :param3 [component=testee]');
+    await expect(await testeeViewTab.getTitle()).toEqual('value1/value2/:param3');
+    await expect(await testeeViewTab.getHeading()).toEqual('value1 value2 :param3');
   });
 });
