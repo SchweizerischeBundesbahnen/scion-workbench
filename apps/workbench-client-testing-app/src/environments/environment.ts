@@ -21,7 +21,6 @@
  * Environment used when starting the app locally.
  */
 export const environment = {
-  production: false,
   animationEnabled: false,
   apps: {
     app1: {

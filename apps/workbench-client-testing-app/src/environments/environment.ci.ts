@@ -12,7 +12,6 @@
  * Environment used when packaging the app for CI on GitHub.
  */
 export const environment = {
-  production: true,
   animationEnabled: false,
   apps: {
     app1: {
