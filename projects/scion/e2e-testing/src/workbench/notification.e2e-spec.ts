@@ -341,8 +341,6 @@ test.describe('Workbench Notification', () => {
         await expect(await inspectorPO.notificationPO.getSeverity()).toEqual('warn');
         await inspectorPO.selectSeverity('error');
         await expect(await inspectorPO.notificationPO.getSeverity()).toEqual('error');
-        await inspectorPO.selectSeverity('');
-        await expect(await inspectorPO.notificationPO.getSeverity()).toEqual('info');
       });
 
       test('should overwrite the severity if also passed by the notification reporter', async ({appPO, workbenchNavigator}) => {

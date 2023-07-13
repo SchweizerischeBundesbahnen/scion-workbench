@@ -776,8 +776,6 @@ test.describe('Workbench Message Box', () => {
       await expect(await inspectorPO.msgboxPO.getSeverity()).toEqual('warn');
       await inspectorPO.selectSeverity('error');
       await expect(await inspectorPO.msgboxPO.getSeverity()).toEqual('error');
-      await inspectorPO.selectSeverity('');
-      await expect(await inspectorPO.msgboxPO.getSeverity()).toEqual('info');
     });
 
     test('should overwrite the severity if also passed by the message box opener', async ({appPO, workbenchNavigator}) => {

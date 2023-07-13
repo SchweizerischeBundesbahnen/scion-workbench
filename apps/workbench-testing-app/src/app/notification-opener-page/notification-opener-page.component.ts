@@ -9,22 +9,12 @@
  */
 
 import {Component, Type} from '@angular/core';
-import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NotificationService} from '@scion/workbench';
 import {InspectNotificationComponent} from '../inspect-notification-provider/inspect-notification.component';
 import {NgIf} from '@angular/common';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
-
-const TITLE = 'title';
-const CONTENT = 'content';
-const COMPONENT = 'component';
-const COMPONENT_INPUT = 'componentInput';
-const SEVERITY = 'severity';
-const DURATION = 'duration';
-const GROUP = 'group';
-const USE_GROUP_INPUT_REDUCER = 'groupInputReducer';
-const CSS_CLASS = 'cssClass';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -40,56 +30,45 @@ const CSS_CLASS = 'cssClass';
 })
 export default class NotificationOpenerPageComponent {
 
-  public readonly TITLE = TITLE;
-  public readonly CONTENT = CONTENT;
-  public readonly COMPONENT = COMPONENT;
-  public readonly COMPONENT_INPUT = COMPONENT_INPUT;
-  public readonly SEVERITY = SEVERITY;
-  public readonly DURATION = DURATION;
-  public readonly GROUP = GROUP;
-  public readonly USE_GROUP_INPUT_REDUCER = USE_GROUP_INPUT_REDUCER;
-  public readonly CSS_CLASS = CSS_CLASS;
+  public form = this._formBuilder.group({
+    title: this._formBuilder.control(''),
+    content: this._formBuilder.control(''),
+    component: this._formBuilder.control<'inspect-notification' | ''>(''),
+    componentInput: this._formBuilder.control(''),
+    severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
+    duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | '' | number>(''),
+    group: this._formBuilder.control(''),
+    useGroupInputReducer: this._formBuilder.control(false),
+    cssClass: this._formBuilder.control(''),
+  });
 
-  public form: UntypedFormGroup;
-
-  constructor(formBuilder: UntypedFormBuilder, private _notificationService: NotificationService) {
-    this.form = formBuilder.group({
-      [TITLE]: formBuilder.control(''),
-      [CONTENT]: formBuilder.control(''),
-      [COMPONENT]: formBuilder.control(''),
-      [COMPONENT_INPUT]: formBuilder.control(''),
-      [SEVERITY]: formBuilder.control(''),
-      [DURATION]: formBuilder.control(''),
-      [GROUP]: formBuilder.control(''),
-      [USE_GROUP_INPUT_REDUCER]: formBuilder.control(false),
-      [CSS_CLASS]: formBuilder.control(''),
-    });
+  constructor(private _formBuilder: NonNullableFormBuilder, private _notificationService: NotificationService) {
   }
 
   public onNotificationShow(): void {
     this._notificationService.notify({
-      title: this.restoreLineBreaks(this.form.get(TITLE).value) || undefined,
-      content: (this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.get(CONTENT).value)) || undefined,
-      componentInput: (this.isUseComponent() ? this.form.get(COMPONENT_INPUT).value : undefined) || undefined,
-      severity: this.form.get(SEVERITY).value || undefined,
+      title: this.restoreLineBreaks(this.form.controls.title.value) || undefined,
+      content: this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.controls.content.value),
+      componentInput: (this.isUseComponent() ? this.form.controls.componentInput.value : undefined) || undefined,
+      severity: this.form.controls.severity.value || undefined,
       duration: this.parseDurationFromUI(),
-      group: this.form.get(GROUP).value || undefined,
+      group: this.form.controls.group.value || undefined,
       groupInputReduceFn: this.isUseGroupInputReducer() ? concatInput : undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
+      cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
     });
   }
 
-  private parseComponentFromUI(): Type<any> {
-    switch (this.form.get(COMPONENT).value) {
+  private parseComponentFromUI(): Type<InspectNotificationComponent> {
+    switch (this.form.controls.component.value) {
       case 'inspect-notification':
         return InspectNotificationComponent;
       default:
-        throw Error(`[IllegalNotificationComponent] Notification component not supported: ${this.form.get(COMPONENT).value}`);
+        throw Error(`[IllegalNotificationComponent] Notification component not supported: ${this.form.controls.component.value}`);
     }
   }
 
   private parseDurationFromUI(): 'short' | 'medium' | 'long' | 'infinite' | number | undefined {
-    const duration = this.form.get(DURATION).value;
+    const duration = this.form.controls.duration.value;
     if (duration === '') {
       return undefined;
     }
@@ -100,11 +79,11 @@ export default class NotificationOpenerPageComponent {
   }
 
   public isUseComponent(): boolean {
-    return !!this.form.get(COMPONENT).value;
+    return !!this.form.controls.component.value;
   }
 
   public isUseGroupInputReducer(): boolean {
-    return this.form.get(USE_GROUP_INPUT_REDUCER).value;
+    return this.form.controls.useGroupInputReducer.value;
   }
 
   /**

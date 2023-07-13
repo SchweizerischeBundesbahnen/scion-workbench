@@ -9,18 +9,11 @@
  */
 
 import {Component, Type} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchRouteData} from '@scion/workbench';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {KeyValuePipe, NgFor, NgIf} from '@angular/common';
 import {DefaultExport, Router, Routes} from '@angular/router';
-
-const PATH = 'path';
-const COMPONENT = 'component';
-const OUTLET = 'outlet';
-const ROUTE_DATA = 'routeData';
-const TITLE = 'title';
-const CSS_CLASS = 'cssClass';
 
 @Component({
   selector: 'app-register-route-page',
@@ -37,42 +30,34 @@ const CSS_CLASS = 'cssClass';
 })
 export default class RegisterRoutePageComponent {
 
-  public readonly PATH = PATH;
-  public readonly COMPONENT = COMPONENT;
-  public readonly OUTLET = OUTLET;
-  public readonly ROUTE_DATA = ROUTE_DATA;
-  public readonly TITLE = TITLE;
-  public readonly CSS_CLASS = CSS_CLASS;
-
   public readonly componentRefs = new Map<string, () => Promise<DefaultExport<Type<unknown>>>>()
     .set('view-page', () => import('../../view-page/view-page.component'))
     .set('router-page', () => import('../../router-page/router-page.component'));
 
-  public form: FormGroup;
+  public form = this._formBuilder.group({
+    path: this._formBuilder.control(''),
+    component: this._formBuilder.control<'view-page' | 'router-page' | ''>('', Validators.required),
+    outlet: this._formBuilder.control(''),
+    routeData: this._formBuilder.group({
+      title: this._formBuilder.control(''),
+      cssClass: this._formBuilder.control(''),
+    }),
+  });
 
-  constructor(formBuilder: FormBuilder, private _router: Router) {
-    this.form = formBuilder.group({
-      [PATH]: formBuilder.control('', {nonNullable: true}),
-      [COMPONENT]: formBuilder.control(undefined, {validators: Validators.required, nonNullable: true}),
-      [OUTLET]: formBuilder.control(undefined, {nonNullable: true}),
-      [ROUTE_DATA]: formBuilder.group({
-        [TITLE]: formBuilder.control(undefined, {nonNullable: true}),
-        [CSS_CLASS]: formBuilder.control(undefined, {nonNullable: true}),
-      }),
-    });
+  constructor(private _formBuilder: NonNullableFormBuilder, private _router: Router) {
   }
 
   public onRegister(): void {
     this.replaceRouterConfig([
       ...this._router.config,
       {
-        path: this.form.get(PATH).value,
-        outlet: this.form.get(OUTLET).value || undefined,
-        loadComponent: this.componentRefs.get(this.form.get(COMPONENT).value),
+        path: this.form.controls.path.value,
+        outlet: this.form.controls.outlet.value || undefined,
+        loadComponent: this.componentRefs.get(this.form.controls.component.value),
         data: {
-          [WorkbenchRouteData.title]: this.form.get([ROUTE_DATA, TITLE]).value || undefined,
+          [WorkbenchRouteData.title]: this.form.controls.routeData.controls.title.value || undefined,
           [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
-          [WorkbenchRouteData.cssClass]: this.form.get([ROUTE_DATA, CSS_CLASS]).value?.split(/\s+/).filter(Boolean),
+          [WorkbenchRouteData.cssClass]: this.form.controls.routeData.controls.cssClass.value.split(/\s+/).filter(Boolean),
         },
       },
     ]);

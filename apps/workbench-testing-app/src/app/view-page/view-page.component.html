@@ -39,7 +39,7 @@
     <header>Navigational State</header>
   </ng-template>
   <ng-template #panel_navigational_state>
-    <sci-property [properties]="state" class="e2e-navigational-state"></sci-property>
+    <sci-property [properties]="$any(state)" class="e2e-navigational-state"></sci-property>
   </ng-template>
 </sci-accordion>
 

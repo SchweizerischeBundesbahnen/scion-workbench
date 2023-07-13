@@ -10,7 +10,7 @@
 
 import {Component} from '@angular/core';
 import {MessageBox} from '@scion/workbench';
-import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 import {NgIf} from '@angular/common';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
@@ -18,12 +18,7 @@ import {SciViewportModule} from '@scion/components/viewport';
 import {SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {StringifyPipe} from '../common/stringify.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-
-const TITLE = 'title';
-const SEVERITY = 'severity';
-const CSS_CLASS = 'cssClass';
-const ACTIONS = 'actions';
-const RETURN_VALUE = 'returnValue';
+import {filter} from 'rxjs/operators';
 
 @Component({
   selector: 'app-inspect-message-box',
@@ -41,49 +36,44 @@ const RETURN_VALUE = 'returnValue';
 })
 export class InspectMessageBoxComponent {
 
-  public readonly TITLE = TITLE;
-  public readonly SEVERITY = SEVERITY;
-  public readonly CSS_CLASS = CSS_CLASS;
-  public readonly ACTIONS = ACTIONS;
-  public readonly RETURN_VALUE = RETURN_VALUE;
-
   public uuid = UUID.randomUUID();
-  public form: UntypedFormGroup;
+  public form = this._formBuilder.group({
+    title: this._formBuilder.control(''),
+    severity: this._formBuilder.control<'info' | 'warn' | 'error' | undefined>(undefined),
+    cssClass: this._formBuilder.control(''),
+    actions: this._formBuilder.array<{paramName: string; paramValue: string}>([]),
+    returnValue: this._formBuilder.control(''),
+  });
 
-  constructor(public messageBox: MessageBox<Map<string, any>>, formBuilder: UntypedFormBuilder) {
-    this.form = formBuilder.group({
-      [TITLE]: formBuilder.control(''),
-      [SEVERITY]: formBuilder.control(''),
-      [CSS_CLASS]: formBuilder.control(''),
-      [ACTIONS]: formBuilder.array([]),
-      [RETURN_VALUE]: formBuilder.control(''),
-    });
-
-    this.form.get(TITLE).valueChanges
+  constructor(public messageBox: MessageBox<Map<string, any>>, private _formBuilder: NonNullableFormBuilder) {
+    this.form.controls.title.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(title => {
         this.messageBox.setTitle(title || undefined);
       });
 
-    this.form.get(SEVERITY).valueChanges
-      .pipe(takeUntilDestroyed())
+    this.form.controls.severity.valueChanges
+      .pipe(
+        filter(Boolean),
+        takeUntilDestroyed()
+      )
       .subscribe(severity => {
-        this.messageBox.setSeverity(severity || undefined);
+        this.messageBox.setSeverity(severity);
       });
 
-    this.form.get(CSS_CLASS).valueChanges
+    this.form.controls.cssClass.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(cssClass => {
         this.messageBox.setCssClass(cssClass.split(/\s+/).filter(Boolean));
       });
 
-    this.form.get(ACTIONS).valueChanges
+    this.form.controls.actions.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe((actions: Array<{paramName: string; paramValue: string}>) => {
         this.messageBox.setActions(actions.map(action => ({
             key: action.paramName,
             label: action.paramValue,
-            onAction: () => `${action.paramName} => ${this.form.get(RETURN_VALUE).value}`,
+            onAction: () => `${action.paramName} => ${this.form.controls.returnValue.value}`,
           })),
         );
       });

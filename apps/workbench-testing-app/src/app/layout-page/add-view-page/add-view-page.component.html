@@ -1,30 +1,30 @@
 <form [formGroup]="form" autocomplete="off">
   <section class="e2e-view">
     <sci-form-field label="View ID">
-      <input [formControlName]="VIEW_ID" class="e2e-view-id">
+      <input [formControl]="form.controls.viewId" class="e2e-view-id">
     </sci-form-field>
   </section>
 
-  <section [formGroupName]="OPTIONS" class="e2e-view-options">
+  <section [formGroup]="form.controls.options" class="e2e-view-options">
     <header>Options</header>
 
     <sci-form-field label="Part ID">
-      <input [formControlName]="PART_ID" class="e2e-part-id" list="parts">
+      <input [formControl]="form.controls.options.controls.partId" class="e2e-part-id" list="parts">
       <datalist id="parts">
         <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
       </datalist>
     </sci-form-field>
 
     <sci-form-field label="Position">
-      <input [formControlName]="POSITION" type="number" class="e2e-position">
+      <input [formControl]="form.controls.options.controls.position" type="number" class="e2e-position">
     </sci-form-field>
 
     <sci-form-field label="Activate View">
-      <sci-checkbox [formControlName]="ACTIVATE_VIEW" class="e2e-activate-view"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.options.controls.activateView" class="e2e-activate-view"></sci-checkbox>
     </sci-form-field>
 
     <sci-form-field label="Activate Part">
-      <sci-checkbox [formControlName]="ACTIVATE_PART" class="e2e-activate-part"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.options.controls.activatePart" class="e2e-activate-part"></sci-checkbox>
     </sci-form-field>
   </section>
 

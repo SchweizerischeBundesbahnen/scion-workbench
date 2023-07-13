@@ -17,7 +17,7 @@ import {Dictionary} from '@scion/toolkit/util';
 @Pipe({name: 'appPluck', standalone: true})
 export class PluckPipe implements PipeTransform {
 
-  public transform<T>(data: Dictionary, name: string): T {
-    return data[name];
+  public transform<T>(data: Dictionary | null | undefined, name: string): T | undefined {
+    return data?.[name];
   }
 }

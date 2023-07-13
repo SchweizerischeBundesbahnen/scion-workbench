@@ -1,36 +1,35 @@
 <form [formGroup]="form" autocomplete="off">
   <section class="e2e-part">
     <sci-form-field label="Part ID">
-      <input [formControlName]="PART_ID" class="e2e-part-id">
+      <input [formControl]="form.controls.partId" class="e2e-part-id">
     </sci-form-field>
 
     <sci-form-field label="Activate">
-      <sci-checkbox [formControlName]="ACTIVATE" class="e2e-activate"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.activate" class="e2e-activate"></sci-checkbox>
     </sci-form-field>
   </section>
 
-  <section [formGroupName]="RELATIVE_TO" class="e2e-reference-part">
+  <section [formGroup]="form.controls.relativeTo" class="e2e-reference-part">
     <header>Relative To</header>
 
     <sci-form-field label="Part ID">
-      <input [formControlName]="PART_ID" class="e2e-part-id" list="parts">
+      <input [formControl]="form.controls.relativeTo.controls.partId" class="e2e-part-id" list="parts">
       <datalist id="parts">
         <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
       </datalist>
     </sci-form-field>
 
     <sci-form-field label="Align">
-      <input [formControlName]="ALIGN" class="e2e-align" list="align">
-      <datalist id="align">
+      <select [formControl]="form.controls.relativeTo.controls.align" class="e2e-align">
         <option value="left">left</option>
         <option value="right">right</option>
         <option value="top">top</option>
         <option value="bottom">bottom</option>
-      </datalist>
+      </select>
     </sci-form-field>
 
     <sci-form-field label="Ratio">
-      <input [formControlName]="RATIO" class="e2e-ratio" type="number">
+      <input [formControl]="form.controls.relativeTo.controls.ratio" class="e2e-ratio" type="number">
     </sci-form-field>
   </section>
 

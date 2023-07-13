@@ -13,14 +13,14 @@ class InspectNotificationIntentHandler {
 
   constructor(intentClient: IntentClient, notificationService: NotificationService) {
     intentClient.onIntent<WorkbenchMessageBoxConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {component: 'inspector'}}, request => {
-      const config: WorkbenchNotificationConfig = request.body;
+      const config: WorkbenchNotificationConfig = request.body!;
 
       notificationService.notify({
         ...config,
         content: InspectNotificationComponent,
         componentInput: new Map([
           ...request.headers,
-          ...request.intent.params,
+          ...request.intent.params ?? [],
           ...Maps.coerce(request.intent.qualifier),
           ['$implicit', config.content],
         ]),

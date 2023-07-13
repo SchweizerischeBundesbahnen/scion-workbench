@@ -30,7 +30,10 @@ export class MenuItem {
   public cssClass?: string | string[];
 
   constructor(menuItem: MenuItem) {
-    Object.assign(this, menuItem);
+    this.text = menuItem.text;
+    this.onAction = menuItem.onAction;
+    this.disabled = menuItem.disabled;
+    this.cssClass = menuItem.cssClass;
   }
 }
 

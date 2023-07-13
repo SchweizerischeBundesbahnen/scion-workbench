@@ -1,37 +1,38 @@
 @use '@scion/components.internal' as sci-ɵcomponents;
 
 :host {
-  display: grid;
-  grid-auto-rows: max-content;
-  row-gap: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
   padding: 1em;
 
-  > section, form {
-    display: grid;
-    grid-row-gap: .5em;
-    border: 1px solid var(--sci-color-P400);
-    border-radius: 5px;
-    padding: 1em;
+  > form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
 
-    > header {
-      margin-top: 0;
-      margin-bottom: 2em;
-      font-weight: bold;
-    }
-  }
-
-  sci-accordion {
-    header {
-      font-weight: bold;
+    > section {
+      display: flex;
+      flex-direction: column;
+      gap: .5em;
+      border: 1px solid var(--sci-color-P400);
+      border-radius: 5px;
+      padding: 1em;
     }
 
-    &.input input {
-      @include sci-ɵcomponents.theme-input-field();
+    > sci-accordion {
+      header {
+        font-weight: bold;
+      }
+
+      &.input input {
+        @include sci-ɵcomponents.theme-input-field();
+      }
     }
   }
 
   > button.open {
-    justify-self: center;
+    align-self: center;
   }
 
   > output.return-value {

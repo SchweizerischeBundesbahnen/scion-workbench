@@ -9,8 +9,8 @@
  */
 
 import {Component, Injector} from '@angular/core';
-import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
-import {WorkbenchNavigationExtras, WorkbenchRouterLinkDirective, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
@@ -19,18 +19,6 @@ import {map} from 'rxjs/operators';
 import {AsyncPipe, NgFor, NgIf, NgTemplateOutlet} from '@angular/common';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
-
-const PATH = 'path';
-const QUERY_PARAMS = 'queryParams';
-const MATRIX_PARAMS = 'matrixParams';
-const NAVIGATIONAL_STATE = 'navigationalState';
-const TARGET = 'target';
-const BLANK_PART_ID = 'blankPartId';
-const INSERTION_INDEX = 'insertionIndex';
-const ACTIVATE = 'activate';
-const CLOSE = 'close';
-const CSS_CLASS = 'cssClass';
-const VIEW_CONTEXT = 'viewContext';
 
 @Component({
   selector: 'app-router-page',
@@ -51,20 +39,20 @@ const VIEW_CONTEXT = 'viewContext';
 })
 export default class RouterPageComponent {
 
-  public readonly PATH = PATH;
-  public readonly MATRIX_PARAMS = MATRIX_PARAMS;
-  public readonly NAVIGATIONAL_STATE = NAVIGATIONAL_STATE;
-  public readonly TARGET = TARGET;
-  public readonly BLANK_PART_ID = BLANK_PART_ID;
-  public readonly INSERTION_INDEX = INSERTION_INDEX;
-  public readonly QUERY_PARAMS = QUERY_PARAMS;
-  public readonly ACTIVATE = ACTIVATE;
-  public readonly CLOSE = CLOSE;
-  public readonly CSS_CLASS = CSS_CLASS;
-  public readonly VIEW_CONTEXT = VIEW_CONTEXT;
-
-  public form: UntypedFormGroup;
-  public navigateError: string;
+  public form = this._formBuilder.group({
+    path: this._formBuilder.control(''),
+    matrixParams: this._formBuilder.array([]),
+    navigationalState: this._formBuilder.array([]),
+    target: this._formBuilder.control(''),
+    blankPartId: this._formBuilder.control(''),
+    insertionIndex: this._formBuilder.control(''),
+    queryParams: this._formBuilder.array([]),
+    activate: this._formBuilder.control<boolean | undefined>(undefined),
+    close: this._formBuilder.control<boolean | undefined>(undefined),
+    cssClass: this._formBuilder.control<string | undefined>(undefined),
+    viewContext: this._formBuilder.control(true),
+  });
+  public navigateError: string | undefined;
 
   public routerLinkCommands$: Observable<any[]>;
   public navigationExtras$: Observable<WorkbenchNavigationExtras>;
@@ -72,25 +60,11 @@ export default class RouterPageComponent {
 
   public nullViewInjector: Injector;
 
-  constructor(formBuilder: UntypedFormBuilder,
+  constructor(private _formBuilder: NonNullableFormBuilder,
               injector: Injector,
               private _router: Router,
               private _wbRouter: WorkbenchRouter,
               public workbenchService: WorkbenchService) {
-    this.form = formBuilder.group({
-      [PATH]: formBuilder.control(''),
-      [MATRIX_PARAMS]: formBuilder.array([]),
-      [NAVIGATIONAL_STATE]: formBuilder.array([]),
-      [TARGET]: formBuilder.control(''),
-      [BLANK_PART_ID]: formBuilder.control(''),
-      [INSERTION_INDEX]: formBuilder.control(''),
-      [QUERY_PARAMS]: formBuilder.array([]),
-      [ACTIVATE]: formBuilder.control(undefined),
-      [CLOSE]: formBuilder.control(undefined),
-      [CSS_CLASS]: formBuilder.control(undefined),
-      [VIEW_CONTEXT]: formBuilder.control(true),
-    });
-
     this.routerLinkCommands$ = this.form.valueChanges
       .pipe(
         map(() => this.constructRouterLinkCommands()),
@@ -104,8 +78,8 @@ export default class RouterPageComponent {
       );
 
     this.routes = this._router.config
-      .filter(it => !it.outlet || it.outlet === PRIMARY_OUTLET)
-      .filter(it => !it.path.startsWith('~')); // microfrontend route prefix
+      .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
+      .filter(route => !route.path?.startsWith('~')); // microfrontend route prefix
 
     this.nullViewInjector = Injector.create({
       parent: injector,
@@ -116,7 +90,7 @@ export default class RouterPageComponent {
   }
 
   public onRouterNavigate(): void {
-    this.navigateError = null;
+    this.navigateError = undefined;
     const commands: any[] = this.constructRouterLinkCommands();
     const extras: WorkbenchNavigationExtras = this.constructNavigationExtras();
 
@@ -126,8 +100,8 @@ export default class RouterPageComponent {
   }
 
   private constructRouterLinkCommands(): any[] {
-    const matrixParams: Params | null = SciParamsEnterComponent.toParamsDictionary(this.form.get(MATRIX_PARAMS) as UntypedFormArray);
-    const path = this.form.get(PATH).value;
+    const matrixParams: Params | null = SciParamsEnterComponent.toParamsDictionary(this.form.controls.matrixParams);
+    const path = this.form.controls.path.value;
     const commands: any[] = path === '<empty>' ? [] : path.split('/');
 
     // When tokenizing the path into segments, an empty segment is created for the leading slash (if any).
@@ -140,14 +114,14 @@ export default class RouterPageComponent {
 
   private constructNavigationExtras(): WorkbenchNavigationExtras {
     return {
-      queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUERY_PARAMS) as UntypedFormArray),
-      activate: this.form.get(ACTIVATE).value,
-      close: this.form.get(CLOSE).value,
-      target: this.form.get(TARGET).value || undefined,
-      blankPartId: this.form.get(BLANK_PART_ID).value || undefined,
-      blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
-      state: SciParamsEnterComponent.toParamsDictionary(this.form.get(NAVIGATIONAL_STATE) as UntypedFormArray),
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
+      queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.controls.queryParams),
+      activate: this.form.controls.activate.value,
+      close: this.form.controls.close.value,
+      target: this.form.controls.target.value || undefined,
+      blankPartId: this.form.controls.blankPartId.value || undefined,
+      blankInsertionIndex: coerceInsertionIndex(this.form.controls.insertionIndex.value),
+      state: SciParamsEnterComponent.toParamsDictionary(this.form.controls.navigationalState) ?? undefined,
+      cssClass: this.form.controls.cssClass.value?.split(/\s+/).filter(Boolean),
     };
   }
 }
