@@ -35,7 +35,6 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
 };
 
 export const environment = {
-  production: true,
   animationEnabled: true,
   microfrontendPlatformConfig,
 };
