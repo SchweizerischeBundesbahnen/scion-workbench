@@ -25,8 +25,8 @@ export class FilterPipe implements PipeTransform {
   public transform<T>(items: T[] | null | undefined, filterControl: FormControl<string>, itemTextFn: (item: T) => string | undefined): Observable<T[]> {
     return of(Arrays.coerce(items))
       .pipe(
-        expand(it => filterControl.valueChanges.pipe(take(1), map(() => it))),
-        filterArray(it => !filterControl.value || !!itemTextFn(it)?.match(toFilterRegExp(filterControl.value))),
+        expand(item => filterControl.valueChanges.pipe(take(1), map(() => item))),
+        filterArray(item => !filterControl.value || !!itemTextFn(item)?.match(toFilterRegExp(filterControl.value)!)),
       );
   }
 }

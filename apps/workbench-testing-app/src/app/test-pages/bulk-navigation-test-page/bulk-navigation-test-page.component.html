@@ -1,10 +1,10 @@
 <form autocomplete="off" [formGroup]="form">
   <sci-form-field label="View Count">
-    <input [formControlName]="VIEW_COUNT" type="number" class="e2e-view-count">
+    <input [formControl]="form.controls.viewCount" type="number" class="e2e-view-count">
   </sci-form-field>
 
   <sci-form-field label="CSS Class">
-    <input [formControlName]="CSS_CLASS" class="e2e-css-class">
+    <input [formControl]="form.controls.cssClass" class="e2e-css-class">
   </sci-form-field>
 </form>
 

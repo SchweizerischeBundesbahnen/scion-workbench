@@ -9,17 +9,12 @@
  */
 
 import {Component} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
-
-const PART_ID = 'partId';
-const RELATIVE_TO = 'relativeTo';
-const ALIGN = 'align';
-const RATIO = 'ratio';
-const ACTIVATE = 'activate';
+import {stringifyError} from '../../common/stringify-error.util';
 
 @Component({
   selector: 'app-add-part-page',
@@ -37,44 +32,38 @@ const ACTIVATE = 'activate';
 })
 export default class AddPartPageComponent {
 
-  public readonly PART_ID = PART_ID;
-  public readonly RELATIVE_TO = RELATIVE_TO;
-  public readonly ALIGN = ALIGN;
-  public readonly RATIO = RATIO;
-  public readonly ACTIVATE = ACTIVATE;
+  public form = this._formBuilder.group({
+    partId: this._formBuilder.control('', Validators.required),
+    relativeTo: this._formBuilder.group({
+      partId: this._formBuilder.control<string | undefined>(undefined),
+      align: this._formBuilder.control<'left' | 'right' | 'top' | 'bottom' | undefined>(undefined, Validators.required),
+      ratio: this._formBuilder.control<number | undefined>(undefined),
+    }),
+    activate: this._formBuilder.control<boolean | undefined>(undefined),
+  });
 
-  public form: FormGroup;
   public navigateError: string | false | undefined;
 
-  constructor(formBuilder: FormBuilder,
+  constructor(private _formBuilder: NonNullableFormBuilder,
               private _wbRouter: WorkbenchRouter,
               public workbenchService: WorkbenchService) {
-    this.form = formBuilder.group({
-      [PART_ID]: formBuilder.control(undefined, {validators: Validators.required, nonNullable: true}),
-      [RELATIVE_TO]: formBuilder.group({
-        [PART_ID]: formBuilder.control(undefined, {nonNullable: true}),
-        [ALIGN]: formBuilder.control(undefined, {validators: Validators.required, nonNullable: true}),
-        [RATIO]: formBuilder.control(undefined, {nonNullable: true}),
-      }),
-      [ACTIVATE]: formBuilder.control(undefined, {nonNullable: true}),
-    });
   }
 
   public onNavigate(): void {
     this.navigateError = undefined;
 
     this._wbRouter
-      .ɵnavigate(layout => layout.addPart(this.form.get([PART_ID]).value, {
-          relativeTo: this.form.get([RELATIVE_TO, PART_ID]).value || undefined,
-          align: this.form.get([RELATIVE_TO, ALIGN]).value,
-          ratio: this.form.get([RELATIVE_TO, RATIO]).value ?? undefined,
+      .ɵnavigate(layout => layout.addPart(this.form.controls.partId.value!, {
+          relativeTo: this.form.controls.relativeTo.controls.partId.value || undefined,
+          align: this.form.controls.relativeTo.controls.align.value!,
+          ratio: this.form.controls.relativeTo.controls.ratio.value,
         },
-        {activate: this.form.get([ACTIVATE]).value},
+        {activate: this.form.controls.activate.value},
       ))
       .then(() => {
         this.navigateError = false;
         this.form.reset();
       })
-      .catch(error => this.navigateError = error);
+      .catch(error => this.navigateError = stringifyError(error));
   }
 }

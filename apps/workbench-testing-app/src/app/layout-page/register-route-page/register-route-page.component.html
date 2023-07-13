@@ -1,30 +1,30 @@
 <form [formGroup]="form" autocomplete="off">
   <section>
     <sci-form-field label="Path">
-      <input [formControlName]="PATH" class="e2e-path">
+      <input [formControl]="form.controls.path" class="e2e-path">
     </sci-form-field>
 
     <sci-form-field label="Component">
-      <input [formControlName]="COMPONENT" class="e2e-component" list="componentRefs">
+      <input [formControl]="form.controls.component" class="e2e-component" list="componentRefs">
       <datalist id="componentRefs">
         <option [value]="componentRef.key" *ngFor="let componentRef of componentRefs | keyvalue">{{componentRef.key}}</option>
       </datalist>
     </sci-form-field>
 
     <sci-form-field label="Outlet">
-      <input [formControlName]="OUTLET" class="e2e-outlet">
+      <input [formControl]="form.controls.outlet" class="e2e-outlet">
     </sci-form-field>
   </section>
 
-  <section [formGroupName]="ROUTE_DATA" class="e2e-route-data">
+  <section [formGroup]="form.controls.routeData" class="e2e-route-data">
     <header>Route Data</header>
 
     <sci-form-field label="Title">
-      <input [formControlName]="TITLE" class="e2e-title">
+      <input [formControl]="form.controls.routeData.controls.title" class="e2e-title">
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <input [formControlName]="CSS_CLASS" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
+      <input [formControl]="form.controls.routeData.controls.cssClass" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
     </sci-form-field>
   </section>
 

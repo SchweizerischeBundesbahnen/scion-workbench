@@ -49,7 +49,7 @@ export namespace PerspectiveDefinitions {
   /**
    * Provides perspectives passed via query params.
    */
-  export const perspectivesFromQueryParam = WorkbenchStartupQueryParams.perspectives().map(perspective => ({
+  export const perspectivesFromQueryParam: WorkbenchPerspectiveDefinition[] = WorkbenchStartupQueryParams.perspectives().map(perspective => ({
     id: perspective,
     layout: layout => layout,
     data: {[PerspectiveData.label]: perspective.toUpperCase()},

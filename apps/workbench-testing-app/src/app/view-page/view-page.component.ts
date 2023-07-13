@@ -14,7 +14,7 @@ import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {FormsModule, ReactiveFormsModule, UntypedFormControl} from '@angular/forms';
+import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
@@ -53,11 +53,12 @@ export default class ViewPageComponent {
 
   public uuid = UUID.randomUUID();
   public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
-  public partActionsFormControl = new UntypedFormControl('');
+  public partActionsFormControl = this._formBuilder.control('');
 
   public WorkbenchRouteData = WorkbenchRouteData;
 
-  constructor(public view: WorkbenchView,
+  constructor(private _formBuilder: NonNullableFormBuilder,
+              public view: WorkbenchView,
               public route: ActivatedRoute,
               workbenchStartup: WorkbenchStartup) {
     if (!workbenchStartup.isStarted()) {

@@ -1,28 +1,28 @@
-<ng-container [formGroup]="form">
+<form [formGroup]="form">
   <section>
     <sci-form-field label="Component">
-      <select [formControlName]="COMPONENT" class="e2e-component">
+      <select [formControl]="form.controls.component" class="e2e-component">
         <option value="inspect-notification">InspectNotificationComponent</option>
         <option value="">default</option>
       </select>
     </sci-form-field>
 
     <sci-form-field label="Content" *ngIf="!isUseComponent()">
-      <input [formControlName]="CONTENT" class="e2e-content">
+      <input [formControl]="form.controls.content" class="e2e-content">
     </sci-form-field>
 
     <sci-form-field label="Component Input" *ngIf="isUseComponent()">
-      <input [formControlName]="COMPONENT_INPUT" class="e2e-component-input">
+      <input [formControl]="form.controls.componentInput" class="e2e-component-input">
     </sci-form-field>
   </section>
 
   <section>
     <sci-form-field label="Title">
-      <input [formControlName]="TITLE" class="e2e-title">
+      <input [formControl]="form.controls.title" class="e2e-title">
     </sci-form-field>
 
     <sci-form-field label="Severity">
-      <select [formControlName]="SEVERITY" class="e2e-severity">
+      <select [formControl]="form.controls.severity" class="e2e-severity">
         <option value="info">info</option>
         <option value="warn">warn</option>
         <option value="error">error</option>
@@ -31,7 +31,7 @@
     </sci-form-field>
 
     <sci-form-field label="Duration">
-      <input [formControlName]="DURATION" list="duration" class="e2e-duration">
+      <input [formControl]="form.controls.duration" list="duration" class="e2e-duration">
       <datalist id="duration">
         <option value="short">short</option>
         <option value="medium">medium</option>
@@ -42,20 +42,20 @@
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+      <input [formControl]="form.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
     </sci-form-field>
   </section>
 
   <section>
     <sci-form-field label="Group">
-      <input [formControlName]="GROUP" class="e2e-group">
+      <input [formControl]="form.controls.group" class="e2e-group">
     </sci-form-field>
 
     <sci-form-field label="Input Reducer">
-      <sci-checkbox [formControlName]="USE_GROUP_INPUT_REDUCER" class="e2e-use-group-input-reducer"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.useGroupInputReducer" class="e2e-use-group-input-reducer"></sci-checkbox>
     </sci-form-field>
   </section>
-</ng-container>
+</form>
 
 <button (click)="onNotificationShow()" class="e2e-show" [disabled]="form.invalid">
   Show notification

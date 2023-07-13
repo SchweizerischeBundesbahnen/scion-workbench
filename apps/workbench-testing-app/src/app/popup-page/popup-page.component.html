@@ -1,77 +1,79 @@
 <sci-viewport>
-  <section>
-    <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
-      <span class="e2e-component-instance-id">{{uuid}}</span>
-    </sci-form-field>
-  </section>
-
-  <section *ngIf="popup.input">
-    <header>Input Data</header>
-
-    <output class="input e2e-input">
-      {{popup.input}}
-    </output>
-  </section>
-
-  <section>
-    <header>Component Size</header>
-
-    <sci-form-field label="Min Height">
-      <input [(ngModel)]="minHeight" class="e2e-min-height">
-    </sci-form-field>
-
-    <sci-form-field label="Height">
-      <input [(ngModel)]="height" class="e2e-height">
-    </sci-form-field>
-
-    <sci-form-field label="Max Height">
-      <input [(ngModel)]="maxHeight" class="e2e-max-height">
-    </sci-form-field>
-
-    <sci-form-field label="Min Width">
-      <input [(ngModel)]="minWidth" class="e2e-min-width">
-    </sci-form-field>
-
-    <sci-form-field label="Width">
-      <input [(ngModel)]="width" class="e2e-width">
-    </sci-form-field>
-
-    <sci-form-field label="Max Width">
-      <input [(ngModel)]="maxWidth" class="e2e-max-width">
-    </sci-form-field>
-  </section>
-
-  <sci-accordion *ngIf="popup.size | appNullIfEmpty as preferredSize"
-                 title="Preferred Overlay Size"
-                 class="preferred-overlay-size e2e-preferred-overlay-size"
-                 variant="solid">
-    <ng-template sciAccordionItem [panel]="panel">
-      <header>Preferred Overlay Size</header>
-    </ng-template>
-    <ng-template #panel>
-      <div class="preferred-overlay-size e2e-preferred-overlay-size">{{preferredSize | json}}</div>
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion class="e2e-referrer" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_referrer">
-      <header>Referrer</header>
-    </ng-template>
-    <ng-template #panel_referrer>
-      <sci-form-field label="View ID">
-        <output class="e2e-view-id" [value]="popup.referrer.viewId ?? '<undefined>'"></output>
+  <form [formGroup]="form">
+    <section>
+      <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
+        <span class="e2e-component-instance-id">{{uuid}}</span>
       </sci-form-field>
-    </ng-template>
-  </sci-accordion>
+    </section>
 
-  <sci-accordion class="return-value e2e-return-value" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_return_value">
-      <header>Return Value</header>
-    </ng-template>
-    <ng-template #panel_return_value>
-      <input class="e2e-return-value" [(ngModel)]="result" placeholder="Optional data to return to the popup opener">
-    </ng-template>
-  </sci-accordion>
+    <section *ngIf="popup.input">
+      <header>Input Data</header>
+
+      <output class="input e2e-input">
+        {{popup.input}}
+      </output>
+    </section>
+
+    <section>
+      <header>Component Size</header>
+
+      <sci-form-field label="Min Height">
+        <input [formControl]="form.controls.minHeight" class="e2e-min-height">
+      </sci-form-field>
+
+      <sci-form-field label="Height">
+        <input [formControl]="form.controls.height" class="e2e-height">
+      </sci-form-field>
+
+      <sci-form-field label="Max Height">
+        <input [formControl]="form.controls.maxHeight" class="e2e-max-height">
+      </sci-form-field>
+
+      <sci-form-field label="Min Width">
+        <input [formControl]="form.controls.minWidth" class="e2e-min-width">
+      </sci-form-field>
+
+      <sci-form-field label="Width">
+        <input [formControl]="form.controls.width" class="e2e-width">
+      </sci-form-field>
+
+      <sci-form-field label="Max Width">
+        <input [formControl]="form.controls.maxWidth" class="e2e-max-width">
+      </sci-form-field>
+    </section>
+
+    <sci-accordion *ngIf="popup.size | appNullIfEmpty as preferredSize"
+                   title="Preferred Overlay Size"
+                   class="preferred-overlay-size e2e-preferred-overlay-size"
+                   variant="solid">
+      <ng-template sciAccordionItem [panel]="panel">
+        <header>Preferred Overlay Size</header>
+      </ng-template>
+      <ng-template #panel>
+        <div class="preferred-overlay-size e2e-preferred-overlay-size">{{preferredSize | json}}</div>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion class="e2e-referrer" variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_referrer">
+        <header>Referrer</header>
+      </ng-template>
+      <ng-template #panel_referrer>
+        <sci-form-field label="View ID">
+          <output class="e2e-view-id" [value]="popup.referrer.viewId ?? '<undefined>'"></output>
+        </sci-form-field>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion class="return-value e2e-return-value" variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_return_value">
+        <header>Return Value</header>
+      </ng-template>
+      <ng-template #panel_return_value>
+        <input class="e2e-return-value" [formControl]="form.controls.result" placeholder="Optional data to return to the popup opener">
+      </ng-template>
+    </sci-accordion>
+  </form>
 </sci-viewport>
 
 <div class="buttons">

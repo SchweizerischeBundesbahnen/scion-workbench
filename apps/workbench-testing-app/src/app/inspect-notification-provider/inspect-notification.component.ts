@@ -11,17 +11,13 @@
 import {Component} from '@angular/core';
 import {Notification} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
-import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciViewportModule} from '@scion/components/viewport';
 import {StringifyPipe} from '../common/stringify.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-
-const TITLE = 'title';
-const SEVERITY = 'severity';
-const DURATION = 'duration';
-const CSS_CLASS = 'cssClass';
+import {filter} from 'rxjs/operators';
 
 @Component({
   selector: 'app-inspect-notification',
@@ -38,51 +34,47 @@ const CSS_CLASS = 'cssClass';
 })
 export class InspectNotificationComponent {
 
-  public readonly TITLE = TITLE;
-  public readonly SEVERITY = SEVERITY;
-  public readonly DURATION = DURATION;
-  public readonly CSS_CLASS = CSS_CLASS;
-
   public uuid = UUID.randomUUID();
-  public form: UntypedFormGroup;
+  public form = this._formBuilder.group({
+    title: this._formBuilder.control(''),
+    severity: this._formBuilder.control<'info' | 'warn' | 'error' | undefined>(undefined),
+    duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | number | undefined>(undefined),
+    cssClass: this._formBuilder.control(''),
+  });
 
-  constructor(public notification: Notification<Map<string, any>>, formBuilder: UntypedFormBuilder) {
-    this.form = formBuilder.group({
-      [TITLE]: formBuilder.control(''),
-      [SEVERITY]: formBuilder.control(''),
-      [DURATION]: formBuilder.control(''),
-      [CSS_CLASS]: formBuilder.control(''),
-    });
-
-    this.form.get(TITLE).valueChanges
+  constructor(public notification: Notification<Map<string, any>>, private _formBuilder: NonNullableFormBuilder) {
+    this.form.controls.title.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(title => {
         this.notification.setTitle(title || undefined);
       });
 
-    this.form.get(SEVERITY).valueChanges
-      .pipe(takeUntilDestroyed())
+    this.form.controls.severity.valueChanges
+      .pipe(
+        filter(Boolean),
+        takeUntilDestroyed()
+      )
       .subscribe(severity => {
-        this.notification.setSeverity(severity || undefined);
+        this.notification.setSeverity(severity);
       });
 
-    this.form.get(DURATION).valueChanges
-      .pipe(takeUntilDestroyed())
+    this.form.controls.duration.valueChanges
+      .pipe(
+        filter(Boolean),
+        takeUntilDestroyed()
+      )
       .subscribe(duration => {
         this.notification.setDuration(this.parseDurationFromUI(duration));
       });
 
-    this.form.get(CSS_CLASS).valueChanges
+    this.form.controls.cssClass.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(cssClass => {
         this.notification.setCssClass(cssClass.split(/\s+/).filter(Boolean));
       });
   }
 
-  private parseDurationFromUI(duration: 'short' | 'medium' | 'long' | 'infinite' | any): 'short' | 'medium' | 'long' | 'infinite' | number | undefined {
-    if (duration === '') {
-      return undefined;
-    }
+  private parseDurationFromUI(duration: 'short' | 'medium' | 'long' | 'infinite' | any): 'short' | 'medium' | 'long' | 'infinite' | number {
     if (isNaN(Number(duration))) {
       return duration;
     }

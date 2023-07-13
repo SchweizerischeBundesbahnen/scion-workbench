@@ -9,20 +9,13 @@
  */
 
 import {Component, inject, InjectionToken, Injector} from '@angular/core';
-import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchService} from '@scion/workbench';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
-
-const CONTENT = 'content';
-const ALIGN = 'align';
-const CSS_CLASS = 'cssClass';
-const TARGET = 'target';
-const VIEW = 'view';
-const PART = 'part';
-const AREA = 'area';
+import {stringifyError} from '../../common/stringify-error.util';
 
 @Component({
   selector: 'app-register-part-action-page',
@@ -39,28 +32,19 @@ const AREA = 'area';
 })
 export default class RegisterPartActionPageComponent {
 
-  public readonly CONTENT = CONTENT;
-  public readonly ALIGN = ALIGN;
-  public readonly CSS_CLASS = CSS_CLASS;
-  public readonly TARGET = TARGET;
-  public readonly VIEW = VIEW;
-  public readonly PART = PART;
-  public readonly AREA = AREA;
-
-  public form: FormGroup;
+  public form = this._formBuilder.group({
+    content: this._formBuilder.control('', {validators: Validators.required}),
+    align: this._formBuilder.control<'start' | 'end' | ''>(''),
+    cssClass: this._formBuilder.control(''),
+    target: this._formBuilder.group({
+      view: this._formBuilder.control(''),
+      part: this._formBuilder.control(''),
+      area: this._formBuilder.control<'main' | 'peripheral' | ''>(''),
+    }),
+  });
   public registerError: string | false | undefined;
 
-  constructor(formBuilder: NonNullableFormBuilder, public workbenchService: WorkbenchService) {
-    this.form = formBuilder.group({
-      [CONTENT]: formBuilder.control('', {validators: Validators.required}),
-      [ALIGN]: formBuilder.control(''),
-      [CSS_CLASS]: formBuilder.control(''),
-      [TARGET]: formBuilder.group({
-        [VIEW]: formBuilder.control(''),
-        [PART]: formBuilder.control(''),
-        [AREA]: formBuilder.control(''),
-      }),
-    });
+  constructor(private _formBuilder: NonNullableFormBuilder, public workbenchService: WorkbenchService) {
   }
 
   public onRegister(): void {
@@ -69,22 +53,22 @@ export default class RegisterPartActionPageComponent {
       this.workbenchService.registerPartAction({
         portal: new ComponentPortal(TextComponent, undefined, Injector.create({
           providers: [
-            {provide: TextComponent.TEXT, useValue: this.form.get(CONTENT).value},
+            {provide: TextComponent.TEXT, useValue: this.form.controls.content},
           ],
         })),
-        align: this.form.get(ALIGN).value || undefined,
+        align: this.form.controls.align.value || undefined,
         target: {
-          viewId: undefinedIfEmpty(this.form.get([TARGET, VIEW]).value.split(/\s+/).filter(Boolean)),
-          partId: undefinedIfEmpty(this.form.get([TARGET, PART]).value.split(/\s+/).filter(Boolean)),
-          area: this.form.get([TARGET, AREA]).value || undefined,
+          viewId: undefinedIfEmpty(this.form.controls.target.controls.view.value.split(/\s+/).filter(Boolean)),
+          partId: undefinedIfEmpty(this.form.controls.target.controls.part.value.split(/\s+/).filter(Boolean)),
+          area: this.form.controls.target.controls.area.value || undefined,
         },
-        cssClass: undefinedIfEmpty(this.form.get(CSS_CLASS).value.split(/\s+/).filter(Boolean)),
+        cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
       });
       this.registerError = false;
       this.form.reset();
     }
-    catch (error) {
-      this.registerError = error;
+    catch (error: unknown) {
+      this.registerError = stringifyError(error);
     }
   }
 }

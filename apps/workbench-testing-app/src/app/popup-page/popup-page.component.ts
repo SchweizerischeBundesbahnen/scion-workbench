@@ -13,7 +13,7 @@ import {Popup} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciViewportModule} from '@scion/components/viewport';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciAccordionModule} from '@scion/components.internal/accordion';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JsonPipe, NgIf} from '@angular/common';
@@ -31,6 +31,7 @@ import {JsonPipe, NgIf} from '@angular/common';
     SciViewportModule,
     SciFormFieldModule,
     SciAccordionModule,
+    ReactiveFormsModule,
   ],
 })
 export class PopupPageComponent {
@@ -38,33 +39,53 @@ export class PopupPageComponent {
   public uuid = UUID.randomUUID();
 
   @HostBinding('style.min-height')
-  public minHeight: string;
+  public get minHeight(): string {
+    return this.form.controls.minHeight.value;
+  }
 
   @HostBinding('style.height')
-  public height: string;
+  public get height(): string {
+    return this.form.controls.height.value;
+  }
 
   @HostBinding('style.max-height')
-  public maxHeight: string;
+  public get maxHeight(): string {
+    return this.form.controls.maxHeight.value;
+  }
 
   @HostBinding('style.min-width')
-  public minWidth: string;
+  public get minWidth(): string {
+    return this.form.controls.minWidth.value;
+  }
 
   @HostBinding('style.width')
-  public width: string;
+  public get width(): string {
+    return this.form.controls.width.value;
+  }
 
   @HostBinding('style.max-width')
-  public maxWidth: string;
+  public get maxWidth(): string {
+    return this.form.controls.maxWidth.value;
+  }
 
-  public result: string;
+  public form = this._formBuilder.group({
+    minHeight: this._formBuilder.control(''),
+    height: this._formBuilder.control(''),
+    maxHeight: this._formBuilder.control(''),
+    minWidth: this._formBuilder.control(''),
+    width: this._formBuilder.control(''),
+    maxWidth: this._formBuilder.control(''),
+    result: this._formBuilder.control(''),
+  });
 
-  constructor(public popup: Popup) {
+  constructor(public popup: Popup, private _formBuilder: NonNullableFormBuilder) {
   }
 
   public onClose(): void {
-    this.popup.close(this.result);
+    this.popup.close(this.form.controls.result.value);
   }
 
   public onCloseWithError(): void {
-    this.popup.closeWithError(this.result);
+    this.popup.closeWithError(this.form.controls.result.value);
   }
 }

@@ -31,7 +31,7 @@ export class NavigationTestPageComponent {
           view.heading = params.get('heading');
         }
         if (params.has('cssClass')) {
-          view.cssClass = params.get('cssClass');
+          view.cssClass = params.get('cssClass')!;
         }
       });
   }

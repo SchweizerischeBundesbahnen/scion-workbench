@@ -1,32 +1,32 @@
-<ng-container [formGroup]="form">
+<form [formGroup]="form">
   <section>
     <sci-form-field label="Component">
-      <select [formControlName]="COMPONENT" class="e2e-component">
+      <select [formControl]="form.controls.component" class="e2e-component">
         <option value="inspect-message-box">InspectMessageBoxComponent</option>
         <option value="">default</option>
       </select>
     </sci-form-field>
 
     <sci-form-field label="Content" *ngIf="!isUseComponent()">
-      <input [formControlName]="CONTENT" class="e2e-content">
+      <input [formControl]="form.controls.content" class="e2e-content">
     </sci-form-field>
 
     <sci-form-field label="Component Input" *ngIf="isUseComponent()">
-      <input [formControlName]="COMPONENT_INPUT" class="e2e-component-input">
+      <input [formControl]="form.controls.componentInput" class="e2e-component-input">
     </sci-form-field>
   </section>
 
   <section>
     <sci-form-field label="Title">
-      <input [formControlName]="TITLE" class="e2e-title">
+      <input [formControl]="form.controls.title" class="e2e-title">
     </sci-form-field>
 
     <sci-form-field label="Actions">
-      <sci-params-enter [paramsFormArray]="$any(form.get(ACTIONS))" [addable]="true" [removable]="true" class="e2e-actions"></sci-params-enter>
+      <sci-params-enter [paramsFormArray]="form.controls.actions" [addable]="true" [removable]="true" class="e2e-actions"></sci-params-enter>
     </sci-form-field>
 
     <sci-form-field label="Severity">
-      <select [formControlName]="SEVERITY" class="e2e-severity">
+      <select [formControl]="form.controls.severity" class="e2e-severity">
         <option value="info">info</option>
         <option value="warn">warn</option>
         <option value="error">error</option>
@@ -35,7 +35,7 @@
     </sci-form-field>
 
     <sci-form-field label="Modality">
-      <select [formControlName]="MODALITY" class="e2e-modality">
+      <select [formControl]="form.controls.modality" class="e2e-modality">
         <option value="application">application</option>
         <option value="view">view</option>
         <option value="">default</option>
@@ -43,29 +43,29 @@
     </sci-form-field>
 
     <sci-form-field label="Contextual View ID">
-      <input [formControlName]="CONTEXTUAL_VIEW_ID" class="e2e-contextual-view-id">
+      <input [formControl]="form.controls.contextualViewId" class="e2e-contextual-view-id">
     </sci-form-field>
 
     <sci-form-field label="Content Selectable">
-      <sci-checkbox [formControlName]="CONTENT_SELECTABLE" class="e2e-content-selectable"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.contentSelectable" class="e2e-content-selectable"></sci-checkbox>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+      <input [formControl]="form.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
     </sci-form-field>
 
     <sci-form-field label="Count">
-      <input [formControlName]="COUNT" class="e2e-count"
+      <input [formControl]="form.controls.count" class="e2e-count"
              placeholder="Number of message boxes to open (1 by default). For every message box, an 'index-$1' CSS class is added, where $1 is the index of the message box, starting with 0.">
     </sci-form-field>
   </section>
 
   <section>
     <sci-form-field label="View Context Active">
-      <sci-checkbox [formControlName]="VIEW_CONTEXT" class="e2e-view-context"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.viewContext" class="e2e-view-context"></sci-checkbox>
     </sci-form-field>
   </section>
-</ng-container>
+</form>
 
 <button (click)="onMessageBoxOpen()" class="e2e-open" [disabled]="form.invalid">
   Open message box
