@@ -43,12 +43,12 @@ export class ɵNotification<T = any> implements Notification<T> {
     this.title$.next(title);
   }
 
-  public setSeverity(severity: 'info' | 'warn' | 'error' | undefined): void {
-    this.severity$.next(severity ?? 'info');
+  public setSeverity(severity: 'info' | 'warn' | 'error'): void {
+    this.severity$.next(severity);
   }
 
-  public setDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number | undefined): void {
-    this.duration$.next(duration ?? 'medium');
+  public setDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number): void {
+    this.duration$.next(duration);
   }
 
   public setCssClass(cssClass: string | string[]): void {
