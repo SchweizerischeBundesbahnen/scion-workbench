@@ -7,7 +7,6 @@
     "stripInternal": true,
     "inlineSources": true,
     "types": [],
-    "strict": true
   },
   "exclude": [
     "src/test.ts",
