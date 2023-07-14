@@ -1,19 +1,19 @@
-<ng-container [formGroup]="form">
+<form [formGroup]="form">
   <section>
     <sci-form-field label="Qualifier">
-      <sci-params-enter [paramsFormArray]="$any(form.get(QUALIFIER))" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+      <sci-params-enter [paramsFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
     </sci-form-field>
 
     <sci-form-field label="Params">
-      <sci-params-enter [paramsFormArray]="$any(form.get(PARAMS))" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+      <sci-params-enter [paramsFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
     </sci-form-field>
 
     <sci-form-field label="Contextual View ID">
-      <input [formControlName]="CONTEXTUAL_VIEW_ID" class="e2e-contextual-view-id" placeholder="Reference to the view to bind this popup to; can be <default>, <null>, or a view id">
+      <input [formControl]="form.controls.contextualViewId" class="e2e-contextual-view-id" placeholder="Reference to the view to bind this popup to; can be <default>, <null>, or a view id">
     </sci-form-field>
 
     <sci-form-field label="Align">
-      <select [formControlName]="ALIGN" class="e2e-align">
+      <select [formControl]="form.controls.align" class="e2e-align">
         <option value="east">east</option>
         <option value="west">west</option>
         <option value="north">north</option>
@@ -23,17 +23,17 @@
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+      <input [formControl]="form.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
     </sci-form-field>
   </section>
 
-  <sci-accordion class="anchor e2e-anchor" variant="solid" [formGroupName]="ANCHOR">
+  <sci-accordion class="anchor e2e-anchor" variant="solid" [formGroup]="form.controls.anchor">
     <ng-template sciAccordionItem [panel]="panel_anchor">
       <header>Anchor</header>
     </ng-template>
     <ng-template #panel_anchor>
       <sci-form-field label="Position">
-        <select [formControlName]="POSITION" class="e2e-position">
+        <select [formControl]="form.controls.anchor.controls.position" class="e2e-position">
           <option value="element">Element</option>
           <option value="top-left">Coordinate (top-left)</option>
           <option value="top-right">Coordinate (top-right)</option>
@@ -41,38 +41,38 @@
           <option value="bottom-right">Coordinate (bottom-right)</option>
         </select>
       </sci-form-field>
-      <ng-container *ngIf="form.get([ANCHOR, POSITION]).value !== 'element'">
-        <sci-form-field [label]="form.get([ANCHOR, POSITION]).value | wbPopupPositionLabel:'vertical'">
-          <input [formControlName]="VERTICAL_POSITION" type="number" class="e2e-position-vertical">
+      <ng-container *ngIf="form.controls.anchor.controls.position.value !== 'element'">
+        <sci-form-field [label]="$any(form.controls.anchor.controls.position.value) | wbPopupPositionLabel:'vertical'">
+          <input [formControl]="form.controls.anchor.controls.verticalPosition" type="number" class="e2e-position-vertical">
         </sci-form-field>
-        <sci-form-field [label]="form.get([ANCHOR, POSITION]).value | wbPopupPositionLabel:'horizontal'">
-          <input [formControlName]="HORIZONTAL_POSITION" type="number" class="e2e-position-horizontal">
+        <sci-form-field [label]="$any(form.controls.anchor.controls.position.value) | wbPopupPositionLabel:'horizontal'">
+          <input [formControl]="form.controls.anchor.controls.horizontalPosition" type="number" class="e2e-position-horizontal">
         </sci-form-field>
         <sci-form-field label="Width">
-          <input [formControlName]="WIDTH" type="number" class="e2e-anchor-width">
+          <input [formControl]="form.controls.anchor.controls.width" type="number" class="e2e-anchor-width">
         </sci-form-field>
         <sci-form-field label="Height">
-          <input [formControlName]="HEIGHT" type="number" class="e2e-anchor-height">
+          <input [formControl]="form.controls.anchor.controls.height" type="number" class="e2e-anchor-height">
         </sci-form-field>
       </ng-container>
     </ng-template>
   </sci-accordion>
 
-  <sci-accordion [formGroupName]="CLOSE_STRATEGY" variant="solid" class="e2e-close-strategy">
+  <sci-accordion [formGroup]="form.controls.closeStrategy" variant="solid" class="e2e-close-strategy">
     <ng-template sciAccordionItem [panel]="panel_close_strategy">
       <header>Close Strategy</header>
     </ng-template>
     <ng-template #panel_close_strategy>
       <sci-form-field label="onFocusLost">
-        <sci-checkbox [formControlName]="ON_FOCUS_LOST" class="e2e-close-on-focus-lost"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.closeStrategy.controls.onFocusLost" class="e2e-close-on-focus-lost"></sci-checkbox>
       </sci-form-field>
 
       <sci-form-field label="onEscape">
-        <sci-checkbox [formControlName]="ON_ESCAPE" class="e2e-close-on-escape"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.closeStrategy.controls.onEscape" class="e2e-close-on-escape"></sci-checkbox>
       </sci-form-field>
     </ng-template>
   </sci-accordion>
-</ng-container>
+</form>
 
 <button (click)="onPopupOpen()" class="open e2e-open" [disabled]="form.invalid" #open_button>
   Open popup

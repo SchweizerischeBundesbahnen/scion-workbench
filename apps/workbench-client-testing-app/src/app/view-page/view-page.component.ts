@@ -9,7 +9,7 @@
  */
 
 import {Component, Inject, OnDestroy} from '@angular/core';
-import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {ViewClosingEvent, ViewClosingListener, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
@@ -27,15 +27,6 @@ import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {SciViewportModule} from '@scion/components/viewport';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-
-const TITLE = 'title';
-const HEADING = 'heading';
-const CLOSABLE = 'closable';
-const CONFIRM_CLOSING = 'confirmClosing';
-const SELF_NAVIGATION = 'selfNavigation';
-const PARAMS = 'params';
-const PARAMS_HANDLING = 'paramsHandling';
-const NAVIGATE_PER_PARAM = 'navigatePerParam';
 
 @Component({
   selector: 'app-view-page',
@@ -59,41 +50,30 @@ const NAVIGATE_PER_PARAM = 'navigatePerParam';
 })
 export default class ViewPageComponent implements ViewClosingListener, OnDestroy {
 
-  public readonly TITLE = TITLE;
-  public readonly HEADING = HEADING;
-  public readonly CLOSABLE = CLOSABLE;
-  public readonly CONFIRM_CLOSING = CONFIRM_CLOSING;
-  public readonly SELF_NAVIGATION = SELF_NAVIGATION;
-  public readonly PARAMS = PARAMS;
-  public readonly PARAMS_HANDLING = PARAMS_HANDLING;
-  public readonly NAVIGATE_PER_PARAM = NAVIGATE_PER_PARAM;
-
-  public form: UntypedFormGroup;
+  public form = this._formBuilder.group({
+    title: this._formBuilder.control(''),
+    heading: this._formBuilder.control(''),
+    closable: this._formBuilder.control(true),
+    confirmClosing: this._formBuilder.control(false),
+    selfNavigation: this._formBuilder.group({
+      params: this._formBuilder.array([]),
+      paramsHandling: this._formBuilder.control<'merge' | 'replace' | ''>(''),
+      navigatePerParam: this._formBuilder.control(false),
+    }),
+  });
   public uuid = UUID.randomUUID();
 
-  constructor(formBuilder: UntypedFormBuilder,
+  constructor(private _formBuilder: NonNullableFormBuilder,
+              private _router: WorkbenchRouter,
+              private _messageBoxService: WorkbenchMessageBoxService,
               public view: WorkbenchView,
               public route: ActivatedRoute,
-              @Inject(APP_INSTANCE_ID) public appInstanceId: string,
-              private _router: WorkbenchRouter,
               public location: Location,
-              private _messageBoxService: WorkbenchMessageBoxService) {
-    this.form = formBuilder.group({
-      [TITLE]: formBuilder.control(''),
-      [HEADING]: formBuilder.control(''),
-      [CLOSABLE]: formBuilder.control(true),
-      [CONFIRM_CLOSING]: formBuilder.control(false),
-      [SELF_NAVIGATION]: formBuilder.group({
-        [PARAMS]: formBuilder.array([]),
-        [PARAMS_HANDLING]: formBuilder.control(''),
-        [NAVIGATE_PER_PARAM]: formBuilder.control(false),
-      }),
-    });
-
-    this.view.setTitle(this.form.get(TITLE).valueChanges.pipe(this.logCompletion('TitleObservableComplete')));
-    this.view.setHeading(this.form.get(HEADING).valueChanges.pipe(this.logCompletion('HeadingObservableComplete')));
+              @Inject(APP_INSTANCE_ID) public appInstanceId: string) {
+    this.view.setTitle(this.form.controls.title.valueChanges.pipe(this.logCompletion('TitleObservableComplete')));
+    this.view.setHeading(this.form.controls.heading.valueChanges.pipe(this.logCompletion('HeadingObservableComplete')));
     this.view.markDirty(NEVER.pipe(this.logCompletion('DirtyObservableComplete')));
-    this.view.setClosable(this.form.get(CLOSABLE).valueChanges.pipe(this.logCompletion('ClosableObservableComplete')));
+    this.view.setClosable(this.form.controls.closable.valueChanges.pipe(this.logCompletion('ClosableObservableComplete')));
 
     this.installClosingListener();
     this.installViewActiveStateLogger();
@@ -106,12 +86,12 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
         takeUntilDestroyed(),
       )
       .subscribe(capability => {
-        console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata.id}]`);
+        console.debug(`[ViewCapability$::first] [component=ViewPageComponent@${this.uuid}, capabilityId=${capability.metadata!.id}]`);
       });
   }
 
   public async onClosing(event: ViewClosingEvent): Promise<void> {
-    if (!this.form.get(CONFIRM_CLOSING).value) {
+    if (!this.form.controls.confirmClosing.value) {
       return;
     }
 
@@ -141,14 +121,14 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
   }
 
   public onSelfNavigate(): void {
-    const selfNavigationGroup = this.form.get(SELF_NAVIGATION);
-    const params = SciParamsEnterComponent.toParamsDictionary(selfNavigationGroup.get(PARAMS) as UntypedFormArray, false);
-    const paramsHandling = selfNavigationGroup.get(PARAMS_HANDLING).value;
+    const selfNavigationGroup = this.form.controls.selfNavigation;
+    const params = SciParamsEnterComponent.toParamsDictionary(selfNavigationGroup.controls.params, false);
+    const paramsHandling = selfNavigationGroup.controls.paramsHandling.value;
 
     // Convert entered params to their actual values.
     Object.entries(params).forEach(([paramName, paramValue]) => params[paramName] = convertValueFromUI(paramValue));
 
-    if (selfNavigationGroup.get(NAVIGATE_PER_PARAM).value) {
+    if (selfNavigationGroup.controls.navigatePerParam.value) {
       Object.entries(params).forEach(([paramName, paramValue]) => {
         this._router.navigate({}, {params: {[paramName]: paramValue}, paramsHandling: paramsHandling || undefined}).then();
       });
@@ -159,9 +139,9 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
   }
 
   private installClosingListener(): void {
-    this.form.get(CONFIRM_CLOSING).valueChanges
+    this.form.controls.confirmClosing.valueChanges
       .pipe(
-        startWith(this.form.get(CONFIRM_CLOSING).value as boolean),
+        startWith(this.form.controls.confirmClosing.value),
         takeUntilDestroyed(),
       )
       .subscribe(confirmClosing => {
@@ -182,7 +162,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
     if (params.has('initialTitle')) {
       this.view.setTitle(params.get('initialTitle'));
       // Restore title observer
-      this.view.setTitle(this.form.get(TITLE).valueChanges);
+      this.view.setTitle(this.form.controls.title.valueChanges);
     }
   }
 

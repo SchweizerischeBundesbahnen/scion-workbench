@@ -9,24 +9,14 @@
  */
 
 import {Component} from '@angular/core';
-import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
 import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {NgIf} from '@angular/common';
-
-const QUALIFIER = 'qualifier';
-const PARAMS = 'params';
-const TITLE = 'title';
-const CONTENT = 'content';
-const ACTIONS = 'actions';
-const SEVERITY = 'severity';
-const MODALITY = 'modality';
-const CONTENT_SELECTABLE = 'contentSelectable';
-const CSS_CLASS = 'cssClass';
-const VIEW_CONTEXT = 'viewContext';
+import {stringifyError} from '../common/stringify-error.util';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -43,62 +33,50 @@ const VIEW_CONTEXT = 'viewContext';
 })
 export default class MessageBoxOpenerPageComponent {
 
-  public readonly QUALIFIER = QUALIFIER;
-  public readonly PARAMS = PARAMS;
-  public readonly TITLE = TITLE;
-  public readonly CONTENT = CONTENT;
-  public readonly ACTIONS = ACTIONS;
-  public readonly SEVERITY = SEVERITY;
-  public readonly MODALITY = MODALITY;
-  public readonly CONTENT_SELECTABLE = CONTENT_SELECTABLE;
-  public readonly CSS_CLASS = CSS_CLASS;
-  public readonly VIEW_CONTEXT = VIEW_CONTEXT;
+  public form = this._formBuilder.group({
+    qualifier: this._formBuilder.array([]),
+    params: this._formBuilder.array([]),
+    title: this._formBuilder.control(''),
+    content: this._formBuilder.control(''),
+    actions: this._formBuilder.array([]),
+    severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
+    modality: this._formBuilder.control<'application' | 'view' | ''>(''),
+    contentSelectable: this._formBuilder.control(true),
+    cssClass: this._formBuilder.control(''),
+    viewContext: this._formBuilder.control(true),
+  });
 
-  public form: UntypedFormGroup;
+  public openError: string | undefined;
+  public closeAction: string | undefined;
 
-  public openError: string;
-  public closeAction: string;
-
-  constructor(formBuilder: UntypedFormBuilder, private _messageBoxService: WorkbenchMessageBoxService) {
-    this.form = formBuilder.group({
-      [QUALIFIER]: formBuilder.array([]),
-      [PARAMS]: formBuilder.array([]),
-      [TITLE]: formBuilder.control(''),
-      [CONTENT]: formBuilder.control(''),
-      [ACTIONS]: formBuilder.array([]),
-      [SEVERITY]: formBuilder.control(''),
-      [MODALITY]: formBuilder.control(''),
-      [CONTENT_SELECTABLE]: formBuilder.control(true),
-      [CSS_CLASS]: formBuilder.control(''),
-      [VIEW_CONTEXT]: formBuilder.control(true),
-    });
+  constructor(private _messageBoxService: WorkbenchMessageBoxService, private _formBuilder: NonNullableFormBuilder) {
   }
 
   public onMessageBoxOpen(): void {
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray);
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as UntypedFormArray);
-    const actions = SciParamsEnterComponent.toParamsDictionary(this.form.get(ACTIONS) as UntypedFormArray);
+    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier);
+    const params = SciParamsEnterComponent.toParamsDictionary(this.form.controls.params);
+    const actions = SciParamsEnterComponent.toParamsDictionary(this.form.controls.actions);
 
-    this.openError = null;
-    this.closeAction = null;
+    this.openError = undefined;
+    this.closeAction = undefined;
 
     const currentView = Beans.get(WorkbenchView);
-    const unsetViewContext = (this.form.get(VIEW_CONTEXT).value === false);
+    const unsetViewContext = !this.form.controls.viewContext.value;
 
     unsetViewContext && Beans.register(WorkbenchView, {useValue: null});
     try {
       this._messageBoxService.open({
-        title: this.form.get(TITLE).value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
-        content: this.form.get(CONTENT).value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
-        params,
-        actions,
-        severity: this.form.get(SEVERITY).value || undefined,
-        modality: this.form.get(MODALITY).value || undefined,
-        contentSelectable: this.form.get(CONTENT_SELECTABLE).value || undefined,
-        cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
-      }, qualifier)
+        title: this.form.controls.title.value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
+        content: this.form.controls.content.value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
+        params: params ?? undefined,
+        actions: actions ?? undefined,
+        severity: this.form.controls.severity.value || undefined,
+        modality: this.form.controls.modality.value || undefined,
+        contentSelectable: this.form.controls.contentSelectable.value || undefined,
+        cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+      }, qualifier ?? undefined)
         .then(closeAction => this.closeAction = closeAction)
-        .catch(error => this.openError = error);
+        .catch(error => this.openError = stringifyError(error));
     }
     finally {
       unsetViewContext && Beans.register(WorkbenchView, {useValue: currentView});

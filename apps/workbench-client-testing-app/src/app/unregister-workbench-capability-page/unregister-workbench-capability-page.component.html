@@ -1,12 +1,14 @@
-<section [formGroup]="form">
-  <sci-form-field label="ID">
-    <input [formControlName]="ID" class="e2e-id">
-  </sci-form-field>
-</section>
+<form [formGroup]="form">
+  <section>
+    <sci-form-field label="ID">
+      <input [formControl]="form.controls.id" class="e2e-id">
+    </sci-form-field>
+  </section>
 
-<button (click)="onUnregister()" class="e2e-unregister" [disabled]="form.invalid">Unregister</button>
+  <button (click)="onUnregister()" class="e2e-unregister" [disabled]="form.invalid">Unregister</button>
 
-<output class="unregister-error e2e-unregister-error" *ngIf="unregisterError">
-  {{unregisterError}}
-</output>
-<output class="unregistered e2e-unregistered" *ngIf="unregistered"></output>
+  <output class="unregister-error e2e-unregister-error" *ngIf="unregisterError">
+    {{unregisterError}}
+  </output>
+  <output class="unregistered e2e-unregistered" *ngIf="unregistered"></output>
+</form>

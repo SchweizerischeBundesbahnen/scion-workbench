@@ -9,7 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
 import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
@@ -17,14 +17,6 @@ import {convertValueFromUI} from '../common/convert-value-from-ui.util';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {NgIf} from '@angular/common';
-
-const QUALIFIER = 'qualifier';
-const PARAMS = 'params';
-const ACTIVATE = 'activate';
-const CLOSE = 'close';
-const TARGET = 'target';
-const INSERTION_INDEX = 'insertionIndex';
-const CSS_CLASS = 'cssClass';
 
 @Component({
   selector: 'app-router-page',
@@ -41,46 +33,37 @@ const CSS_CLASS = 'cssClass';
 })
 export default class RouterPageComponent {
 
-  public readonly QUALIFIER = QUALIFIER;
-  public readonly PARAMS = PARAMS;
-  public readonly TARGET = TARGET;
-  public readonly INSERTION_INDEX = INSERTION_INDEX;
-  public readonly ACTIVATE = ACTIVATE;
-  public readonly CLOSE = CLOSE;
-  public readonly CSS_CLASS = CSS_CLASS;
+  public form = this._formBuilder.group({
+    qualifier: this._formBuilder.array([], Validators.required),
+    params: this._formBuilder.array([]),
+    target: this._formBuilder.control(''),
+    insertionIndex: this._formBuilder.control(''),
+    activate: this._formBuilder.control<boolean | undefined>(undefined),
+    close: this._formBuilder.control<boolean | undefined>(undefined),
+    cssClass: this._formBuilder.control<string | undefined>(undefined),
+  });
+  public navigateError: string | undefined;
 
-  public form: UntypedFormGroup;
-  public navigateError: string;
-
-  constructor(formBuilder: UntypedFormBuilder,
+  constructor(private _formBuilder: NonNullableFormBuilder,
               private _router: WorkbenchRouter) {
-    this.form = formBuilder.group({
-      [QUALIFIER]: formBuilder.array([], Validators.required),
-      [PARAMS]: formBuilder.array([]),
-      [TARGET]: formBuilder.control(''),
-      [INSERTION_INDEX]: formBuilder.control(''),
-      [ACTIVATE]: formBuilder.control(undefined),
-      [CLOSE]: formBuilder.control(undefined),
-      [CSS_CLASS]: formBuilder.control(undefined),
-    });
   }
 
   public async onNavigate(): Promise<void> {
     this.navigateError = undefined;
 
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray);
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as UntypedFormArray);
+    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier)!;
+    const params = SciParamsEnterComponent.toParamsDictionary(this.form.controls.params);
 
     // Convert entered params to their actual values.
     params && Object.entries(params).forEach(([paramName, paramValue]) => params[paramName] = convertValueFromUI(paramValue));
 
     const extras: WorkbenchNavigationExtras = {
-      activate: this.form.get(ACTIVATE).value,
-      close: this.form.get(CLOSE).value,
-      target: this.form.get(TARGET).value || undefined,
-      blankInsertionIndex: coerceInsertionIndex(this.form.get(INSERTION_INDEX).value),
+      activate: this.form.controls.activate.value,
+      close: this.form.controls.close.value,
+      target: this.form.controls.target.value || undefined,
+      blankInsertionIndex: coerceInsertionIndex(this.form.controls.insertionIndex.value),
       params: params || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
+      cssClass: this.form.controls.cssClass.value?.split(/\s+/).filter(Boolean),
     };
     await this._router.navigate(qualifier, extras)
       .then(success => success ? Promise.resolve() : Promise.reject('Navigation failed'))

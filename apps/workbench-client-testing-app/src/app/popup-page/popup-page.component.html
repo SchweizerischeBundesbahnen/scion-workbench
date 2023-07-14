@@ -1,124 +1,125 @@
 <sci-viewport cdkTrapFocus>
-  <section class="general">
-    <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
-      <span class="e2e-component-instance-id">{{uuid}}</span>
-    </sci-form-field>
-  </section>
-
-  <section class="component-size">
-    <header>Component Size</header>
-
-    <sci-form-field label="Min Height">
-      <input [(ngModel)]="minHeight" class="e2e-min-height">
-    </sci-form-field>
-
-    <sci-form-field label="Height">
-      <input [(ngModel)]="height" class="e2e-height">
-    </sci-form-field>
-
-    <sci-form-field label="Max Height">
-      <input [(ngModel)]="maxHeight" class="e2e-max-height">
-    </sci-form-field>
-
-    <sci-form-field label="Min Width">
-      <input [(ngModel)]="minWidth" class="e2e-min-width">
-    </sci-form-field>
-
-    <sci-form-field label="Width">
-      <input [(ngModel)]="width" class="e2e-width">
-    </sci-form-field>
-
-    <sci-form-field label="Max Width">
-      <input [(ngModel)]="maxWidth" class="e2e-max-width">
-    </sci-form-field>
-  </section>
-
-  <sci-accordion class="popup-capability e2e-popup-capability" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_capability">
-      <header>Popup Capability</header>
-    </ng-template>
-    <ng-template #panel_capability>
-      <sci-viewport>
-        <div class="capability e2e-popup-capability">{{popup.capability | json}}</div>
-      </sci-viewport>
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion class="e2e-popup-params" variant="solid" *ngIf="popup.params | appNullIfEmpty as params">
-    <ng-template sciAccordionItem [panel]="panel_popup_params">
-      <header>Popup Params</header>
-    </ng-template>
-    <ng-template #panel_popup_params>
-      <sci-viewport>
-        <sci-property [properties]="params" class="e2e-popup-params"></sci-property>
-      </sci-viewport>
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | appNullIfEmpty as params">
-    <ng-template sciAccordionItem [panel]="panel_route_params">
-      <header>Route Params</header>
-    </ng-template>
-    <ng-template #panel_route_params>
-      <sci-property [properties]="params" class="e2e-route-params"></sci-property>
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | appNullIfEmpty as params">
-    <ng-template sciAccordionItem [panel]="panel_query_params">
-      <header>Route Query Params</header>
-    </ng-template>
-    <ng-template #panel_query_params>
-      <sci-property [properties]="params" class="e2e-route-query-params"></sci-property>
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion class="e2e-route-fragment" variant="solid" *ngIf="route.fragment | async | appNullIfEmpty as fragment">
-    <ng-template sciAccordionItem [panel]="panel_route_fragment">
-      <header>Route Fragment</header>
-    </ng-template>
-    <ng-template #panel_route_fragment>
-      <span class="e2e-route-fragment">{{fragment}}</span>
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion *ngIf="popup.capability.properties.size | appNullIfEmpty as preferredSize"
-                 title="Preferred Overlay Size"
-                 class="preferred-overlay-size e2e-preferred-overlay-size"
-                 variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_size">
-      <header>Preferred Overlay Size</header>
-    </ng-template>
-    <ng-template #panel_size>
-      <sci-viewport>
-        <div class="preferred-overlay-size e2e-preferred-overlay-size">{{preferredSize | json}}</div>
-      </sci-viewport>
-    </ng-template>
-  </sci-accordion>
-
-  <sci-accordion class="e2e-referrer" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_referrer">
-      <header>Referrer</header>
-    </ng-template>
-    <ng-template #panel_referrer>
-      <sci-form-field label="View ID">
-        <output class="e2e-view-id" [value]="popup.referrer.viewId ?? '<undefined>'"></output>
+  <form [formGroup]="form">
+    <section class="general">
+      <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
+        <span class="e2e-component-instance-id">{{uuid}}</span>
       </sci-form-field>
-      <sci-form-field label="View Capability ID">
-        <output class="e2e-view-capability-id" [value]="popup.referrer.viewCapabilityId ?? '<undefined>'"></output>
+    </section>
+
+    <section class="component-size">
+      <header>Component Size</header>
+
+      <sci-form-field label="Min Height">
+        <input [formControl]="form.controls.minHeight" class="e2e-min-height">
       </sci-form-field>
-    </ng-template>
-  </sci-accordion>
 
-  <sci-accordion class="return-value e2e-return-value" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_return_value">
-      <header>Return Value</header>
-    </ng-template>
-    <ng-template #panel_return_value>
-      <input [(ngModel)]="result" class="e2e-return-value" placeholder="Optional data to return to the popup opener">
-    </ng-template>
-  </sci-accordion>
+      <sci-form-field label="Height">
+        <input [formControl]="form.controls.height" class="e2e-height">
+      </sci-form-field>
 
+      <sci-form-field label="Max Height">
+        <input [formControl]="form.controls.maxHeight" class="e2e-max-height">
+      </sci-form-field>
+
+      <sci-form-field label="Min Width">
+        <input [formControl]="form.controls.minWidth" class="e2e-min-width">
+      </sci-form-field>
+
+      <sci-form-field label="Width">
+        <input [formControl]="form.controls.width" class="e2e-width">
+      </sci-form-field>
+
+      <sci-form-field label="Max Width">
+        <input [formControl]="form.controls.maxWidth" class="e2e-max-width">
+      </sci-form-field>
+    </section>
+
+    <sci-accordion class="popup-capability e2e-popup-capability" variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_capability">
+        <header>Popup Capability</header>
+      </ng-template>
+      <ng-template #panel_capability>
+        <sci-viewport>
+          <div class="capability e2e-popup-capability">{{popup.capability | json}}</div>
+        </sci-viewport>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion class="e2e-popup-params" variant="solid" *ngIf="popup.params | appNullIfEmpty as params">
+      <ng-template sciAccordionItem [panel]="panel_popup_params">
+        <header>Popup Params</header>
+      </ng-template>
+      <ng-template #panel_popup_params>
+        <sci-viewport>
+          <sci-property [properties]="params" class="e2e-popup-params"></sci-property>
+        </sci-viewport>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | appNullIfEmpty as params">
+      <ng-template sciAccordionItem [panel]="panel_route_params">
+        <header>Route Params</header>
+      </ng-template>
+      <ng-template #panel_route_params>
+        <sci-property [properties]="params" class="e2e-route-params"></sci-property>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | appNullIfEmpty as params">
+      <ng-template sciAccordionItem [panel]="panel_query_params">
+        <header>Route Query Params</header>
+      </ng-template>
+      <ng-template #panel_query_params>
+        <sci-property [properties]="params" class="e2e-route-query-params"></sci-property>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion class="e2e-route-fragment" variant="solid" *ngIf="route.fragment | async | appNullIfEmpty as fragment">
+      <ng-template sciAccordionItem [panel]="panel_route_fragment">
+        <header>Route Fragment</header>
+      </ng-template>
+      <ng-template #panel_route_fragment>
+        <span class="e2e-route-fragment">{{fragment}}</span>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion *ngIf="popup.capability.properties.size | appNullIfEmpty as preferredSize"
+                   title="Preferred Overlay Size"
+                   class="preferred-overlay-size e2e-preferred-overlay-size"
+                   variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_size">
+        <header>Preferred Overlay Size</header>
+      </ng-template>
+      <ng-template #panel_size>
+        <sci-viewport>
+          <div class="preferred-overlay-size e2e-preferred-overlay-size">{{preferredSize | json}}</div>
+        </sci-viewport>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion class="e2e-referrer" variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_referrer">
+        <header>Referrer</header>
+      </ng-template>
+      <ng-template #panel_referrer>
+        <sci-form-field label="View ID">
+          <output class="e2e-view-id" [value]="popup.referrer.viewId ?? '<undefined>'"></output>
+        </sci-form-field>
+        <sci-form-field label="View Capability ID">
+          <output class="e2e-view-capability-id" [value]="popup.referrer.viewCapabilityId ?? '<undefined>'"></output>
+        </sci-form-field>
+      </ng-template>
+    </sci-accordion>
+
+    <sci-accordion class="return-value e2e-return-value" variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_return_value">
+        <header>Return Value</header>
+      </ng-template>
+      <ng-template #panel_return_value>
+        <input [formControl]="form.controls.result" class="e2e-return-value" placeholder="Optional data to return to the popup opener">
+      </ng-template>
+    </sci-accordion>
+  </form>
 </sci-viewport>
 
 <div class="buttons">

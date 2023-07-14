@@ -20,7 +20,7 @@ export function convertValueFromUI(value: string): string | number | boolean | o
     return null;
   }
   const paramMatch = value.match(/<(?<type>.+)>(?<value>.+)<\/\k<type>>/);
-  switch (paramMatch?.groups['type']) {
+  switch (paramMatch?.groups!['type']) {
     case 'number': {
       return coerceNumberProperty(paramMatch.groups['value']);
     }

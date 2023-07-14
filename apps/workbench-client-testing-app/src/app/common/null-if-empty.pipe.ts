@@ -17,7 +17,7 @@ import {undefinedIfEmpty} from './undefined-if-empty.util';
 @Pipe({name: 'appNullIfEmpty', standalone: true})
 export class NullIfEmptyPipe implements PipeTransform {
 
-  public transform<T>(value: T): T {
+  public transform<T>(value: T): T | null {
     return undefinedIfEmpty(value) ?? null;
   }
 }

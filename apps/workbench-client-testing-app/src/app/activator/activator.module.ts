@@ -13,8 +13,6 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY, ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 
-declare type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage?: boolean}};
-
 @NgModule({})
 export default class ActivatorModule {
 
@@ -23,7 +21,7 @@ export default class ActivatorModule {
   }
 
   private async registerManifestObjects(appSymbolicName: string): Promise<void> {
-    const app = /workbench-client-testing-(?<app>.+)/.exec(appSymbolicName).groups['app'];
+    const app = /workbench-client-testing-(?<app>.+)/.exec(appSymbolicName)!.groups!['app'];
     const heading = `${app}: Workbench Client E2E Testpage`;
 
     // Register view to interact with the workbench view object.
@@ -196,3 +194,5 @@ export default class ActivatorModule {
     });
   }
 }
+
+type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage?: boolean}};
