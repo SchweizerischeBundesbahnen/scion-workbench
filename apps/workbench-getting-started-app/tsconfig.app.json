@@ -4,7 +4,6 @@
   "compilerOptions": {
     "outDir": "../../out-tsc/workbench-getting-started-app",
     "types": [],
-    "strict": true
   },
   "files": [
     "src/main.ts",

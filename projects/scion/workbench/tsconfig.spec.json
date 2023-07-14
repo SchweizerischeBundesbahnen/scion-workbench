@@ -5,7 +5,6 @@
     "types": [
       "jasmine"
     ],
-    "strict": true,
   },
   "include": [
     "**/*.spec.ts",
