@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {Component, DebugElement} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {Component} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {By} from '@angular/platform-browser';
-import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MessageBoxService} from './message-box.service';
 import {WorkbenchModule} from '../workbench.module';
@@ -40,7 +39,7 @@ describe('MessageBox', () => {
       TestBed.inject(MessageBoxService).open({content: 'message', cssClass: 'testee'}).then();
 
       // Expect message box to show
-      expect(querySelector(fixture, 'wb-message-box.testee')).toBeDefined();
+      expect(fixture.debugElement.query(By.css('wb-message-box.testee'))).toBeDefined();
     });
 
     it('should display view-local message box', async () => {
@@ -61,11 +60,11 @@ describe('MessageBox', () => {
       await waitForWorkbenchLayoutChange();
 
       // Open view-local message box
-      const viewDebugElement = debugElement(fixture, ViewTestComponent);
+      const viewDebugElement = fixture.debugElement.query(By.directive(ViewTestComponent))!;
       viewDebugElement.injector.get(MessageBoxService).open({content: 'Message from View', cssClass: 'testee'}).then();
 
       // Expect message box to show
-      expect(querySelector(fixture, 'wb-message-box.testee')).toBeDefined();
+      expect(fixture.debugElement.query(By.css('wb-message-box.testee'))).toBeDefined();
     });
 
     /****************************************************************************************************
@@ -99,11 +98,3 @@ describe('MessageBox', () => {
     }
   });
 });
-
-function querySelector(fixture: ComponentFixture<any>, selector: string): HTMLElement | undefined {
-  return fixture.debugElement.query(By.css(selector))?.nativeElement ?? undefined;
-}
-
-function debugElement(fixture: ComponentFixture<any>, view: ComponentType<any>): DebugElement | undefined {
-  return fixture.debugElement.query(By.directive(view)) ?? undefined;
-}

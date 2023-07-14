@@ -1389,8 +1389,12 @@ describe('WorkbenchLayout', () => {
     expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 1)).not.toThrowError(/IllegalArgumentError/);
     expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 1.1)).toThrowError(/IllegalArgumentError/);
 
-    function findParentNode(partId: string): MTreeNode | undefined {
-      return workbenchLayout.part({by: {partId}}).parent;
+    function findParentNode(partId: string): MTreeNode {
+      const parent = workbenchLayout.part({by: {partId}}).parent;
+      if (!parent) {
+        throw Error(`[MTreeNodeNotFoundError] Parent MTreeNode not found [partId=${partId}].`);
+      }
+      return parent;
     }
   });
 });

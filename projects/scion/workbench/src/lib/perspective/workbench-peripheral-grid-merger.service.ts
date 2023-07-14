@@ -28,7 +28,7 @@ export class WorkbenchPeripheralGridMerger {
   /**
    * Performs a merge of given local and remote grids, using the base grid as the common ancestor.
    */
-  public merge(grids: {local: MPartGrid; remote: MPartGrid; base: MPartGrid}): MPartGrid {
+  public merge(grids: {local: MPartGrid | null; remote: MPartGrid | null; base: MPartGrid | null}): MPartGrid {
     const localLayout = this._workbenchLayoutFactory.create({peripheralGrid: grids.local});
     const baseLayout = this._workbenchLayoutFactory.create({peripheralGrid: grids.base});
     const remoteLayout = this._workbenchLayoutFactory.create({peripheralGrid: grids.remote});
