@@ -4,7 +4,8 @@
     "outDir": "../../../out-tsc/workbench.spec",
     "types": [
       "jasmine"
-    ]
+    ],
+    "strict": true,
   },
   "include": [
     "**/*.spec.ts",

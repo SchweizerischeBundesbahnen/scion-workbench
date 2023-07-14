@@ -36,8 +36,8 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
           assertWorkbenchLayout(expected, actual, util);
           return pass();
         }
-        catch (error) {
-          return fail(error.message ?? `${error}`);
+        catch (error: unknown) {
+          return fail(error instanceof Error ? error.message : `${error}`);
         }
 
         function pass(): CustomMatcherResult {
@@ -54,14 +54,14 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
 
 function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, actual: ɵWorkbenchLayout | ComponentFixture<WorkbenchLayoutComponent> | DebugElement, util: MatchersUtil): void {
   if (actual instanceof ɵWorkbenchLayout) {
-    assertPartGridModel(expected.peripheralGrid, actual.peripheralGrid, util);
-    assertPartGridModel(expected.mainGrid, actual.mainGrid, util);
+    assertPartGridModel(expected.peripheralGrid!, actual.peripheralGrid, util);
+    assertPartGridModel(expected.mainGrid!, actual.mainGrid, util);
   }
   else if ((actual instanceof ComponentFixture || actual instanceof DebugElement) && actual.componentInstance instanceof WorkbenchLayoutComponent) {
     const actualDebugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
-    assertPartGridModel(expected.peripheralGrid, actualDebugElement.componentInstance.layout.peripheralGrid, util);
-    assertPartGridModel(expected.mainGrid, actualDebugElement.componentInstance.layout.mainGrid, util);
-    assertGridElementDOM(expected.peripheralGrid.root, actualDebugElement.query(By.css('wb-grid-element')), expected);
+    assertPartGridModel(expected.peripheralGrid!, actualDebugElement.componentInstance.layout.peripheralGrid, util);
+    assertPartGridModel(expected.mainGrid!, actualDebugElement.componentInstance.layout.mainGrid, util);
+    assertGridElementDOM(expected.peripheralGrid!.root!, actualDebugElement.query(By.css('wb-grid-element')), expected);
   }
   else {
     throw Error(`Expected testee to be of type 'ɵWorkbenchLayout' or 'DebugElement<WorkbenchLayoutComponent>' [actual=${actual.constructor.name}]`);
@@ -108,8 +108,8 @@ function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualDom: Deb
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
   }
 
-  const child1Visible = isVisible(expectedTreeNode.child1);
-  const child2Visible = isVisible(expectedTreeNode.child2);
+  const child1Visible = isVisible(expectedTreeNode.child1!);
+  const child2Visible = isVisible(expectedTreeNode.child2!);
 
   // Assert sashbox.
   if (child1Visible && child2Visible) {
@@ -128,18 +128,18 @@ function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualDom: Deb
   if (child1Visible) {
     const actualChild1Element = actualDom.query(By.css(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-1`));
     if (!actualChild1Element) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-1' to be in the DOM, but is not. [${expectedTreeNode.child1.type}=${JSON.stringify(expectedTreeNode.child1)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-1' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}]`);
     }
-    assertGridElementDOM(expectedTreeNode.child1, actualChild1Element, expectedWorkbenchLayout);
+    assertGridElementDOM(expectedTreeNode.child1!, actualChild1Element, expectedWorkbenchLayout);
   }
 
   // Assert sash of child 2.
   if (child2Visible) {
     const actualChild2Element = actualDom.query(By.css(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-2`));
     if (!actualChild2Element) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-2' to be in the DOM, but is not. [${expectedTreeNode.child2.type}=${JSON.stringify(expectedTreeNode.child2)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-2' to be in the DOM, but is not. [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}]`);
     }
-    assertGridElementDOM(expectedTreeNode.child2, actualChild2Element, expectedWorkbenchLayout);
+    assertGridElementDOM(expectedTreeNode.child2!, actualChild2Element, expectedWorkbenchLayout);
   }
 }
 
@@ -156,7 +156,7 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualDom: DebugElement, e
     if (!actualPartElement) {
       throw Error(`[DOMAssertError]: Expected element 'wb-main-area-layout[data-partid="${partId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
-    assertGridElementDOM(expectedWorkbenchLayout.mainGrid.root, actualPartElement.query(By.css(`wb-main-area-layout[data-partid="${partId}"] > wb-grid-element`)), expectedWorkbenchLayout);
+    assertGridElementDOM(expectedWorkbenchLayout.mainGrid!.root!, actualPartElement.query(By.css(`wb-main-area-layout[data-partid="${partId}"] > wb-grid-element`)), expectedWorkbenchLayout);
   }
   else {
     const actualPartElement = actualDom.query(By.css(`wb-part[data-partid="${partId}"]`));
@@ -174,10 +174,10 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualDom: DebugElement, e
 /**
  * Like {@link jasmine.ObjectContaining}, but applies {@link jasmine.ObjectContaining} recursively to all fields.
  */
-function objectContainingRecursive<T>(object: T): ObjectContaining<T> {
-  const workingCopy = {...object};
+function objectContainingRecursive<T extends Record<string, any>>(object: T): ObjectContaining<T> {
+  const workingCopy = {...object} as Record<string, any>;
   Object.entries(workingCopy).forEach(([key, value]) => {
-    if (typeof value === 'object' && !Array.isArray(value)) {
+    if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
       workingCopy[key] = objectContainingRecursive(value);
     }
   });

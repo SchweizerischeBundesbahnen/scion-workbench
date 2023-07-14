@@ -24,6 +24,7 @@ import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {By} from '@angular/platform-browser';
 
 describe('ViewComponent', () => {
 
@@ -54,16 +55,16 @@ describe('ViewComponent', () => {
     const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(cssClasses(fixture, 'wb-view-tab')).withContext('(A)').toEqual(jasmine.arrayContaining(['dirty']));
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).withContext('(A)').toEqual(jasmine.objectContaining({'dirty': true}));
 
     // Clear dirty flag
     viewDebugElement.view.dirty = false;
     advance(fixture);
-    expect(cssClasses(fixture, 'wb-view-tab')).not.withContext('(B)').toEqual(jasmine.arrayContaining(['dirty']));
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).not.withContext('(B)').toEqual(jasmine.objectContaining({'dirty': true}));
 
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(cssClasses(fixture, 'wb-view-tab')).withContext('(C)').toEqual(jasmine.arrayContaining(['dirty']));
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).withContext('(C)').toEqual(jasmine.objectContaining({'dirty': true}));
 
     discardPeriodicTasks();
   }));
@@ -72,18 +73,18 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view', {title: 'TITLE'}]).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('TITLE');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(A)').toEqual('TITLE');
 
     // Set title
     const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
     viewDebugElement.view.title = 'Foo';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('Foo');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(B)').toEqual('Foo');
 
     // Set title
     viewDebugElement.view.title = 'Bar';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(C)').toEqual('Bar');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(C)').toEqual('Bar');
 
     discardPeriodicTasks();
   }));
@@ -92,18 +93,18 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view', {heading: 'HEADING'}]).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('HEADING');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(A)').toEqual('HEADING');
 
     // Set heading
     const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
     viewDebugElement.view.heading = 'Foo';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('Foo');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(A)').toEqual('Foo');
 
     // Set heading
     viewDebugElement.view.heading = 'Bar';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(B)').toEqual('Bar');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(B)').toEqual('Bar');
 
     discardPeriodicTasks();
   }));
@@ -112,18 +113,18 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-with-title']).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('ROUTE TITLE');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(A)').toEqual('ROUTE TITLE');
 
     // Set title
     const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
     viewDebugElement.view.title = 'Foo';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('Foo');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(B)').toEqual('Foo');
 
     // Set title
     viewDebugElement.view.title = 'Bar';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(C)').toEqual('Bar');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(C)').toEqual('Bar');
 
     discardPeriodicTasks();
   }));
@@ -132,18 +133,18 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-with-heading']).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('ROUTE HEADING');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(A)').toEqual('ROUTE HEADING');
 
     // Set heading
     const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
     viewDebugElement.view.heading = 'Foo';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(B)').toEqual('Foo');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(B)').toEqual('Foo');
 
     // Set heading
     viewDebugElement.view.heading = 'Bar';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(C)').toEqual('Bar');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(C)').toEqual('Bar');
 
     discardPeriodicTasks();
   }));
@@ -152,18 +153,18 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-with-title', {title: 'TITLE'}]).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('TITLE');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(A)').toEqual('TITLE');
 
     // Set title
     const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
     viewDebugElement.view.title = 'Foo';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('Foo');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(B)').toEqual('Foo');
 
     // Set title
     viewDebugElement.view.title = 'Bar';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(C)').toEqual('Bar');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(C)').toEqual('Bar');
 
     discardPeriodicTasks();
   }));
@@ -172,18 +173,18 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-with-heading', {heading: 'HEADING'}]).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('HEADING');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(A)').toEqual('HEADING');
 
     // Set heading
     const viewDebugElement = getViewDebugElement<SpecViewComponent>('view.1');
     viewDebugElement.view.heading = 'Foo';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(B)').toEqual('Foo');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(B)').toEqual('Foo');
 
     // Set heading
     viewDebugElement.view.heading = 'Bar';
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(C)').toEqual('Bar');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(C)').toEqual('Bar');
 
     discardPeriodicTasks();
   }));
@@ -192,11 +193,11 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-1', {title: 'TITLE'}]).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('TITLE');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(A)').toEqual('TITLE');
 
     TestBed.inject(WorkbenchRouter).navigate(['view-2', {title: ''}], {target: 'view.1'}).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(B)').toEqual('');
 
     discardPeriodicTasks();
   }));
@@ -205,11 +206,11 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-1', {heading: 'HEADING'}]).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('HEADING');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(A)').toEqual('HEADING');
 
     TestBed.inject(WorkbenchRouter).navigate(['view-2', {heading: ''}], {target: 'view.1'}).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading')).withContext('(B)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading'))).withContext('(B)').toBeNull();
 
     discardPeriodicTasks();
   }));
@@ -218,12 +219,12 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-1', {title: 'TITLE 1'}]).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(A)').toEqual('TITLE 1');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(A)').toEqual('TITLE 1');
 
     // Navigate to a different view
     TestBed.inject(WorkbenchRouter).navigate(['view-2', {title: 'TITLE 2'}], {target: 'view.1'}).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .title').innerText).withContext('(B)').toEqual('TITLE 2');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .title')).nativeElement.innerText).withContext('(B)').toEqual('TITLE 2');
 
     discardPeriodicTasks();
   }));
@@ -232,12 +233,12 @@ describe('ViewComponent', () => {
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-1', {heading: 'HEADING 1'}]).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(A)').toEqual('HEADING 1');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(A)').toEqual('HEADING 1');
 
     // Navigate to a different view
     TestBed.inject(WorkbenchRouter).navigate(['view-2', {heading: 'HEADING 2'}], {target: 'view.1'}).then();
     advance(fixture);
-    expect(querySelector(fixture, 'wb-view-tab .heading').innerText).withContext('(B)').toEqual('HEADING 2');
+    expect(fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement.innerText).withContext('(B)').toEqual('HEADING 2');
 
     discardPeriodicTasks();
   }));
@@ -252,7 +253,7 @@ describe('ViewComponent', () => {
     view1DebugElement.component.checked = false;
     fixture.detectChanges();
     expect(view1DebugElement.component.checked).withContext('(A)').toBeTrue();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(B)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(B)').toBeDefined();
 
     // Add View 2
     TestBed.inject(WorkbenchRouter).navigate(['view-2']).then();
@@ -264,9 +265,9 @@ describe('ViewComponent', () => {
     view2DebugElement.component.checked = false;
     fixture.detectChanges();
     expect(view1DebugElement.component.checked).withContext('(C)').toBeFalse();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(D)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(D)').toBeNull();
     expect(view2DebugElement.component.checked).withContext('(E)').toBeTrue();
-    expect(querySelector(fixture, 'spec-view-2')).withContext('(F)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(F)').toBeDefined();
 
     // Ensure View 1 not to be destroyed
     expect(getViewDebugElement<SpecView1Component>('view.1').component).withContext('(G)').toBe(component1);
@@ -280,9 +281,9 @@ describe('ViewComponent', () => {
     view2DebugElement.component.checked = false;
     fixture.detectChanges();
     expect(view1DebugElement.component.checked).withContext('(I)').toBeTrue();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(J)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(J)').toBeDefined();
     expect(view2DebugElement.component.checked).withContext('(K)').toBeFalse();
-    expect(querySelector(fixture, 'spec-view-2')).withContext('(L)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(L)').toBeNull();
 
     // Ensure View 2 not to be destroyed
     expect(getViewDebugElement<SpecView1Component>('view.2').component).withContext('(M)').toBe(component2);
@@ -296,9 +297,9 @@ describe('ViewComponent', () => {
     view2DebugElement.component.checked = false;
     fixture.detectChanges();
     expect(view1DebugElement.component.checked).withContext('(O)').toBeFalse();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(P)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(P)').toBeNull();
     expect(view2DebugElement.component.checked).withContext('(Q)').toBeTrue();
-    expect(querySelector(fixture, 'spec-view-2')).withContext('(R)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(R)').toBeDefined();
 
     // Ensure View 1 not to be destroyed
     expect(getViewDebugElement<SpecView1Component>('view.1').component).withContext('(S)').toBe(component1);
@@ -378,8 +379,8 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.view.destroyed).withContext('(M)').toBeTrue();
     expect(view2DebugElement.component.destroyed).withContext('(N)').toBeTrue();
 
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(O)').toBeUndefined();
-    expect(querySelector(fixture, 'spec-view-2')).withContext('(P)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(O)').toBeNull();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(P)').toBeNull();
 
     discardPeriodicTasks();
   }));
@@ -397,7 +398,7 @@ describe('ViewComponent', () => {
 
     expect(view1DebugElement.view.destroyed).withContext('(A)').toBeFalse();
     expect(view1DebugElement.component.destroyed).withContext('(B)').toBeFalse();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(C)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(C)').toBeDefined();
 
     // Try to close to View 1 (accept)
     view1DebugElement.component.preventDestroy = false;
@@ -406,7 +407,7 @@ describe('ViewComponent', () => {
 
     expect(view1DebugElement.view.destroyed).withContext('(D)').toBeTrue();
     expect(view1DebugElement.component.destroyed).withContext('(E)').toBeTrue();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(F)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(F)').toBeNull();
 
     discardPeriodicTasks();
   }));
@@ -418,7 +419,7 @@ describe('ViewComponent', () => {
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement1.component.destroyed).withContext('(A)').toBeFalse();
     expect(viewDebugElement1.view.destroyed).withContext('(B)').toBeFalse();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(C)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(C)').toBeDefined();
 
     // Route to View 2
     TestBed.inject(WorkbenchRouter).navigate(['view-2'], {target: 'view.1'}).then();
@@ -427,10 +428,10 @@ describe('ViewComponent', () => {
     const viewDebugElement2 = getViewDebugElement<SpecView2Component>('view.1');
     expect(viewDebugElement2.component.destroyed).withContext('(C)').toBeFalse();
     expect(viewDebugElement2.view.destroyed).withContext('(D)').toBeFalse();
-    expect(querySelector(fixture, 'spec-view-2')).withContext('(E)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-2'))).withContext('(E)').toBeDefined();
 
     expect(viewDebugElement1.component.destroyed).withContext('(F)').toBeTrue();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(G)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(G)').toBeNull();
 
     expect(viewDebugElement1.view.destroyed).withContext('(H)').toBeFalse();
     expect(viewDebugElement1.view).withContext('(I)').toBe(viewDebugElement2.view);
@@ -445,14 +446,14 @@ describe('ViewComponent', () => {
     const viewDebugElement1 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement1.component.destroyed).withContext('(A)').toBeFalse();
     expect(viewDebugElement1.view.destroyed).withContext('(B)').toBeFalse();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(C)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(C)').toBeDefined();
 
     // Remove View 1
     viewDebugElement1.view.close().then();
     advance(fixture);
     expect(viewDebugElement1.component.destroyed).withContext('(D)').toBeTrue();
     expect(viewDebugElement1.view.destroyed).withContext('(E)').toBeTrue();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(F)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(F)').toBeNull();
 
     // Add View 1 again
     TestBed.inject(WorkbenchRouter).navigate(['view-1']).then();
@@ -460,14 +461,14 @@ describe('ViewComponent', () => {
     const viewDebugElement2 = getViewDebugElement<SpecView1Component>('view.1');
     expect(viewDebugElement2.component.destroyed).withContext('(G)').toBeFalse();
     expect(viewDebugElement2.view.destroyed).withContext('(H)').toBeFalse();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(I)').toBeDefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(I)').toBeDefined();
 
     // Remove View 1
     viewDebugElement2.view.close().then();
     advance(fixture);
     expect(viewDebugElement2.component.destroyed).withContext('(D)').toBeTrue();
     expect(viewDebugElement2.view.destroyed).withContext('(E)').toBeTrue();
-    expect(querySelector(fixture, 'spec-view-1')).withContext('(F)').toBeUndefined();
+    expect(fixture.debugElement.query(By.css('spec-view-1'))).withContext('(F)').toBeNull();
 
     discardPeriodicTasks();
   }));
@@ -487,22 +488,6 @@ describe('ViewComponent', () => {
   }
 });
 
-/**
- * Since 'sci-viewport' uses a shadow DOM, we cannot use {@link DebugElement#query} because not working
- * across shadow DOM boundaries.
- */
-function querySelector(fixture: ComponentFixture<any>, selector: string): HTMLElement | undefined {
-  return fixture.nativeElement.querySelector(selector) ?? undefined;
-}
-
-/**
- * Since 'sci-viewport' uses a shadow DOM, we cannot use {@link DebugElement#query} because not working
- * across shadow DOM boundaries.
- */
-function cssClasses(fixture: ComponentFixture<any>, selector: string): string[] {
-  return Array.from(querySelector(fixture, selector)?.classList);
-}
-
 @Component({
   selector: 'spec-view',
   template: '{{checkFromTemplate()}}',
@@ -511,7 +496,7 @@ function cssClasses(fixture: ComponentFixture<any>, selector: string): string[] 
 class SpecViewComponent implements OnDestroy, WorkbenchViewPreDestroy {
 
   public destroyed = false;
-  public activated: boolean;
+  public activated: boolean | undefined;
   public checked = false;
   public preventDestroy = false;
 

@@ -70,7 +70,7 @@ describe('WorkbenchObjectRegistry', () => {
   });
 
   it('should emit objects on registry change', async () => {
-    const captor = new ObserveCaptor<TestObject[]>();
+    const captor = new ObserveCaptor<readonly TestObject[]>();
 
     registry.register({id: '1', version: 1});
 
