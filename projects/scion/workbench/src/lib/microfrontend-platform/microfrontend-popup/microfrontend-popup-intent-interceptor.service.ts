@@ -15,7 +15,7 @@ import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
 import {Observable} from 'rxjs';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {stringifyError} from '../messaging.util';
+import {stringifyError} from '../../common/stringify-error.util';
 import {Arrays, Maps} from '@scion/toolkit/util';
 import {PopupService} from '../../popup/popup.service';
 import {PopupOrigin} from '../../popup/popup.origin';
