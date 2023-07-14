@@ -1,97 +1,97 @@
 <form autocomplete="off" [formGroup]="form">
   <section>
     <sci-form-field label="Type">
-      <select [formControlName]="TYPE" class="e2e-type">
+      <select [formControl]="form.controls.type" class="e2e-type">
         <option [value]="WorkbenchCapabilities.View">VIEW</option>
         <option [value]="WorkbenchCapabilities.Popup">POPUP</option>
       </select>
     </sci-form-field>
 
     <sci-form-field label="Qualifier">
-      <sci-params-enter [paramsFormArray]="$any(form.get(QUALIFIER))" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+      <sci-params-enter [paramsFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
     </sci-form-field>
 
     <sci-form-field label="Required Params">
-      <input [formControlName]="REQUIRED_PARAMS" class="e2e-required-params" placeholder="param1,param2,...">
+      <input [formControl]="form.controls.requiredParams" class="e2e-required-params" placeholder="param1,param2,...">
     </sci-form-field>
     <sci-form-field label="Optional Params">
-      <input [formControlName]="OPTIONAL_PARAMS" class="e2e-optional-params" placeholder="param1,param2,...">
+      <input [formControl]="form.controls.optionalParams" class="e2e-optional-params" placeholder="param1,param2,...">
     </sci-form-field>
-    <sci-form-field label="Transient Params" *ngIf="form.get(TYPE).value === WorkbenchCapabilities.View">
-      <input [formControlName]="TRANSIENT_PARAMS" class="e2e-transient-params" placeholder="param1,param2,...">
+    <sci-form-field label="Transient Params" *ngIf="form.controls.type.value === WorkbenchCapabilities.View">
+      <input [formControl]="form.controls.transientParams" class="e2e-transient-params" placeholder="param1,param2,...">
     </sci-form-field>
 
     <sci-form-field label="Private">
-      <sci-checkbox [formControlName]="PRIVATE" class="e2e-private"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.private" class="e2e-private"></sci-checkbox>
     </sci-form-field>
   </section>
 
   <section>
     <header>Properties</header>
 
-    <ng-container *ngIf="form.get(TYPE).value === WorkbenchCapabilities.View" [formGroupName]="VIEW_PROPERTIES">
+    <ng-container *ngIf="form.controls.type.value === WorkbenchCapabilities.View" [formGroup]="this.form.controls.viewProperties">
       <sci-form-field label="Path">
-        <input [formControlName]="PATH" class="e2e-path">
+        <input [formControl]="this.form.controls.viewProperties.controls.path" class="e2e-path">
       </sci-form-field>
 
       <sci-form-field label="Title">
-        <input [formControlName]="TITLE" class="e2e-title">
+        <input [formControl]="this.form.controls.viewProperties.controls.title" class="e2e-title">
       </sci-form-field>
 
       <sci-form-field label="Heading">
-        <input [formControlName]="HEADING" class="e2e-heading">
+        <input [formControl]="this.form.controls.viewProperties.controls.heading" class="e2e-heading">
       </sci-form-field>
 
       <sci-form-field label="Closable">
-        <sci-checkbox [formControlName]="CLOSABLE" class="e2e-closable"></sci-checkbox>
+        <sci-checkbox [formControl]="this.form.controls.viewProperties.controls.closable" class="e2e-closable"></sci-checkbox>
       </sci-form-field>
 
       <sci-form-field label="CSS Class(es)">
-        <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+        <input [formControl]="this.form.controls.viewProperties.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
       </sci-form-field>
 
       <sci-form-field label="Pin to Startpage">
-        <sci-checkbox [formControlName]="PIN_TO_START_PAGE" class="e2e-pin-to-startpage"></sci-checkbox>
+        <sci-checkbox [formControl]="this.form.controls.viewProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
       </sci-form-field>
     </ng-container>
 
-    <ng-container *ngIf="form.get(TYPE).value === WorkbenchCapabilities.Popup" [formGroupName]="POPUP_PROPERTIES">
+    <ng-container *ngIf="form.controls.type.value === WorkbenchCapabilities.Popup" [formGroup]="this.form.controls.popupProperties">
       <sci-form-field label="Path">
-        <input [formControlName]="PATH" class="e2e-path">
+        <input [formControl]="this.form.controls.popupProperties.controls.path" class="e2e-path">
       </sci-form-field>
 
-      <ng-container [formGroupName]="SIZE">
+      <ng-container [formGroup]="this.form.controls.popupProperties.controls.size">
         <sci-form-field label="Min Height">
-          <input [formControlName]="MIN_HEIGHT" class="e2e-min-height">
+          <input [formControl]="this.form.controls.popupProperties.controls.size.controls.minHeight" class="e2e-min-height">
         </sci-form-field>
 
         <sci-form-field label="Height">
-          <input [formControlName]="HEIGHT" class="e2e-height">
+          <input [formControl]="this.form.controls.popupProperties.controls.size.controls.height" class="e2e-height">
         </sci-form-field>
 
         <sci-form-field label="Max Height">
-          <input [formControlName]="MAX_HEIGHT" class="e2e-max-height">
+          <input [formControl]="this.form.controls.popupProperties.controls.size.controls.maxHeight" class="e2e-max-height">
         </sci-form-field>
 
         <sci-form-field label="Min Width">
-          <input [formControlName]="MIN_WIDTH" class="e2e-min-width">
+          <input [formControl]="this.form.controls.popupProperties.controls.size.controls.minWidth" class="e2e-min-width">
         </sci-form-field>
 
         <sci-form-field label="Width">
-          <input [formControlName]="WIDTH" class="e2e-width">
+          <input [formControl]="this.form.controls.popupProperties.controls.size.controls.width" class="e2e-width">
         </sci-form-field>
 
         <sci-form-field label="Max Width">
-          <input [formControlName]="MAX_WIDTH" class="e2e-max-width">
+          <input [formControl]="this.form.controls.popupProperties.controls.size.controls.maxWidth" class="e2e-max-width">
         </sci-form-field>
       </ng-container>
 
       <sci-form-field label="Pin to Startpage">
-        <sci-checkbox [formControlName]="PIN_TO_START_PAGE" class="e2e-pin-to-startpage"></sci-checkbox>
+        <sci-checkbox [formControl]="this.form.controls.popupProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
       </sci-form-field>
 
       <sci-form-field label="CSS Class(es)">
-        <input [formControlName]="CSS_CLASS" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+        <input [formControl]="this.form.controls.popupProperties.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
       </sci-form-field>
     </ng-container>
   </section>

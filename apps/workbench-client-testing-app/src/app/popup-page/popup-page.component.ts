@@ -16,7 +16,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {SciViewportModule} from '@scion/components/viewport';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciAccordionModule} from '@scion/components.internal/accordion';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {SciPropertyModule} from '@scion/components.internal/property';
@@ -42,6 +42,7 @@ import {A11yModule} from '@angular/cdk/a11y';
     SciFormFieldModule,
     SciAccordionModule,
     SciPropertyModule,
+    ReactiveFormsModule,
   ],
 })
 export default class PopupPageComponent {
@@ -49,46 +50,67 @@ export default class PopupPageComponent {
   public uuid = UUID.randomUUID();
 
   @HostBinding('style.width')
-  public width: string;
+  public get width(): string {
+    return this.form.controls.width.value;
+  }
 
   @HostBinding('style.height')
-  public height: string;
+  public get height(): string {
+    return this.form.controls.height.value;
+  }
 
   @HostBinding('style.min-height')
-  public minHeight: string;
+  public get minHeight(): string {
+    return this.form.controls.minHeight.value;
+  }
 
   @HostBinding('style.max-height')
-  public maxHeight: string;
+  public get maxHeight(): string {
+    return this.form.controls.maxHeight.value;
+  }
 
-  /**
-   * Since the component is positioned absolutely, we set its 'minWidth' to '100VW'
-   * so that it can fill the available space horizontally if the popup overlay defines
-   * a fixed width.
-   */
   @HostBinding('style.min-width')
-  public minWidth = '100vw';
+  public get minWidth(): string {
+    return this.form.controls.minWidth.value;
+  }
 
   @HostBinding('style.max-width')
-  public maxWidth: string;
+  public get maxWidth(): string {
+    return this.form.controls.maxWidth.value;
+  }
 
-  public result: string;
+  public form = this._formBuilder.group({
+    minHeight: this._formBuilder.control(''),
+    height: this._formBuilder.control(''),
+    maxHeight: this._formBuilder.control(''),
+    /**
+     * Since the component is positioned absolutely, we set its 'minWidth' to '100vw'
+     * so that it can fill the available space horizontally if the popup overlay defines
+     * a fixed width.
+     */
+    minWidth: this._formBuilder.control('100vw'),
+    width: this._formBuilder.control(''),
+    maxWidth: this._formBuilder.control(''),
+    result: this._formBuilder.control(''),
+  });
 
   constructor(host: ElementRef<HTMLElement>,
+              private _formBuilder: NonNullableFormBuilder,
               public route: ActivatedRoute,
               public popup: WorkbenchPopup) {
     // Use the size of this component as the popup size.
     Beans.get(PreferredSizeService).fromDimension(host.nativeElement);
 
     const configuredPopupSize = popup.capability.properties.size;
-    this.width = configuredPopupSize?.width ?? 'max-content';
-    this.height = configuredPopupSize?.height ?? 'max-content';
+    this.form.controls.width.setValue(configuredPopupSize?.width ?? 'max-content');
+    this.form.controls.height.setValue(configuredPopupSize?.height ?? 'max-content');
   }
 
   public onClose(): void {
-    this.popup.close(this.result);
+    this.popup.close(this.form.controls.result.value);
   }
 
   public onCloseWithError(): void {
-    this.popup.closeWithError(this.result);
+    this.popup.closeWithError(this.form.controls.result.value);
   }
 }

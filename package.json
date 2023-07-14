@@ -42,6 +42,7 @@
     "workbench-testing-app:serve": "ng serve workbench-testing-app --port 4200",
     "workbench-testing-app:http-server": "cd dist/workbench-testing-app-ci && http-server --silent --port 4200",
 
+    "workbench-client-testing-app:build": "ng build workbench-client-testing-app --configuration=development",
     "workbench-client-testing-app:vercel:build": "ng build workbench-client-testing-app --configuration=production-vercel",
     "workbench-client-testing-app:ci:build": "ng build workbench-client-testing-app --configuration=production-ci",
     "workbench-client-testing-app:lint": "ng lint workbench-client-testing-app",

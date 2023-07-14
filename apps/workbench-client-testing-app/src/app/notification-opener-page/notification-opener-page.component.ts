@@ -9,20 +9,12 @@
  */
 
 import {Component} from '@angular/core';
-import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNotificationService} from '@scion/workbench-client';
 import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
-
-const QUALIFIER = 'qualifier';
-const PARAMS = 'params';
-const TITLE = 'title';
-const CONTENT = 'content';
-const SEVERITY = 'severity';
-const DURATION = 'duration';
-const GROUP = 'group';
-const CSS_CLASS = 'cssClass';
+import {stringifyError} from '../common/stringify-error.util';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -38,51 +30,41 @@ const CSS_CLASS = 'cssClass';
 })
 export default class NotificationOpenerPageComponent {
 
-  public readonly QUALIFIER = QUALIFIER;
-  public readonly PARAMS = PARAMS;
-  public readonly TITLE = TITLE;
-  public readonly CONTENT = CONTENT;
-  public readonly SEVERITY = SEVERITY;
-  public readonly DURATION = DURATION;
-  public readonly GROUP = GROUP;
-  public readonly CSS_CLASS = CSS_CLASS;
+  public form = this._formBuilder.group({
+    qualifier: this._formBuilder.array([]),
+    params: this._formBuilder.array([]),
+    title: this._formBuilder.control(''),
+    content: this._formBuilder.control(''),
+    severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
+    duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | number | ''>(''),
+    group: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control(''),
+  });
 
-  public form: UntypedFormGroup;
+  public error: string | undefined;
 
-  public error: string;
-
-  constructor(formBuilder: UntypedFormBuilder, private _notificationService: WorkbenchNotificationService) {
-    this.form = formBuilder.group({
-      [QUALIFIER]: formBuilder.array([]),
-      [PARAMS]: formBuilder.array([]),
-      [TITLE]: formBuilder.control(''),
-      [CONTENT]: formBuilder.control(''),
-      [SEVERITY]: formBuilder.control(''),
-      [DURATION]: formBuilder.control(''),
-      [GROUP]: formBuilder.control(''),
-      [CSS_CLASS]: formBuilder.control(''),
-    });
+  constructor(private _formBuilder: NonNullableFormBuilder, private _notificationService: WorkbenchNotificationService) {
   }
 
   public onNotificationShow(): void {
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray);
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.get(PARAMS) as UntypedFormArray);
+    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier);
+    const params = SciParamsEnterComponent.toParamsDictionary(this.form.controls.params);
 
-    this.error = null;
+    this.error = undefined;
     this._notificationService.show({
-      title: this.form.get(TITLE).value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
-      content: this.form.get(CONTENT).value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
-      params,
-      severity: this.form.get(SEVERITY).value || undefined,
+      title: this.form.controls.title.value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
+      content: this.form.controls.content.value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
+      params: params ?? undefined,
+      severity: this.form.controls.severity.value || undefined,
       duration: this.parseDurationFromUI(),
-      group: this.form.get(GROUP).value || undefined,
-      cssClass: this.form.get(CSS_CLASS).value?.split(/\s+/).filter(Boolean),
-    }, qualifier)
-      .catch(error => this.error = error);
+      group: this.form.controls.group.value || undefined,
+      cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+    }, qualifier ?? undefined)
+      .catch(error => this.error = stringifyError(error));
   }
 
   private parseDurationFromUI(): 'short' | 'medium' | 'long' | 'infinite' | number | undefined {
-    const duration = this.form.get(DURATION).value;
+    const duration = this.form.controls.duration.value;
     if (duration === '') {
       return undefined;
     }

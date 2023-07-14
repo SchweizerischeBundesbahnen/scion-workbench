@@ -23,7 +23,9 @@ import {Pipe, PipeTransform} from '@angular/core';
 @Pipe({name: 'appAppendParamDataType', standalone: true})
 export class AppendParamDataTypePipe implements PipeTransform {
 
-  public transform(params: ReadonlyMap<string, any> | null): ReadonlyMap<string, any> {
+  public transform(params: null): null;
+  public transform(params: ReadonlyMap<string, any>): ReadonlyMap<string, any>;
+  public transform(params: ReadonlyMap<string, any> | null): ReadonlyMap<string, any> | null {
     if (params === null) {
       return null;
     }

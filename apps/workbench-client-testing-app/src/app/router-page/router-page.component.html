@@ -1,49 +1,51 @@
 <form autocomplete="off" [formGroup]="form">
-  <header>View Intent</header>
+  <section>
+    <header>View Intent</header>
 
-  <sci-form-field label="Qualifier">
-    <sci-params-enter [paramsFormArray]="$any(form.get(QUALIFIER))" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
-  </sci-form-field>
+    <sci-form-field label="Qualifier">
+      <sci-params-enter [paramsFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+    </sci-form-field>
 
-  <sci-form-field label="Params">
-    <sci-params-enter [paramsFormArray]="$any(form.get(PARAMS))" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
-  </sci-form-field>
+    <sci-form-field label="Params">
+      <sci-params-enter [paramsFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <header>Navigation Extras</header>
+
+    <sci-form-field label="Target">
+      <input [formControl]="form.controls.target" class="e2e-target" list="targets">
+      <datalist id="targets">
+        <option value="auto">auto</option>
+        <option value="blank">blank</option>
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="InsertionIndex">
+      <input [formControl]="form.controls.insertionIndex" list="insertionIndexHints" class="e2e-insertion-index">
+      <datalist id="insertionIndexHints">
+        <option value="start">
+        <option value="end">
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Activate">
+      <sci-checkbox [formControl]="form.controls.activate" class="e2e-activate"></sci-checkbox>
+    </sci-form-field>
+
+    <sci-form-field label="Close">
+      <sci-checkbox [formControl]="form.controls.close" class="e2e-close"></sci-checkbox>
+    </sci-form-field>
+
+    <sci-form-field label="CSS Class(es)">
+      <input [formControl]="form.controls.cssClass" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
+    </sci-form-field>
+  </section>
+
+  <button (click)="onNavigate()" class="e2e-navigate" [disabled]="form.invalid">Navigate</button>
+
+  <output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
+    {{navigateError}}
+  </output>
 </form>
-
-<form autocomplete="off" [formGroup]="form">
-  <header>Navigation Extras</header>
-
-  <sci-form-field label="Target">
-    <input [formControlName]="TARGET" class="e2e-target" list="targets">
-    <datalist id="targets">
-      <option value="auto">auto</option>
-      <option value="blank">blank</option>
-    </datalist>
-  </sci-form-field>
-
-  <sci-form-field label="InsertionIndex">
-    <input [formControlName]="INSERTION_INDEX" list="insertionIndexHints" class="e2e-insertion-index">
-    <datalist id="insertionIndexHints">
-      <option value="start">
-      <option value="end">
-    </datalist>
-  </sci-form-field>
-
-  <sci-form-field label="Activate">
-    <sci-checkbox [formControlName]="ACTIVATE" class="e2e-activate"></sci-checkbox>
-  </sci-form-field>
-
-  <sci-form-field label="Close">
-    <sci-checkbox [formControlName]="CLOSE" class="e2e-close"></sci-checkbox>
-  </sci-form-field>
-
-  <sci-form-field label="CSS Class(es)">
-    <input [formControlName]="CSS_CLASS" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
-  </sci-form-field>
-</form>
-
-<button (click)="onNavigate()" class="e2e-navigate">Navigate</button>
-
-<output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
-  {{navigateError}}
-</output>

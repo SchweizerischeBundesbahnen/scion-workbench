@@ -9,15 +9,13 @@
  */
 
 import {Component} from '@angular/core';
-import {ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
-
-const TYPE = 'type';
-const QUALIFIER = 'qualifier';
+import {stringifyError} from '../common/stringify-error.util';
 
 @Component({
   selector: 'app-register-workbench-intention-page',
@@ -33,37 +31,33 @@ const QUALIFIER = 'qualifier';
 })
 export default class RegisterWorkbenchIntentionPageComponent {
 
-  public readonly TYPE = TYPE;
-  public readonly QUALIFIER = QUALIFIER;
+  public form = this._formBuilder.group({
+    type: this._formBuilder.control('', Validators.required),
+    qualifier: this._formBuilder.array([]),
+  });
 
-  public form: UntypedFormGroup;
-
-  public intentionId: string;
-  public registerError: string;
+  public intentionId: string | undefined;
+  public registerError: string | undefined;
   public WorkbenchCapabilities = WorkbenchCapabilities;
 
-  constructor(formBuilder: UntypedFormBuilder, private _manifestService: ManifestService) {
-    this.form = formBuilder.group({
-      [TYPE]: formBuilder.control('', Validators.required),
-      [QUALIFIER]: formBuilder.array([]),
-    });
+  constructor(private _manifestService: ManifestService, private _formBuilder: NonNullableFormBuilder) {
   }
 
   public async onRegister(): Promise<void> {
     const intention: Intention = {
-      type: this.form.get(TYPE).value,
-      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.get(QUALIFIER) as UntypedFormArray),
+      type: this.form.controls.type.value,
+      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier) ?? undefined,
     };
 
-    this.intentionId = null;
-    this.registerError = null;
+    this.intentionId = undefined;
+    this.registerError = undefined;
 
     await this._manifestService.registerIntention(intention)
       .then(id => {
         this.intentionId = id;
         this.form.reset();
-        this.form.setControl(QUALIFIER, new UntypedFormArray([]));
+        this.form.setControl('qualifier', this._formBuilder.array([]));
       })
-      .catch(error => this.registerError = error);
+      .catch(error => this.registerError = stringifyError(error));
   }
 }

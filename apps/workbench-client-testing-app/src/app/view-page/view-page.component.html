@@ -64,54 +64,54 @@
 </sci-accordion>
 
 <form autocomplete="off" [formGroup]="form">
-  <header>View Properties</header>
+  <section>
+    <header>View Properties</header>
 
-  <sci-form-field label="Title">
-    <input [formControlName]="TITLE" class="e2e-title">
-  </sci-form-field>
+    <sci-form-field label="Title">
+      <input [formControl]="form.controls.title" class="e2e-title">
+    </sci-form-field>
 
-  <sci-form-field label="Heading">
-    <input [formControlName]="HEADING" class="e2e-heading">
-  </sci-form-field>
+    <sci-form-field label="Heading">
+      <input [formControl]="form.controls.heading" class="e2e-heading">
+    </sci-form-field>
 
-  <sci-form-field label="Closable">
-    <sci-checkbox [formControlName]="CLOSABLE" class="e2e-closable"></sci-checkbox>
-  </sci-form-field>
+    <sci-form-field label="Closable">
+      <sci-checkbox [formControl]="form.controls.closable" class="e2e-closable"></sci-checkbox>
+    </sci-form-field>
 
-  <sci-form-field label="Confirm Closing">
-    <sci-checkbox [formControlName]="CONFIRM_CLOSING" class="e2e-confirm-closing"></sci-checkbox>
-  </sci-form-field>
+    <sci-form-field label="Confirm Closing">
+      <sci-checkbox [formControl]="form.controls.confirmClosing" class="e2e-confirm-closing"></sci-checkbox>
+    </sci-form-field>
 
-  <sci-form-field label="Dirty State">
-    <div class="dirty-state-actions">
-      <button (click)="onMarkDirty()" class="e2e-mark-dirty-noarg">Mark as dirty (no arg)</button>
-      <button (click)="onMarkDirty(true)" class="e2e-mark-dirty">Mark as dirty</button>
-      <button (click)="onMarkDirty(false)" class="e2e-mark-pristine">Mark as pristine</button>
-    </div>
-  </sci-form-field>
-</form>
+    <sci-form-field label="Dirty State">
+      <div class="dirty-state-actions">
+        <button (click)="onMarkDirty()" class="e2e-mark-dirty-noarg">Mark as dirty (no arg)</button>
+        <button (click)="onMarkDirty(true)" class="e2e-mark-dirty">Mark as dirty</button>
+        <button (click)="onMarkDirty(false)" class="e2e-mark-pristine">Mark as pristine</button>
+      </div>
+    </sci-form-field>
+  </section>
 
-<sci-accordion class="e2e-view-actions" variant="solid">
-  <ng-template sciAccordionItem [panel]="panel_view_actions">
-    <header>View Actions</header>
-  </ng-template>
-  <ng-template #panel_view_actions>
-    <button (click)="view.close()" class="e2e-close">Close</button>
-  </ng-template>
-</sci-accordion>
+  <sci-accordion class="e2e-view-actions" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_view_actions">
+      <header>View Actions</header>
+    </ng-template>
+    <ng-template #panel_view_actions>
+      <button (click)="view.close()" class="e2e-close">Close</button>
+    </ng-template>
+  </sci-accordion>
 
-<ng-container [formGroup]="form">
-  <sci-accordion class="self-navigation e2e-self-navigation" variant="solid" [formGroupName]="SELF_NAVIGATION">
+  <sci-accordion class="self-navigation e2e-self-navigation" variant="solid" [formGroup]="form.controls.selfNavigation">
     <ng-template sciAccordionItem [panel]="panel_self_navigation">
       <header>Self-Navigation</header>
     </ng-template>
     <ng-template #panel_self_navigation>
       <sci-form-field label="Params">
-        <sci-params-enter [paramsFormArray]="$any(form.get([SELF_NAVIGATION, PARAMS]))" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+        <sci-params-enter [paramsFormArray]="form.controls.selfNavigation.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
       </sci-form-field>
 
       <sci-form-field label="ParamsHandling">
-        <select [formControlName]="PARAMS_HANDLING" class="e2e-param-handling">
+        <select [formControl]="form.controls.selfNavigation.controls.paramsHandling" class="e2e-param-handling">
           <option value="merge">merge</option>
           <option value="replace">replace</option>
           <option value="">default</option>
@@ -119,10 +119,10 @@
       </sci-form-field>
 
       <sci-form-field label="Navigate per Param" title="Check to simulate the performing of bulk navigations">
-        <sci-checkbox [formControlName]="NAVIGATE_PER_PARAM" class="e2e-navigate-per-param"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.selfNavigation.controls.navigatePerParam" class="e2e-navigate-per-param"></sci-checkbox>
       </sci-form-field>
 
       <button (click)="onSelfNavigate()" class="navigate-self e2e-navigate-self">Perform self-navigation</button>
     </ng-template>
   </sci-accordion>
-</ng-container>
+</form>

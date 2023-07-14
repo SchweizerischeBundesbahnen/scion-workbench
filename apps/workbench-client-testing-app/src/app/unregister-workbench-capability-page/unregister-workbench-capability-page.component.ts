@@ -9,12 +9,11 @@
  */
 
 import {Component} from '@angular/core';
-import {ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ManifestService} from '@scion/microfrontend-platform';
 import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
-
-const ID = 'id';
+import {stringifyError} from '../common/stringify-error.util';
 
 /**
  * Allows unregistering workbench capabilities.
@@ -32,28 +31,24 @@ const ID = 'id';
 })
 export default class UnregisterWorkbenchCapabilityPageComponent {
 
-  public readonly ID = ID;
+  public form = this._formBuilder.group({
+    id: this._formBuilder.control('', Validators.required),
+  });
+  public unregisterError: string | undefined;
+  public unregistered: boolean | undefined;
 
-  public form: UntypedFormGroup;
-  public unregisterError: string;
-  public unregistered: boolean;
-
-  constructor(formBuilder: UntypedFormBuilder,
-              private _manifestService: ManifestService) {
-    this.form = formBuilder.group({
-      [ID]: formBuilder.control('', Validators.required),
-    });
+  constructor(private _manifestService: ManifestService, private _formBuilder: NonNullableFormBuilder) {
   }
 
   public async onUnregister(): Promise<void> {
     this.unregisterError = undefined;
     this.unregistered = undefined;
 
-    await this._manifestService.unregisterCapabilities({id: this.form.get(ID).value})
+    await this._manifestService.unregisterCapabilities({id: this.form.controls.id.value})
       .then(() => {
         this.unregistered = true;
         this.form.reset();
       })
-      .catch(error => this.unregisterError = error);
+      .catch(error => this.unregisterError = stringifyError(error));
   }
 }
