@@ -11,23 +11,23 @@
 import {Locator} from '@playwright/test';
 
 /**
- * Page object for {@link SciPropertyComponent}.
+ * Page object for {@link SciKeyValueComponent}.
  */
-export class SciPropertyPO {
+export class SciKeyValuePO {
 
-  constructor(private _sciPropertyLocator: Locator) {
+  constructor(private _sciKeyValueLocator: Locator) {
   }
 
   /**
-   * Reads the properties as dictionary.
+   * Reads the entries as dictionary.
    */
-  public async readProperties(): Promise<Record<string, string>> {
-    if (!await this._sciPropertyLocator.isVisible()) {
-      throw Error(`No element found using locator for 'SciPropertyPO': ${this._sciPropertyLocator.toString()}`);
+  public async readEntries(): Promise<Record<string, string>> {
+    if (!await this._sciKeyValueLocator.isVisible()) {
+      throw Error(`No element found using locator for 'SciKeyValuePO': ${this._sciKeyValueLocator.toString()}`);
     }
 
-    const keysLocator = this._sciPropertyLocator.locator('.e2e-key');
-    const valuesLocator = this._sciPropertyLocator.locator('.e2e-value');
+    const keysLocator = this._sciKeyValueLocator.locator('.e2e-key');
+    const valuesLocator = this._sciKeyValueLocator.locator('.e2e-value');
 
     const propertyCount = await keysLocator.count();
     const properties: Record<string, string> = {};

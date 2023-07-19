@@ -17,13 +17,13 @@ import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {filter} from 'rxjs/operators';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {SciFilterFieldComponent, SciFilterFieldModule} from '@scion/components.internal/filter-field';
+import {SciFilterFieldComponent} from '@scion/components.internal/filter-field';
 import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
-import {SciTabbarModule} from '@scion/components.internal/tabbar';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {FilterPipe} from '../common/filter.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ArrayConcatPipe} from '../common/array-concat.pipe';
+import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
 
 @Component({
   selector: 'app-start-page',
@@ -38,8 +38,9 @@ import {ArrayConcatPipe} from '../common/array-concat.pipe';
     AsyncPipe,
     ReactiveFormsModule,
     NullIfEmptyPipe,
-    SciFilterFieldModule,
-    SciTabbarModule,
+    SciFilterFieldComponent,
+    SciTabbarComponent,
+    SciTabDirective,
     FilterPipe,
     ArrayConcatPipe,
     WorkbenchRouterLinkDirective,

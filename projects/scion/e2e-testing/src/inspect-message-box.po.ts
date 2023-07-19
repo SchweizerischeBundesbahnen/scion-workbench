@@ -11,7 +11,7 @@
 import {AppPO} from './app.po';
 import {MessageBoxPO} from './message-box.po';
 import {coerceArray, isPresent} from './helper/testing.util';
-import {SciParamsEnterPO} from './@scion/components.internal/params-enter.po';
+import {SciKeyValueFieldPO} from './@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 
 /**
@@ -80,9 +80,9 @@ export class InspectMessageBoxPO {
   }
 
   public async enterActions(actions: Record<string, string>): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-actions'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(actions);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-actions'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(actions);
   }
 
   public async enterReturnValue(returnValue: string): Promise<void> {

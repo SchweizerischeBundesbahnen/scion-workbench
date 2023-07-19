@@ -12,7 +12,7 @@ import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {Qualifier} from '@scion/microfrontend-platform';
-import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
+import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
@@ -32,15 +32,15 @@ export class MessageBoxOpenerPagePO {
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(qualifier);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(qualifier);
   }
 
   public async enterParams(params: Record<string, string>): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-params'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(params);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-params'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(params);
   }
 
   public async enterTitle(title: string): Promise<void> {
@@ -52,9 +52,9 @@ export class MessageBoxOpenerPagePO {
   }
 
   public async enterActions(actions: Record<string, string>): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-actions'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(actions);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-actions'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(actions);
   }
 
   public async selectSeverity(severity: 'info' | 'warn' | 'error'): Promise<void> {

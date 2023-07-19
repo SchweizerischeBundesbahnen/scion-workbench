@@ -13,11 +13,11 @@ import {Notification} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {StringifyPipe} from '../common/stringify.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-inspect-notification',
@@ -28,8 +28,8 @@ import {filter} from 'rxjs/operators';
     NgIf,
     ReactiveFormsModule,
     StringifyPipe,
-    SciFormFieldModule,
-    SciViewportModule,
+    SciFormFieldComponent,
+    SciViewportComponent,
   ],
 })
 export class InspectNotificationComponent {
@@ -52,7 +52,7 @@ export class InspectNotificationComponent {
     this.form.controls.severity.valueChanges
       .pipe(
         filter(Boolean),
-        takeUntilDestroyed()
+        takeUntilDestroyed(),
       )
       .subscribe(severity => {
         this.notification.setSeverity(severity);
@@ -61,7 +61,7 @@ export class InspectNotificationComponent {
     this.form.controls.duration.valueChanges
       .pipe(
         filter(Boolean),
-        takeUntilDestroyed()
+        takeUntilDestroyed(),
       )
       .subscribe(duration => {
         this.notification.setDuration(this.parseDurationFromUI(duration));

@@ -9,13 +9,13 @@
  */
 
 import {Component} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 
 @Component({
   selector: 'app-register-workbench-intention-page',
@@ -25,15 +25,15 @@ import {stringifyError} from '../common/stringify-error.util';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciParamsEnterModule,
+    SciFormFieldComponent,
+    SciKeyValueFieldComponent,
   ],
 })
 export default class RegisterWorkbenchIntentionPageComponent {
 
   public form = this._formBuilder.group({
     type: this._formBuilder.control('', Validators.required),
-    qualifier: this._formBuilder.array([]),
+    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
   });
 
   public intentionId: string | undefined;
@@ -46,7 +46,7 @@ export default class RegisterWorkbenchIntentionPageComponent {
   public async onRegister(): Promise<void> {
     const intention: Intention = {
       type: this.form.controls.type.value,
-      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier) ?? undefined,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier) ?? undefined,
     };
 
     this.intentionId = undefined;
@@ -56,7 +56,7 @@ export default class RegisterWorkbenchIntentionPageComponent {
       .then(id => {
         this.intentionId = id;
         this.form.reset();
-        this.form.setControl('qualifier', this._formBuilder.array([]));
+        this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       })
       .catch(error => this.registerError = stringifyError(error));
   }

@@ -11,7 +11,7 @@
 import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
-import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
+import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
@@ -54,9 +54,9 @@ export class RegisterWorkbenchCapabilityPagePO {
       await this._locator.locator('select.e2e-type').selectOption(capability.type);
     }
     if (capability.qualifier !== undefined) {
-      const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
-      await paramsEnterPO.clear();
-      await paramsEnterPO.enterParams(capability.qualifier);
+      const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
+      await keyValueFieldPO.clear();
+      await keyValueFieldPO.addEntries(capability.qualifier);
     }
     const requiredParams = capability.params?.filter(param => param.required && !param.transient).map(param => param.name);
     const optionalParams = capability.params?.filter(param => !param.required && !param.transient).map(param => param.name);

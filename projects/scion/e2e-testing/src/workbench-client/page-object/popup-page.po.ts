@@ -15,9 +15,9 @@ import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
 import {WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
-import {SciPropertyPO} from '../../@scion/components.internal/property.po';
 import {ElementSelectors} from '../../helper/element-selectors';
 import {Locator} from '@playwright/test';
+import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 
 /**
  * Page object to interact {@link PopupPageComponent}.
@@ -56,7 +56,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(accordionPO.itemLocator().locator('sci-property.e2e-popup-params')).readProperties();
+      return await new SciKeyValuePO(accordionPO.itemLocator().locator('sci-key-value.e2e-popup-params')).readEntries();
     }
     finally {
       await accordionPO.collapse();
@@ -67,7 +67,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(accordionPO.itemLocator().locator('sci-property.e2e-route-params')).readProperties();
+      return await new SciKeyValuePO(accordionPO.itemLocator().locator('sci-key-value.e2e-route-params')).readEntries();
     }
     finally {
       await accordionPO.collapse();
@@ -78,7 +78,7 @@ export class PopupPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-query-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(accordionPO.itemLocator().locator('sci-property.e2e-route-query-params')).readProperties();
+      return await new SciKeyValuePO(accordionPO.itemLocator().locator('sci-key-value.e2e-route-query-params')).readEntries();
     }
     finally {
       await accordionPO.collapse();
@@ -130,7 +130,7 @@ export class PopupPagePO {
     }
   }
 
-  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
+  public async clickClose(options?: { returnValue?: string; closeWithError?: boolean }): Promise<void> {
     if (options?.returnValue !== undefined) {
       await this.enterReturnValue(options.returnValue);
     }

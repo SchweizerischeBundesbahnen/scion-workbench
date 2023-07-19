@@ -9,18 +9,18 @@
  */
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CloseStrategy, PopupOrigin, WorkbenchPopupService} from '@scion/workbench-client';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciAccordionModule} from '@scion/components.internal/accordion';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -30,10 +30,11 @@ import {stringifyError} from '../common/stringify-error.util';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciParamsEnterModule,
-    SciAccordionModule,
-    SciCheckboxModule,
+    SciFormFieldComponent,
+    SciKeyValueFieldComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
+    SciCheckboxComponent,
     PopupPositionLabelPipe,
   ],
 })
@@ -42,17 +43,17 @@ export default class PopupOpenerPageComponent {
   private _popupOrigin$: Observable<PopupOrigin>;
 
   public form = this._formBuilder.group({
-    qualifier: this._formBuilder.array([
+    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([
       this._formBuilder.group({
-        paramName: this._formBuilder.control('component'),
-        paramValue: this._formBuilder.control('popup'),
+        key: this._formBuilder.control('component'),
+        value: this._formBuilder.control('popup'),
       }),
       this._formBuilder.group({
-          paramName: this._formBuilder.control('app'),
-          paramValue: this._formBuilder.control('app1'),
+          key: this._formBuilder.control('app'),
+          value: this._formBuilder.control('app1'),
         },
       )], Validators.required),
-    params: this._formBuilder.array([]),
+    params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     anchor: this._formBuilder.group({
       position: this._formBuilder.control<Position | 'element'>('element', Validators.required),
       verticalPosition: this._formBuilder.control(0, Validators.required),
@@ -80,8 +81,8 @@ export default class PopupOpenerPageComponent {
   }
 
   public async onPopupOpen(): Promise<void> {
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier)!;
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.controls.params);
+    const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
+    const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
 
     this.popupError = undefined;
     this.returnValue = undefined;

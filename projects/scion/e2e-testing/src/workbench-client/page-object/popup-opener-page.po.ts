@@ -13,7 +13,7 @@ import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {BottomLeftPoint, BottomRightPoint, PopupOrigin, TopLeftPoint, TopRightPoint} from '@scion/workbench';
-import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
+import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
@@ -37,15 +37,15 @@ export class PopupOpenerPagePO {
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(qualifier);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(qualifier);
   }
 
   public async enterParams(params: Record<string, string>): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-params'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(params);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-params'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(params);
   }
 
   public async enterPosition(position: 'element'): Promise<void>;

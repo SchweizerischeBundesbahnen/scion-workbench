@@ -119,11 +119,11 @@
     //      //      "@scion/components.internal/list": [
     //      //        "../scion-toolkit/projects/scion/components.internal/list/src/public_api"
     //      //      ],
-    //      //      "@scion/components.internal/params-enter": [
-    //      //        "../scion-toolkit/projects/scion/components.internal/params-enter/src/public_api"
+    //      //      "@scion/components.internal/key-value-field": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/key-value-field/src/public_api"
     //      //      ],
-    //      //      "@scion/components.internal/property": [
-    //      //        "../scion-toolkit/projects/scion/components.internal/property/src/public_api"
+    //      //      "@scion/components.internal/key-value": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/key-value/src/public_api"
     //      //      ],
     //      //      "@scion/components.internal/qualifier-chip-list": [
     //      //        "../scion-toolkit/projects/scion/components.internal/qualifier-chip-list/src/public_api"

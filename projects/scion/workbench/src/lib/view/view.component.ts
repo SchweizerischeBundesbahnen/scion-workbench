@@ -12,7 +12,7 @@ import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy
 import {AsyncSubject, combineLatest, EMPTY, fromEvent} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
-import {SciViewportComponent, SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {MessageBoxService} from '../message-box/message-box.service';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
@@ -46,7 +46,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   imports: [
     RouterOutlet,
     A11yModule,
-    SciViewportModule,
+    SciViewportComponent,
     ContentProjectionDirective,
     MessageBoxStackComponent,
   ],

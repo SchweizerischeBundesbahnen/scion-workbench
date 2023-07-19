@@ -9,12 +9,12 @@
  */
 
 import {Component} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNotificationService} from '@scion/workbench-client';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -24,15 +24,15 @@ import {stringifyError} from '../common/stringify-error.util';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciParamsEnterModule,
+    SciFormFieldComponent,
+    SciKeyValueFieldComponent,
   ],
 })
 export default class NotificationOpenerPageComponent {
 
   public form = this._formBuilder.group({
-    qualifier: this._formBuilder.array([]),
-    params: this._formBuilder.array([]),
+    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+    params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     title: this._formBuilder.control(''),
     content: this._formBuilder.control(''),
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
@@ -47,8 +47,8 @@ export default class NotificationOpenerPageComponent {
   }
 
   public onNotificationShow(): void {
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier);
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.controls.params);
+    const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier);
+    const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
 
     this.error = undefined;
     this._notificationService.show({

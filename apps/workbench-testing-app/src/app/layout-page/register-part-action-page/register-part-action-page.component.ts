@@ -11,11 +11,11 @@
 import {Component, inject, InjectionToken, Injector} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchService} from '@scion/workbench';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {stringifyError} from '../../common/stringify-error.util';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-register-part-action-page',
@@ -27,7 +27,7 @@ import {stringifyError} from '../../common/stringify-error.util';
     NgFor,
     AsyncPipe,
     ReactiveFormsModule,
-    SciFormFieldModule,
+    SciFormFieldComponent,
   ],
 })
 export default class RegisterPartActionPageComponent {

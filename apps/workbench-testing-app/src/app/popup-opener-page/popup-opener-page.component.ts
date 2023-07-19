@@ -19,11 +19,11 @@ import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-pag
 import {PopupOrigin} from '@scion/workbench-client';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {NgIf} from '@angular/common';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciAccordionModule} from '@scion/components.internal/accordion';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
 import {stringifyError} from '../common/stringify-error.util';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -33,9 +33,10 @@ import {stringifyError} from '../common/stringify-error.util';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciAccordionModule,
-    SciCheckboxModule,
+    SciFormFieldComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
+    SciCheckboxComponent,
     PopupPositionLabelPipe,
   ],
 })

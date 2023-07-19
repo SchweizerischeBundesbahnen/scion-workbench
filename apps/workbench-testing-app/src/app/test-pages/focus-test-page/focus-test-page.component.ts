@@ -9,14 +9,14 @@
  */
 
 import {Component} from '@angular/core';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-focus-test-page',
   templateUrl: './focus-test-page.component.html',
   styleUrls: ['./focus-test-page.component.scss'],
   standalone: true,
-  imports: [SciFormFieldModule],
+  imports: [SciFormFieldComponent],
 })
 export class FocusTestPageComponent {
 }

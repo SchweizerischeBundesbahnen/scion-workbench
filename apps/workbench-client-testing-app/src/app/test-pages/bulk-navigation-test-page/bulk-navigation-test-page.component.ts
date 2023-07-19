@@ -12,7 +12,7 @@ import {Component, Inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench-client';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {APP_IDENTITY} from '@scion/microfrontend-platform';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-bulk-navigation-test-page',
@@ -20,7 +20,7 @@ import {SciFormFieldModule} from '@scion/components.internal/form-field';
   styleUrls: ['./bulk-navigation-test-page.component.scss'],
   standalone: true,
   imports: [
-    SciFormFieldModule,
+    SciFormFieldComponent,
     ReactiveFormsModule,
   ],
 })

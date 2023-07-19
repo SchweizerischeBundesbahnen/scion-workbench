@@ -9,14 +9,14 @@
  */
 
 import {Component} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -26,19 +26,19 @@ import {stringifyError} from '../common/stringify-error.util';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciParamsEnterModule,
-    SciCheckboxModule,
+    SciFormFieldComponent,
+    SciKeyValueFieldComponent,
+    SciCheckboxComponent,
   ],
 })
 export default class MessageBoxOpenerPageComponent {
 
   public form = this._formBuilder.group({
-    qualifier: this._formBuilder.array([]),
-    params: this._formBuilder.array([]),
+    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+    params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     title: this._formBuilder.control(''),
     content: this._formBuilder.control(''),
-    actions: this._formBuilder.array([]),
+    actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
     modality: this._formBuilder.control<'application' | 'view' | ''>(''),
     contentSelectable: this._formBuilder.control(true),
@@ -53,9 +53,9 @@ export default class MessageBoxOpenerPageComponent {
   }
 
   public onMessageBoxOpen(): void {
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier);
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.controls.params);
-    const actions = SciParamsEnterComponent.toParamsDictionary(this.form.controls.actions);
+    const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier);
+    const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
+    const actions = SciKeyValueFieldComponent.toDictionary(this.form.controls.actions);
 
     this.openError = undefined;
     this.closeAction = undefined;

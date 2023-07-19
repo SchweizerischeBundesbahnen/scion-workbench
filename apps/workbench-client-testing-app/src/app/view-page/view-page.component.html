@@ -32,7 +32,7 @@
     <header>View Params</header>
   </ng-template>
   <ng-template #panel_view_params>
-    <sci-property [properties]="params | appAppendParamDataType" class="e2e-view-params"></sci-property>
+    <sci-key-value [object]="params | appAppendParamDataType" class="e2e-view-params"></sci-key-value>
   </ng-template>
 </sci-accordion>
 
@@ -41,7 +41,7 @@
     <header>Route Params</header>
   </ng-template>
   <ng-template #panel_route_params>
-    <sci-property [properties]="params" class="e2e-route-params"></sci-property>
+    <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
   </ng-template>
 </sci-accordion>
 
@@ -50,7 +50,7 @@
     <header>Route Query Params</header>
   </ng-template>
   <ng-template #panel_query_params>
-    <sci-property [properties]="params" class="e2e-route-query-params"></sci-property>
+    <sci-key-value [object]="params" class="e2e-route-query-params"></sci-key-value>
   </ng-template>
 </sci-accordion>
 
@@ -107,7 +107,7 @@
     </ng-template>
     <ng-template #panel_self_navigation>
       <sci-form-field label="Params">
-        <sci-params-enter [paramsFormArray]="form.controls.selfNavigation.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+        <sci-key-value-field [keyValueFormArray]="form.controls.selfNavigation.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
       </sci-form-field>
 
       <sci-form-field label="ParamsHandling">

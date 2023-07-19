@@ -12,7 +12,7 @@ import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {Qualifier} from '@scion/microfrontend-platform';
-import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
+import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
@@ -39,15 +39,15 @@ export class RouterPagePO {
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(qualifier);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(qualifier);
   }
 
   public async enterParams(params: Record<string, string>): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-params'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(params);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-params'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(params);
   }
 
   public async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {

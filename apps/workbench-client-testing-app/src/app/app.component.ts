@@ -11,7 +11,7 @@
 import {Component, HostBinding, Inject, Optional} from '@angular/core';
 import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatformClient, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {AsyncPipe, NgIf} from '@angular/common';
-import {SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutlet} from '@angular/router';
 import {A11yModule} from '@angular/cdk/a11y';
 
@@ -25,7 +25,7 @@ import {A11yModule} from '@angular/cdk/a11y';
     AsyncPipe,
     RouterOutlet,
     A11yModule,
-    SciViewportModule,
+    SciViewportComponent,
   ],
 })
 export class AppComponent {

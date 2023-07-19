@@ -9,16 +9,16 @@
  */
 
 import {Component, Injector} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Params, PRIMARY_OUTLET, Router, Routes} from '@angular/router';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {BehaviorSubject, Observable, share} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {AsyncPipe, NgFor, NgIf, NgTemplateOutlet} from '@angular/common';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 @Component({
   selector: 'app-router-page',
@@ -32,21 +32,21 @@ import {SciCheckboxModule} from '@scion/components.internal/checkbox';
     NgTemplateOutlet,
     WorkbenchRouterLinkDirective,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciParamsEnterModule,
-    SciCheckboxModule,
+    SciFormFieldComponent,
+    SciKeyValueFieldComponent,
+    SciCheckboxComponent,
   ],
 })
 export default class RouterPageComponent {
 
   public form = this._formBuilder.group({
     path: this._formBuilder.control(''),
-    matrixParams: this._formBuilder.array([]),
-    navigationalState: this._formBuilder.array([]),
+    matrixParams: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+    navigationalState: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     target: this._formBuilder.control(''),
     blankPartId: this._formBuilder.control(''),
     insertionIndex: this._formBuilder.control(''),
-    queryParams: this._formBuilder.array([]),
+    queryParams: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     activate: this._formBuilder.control<boolean | undefined>(undefined),
     close: this._formBuilder.control<boolean | undefined>(undefined),
     cssClass: this._formBuilder.control<string | undefined>(undefined),
@@ -100,7 +100,7 @@ export default class RouterPageComponent {
   }
 
   private constructRouterLinkCommands(): any[] {
-    const matrixParams: Params | null = SciParamsEnterComponent.toParamsDictionary(this.form.controls.matrixParams);
+    const matrixParams: Params | null = SciKeyValueFieldComponent.toDictionary(this.form.controls.matrixParams);
     const path = this.form.controls.path.value;
     const commands: any[] = path === '<empty>' ? [] : path.split('/');
 
@@ -114,13 +114,13 @@ export default class RouterPageComponent {
 
   private constructNavigationExtras(): WorkbenchNavigationExtras {
     return {
-      queryParams: SciParamsEnterComponent.toParamsDictionary(this.form.controls.queryParams),
+      queryParams: SciKeyValueFieldComponent.toDictionary(this.form.controls.queryParams),
       activate: this.form.controls.activate.value,
       close: this.form.controls.close.value,
       target: this.form.controls.target.value || undefined,
       blankPartId: this.form.controls.blankPartId.value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.controls.insertionIndex.value),
-      state: SciParamsEnterComponent.toParamsDictionary(this.form.controls.navigationalState) ?? undefined,
+      state: SciKeyValueFieldComponent.toDictionary(this.form.controls.navigationalState) ?? undefined,
       cssClass: this.form.controls.cssClass.value?.split(/\s+/).filter(Boolean),
     };
   }

@@ -9,14 +9,14 @@
  */
 
 import {Component} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {convertValueFromUI} from '../common/convert-value-from-ui.util';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {NgIf} from '@angular/common';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-router-page',
@@ -26,16 +26,16 @@ import {NgIf} from '@angular/common';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciParamsEnterModule,
-    SciCheckboxModule,
+    SciFormFieldComponent,
+    SciKeyValueFieldComponent,
+    SciCheckboxComponent,
   ],
 })
 export default class RouterPageComponent {
 
   public form = this._formBuilder.group({
-    qualifier: this._formBuilder.array([], Validators.required),
-    params: this._formBuilder.array([]),
+    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([], Validators.required),
+    params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     target: this._formBuilder.control(''),
     insertionIndex: this._formBuilder.control(''),
     activate: this._formBuilder.control<boolean | undefined>(undefined),
@@ -51,8 +51,8 @@ export default class RouterPageComponent {
   public async onNavigate(): Promise<void> {
     this.navigateError = undefined;
 
-    const qualifier = SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier)!;
-    const params = SciParamsEnterComponent.toParamsDictionary(this.form.controls.params);
+    const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
+    const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
 
     // Convert entered params to their actual values.
     params && Object.entries(params).forEach(([paramName, paramValue]) => params[paramName] = convertValueFromUI(paramValue));

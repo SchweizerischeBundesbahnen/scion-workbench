@@ -11,9 +11,9 @@
 import {Component, Type} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchRouteData} from '@scion/workbench';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {KeyValuePipe, NgFor, NgIf} from '@angular/common';
 import {DefaultExport, Router, Routes} from '@angular/router';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-register-route-page',
@@ -25,7 +25,7 @@ import {DefaultExport, Router, Routes} from '@angular/router';
     NgFor,
     ReactiveFormsModule,
     KeyValuePipe,
-    SciFormFieldModule,
+    SciFormFieldComponent,
   ],
 })
 export default class RegisterRoutePageComponent {

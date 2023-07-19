@@ -21,7 +21,7 @@ import {WorkbenchPart} from '../workbench-part.model';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {FilterByPredicatePipe} from '../../common/filter-by-predicate.pipe';
 import {FilterByTextPipe} from '../../common/filter-by-text.pipe';
-import {SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 
 /**
@@ -46,7 +46,7 @@ export const ViewListComponentInputs = {
     FilterByPredicatePipe,
     FilterByTextPipe,
     ViewTabComponent,
-    SciViewportModule,
+    SciViewportComponent,
   ],
 })
 export class ViewListComponent implements OnInit {

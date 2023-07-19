@@ -11,12 +11,12 @@ import {Component, inject, NgZone} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
-import {SciAccordionModule} from '@scion/components.internal/accordion';
 import {ɵMicrofrontendRouteParams, ɵWorkbenchCommands, ɵWorkbenchView} from '@scion/workbench-client';
 import {take} from 'rxjs/operators';
 import {ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {firstValueFrom} from 'rxjs';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
 @Component({
   selector: 'app-angular-zone-test-page',
@@ -26,8 +26,9 @@ import {firstValueFrom} from 'rxjs';
   imports: [
     CommonModule,
     FormsModule,
-    SciCheckboxModule,
-    SciAccordionModule,
+    SciCheckboxComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
   ],
 })
 export class AngularZoneTestPageComponent {
@@ -120,7 +121,7 @@ export class AngularZoneTestPageComponent {
 export class TestCaseModel {
 
   public runInAngular = true;
-  public emissions = new Array<{insideAngular: boolean; label: string}>();
+  public emissions = new Array<{ insideAngular: boolean; label: string }>();
   private _zone = inject(NgZone);
 
   constructor(private _testFn: (model: TestCaseModel) => void) {

@@ -9,14 +9,14 @@
  */
 
 import {Component} from '@angular/core';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-input-field-test-page',
   templateUrl: './input-field-test-page.component.html',
   styleUrls: ['./input-field-test-page.component.scss'],
   standalone: true,
-  imports: [SciFormFieldModule],
+  imports: [SciFormFieldComponent],
 })
 export default class InputFieldTestPageComponent {
 }

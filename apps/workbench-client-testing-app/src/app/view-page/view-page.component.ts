@@ -9,24 +9,24 @@
  */
 
 import {Component, Inject, OnDestroy} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {ViewClosingEvent, ViewClosingListener, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {MonoTypeOperatorFunction, NEVER} from 'rxjs';
 import {finalize, startWith, take} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {AsyncPipe, JsonPipe, Location, NgIf} from '@angular/common';
 import {convertValueFromUI} from '../common/convert-value-from-ui.util';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciAccordionModule} from '@scion/components.internal/accordion';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
-import {SciPropertyModule} from '@scion/components.internal/property';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
-import {SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {SciKeyValueComponent} from '@scion/components.internal/key-value';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 @Component({
   selector: 'app-view-page',
@@ -40,12 +40,13 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     ReactiveFormsModule,
     AppendParamDataTypePipe,
     NullIfEmptyPipe,
-    SciFormFieldModule,
-    SciAccordionModule,
-    SciPropertyModule,
-    SciCheckboxModule,
-    SciParamsEnterModule,
-    SciViewportModule,
+    SciFormFieldComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
+    SciKeyValueComponent,
+    SciCheckboxComponent,
+    SciKeyValueFieldComponent,
+    SciViewportComponent,
   ],
 })
 export default class ViewPageComponent implements ViewClosingListener, OnDestroy {
@@ -56,7 +57,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
     closable: this._formBuilder.control(true),
     confirmClosing: this._formBuilder.control(false),
     selfNavigation: this._formBuilder.group({
-      params: this._formBuilder.array([]),
+      params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       paramsHandling: this._formBuilder.control<'merge' | 'replace' | ''>(''),
       navigatePerParam: this._formBuilder.control(false),
     }),
@@ -122,7 +123,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
 
   public onSelfNavigate(): void {
     const selfNavigationGroup = this.form.controls.selfNavigation;
-    const params = SciParamsEnterComponent.toParamsDictionary(selfNavigationGroup.controls.params, false);
+    const params = SciKeyValueFieldComponent.toDictionary(selfNavigationGroup.controls.params, false);
     const paramsHandling = selfNavigationGroup.controls.paramsHandling.value;
 
     // Convert entered params to their actual values.
