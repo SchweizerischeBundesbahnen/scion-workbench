@@ -11,10 +11,10 @@
 import {Component} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {stringifyError} from '../../common/stringify-error.util';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-add-view-page',
@@ -26,8 +26,8 @@ import {stringifyError} from '../../common/stringify-error.util';
     NgFor,
     AsyncPipe,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciCheckboxModule,
+    SciFormFieldComponent,
+    SciCheckboxComponent,
   ],
 })
 export default class AddViewPageComponent {

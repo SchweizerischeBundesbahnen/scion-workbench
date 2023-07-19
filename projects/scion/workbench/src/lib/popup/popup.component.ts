@@ -13,7 +13,7 @@ import {ɵPopup} from './popup.config';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
 import {noop} from 'rxjs';
-import {SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 
 /**
  * Displays the configured popup component in the popup overlay.
@@ -29,7 +29,7 @@ import {SciViewportModule} from '@scion/components/viewport';
   imports: [
     A11yModule,
     PortalModule,
-    SciViewportModule,
+    SciViewportComponent,
   ],
 })
 export class PopupComponent implements OnInit {

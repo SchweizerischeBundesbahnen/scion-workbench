@@ -1,11 +1,11 @@
 <form [formGroup]="form">
   <section>
     <sci-form-field label="Qualifier">
-      <sci-params-enter [paramsFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-params-enter>
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
     </sci-form-field>
 
     <sci-form-field label="Params">
-      <sci-params-enter [paramsFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-params-enter>
+      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
     </sci-form-field>
   </section>
 
@@ -19,7 +19,7 @@
     </sci-form-field>
 
     <sci-form-field label="Actions">
-      <sci-params-enter [paramsFormArray]="form.controls.actions" [addable]="true" [removable]="true" class="e2e-actions"></sci-params-enter>
+      <sci-key-value-field [keyValueFormArray]="form.controls.actions" [addable]="true" [removable]="true" class="e2e-actions"></sci-key-value-field>
     </sci-form-field>
 
     <sci-form-field label="Severity">

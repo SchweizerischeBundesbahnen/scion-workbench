@@ -16,8 +16,8 @@ import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {InstanceofPipe} from '../../common/instanceof.pipe';
 import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
-import {SciSashboxModule} from '@scion/components/sashbox';
 import {NgFor, NgIf} from '@angular/common';
+import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -42,7 +42,8 @@ import {NgFor, NgIf} from '@angular/common';
     InstanceofPipe,
     PortalModule,
     PartPortalPipe,
-    SciSashboxModule,
+    SciSashboxComponent,
+    SciSashDirective,
   ],
 })
 export class GridElementComponent implements OnChanges {

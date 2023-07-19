@@ -10,11 +10,11 @@
     </sci-form-field>
 
     <sci-form-field label="Matrix parameters">
-      <sci-params-enter [paramsFormArray]="form.controls.matrixParams" [addable]="true" [removable]="true" class="e2e-matrix-params"></sci-params-enter>
+      <sci-key-value-field [keyValueFormArray]="form.controls.matrixParams" [addable]="true" [removable]="true" class="e2e-matrix-params"></sci-key-value-field>
     </sci-form-field>
 
     <sci-form-field label="Navigational state">
-      <sci-params-enter [paramsFormArray]="form.controls.navigationalState" [addable]="true" [removable]="true" class="e2e-navigational-state"></sci-params-enter>
+      <sci-key-value-field [keyValueFormArray]="form.controls.navigationalState" [addable]="true" [removable]="true" class="e2e-navigational-state"></sci-key-value-field>
     </sci-form-field>
   </section>
 
@@ -45,7 +45,7 @@
     </sci-form-field>
 
     <sci-form-field label="Query parameters">
-      <sci-params-enter [paramsFormArray]="form.controls.queryParams" [addable]="true" [removable]="true" class="e2e-query-params"></sci-params-enter>
+      <sci-key-value-field [keyValueFormArray]="form.controls.queryParams" [addable]="true" [removable]="true" class="e2e-query-params"></sci-key-value-field>
     </sci-form-field>
 
     <sci-form-field label="Activate">

@@ -11,7 +11,7 @@
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {Intention, Qualifier} from '@scion/microfrontend-platform';
-import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
+import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
 import {rejectWhenAttached} from '../../helper/testing.util';
@@ -56,10 +56,10 @@ export class RegisterWorkbenchIntentionPagePO {
   }
 
   public async enterQualifier(qualifier: Qualifier | undefined): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-qualifier'));
-    await paramsEnterPO.clear();
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
+    await keyValueFieldPO.clear();
     if (qualifier && Object.keys(qualifier).length) {
-      await paramsEnterPO.enterParams(qualifier);
+      await keyValueFieldPO.addEntries(qualifier);
     }
   }
 

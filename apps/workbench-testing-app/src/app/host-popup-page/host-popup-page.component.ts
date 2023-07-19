@@ -15,11 +15,11 @@ import {WorkbenchPopup} from '@scion/workbench-client';
 import {AsyncPipe, JsonPipe, NgIf} from '@angular/common';
 import {A11yModule} from '@angular/cdk/a11y';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {SciViewportModule} from '@scion/components/viewport';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciAccordionModule} from '@scion/components.internal/accordion';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
-import {SciPropertyModule} from '@scion/components.internal/property';
+import {SciKeyValueComponent} from '@scion/components.internal/key-value';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
 /**
  * Popup component provided by the host app via a popup capability.
@@ -36,10 +36,11 @@ import {SciPropertyModule} from '@scion/components.internal/property';
     JsonPipe,
     A11yModule,
     NullIfEmptyPipe,
-    SciViewportModule,
-    SciFormFieldModule,
-    SciAccordionModule,
-    SciPropertyModule,
+    SciViewportComponent,
+    SciFormFieldComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
+    SciKeyValueComponent,
     ReactiveFormsModule,
   ],
 })

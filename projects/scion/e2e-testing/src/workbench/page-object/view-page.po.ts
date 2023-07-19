@@ -15,8 +15,8 @@ import {ViewTabPO} from '../../view-tab.po';
 import {Locator} from '@playwright/test';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
-import {SciPropertyPO} from '../../@scion/components.internal/property.po';
 import {Params} from '@angular/router';
+import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 
 /**
  * Page object to interact {@link ViewPageComponent}.
@@ -50,7 +50,7 @@ export class ViewPagePO {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(this._locator.locator('sci-property.e2e-route-params')).readProperties();
+      return await new SciKeyValuePO(this._locator.locator('sci-key-value.e2e-route-params')).readEntries();
     }
     finally {
       await accordionPO.collapse();
@@ -79,7 +79,7 @@ export class ViewPagePO {
     await this._locator.locator('button.e2e-close').click();
   }
 
-  public async addViewAction(partAction: WorkbenchPartActionDescriptor, options?: {append?: boolean}): Promise<void> {
+  public async addViewAction(partAction: WorkbenchPartActionDescriptor, options?: { append?: boolean }): Promise<void> {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-part-actions'));
     await accordionPO.expand();
     try {

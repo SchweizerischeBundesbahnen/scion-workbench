@@ -9,12 +9,12 @@
  */
 
 import {Component} from '@angular/core';
-import {SciTabbarModule} from '@scion/components.internal/tabbar';
 import AddPartPageComponent from './add-part-page/add-part-page.component';
 import AddViewPageComponent from './add-view-page/add-view-page.component';
 import ActivateViewPageComponent from './activate-view-page/activate-view-page.component';
 import RegisterPartActionPageComponent from './register-part-action-page/register-part-action-page.component';
 import RegisterRoutePageComponent from './register-route-page/register-route-page.component';
+import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
 
 @Component({
   selector: 'app-layout-page',
@@ -22,7 +22,8 @@ import RegisterRoutePageComponent from './register-route-page/register-route-pag
   styleUrls: ['./layout-page.component.scss'],
   standalone: true,
   imports: [
-    SciTabbarModule,
+    SciTabbarComponent,
+    SciTabDirective,
     AddPartPageComponent,
     AddViewPageComponent,
     ActivateViewPageComponent,

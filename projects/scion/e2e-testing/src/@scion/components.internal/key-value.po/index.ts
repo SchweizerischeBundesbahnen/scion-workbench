@@ -8,4 +8,4 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-export * from './property.po';
+export * from './key-value.po';

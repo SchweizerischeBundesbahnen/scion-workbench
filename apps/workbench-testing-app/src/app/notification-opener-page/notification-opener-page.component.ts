@@ -13,8 +13,8 @@ import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NotificationService} from '@scion/workbench';
 import {InspectNotificationComponent} from '../inspect-notification-provider/inspect-notification.component';
 import {NgIf} from '@angular/common';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -24,8 +24,8 @@ import {SciCheckboxModule} from '@scion/components.internal/checkbox';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciCheckboxModule,
+    SciFormFieldComponent,
+    SciCheckboxComponent,
   ],
 })
 export default class NotificationOpenerPageComponent {

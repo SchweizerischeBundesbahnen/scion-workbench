@@ -12,7 +12,7 @@ import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/tes
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
-import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
+import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {Params} from '@angular/router';
@@ -38,21 +38,21 @@ export class RouterPagePO {
   }
 
   public async enterMatrixParams(params: Params): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-matrix-params'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(params);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-matrix-params'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(params);
   }
 
   public async enterQueryParams(params: Params): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-query-params'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(params);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-query-params'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(params);
   }
 
   public async enterNavigationalState(state: Record<string, string>): Promise<void> {
-    const paramsEnterPO = new SciParamsEnterPO(this._locator.locator('sci-params-enter.e2e-navigational-state'));
-    await paramsEnterPO.clear();
-    await paramsEnterPO.enterParams(state);
+    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-navigational-state'));
+    await keyValueFieldPO.clear();
+    await keyValueFieldPO.addEntries(state);
   }
 
   public async checkActivate(check: boolean): Promise<void> {

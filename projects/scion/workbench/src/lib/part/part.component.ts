@@ -23,7 +23,7 @@ import {RouterOutlet} from '@angular/router';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {ViewPortalPipe} from '../view/view-portal.pipe';
-import {SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
@@ -39,7 +39,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
     ViewPortalPipe,
-    SciViewportModule,
+    SciViewportComponent,
   ],
 })
 export class PartComponent implements OnInit, OnDestroy {

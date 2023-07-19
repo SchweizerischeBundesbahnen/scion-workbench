@@ -14,9 +14,9 @@ import {ViewPO} from '../../view.po';
 import {Params} from '@angular/router';
 import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
-import {SciPropertyPO} from '../../@scion/components.internal/property.po';
+import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
-import {SciParamsEnterPO} from '../../@scion/components.internal/params-enter.po';
+import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ElementSelectors} from '../../helper/element-selectors';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
@@ -81,7 +81,7 @@ export class ViewPagePO {
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(this.locator.locator('sci-property.e2e-view-params')).readProperties();
+      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-view-params')).readEntries();
     }
     finally {
       await accordionPO.collapse();
@@ -92,7 +92,7 @@ export class ViewPagePO {
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(this.locator.locator('sci-property.e2e-route-params')).readProperties();
+      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-route-params')).readEntries();
     }
     finally {
       await accordionPO.collapse();
@@ -103,7 +103,7 @@ export class ViewPagePO {
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-query-params'));
     await accordionPO.expand();
     try {
-      return await new SciPropertyPO(this.locator.locator('sci-property.e2e-route-query-params')).readProperties();
+      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-route-query-params')).readEntries();
     }
     finally {
       await accordionPO.collapse();
@@ -166,13 +166,13 @@ export class ViewPagePO {
     return {width, height};
   }
 
-  public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean}): Promise<void> {
+  public async navigateSelf(params: Params, options?: { paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean }): Promise<void> {
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-self-navigation'));
     await accordionPO.expand();
     try {
-      const paramsEnterPO = new SciParamsEnterPO(this.locator.locator('sci-accordion.e2e-self-navigation').locator('sci-params-enter.e2e-params'));
-      await paramsEnterPO.clear();
-      await paramsEnterPO.enterParams(params);
+      const keyValueFieldPO = new SciKeyValueFieldPO(this.locator.locator('sci-accordion.e2e-self-navigation').locator('sci-key-value-field.e2e-params'));
+      await keyValueFieldPO.clear();
+      await keyValueFieldPO.addEntries(params);
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('select.e2e-param-handling').selectOption(options?.paramsHandling || '');
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-navigate-per-param')).toggle(options?.navigatePerParam ?? false);
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('button.e2e-navigate-self').click();

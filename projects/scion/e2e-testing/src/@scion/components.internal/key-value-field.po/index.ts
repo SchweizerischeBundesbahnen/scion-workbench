@@ -8,4 +8,4 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-export * from './params-enter.po';
+export * from './key-value-field.po';

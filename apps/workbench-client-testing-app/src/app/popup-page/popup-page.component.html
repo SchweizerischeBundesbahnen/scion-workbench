@@ -51,7 +51,7 @@
       </ng-template>
       <ng-template #panel_popup_params>
         <sci-viewport>
-          <sci-property [properties]="params" class="e2e-popup-params"></sci-property>
+          <sci-key-value [object]="params" class="e2e-popup-params"></sci-key-value>
         </sci-viewport>
       </ng-template>
     </sci-accordion>
@@ -61,7 +61,7 @@
         <header>Route Params</header>
       </ng-template>
       <ng-template #panel_route_params>
-        <sci-property [properties]="params" class="e2e-route-params"></sci-property>
+        <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
       </ng-template>
     </sci-accordion>
 
@@ -70,7 +70,7 @@
         <header>Route Query Params</header>
       </ng-template>
       <ng-template #panel_query_params>
-        <sci-property [properties]="params" class="e2e-route-query-params"></sci-property>
+        <sci-key-value [object]="params" class="e2e-route-query-params"></sci-key-value>
       </ng-template>
     </sci-accordion>
 

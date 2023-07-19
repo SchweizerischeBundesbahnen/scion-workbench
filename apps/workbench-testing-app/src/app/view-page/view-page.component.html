@@ -21,7 +21,7 @@
     <header>Route Params</header>
   </ng-template>
   <ng-template #panel_route_params>
-    <sci-property [properties]="params" class="e2e-route-params"></sci-property>
+    <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
   </ng-template>
 </sci-accordion>
 
@@ -30,7 +30,7 @@
     <header>Route Query Params</header>
   </ng-template>
   <ng-template #panel_route_query_params>
-    <sci-property [properties]="params" class="e2e-route-query-params"></sci-property>
+    <sci-key-value [object]="params" class="e2e-route-query-params"></sci-key-value>
   </ng-template>
 </sci-accordion>
 
@@ -39,7 +39,7 @@
     <header>Navigational State</header>
   </ng-template>
   <ng-template #panel_navigational_state>
-    <sci-property [properties]="$any(state)" class="e2e-navigational-state"></sci-property>
+    <sci-key-value [object]="$any(state)" class="e2e-navigational-state"></sci-key-value>
   </ng-template>
 </sci-accordion>
 

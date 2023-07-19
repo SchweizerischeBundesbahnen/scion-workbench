@@ -67,7 +67,7 @@
     "@angular/platform-browser-dynamic": "16.0.4",
     "@angular/router": "16.0.4",
     "@scion/components": "16.1.0",
-    "@scion/components.internal": "16.1.0",
+    "@scion/components.internal": "16.2.0",
     "@scion/microfrontend-platform": "1.0.0",
     "@scion/toolkit": "1.4.0",
     "rxjs": "7.8.1",

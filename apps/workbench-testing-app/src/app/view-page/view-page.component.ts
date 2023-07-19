@@ -16,15 +16,15 @@ import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
-import {SciAccordionModule} from '@scion/components.internal/accordion';
 import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {PluckPipe} from '../common/pluck.pipe';
-import {SciPropertyModule} from '@scion/components.internal/property';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JoinPipe} from '../common/join.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {SciKeyValueComponent} from '@scion/components.internal/key-value';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
 @Component({
   selector: 'app-view-page',
@@ -39,10 +39,11 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     FormsModule,
     ReactiveFormsModule,
     WorkbenchModule,
-    SciFormFieldModule,
-    SciCheckboxModule,
-    SciAccordionModule,
-    SciPropertyModule,
+    SciFormFieldComponent,
+    SciCheckboxComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
+    SciKeyValueComponent,
     PluckPipe,
     PluckPipe,
     NullIfEmptyPipe,

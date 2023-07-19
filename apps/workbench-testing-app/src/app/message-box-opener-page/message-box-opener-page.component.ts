@@ -9,16 +9,16 @@
  */
 
 import {ApplicationRef, Component, Type} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {MessageBoxService} from '@scion/workbench';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
 import {InspectMessageBoxComponent} from '../inspect-message-box-provider/inspect-message-box.component';
 import {startWith} from 'rxjs/operators';
 import {NgIf} from '@angular/common';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {stringifyError} from '../common/stringify-error.util';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -28,9 +28,9 @@ import {stringifyError} from '../common/stringify-error.util';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciParamsEnterModule,
-    SciCheckboxModule,
+    SciFormFieldComponent,
+    SciKeyValueFieldComponent,
+    SciCheckboxComponent,
   ],
 })
 export default class MessageBoxOpenerPageComponent {
@@ -46,7 +46,7 @@ export default class MessageBoxOpenerPageComponent {
     contentSelectable: this._formBuilder.control(false),
     cssClass: this._formBuilder.control(''),
     count: this._formBuilder.control(''),
-    actions: this._formBuilder.array([]),
+    actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     viewContext: this._formBuilder.control(true),
   });
   public openError: string | undefined;
@@ -85,7 +85,7 @@ export default class MessageBoxOpenerPageComponent {
       },
       contentSelectable: this.form.controls.contentSelectable.value || undefined,
       cssClass: [`index-${index}`].concat(this.form.controls.cssClass.value.split(/\s+/).filter(Boolean) || []),
-      actions: SciParamsEnterComponent.toParamsDictionary(this.form.controls.actions) || undefined,
+      actions: SciKeyValueFieldComponent.toDictionary(this.form.controls.actions) || undefined,
     })
       .then(closeAction => this.closeAction = closeAction)
       .catch(error => this.openError = stringifyError(error));

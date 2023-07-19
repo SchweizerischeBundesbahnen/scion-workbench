@@ -18,7 +18,7 @@ import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
-import {SciViewportComponent, SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
 import {SciDimensionModule} from '@scion/components/dimension';
@@ -58,7 +58,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   imports: [
     NgFor,
     AsyncPipe,
-    SciViewportModule,
+    SciViewportComponent,
     SciDimensionModule,
     ViewTabComponent,
     PartActionBarComponent,
@@ -390,7 +390,7 @@ export class PartBarComponent implements OnInit {
     });
   }
 
-  private unsetDragState(options?: {unsetDragSource?: boolean}): void {
+  private unsetDragState(options?: { unsetDragSource?: boolean }): void {
     if (options?.unsetDragSource ?? true) {
       this.dragSourceViewTab = null;
     }

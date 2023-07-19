@@ -9,17 +9,17 @@
  */
 
 import {Component} from '@angular/core';
-import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {SciParamsEnterComponent, SciParamsEnterModule} from '@scion/components.internal/params-enter';
+import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
 import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
-import {SciCheckboxModule} from '@scion/components.internal/checkbox';
-import {SciViewportModule} from '@scion/components/viewport';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {JsonPipe, NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 /**
  * Allows registering workbench capabilities.
@@ -33,17 +33,17 @@ import {stringifyError} from '../common/stringify-error.util';
     NgIf,
     JsonPipe,
     ReactiveFormsModule,
-    SciFormFieldModule,
-    SciParamsEnterModule,
-    SciCheckboxModule,
-    SciViewportModule,
+    SciFormFieldComponent,
+    SciKeyValueFieldComponent,
+    SciCheckboxComponent,
+    SciViewportComponent,
   ],
 })
 export default class RegisterWorkbenchCapabilityPageComponent {
 
   public form = this._formBuilder.group({
     type: this._formBuilder.control('', Validators.required),
-    qualifier: this._formBuilder.array([]),
+    qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     requiredParams: this._formBuilder.control(''),
     optionalParams: this._formBuilder.control(''),
     transientParams: this._formBuilder.control(''),
@@ -97,18 +97,18 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       .then(async id => {
         this.capability = (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0];
         this.form.reset();
-        this.form.setControl('qualifier', this._formBuilder.array([]));
+        this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       })
       .catch(error => this.registerError = stringifyError(error));
   }
 
-  private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToStartPage: boolean}} {
+  private readViewCapabilityFromUI(): WorkbenchViewCapability & { properties: { pinToStartPage: boolean } } {
     const requiredParams: ViewParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ViewParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     const transientParams: ViewParamDefinition[] = this.form.controls.transientParams.value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
     return {
       type: WorkbenchCapabilities.View,
-      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier)!,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
       params: [
         ...requiredParams,
         ...optionalParams,
@@ -126,12 +126,12 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     };
   }
 
-  private readPopupCapabilityFromUI(): WorkbenchPopupCapability & {properties: {pinToStartPage: boolean}} {
+  private readPopupCapabilityFromUI(): WorkbenchPopupCapability & { properties: { pinToStartPage: boolean } } {
     const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     return {
       type: WorkbenchCapabilities.Popup,
-      qualifier: SciParamsEnterComponent.toParamsDictionary(this.form.controls.qualifier)!,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
       params: [
         ...requiredParams,
         ...optionalParams,

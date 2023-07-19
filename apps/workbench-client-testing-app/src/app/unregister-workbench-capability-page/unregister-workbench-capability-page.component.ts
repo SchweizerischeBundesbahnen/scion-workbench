@@ -11,9 +11,9 @@
 import {Component} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ManifestService} from '@scion/microfrontend-platform';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 /**
  * Allows unregistering workbench capabilities.
@@ -26,7 +26,7 @@ import {stringifyError} from '../common/stringify-error.util';
   imports: [
     NgIf,
     ReactiveFormsModule,
-    SciFormFieldModule,
+    SciFormFieldComponent,
   ],
 })
 export default class UnregisterWorkbenchCapabilityPageComponent {

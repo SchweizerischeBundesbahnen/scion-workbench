@@ -11,12 +11,12 @@
 import {Component, HostBinding} from '@angular/core';
 import {Popup} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
-import {SciViewportModule} from '@scion/components/viewport';
-import {SciFormFieldModule} from '@scion/components.internal/form-field';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {SciAccordionModule} from '@scion/components.internal/accordion';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JsonPipe, NgIf} from '@angular/common';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
 @Component({
   selector: 'app-popup-page',
@@ -28,9 +28,10 @@ import {JsonPipe, NgIf} from '@angular/common';
     JsonPipe,
     FormsModule,
     NullIfEmptyPipe,
-    SciViewportModule,
-    SciFormFieldModule,
-    SciAccordionModule,
+    SciViewportComponent,
+    SciFormFieldComponent,
+    SciAccordionComponent,
+    SciAccordionItemDirective,
     ReactiveFormsModule,
   ],
 })
