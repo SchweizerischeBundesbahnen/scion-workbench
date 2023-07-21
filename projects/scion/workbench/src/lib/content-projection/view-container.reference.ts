@@ -9,31 +9,49 @@
  */
 
 import {InjectionToken, ViewContainerRef} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 /**
  * Handle holding a reference to a DOM location.
  */
 export class ViewContainerReference {
 
-  private _resolve: ((host: ViewContainerRef) => void) | null = null;
-  private _promise = new Promise<ViewContainerRef>(resolve => this._resolve = resolve);
+  private _ref$ = new BehaviorSubject<ViewContainerRef | undefined>(undefined);
 
   /**
-   * Sets the given {@link ViewContainerRef}, or throws if already set.
+   * Sets the given {@link ViewContainerRef}.
    */
   public set(vcr: ViewContainerRef): void {
-    if (!this._resolve) {
-      throw Error('[ViewContainerReferenceError] ViewContainer already set.');
-    }
-    this._resolve(vcr);
-    this._resolve = null;
+    this._ref$.next(vcr);
   }
 
   /**
-   * Promise that resolves to the {@link ViewContainerRef}.
+   * Unsets the reference.
    */
-  public get(): Promise<ViewContainerRef> {
-    return this._promise;
+  public unset(): void {
+    this._ref$.next(undefined);
+  }
+
+  /**
+   * Returns the {@link ViewContainerRef}. If not set, by default, throws an error unless setting the `orElseUndefined` option.
+   */
+  public ref(): ViewContainerRef;
+  public ref(options: {orElse: undefined}): ViewContainerRef | undefined;
+  public ref(options?: {orElse: undefined}): ViewContainerRef | undefined {
+    if (!this._ref$.value && !options) {
+      throw Error('[NullViewContainerReference] ViewContainer not set.');
+    }
+    return this._ref$.value;
+  }
+
+  /**
+   * Emits the {@link ViewContainerRef}, or undefined if not set.
+   *
+   * Upon subscription, emits the current reference (or `undefined` if not set), and then continues to emit each time the reference changes.
+   * The observable never completes.
+   */
+  public get ref$(): Observable<ViewContainerRef | undefined> {
+    return this._ref$;
   }
 }
 
@@ -48,7 +66,7 @@ export const IFRAME_HOST = new InjectionToken<ViewContainerReference>('IFRAME_HO
 /**
  * DI token to inject the DOM location where to insert view-modal message boxes.
  */
-export const VIEW_LOCAL_MESSAGE_BOX_HOST = new InjectionToken<ViewContainerReference>('VIEW_LOCAL_MESSAGE_BOX_HOST', {
+export const VIEW_MODAL_MESSAGE_BOX_HOST = new InjectionToken<ViewContainerReference>('VIEW_MODAL_MESSAGE_BOX_HOST', {
   providedIn: 'root',
   factory: () => new ViewContainerReference(),
 });

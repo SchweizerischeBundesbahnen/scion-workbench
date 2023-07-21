@@ -72,9 +72,9 @@ export class ɵWorkbenchView implements WorkbenchView {
       providers: [
         {provide: ɵWorkbenchView, useValue: this},
         {provide: WorkbenchView, useExisting: ɵWorkbenchView},
-        // For each primary top-level route, the workbench creates corresponding secondary view routes.
-        // However, if the workbench component is displayed in a router outlet, the outlet in the view component is not a top-level outlet anymore.
-        // Therefore, we instruct the router outlet to act as a top-level outlet to be the target of the created top-level view routes.
+        // For each primary top-level route, the workbench registers corresponding secondary top-level view routes.
+        // However, if the workbench component is displayed in a router outlet, view outlets are not top-level outlets anymore.
+        // Therefore, we instruct the view's router outlet to act as a top-level outlet to be the target of the registered top-level view routes.
         {provide: ChildrenOutletContexts, useValue: inject(ChildrenOutletContexts)},
         // Prevent injecting this part into the view because the view may be dragged to a different part.
         {provide: WorkbenchPart, useValue: null},

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, isPresent, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -99,6 +99,10 @@ export class MessageBoxOpenerPagePO {
 
   public async getMessageBoxCloseAction(): Promise<string> {
     return this._locator.locator('output.e2e-close-action').innerText();
+  }
+
+  public async isPresent(): Promise<boolean> {
+    return await this.viewTabPO.isPresent() && await isPresent(this._locator);
   }
 }
 

@@ -89,7 +89,7 @@ export class WorkbenchLauncher {
    *
    * @return A Promise that resolves when the workbench has completed the startup or that rejects if the startup failed.
    */
-  public async launch(): Promise<void> {
+  public async launch(): Promise<true> {
     // Ensure to run in the Angular zone to check the workbench for changes even if called from outside the Angular zone, e.g. in unit tests.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.launch());
@@ -105,7 +105,7 @@ export class WorkbenchLauncher {
         await runWorkbenchInitializers(WORKBENCH_POST_STARTUP, this._injector);
         this._logger.debug(() => 'Workbench started.', LoggerNames.LIFECYCLE);
         this._startup.notifyStarted();
-        return Promise.resolve();
+        return this._startup.whenStarted;
       }
       case StartupState.Starting:
       case StartupState.Started: {
@@ -136,9 +136,9 @@ export class WorkbenchStartup {
   /**
    * Promise that resolves when the workbench has completed the startup.
    */
-  public readonly whenStarted = new Promise<void>(resolve => this.notifyStarted = () => {
+  public readonly whenStarted = new Promise<true>(resolve => this.notifyStarted = () => {
     this._started = true;
-    resolve();
+    resolve(true);
   });
 
   /**

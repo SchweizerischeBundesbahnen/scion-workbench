@@ -1,9 +1,19 @@
 :host {
   position: absolute;
   inset: 0;
-  display: grid;
+  display: flex;
+  flex-direction: column;
 
-  > router-outlet {
-    position: absolute; // take router outlet out of the document flow
+  > app-header {
+    flex: none;
+  }
+
+  > main {
+    flex: auto;
+    display: grid;
+
+    > router-outlet {
+      position: absolute; // take router outlet out of the document flow
+    }
   }
 }

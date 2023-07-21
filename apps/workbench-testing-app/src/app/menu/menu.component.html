@@ -1,6 +1,6 @@
 <ng-container *ngFor="let menuItem of menuItems">
   <button *ngIf="menuItem | appInstanceof:MenuItem as menuItem; else separator_template"
-       class="menu-item"
+       class="menu-item e2e-menu-item"
        [ngClass]="menuItem.cssClass"
        [class.disabled]="menuItem.disabled"
        (click)="onMenuItemClick(menuItem)">

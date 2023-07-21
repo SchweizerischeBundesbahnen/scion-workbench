@@ -13,13 +13,21 @@ import {filter} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {AsyncPipe, NgIf} from '@angular/common';
+import {WorkbenchStartup} from '@scion/workbench';
+import {HeaderComponent} from './header/header.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [
+    NgIf,
+    AsyncPipe,
+    RouterOutlet,
+    HeaderComponent,
+  ],
 })
 export class AppComponent {
 
@@ -30,9 +38,9 @@ export class AppComponent {
    * @see RouterPagePO
    */
   @HostBinding('attr.data-navigationid')
-  public navigationId: string | undefined;
+  protected navigationId: string | undefined;
 
-  constructor(private _router: Router) {
+  constructor(private _router: Router, protected workbenchStartup: WorkbenchStartup) {
     this.installRouterEventListeners();
   }
 

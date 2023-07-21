@@ -19,12 +19,16 @@ export class PartActionPO {
   constructor(private readonly _locator: Locator) {
   }
 
-  public async isPresent(): Promise<boolean> {
+  public isPresent(): Promise<boolean> {
     return isPresent(this._locator);
   }
 
-  public async isVisible(): Promise<boolean> {
+  public isVisible(): Promise<boolean> {
     return this._locator.isVisible();
+  }
+
+  public count(): Promise<number> {
+    return this._locator.count();
   }
 
   public locate(selector: string): Locator {

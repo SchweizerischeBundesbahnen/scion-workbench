@@ -60,7 +60,7 @@ test.describe('Workbench Popup', () => {
   });
 
   test.describe('overlay size constraint', () => {
-    test('should not grow beyond the preferred overlay height', async ({page, appPO, workbenchNavigator, consoleLogs}) => {
+    test('should not grow beyond the preferred overlay height', async ({page, appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);

@@ -46,8 +46,8 @@ export namespace WorkbenchStartupQueryParams {
   /**
    * Reads the query param to set the workbench launching strategy.
    */
-  export function launcher(): 'APP_INITIALIZER' | 'LAZY' {
-    return new URL(window.location.href).searchParams.get(LAUNCHER_QUERY_PARAM) as 'APP_INITIALIZER' | 'LAZY';
+  export function launcher(): 'APP_INITIALIZER' | 'LAZY' | undefined {
+    return new URL(window.location.href).searchParams.get(LAUNCHER_QUERY_PARAM) as 'APP_INITIALIZER' | 'LAZY' ?? undefined;
   }
 
   /**

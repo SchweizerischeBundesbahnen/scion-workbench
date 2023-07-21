@@ -42,7 +42,7 @@ describe('MessageBox', () => {
       expect(fixture.debugElement.query(By.css('wb-message-box.testee'))).toBeDefined();
     });
 
-    it('should display view-local message box', async () => {
+    it('should display view-modal message box', async () => {
       TestBed.configureTestingModule({
         imports: [
           WorkbenchTestingModule.forTest(),
@@ -59,7 +59,7 @@ describe('MessageBox', () => {
       await TestBed.inject(WorkbenchRouter).navigate(['view']);
       await waitForWorkbenchLayoutChange();
 
-      // Open view-local message box
+      // Open view-modal message box
       const viewDebugElement = fixture.debugElement.query(By.directive(ViewTestComponent))!;
       viewDebugElement.injector.get(MessageBoxService).open({content: 'Message from View', cssClass: 'testee'}).then();
 

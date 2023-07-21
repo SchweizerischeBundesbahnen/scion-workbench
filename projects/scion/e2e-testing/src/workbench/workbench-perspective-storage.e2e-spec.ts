@@ -18,7 +18,7 @@ test.describe('Workbench Perspective Storage', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
 
     // Switch to perspective-1
-    const perspectiveToggleButtonPO = await appPO.perspectiveToggleButton({perspectiveId: 'perspective-1'});
+    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective-1'});
     await perspectiveToggleButtonPO.click();
 
     // Add part and view to the peripheral grid

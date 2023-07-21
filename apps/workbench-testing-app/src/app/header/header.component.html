@@ -1,0 +1,13 @@
+<div class="toggle-buttons e2e-perspective-toggles">
+  <button *ngFor="let perspective of workbenchService.perspectives$ | async"
+          (click)="onPerspectiveActivate(perspective.id)"
+          class="e2e-perspective"
+          [attr.data-perspectiveid]="perspective.id"
+          [class.active]="perspective.active$ | async"
+          [class.e2e-active]="perspective.active$ | async">
+    {{perspective.data[PerspectiveData.label]}}
+  </button>
+</div>
+<button class="material-icons menu-button e2e-menu-button" (click)="onMenuOpen($event)">
+  more_vert
+</button>

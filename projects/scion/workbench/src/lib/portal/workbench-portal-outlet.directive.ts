@@ -33,10 +33,15 @@ export class WorkbenchPortalOutletDirective implements OnDestroy {
   private _portal: WbComponentPortal | null = null;
 
   constructor(private _viewContainerRef: ViewContainerRef, nullTemplate: TemplateRef<void>) {
-    // To get notified when Angular is about to destroy the portal, we insert a pseudo-element
-    // in front of the portal. When Angular invokes its destroy hook, we detach the portal, so
-    // it does not get destroyed.
+    // To get notified before Angular destroys the portal, we insert a pseudo-element ahead of it.
+    // This pseudo-element gets destroyed first, allowing us to detach the portal and prevent its destruction.
     this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => this.detach());
+    // Additionally, we add an extra element between the pseudo-element and the portal to not break Angular's destroy algorithm.
+    // Angular's destroy algorithm terminates when an element removes its immediate successor during destruction, but it continues
+    // if the next but one element is removed instead. It is crucial to insert this intermediary element; otherwise, unmounting
+    // the workbench with opened views would fail to destroy the workbench component entirely.
+    // See tests `workbench-ummount.e2e-spec`.
+    this._viewContainerRef.createEmbeddedView(nullTemplate);
   }
 
   @Input({alias: 'wbPortalOutlet', required: true}) // eslint-disable-line @angular-eslint/no-input-rename

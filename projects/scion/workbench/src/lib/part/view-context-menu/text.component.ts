@@ -10,7 +10,7 @@
 
 import {Component, Inject, InjectionToken} from '@angular/core';
 
-export const TEXT = new InjectionToken<string[]>('TEXT');
+export const TEXT = new InjectionToken<string>('TEXT');
 
 /**
  * Component which renders text injected via {@link TEXT} injection token.

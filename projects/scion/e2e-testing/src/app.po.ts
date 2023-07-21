@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, waitUntilStable} from './helper/testing.util';
+import {coerceArray, isPresent, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
@@ -17,7 +17,7 @@ import {ViewTabPO} from './view-tab.po';
 import {PopupPO} from './popup.po';
 import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
-import {PerspectiveTogglePO} from './perspective-toggle-button.po';
+import {AppHeaderPO} from './app-header.po';
 
 export class AppPO {
 
@@ -27,6 +27,10 @@ export class AppPO {
    * Handle for interacting with the currently active workbench part.
    */
   public readonly activePart = new PartPO(this.page.locator('wb-part.active'));
+  /**
+   * Handle for interacting with the header of the testing application.
+   */
+  public readonly header = new AppHeaderPO(this.page.locator('app-header'));
 
   constructor(public readonly page: Page) {
   }
@@ -90,16 +94,6 @@ export class AppPO {
   }
 
   /**
-   * Handle to the specified perspective toggle button.
-   *
-   * @param locateBy - Specifies how to locate the perspective toggle button.
-   *        @property perspectiveId - Identifies the toggle button by the perspective id
-   */
-  public perspectiveToggleButton(locateBy: {perspectiveId: string}): PerspectiveTogglePO {
-    return new PerspectiveTogglePO(this.page.locator('header.e2e-application-header').locator(`button.e2e-perspective[data-perspectiveid="${locateBy.perspectiveId}"]`));
-  }
-
-  /**
    * Handle to the specified part in the workbench layout.
    *
    * @param locateBy - Specifies how to locate the part.
@@ -113,7 +107,7 @@ export class AppPO {
    * Returns parts visible in the layout.
    */
   public async partIds(): Promise<string[]> {
-    const partLocators = await this.page.locator(`wb-part`).all();
+    const partLocators = await this.page.locator('wb-part').all();
     return Promise.all(partLocators.map(async locator => (await locator.getAttribute('data-partid'))!));
   }
 
@@ -121,19 +115,32 @@ export class AppPO {
    * Returns views visible in the layout.
    */
   public async viewIds(): Promise<string[]> {
-    const viewLocators = await this.page.locator(`wb-view`).all();
+    const viewLocators = await this.page.locator('wb-view').all();
     return Promise.all(viewLocators.map(async locator => (await locator.getAttribute('data-viewid'))!));
+  }
+
+  /**
+   * Returns the number of opened views.
+   */
+  public viewCount(): Promise<number> {
+    return this.page.locator('wb-view').count();
   }
 
   /**
    * Handle to the specified view in the workbench layout.
    *
-   * @param locateBy - Specifies how to locate the view. Either `viewId` or `cssClass` must be set.
+   * @param locateBy - Specifies how to locate the view. Either `viewId` or `cssClass`, or both must be set.
    *        @property viewId? - Identifies the view by its id
    *        @property cssClass? - Identifies the view by its CSS class
    */
   public view(locateBy: {viewId?: string; cssClass?: string}): ViewPO {
-    if (locateBy.viewId !== undefined) {
+    if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
+      const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
+      const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
+      const partLocator = this.page.locator('wb-part', {has: viewTabLocator});
+      return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
+    }
+    else if (locateBy.viewId !== undefined) {
       const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"]`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"]`);
       const partLocator = this.page.locator('wb-part', {has: viewTabLocator});
@@ -145,7 +152,7 @@ export class AppPO {
       const partLocator: Locator = this.page.locator('wb-part', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
-    throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass' must be set.`);
+    throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
   }
 
   /**
@@ -154,6 +161,16 @@ export class AppPO {
   public popup(locateBy?: {cssClass?: string | string[]}): PopupPO {
     const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
     return new PopupPO(this.page.locator(['.wb-popup'].concat(cssClasses).join('.')));
+  }
+
+  /**
+   * Returns the size of the page viewport.
+   */
+  public size(): {width: number; height: number} {
+    return {
+      width: this.page.viewportSize()?.width ?? 0,
+      height: this.page.viewportSize()?.height ?? 0,
+    };
   }
 
   /**
@@ -189,6 +206,13 @@ export class AppPO {
   }
 
   /**
+   * Tests whether the workbench component is present in the DOM and is displaying the workbench layout.
+   */
+  public async isWorkbenchComponentPresent(): Promise<boolean> {
+    return await isPresent(this.page.locator('wb-workbench')) && await this.page.locator('wb-workbench wb-workbench-layout').isVisible();
+  }
+
+  /**
    * Opens a new view tab.
    */
   public async openNewViewTab(): Promise<StartPagePO> {
@@ -204,7 +228,7 @@ export class AppPO {
    * Waits until the workbench finished startup.
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {
-    await this.page.locator('wb-workbench:not(.starting)').waitFor({state: 'visible'});
+    await this.page.locator('wb-workbench wb-workbench-layout').waitFor({state: 'visible'});
   }
 
   /**

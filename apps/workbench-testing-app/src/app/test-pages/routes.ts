@@ -34,6 +34,11 @@ export default [
     loadChildren: () => import('./navigation-test-page/routes'),
     data: {[WorkbenchRouteData.title]: 'Navigation Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage'},
   },
+  {
+    path: 'blank-test-page',
+    loadComponent: () => import('./blank-test-page/blank-test-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Blank Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage'},
+  },
 ] satisfies Routes;
 
 /**
