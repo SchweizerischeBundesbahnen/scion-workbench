@@ -8,26 +8,26 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, ElementRef, EmbeddedViewRef, Input, OnDestroy, OnInit, Optional, TemplateRef, ViewContainerRef} from '@angular/core';
+import {Directive, ElementRef, EmbeddedViewRef, Input, OnChanges, OnDestroy, Optional, SimpleChanges, TemplateRef, ViewContainerRef} from '@angular/core';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {Dimension, fromDimension$} from '@scion/toolkit/observable';
 import {setStyle} from '../common/dom.util';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 /**
  * Renders a given template as overlay. The template will stick to the bounding box of the host element of this directive.
  */
 @Directive({selector: '[wbContentProjection]', standalone: true})
-export class ContentProjectionDirective implements OnInit, OnDestroy {
+export class ContentProjectionDirective implements OnChanges, OnDestroy {
 
-  private _boundingBoxElement: HTMLElement;
-  private _contentViewRef!: EmbeddedViewRef<any>;
+  private _contentViewRef: EmbeddedViewRef<unknown> | undefined;
 
   /**
    * Reference to the view container where to insert the overlay.
    */
   @Input({alias: 'wbContentProjectionOverlayHost', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
-  public overlayHost!: ViewContainerRef | Promise<ViewContainerRef>;
+  public overlayHost: ViewContainerRef | undefined | null;
 
   /**
    * Template which to render as overlay. The template will stick to the bounding box of the host element of this directive.
@@ -35,26 +35,30 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   @Input({alias: 'wbContentProjectionContent', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
   public contentTemplateRef!: TemplateRef<void>;
 
-  constructor(host: ElementRef<HTMLElement>,
-              private _destroyRef: DestroyRef,
-              @Optional() private _view: WorkbenchView) {
-    this._boundingBoxElement = host.nativeElement;
+  constructor(private _host: ElementRef<HTMLElement>, @Optional() private _view: WorkbenchView) {
   }
 
-  public ngOnInit(): void {
-    this.createAndProjectEmbeddedView().then();
-  }
+  public ngOnChanges(changes: SimpleChanges): void {
+    this._contentViewRef?.destroy();
 
-  private async createAndProjectEmbeddedView(): Promise<void> {
-    this._contentViewRef = (await this.overlayHost).createEmbeddedView(this.contentTemplateRef, null);
+    if (!this.overlayHost) {
+      return;
+    }
+
+    // Create embedded view from content template and align it to the bounds of the host element.
+    this._contentViewRef = this.overlayHost.createEmbeddedView(this.contentTemplateRef, null);
     this._contentViewRef.detectChanges();
+
+    // Register dispose notifier.
+    const dispose$ = new Subject<void>();
+    this._contentViewRef.onDestroy(() => dispose$.next());
 
     // Position projected content out of the document flow relative to the page viewport.
     this.styleContent({position: 'fixed'});
 
-    // (Re-)position visible content each time the bounding box element changes its size.
-    fromDimension$(this._boundingBoxElement)
-      .pipe(takeUntilDestroyed(this._destroyRef))
+    // Align content each time the bounding box element changes its size.
+    fromDimension$(this._host.nativeElement)
+      .pipe(takeUntil(dispose$))
       .subscribe(dimension => {
         if (isNullDimension(dimension)) {
           // When removing the bounding box element (this directive's host) from the DOM, its dimension drops to 0.
@@ -63,19 +67,22 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
           // For example, inactive views are removed from the DOM.
           return;
         }
-        this.stickContentToHostBoundingBox();
+        this.alignContentToHostBoundaries();
       });
 
     // Hide content of inactive views.
-    this._view && this._view.active$
-      .pipe(takeUntilDestroyed(this._destroyRef))
+    this._view?.active$
+      .pipe(takeUntil(dispose$))
       .subscribe(active => {
         this.setVisible(active);
       });
   }
 
-  private stickContentToHostBoundingBox(): void {
-    const hostPosition: DOMRect = this._boundingBoxElement.getBoundingClientRect();
+  /**
+   * Aligns the content of the projection to the boundaries of the host element.
+   */
+  private alignContentToHostBoundaries(): void {
+    const hostPosition: DOMRect = this._host.nativeElement.getBoundingClientRect();
     this.styleContent({
       top: `${hostPosition.top}px`,
       left: `${hostPosition.left}px`,
@@ -92,7 +99,7 @@ export class ContentProjectionDirective implements OnInit, OnDestroy {
   }
 
   private styleContent(style: {[style: string]: any}): void {
-    this._contentViewRef.rootNodes.forEach(node => setStyle(node, style));
+    this._contentViewRef!.rootNodes.forEach(node => setStyle(node, style));
   }
 
   public ngOnDestroy(): void {

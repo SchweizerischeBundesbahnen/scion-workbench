@@ -53,7 +53,7 @@ export default class RegisterPartActionPageComponent {
       this.workbenchService.registerPartAction({
         portal: new ComponentPortal(TextComponent, undefined, Injector.create({
           providers: [
-            {provide: TextComponent.TEXT, useValue: this.form.controls.content},
+            {provide: TextComponent.TEXT, useValue: this.form.controls.content.value},
           ],
         })),
         align: this.form.controls.align.value || undefined,

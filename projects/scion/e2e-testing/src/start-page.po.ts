@@ -12,6 +12,7 @@ import {AppPO} from './app.po';
 import {ViewPO} from './view.po';
 import {Locator} from '@playwright/test';
 import {SciTabbarPO} from './@scion/components.internal/tabbar.po';
+import {ElementSelectors} from './helper/element-selectors';
 
 /**
  * Page object to interact {@link StartPageComponent}.
@@ -42,7 +43,7 @@ export class StartPagePO {
   public async openWorkbenchView(viewCssClass: string): Promise<void> {
     await this._tabbarPO.selectTab('e2e-workbench-views');
     await this._tabbarLocator.locator(`.e2e-workbench-view-tiles a.${viewCssClass}`).click();
-    await this._appPO.view({cssClass: viewCssClass}).waitUntilPresent();
+    await this._appPO.view({viewId: this.viewId, cssClass: viewCssClass}).waitUntilPresent();
   }
 
   /**
@@ -51,7 +52,11 @@ export class StartPagePO {
   public async openMicrofrontendView(viewCssClass: string, app: string): Promise<void> {
     await this._tabbarPO.selectTab('e2e-microfrontend-views');
     await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles a.${viewCssClass}.workbench-client-testing-${app}`).click();
-    await this._appPO.view({cssClass: viewCssClass}).waitUntilPresent();
+    await this._appPO.view({viewId: this.viewId, cssClass: viewCssClass}).waitUntilPresent();
+
+    // Wait for microfrontend to be loaded.
+    const frameLocator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(this.viewId));
+    await frameLocator.locator('app-root').waitFor({state: 'visible'});
   }
 
   /**

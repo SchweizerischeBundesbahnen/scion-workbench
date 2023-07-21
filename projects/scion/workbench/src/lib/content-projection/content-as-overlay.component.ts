@@ -57,5 +57,5 @@ export class ContentAsOverlayComponent {
    * Reference to the view container where to insert the overlay.
    */
   @Input({required: true})
-  public overlayHost!: ViewContainerRef | Promise<ViewContainerRef>;
+  public overlayHost: ViewContainerRef | undefined | null;
 }

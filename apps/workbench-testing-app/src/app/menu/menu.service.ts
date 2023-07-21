@@ -31,6 +31,7 @@ export class MenuService {
       scrollStrategy: this._overlay.scrollStrategies.noop(),
       hasBackdrop: true,
       backdropClass: 'cdk-overlay-transparent-backdrop',
+      panelClass: 'e2e-application-menu',
       disposeOnNavigation: true,
       positionStrategy: this._overlay.position()
         .flexibleConnectedTo(event.target as HTMLElement)

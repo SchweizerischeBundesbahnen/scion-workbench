@@ -1,4 +1,4 @@
-<ng-container *ngIf="workbenchStarting; then splash_template; else workbench_template;"></ng-container>
+<ng-container *ngIf="workbenchStartup.whenStarted | async; then workbench_template; else splash_template;"></ng-container>
 
 <!-- splash that is rendered during workbench startup -->
 <ng-template #splash_template>
@@ -8,15 +8,15 @@
 <!-- workbench that is rendered after workbench startup completed -->
 <ng-template #workbench_template>
   <div class="stacking-context-barrier">
-    <wb-workbench-layout></wb-workbench-layout>
-    <!-- iframes -->
+    <wb-workbench-layout *ngIf="whenViewContainersInjected | async"></wb-workbench-layout>
+    <!-- anchor to attach iframes of embedded microfrontends -->
     <ng-container #iframe_host></ng-container>
   </div>
 
   <!-- notifications -->
   <wb-notification-list></wb-notification-list>
 
-  <!-- message boxes -->
-  <ng-container #view_local_message_box_host></ng-container>
+  <!-- anchor to attach view-modal message boxes -->
+  <ng-container #view_modal_messagebox_host></ng-container>
   <wb-message-box-stack class="e2e-application-modal"></wb-message-box-stack>
 </ng-template>

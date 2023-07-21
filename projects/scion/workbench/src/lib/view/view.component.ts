@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild} from '@angular/core';
 import {AsyncSubject, combineLatest, EMPTY, fromEvent} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
@@ -17,7 +17,7 @@ import {MessageBoxService} from '../message-box/message-box.service';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
-import {VIEW_LOCAL_MESSAGE_BOX_HOST, ViewContainerReference} from '../content-projection/view-container.reference';
+import {VIEW_MODAL_MESSAGE_BOX_HOST, ViewContainerReference} from '../content-projection/view-container.reference';
 import {PopupService} from '../popup/popup.service';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
@@ -27,6 +27,7 @@ import {A11yModule} from '@angular/cdk/a11y';
 import {ContentProjectionDirective} from '../content-projection/content-projection.directive';
 import {MessageBoxStackComponent} from '../message-box/message-box-stack.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {AsyncPipe} from '@angular/common';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -49,12 +50,12 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     SciViewportComponent,
     ContentProjectionDirective,
     MessageBoxStackComponent,
+    AsyncPipe,
   ],
 })
 export class ViewComponent implements OnDestroy {
 
   private _viewport$ = new AsyncSubject<SciViewportComponent>();
-  public viewLocalMessageBoxHost: Promise<ViewContainerRef>;
 
   @ViewChild(SciViewportComponent)
   public set setViewport(viewport: SciViewportComponent) {
@@ -85,12 +86,11 @@ export class ViewComponent implements OnDestroy {
   constructor(private _view: ɵWorkbenchView,
               private _logger: Logger,
               private _host: ElementRef<HTMLElement>,
+              private _cd: ChangeDetectorRef,
               messageBoxService: MessageBoxService,
               viewContextMenuService: ViewMenuService,
-              private _cd: ChangeDetectorRef,
-              @Inject(VIEW_LOCAL_MESSAGE_BOX_HOST) viewLocalMessageBoxHost: ViewContainerReference) {
+              @Inject(VIEW_MODAL_MESSAGE_BOX_HOST) protected viewModalMessageBoxHostRef: ViewContainerReference) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
-    this.viewLocalMessageBoxHost = viewLocalMessageBoxHost.get();
 
     messageBoxService.messageBoxes$({includeParents: true})
       .pipe(takeUntilDestroyed())

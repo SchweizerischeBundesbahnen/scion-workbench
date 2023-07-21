@@ -25,6 +25,10 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'workbench-page',
+    redirectTo: '',
+  },
+  {
     path: 'start-page',
     loadComponent: () => import('./start-page/start-page.component'),
     data: {[WorkbenchRouteData.title]: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'},

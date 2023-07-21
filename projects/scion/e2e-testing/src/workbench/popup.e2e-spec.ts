@@ -423,8 +423,8 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.enterContextualViewId(startPagePO.viewId!);
-      await popupOpenerPagePO.enterPosition({left: 0, top: 0});
-      await popupOpenerPagePO.selectPopupComponent('blank-test-page');
+      await popupOpenerPagePO.enterPosition({left: appPO.size().width / 2, top: appPO.size().height / 2});
+      await popupOpenerPagePO.selectPopupComponent('popup-page');
       await popupOpenerPagePO.enterCssClass('testee');
       await popupOpenerPagePO.clickOpen();
 

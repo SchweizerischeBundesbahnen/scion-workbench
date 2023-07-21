@@ -38,6 +38,10 @@ export class ViewPagePO {
     return await this.viewTabPO.isPresent() && await isPresent(this._locator);
   }
 
+  public async isVisible(): Promise<boolean> {
+    return await this.viewPO.isVisible() && await this._locator.isVisible();
+  }
+
   public async getViewId(): Promise<string> {
     return this._locator.locator('span.e2e-view-id').innerText();
   }
@@ -79,7 +83,7 @@ export class ViewPagePO {
     await this._locator.locator('button.e2e-close').click();
   }
 
-  public async addViewAction(partAction: WorkbenchPartActionDescriptor, options?: { append?: boolean }): Promise<void> {
+  public async addViewAction(partAction: WorkbenchPartActionDescriptor, options?: {append?: boolean}): Promise<void> {
     const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-part-actions'));
     await accordionPO.expand();
     try {
@@ -96,6 +100,14 @@ export class ViewPagePO {
     finally {
       await accordionPO.collapse();
     }
+  }
+
+  public async enterFreeText(text: string): Promise<void> {
+    await this._locator.locator('input.e2e-free-text').fill(text);
+  }
+
+  public getFreeText(): Promise<string> {
+    return this._locator.locator('input.e2e-free-text').inputValue();
   }
 }
 

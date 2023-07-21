@@ -1,4 +1,4 @@
-<wb-content-as-overlay [overlayHost]="iframeHost">
+<wb-content-as-overlay [overlayHost]="iframeHostRef.ref$ | async">
   <sci-router-outlet #router_outlet
                      [name]="viewId"
                      [attr.data-capabilityid]="viewCapability && viewCapability.metadata!.id"

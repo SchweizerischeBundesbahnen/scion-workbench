@@ -1,6 +1,6 @@
 <sci-viewport wbContentProjection
               [wbContentProjectionContent]="message_box_stack_template"
-              [wbContentProjectionOverlayHost]="viewLocalMessageBoxHost"
+              [wbContentProjectionOverlayHost]="viewModalMessageBoxHostRef.ref$ | async"
               cdkTrapFocus>
   <router-outlet #router_outlet="outlet"
                  [name]="viewId"

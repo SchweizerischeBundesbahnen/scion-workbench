@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
 import {asapScheduler, combineLatest, EMPTY, firstValueFrom, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
@@ -56,7 +56,6 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
   ];
 
   public viewCapability: WorkbenchViewCapability | undefined;
-  public iframeHost: Promise<ViewContainerRef>;
 
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
@@ -75,9 +74,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
               private _logger: Logger,
               private _viewContextMenuService: ViewMenuService,
               private _workbenchRouter: WorkbenchRouter,
-              @Inject(IFRAME_HOST) iframeHost: ViewContainerReference) {
+              @Inject(IFRAME_HOST) protected iframeHostRef: ViewContainerReference) {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
-    this.iframeHost = iframeHost.get();
     this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
       .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
   }

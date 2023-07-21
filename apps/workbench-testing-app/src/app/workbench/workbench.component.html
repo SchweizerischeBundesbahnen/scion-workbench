@@ -1,18 +1,3 @@
-<header class="e2e-application-header" *ngIf="whenWorkbenchStarted | async">
-  <div class="toggle-buttons">
-    <button *ngFor="let perspective of workbenchService.perspectives$ | async"
-            (click)="onPerspectiveActivate(perspective.id)"
-            class="e2e-perspective"
-            [attr.data-perspectiveid]="perspective.id"
-            [class.active]="perspective.active$ | async"
-            [class.e2e-active]="perspective.active$ | async">
-      {{perspective.data[PerspectiveData.label]}}
-    </button>
-  </div>
-  <button class="material-icons menu-button" (click)="onMenuOpen($event)">
-    more_vert
-  </button>
-</header>
 <wb-workbench>
   <ng-template wbPartAction *ngIf="showNewTabAction$ | async" area="main" cssClass="e2e-open-new-tab">
     <button [wbRouterLink]="'/start-page'" class="material-icons" [wbRouterLinkExtras]="{target: 'blank', blankInsertionIndex: 'end'}">
