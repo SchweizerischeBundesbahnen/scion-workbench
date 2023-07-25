@@ -55,7 +55,7 @@ export class StartPagePO {
     await this._appPO.view({viewId: this.viewId, cssClass: viewCssClass}).waitUntilPresent();
 
     // Wait for microfrontend to be loaded.
-    const frameLocator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(this.viewId));
+    const frameLocator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(this.viewId!));
     await frameLocator.locator('app-root').waitFor({state: 'visible'});
   }
 

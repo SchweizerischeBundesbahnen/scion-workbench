@@ -4,6 +4,7 @@
     "outDir": "../../../out-tsc",
     "module": "commonjs",
     "sourceMap": true,
+    "strict": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "target": "es2020",
