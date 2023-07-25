@@ -90,8 +90,8 @@ export class MessageBoxPO {
     return getCssClasses(this._locator);
   }
 
-  public async waitUntilAttached(): Promise<void> {
-    await this._locator.waitFor({state: 'attached'});
+  public waitUntilAttached(): Promise<void> {
+    return this._locator.waitFor({state: 'attached'});
   }
 
   public locator(selector: string): Locator {

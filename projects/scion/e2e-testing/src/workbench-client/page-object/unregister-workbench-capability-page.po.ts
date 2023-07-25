@@ -28,6 +28,10 @@ export class UnregisterWorkbenchCapabilityPagePO {
     this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-unregister-workbench-capability-page');
   }
 
+  public waitUntilAttached(): Promise<void> {
+    return this._locator.waitFor({state: 'attached'});
+  }
+
   /**
    * Unregisters the given workbench capability.
    *
@@ -44,7 +48,7 @@ export class UnregisterWorkbenchCapabilityPagePO {
     const errorLocator = this._locator.locator('output.e2e-unregister-error');
     return Promise.race([
       responseLocator.waitFor({state: 'attached'}),
-      rejectWhenAttached(errorLocator)
+      rejectWhenAttached(errorLocator),
     ]);
   }
 

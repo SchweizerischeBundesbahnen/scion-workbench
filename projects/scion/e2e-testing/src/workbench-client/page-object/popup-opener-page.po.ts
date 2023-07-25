@@ -36,6 +36,10 @@ export class PopupOpenerPagePO {
     this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-popup-opener-page');
   }
 
+  public waitUntilAttached(): Promise<void> {
+    return this._locator.waitFor({state: 'attached'});
+  }
+
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
     const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
     await keyValueFieldPO.clear();

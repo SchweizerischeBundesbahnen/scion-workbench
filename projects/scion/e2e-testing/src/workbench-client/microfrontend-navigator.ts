@@ -70,39 +70,44 @@ export class MicrofrontendNavigator {
     switch (page) {
       case MessageBoxOpenerPagePO: {
         await startPO.openMicrofrontendView('e2e-test-message-box-opener', app);
-        return new MessageBoxOpenerPagePO(this._appPO, viewId);
+        return waitUntilAttached(new MessageBoxOpenerPagePO(this._appPO, viewId));
       }
       case RegisterWorkbenchIntentionPagePO: {
         await startPO.openMicrofrontendView('e2e-register-workbench-intention', app);
-        return new RegisterWorkbenchIntentionPagePO(this._appPO, viewId);
+        return waitUntilAttached(new RegisterWorkbenchIntentionPagePO(this._appPO, viewId));
       }
       case RegisterWorkbenchCapabilityPagePO: {
         await startPO.openMicrofrontendView('e2e-register-workbench-capability', app);
-        return new RegisterWorkbenchCapabilityPagePO(this._appPO, viewId);
+        return waitUntilAttached(new RegisterWorkbenchCapabilityPagePO(this._appPO, viewId));
       }
       case ViewPagePO: {
         await startPO.openMicrofrontendView('e2e-test-view', app);
-        return new ViewPagePO(this._appPO, viewId);
+        return waitUntilAttached(new ViewPagePO(this._appPO, viewId));
       }
       case UnregisterWorkbenchCapabilityPagePO: {
         await startPO.openMicrofrontendView('e2e-unregister-workbench-capability', app);
-        return new UnregisterWorkbenchCapabilityPagePO(this._appPO, viewId);
+        return waitUntilAttached(new UnregisterWorkbenchCapabilityPagePO(this._appPO, viewId));
       }
       case NotificationOpenerPagePO: {
         await startPO.openMicrofrontendView('e2e-test-notification-opener', app);
-        return new NotificationOpenerPagePO(this._appPO, viewId);
+        return waitUntilAttached(new NotificationOpenerPagePO(this._appPO, viewId));
       }
       case RouterPagePO: {
         await startPO.openMicrofrontendView('e2e-test-router', app);
-        return new RouterPagePO(this._appPO, viewId);
+        return waitUntilAttached(new RouterPagePO(this._appPO, viewId));
       }
       case PopupOpenerPagePO: {
         await startPO.openMicrofrontendView('e2e-test-popup-opener', app);
-        return new PopupOpenerPagePO(this._appPO, viewId);
+        return waitUntilAttached(new PopupOpenerPagePO(this._appPO, viewId));
       }
       default: {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);
       }
+    }
+
+    async function waitUntilAttached<T extends {waitUntilAttached(): Promise<void>}>(pageObject: T): Promise<T> {
+      await pageObject.waitUntilAttached();
+      return pageObject;
     }
   }
 }

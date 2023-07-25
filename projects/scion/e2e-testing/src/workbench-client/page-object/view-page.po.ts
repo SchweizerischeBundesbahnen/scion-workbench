@@ -37,8 +37,8 @@ export class ViewPagePO {
     this.locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-view-page');
   }
 
-  public async waitUntilAttached(): Promise<void> {
-    await this.locator.waitFor({state: 'attached'});
+  public waitUntilAttached(): Promise<void> {
+    return this.locator.waitFor({state: 'attached'});
   }
 
   public async isPresent(): Promise<boolean> {
@@ -166,7 +166,7 @@ export class ViewPagePO {
     return {width, height};
   }
 
-  public async navigateSelf(params: Params, options?: { paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean }): Promise<void> {
+  public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean}): Promise<void> {
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-self-navigation'));
     await accordionPO.expand();
     try {

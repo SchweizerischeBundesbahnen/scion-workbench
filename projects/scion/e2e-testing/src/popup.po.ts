@@ -73,8 +73,8 @@ export class PopupPO {
     await this._popupLocator.waitFor({state: 'detached'});
   }
 
-  public async waitUntilAttached(): Promise<void> {
-    await this._popupLocator.waitFor({state: 'attached'});
+  public waitUntilAttached(): Promise<void> {
+    return this._popupLocator.waitFor({state: 'attached'});
   }
 
   public async pressEscape(): Promise<void> {

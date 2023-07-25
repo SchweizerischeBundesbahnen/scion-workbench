@@ -42,6 +42,10 @@ export class RegisterWorkbenchCapabilityPagePO {
     this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-register-workbench-capability-page');
   }
 
+  public waitUntilAttached(): Promise<void> {
+    return this._locator.waitFor({state: 'attached'});
+  }
+
   /**
    * Registers the given workbench capability.
    *

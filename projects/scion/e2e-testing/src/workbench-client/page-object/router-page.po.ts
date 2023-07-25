@@ -34,6 +34,10 @@ export class RouterPagePO {
     this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-router-page');
   }
 
+  public waitUntilAttached(): Promise<void> {
+    return this._locator.waitFor({state: 'attached'});
+  }
+
   public async isVisible(): Promise<boolean> {
     return await this._viewPO.isVisible() && await this._locator.isVisible();
   }

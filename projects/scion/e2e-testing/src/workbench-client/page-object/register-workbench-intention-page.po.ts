@@ -30,6 +30,10 @@ export class RegisterWorkbenchIntentionPagePO {
     this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-register-workbench-intention-page');
   }
 
+  public waitUntilAttached(): Promise<void> {
+    return this._locator.waitFor({state: 'attached'});
+  }
+
   /**
    * Registers the given workbench intention.
    *
@@ -47,7 +51,7 @@ export class RegisterWorkbenchIntentionPagePO {
     const errorLocator = this._locator.locator('output.e2e-register-error');
     return Promise.race([
       responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-intention-id').innerText()),
-      rejectWhenAttached(errorLocator)
+      rejectWhenAttached(errorLocator),
     ]);
   }
 
