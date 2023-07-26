@@ -35,17 +35,19 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
    * The actual value can be either a {@link ɵWorkbenchLayout}, a {@link ComponentFixture<WorkbenchLayoutComponent>} or a {@link DebugElement<WorkbenchLayoutComponent>}.
    * If passing a fixture or debug element, also asserts the DOM structure.
    *
+   * Note that properties not specified in the `expected` object are excluded from the assertion.
+   *
    * ---
    * Usage:
    *
    * ```ts
    * expect(workbenchLayout).toEqualWorkbenchLayout({
    *   mainGrid: {
-   *     root: partialMTreeNode({
+   *     root: new MTreeNode({
    *       direction: 'row',
    *       ratio: .25,
-   *       child1: partialMPart({id: 'A', views: [{id: 'view.1'}]}),
-   *       child2: partialMPart({id: 'B', views: [{id: 'view.2'}, {id: 'view.3'}]}),
+   *       child1: new MPart({id: 'A', views: [{id: 'view.1'}]}),
+   *       child2: new MPart({id: 'B', views: [{id: 'view.2'}, {id: 'view.3'}]}),
    *     }),
    *   },
    * });
@@ -112,29 +114,15 @@ export function toEqual(actual: any, expected: any, util: MatchersUtil, expectat
 }
 
 /**
- * Use like {@link jasmine.ObjectContaining} to assert only specified properties of a {@link MTreeNode}.
- */
-export function partialMTreeNode(part: Partial<MTreeNode>): MTreeNode {
-  return {...part, type: 'MTreeNode'} as MTreeNode;
-}
-
-/**
- * Use like {@link jasmine.ObjectContaining} to assert only specified properties of a {@link MPart}.
- */
-export function partialMPart(part: Partial<MPart>): MPart {
-  return {...part, type: 'MPart'} as MPart;
-}
-
-/**
  * Expected layout used in {@link #toEqualWorkbenchLayout}.
  */
 export interface ExpectedWorkbenchLayout {
   /**
    * Specifies the expected main grid. If not set, defaults to a grid with only the initial part.
    */
-  mainGrid?: Partial<MPartGrid>;
+  mainGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
   /**
    * Specifies the expected peripheral grid. If not set, defaults to a grid with only the main area part.
    */
-  peripheralGrid?: Partial<MPartGrid>;
+  peripheralGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
 }

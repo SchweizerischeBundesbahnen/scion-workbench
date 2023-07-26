@@ -15,7 +15,7 @@ import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to
 import {toBeRegisteredCustomMatcher} from '../testing/jasmine/matcher/to-be-registered.matcher';
 import {WorkbenchLayoutComponent} from './workbench-layout.component';
 import {Component} from '@angular/core';
-import {expect, partialMPart, partialMTreeNode} from '../testing/jasmine/matcher/custom-matchers.definition';
+import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WorkbenchModule} from '../workbench.module';
 import {By} from '@angular/platform-browser';
@@ -26,6 +26,7 @@ import {styleFixture, waitForInitialWorkbenchLayout, waitForWorkbenchLayoutChang
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
+import {MPart, MTreeNode} from './workbench-layout.model';
 
 describe('WorkbenchLayout', () => {
 
@@ -74,17 +75,17 @@ describe('WorkbenchLayout', () => {
     // Assert initial workbench layout
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
           direction: 'row',
           ratio: .2,
         }),
       },
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -98,17 +99,17 @@ describe('WorkbenchLayout', () => {
     // Expect the layout not to be discarded.
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
           direction: 'row',
           ratio: .2,
         }),
       },
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -122,17 +123,17 @@ describe('WorkbenchLayout', () => {
     // Expect the layout to be changed.
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
           direction: 'row',
           ratio: .2,
         }),
       },
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.2'}, {id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: partialMPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.2'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -160,7 +161,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -173,7 +174,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -200,9 +201,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -234,7 +235,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -247,7 +248,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -274,9 +275,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -308,7 +309,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -321,7 +322,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -348,9 +349,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'column',
           ratio: .5,
         }),
@@ -382,7 +383,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -395,7 +396,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -422,9 +423,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
@@ -456,7 +457,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -469,7 +470,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -495,7 +496,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -525,7 +526,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -538,7 +539,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -553,7 +554,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -582,9 +583,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -616,9 +617,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.3'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}, {id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -649,7 +650,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'EAST', views: [{id: 'view.3'}, {id: 'view.2'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'EAST', views: [{id: 'view.3'}, {id: 'view.2'}, {id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
 
@@ -681,7 +682,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -694,7 +695,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -721,9 +722,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -754,9 +755,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -788,7 +789,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -801,7 +802,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -828,9 +829,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -861,9 +862,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -895,7 +896,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -908,7 +909,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -935,9 +936,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -967,9 +968,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'column',
           ratio: .5,
         }),
@@ -1001,7 +1002,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -1014,7 +1015,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1041,9 +1042,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -1073,9 +1074,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
@@ -1108,7 +1109,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -1121,7 +1122,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1136,7 +1137,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1165,9 +1166,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -1200,11 +1201,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: partialMPart({id: 'SOUTH-EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'SOUTH-EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -1239,14 +1240,14 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: partialMPart({id: 'SOUTH-WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'SOUTH-WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'column',
             ratio: .5,
           }),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -1280,7 +1281,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -1293,7 +1294,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1320,9 +1321,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
@@ -1351,7 +1352,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1380,7 +1381,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -1393,7 +1394,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1420,9 +1421,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -1452,9 +1453,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
@@ -1486,7 +1487,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -1499,7 +1500,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1526,9 +1527,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -1558,9 +1559,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
@@ -1592,7 +1593,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
 
@@ -1606,7 +1607,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1620,7 +1621,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1649,7 +1650,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -1662,7 +1663,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1677,7 +1678,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1710,7 +1711,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
@@ -1723,7 +1724,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
@@ -1750,9 +1751,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -1770,9 +1771,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -1804,11 +1805,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -1831,11 +1832,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'EAST-2', views: [{id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -1872,16 +1873,16 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-            child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -1918,19 +1919,19 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMTreeNode({
-              child1: partialMPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-              child2: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
               direction: 'row',
               ratio: .5,
             }),
-            child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -1964,16 +1965,16 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -1998,14 +1999,14 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: partialMPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2025,9 +2026,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: partialMPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2046,7 +2047,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.1').not.toBeRegistered({partId: 'main', active: true});
@@ -2117,9 +2118,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
-          child2: partialMPart({id: 'right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+          child2: new MPart({id: 'right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2148,11 +2149,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'top-right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: partialMPart({id: 'right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'top-right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2227,9 +2228,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2258,9 +2259,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2338,9 +2339,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2370,11 +2371,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -2407,16 +2408,16 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-            child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -2449,19 +2450,19 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMTreeNode({
-              child1: partialMPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-              child2: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
               direction: 'row',
               ratio: .5,
             }),
-            child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: partialMPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2491,16 +2492,16 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2520,14 +2521,14 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMTreeNode({
-            child1: partialMPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+        root: new MTreeNode({
+          child1: new MTreeNode({
+            child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: partialMPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2543,9 +2544,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: partialMPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2560,7 +2561,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.2').toHaveTransientState('B');
@@ -2627,9 +2628,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2658,11 +2659,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: partialMPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2694,11 +2695,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2773,9 +2774,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2804,11 +2805,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2840,11 +2841,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMTreeNode({
-            child1: partialMPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: partialMPart({id: 'SOUTH', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MTreeNode({
+            child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'SOUTH', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2913,9 +2914,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: partialMPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2943,9 +2944,9 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),

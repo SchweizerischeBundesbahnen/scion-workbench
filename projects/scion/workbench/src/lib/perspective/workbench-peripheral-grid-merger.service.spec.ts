@@ -11,13 +11,13 @@
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
-import {expect, partialMPart, partialMTreeNode} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
 import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
 import {WorkbenchPeripheralGridMerger} from './workbench-peripheral-grid-merger.service';
-import {MPartGrid} from '../layout/workbench-layout.model';
+import {MPart, MPartGrid, MTreeNode} from '../layout/workbench-layout.model';
+import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 
 describe('WorkbenchPeripheralGridMerger', () => {
 
@@ -59,16 +59,16 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedLayout).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: partialMPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}]}),
-            child2: partialMPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}]}),
+            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
           }),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });
@@ -82,16 +82,16 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedGrid).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: partialMPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
-            child2: partialMPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
+            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
           }),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });
@@ -105,16 +105,16 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedGrid).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: partialMPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}]}),
-            child2: partialMPart({id: 'bottomLeft', views: [{id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}]}),
+            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.5'}, {id: 'view.6'}]}),
           }),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });
@@ -128,16 +128,16 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedGrid).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: partialMPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
-            child2: partialMPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
+            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
           }),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });
@@ -151,16 +151,16 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedGrid).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: partialMPart({id: 'topLeft', views: [{id: 'view.2'}, {id: 'view.3'}]}),
-            child2: partialMPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({id: 'topLeft', views: [{id: 'view.2'}, {id: 'view.3'}]}),
+            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
           }),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });
@@ -174,7 +174,7 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedGrid).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMPart({id: MAIN_AREA_PART_ID}),
+        root: new MPart({id: MAIN_AREA_PART_ID}),
       },
     });
   });
@@ -187,16 +187,16 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedGrid).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: partialMPart({id: 'topLeft', views: [{id: 'view.2'}, {id: 'view.3'}]}),
-            child2: partialMPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}, {id: 'view.1'}]}),
+            child1: new MPart({id: 'topLeft', views: [{id: 'view.2'}, {id: 'view.3'}]}),
+            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}, {id: 'view.1'}]}),
           }),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });
@@ -210,16 +210,16 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedGrid).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: partialMPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
-            child2: partialMPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
+            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
           }),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });
@@ -233,11 +233,11 @@ describe('WorkbenchPeripheralGridMerger', () => {
     }));
     expect(mergedGrid).toEqualWorkbenchLayout({
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .5,
-          child1: partialMPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+          child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });

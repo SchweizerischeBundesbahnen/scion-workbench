@@ -10,7 +10,6 @@
 
 import {assertType} from '../common/asserts.util';
 import {Defined} from '@scion/toolkit/util';
-import {UUID} from '@scion/toolkit/uuid';
 
 /**
  * Represents the arrangement of parts as grid.
@@ -53,17 +52,17 @@ export class MTreeNode {
   public direction!: 'column' | 'row';
   public parent?: MTreeNode;
 
-  constructor(treeNode: Omit<MTreeNode, 'type'>) {
+  constructor(treeNode: Partial<Omit<MTreeNode, 'type'>>) {
     treeNode.parent && assertType(treeNode.parent, {toBeOneOf: MTreeNode}); // assert not to be an object literal
     assertType(treeNode.child1, {toBeOneOf: [MTreeNode, MPart]}); // assert not to be an object literal
     assertType(treeNode.child2, {toBeOneOf: [MTreeNode, MPart]}); // assert not to be an object literal
-    Object.assign(this, {...treeNode, nodeId: treeNode.nodeId ?? UUID.randomUUID()});
+    Object.assign(this, treeNode);
   }
 
   /**
    * Tests if the given object is a {@link MTreeNode}.
    */
-  public static isMTreeNode(object: any): boolean {
+  public static isMTreeNode(object: any): object is MTreeNode {
     return (object as MTreeNode).type === 'MTreeNode';
   }
 }
@@ -85,7 +84,7 @@ export class MPart {
   public parent?: MTreeNode;
   public views: MView[] = [];
   public activeViewId?: string;
-  public structural = false;
+  public structural!: boolean;
 
   constructor(part: Partial<Omit<MPart, 'type'>>) {
     Defined.orElseThrow(part.id, () => Error('MPart requires an id'));
@@ -96,7 +95,7 @@ export class MPart {
   /**
    * Tests if the given object is a {@link MPart}.
    */
-  public static isMPart(object: any): boolean {
+  public static isMPart(object: any): object is MPart {
     return (object as MPart).type === 'MPart';
   }
 }

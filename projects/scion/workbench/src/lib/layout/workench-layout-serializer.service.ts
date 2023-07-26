@@ -11,6 +11,7 @@
 import {Injectable} from '@angular/core';
 import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
 import {WorkbenchLayoutMigrator} from './migration/workbench-layout-migrator.service';
+import {UUID} from '@scion/toolkit/uuid';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -60,7 +61,7 @@ export class WorkbenchLayoutSerializer {
         return new MPart(value); // create a class object from the object literal
       }
       if (MTreeNode.isMTreeNode(value)) {
-        return new MTreeNode(value); // create a class object from the object literal
+        return new MTreeNode({...value, nodeId: value.nodeId ?? UUID.randomUUID()}); // create a class object from the object literal
       }
       return value;
     });

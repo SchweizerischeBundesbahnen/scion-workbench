@@ -100,7 +100,7 @@ export class ViewMoveHandler {
       const partId = UUID.randomUUID();
 
       return {
-        layout: this._workbenchLayoutFactory.create({mainGrid: {root: new MPart({id: partId}), activePartId: partId}})
+        layout: this._workbenchLayoutFactory.create({mainGrid: {root: new MPart({id: partId, structural: false}), activePartId: partId}})
           .addView(viewId, {partId, activateView: true, activatePart: true}),
         viewOutlets: layout.views()
           .map(view => view.id)

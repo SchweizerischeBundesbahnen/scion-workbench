@@ -12,12 +12,14 @@ import CustomMatcher = jasmine.CustomMatcher;
 import MatchersUtil = jasmine.MatchersUtil;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
+import objectContaining = jasmine.objectContaining;
+import ArrayContaining = jasmine.ArrayContaining;
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
 import {MPart, MPartGrid, MTreeNode} from '../../../layout/workbench-layout.model';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
-import {ExpectedWorkbenchLayout, partialMPart, toEqual} from './custom-matchers.definition';
+import {ExpectedWorkbenchLayout, toEqual} from './custom-matchers.definition';
 import {MAIN_AREA_PART_ID} from '../../../layout/workbench-layout';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {WORKBENCH_LAYOUT_INITIAL_PART_ID} from '../../../layout/workbench-layout-factory.service';
@@ -29,8 +31,8 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
   toEqualWorkbenchLayout: (util: MatchersUtil): CustomMatcher => {
     return {
       compare(actual: ɵWorkbenchLayout | ComponentFixture<WorkbenchLayoutComponent> | DebugElement, expected: ExpectedWorkbenchLayout, failOutput: string | undefined): CustomMatcherResult {
-        expected.peripheralGrid ??= {root: partialMPart({id: MAIN_AREA_PART_ID})};
-        expected.mainGrid ??= {root: partialMPart({id: TestBed.inject(WORKBENCH_LAYOUT_INITIAL_PART_ID)})};
+        expected.peripheralGrid ??= {root: new MPart({id: MAIN_AREA_PART_ID})};
+        expected.mainGrid ??= {root: new MPart({id: TestBed.inject(WORKBENCH_LAYOUT_INITIAL_PART_ID)})};
 
         try {
           assertWorkbenchLayout(expected, actual, util);
@@ -61,7 +63,7 @@ function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, actual: ɵWork
     const actualDebugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
     assertPartGridModel(expected.peripheralGrid!, actualDebugElement.componentInstance.layout.peripheralGrid, util);
     assertPartGridModel(expected.mainGrid!, actualDebugElement.componentInstance.layout.mainGrid, util);
-    assertGridElementDOM(expected.peripheralGrid!.root!, actualDebugElement.query(By.css('wb-grid-element')), expected);
+    assertGridElementDOM(expected.peripheralGrid!.root, actualDebugElement.query(By.css('wb-grid-element')), expected);
   }
   else {
     throw Error(`Expected testee to be of type 'ɵWorkbenchLayout' or 'DebugElement<WorkbenchLayoutComponent>' [actual=${actual.constructor.name}]`);
@@ -79,7 +81,7 @@ function assertPartGridModel(expectedLayout: Partial<MPartGrid>, actualLayout: M
 }
 
 /**
- * Performs a recursive assertion of the DOM representation starting with the expected grid element.
+ * Performs a recursive assertion of the DOM structure starting with the expected grid element.
  *
  * @see assertMTreeNodeDOM
  * @see assertMPartDOM
@@ -100,7 +102,7 @@ function assertGridElementDOM(expectedModelElement: Partial<MTreeNode | MPart>, 
 }
 
 /**
- * Performs a recursive assertion of the DOM representation starting with the expected tree node.
+ * Performs a recursive assertion of the DOM structure starting with the expected tree node.
  */
 function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualDom: DebugElement, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
   const nodeId = actualDom.attributes['data-nodeid'];
@@ -120,7 +122,7 @@ function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualDom: Deb
   }
   else {
     if (actualDom.query(By.css(`sci-sashbox[data-nodeid="${nodeId}"]`))) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element' not to contain a 'sci-sashbox' beause having a single visible child. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element' not to contain a 'sci-sashbox' because having a single visible child. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
     }
   }
 
@@ -144,19 +146,19 @@ function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualDom: Deb
 }
 
 /**
- * Performs a recursive assertion of the DOM representation starting with the expected part.
+ * Performs a recursive assertion of the DOM structure starting with the expected part.
  */
 function assertMPartDOM(expectedPart: Partial<MPart>, actualDom: DebugElement, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
   const partId = actualDom.attributes['data-partid'];
   if (partId !== expectedPart.id) {
-    throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute '[data-partid="${expectedPart}"]', but is '[data-partid="${partId}"]'. [MPart=${JSON.stringify(expectedPart)}]`);
+    throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute '[data-partid="${expectedPart.id}"]', but is '[data-partid="${partId}"]'. [MPart=${JSON.stringify(expectedPart)}]`);
   }
   else if (partId === MAIN_AREA_PART_ID) {
     const actualPartElement = actualDom.query(By.css(`wb-main-area-layout[data-partid="${partId}"]`));
     if (!actualPartElement) {
       throw Error(`[DOMAssertError]: Expected element 'wb-main-area-layout[data-partid="${partId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
-    assertGridElementDOM(expectedWorkbenchLayout.mainGrid!.root!, actualPartElement.query(By.css(`wb-main-area-layout[data-partid="${partId}"] > wb-grid-element`)), expectedWorkbenchLayout);
+    assertGridElementDOM(expectedWorkbenchLayout.mainGrid!.root, actualPartElement.query(By.css(`wb-main-area-layout[data-partid="${partId}"] > wb-grid-element`)), expectedWorkbenchLayout);
   }
   else {
     const actualPartElement = actualDom.query(By.css(`wb-part[data-partid="${partId}"]`));
@@ -174,14 +176,18 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualDom: DebugElement, e
 /**
  * Like {@link jasmine.ObjectContaining}, but applies {@link jasmine.ObjectContaining} recursively to all fields.
  */
-function objectContainingRecursive<T extends Record<string, any>>(object: T): ObjectContaining<T> {
-  const workingCopy = {...object} as Record<string, any>;
-  Object.entries(workingCopy).forEach(([key, value]) => {
-    if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
+function objectContainingRecursive<T>(object: T): ObjectContaining<T> | ArrayContaining<T> | T {
+  if (Array.isArray(object)) {
+    return jasmine.arrayContaining(object.map(objectContaining));
+  }
+  else if (typeof object === 'object' && object !== null) {
+    const workingCopy = {...object} as Record<string, any>;
+    Object.entries(workingCopy).forEach(([key, value]) => {
       workingCopy[key] = objectContainingRecursive(value);
-    }
-  });
-  return jasmine.objectContaining(workingCopy);
+    });
+    return jasmine.objectContaining<T>(workingCopy);
+  }
+  return object;
 }
 
 /**

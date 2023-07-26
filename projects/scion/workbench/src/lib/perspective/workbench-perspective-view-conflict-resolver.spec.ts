@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {expect, partialMPart, partialMTreeNode} from '../testing/jasmine/matcher/custom-matchers.definition';
+import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {By} from '@angular/platform-browser';
 import {TestComponent, withComponentContent} from '../testing/test.component';
@@ -20,6 +20,7 @@ import {styleFixture, waitForInitialWorkbenchLayout, waitForWorkbenchLayoutChang
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
+import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 
 describe('WorkbenchPerspectiveViewConflictResolver', () => {
 
@@ -68,12 +69,12 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
     // Expect view.1 in perspective-1 to be renamed to view.2
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
       peripheralGrid: {
-        root: partialMTreeNode({
-          child1: partialMPart({id: 'left', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: partialMPart({id: MAIN_AREA_PART_ID}),
+        root: new MTreeNode({
+          child1: new MPart({id: 'left', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
         }),
       },
     });
