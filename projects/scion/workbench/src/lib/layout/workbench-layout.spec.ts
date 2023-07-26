@@ -9,12 +9,12 @@
  */
 
 import {MPart, MTreeNode} from './workbench-layout.model';
-import {expect, partialMPart, partialMTreeNode} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchAccessor, ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {MAIN_AREA_PART_ID} from './workbench-layout';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
+import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 
 describe('WorkbenchLayout', () => {
 
@@ -34,16 +34,16 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child2: partialMPart({id: 'C'}),
-            child1: partialMPart({id: 'B'}),
+            child2: new MPart({id: 'C'}),
+            child1: new MPart({id: 'B'}),
           }),
-          child2: partialMPart({id: 'A'}),
+          child2: new MPart({id: 'A'}),
         }),
       },
     });
@@ -66,7 +66,7 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMPart({id: 'C'}),
+        root: new MPart({id: 'C'}),
       },
     });
   });
@@ -87,33 +87,33 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
-            child1: partialMPart({id: 'A'}),
-            child2: partialMTreeNode({
+            child1: new MPart({id: 'A'}),
+            child2: new MTreeNode({
               direction: 'row',
-              child1: partialMPart({id: 'B'}),
-              child2: partialMPart({id: 'C'}),
+              child1: new MPart({id: 'B'}),
+              child2: new MPart({id: 'C'}),
             }),
           }),
-          child2: partialMTreeNode({
+          child2: new MTreeNode({
             direction: 'column',
-            child1: partialMTreeNode({
+            child1: new MTreeNode({
               direction: 'row',
-              child1: partialMTreeNode({
+              child1: new MTreeNode({
                 direction: 'column',
-                child1: partialMPart({id: 'root'}),
-                child2: partialMPart({id: 'G'}),
+                child1: new MPart({id: 'root'}),
+                child2: new MPart({id: 'G'}),
               }),
-              child2: partialMTreeNode({
+              child2: new MTreeNode({
                 direction: 'column',
-                child1: partialMPart({id: 'E'}),
-                child2: partialMPart({id: 'F'}),
+                child1: new MPart({id: 'E'}),
+                child2: new MPart({id: 'F'}),
               }),
             }),
-            child2: partialMPart({id: 'D'}),
+            child2: new MPart({id: 'D'}),
           }),
         }),
       },
@@ -152,25 +152,25 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'row',
-            child1: partialMPart({id: 'B'}),
-            child2: partialMPart({id: 'C'}),
+            child1: new MPart({id: 'B'}),
+            child2: new MPart({id: 'C'}),
           }),
-          child2: partialMTreeNode({
+          child2: new MTreeNode({
             direction: 'column',
-            child1: partialMTreeNode({
+            child1: new MTreeNode({
               direction: 'row',
-              child1: partialMTreeNode({
+              child1: new MTreeNode({
                 direction: 'column',
-                child1: partialMPart({id: 'root'}),
-                child2: partialMPart({id: 'G'}),
+                child1: new MPart({id: 'root'}),
+                child2: new MPart({id: 'G'}),
               }),
-              child2: partialMPart({id: 'E'}),
+              child2: new MPart({id: 'E'}),
             }),
-            child2: partialMPart({id: 'D'}),
+            child2: new MPart({id: 'D'}),
           }),
         }),
       },
@@ -209,25 +209,25 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'row',
-            child1: partialMPart({id: 'B'}),
-            child2: partialMPart({id: 'C'}),
+            child1: new MPart({id: 'B'}),
+            child2: new MPart({id: 'C'}),
           }),
-          child2: partialMTreeNode({
+          child2: new MTreeNode({
             direction: 'column',
-            child1: partialMTreeNode({
+            child1: new MTreeNode({
               direction: 'row',
-              child1: partialMTreeNode({
+              child1: new MTreeNode({
                 direction: 'column',
-                child1: partialMPart({id: 'root'}),
-                child2: partialMPart({id: 'G'}),
+                child1: new MPart({id: 'root'}),
+                child2: new MPart({id: 'G'}),
               }),
-              child2: partialMPart({id: 'E'}),
+              child2: new MPart({id: 'E'}),
             }),
-            child2: partialMPart({id: 'D'}),
+            child2: new MPart({id: 'D'}),
           }),
         }),
       },
@@ -255,26 +255,26 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
-            child1: partialMPart({id: 'B'}),
-            child2: partialMPart({id: 'C'}),
+            child1: new MPart({id: 'B'}),
+            child2: new MPart({id: 'C'}),
           }),
-          child2: partialMTreeNode({
+          child2: new MTreeNode({
             direction: 'row',
             ratio: .5,
-            child1: partialMPart({id: 'A'}),
-            child2: partialMTreeNode({
+            child1: new MPart({id: 'A'}),
+            child2: new MTreeNode({
               direction: 'column',
               ratio: .75,
-              child1: partialMPart({id: 'X'}),
-              child2: partialMTreeNode({
+              child1: new MPart({id: 'X'}),
+              child2: new MTreeNode({
                 direction: 'column',
                 ratio: .75,
-                child1: partialMPart({id: 'Y'}),
-                child2: partialMPart({id: 'Z'}),
+                child1: new MPart({id: 'Y'}),
+                child2: new MPart({id: 'Z'}),
               }),
             }),
           }),
@@ -285,21 +285,21 @@ describe('WorkbenchLayout', () => {
     const modifiedLayout = workbenchLayout.removePart('Y');
     expect(modifiedLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
-            child1: partialMPart({id: 'B'}),
-            child2: partialMPart({id: 'C'}),
+            child1: new MPart({id: 'B'}),
+            child2: new MPart({id: 'C'}),
           }),
-          child2: partialMTreeNode({
+          child2: new MTreeNode({
             direction: 'row',
-            child1: partialMPart({id: 'A'}),
-            child2: partialMTreeNode({
+            child1: new MPart({id: 'A'}),
+            child2: new MTreeNode({
               direction: 'column',
               ratio: .75,
-              child1: partialMPart({id: 'X'}),
-              child2: partialMPart({id: 'Z'}),
+              child1: new MPart({id: 'X'}),
+              child2: new MPart({id: 'Z'}),
             }),
           }),
         }),
@@ -345,52 +345,52 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
-            child1: partialMPart({id: 'A'}),
-            child2: partialMTreeNode({
+            child1: new MPart({id: 'A'}),
+            child2: new MTreeNode({
               direction: 'row',
-              child1: partialMPart({id: 'B'}),
-              child2: partialMPart({id: 'C'}),
+              child1: new MPart({id: 'B'}),
+              child2: new MPart({id: 'C'}),
             }),
           }),
-          child2: partialMTreeNode({
+          child2: new MTreeNode({
             direction: 'column',
-            child1: partialMTreeNode({
+            child1: new MTreeNode({
               direction: 'row',
-              child1: partialMTreeNode({
+              child1: new MTreeNode({
                 direction: 'column',
-                child1: partialMPart({id: 'root'}),
-                child2: partialMPart({id: 'G'}),
+                child1: new MPart({id: 'root'}),
+                child2: new MPart({id: 'G'}),
               }),
-              child2: partialMTreeNode({
+              child2: new MTreeNode({
                 direction: 'column',
-                child1: partialMPart({id: 'E'}),
-                child2: partialMPart({id: 'F'}),
+                child1: new MPart({id: 'E'}),
+                child2: new MPart({id: 'F'}),
               }),
             }),
-            child2: partialMPart({id: 'D'}),
+            child2: new MPart({id: 'D'}),
           }),
         }),
       },
       peripheralGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'column',
-          child1: partialMPart({id: 'TOP'}),
-          child2: partialMTreeNode({
+          child1: new MPart({id: 'TOP'}),
+          child2: new MTreeNode({
             direction: 'row',
-            child1: partialMTreeNode({
+            child1: new MTreeNode({
               direction: 'column',
-              child1: partialMTreeNode({
+              child1: new MTreeNode({
                 direction: 'row',
-                child1: partialMPart({id: 'LEFT'}),
-                child2: partialMPart({id: MAIN_AREA_PART_ID}),
+                child1: new MPart({id: 'LEFT'}),
+                child2: new MPart({id: MAIN_AREA_PART_ID}),
               }),
-              child2: partialMPart({id: 'BOTTOM'}),
+              child2: new MPart({id: 'BOTTOM'}),
             }),
-            child2: partialMPart({id: 'RIGHT'}),
+            child2: new MPart({id: 'RIGHT'}),
           }),
         }),
       },
@@ -428,21 +428,21 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
       mainGrid: {
-        root: partialMTreeNode({
+        root: new MTreeNode({
           direction: 'row',
-          child1: partialMTreeNode({
+          child1: new MTreeNode({
             direction: 'column',
-            child1: partialMPart({id: 'A'}),
-            child2: partialMPart({id: 'C'}),
+            child1: new MPart({id: 'A'}),
+            child2: new MPart({id: 'C'}),
           }),
-          child2: partialMTreeNode({
+          child2: new MTreeNode({
             direction: 'row',
-            child1: partialMTreeNode({
+            child1: new MTreeNode({
               direction: 'column',
-              child1: partialMPart({id: 'root'}),
-              child2: partialMPart({id: 'G'}),
+              child1: new MPart({id: 'root'}),
+              child2: new MPart({id: 'G'}),
             }),
-            child2: partialMPart({id: 'F'}),
+            child2: new MPart({id: 'F'}),
           }),
         }),
       },
