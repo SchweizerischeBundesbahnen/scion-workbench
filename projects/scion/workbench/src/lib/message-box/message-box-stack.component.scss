@@ -3,6 +3,10 @@
   pointer-events: none;
   position: relative; // positioning context for the glasspane
 
+  &.view-drag {
+    display: none;
+  }
+
   > div.glasspane {
     pointer-events: auto;
 

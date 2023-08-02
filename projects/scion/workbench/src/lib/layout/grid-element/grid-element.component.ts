@@ -10,7 +10,6 @@
 
 import {Component, HostBinding, Input, OnChanges, SimpleChanges, TrackByFunction} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-layout.model';
-import {MAIN_AREA_PART_ID} from '../workbench-layout';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {InstanceofPipe} from '../../common/instanceof.pipe';
@@ -18,6 +17,7 @@ import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {NgFor, NgIf} from '@angular/common';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
+import {isGridElementVisible} from '../ɵworkbench-layout';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -86,14 +86,14 @@ export class GridElementComponent implements OnChanges {
   }
 
   private computeChildren(treeNode: MTreeNode): ChildElement[] {
-    if (isVisible(treeNode.child1) && isVisible(treeNode.child2)) {
+    if (isGridElementVisible(treeNode.child1) && isGridElementVisible(treeNode.child2)) {
       const [size1, size2] = calculateSashSizes(treeNode.ratio);
       return [
         {element: treeNode.child1, size: size1},
         {element: treeNode.child2, size: size2},
       ];
     }
-    return [{element: isVisible(treeNode.child1) ? treeNode.child1 : treeNode.child2}];
+    return [{element: isGridElementVisible(treeNode.child1) ? treeNode.child1 : treeNode.child2}];
   }
 
   /**
@@ -103,19 +103,6 @@ export class GridElementComponent implements OnChanges {
    * nodes when re-arranging parts. Using the index is like not using *ngFor at all.
    */
   public indexTrackByFn: TrackByFunction<ChildElement> = (index: number): number => index;
-}
-
-/**
- * Tests if the given element is visible.
- *
- * - A part is considered visible if it is the main area part or has at least one view.
- * - A node is considered visible if it has at least one visible part in its child hierarchy.
- */
-function isVisible(element: MTreeNode | MPart): boolean {
-  if (element instanceof MPart) {
-    return element.id === MAIN_AREA_PART_ID || element.views.length > 0;
-  }
-  return isVisible(element.child1) || isVisible(element.child2);
 }
 
 /**

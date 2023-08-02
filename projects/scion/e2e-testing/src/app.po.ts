@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, isPresent, waitUntilStable} from './helper/testing.util';
+import {coerceArray, fromRect, isPresent, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
@@ -31,6 +31,10 @@ export class AppPO {
    * Handle for interacting with the header of the testing application.
    */
   public readonly header = new AppHeaderPO(this.page.locator('app-header'));
+  /**
+   * Locates the 'wb-workbench' element.
+   */
+  public readonly workbenchLocator = this.page.locator('wb-workbench');
 
   constructor(public readonly page: Page) {
   }
@@ -240,6 +244,22 @@ export class AppPO {
    */
   public getCurrentNavigationId(): Promise<string | null> {
     return this.page.locator('app-root').getAttribute('data-navigationid');
+  }
+
+  /**
+   * Tests if specified drop zone is active, i.e., present in the DOM and armed for pointed events.
+   */
+  public async isDropZoneActive(target: {area: 'main-area' | 'peripheral-area'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<boolean> {
+    const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-${target.area}`);
+    return await isPresent(dropZoneLocator) && await dropZoneLocator.evaluate((element: HTMLElement) => getComputedStyle(element).pointerEvents) !== 'none';
+  }
+
+  /**
+   * Returns the bounding box of the specified drop zone.
+   */
+  public async getDropZoneBoundingBox(target: {area: 'main-area' | 'peripheral-area'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<DOMRect & {hcenter: number; vcenter: number}> {
+    const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-${target.area}`);
+    return fromRect(await dropZoneLocator.boundingBox());
   }
 }
 

@@ -9,6 +9,7 @@ import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service
 import {MPart} from '../layout/workbench-layout.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Defined} from '@scion/toolkit/util';
 
 /**
  * Updates the workbench layout when the user moves a view.
@@ -31,6 +32,8 @@ export class ViewMoveHandler {
     this._viewDragService.viewMove$
       .pipe(takeUntilDestroyed())
       .subscribe(async (event: ViewMoveEvent) => { // eslint-disable-line rxjs/no-async-subscribe
+        event.target.region ??= 'center';
+
         // Check if this app instance takes part in the view drag operation. If not, do nothing.
         if (event.source.appInstanceId !== appInstanceId && event.target.appInstanceId !== appInstanceId) {
           return;
@@ -39,7 +42,7 @@ export class ViewMoveHandler {
         const crossAppInstanceViewDrag = (event.source.appInstanceId !== event.target.appInstanceId);
 
         // Check if the user dropped the viewtab at the same location. If so, do nothing.
-        if (!crossAppInstanceViewDrag && event.source.partId === event.target.partId && event.target.region === 'center') {
+        if (!crossAppInstanceViewDrag && event.source.partId === event.target.elementId && event.target.region === 'center') {
           await this.activateView(event.source.viewId);
           return;
         }
@@ -70,24 +73,29 @@ export class ViewMoveHandler {
   }
 
   private async addView(event: ViewMoveEvent): Promise<void> {
-    const region = event.target.region || 'center';
+    const region = event.target.region;
     const addToNewPart = region !== 'center';
     const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
 
     await this._workbenchRouter.ɵnavigate(layout => {
       const newViewId = RouterUtils.isPrimaryRouteTarget(event.source.viewId) ? layout.computeNextViewId() : event.source.viewId;
       if (addToNewPart) {
-        const newPartId = event.target.newPartId || UUID.randomUUID();
+        const newPartId = event.target.newPart?.id ?? UUID.randomUUID();
         return {
           layout: layout
-            .addPart(newPartId, {relativeTo: event.target.partId!, align: coerceLayoutAlignment(region)}, {structural: false})
+            .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region!), ratio: event.target.newPart?.ratio}, {structural: false})
             .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true}),
           viewOutlets: {[newViewId]: commands},
         };
       }
       else {
         return {
-          layout: layout.addView(newViewId, {partId: event.target.partId!, position: event.target.insertionIndex, activateView: true, activatePart: true}),
+          layout: layout.addView(newViewId, {
+            partId: Defined.orElseThrow(event.target.elementId, () => Error(`[IllegalArgumentError] Target part mandatory for region 'center'.`)),
+            position: event.target.insertionIndex,
+            activateView: true,
+            activatePart: true,
+          }),
           viewOutlets: {[newViewId]: commands},
         };
       }
@@ -124,16 +132,17 @@ export class ViewMoveHandler {
   }
 
   private async moveView(event: ViewMoveEvent): Promise<void> {
-    const addToNewPart = (event.target.region || 'center') !== 'center';
+    const addToNewPart = event.target.region !== 'center';
     if (addToNewPart) {
-      const newPartId = event.target.newPartId || UUID.randomUUID();
+      const newPartId = event.target.newPart?.id ?? UUID.randomUUID();
       await this._workbenchRouter.ɵnavigate(layout => layout
-        .addPart(newPartId, {relativeTo: event.target.partId!, align: coerceLayoutAlignment(event.target.region!)}, {structural: false})
+        .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(event.target.region!), ratio: event.target.newPart?.ratio}, {structural: false})
         .moveView(event.source.viewId, newPartId, {activatePart: true, activateView: true}),
       );
     }
     else {
-      await this._workbenchRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, event.target.partId!, {
+      const targetPartId = Defined.orElseThrow(event.target.elementId, () => Error(`[IllegalArgumentError] Target part mandatory for region 'center'.`));
+      await this._workbenchRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, targetPartId, {
         position: event.target.insertionIndex,
         activateView: true,
         activatePart: true,
@@ -142,7 +151,7 @@ export class ViewMoveHandler {
   }
 }
 
-function coerceLayoutAlignment(region: 'north' | 'east' | 'south' | 'west' | 'center'): 'left' | 'right' | 'top' | 'bottom' {
+function coerceAlignProperty(region: 'north' | 'east' | 'south' | 'west' | 'center'): 'left' | 'right' | 'top' | 'bottom' {
   switch (region) {
     case 'west':
       return 'left';
@@ -153,6 +162,6 @@ function coerceLayoutAlignment(region: 'north' | 'east' | 'south' | 'west' | 'ce
     case 'south':
       return 'bottom';
     default:
-      throw Error(`[UnsupportedRegionError] Supported regions are: 'north', 'east', 'south' or 'west' [actual=${region}]`);
+      throw Error(`[UnsupportedRegionError] Supported regions are 'north', 'east', 'south' or 'west', but is '${region}'.`);
   }
 }

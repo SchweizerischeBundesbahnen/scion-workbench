@@ -192,9 +192,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -266,9 +266,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'west',
-        newPartId: 'WEST',
+        newPart: {id: 'WEST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -340,9 +340,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'north',
-        newPartId: 'NORTH',
+        newPart: {id: 'NORTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -414,9 +414,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'south',
-        newPartId: 'SOUTH',
+        newPart: {id: 'SOUTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -488,7 +488,7 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'center',
       },
     });
@@ -574,9 +574,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -609,7 +609,7 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'EAST',
+        elementId: 'EAST',
         region: 'center',
       },
     });
@@ -642,7 +642,7 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'EAST',
+        elementId: 'EAST',
         region: 'center',
       },
     });
@@ -713,9 +713,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST-1',
+        newPart: {id: 'EAST-1'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -746,9 +746,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST-2',
+        newPart: {id: 'EAST-2'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -820,9 +820,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -853,9 +853,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'west',
-        newPartId: 'WEST-2',
+        newPart: {id: 'WEST-2'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -927,9 +927,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -959,9 +959,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'north',
-        newPartId: 'NORTH',
+        newPart: {id: 'NORTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1033,9 +1033,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1065,9 +1065,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'south',
-        newPartId: 'SOUTH',
+        newPart: {id: 'SOUTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1157,9 +1157,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1192,9 +1192,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'EAST',
+        elementId: 'EAST',
         region: 'south',
-        newPartId: 'SOUTH-EAST',
+        newPart: {id: 'SOUTH-EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1231,8 +1231,8 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
-        newPartId: 'SOUTH-WEST',
+        elementId: 'main',
+        newPart: {id: 'SOUTH-WEST'},
         region: 'south',
       },
     });
@@ -1312,9 +1312,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'south',
-        newPartId: 'SOUTH',
+        newPart: {id: 'SOUTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1344,7 +1344,7 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'center',
       },
     });
@@ -1412,9 +1412,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1444,9 +1444,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'south',
-        newPartId: 'SOUTH',
+        newPart: {id: 'SOUTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1518,9 +1518,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'west',
-        newPartId: 'WEST',
+        newPart: {id: 'WEST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1550,9 +1550,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'south',
-        newPartId: 'SOUTH',
+        newPart: {id: 'SOUTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1742,9 +1742,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST-1',
+        newPart: {id: 'EAST-1'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1796,9 +1796,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'EAST-1',
+        elementId: 'EAST-1',
         region: 'east',
-        newPartId: 'EAST-2',
+        newPart: {id: 'EAST-2'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1864,9 +1864,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'west',
-        newPartId: 'WEST-1',
+        newPart: {id: 'WEST-1'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1910,9 +1910,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'WEST-1',
+        elementId: 'WEST-1',
         region: 'west',
-        newPartId: 'WEST-2',
+        newPart: {id: 'WEST-2'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -1956,9 +1956,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'north',
-        newPartId: 'NORTH-1',
+        newPart: {id: 'NORTH-1'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2109,9 +2109,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'right',
+        newPart: {id: 'right'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2140,9 +2140,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'right',
+        elementId: 'right',
         region: 'north',
-        newPartId: 'top-right',
+        newPart: {id: 'top-right'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2219,9 +2219,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2250,9 +2250,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'west',
-        newPartId: 'WEST-2',
+        newPart: {id: 'WEST-2'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2330,9 +2330,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST-1',
+        newPart: {id: 'EAST-1'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2362,9 +2362,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'EAST-1',
+        elementId: 'EAST-1',
         region: 'east',
-        newPartId: 'EAST-2',
+        newPart: {id: 'EAST-2'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2399,9 +2399,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'west',
-        newPartId: 'WEST-1',
+        newPart: {id: 'WEST-1'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2441,9 +2441,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'WEST-1',
+        elementId: 'WEST-1',
         region: 'west',
-        newPartId: 'WEST-2',
+        newPart: {id: 'WEST-2'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2483,9 +2483,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'north',
-        newPartId: 'NORTH-1',
+        newPart: {id: 'NORTH-1'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2619,9 +2619,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2650,9 +2650,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'EAST',
+        elementId: 'EAST',
         region: 'south',
-        newPartId: 'SOUTH',
+        newPart: {id: 'SOUTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2686,9 +2686,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'EAST',
+        elementId: 'EAST',
         region: 'north',
-        newPartId: 'NORTH',
+        newPart: {id: 'NORTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2765,9 +2765,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2796,9 +2796,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'EAST',
+        elementId: 'EAST',
         region: 'north',
-        newPartId: 'NORTH',
+        newPart: {id: 'NORTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2832,9 +2832,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'NORTH',
+        elementId: 'NORTH',
         region: 'south',
-        newPartId: 'SOUTH',
+        newPart: {id: 'SOUTH'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2905,9 +2905,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'east',
-        newPartId: 'EAST',
+        newPart: {id: 'EAST'},
       },
     });
     await waitForWorkbenchLayoutChange();
@@ -2935,9 +2935,9 @@ describe('WorkbenchLayout', () => {
       },
       target: {
         appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
-        partId: 'main',
+        elementId: 'main',
         region: 'west',
-        newPartId: 'WEST',
+        newPart: {id: 'WEST'},
       },
     });
     await waitForWorkbenchLayoutChange();

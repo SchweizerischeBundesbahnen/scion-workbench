@@ -10,7 +10,7 @@
 
 import {Component, HostBinding, inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
-import {IFRAME_HOST, VIEW_MODAL_MESSAGE_BOX_HOST} from './content-projection/view-container.reference';
+import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, VIEW_MODAL_MESSAGE_BOX_HOST} from './content-projection/view-container.reference';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchModuleConfig} from './workbench-module-config';
 import {ComponentType} from '@angular/cdk/portal';
@@ -49,6 +49,7 @@ export class WorkbenchComponent implements OnDestroy {
   private viewContainerReferences = {
     iframeHost: inject(IFRAME_HOST),
     viewModalMessageBoxHost: inject(VIEW_MODAL_MESSAGE_BOX_HOST),
+    viewDropPlaceholderHost: inject(VIEW_DROP_PLACEHOLDER_HOST),
   };
 
   /**
@@ -76,6 +77,11 @@ export class WorkbenchComponent implements OnDestroy {
   @ViewChild('view_modal_messagebox_host', {read: ViewContainerRef})
   protected set injectViewModalMessageBoxHost(vcr: ViewContainerRef) {
     vcr && this.viewContainerReferences.viewModalMessageBoxHost.set(vcr);
+  }
+
+  @ViewChild('view_drop_placeholder_host', {read: ViewContainerRef})
+  protected set injectViewDropPlaceholderHost(vcr: ViewContainerRef) {
+    vcr && this.viewContainerReferences.viewDropPlaceholderHost.set(vcr);
   }
 
   constructor(workbenchModuleConfig: WorkbenchModuleConfig,

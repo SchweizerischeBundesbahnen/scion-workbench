@@ -14,6 +14,11 @@ import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {GridElementComponent} from './grid-element/grid-element.component';
 import {NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ViewDragService} from '../view-dnd/view-drag.service';
+import {ɵWorkbenchService} from '../ɵworkbench.service';
+import {MPart, MTreeNode} from './workbench-layout.model';
+import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
+import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 
 /**
  * Renders the workbench layout.
@@ -51,17 +56,40 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   imports: [
     NgIf,
     GridElementComponent,
+    ViewDropZoneDirective,
+    RequiresDropZonePipe,
   ],
 })
 export class WorkbenchLayoutComponent {
 
   public layout: ɵWorkbenchLayout | undefined;
+  public root: MTreeNode | MPart | undefined;
 
-  constructor(workbenchLayoutService: WorkbenchLayoutService) {
+  constructor(workbenchLayoutService: WorkbenchLayoutService,
+              private _workbenchService: ɵWorkbenchService,
+              private _viewDragService: ViewDragService) {
     workbenchLayoutService.layout$
       .pipe(takeUntilDestroyed())
       .subscribe(layout => {
         this.layout = layout;
+        this.root = layout.maximized ? layout.mainGrid.root : layout.peripheralGrid.root;
       });
+  }
+
+  public onViewDrop(event: WbViewDropEvent): void {
+    this._viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: event.dragData.appInstanceId,
+        partId: event.dragData.partId,
+        viewId: event.dragData.viewId,
+        viewUrlSegments: event.dragData.viewUrlSegments,
+      },
+      target: {
+        appInstanceId: this._workbenchService.appInstanceId,
+        elementId: this.root instanceof MPart ? this.root.id : this.root!.nodeId,
+        region: event.dropRegion,
+        newPart: {ratio: .2},
+      },
+    });
   }
 }

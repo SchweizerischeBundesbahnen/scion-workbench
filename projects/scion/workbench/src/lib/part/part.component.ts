@@ -25,6 +25,7 @@ import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.
 import {ViewPortalPipe} from '../view/view-portal.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
 
 @Component({
   selector: 'wb-part',
@@ -40,6 +41,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     WorkbenchPortalOutletDirective,
     ViewPortalPipe,
     SciViewportComponent,
+    RequiresDropZonePipe,
   ],
 })
 export class PartComponent implements OnInit, OnDestroy {
@@ -50,6 +52,11 @@ export class PartComponent implements OnInit, OnDestroy {
   @HostBinding('attr.data-partid')
   public get partId(): string {
     return this.part.id;
+  }
+
+  @HostBinding('class.e2e-peripheral')
+  public get isPeripheral(): boolean {
+    return !this.part.isInMainArea;
   }
 
   @HostBinding('class.active')
@@ -80,7 +87,7 @@ export class PartComponent implements OnInit, OnDestroy {
   /**
    * Method invoked to move a view into this part.
    */
-  public onDrop(event: WbViewDropEvent): void {
+  public onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: event.dragData.appInstanceId,
@@ -90,7 +97,7 @@ export class PartComponent implements OnInit, OnDestroy {
       },
       target: {
         appInstanceId: this._workbenchService.appInstanceId,
-        partId: this.part.id,
+        elementId: this.part.id,
         region: event.dropRegion,
       },
     });
