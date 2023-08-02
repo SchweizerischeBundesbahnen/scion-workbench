@@ -212,6 +212,7 @@ export class PartBarComponent implements OnInit {
    */
   private onTabbarDragEnter(event: DragEvent): void {
     this._dragenter$.next();
+    this._viewDragService.notifyDragOverTabbar(true);
     this._dragData = this._viewDragService.viewDragData!;
 
     // Inject constrain function into the drag image renderer to snap the drag image to the tabbar when dragging near it.
@@ -238,6 +239,7 @@ export class PartBarComponent implements OnInit {
    */
   private onTabbarDragLeave(): void {
     this._dragleave$.next();
+    this._viewDragService.notifyDragOverTabbar(false);
 
     // Set the CSS class 'drag-leave' to indicate leaving the tabbar.
     setCssClass(this._host, 'drag-leave');
@@ -272,6 +274,7 @@ export class PartBarComponent implements OnInit {
    */
   private onTabbarDrop(): void {
     const dropIndex = this.dropTargetViewTab === 'end' ? undefined : this._viewTabs.indexOf(this.dropTargetViewTab!);
+    this._viewDragService.notifyDragOverTabbar(false);
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: this._dragData!.appInstanceId,
@@ -282,7 +285,7 @@ export class PartBarComponent implements OnInit {
       target: {
         appInstanceId: this._workbenchService.appInstanceId,
         insertionIndex: dropIndex,
-        partId: this._part.id,
+        elementId: this._part.id,
       },
     });
 
@@ -390,7 +393,7 @@ export class PartBarComponent implements OnInit {
     });
   }
 
-  private unsetDragState(options?: { unsetDragSource?: boolean }): void {
+  private unsetDragState(options?: {unsetDragSource?: boolean}): void {
     if (options?.unsetDragSource ?? true) {
       this.dragSourceViewTab = null;
     }

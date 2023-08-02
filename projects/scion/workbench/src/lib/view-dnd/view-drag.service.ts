@@ -9,7 +9,7 @@
  */
 
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
-import {EMPTY, fromEvent, merge, Observable, Observer, of, TeardownLogic, zip} from 'rxjs';
+import {BehaviorSubject, EMPTY, fromEvent, merge, Observable, Observer, of, TeardownLogic, zip} from 'rxjs';
 import {filter, map, take} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegment} from '@angular/router';
@@ -36,10 +36,10 @@ export class ViewDragService implements OnDestroy {
    * Reference to the view drag data of the ongoing view drag operation, if any, or `null` otherwise.
    */
   private _viewDragData: ViewDragData | null = null;
-
   private _viewDragStartBroadcastChannel = new WorkbenchBroadcastChannel<ViewDragData>('workbench/view/dragstart');
   private _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
   private _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
+  private _tabbarDragOver$ = new BehaviorSubject<boolean>(false);
 
   /**
    * Emits when the user starts dragging a viewtab. The event is received across app instances of the same origin.
@@ -56,6 +56,13 @@ export class ViewDragService implements OnDestroy {
    */
   public readonly viewMove$: Observable<ViewMoveEvent> = this._viewMoveBroadcastChannel.observe$;
 
+  /**
+   * Emits when the user is dragging a view over the tabbar of the current document.
+   *
+   * Upon subscription, emits the current state, and then each time the state changes. The observable never completes.
+   */
+  public readonly tabbarDragOver$: Observable<boolean> = this._tabbarDragOver$;
+
   constructor(private _zone: NgZone) {
     this.viewDragStart$
       .pipe(takeUntilDestroyed())
@@ -67,6 +74,15 @@ export class ViewDragService implements OnDestroy {
       .subscribe(() => {
         this._viewDragData = null;
       });
+  }
+
+  /**
+   * Invoke to inform when the user is dragging a view over the tabbar.
+   */
+  public notifyDragOverTabbar(dragOverTabbar: boolean): void {
+    if (this._tabbarDragOver$.value !== dragOverTabbar) {
+      this._tabbarDragOver$.next(dragOverTabbar);
+    }
   }
 
   /**
@@ -255,27 +271,45 @@ export interface ViewMoveEvent {
   };
   target: {
     /**
-     * Part to which to add the view. If using a {@link region} other than 'center', that part is used as a reference for creating a new part.
-     * Set the part to `null` if moving the view to a blank window.
+     * Part (or node) where (or relative to which) to add the view.
+     *
+     * Rules for different regions:
+     * - For region 'center', the 'elementId' is mandatory and must reference a part.
+     * - For regions 'north', 'south', 'east', or 'west', the 'elementId' can reference a part or node,
+     *   relative to which to align the view. If not set, the view is aligend relative to the root of
+     *   the entire layout.
+     *
+     * Note: Property is ignored when moving the view to a new window.
      */
-    partId: string | null;
+    elementId?: string;
     /**
-     * Identity of the new part to be created, if the region is either 'north', 'east', 'south', or 'west'.
-     * If not set, a UUID is generated.
-     */
-    newPartId?: string;
-    /**
-     * Region of the {@link partId part} where to add the view. If using a region other than 'center', creates a new part in that region.
+     * Region where to add the view. For regions 'north', 'south', 'east', or 'west', creates a new part in that region.
+     *
+     * Note: Property is ignored when moving the view to a new window. If not set, it defaults to 'center'.
      */
     region?: 'north' | 'east' | 'south' | 'west' | 'center';
     /**
-     * Tab index in the tabbar where to add the view tab. If not set, then the view tab is added as last view tab.
+     * Tab index in the tabbar where to add the view tab. If not set, the view tab is added as last view tab.
      */
     insertionIndex?: number;
     /**
-     * Identity of the window where to move the view to.
+     * Identifier of the target application, or 'new' to move the view to a new browser window.
      */
     appInstanceId: string | 'new';
+    /**
+     * Describes the part to be created if the region is 'north', 'east', 'south', or 'west'.
+     */
+    newPart?: {
+      /**
+       * Identity of the new part. If not set, assigns a UUID.
+       */
+      id?: string;
+      /**
+       * Proportional size of the part relative to the reference part.
+       * The ratio is the closed interval [0,1]. If not set, defaults to `0.5`.
+       */
+      ratio?: number;
+    };
   };
 }
 

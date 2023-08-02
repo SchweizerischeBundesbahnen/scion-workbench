@@ -452,7 +452,7 @@ describe('WorkbenchLayout', () => {
   it('should throw an error when referencing an unknown part', () => {
     expect(() => createMainAreaLayout('A')
       .addPart('B', {relativeTo: 'unknown-part-id', align: 'left'}),
-    ).toThrowError(/NullPartError/);
+    ).toThrowError(/NullElementError/);
   });
 
   it('should throw an error when trying to remove the main area part', () => {

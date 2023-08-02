@@ -22,7 +22,14 @@ export function createElement(tag: string, options: ElementCreateOptions): HTMLE
  */
 export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, styles: {[style: string]: any | null}): void {
   const target = coerceElement(element);
-  Object.keys(styles).forEach(key => target.style.setProperty(key, styles[key]));
+  Object.entries(styles).forEach(([name, value]) => {
+    if (value === null) {
+      target.style.removeProperty(name);
+    }
+    else {
+      target.style.setProperty(name, value);
+    }
+  });
 }
 
 /**

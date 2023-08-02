@@ -183,6 +183,8 @@ export class ɵWorkbenchView implements WorkbenchView {
   }
 
   public move(region: 'north' | 'south' | 'west' | 'east' | 'blank-window'): Promise<boolean> {
+    const moveToNewWindow = region === 'blank-window';
+
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: this._workbenchService.appInstanceId,
@@ -191,9 +193,9 @@ export class ɵWorkbenchView implements WorkbenchView {
         viewUrlSegments: this.urlSegments,
       },
       target: {
-        appInstanceId: region === 'blank-window' ? 'new' : this._workbenchService.appInstanceId,
-        partId: region === 'blank-window' ? null : this.part.id,
-        region: region === 'blank-window' ? 'center' : region,
+        appInstanceId: moveToNewWindow ? 'new' : this._workbenchService.appInstanceId,
+        elementId: moveToNewWindow ? undefined : this.part.id,
+        region: moveToNewWindow ? undefined : region,
       },
     });
     return Promise.resolve(true);

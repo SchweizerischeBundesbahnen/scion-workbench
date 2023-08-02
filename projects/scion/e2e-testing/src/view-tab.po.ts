@@ -38,6 +38,16 @@ export class ViewTabPO {
     await this._locator.click();
   }
 
+  /**
+   * Performs a mouse down on this view tab.
+   */
+  public async mousedown(): Promise<void> {
+    const bounds = fromRect(await this._locator.boundingBox());
+    const mouse = this._locator.page().mouse;
+    await mouse.move(bounds.hcenter, bounds.vcenter);
+    await mouse.down();
+  }
+
   public async close(): Promise<void> {
     await this._locator.hover();
     await this._locator.locator('.e2e-close').click();
@@ -79,7 +89,37 @@ export class ViewTabPO {
   }
 
   /**
-   * Drags this view tab to the specified part.
+   * Moves this view tab to the center of the specified area without releasing the mouse button.
+   */
+  public async moveToArea(area: 'main-area' | 'peripheral-area'): Promise<void> {
+    const mouse = this._locator.page().mouse;
+
+    // 1. Perform a "mousedown" on the view tab.
+    await this.mousedown();
+
+    // 2. Move the mouse pointer over the specified area.
+    const targetAreaLocator = this._locator.page().locator(area === 'main-area' ? 'wb-main-area-layout' : 'wb-workbench-layout');
+    const targetAreaBounds = fromRect(await targetAreaLocator.boundingBox());
+    await mouse.move(targetAreaBounds.hcenter, targetAreaBounds.vcenter, {steps: 1});
+  }
+
+  /**
+   * Moves this view tab to the center of the specified part without releasing the mouse button.
+   */
+  public async moveToPart(partId: string, options?: {steps?: number}): Promise<void> {
+    const mouse = this._locator.page().mouse;
+
+    // 1. Perform a "mousedown" on the view tab.
+    await this.mousedown();
+
+    // 2. Move the mouse pointer over the specified part.
+    const targetPartLocator = this._locator.page().locator(`wb-part[data-partid="${partId}"]`).locator('div.e2e-active-view');
+    const targetPartBounds = fromRect(await targetPartLocator.boundingBox());
+    await mouse.move(targetPartBounds.hcenter, targetPartBounds.vcenter, {steps: options?.steps ?? 1});
+  }
+
+  /**
+   * Drags this view tab to the specified region of a part.
    *
    * @param target - Specifies part and region where to drop this view tab.
    *        @property partId - Identifies the target part by its id; if not set, defaults to "this" part
@@ -89,45 +129,75 @@ export class ViewTabPO {
    *        @property performDrop - Controls whether to perform the drop; defaults to `true`.
    */
   public async dragToPart(target: {partId?: string; region: 'north' | 'east' | 'south' | 'west' | 'center'}, options?: {steps?: number; performDrop?: boolean}): Promise<void> {
+    const partId = target.partId ?? await this.part.getPartId();
+
     // We cannot use {@link Locator#dragTo} because the workbench dynamically inserts drop zones when dragging over the target part.
     // For this reason, we first perform a "mousedown" on the view tab, move the mouse to the specified region of the target part, and then perform a "mouseup".
+
+    // 1. Move the view tab over the specified part to activate the drop zones.
+    await this.moveToPart(partId, options);
+
+    // 2. Move the view tab over the drop zone.
+    const dropZoneLocator = this._locator.page().locator(`wb-part[data-partid="${partId}"]`).locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-part`);
+    await this.moveMouseToDropZone(dropZoneLocator, target.region);
+
+    // 3. Perform a "mouseup".
+    if (options?.performDrop ?? true) {
+      await this._locator.page().mouse.up();
+    }
+  }
+
+  /**
+   * Drags this view tab to the specified region of the specified area.
+   *
+   * @param target - Specifies area and region where to drop this view tab.
+   *        @property area - Identifies the target area
+   *        @property region - Specifies the region where to drop this view tab in the specified area
+   */
+  public async dragToArea(target: {area: 'main-area' | 'peripheral-area'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<void> {
+    // We cannot use {@link Locator#dragTo} because the workbench dynamically inserts drop zones when dragging over the target part.
+    // For this reason, we first perform a "mousedown" on the view tab, move the mouse to the specified region of the target part, and then perform a "mouseup".
+    // 1. Move the view tab over the specified area to activate the drop zones.
+    await this.moveToArea(target.area);
+
+    // 2. Move the view tab over the drop zone.
+    const dropZoneLocator = this._locator.page().locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-${target.area}`);
+    await this.moveMouseToDropZone(dropZoneLocator, target.region);
+
+    // 3. Perform a "mouseup".
+    await this._locator.page().mouse.up();
+  }
+
+  /**
+   * Moves the mouse pointer to the edge or center of the specified drop zone.
+   *
+   * @param dropZoneLocator - The drop zone element to move the mouse to.
+   * @param region - The region of the drop zone where the mouse should be moved.
+   *   - 'north': Moves the mouse to the bottom edge, just one pixel inside the drop zone
+   *   - 'south': Moves the mouse to the top edge, just one pixel inside the drop zone
+   *   - 'west': Moves the mouse to the right edge, just one pixel inside the drop zone
+   *   - 'east': Moves the mouse to the left edge, just one pixel inside the drop zone
+   *   - 'center': Moves the mouse to the center of the drop zone.
+   */
+  private async moveMouseToDropZone(dropZoneLocator: Locator, region: 'north' | 'east' | 'south' | 'west' | 'center'): Promise<void> {
+    const dropZoneBounds = fromRect(await dropZoneLocator.boundingBox());
     const mouse = this._locator.page().mouse;
-
-    // 1. Move the mouse cursor to the view tab.
-    const viewTabBounds = fromRect(await this._locator.boundingBox());
-    await mouse.move(viewTabBounds.hcenter, viewTabBounds.vcenter);
-
-    // 2. Perform a "mousedown" on the view tab.
-    await mouse.down();
-
-    // 3. Move the mouse cursor to the specified region of the target part, or "this" part if not specified.
-    const targetPartId = target.partId ?? await this.part.getPartId();
-    const targetPartLocator = this._locator.page().locator(`wb-part[data-partid="${targetPartId}"]`);
-    const targetPartDropZoneBounds = fromRect(await targetPartLocator.locator('[wbviewdropzone]').boundingBox()); /* ViewDropZoneDirective */
-
-    const steps = options?.steps ?? 2;
-    switch (target.region) {
+    switch (region) {
       case 'north':
-        await mouse.move(targetPartDropZoneBounds.hcenter, targetPartDropZoneBounds.top + 1, {steps});
+        await mouse.move(dropZoneBounds.hcenter, dropZoneBounds.bottom - 1, {steps: 1});
         break;
       case 'south':
-        await mouse.move(targetPartDropZoneBounds.hcenter, targetPartDropZoneBounds.bottom - 1, {steps});
+        await mouse.move(dropZoneBounds.hcenter, dropZoneBounds.top + 1, {steps: 1});
         break;
       case 'west':
-        await mouse.move(targetPartDropZoneBounds.left + 1, targetPartDropZoneBounds.vcenter, {steps});
+        await mouse.move(dropZoneBounds.right - 1, dropZoneBounds.vcenter, {steps: 1});
         break;
-      case 'east': {
-        await mouse.move(targetPartDropZoneBounds.right - 1, targetPartDropZoneBounds.vcenter, {steps});
+      case 'east':
+        await mouse.move(dropZoneBounds.left + 1, dropZoneBounds.vcenter, {steps: 1});
         break;
-      }
-      default:
-        await mouse.move(targetPartDropZoneBounds.hcenter, targetPartDropZoneBounds.vcenter, {steps});
+      case 'center':
+        await mouse.move(dropZoneBounds.hcenter, dropZoneBounds.vcenter, {steps: 1});
         break;
-    }
-
-    // 4. Perform a "mouseup".
-    if (options?.performDrop ?? true) {
-      await mouse.up();
     }
   }
 }

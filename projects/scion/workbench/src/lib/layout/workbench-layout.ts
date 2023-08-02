@@ -87,12 +87,12 @@ export interface WorkbenchLayout {
 }
 
 /**
- * Describes how to position and size a part relative to another part.
+ * Describes how to lay out a part relative to another part.
  */
 export interface ReferencePart {
   /**
    * Specifies the part which to use as the reference part to lay out the part.
-   * If not set, it is aligned relative to the overall workbench layout.
+   * If not set, the part will be aligned relative to the root of the workbench layout.
    */
   relativeTo?: string;
   /**

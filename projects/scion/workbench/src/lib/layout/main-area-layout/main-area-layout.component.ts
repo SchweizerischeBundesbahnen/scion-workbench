@@ -13,6 +13,10 @@ import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MPart, MTreeNode} from '../workbench-layout.model';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {GridElementComponent} from '../grid-element/grid-element.component';
+import {ɵWorkbenchService} from '../../ɵworkbench.service';
+import {ViewDragService} from '../../view-dnd/view-drag.service';
+import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
+import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 
 /**
  * Renders main area layout.
@@ -37,7 +41,11 @@ import {GridElementComponent} from '../grid-element/grid-element.component';
   templateUrl: './main-area-layout.component.html',
   styleUrls: ['./main-area-layout.component.scss'],
   standalone: true,
-  imports: [GridElementComponent],
+  imports: [
+    GridElementComponent,
+    ViewDropZoneDirective,
+    RequiresDropZonePipe,
+  ],
 })
 export class MainAreaLayoutComponent {
 
@@ -46,7 +54,10 @@ export class MainAreaLayoutComponent {
     return this._part.id;
   }
 
-  constructor(private _part: ɵWorkbenchPart, private _workbenchLayoutService: WorkbenchLayoutService) {
+  constructor(private _part: ɵWorkbenchPart,
+              private _workbenchService: ɵWorkbenchService,
+              private _workbenchLayoutService: WorkbenchLayoutService,
+              private _viewDragService: ViewDragService) {
   }
 
   /**
@@ -56,5 +67,22 @@ export class MainAreaLayoutComponent {
     // It is critical that both `WorkbenchLayoutComponent` and `MainAreaLayoutComponent` operate on the same layout,
     // so we do not subscribe to the layout but reference it directly.
     return this._workbenchLayoutService.layout!.mainGrid.root;
+  }
+
+  public onViewDrop(event: WbViewDropEvent): void {
+    this._viewDragService.dispatchViewMoveEvent({
+      source: {
+        appInstanceId: event.dragData.appInstanceId,
+        partId: event.dragData.partId,
+        viewId: event.dragData.viewId,
+        viewUrlSegments: event.dragData.viewUrlSegments,
+      },
+      target: {
+        appInstanceId: this._workbenchService.appInstanceId,
+        elementId: this.root instanceof MPart ? this.root.id : this.root.nodeId,
+        region: event.dropRegion,
+        newPart: {ratio: .2},
+      },
+    });
   }
 }

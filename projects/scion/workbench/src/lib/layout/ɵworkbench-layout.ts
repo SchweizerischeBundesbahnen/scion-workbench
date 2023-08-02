@@ -105,7 +105,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Returns parts contained in the specified scope, or parts in any scope if not specifying a search scope.
    *
    * @param find - Search constraints
-   *       @property scope - Limits the search to parts in the specified scope. If not specified, all scopes are searched.
+   *       @property scope - Limits the search scope. If not specified, all scopes are searched.
    * @return parts maching the filter criteria.
    */
   public parts(find?: {scope?: Scope}): readonly MPart[] {
@@ -119,7 +119,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *        @property by
    *          @property partId - If specified, searches the part of given identity.
    *          @property viewId - If specified, searches the part that contains given view.
-   *        @property scope - Limits the search to parts in the specified scope. If not specified, all scopes are searched.
+   *        @property scope - Limits the search scope. If not specified, all scopes are searched.
    * @param options - Search options
    *       @property orElse - If set, returns `null` instead of throwing an error if no part is found.
    * @return part maching the filter criteria.
@@ -158,7 +158,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *        @property structural - Specifies whether this is a structural part. A structural part is not removed
    *                               from the layout when removing its last view. If not set, defaults to `true`.
    */
-  public addPart(id: string, relativeTo: ReferencePart, options?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout {
+  public addPart(id: string, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout {
     return this.workingCopy().__addPart(id, relativeTo, options);
   }
 
@@ -189,7 +189,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Returns views contained in the specified scope, or views in any scope if not specifying a search scope.
    *
    * @param find - Search constraints
-   *       @property scope - Limits the search to views in the specified scope. If not specified, all scopes are searched.
+   *       @property scope - Limits the search scope. If not specified, all scopes are searched.
    * @return views maching the filter criteria.
    */
   public views(find?: {scope?: Scope}): readonly MView[] {
@@ -333,15 +333,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __addPart(id: string, relativeTo: ReferencePart, options?: {activate?: boolean; structural?: boolean}): this {
+  private __addPart(id: string, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): this {
     if (this.part({by: {partId: id}}, {orElse: null})) {
       throw Error(`[IllegalArgumentError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
     const newPart = new MPart({id, structural: options?.structural ?? true});
 
-    // Find the reference part, if any, or insert the new part beside the root.
-    const referenceElement = relativeTo.relativeTo ? this.part({by: {partId: relativeTo.relativeTo}}) : this.peripheralGrid.root;
+    // Find the reference element, if specified, or use the layout root as reference otherwise.
+    const referenceElement = relativeTo.relativeTo ? this.element({by: {id: relativeTo.relativeTo}}) : this.peripheralGrid.root;
     const addBefore = relativeTo.align === 'left' || relativeTo.align === 'top';
     const ratio = relativeTo.ratio ?? .5;
 
@@ -600,6 +600,30 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * Returns the element of given id. If not found, by default, throws an error unless setting the `orElseNull` option.
+   *
+   * @param find - Search constraints
+   *        @property by
+   *          @property id - Specifies the identity of the element.
+   *        @property scope - Limits the search scope. If not specified, all scopes are searched.
+   * @param options - Search options
+   *       @property orElse - If set, returns `null` instead of throwing an error if no element is found.
+   * @return part maching the filter criteria.
+   */
+  private element(find: {by: {id: string}; scope?: Scope}): MPart | MTreeNode;
+  private element(find: {by: {id: string}; scope?: Scope}, options: {orElse: null}): MPart | MTreeNode | null;
+  private element(find: {by: {id: string}; scope?: Scope}, options?: {orElse: null}): MPart | MTreeNode | null {
+    const element = this.findTreeElements((element: MTreeNode | MPart): element is MPart | MTreeNode => {
+      return element instanceof MPart ? element.id === find.by.id : element.nodeId === find.by.id;
+    }, {findFirst: true, scope: find.scope})[0];
+
+    if (!element && !options) {
+      throw Error(`[NullElementError] Element with id '${find.by.id}' not found in the layout.`);
+    }
+    return element ?? null;
+  }
+
+  /**
    * Returns the node of given id. If not found, throws an error.
    */
   private node(find: {by: {nodeId: string}}): MTreeNode {
@@ -616,7 +640,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param predicateFn - Predicate function to match.
    * @param options - Search options
    *        @property findFirst - If specified, stops traversing on first match. If not set, defaults to `false`.
-   *        @property scope - Limits the search to elements in the specified scope. If not specified, all scopes are searched.
+   *        @property scope - Limits the search scope. If not specified, all scopes are searched.
    */
   private findTreeElements<T extends MTreeNode | MPart>(predicateFn: (element: MTreeNode | MPart) => element is T, options?: {findFirst?: boolean; scope?: Scope}): T[] {
     const result: T[] = [];
@@ -729,4 +753,28 @@ interface Grids {
    * which is always present and common to all perspectives. The main area part embeds the main grid.
    */
   peripheral: ɵMPartGrid;
+}
+
+/**
+ * Tests if the given {@link MTreeNode} or {@link MPart} is visible.
+ *
+ * - A part is considered visible if it is the main area part or has at least one view.
+ * - A node is considered visible if it has at least one visible part in its child hierarchy.
+ */
+export function isGridElementVisible(element: MTreeNode | MPart): boolean {
+  if (element instanceof MPart) {
+    return element.id === MAIN_AREA_PART_ID || element.views.length > 0;
+  }
+  return isGridElementVisible(element.child1) || isGridElementVisible(element.child2);
+}
+
+/**
+ * Describes how to lay out a part relative to another part or node.
+ */
+export interface ReferenceElement extends ReferencePart {
+  /**
+   * Specifies the part or node which to use as the reference element to lay out the part.
+   * If not set, the part will be aligned relative to the root of the workbench layout.
+   */
+  relativeTo?: string;
 }

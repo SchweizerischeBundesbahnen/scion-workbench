@@ -28,6 +28,7 @@ import {ContentProjectionDirective} from '../content-projection/content-projecti
 import {MessageBoxStackComponent} from '../message-box/message-box-stack.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe} from '@angular/common';
+import {ViewDragService} from '../view-dnd/view-drag.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -83,10 +84,16 @@ export class ViewComponent implements OnDestroy {
     return this._view.blocked;
   }
 
+  @HostBinding('class.view-drag')
+  public get isViewDragActive(): boolean {
+    return this._viewDragService.viewDragData !== null;
+  }
+
   constructor(private _view: ɵWorkbenchView,
               private _logger: Logger,
               private _host: ElementRef<HTMLElement>,
               private _cd: ChangeDetectorRef,
+              private _viewDragService: ViewDragService,
               messageBoxService: MessageBoxService,
               viewContextMenuService: ViewMenuService,
               @Inject(VIEW_MODAL_MESSAGE_BOX_HOST) protected viewModalMessageBoxHostRef: ViewContainerReference) {

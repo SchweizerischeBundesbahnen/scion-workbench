@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,299 +8,234 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, ElementRef, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
-import {asapScheduler} from 'rxjs';
-import {createElement, ElementCreateOptions, setStyle} from '../common/dom.util';
+import {Directive, ElementRef, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
+import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-
-const DROP_REGION_MAX_SIZE = 150;
-const DROP_REGION_GAP = 20;
-const DROP_REGION_BGCOLOR = 'rgba(0, 0, 0, .1)';
-const NULL_BOUNDS: Bounds = null!;
+import {ViewDropPlaceholderRenderer} from './view-drop-placeholder-renderer.service';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
- * Adds a view drop zone to the host element allowing the view to be dropped either in the north,
- * east, south, west or in the center.
+ * Adds view drop zones to the host element, allowing views to be dropped either in the north, east, south, west or center.
  *
- * The drop zone is aligned with the target's bounds, thus requires the element to define a positioning context.
+ * The drop zones are aligned with the bounds of the host element, requiring the host to define a positioning context.
  * If not positioned, the element is changed to be positioned relative.
  */
 @Directive({selector: '[wbViewDropZone]', standalone: true})
 export class ViewDropZoneDirective implements OnInit {
 
-  private _host: HTMLElement;
-
-  private _dropZoneOverlay!: HTMLElement;
-  private _dropRegionElement1!: HTMLElement;
-  private _dropRegionElement2!: HTMLElement;
-
-  private _dropRegion: Region | null = null;
+  private readonly _host: HTMLElement;
 
   /**
-   * Specifies which drop regions to allow. If not specified, all regions are allowed.
+   * Specifies the regions where a drop zone should be installed. If not set, installs a drop zone in every region.
    */
-  @Input()
-  public wbViewDropZoneRegions?: Region[] | undefined;
+  @Input('wbViewDropZoneRegions') // eslint-disable-line @angular-eslint/no-input-rename
+  public regions?: DropZoneRegion;
+
+  /**
+   * Specifies CSS class(es) to be associated with the drop zone.
+   */
+  @Input('wbViewDropZoneCssClass') // eslint-disable-line @angular-eslint/no-input-rename
+  public cssClass?: string | string[] | undefined;
+
+  /**
+   * Specifies the size of the drop zone, either as percentage value [0,1] or absolute pixel value.
+   */
+  @Input({alias: 'wbViewDropZoneSize', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
+  public dropZoneSize = .5;
+
+  /**
+   * Specifies the size of the visual placeholder when dragging a view over a drop zone.
+   * Can be a percentage value [0,1] or absolute pixel value. If not set, defaults to {@link dropZoneSize}.
+   */
+  @Input('wbViewDropZonePlaceholderSize') // eslint-disable-line @angular-eslint/no-input-rename
+  public dropPlaceholderSize?: number | undefined;
 
   /**
    * Emits upon a view drop action.
    */
-  @Output()
-  public wbViewDropZoneDrop = new EventEmitter<WbViewDropEvent>();
+  @Output('wbViewDropZoneDrop') // eslint-disable-line @angular-eslint/no-output-rename
+  public viewDrop = new EventEmitter<WbViewDropEvent>();
 
   constructor(host: ElementRef<HTMLElement>,
               private _viewDragService: ViewDragService,
-              private _destroyRef: DestroyRef,
+              private _viewDropPlaceholderRenderer: ViewDropPlaceholderRenderer,
               private _zone: NgZone) {
     this._host = host.nativeElement;
-
-    // Ensure the host element to define a positioning context (after element creation)
-    asapScheduler.schedule(() => ensureHostElementPositioned(this._host));
+    this.installDropZones();
   }
 
   public ngOnInit(): void {
-    this.createDropZoneOverlay();
-    this.installDragListeners();
+    this.ensureHostElementPositioned();
   }
 
-  private onDragOver(event: DragEvent): void {
-    NgZone.assertNotInAngularZone();
+  /**
+   * Installs a drop zone for each specified region.
+   *
+   * - DOM elements for drop zones are created lazily when dragging a view over the host element.
+   * - When dragging a view over a drop zone, renders the drop placeholder using the {@link ViewDropPlaceholderRenderer}.
+   */
+  private installDropZones(): void {
+    const disposables = new Array<DisposeFn>();
 
-    const dropRegion = this.computeDropRegion(event);
-    if (dropRegion === undefined) {
-      this.renderDropRegions(NULL_BOUNDS, NULL_BOUNDS);
-      return;
-    }
-
-    event.preventDefault(); // allow view drop
-    if (dropRegion === this._dropRegion) {
-      return; // drop region did not change
-    }
-
-    switch (this._dropRegion = dropRegion) {
-      case 'north': {
-        this.renderDropRegions(
-          {
-            top: '0', right: '0', bottom: `calc(50% + ${DROP_REGION_GAP}px)`, left: '0',
-            background: DROP_REGION_BGCOLOR,
-          },
-          {
-            top: `calc(50% + ${DROP_REGION_GAP}px)`, right: '0', bottom: '0', left: '0',
-            background: null,
-          });
-        break;
-      }
-      case 'east': {
-        this.renderDropRegions(
-          {
-            top: '0', right: '0', bottom: '0', left: `calc(50% + ${DROP_REGION_GAP}px)`,
-            background: DROP_REGION_BGCOLOR,
-          },
-          {
-            top: '0', right: `calc(50% + ${DROP_REGION_GAP}px)`, bottom: '0', left: '0',
-            background: null,
-          });
-        break;
-      }
-      case 'south': {
-        this.renderDropRegions(
-          {
-            top: `calc(50% + ${DROP_REGION_GAP}px)`, right: '0', bottom: '0', left: '0',
-            background: DROP_REGION_BGCOLOR,
-          },
-          {
-            top: '0', right: '0', bottom: `calc(50% + ${DROP_REGION_GAP}px)`, left: '0',
-            background: null,
-          });
-        break;
-      }
-      case 'west': {
-        this.renderDropRegions(
-          {
-            top: '0', right: `calc(50% + ${DROP_REGION_GAP}px)`, bottom: '0', left: '0',
-            background: DROP_REGION_BGCOLOR,
-          },
-          {
-            top: '0', right: '0', bottom: '0', left: `calc(50% + ${DROP_REGION_GAP}px)`,
-            background: null,
-          });
-        break;
-      }
-      default: {
-        this.renderDropRegions(
-          {
-            top: '0', right: '0', bottom: '0', left: '0', background: DROP_REGION_BGCOLOR,
-          },
-          NULL_BOUNDS,
-        );
-        break;
-      }
-    }
-  }
-
-  private onDragLeave(): void {
-    this._dropRegion = null;
-    this.renderDropRegions(NULL_BOUNDS, NULL_BOUNDS);
-  }
-
-  private onDrop(event: DragEvent): void {
-    const dropEvent: WbViewDropEvent = {
-      dropRegion: this._dropRegion!,
-      dragData: this._viewDragService.viewDragData!,
-      sourceEvent: event,
-    };
-
-    this._dropRegion = null;
-    this.renderDropRegions(NULL_BOUNDS, NULL_BOUNDS);
-
-    this._zone.run(() => this.wbViewDropZoneDrop.emit(dropEvent));
-  }
-
-  private activateDropZone(): void {
-    setStyle(this._dropZoneOverlay, {display: 'block'});
-  }
-
-  private deactivateDropZone(): void {
-    setStyle(this._dropZoneOverlay, {display: 'none'});
-  }
-
-  private installDragListeners(): void {
-    // Activate the drop zone in `dragstart` (and not in `dragenter`) to have it installed on `dragenter`.
-    // Otherwise, when quickly dragging a tab out of the tabbar, activating the "next" view might destroy the
-    // related event target of `dragenter` (since it refers to an element of the view that is being deactivated)
-    // and thus corrupt the drag operation.
-    this._viewDragService.viewDragStart$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(() => this.activateDropZone());
-
-    this._viewDragService.viewDragEnd$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(() => this.deactivateDropZone());
-
-    this._viewDragService.viewDrag$(this._dropZoneOverlay)
+    // Create drop zones when entering the host element.
+    this._viewDragService.viewDrag$(this._host, {eventType: 'dragenter'})
       .pipe(
         subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
-      .subscribe((event: DragEvent) => {
-        switch (event.type) {
-          case 'dragover':
-            this.onDragOver(event);
-            break;
-          case 'dragleave':
-            this.onDragLeave();
-            break;
-          case 'drop':
-            this.onDrop(event);
-            break;
+      .subscribe(() => {
+        if (!this.regions || this.regions.center) {
+          disposables.push(...this.createDropZone('center'));
         }
+        if (!this.regions || this.regions.north) {
+          disposables.push(...this.createDropZone('north'));
+        }
+        if (!this.regions || this.regions.south) {
+          disposables.push(...this.createDropZone('south'));
+        }
+        if (!this.regions || this.regions.west) {
+          disposables.push(...this.createDropZone('west'));
+        }
+        if (!this.regions || this.regions.east) {
+          disposables.push(...this.createDropZone('east'));
+        }
+      });
+
+    // Dispose drop zones when leaving the host element, or when the drag operation completes.
+    this._viewDragService.viewDrag$(this._host, {eventType: ['dragleave', 'drop']})
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        disposables.forEach(disposeFn => disposeFn());
+        disposables.length = 0;
       });
   }
 
-  private createDropZoneOverlay(): void {
-    // Create drop zone as an overlay to avoid flickering when dragging over child elements.
-    this._dropZoneOverlay = createElement('div', {
+  /**
+   * Creates the drop zone for the specified region.
+   */
+  private createDropZone(region: 'north' | 'east' | 'south' | 'west' | 'center'): DisposeFn[] {
+    const dropZoneInset = this.calculateInset(region, this.dropZoneSize);
+    const dropPlaceholderInset = this.calculateInset(region, this.dropPlaceholderSize ?? this.dropZoneSize);
+    const dispose$ = new Subject<void>();
+
+    // Create the drop zone HTML element.
+    const dropZoneElement = createElement('div', {
       parent: this._host,
-      cssClass: 'wb-view-drop-zone',
+      cssClass: ['e2e-view-drop-zone', `e2e-${region}`, ...Arrays.coerce(this.cssClass)],
       style: {
-        'position': 'absolute',
-        'display': 'none',
-        'pointer-events': 'auto',
-        'user-select': 'none',
-        'top': '0',
-        'right': '0',
-        'bottom': '0',
-        'left': '0',
+        position: 'absolute',
+        top: `${dropZoneInset.top}px`,
+        right: `${dropZoneInset.right}px`,
+        bottom: `${dropZoneInset.bottom}px`,
+        left: `${dropZoneInset.left}px`,
       },
     });
 
-    // Create the two drop regions which are moved depending on the computed region.
-    const dropRegionOptions: ElementCreateOptions = {
-      parent: this._dropZoneOverlay,
-      cssClass: 'wb-view-drop-region',
-      style: {
-        'position': 'absolute',
-        'display': 'none',
-        'pointer-events': 'none',
-        'user-select': 'none',
-        'border': '1px dashed rgba(0, 0, 0, 1)',
-        'margin': '1px',
-        'transition-duration': '125ms',
-        'transition-property': 'top,right,bottom,left',
-        'transition-timing-function': 'ease-out',
-      },
-    };
-    this._dropRegionElement1 = createElement('section', dropRegionOptions);
-    this._dropRegionElement2 = createElement('section', dropRegionOptions);
-  }
-
-  private renderDropRegions(region1: Bounds, region2: Bounds): void {
-    this.renderDropRegion(this._dropRegionElement1, region1);
-    this.renderDropRegion(this._dropRegionElement2, region2);
-  }
-
-  private renderDropRegion(element: HTMLElement, bounds: Bounds): void {
-    if (bounds === NULL_BOUNDS) {
-      setStyle(element, {display: 'none'});
-    }
-    else {
-      setStyle(element, {
-        ...bounds,
-        display: null,
+    // Install drag listener to render the drop placeholder and handle drop.
+    this._viewDragService.viewDrag$(dropZoneElement, {eventType: ['dragenter', 'dragover', 'drop']})
+      .pipe(
+        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        takeUntil(dispose$),
+      )
+      .subscribe((event: DragEvent) => {
+        switch (event.type) {
+          case 'dragenter':
+            this._viewDropPlaceholderRenderer.updatePosition(this._host, dropPlaceholderInset);
+            break;
+          case 'dragover':
+            event.preventDefault(); // allow view drop
+            break;
+          case 'drop':
+            this._zone.run(() => this.viewDrop.emit({
+              dropRegion: region,
+              dragData: this._viewDragService.viewDragData!,
+            }));
+            break;
+        }
       });
-    }
+
+    // Disable the drop zone when dragging over the tab bar, allowing the user to change the tab order even for tabs covered by the drop zone.
+    this._viewDragService.tabbarDragOver$
+      .pipe(
+        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        takeUntil(dispose$),
+      )
+      .subscribe(dragOverTabbar => {
+        if (dragOverTabbar) {
+          setStyle(dropZoneElement, {'pointer-events': 'none'});
+        }
+        else {
+          setStyle(dropZoneElement, {'pointer-events': null});
+        }
+      });
+
+    return [
+      () => dispose$.next(),
+      () => dropZoneElement.remove(),
+    ];
   }
 
-  private computeDropRegion(event: DragEvent): Region | undefined {
-    const horizontalDropZoneWidth = Math.min(DROP_REGION_MAX_SIZE, this._host.clientWidth / 3);
-    const verticalDropZoneHeight = Math.min(DROP_REGION_MAX_SIZE, this._host.clientHeight / 3);
-    const offsetX = event.pageX - this._host.getBoundingClientRect().left;
-    const offsetY = event.pageY - this._host.getBoundingClientRect().top;
-
-    if (this.supportsRegion('west') && offsetX < horizontalDropZoneWidth) {
-      return 'west';
-    }
-    if (this.supportsRegion('east') && offsetX > this._host.clientWidth - horizontalDropZoneWidth) {
-      return 'east';
-    }
-    if (this.supportsRegion('north') && offsetY < verticalDropZoneHeight) {
-      return 'north';
-    }
-    if (this.supportsRegion('south') && offsetY > this._host.clientHeight - verticalDropZoneHeight) {
-      return 'south';
-    }
-    if (this.supportsRegion('center')) {
-      return 'center';
-    }
-
-    return undefined;
+  /**
+   * Calculates the inset for the drop region based on the given size.
+   *
+   * If passing a ratio [0,1] for the size, the size is interpreted as a percentage value relative to the size of the host element.
+   */
+  private calculateInset(region: 'north' | 'east' | 'south' | 'west' | 'center', size: number): Inset {
+    return {
+      top: region === 'south' ? this._host.clientHeight - coercePixelValue(size, {containerSize: this._host.clientHeight}) : 0,
+      right: region === 'west' ? this._host.clientWidth - coercePixelValue(size, {containerSize: this._host.clientWidth}) : 0,
+      bottom: region === 'north' ? this._host.clientHeight - coercePixelValue(size, {containerSize: this._host.clientHeight}) : 0,
+      left: region === 'east' ? this._host.clientWidth - coercePixelValue(size, {containerSize: this._host.clientWidth}) : 0,
+    };
   }
 
-  private supportsRegion(region: Region): boolean {
-    return !this.wbViewDropZoneRegions || this.wbViewDropZoneRegions.includes(region);
+  private ensureHostElementPositioned(): void {
+    if (getComputedStyle(this._host).position === 'static') {
+      setStyle(this._host, {'position': 'relative'});
+    }
   }
 }
 
-function ensureHostElementPositioned(element: HTMLElement): void {
-  if (getComputedStyle(element).position === 'static') {
-    element.style.position = 'relative';
-  }
+/**
+ * Coerces given value to a CSS pixel value.
+ *
+ * If passing a ratio [0,1], it is interpreted as a percentage value relative to the size of the container.
+ */
+function coercePixelValue(pixelOrRatio: number, options: {containerSize: number}): number {
+  return (pixelOrRatio <= 1) ? options.containerSize * pixelOrRatio : pixelOrRatio;
 }
 
-interface Bounds {
-  top: string;
-  right: string;
-  bottom: string;
-  left: string;
-  background: string | null;
-}
-
+/**
+ * Event that is emitted when dropping a view.
+ */
 export interface WbViewDropEvent {
-  sourceEvent: DragEvent;
-  dropRegion: Region;
+  dropRegion: 'north' | 'east' | 'south' | 'west' | 'center';
   dragData: ViewDragData;
 }
 
-export type Region = 'north' | 'east' | 'south' | 'west' | 'center';
+/**
+ * Specifies the regions where a drop zone should be installed.
+ */
+export interface DropZoneRegion {
+  north: boolean;
+  south: boolean;
+  west: boolean;
+  east: boolean;
+  center: boolean;
+}
+
+/**
+ * Distance between an element and the parent element.
+ */
+interface Inset {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+type DisposeFn = () => void;

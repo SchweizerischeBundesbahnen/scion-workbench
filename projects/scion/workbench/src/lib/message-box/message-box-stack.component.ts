@@ -9,13 +9,14 @@
  */
 
 import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostBinding} from '@angular/core';
 import {MessageBoxService} from './message-box.service';
 import {ɵMessageBox} from './ɵmessage-box';
 import {Observable} from 'rxjs';
 import {AsyncPipe, NgClass, NgFor} from '@angular/common';
 import {MessageBoxComponent} from './message-box.component';
 import {MessageBoxCssClassesPipe} from './message-box-css-classes.pipe';
+import {ViewDragService} from '../view-dnd/view-drag.service';
 
 /**
  * Stacks message boxes of the current context. Does not include message boxes of parent contexts.
@@ -42,7 +43,12 @@ export class MessageBoxStackComponent {
 
   public messageBoxes$: Observable<ɵMessageBox[]>;
 
-  constructor(messageBoxService: MessageBoxService) {
+  @HostBinding('class.view-drag')
+  public get isViewDragActive(): boolean {
+    return this._viewDragService.viewDragData !== null;
+  }
+
+  constructor(messageBoxService: MessageBoxService, private _viewDragService: ViewDragService,) {
     this.messageBoxes$ = messageBoxService.messageBoxes$({includeParents: false});
   }
 

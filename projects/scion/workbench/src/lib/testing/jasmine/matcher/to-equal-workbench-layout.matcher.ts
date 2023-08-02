@@ -18,7 +18,7 @@ import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
 import {MPart, MPartGrid, MTreeNode} from '../../../layout/workbench-layout.model';
-import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
+import {isGridElementVisible, ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
 import {ExpectedWorkbenchLayout, toEqual} from './custom-matchers.definition';
 import {MAIN_AREA_PART_ID} from '../../../layout/workbench-layout';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
@@ -110,8 +110,8 @@ function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualDom: Deb
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
   }
 
-  const child1Visible = isVisible(expectedTreeNode.child1!);
-  const child2Visible = isVisible(expectedTreeNode.child2!);
+  const child1Visible = isGridElementVisible(expectedTreeNode.child1!);
+  const child2Visible = isGridElementVisible(expectedTreeNode.child2!);
 
   // Assert sashbox.
   if (child1Visible && child2Visible) {
@@ -188,14 +188,4 @@ function objectContainingRecursive<T>(object: T): ObjectContaining<T> | ArrayCon
     return jasmine.objectContaining<T>(workingCopy);
   }
   return object;
-}
-
-/**
- * Computes the visibility of given element.
- */
-function isVisible(element: MTreeNode | MPart): boolean {
-  if (element.type === 'MPart') {
-    return element.id === MAIN_AREA_PART_ID || element.views.length > 0;
-  }
-  return isVisible(element.child1) || isVisible(element.child2);
 }

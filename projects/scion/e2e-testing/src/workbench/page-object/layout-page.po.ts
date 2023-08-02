@@ -45,7 +45,7 @@ export class LayoutPagePO {
     await new SciCheckboxPO(locator.locator('section.e2e-part').locator('sci-checkbox.e2e-activate')).toggle(options?.activate ?? false);
     await locator.locator('section.e2e-reference-part').locator('input.e2e-part-id').fill(relativeTo.relativeTo ?? '');
     await locator.locator('section.e2e-reference-part').locator('select.e2e-align').selectOption(relativeTo.align);
-    await locator.locator('section.e2e-reference-part').locator('input.e2e-ratio').fill(`${relativeTo.ratio}`);
+    await locator.locator('section.e2e-reference-part').locator('input.e2e-ratio').fill(relativeTo.ratio ? `${relativeTo.ratio}` : '');
     await locator.locator('button.e2e-navigate').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.

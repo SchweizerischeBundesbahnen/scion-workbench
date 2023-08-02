@@ -1,1 +1,15 @@
-<wb-grid-element *ngIf="layout" [element]="layout.maximized ? layout.mainGrid.root : layout.peripheralGrid.root"></wb-grid-element>
+<wb-grid-element *ngIf="root"
+                 [element]="root"
+                 wbViewDropZone
+                 [wbViewDropZoneSize]="50"
+                 [wbViewDropZonePlaceholderSize]="50"
+                 [wbViewDropZoneRegions]="{
+                   north: false,
+                   south: root | wbRequiresDropZone:'south',
+                   west: root | wbRequiresDropZone:'west',
+                   east: root | wbRequiresDropZone:'east',
+                   center: false,
+                 }"
+                 [wbViewDropZoneCssClass]="'e2e-peripheral-area'"
+                 (wbViewDropZoneDrop)="onViewDrop($event)">
+</wb-grid-element>
