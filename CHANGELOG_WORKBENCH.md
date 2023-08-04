@@ -1,3 +1,17 @@
+# [16.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.1...16.0.0-beta.2) (2023-08-04)
+
+
+### Bug Fixes
+
+* **workbench:** allow re-mounting of the workbench component ([6fdc142](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/6fdc142c0d9aa51423be1b6636f03e8e336e5e52)), closes [#250](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/250)
+
+
+### Features
+
+* **workbench:** enable users to drag views to the side of the main or peripheral area ([5ea3fc9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5ea3fc9e7281dce0075ba021714e59b63cfe197a)), closes [#444](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/444)
+
+
+
 # [16.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/15.0.0-beta.8...16.0.0-beta.1) (2023-06-08)
 
 
