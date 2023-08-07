@@ -44,7 +44,7 @@ export class UnregisterWorkbenchCapabilityPagePO {
     const errorLocator = this._locator.locator('output.e2e-unregister-error');
     return Promise.race([
       responseLocator.waitFor({state: 'attached'}),
-      rejectWhenAttached(errorLocator)
+      rejectWhenAttached(errorLocator),
     ]);
   }
 

@@ -130,7 +130,7 @@ export class PopupPagePO {
     }
   }
 
-  public async clickClose(options?: { returnValue?: string; closeWithError?: boolean }): Promise<void> {
+  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
     if (options?.returnValue !== undefined) {
       await this.enterReturnValue(options.returnValue);
     }

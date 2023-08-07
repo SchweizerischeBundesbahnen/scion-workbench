@@ -4,7 +4,7 @@
     "outDir": "../../../out-tsc/workbench-client.spec",
     "types": [
       "jasmine"
-    ],
+    ]
   },
   "files": [
     "src/test.ts"

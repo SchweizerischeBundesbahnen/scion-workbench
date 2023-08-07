@@ -102,7 +102,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       .catch(error => this.registerError = stringifyError(error));
   }
 
-  private readViewCapabilityFromUI(): WorkbenchViewCapability & { properties: { pinToStartPage: boolean } } {
+  private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToStartPage: boolean}} {
     const requiredParams: ViewParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ViewParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     const transientParams: ViewParamDefinition[] = this.form.controls.transientParams.value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
@@ -126,7 +126,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     };
   }
 
-  private readPopupCapabilityFromUI(): WorkbenchPopupCapability & { properties: { pinToStartPage: boolean } } {
+  private readPopupCapabilityFromUI(): WorkbenchPopupCapability & {properties: {pinToStartPage: boolean}} {
     const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     return {

@@ -48,7 +48,7 @@ export class MessageBoxStackComponent {
     return this._viewDragService.viewDragData !== null;
   }
 
-  constructor(messageBoxService: MessageBoxService, private _viewDragService: ViewDragService,) {
+  constructor(messageBoxService: MessageBoxService, private _viewDragService: ViewDragService) {
     this.messageBoxes$ = messageBoxService.messageBoxes$({includeParents: false});
   }
 
