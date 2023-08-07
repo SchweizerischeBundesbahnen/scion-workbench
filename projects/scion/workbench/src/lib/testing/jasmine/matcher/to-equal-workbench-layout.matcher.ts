@@ -12,8 +12,6 @@ import CustomMatcher = jasmine.CustomMatcher;
 import MatchersUtil = jasmine.MatchersUtil;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
-import objectContaining = jasmine.objectContaining;
-import ArrayContaining = jasmine.ArrayContaining;
 import {DebugElement} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
@@ -176,9 +174,9 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualDom: DebugElement, e
 /**
  * Like {@link jasmine.ObjectContaining}, but applies {@link jasmine.ObjectContaining} recursively to all fields.
  */
-function objectContainingRecursive<T>(object: T): ObjectContaining<T> | ArrayContaining<T> | T {
+function objectContainingRecursive<T>(object: T): ObjectContaining<T> | T {
   if (Array.isArray(object)) {
-    return jasmine.arrayContaining(object.map(objectContaining));
+    return object.map(objectContainingRecursive) as T;
   }
   else if (typeof object === 'object' && object !== null) {
     const workingCopy = {...object} as Record<string, any>;
