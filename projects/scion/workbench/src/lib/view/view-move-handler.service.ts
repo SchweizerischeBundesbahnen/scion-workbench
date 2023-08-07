@@ -32,8 +32,6 @@ export class ViewMoveHandler {
     this._viewDragService.viewMove$
       .pipe(takeUntilDestroyed())
       .subscribe(async (event: ViewMoveEvent) => { // eslint-disable-line rxjs/no-async-subscribe
-        event.target.region ??= 'center';
-
         // Check if this app instance takes part in the view drag operation. If not, do nothing.
         if (event.source.appInstanceId !== appInstanceId && event.target.appInstanceId !== appInstanceId) {
           return;
@@ -41,11 +39,15 @@ export class ViewMoveHandler {
 
         const crossAppInstanceViewDrag = (event.source.appInstanceId !== event.target.appInstanceId);
 
-        // Check if the user dropped the viewtab at the same location. If so, do nothing.
+        // Check if the user dropped the view into the center of the view's part. If so, do nothing.
         if (!crossAppInstanceViewDrag && event.source.partId === event.target.elementId && event.target.region === 'center') {
           await this.activateView(event.source.viewId);
           return;
         }
+
+        // Set default values.
+        event = structuredClone(event);
+        event.target.region ??= 'center';
 
         // Check if to remove the view from this app instance if being moved to another app instance.
         if (crossAppInstanceViewDrag && event.source.appInstanceId === appInstanceId) {
