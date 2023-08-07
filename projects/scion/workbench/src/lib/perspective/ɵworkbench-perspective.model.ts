@@ -10,7 +10,7 @@
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
 import {MPartGrid} from '../layout/workbench-layout.model';
 import {EnvironmentInjector, inject, runInInjectionContext} from '@angular/core';
-import {ɵStoredPerspectiveData, WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
+import {WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition, ɵStoredPerspectiveData} from './workbench-perspective.model';
 import {BehaviorSubject} from 'rxjs';
 import {Commands} from '../routing/workbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';

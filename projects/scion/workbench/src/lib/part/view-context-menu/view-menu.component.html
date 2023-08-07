@@ -1,9 +1,9 @@
 <div class="menu-item-group" *ngFor="let menuItemGroup of menuItemGroups$ | async | keyvalue">
   <button *ngFor="let menuItem of menuItemGroup.value"
-       class="menu-item"
-       [ngClass]="menuItem.cssClass"
-       [class.disabled]="menuItem.isDisabled && menuItem.isDisabled()"
-       (click)="onMenuItemClick(menuItem)">
+          class="menu-item"
+          [ngClass]="menuItem.cssClass"
+          [class.disabled]="menuItem.isDisabled && menuItem.isDisabled()"
+          (click)="onMenuItemClick(menuItem)">
     <div class="text">
       <ng-container *cdkPortalOutlet="menuItem.portal"></ng-container>
     </div>

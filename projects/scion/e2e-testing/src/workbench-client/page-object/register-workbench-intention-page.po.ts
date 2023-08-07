@@ -47,7 +47,7 @@ export class RegisterWorkbenchIntentionPagePO {
     const errorLocator = this._locator.locator('output.e2e-register-error');
     return Promise.race([
       responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-intention-id').innerText()),
-      rejectWhenAttached(errorLocator)
+      rejectWhenAttached(errorLocator),
     ]);
   }
 

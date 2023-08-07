@@ -3,10 +3,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/workbench-getting-started-app",
-    "types": [],
+    "types": []
   },
   "files": [
-    "src/main.ts",
+    "src/main.ts"
   ],
   "include": [
     "src/**/*.d.ts"

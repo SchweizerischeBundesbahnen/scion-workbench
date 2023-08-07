@@ -166,7 +166,7 @@ export class ViewPagePO {
     return {width, height};
   }
 
-  public async navigateSelf(params: Params, options?: { paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean }): Promise<void> {
+  public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean}): Promise<void> {
     const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-self-navigation'));
     await accordionPO.expand();
     try {

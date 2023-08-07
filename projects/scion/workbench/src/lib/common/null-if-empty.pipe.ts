@@ -10,7 +10,6 @@
 
 import {Pipe, PipeTransform} from '@angular/core';
 
-
 /**
  * Returns `null` if the given object is empty.
  */

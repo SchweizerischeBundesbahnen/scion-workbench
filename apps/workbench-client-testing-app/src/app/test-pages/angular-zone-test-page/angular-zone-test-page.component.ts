@@ -121,7 +121,7 @@ export class AngularZoneTestPageComponent {
 export class TestCaseModel {
 
   public runInAngular = true;
-  public emissions = new Array<{ insideAngular: boolean; label: string }>();
+  public emissions = new Array<{insideAngular: boolean; label: string}>();
   private _zone = inject(NgZone);
 
   constructor(private _testFn: (model: TestCaseModel) => void) {
