@@ -150,12 +150,12 @@ async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Lo
 
   // Assert views
   if (expectedPart.views) {
-    const expectedViewIds = new Set<string>(expectedPart.views.map(view => view.id));
-    const actualViewIds = new Set<string>();
+    const expectedViewIds = expectedPart.views.map(view => view.id);
+    const actualViewIds = new Array<string>();
     for (const viewTabLocator of await partLocator.locator('wb-part-bar wb-view-tab').all()) {
-      actualViewIds.add((await viewTabLocator.getAttribute('data-viewid'))!);
+      actualViewIds.push((await viewTabLocator.getAttribute('data-viewid'))!);
     }
-    if (!isEqualSet(actualViewIds, expectedViewIds)) {
+    if (!isEqualArray(actualViewIds, expectedViewIds)) {
       throw Error(`[DOMAssertError] Expected part '${partId}' to have views [${[...expectedViewIds]}], but has views [${[...actualViewIds]}]. [MPart=${JSON.stringify(expectedPart)}, locator=${partLocator}]`);
     }
   }
@@ -287,10 +287,19 @@ async function throwIfBoundingBoxNotCloseTo(args: {actual: BoundingBox | null | 
 }
 
 /**
- * Compares given two Sets for shallow equality.
+ * Compares given two Arrays for shallow equality.
  */
-function isEqualSet(set1: Set<unknown>, set2: Set<unknown>): boolean {
-  return set1.size === set2.size && [...set1].every(item => set2.has(item));
+function isEqualArray(array1: Array<unknown>, array2: Array<unknown>): boolean {
+  if (array1 === array2) {
+    return true;
+  }
+  if (!array1 || !array2) {
+    return false;
+  }
+  if (array1.length !== array2.length) {
+    return false;
+  }
+  return array1.every((item, index) => item === array2[index]);
 }
 
 /**
