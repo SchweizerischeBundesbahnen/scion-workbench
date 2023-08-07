@@ -27,6 +27,7 @@ import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {MPart, MTreeNode} from './workbench-layout.model';
+import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 
 describe('WorkbenchLayout', () => {
 
@@ -139,6 +140,125 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
+  });
+
+  it('allows moving a view in the tabbar', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: 'view', component: TestComponent},
+        ]),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // GIVEN four views (view.1, view.2, view.3, view.4).
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
+
+    // WHEN moving view.3 to position 0
+    TestBed.inject(ViewDragService).dispatchViewMoveEvent({
+      source: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        partId: 'main',
+        viewId: 'view.3',
+        viewUrlSegments: [new UrlSegment('view', {})],
+      },
+      target: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        elementId: 'main',
+        insertionIndex: 0,
+      },
+    });
+    await waitForWorkbenchLayoutChange();
+
+    // THEN expect view.3 to be moved: ['view.3', 'view.1', 'view.2', 'view.4']
+    expect('view.3').toBeRegistered({partId: 'main', active: true});
+    expect(TestBed.inject(WorkbenchPartRegistry).get('main').viewIds).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
+
+    // WHEN moving view.3 to position 1
+    TestBed.inject(ViewDragService).dispatchViewMoveEvent({
+      source: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        partId: 'main',
+        viewId: 'view.3',
+        viewUrlSegments: [new UrlSegment('view', {})],
+      },
+      target: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        elementId: 'main',
+        insertionIndex: 1,
+      },
+    });
+    await waitForWorkbenchLayoutChange();
+
+    // THEN expect view.3 not to be moved
+    expect('view.3').toBeRegistered({partId: 'main', active: true});
+    expect(TestBed.inject(WorkbenchPartRegistry).get('main').viewIds).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
+
+    // WHEN moving view.3 to position 2
+    TestBed.inject(ViewDragService).dispatchViewMoveEvent({
+      source: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        partId: 'main',
+        viewId: 'view.3',
+        viewUrlSegments: [new UrlSegment('view', {})],
+      },
+      target: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        elementId: 'main',
+        insertionIndex: 2,
+      },
+    });
+    await waitForWorkbenchLayoutChange();
+
+    // THEN view.3 to be moved as follows: ['view.1', 'view.3', 'view.2', 'view.4']
+    expect('view.3').toBeRegistered({partId: 'main', active: true});
+    expect(TestBed.inject(WorkbenchPartRegistry).get('main').viewIds).toEqual(['view.1', 'view.3', 'view.2', 'view.4']);
+
+    // WHEN moving view.3 to position 3
+    TestBed.inject(ViewDragService).dispatchViewMoveEvent({
+      source: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        partId: 'main',
+        viewId: 'view.3',
+        viewUrlSegments: [new UrlSegment('view', {})],
+      },
+      target: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        elementId: 'main',
+        insertionIndex: 3,
+      },
+    });
+    await waitForWorkbenchLayoutChange();
+
+    // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.3', 'view.4']
+    expect('view.3').toBeRegistered({partId: 'main', active: true});
+    expect(TestBed.inject(WorkbenchPartRegistry).get('main').viewIds).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
+
+    // WHEN moving view.3 to position 4
+    TestBed.inject(ViewDragService).dispatchViewMoveEvent({
+      source: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        partId: 'main',
+        viewId: 'view.3',
+        viewUrlSegments: [new UrlSegment('view', {})],
+      },
+      target: {
+        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        elementId: 'main',
+        insertionIndex: undefined,
+      },
+    });
+    await waitForWorkbenchLayoutChange();
+
+    // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.4', 'view.3']
+    expect('view.3').toBeRegistered({partId: 'main', active: true});
+    expect(TestBed.inject(WorkbenchPartRegistry).get('main').viewIds).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
   });
 
   it('allows to move a view to a new part in the east', async () => {
