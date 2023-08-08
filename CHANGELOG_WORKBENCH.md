@@ -1,3 +1,12 @@
+# [16.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.2...16.0.0-beta.3) (2023-08-08)
+
+
+### Bug Fixes
+
+* **workbench:** fix moving view tabs in the tabbar ([cfc8482](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/cfc8482ac9f6c1cdba30cb8c81b6ed7228ab891f)), closes [#444](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/444)
+
+
+
 # [16.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.1...16.0.0-beta.2) (2023-08-04)
 
 
