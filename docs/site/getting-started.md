@@ -311,7 +311,7 @@ In this step, we will create a component to open a todo in a view.
 2. Open `todo.component.ts` and change it as follows.
 
     ```ts
-        import {Component} from '@angular/core';
+    [+] import {Component, Inject, LOCALE_ID} from '@angular/core';
     [+] import {WorkbenchView} from '@scion/workbench';
     [+] import {Todo, TodoService} from '../todo.service';
     [+] import {ActivatedRoute} from '@angular/router';
@@ -331,14 +331,14 @@ In this step, we will create a component to open a todo in a view.
         
     [+]   public todo$: Observable<Todo>;
         
-    [+]   constructor(route: ActivatedRoute, todoService: TodoService, view: WorkbenchView) {
+    [+]   constructor(route: ActivatedRoute, todoService: TodoService, view: WorkbenchView, @Inject(LOCALE_ID) locale: string) {
     [+]     this.todo$ = route.params
     [+]       .pipe(
     [+]         map(params => params['id']),
     [+]         map(id => todoService.getTodo(id)),
     [+]         tap(todo => {
     [+]           view.title = todo.task;
-    [+]           view.heading = `Due by ${formatDate(todo.dueDate, 'short', navigator.language)}`;
+    [+]           view.heading = `Due by ${formatDate(todo.dueDate, 'short', locale)}`;
     [+]         }),
     [+]       );
     [+]   }
