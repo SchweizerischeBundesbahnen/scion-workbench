@@ -11,7 +11,7 @@ The application lists todos on the left side. When the user clicks a todo, a new
 
 ***
 - After you complete this guide, the application will look like this: https://scion-workbench-getting-started.vercel.app.
-- The source code of the application can be found <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/apps/apps/workbench-getting-started-app/src">here</a>.
+- The source code of the application can be found <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/apps/workbench-getting-started-app/src">here</a>.
 ***
 
 <details>
