@@ -18,7 +18,7 @@
  * @use '@scion/workbench' with (
  *   $theme: (
  *     icon-font: (
- *       directory: '/path/to/font', // defaults to '/assets/fonts' if omitted
+ *       directory: 'path/to/font', // defaults to 'assets/fonts' if omitted
  *       filename: 'icons' // defaults to 'scion-workbench-icons' if omitted
  *     )
  *   )

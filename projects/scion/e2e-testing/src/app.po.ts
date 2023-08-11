@@ -44,24 +44,24 @@ export class AppPO {
    *
    * By passing a features object, you can control how to start the workbench and which app features to enable.
    */
-  public async navigateTo(features?: Features): Promise<void> {
+  public async navigateTo(options?: Options): Promise<void> {
     this._workbenchStartupQueryParams = new URLSearchParams();
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, features?.launcher ?? 'LAZY');
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(features?.microfrontendSupport ?? true) === false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${features?.confirmStartup ?? false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${features?.simulateSlowCapabilityLookup ?? false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${(features?.perspectives ?? []).join(';')}`);
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options?.launcher ?? 'LAZY');
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(options?.microfrontendSupport ?? true) === false}`);
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${options?.confirmStartup ?? false}`);
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${options?.simulateSlowCapabilityLookup ?? false}`);
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${(options?.perspectives ?? []).join(';')}`);
 
     const featureQueryParams = new URLSearchParams();
-    if (features?.stickyStartViewTab !== undefined) {
-      featureQueryParams.append('stickyStartViewTab', `${features.stickyStartViewTab}`);
+    if (options?.stickyStartViewTab !== undefined) {
+      featureQueryParams.append('stickyStartViewTab', `${options.stickyStartViewTab}`);
     }
 
-    if (features?.showNewTabAction !== undefined) {
-      featureQueryParams.append('showNewTabAction', `${features.showNewTabAction}`);
+    if (options?.showNewTabAction !== undefined) {
+      featureQueryParams.append('showNewTabAction', `${options.showNewTabAction}`);
     }
 
-    await this.page.goto(`/?${this._workbenchStartupQueryParams.toString()}#/${featureQueryParams.toString() ? `?${featureQueryParams.toString()}` : ''}`);
+    await this.page.goto(`${options?.url ?? ''}/?${this._workbenchStartupQueryParams.toString()}#/${featureQueryParams.toString() ? `?${featureQueryParams.toString()}` : ''}`);
     // Wait until the workbench completed startup.
     await this.waitUntilWorkbenchStarted();
   }
@@ -264,9 +264,13 @@ export class AppPO {
 }
 
 /**
- * Configures features of the testing app.
+ * Configures options to start the testing app.
  */
-export interface Features {
+export interface Options {
+  /**
+   * Specifies the URL to load into the browser. If not set, defaults to the `baseURL` as specified in `playwright.config.ts`.
+   */
+  url?: string;
   /**
    * Controls launching of the testing app. By default, if not specified, starts the workbench lazy.
    */
