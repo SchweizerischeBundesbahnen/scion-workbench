@@ -6,6 +6,15 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [16.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.3...16.0.0-beta.4) (2023-08-11)
+
+
+### Bug Fixes
+
+* **workbench:** fetch icon font for applications deployed in a subdirectory ([02db939](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/02db939e89ca918b93aca252ff82aa6346f7e56f)), closes [#466](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/466)
+
+
+
 # [16.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.2...16.0.0-beta.3) (2023-08-08)
 
 
