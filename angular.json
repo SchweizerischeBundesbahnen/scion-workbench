@@ -292,6 +292,29 @@
               "outputHashing": "all",
               "outputPath": "dist/workbench-testing-app-ci"
             },
+            "production-basehref": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/workbench-testing-app/src/environments/environment.ts",
+                  "with": "apps/workbench-testing-app/src/environments/environment.ci.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "outputPath": "dist/workbench-testing-app-basehref/subdir",
+              "baseHref": "/subdir/"
+            },
             "development": {
               "buildOptimizer": false,
               "optimization": false,
@@ -299,6 +322,15 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "development-basehref": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "baseHref": "/subdir/"
             }
           },
           "defaultConfiguration": "development"
@@ -311,6 +343,9 @@
             },
             "development": {
               "browserTarget": "workbench-testing-app:build:development"
+            },
+            "development-basehref": {
+              "browserTarget": "workbench-testing-app:build:development-basehref"
             }
           },
           "defaultConfiguration": "development"

@@ -33,6 +33,11 @@ export default {
       port: 4202,
       reuseExistingServer: !runInCI,
     },
+    {
+      command: runInCI ? 'npm run workbench-testing-app:basehref:http-server' : 'npm run workbench-testing-app:basehref:serve',
+      port: 4300,
+      reuseExistingServer: !runInCI,
+    },
   ],
   use: {
     browserName: 'chromium',
