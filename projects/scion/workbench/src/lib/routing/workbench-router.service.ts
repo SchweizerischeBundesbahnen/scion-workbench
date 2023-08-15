@@ -20,7 +20,6 @@ import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates, WorkbenchNavigationalViewStates} from './workbench-navigational-states';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
-import {RouterUtils} from './router.util';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -114,10 +113,7 @@ export class WorkbenchRouter implements OnDestroy {
         }
         default: {
           const viewId = extras.target!;
-          if (!RouterUtils.isPrimaryRouteTarget(viewId)) {
-            throw Error(`[WorkbenchRouterError][IllegalArgumentError] View not target of a primary route' [viewId=${viewId}]`);
-          }
-          else if (layout.views().some(view => view.id === viewId)) {
+          if (layout.views().some(view => view.id === viewId)) {
             return updateView(viewId, layout);
           }
           else {
@@ -138,7 +134,7 @@ export class WorkbenchRouter implements OnDestroy {
           position: layout.computeViewInsertionIndex(extras.blankInsertionIndex, partId),
           activateView: extras.activate ?? true,
         }),
-        viewOutlets: {[viewId]: commands},
+        viewOutlets: commands.length ? {[viewId]: commands} : {},
         viewStates: {[viewId]: {[WorkbenchNavigationalViewStates.cssClass]: extras.cssClass}},
       };
     }
@@ -151,7 +147,7 @@ export class WorkbenchRouter implements OnDestroy {
       const activateView = extras.activate ?? true;
       return {
         layout: activateView ? navigation.layout.activateView(viewId) : navigation.layout,
-        viewOutlets: {...navigation.viewOutlets, [viewId]: commands},
+        viewOutlets: {...navigation.viewOutlets, ...(commands.length ? {[viewId]: commands} : {})},
         viewStates: {...navigation.viewStates, [viewId]: {[WorkbenchNavigationalViewStates.cssClass]: extras.cssClass}},
       };
     }
@@ -308,7 +304,7 @@ export class WorkbenchRouter implements OnDestroy {
    *
    * Example: router.navigate([{outlets: {[outlet]: commands}}])
    *
-   * To bypass that restriction, we first create an URL tree without specifying the target outlet. As expected, this translates into an
+   * To bypass that restriction, we first create a URL tree without specifying the target outlet. As expected, this translates into a
    * URL with all navigational symbols resolved. Then, we extract the URL segments of the resolved route and convert it back into commands.
    * The resulting commands are in their absolute form and may be used for the effective navigation to target a named router outlet.
    */
@@ -446,8 +442,7 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    */
   target?: string | 'blank' | 'auto';
   /**
-   * Specifies the part where to add the view when using 'blank' view target strategy.
-   * If not specified, the currently active workbench part is used.
+   * Specifies in which part to open the view. By default, if not specified, opens the view in the active part of the main area.
    */
   blankPartId?: string;
   /**

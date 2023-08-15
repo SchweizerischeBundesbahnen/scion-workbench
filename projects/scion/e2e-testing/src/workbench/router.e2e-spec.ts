@@ -1245,4 +1245,83 @@ test.describe('Workbench Router', () => {
     // Expect the test view to display.
     await expect(new ViewPagePO(appPO, 'view.3').locator).toBeVisible();
   });
+  
+  test('should allow for navigation to an empty path auxiliary route in the perspectival grid', async ({appPO, workbenchNavigator, page, consoleLogs}) => {
+    await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
+
+    // Define perspective with a part on the left.
+    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
+    await perspectiveToggleButtonPO.click();
+    const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPagePO.addPart('left', {align: 'left', ratio: .25});
+
+    // Register auxiliary route.
+    await layoutPagePO.registerRoute({path: '', outlet: 'testee', component: 'view-page'});
+
+    // Open view in the left part.
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPagePO.enterPath('<empty>');
+    await routerPagePO.enterTarget('testee');
+    await routerPagePO.enterBlankPartId('left');
+    await routerPagePO.clickNavigate();
+
+    // Expect the view to be opened in the left part.
+    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      peripheralGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .25,
+          child1: new MPart({
+            id: 'left',
+            views: [{id: 'testee'}],
+            activeViewId: 'testee',
+          }),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
+        }),
+      },
+      mainGrid: {
+        root: new MPart({
+          id: await layoutPagePO.viewPO.part.getPartId(),
+          views: [{id: 'view.1'}, {id: 'view.2'}], // layout page, router page
+          activeViewId: 'view.2',
+        }),
+        activePartId: await layoutPagePO.viewPO.part.getPartId(),
+      },
+    });
+
+    // Expect the view to display.
+    await expect(new ViewPagePO(appPO, 'testee').locator).toBeVisible();
+  });
+
+  test('should allow for navigation to an empty path auxiliary route in the main area', async ({appPO, workbenchNavigator, page, consoleLogs}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Register auxiliary route.
+    const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPagePO.registerRoute({path: '', outlet: 'testee', component: 'view-page'});
+
+    // Open view in the left part.
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPagePO.enterPath('<empty>');
+    await routerPagePO.enterTarget('testee');
+    await routerPagePO.clickNavigate();
+
+    // Expect the view to be opened in the left part.
+    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      peripheralGrid: {
+        root: new MPart({id: MAIN_AREA_PART_ID}),
+      },
+      mainGrid: {
+        root: new MPart({
+          id: await layoutPagePO.viewPO.part.getPartId(),
+          views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'testee'}], // layout page, router page, testee view
+          activeViewId: 'testee',
+        }),
+        activePartId: await layoutPagePO.viewPO.part.getPartId(),
+      },
+    });
+
+    // Expect the view to display.
+    await expect(new ViewPagePO(appPO, 'testee').locator).toBeVisible();
+  });
 });
