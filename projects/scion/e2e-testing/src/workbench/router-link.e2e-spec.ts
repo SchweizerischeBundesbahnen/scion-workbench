@@ -13,7 +13,7 @@ import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {PerspectivePagePO} from './page-object/perspective-page.po';
-import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {BinaryMTreeNode, MPart} from '../matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../workbench.model';
 
 test.describe('Workbench RouterLink', () => {
@@ -376,7 +376,7 @@ test.describe('Workbench RouterLink', () => {
     // Expect layout to match the perspective definition.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .5,
           child1: new MPart({id: 'left', views: [{id: 'router'}], activeViewId: 'router'}),
@@ -399,7 +399,7 @@ test.describe('Workbench RouterLink', () => {
     // Expect new view to be opened in active part of the contextual view i.e. left
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .5,
           child1: new MPart({id: 'left', views: [{id: 'router'}, {id: testeeViewId}], activeViewId: testeeViewId}),

@@ -14,7 +14,7 @@ import {LayoutPagePO} from './page-object/layout-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {RouterPagePO} from './page-object/router-page.po';
 import {expect} from '@playwright/test';
-import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {BinaryMTreeNode, MPart} from '../matcher/to-equal-workbench-layout.matcher';
 
 test.describe('Workbench', () => {
 
@@ -70,7 +70,7 @@ test.describe('Workbench', () => {
     // Expect the workbench layout.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .2,
           child1: new MPart({
@@ -82,7 +82,7 @@ test.describe('Workbench', () => {
         }),
       },
       mainAreaGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .5,
           child1: new MPart({
@@ -101,7 +101,7 @@ test.describe('Workbench', () => {
     await view2.viewTab.dblclick();
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .5,
           child1: new MPart({
@@ -120,7 +120,7 @@ test.describe('Workbench', () => {
     await view2.viewTab.dblclick();
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .2,
           child1: new MPart({
@@ -132,7 +132,7 @@ test.describe('Workbench', () => {
         }),
       },
       mainAreaGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .5,
           child1: new MPart({

@@ -14,7 +14,7 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {fromRect} from '../helper/testing.util';
 import {MAIN_AREA} from '../workbench.model';
-import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {BinaryMTreeNode, MPart} from '../matcher/to-equal-workbench-layout.matcher';
 
 test.describe('View Drag Workbench Grid', () => {
 
@@ -38,7 +38,7 @@ test.describe('View Drag Workbench Grid', () => {
       // Expect view 2 to be moved to the west of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         workbenchGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .2,
             child1: new MPart({
@@ -85,7 +85,7 @@ test.describe('View Drag Workbench Grid', () => {
       // Expect view 2 to be moved to the west of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         workbenchGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .2,
             child1: new MPart({
@@ -93,10 +93,10 @@ test.describe('View Drag Workbench Grid', () => {
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
-            child2: new MTreeNode({
+            child2: new BinaryMTreeNode({
               direction: 'row',
               ratio: .25,
-              child1: new MTreeNode({
+              child1: new BinaryMTreeNode({
                 direction: 'column',
                 ratio: .75,
                 child1: new MPart({
@@ -143,7 +143,7 @@ test.describe('View Drag Workbench Grid', () => {
       // Expect view 2 to be moved to the east of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         workbenchGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .8,
             child1: new MPart({id: MAIN_AREA}),
@@ -190,14 +190,14 @@ test.describe('View Drag Workbench Grid', () => {
       // Expect view 2 to be moved to the east of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         workbenchGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .8,
-            child1: new MTreeNode({
+            child1: new BinaryMTreeNode({
               direction: 'row',
               ratio: .75,
               child1: new MPart({id: MAIN_AREA}),
-              child2: new MTreeNode({
+              child2: new BinaryMTreeNode({
                 direction: 'column',
                 ratio: .75,
                 child1: new MPart({
@@ -251,7 +251,7 @@ test.describe('View Drag Workbench Grid', () => {
       // Expect view 2 to be moved to the south of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         workbenchGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'column',
             ratio: .8,
             child1: new MPart({id: MAIN_AREA}),
@@ -301,14 +301,14 @@ test.describe('View Drag Workbench Grid', () => {
       // Expect view 2 to be moved to the south of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         workbenchGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'column',
             ratio: .8,
-            child1: new MTreeNode({
+            child1: new BinaryMTreeNode({
               direction: 'column',
               ratio: .75,
               child1: new MPart({id: MAIN_AREA}),
-              child2: new MTreeNode({
+              child2: new BinaryMTreeNode({
                 direction: 'row',
                 ratio: .4,
                 child1: new MPart({

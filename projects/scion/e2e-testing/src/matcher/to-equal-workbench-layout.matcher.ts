@@ -63,7 +63,7 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
 async function assertGridElement(expectedGridElement: MTreeNode | MPart, gridElementLocator: Locator, expectedWorkbenchLayout: ExpectedWorkbenchLayout): Promise<void> {
   await throwIfAbsent(gridElementLocator, () => Error(`[DOMAssertError] Expected grid element to be present, but is not'. [${expectedGridElement.type}=${JSON.stringify(expectedGridElement)}, locator=${gridElementLocator}]`));
 
-  if (expectedGridElement instanceof MTreeNode) {
+  if (expectedGridElement instanceof BinaryMTreeNode || expectedGridElement instanceof UnaryMTreeNode) {
     await assertNodeGridElement(expectedGridElement, gridElementLocator, expectedWorkbenchLayout);
   }
   else {
@@ -80,41 +80,75 @@ async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLoc
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}, locator=${gridElementLocator}]`);
   }
 
-  // Assert sashbox to be present.
+  const gridElementBoundingBox = (await gridElementLocator.boundingBox())!;
   const sashboxSelector = `sci-sashbox[data-nodeid="${nodeId}"]`;
-  if (expectedTreeNode.child1 && expectedTreeNode.child2) {
-    gridElementLocator = gridElementLocator.locator(sashboxSelector);
-    await throwIfAbsent(gridElementLocator, () => Error(`[DOMAssertError] Expected element '${sashboxSelector}' to be in the DOM, but is not. [MTreeNode=${JSON.stringify(expectedTreeNode)}, locator=${gridElementLocator}]`));
+  const sashboxLocator = gridElementLocator.locator(sashboxSelector);
+
+  if (expectedTreeNode instanceof BinaryMTreeNode) {
+    // Expect sashbox to be present.
+    await throwIfAbsent(sashboxLocator, () => Error(`[DOMAssertError] Expected element '${sashboxSelector}' to be in the DOM, but is not. [MTreeNode=${JSON.stringify(expectedTreeNode)}, locator=${sashboxLocator}]`));
+
+    // Assert child 1
+    const expectedBoundsChild1 = expectedTreeNode.direction === 'row' ? {
+      x: gridElementBoundingBox.x,
+      y: gridElementBoundingBox.y,
+      width: gridElementBoundingBox.width * expectedTreeNode.ratio,
+      height: gridElementBoundingBox.height,
+    } : {
+      x: gridElementBoundingBox.x,
+      y: gridElementBoundingBox.y,
+      width: gridElementBoundingBox.width,
+      height: gridElementBoundingBox.height * expectedTreeNode.ratio,
+    };
+    await assertChild(expectedTreeNode.child1, sashboxLocator.locator(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-1`), expectedBoundsChild1, expectedWorkbenchLayout);
+
+    // Assert child 2
+    const expectedBoundsChild2 = expectedTreeNode.direction === 'row' ? {
+      x: gridElementBoundingBox.x + (gridElementBoundingBox.width * expectedTreeNode.ratio),
+      y: gridElementBoundingBox.y,
+      width: gridElementBoundingBox.width * (1 - expectedTreeNode.ratio),
+      height: gridElementBoundingBox.height,
+    } : {
+      x: gridElementBoundingBox.x,
+      y: gridElementBoundingBox.y + (gridElementBoundingBox.height * expectedTreeNode.ratio),
+      width: gridElementBoundingBox.width,
+      height: gridElementBoundingBox.height * (1 - expectedTreeNode.ratio),
+    };
+    await assertChild(expectedTreeNode.child2, sashboxLocator.locator(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-2`), expectedBoundsChild2, expectedWorkbenchLayout);
   }
   else {
-    const sashboxLocator = gridElementLocator.locator(`${sashboxSelector}`);
+    // Expect no sashbox to be present.
     await throwIfPresent(sashboxLocator, () => Error(`[DOMAssertError] Expected element 'wb-grid-element' not to contain a 'sci-sashbox' because having a single child. [MTreeNode=${JSON.stringify(expectedTreeNode)}, locator=${sashboxLocator}]`));
+
+    await assertChild(expectedTreeNode.child, gridElementLocator.locator(`wb-grid-element[data-parentnodeid="${nodeId}"]`), {
+      x: gridElementBoundingBox.x,
+      y: gridElementBoundingBox.y,
+      width: gridElementBoundingBox.width,
+      height: gridElementBoundingBox.height,
+    }, expectedWorkbenchLayout);
+  }
+}
+
+async function assertChild(child: MPart | MTreeNode, childLocator: Locator, expectedBoundingBox: BoundingBox, expectedWorkbenchLayout: ExpectedWorkbenchLayout): Promise<void> {
+  // Assert child resolves to exactly one DOM element.
+  switch (await childLocator.count()) {
+    case 0:
+      throw Error(`[DOMAssertError] Expected child to be in the DOM, but is not. [${child.type}=${JSON.stringify(child)}, locator=${childLocator}]`);
+    case 1:
+      break;
+    default:
+      throw Error(`[DOMAssertError] Expected child to resolve to exactly one DOM element, but resolves to multiple DOM elements. [${child.type}=${JSON.stringify(child)}, locator=${childLocator}]`);
   }
 
-  // Assert sash 1 to be present.
-  const child1Selector = `wb-grid-element[data-parentnodeid="${nodeId}"].sash-1`;
-  const child1Locator = gridElementLocator.locator(child1Selector);
-  if (expectedTreeNode.child1) {
-    await throwIfAbsent(child1Locator, () => Error(`[DOMAssertError] Expected element '${child1Selector}' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`));
-    await assertGridElement(expectedTreeNode.child1!, child1Locator, expectedWorkbenchLayout);
-  }
-  else {
-    await throwIfPresent(child1Locator, () => Error(`[DOMAssertError] Expected element '${child1Selector}' not to be in the DOM, but is. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`));
-  }
+  // Assert bounding box.
+  await throwIfBoundingBoxNotCloseTo({
+    actual: await childLocator.boundingBox(),
+    expected: expectedBoundingBox,
+    context: () => `[${child.type}=${JSON.stringify(child)}, locator=${childLocator}]`,
+  });
 
-  // Assert sash 2 to be present.
-  const child2Selector = `wb-grid-element[data-parentnodeid="${nodeId}"].sash-2`;
-  const child2Locator = gridElementLocator.locator(child2Selector);
-  if (expectedTreeNode.child2) {
-    await throwIfAbsent(child2Locator, () => Error(`[DOMAssertError] Expected element '${child2Selector}' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child2Locator}]`));
-    await assertGridElement(expectedTreeNode.child2!, child2Locator, expectedWorkbenchLayout);
-  }
-  else {
-    await throwIfPresent(child2Locator, () => Error(`[DOMAssertError] Expected element '${child2Selector}' not to be in the DOM, but is. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child2Locator}]`));
-  }
-
-  // Assert sash bounding box.
-  await assertSashBoundingBox({...expectedTreeNode, nodeId}, gridElementLocator);
+  // Continue assertion.
+  await assertGridElement(child, childLocator, expectedWorkbenchLayout);
 }
 
 /**
@@ -158,92 +192,6 @@ async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Lo
     if (!isEqualArray(actualViewIds, expectedViewIds)) {
       throw Error(`[DOMAssertError] Expected part '${partId}' to have views [${[...expectedViewIds]}], but has views [${[...actualViewIds]}]. [MPart=${JSON.stringify(expectedPart)}, locator=${partLocator}]`);
     }
-  }
-}
-
-/**
- * Performs an assertion of the bounding box of the sash(es) in the given 'wb-grid-element'.
- */
-async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: string}, gridElementLocator: Locator): Promise<void> {
-  const child1Locator = gridElementLocator.locator(`wb-grid-element[data-parentnodeid="${expectedTreeNode.nodeId}"].sash-1`);
-  const child2Locator = gridElementLocator.locator(`wb-grid-element[data-parentnodeid="${expectedTreeNode.nodeId}"].sash-2`);
-
-  const gridElementBoundingBox = (await gridElementLocator.boundingBox())!;
-  if (expectedTreeNode.child1 && expectedTreeNode.child2) {
-    if (expectedTreeNode.direction === 'row') {
-      // Expect bounding box of sash 1.
-      await throwIfBoundingBoxNotCloseTo({
-        actual: await child1Locator.boundingBox(),
-        expected: {
-          x: gridElementBoundingBox.x,
-          y: gridElementBoundingBox.y,
-          width: gridElementBoundingBox.width * expectedTreeNode.ratio,
-          height: gridElementBoundingBox.height,
-        },
-        context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`,
-      });
-      // Expect bounding box of sash 2.
-      await throwIfBoundingBoxNotCloseTo({
-        actual: await child2Locator.boundingBox(),
-        expected: {
-          x: gridElementBoundingBox.x + (gridElementBoundingBox.width * expectedTreeNode.ratio),
-          y: gridElementBoundingBox.y,
-          width: gridElementBoundingBox.width * (1 - expectedTreeNode.ratio),
-          height: gridElementBoundingBox.height,
-        },
-        context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}, locator=${child2Locator}]`,
-      });
-    }
-    else if (expectedTreeNode.direction === 'column') {
-      // Expect bounding box of sash 1.
-      await throwIfBoundingBoxNotCloseTo({
-        actual: await child1Locator.boundingBox(),
-        expected: {
-          x: gridElementBoundingBox.x,
-          y: gridElementBoundingBox.y,
-          width: gridElementBoundingBox.width,
-          height: gridElementBoundingBox.height * expectedTreeNode.ratio,
-        },
-        context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`,
-      });
-      // Expect bounding box of sash 2.
-      await throwIfBoundingBoxNotCloseTo({
-        actual: await child2Locator.boundingBox(),
-        expected: {
-          x: gridElementBoundingBox.x,
-          y: gridElementBoundingBox.y + (gridElementBoundingBox.height * expectedTreeNode.ratio),
-          width: gridElementBoundingBox.width,
-          height: gridElementBoundingBox.height * (1 - expectedTreeNode.ratio),
-        },
-        context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}, locator=${child1Locator}]`,
-      });
-    }
-  }
-  else if (expectedTreeNode.child1) {
-    // Expect bounding box of child 1.
-    await throwIfBoundingBoxNotCloseTo({
-      actual: await child1Locator.boundingBox(),
-      expected: {
-        x: gridElementBoundingBox.x,
-        y: gridElementBoundingBox.y,
-        width: gridElementBoundingBox.width,
-        height: gridElementBoundingBox.height,
-      },
-      context: () => `[${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`,
-    });
-  }
-  else if (expectedTreeNode.child2) {
-    // Expect bounding box of child 2.
-    await throwIfBoundingBoxNotCloseTo({
-      actual: await child2Locator.boundingBox(),
-      expected: {
-        x: gridElementBoundingBox.x,
-        y: gridElementBoundingBox.y,
-        width: gridElementBoundingBox.width,
-        height: gridElementBoundingBox.height,
-      },
-      context: () => `[${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}, locator=${child2Locator}]`,
-    });
   }
 }
 
@@ -331,18 +279,33 @@ export interface MPartGrid {
   activePartId?: string;
 }
 
+export type MTreeNode = BinaryMTreeNode | UnaryMTreeNode;
+
 /**
- * Modified version of {@link MTreeNode} to expect the workbench layout.
+ * Modified version of {@link MTreeNode} with two children to expect the workbench layout.
  */
-export class MTreeNode {
+export class BinaryMTreeNode {
 
   public readonly type = 'MTreeNode';
-  public child1?: MTreeNode | MPart;
-  public child2?: MTreeNode | MPart;
+  public child1!: MTreeNode | MPart;
+  public child2!: MTreeNode | MPart;
   public ratio!: number;
   public direction!: 'column' | 'row';
 
-  constructor(treeNode: Omit<MTreeNode, 'type'>) {
+  constructor(treeNode: Omit<BinaryMTreeNode, 'type'>) {
+    Object.assign(this, treeNode);
+  }
+}
+
+/**
+ * Modified version of {@link MTreeNode} with a single child to expect the workbench layout.
+ */
+export class UnaryMTreeNode {
+
+  public readonly type = 'MTreeNode';
+  public child!: MTreeNode | MPart;
+
+  constructor(treeNode: Omit<UnaryMTreeNode, 'type'>) {
     Object.assign(this, treeNode);
   }
 }

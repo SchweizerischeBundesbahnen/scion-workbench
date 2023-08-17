@@ -11,7 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {InputFieldTestPagePO as MicrofrontendInputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
-import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {BinaryMTreeNode, MPart} from '../matcher/to-equal-workbench-layout.matcher';
 import {waitUntilStable} from '../helper/testing.util';
 import {ViewPagePO} from './page-object/view-page.po';
 
@@ -36,7 +36,7 @@ test.describe('Workbench Part', () => {
     // Expect right part to be activated.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .5,
           child1: new MPart({
@@ -61,7 +61,7 @@ test.describe('Workbench Part', () => {
     // Expect left part to be activated.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .5,
           child1: new MPart({

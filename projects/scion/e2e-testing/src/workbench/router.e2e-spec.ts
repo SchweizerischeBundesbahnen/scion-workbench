@@ -13,7 +13,7 @@ import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
-import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {BinaryMTreeNode, MPart} from '../matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../workbench.model';
 
 test.describe('Workbench Router', () => {
@@ -1185,7 +1185,7 @@ test.describe('Workbench Router', () => {
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .25,
           child1: new MPart({
@@ -1218,7 +1218,7 @@ test.describe('Workbench Router', () => {
     // THEN: Expect the workbench layout to be restored.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .25,
           child1: new MPart({
@@ -1264,7 +1264,7 @@ test.describe('Workbench Router', () => {
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .25,
           child1: new MPart({

@@ -12,7 +12,7 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
-import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {BinaryMTreeNode, MPart} from '../matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../workbench.model';
 import {PerspectivePagePO} from './page-object/perspective-page.po';
 import {WorkbenchNavigator} from './workbench-navigator';
@@ -67,7 +67,7 @@ test.describe('Workbench View', () => {
     // Expect test view to be removed from the origin window.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .25,
           child1: new MPart({id: 'left', views: [{id: 'other'}], activeViewId: 'other'}),
@@ -132,7 +132,7 @@ test.describe('Workbench View', () => {
     // Expect test view to be removed from the origin window.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .25,
           child1: new MPart({id: 'left', views: [{id: 'other'}], activeViewId: 'other'}),
@@ -298,7 +298,7 @@ test.describe('Workbench View', () => {
     // Expect peripheral view to be dragged to the workbench grid.
     await expect(newWindow.appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .8,
           child1: new MPart({id: MAIN_AREA}),
@@ -352,7 +352,7 @@ test.describe('Workbench View', () => {
     // Expect the layout of the anonymous perspective to be restored.
     await expect(newWindow.appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .8,
           child1: new MPart({id: MAIN_AREA}),
@@ -409,7 +409,7 @@ test.describe('Workbench View', () => {
     // Expect peripheral view to be dragged to the workbench grid.
     await expect(newWindow.appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
-        root: new MTreeNode({
+        root: new BinaryMTreeNode({
           direction: 'row',
           ratio: .8,
           child1: new MPart({id: MAIN_AREA}),

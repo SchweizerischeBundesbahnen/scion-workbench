@@ -12,7 +12,7 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
-import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {BinaryMTreeNode, MPart} from '../matcher/to-equal-workbench-layout.matcher';
 
 test.describe('View Drag', () => {
 
@@ -178,7 +178,7 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to a new part in the west.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .5,
             child1: new MPart({
@@ -216,7 +216,7 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to a new part in the east.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .5,
             child1: new MPart({
@@ -257,7 +257,7 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to a new part in the north.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'column',
             ratio: .5,
             child1: new MPart({
@@ -298,7 +298,7 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to a new part in the south.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'column',
             ratio: .5,
             child1: new MPart({
@@ -345,7 +345,7 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .5,
             child1: new MPart({
@@ -389,10 +389,10 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to a new part in the west of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .5,
-            child1: new MTreeNode({
+            child1: new BinaryMTreeNode({
               direction: 'row',
               ratio: .5,
               child1: new MPart({
@@ -442,10 +442,10 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to a new part in the east of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .5,
-            child1: new MTreeNode({
+            child1: new BinaryMTreeNode({
               direction: 'row',
               ratio: .5,
               child1: new MPart({
@@ -498,10 +498,10 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to a new part in the north of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .5,
-            child1: new MTreeNode({
+            child1: new BinaryMTreeNode({
               direction: 'column',
               ratio: .5,
               child1: new MPart({
@@ -554,10 +554,10 @@ test.describe('View Drag', () => {
       // Expect view 2 to be moved to a new part in the south of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
-          root: new MTreeNode({
+          root: new BinaryMTreeNode({
             direction: 'row',
             ratio: .5,
-            child1: new MTreeNode({
+            child1: new BinaryMTreeNode({
               direction: 'column',
               ratio: .5,
               child1: new MPart({
