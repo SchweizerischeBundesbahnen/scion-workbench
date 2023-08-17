@@ -78,7 +78,7 @@ test.describe('Workbench Popup Capability', () => {
       type: 'popup',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: '<empty>',
+        path: '',
       },
     });
     await expect(registeredCapability.properties!['path']).toEqual('');

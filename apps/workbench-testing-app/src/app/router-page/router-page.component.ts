@@ -102,7 +102,7 @@ export default class RouterPageComponent {
   private constructRouterLinkCommands(): any[] {
     const matrixParams: Params | null = SciKeyValueFieldComponent.toDictionary(this.form.controls.matrixParams);
     const path = this.form.controls.path.value;
-    const commands: any[] = path === '<empty>' ? [] : path.split('/');
+    const commands: any[] = path === '' ? [] : path.split('/');
 
     // When tokenizing the path into segments, an empty segment is created for the leading slash (if any).
     if (path.startsWith('/')) {

@@ -237,7 +237,7 @@ test.describe('Workbench Router', () => {
 
     // close the view 1
     await routerPage.viewTab.click();
-    await routerPage.enterPath('<empty>');
+    await routerPage.enterPath('');
     await routerPage.enterTarget(testeeViewId);
     await routerPage.checkClose(true);
     await routerPage.clickNavigate();
@@ -272,7 +272,7 @@ test.describe('Workbench Router', () => {
 
     // close the unknown view 99
     await routerPage.viewTab.click();
-    await routerPage.enterPath('<empty>');
+    await routerPage.enterPath('');
     await routerPage.enterTarget('view.99');
     await routerPage.checkClose(true);
     await routerPage.clickNavigate();
@@ -1256,7 +1256,7 @@ test.describe('Workbench Router', () => {
 
     // Open view in the left part.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('<empty>');
+    await routerPage.enterPath('');
     await routerPage.enterTarget('testee');
     await routerPage.enterBlankPartId('left');
     await routerPage.clickNavigate();
@@ -1298,7 +1298,7 @@ test.describe('Workbench Router', () => {
 
     // Open view in the left part.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('<empty>');
+    await routerPage.enterPath('');
     await routerPage.enterTarget('testee');
     await routerPage.clickNavigate();
 

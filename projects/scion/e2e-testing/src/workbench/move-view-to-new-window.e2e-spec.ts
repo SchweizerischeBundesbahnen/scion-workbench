@@ -157,7 +157,7 @@ test.describe('Workbench View', () => {
 
     // Open test view in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('<empty>');
+    await routerPage.enterPath('');
     await routerPage.enterTarget('testee');
     await routerPage.clickNavigate();
 

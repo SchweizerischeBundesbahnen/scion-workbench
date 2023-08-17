@@ -164,7 +164,7 @@ test.describe('Workbench RouterLink', () => {
     await expect(await testView.viewTab.isPresent()).toBe(true);
 
     // WHEN
-    await routerPage.enterPath('<empty>');
+    await routerPage.enterPath('');
     await routerPage.enterTarget(await testView.getViewId());
     await routerPage.checkClose(true);
     await routerPage.clickNavigateViaRouterLink();
@@ -184,7 +184,7 @@ test.describe('Workbench RouterLink', () => {
 
     // WHEN
     await routerPage2.viewTab.click();
-    await routerPage2.enterPath('<empty>');
+    await routerPage2.enterPath('');
     await routerPage2.checkClose(true);
     await routerPage2.clickNavigateViaRouterLink();
 

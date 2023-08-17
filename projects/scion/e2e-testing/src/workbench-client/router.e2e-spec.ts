@@ -908,7 +908,7 @@ test.describe('Workbench Router', () => {
       type: 'view',
       qualifier: {component: 'testee', path: 'empty'},
       properties: {
-        path: '<empty>',
+        path: '',
         title: 'testee',
         cssClass: 'testee',
       },

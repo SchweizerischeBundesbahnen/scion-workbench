@@ -166,8 +166,6 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         return null;
       case '<undefined>':
         return undefined;
-      case '<empty>':
-        return '';
       default:
         return path;
     }

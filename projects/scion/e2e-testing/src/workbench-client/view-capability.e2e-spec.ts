@@ -98,7 +98,7 @@ test.describe('Workbench View Capability', () => {
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
-        path: '<empty>',
+        path: '',
       },
     });
     await expect(registeredCapability.properties!['path']).toEqual('');
