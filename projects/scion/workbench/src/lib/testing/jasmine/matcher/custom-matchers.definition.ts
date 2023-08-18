@@ -8,10 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Type} from '@angular/core';
-import {MPart, MPartGrid, MTreeNode} from '../../../layout/workbench-layout.model';
-import MatchersUtil = jasmine.MatchersUtil;
-import CustomMatcherResult = jasmine.CustomMatcherResult;
-import CustomMatcher = jasmine.CustomMatcher;
+import {ExpectedWorkbenchLayout} from './to-equal-workbench-layout.matcher';
 
 /**
  * Extends the Jasmine expect API with project specific custom matchers.
@@ -98,31 +95,4 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
    * ```
    */
   toHaveTransientState(expected: string, expectationFailOutput?: any): boolean;
-}
-
-/**
- * Delegates to the Jasmine `toEqual` matcher to be used in custom matchers.
- */
-export function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFailOutput?: string): CustomMatcherResult {
-  const toEqualMatcher: CustomMatcher = (jasmine as any).matchers.toEqual(util);
-  const result = toEqualMatcher.compare(actual, expected);
-  if (!result.pass && expectationFailOutput) {
-    result.message = `${result.message} [${expectationFailOutput}]`;
-  }
-
-  return result;
-}
-
-/**
- * Expected layout used in {@link #toEqualWorkbenchLayout}.
- */
-export interface ExpectedWorkbenchLayout {
-  /**
-   * Specifies the expected main grid. If not set, defaults to a grid with only the initial part.
-   */
-  mainGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
-  /**
-   * Specifies the expected peripheral grid. If not set, defaults to a grid with only the main area part.
-   */
-  peripheralGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
 }
