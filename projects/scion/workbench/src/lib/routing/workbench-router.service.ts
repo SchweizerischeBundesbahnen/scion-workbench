@@ -176,7 +176,7 @@ export class WorkbenchRouter implements OnDestroy {
    *        The callback is passed the current layout which can be modified and returned for navigation. Returning `null` does not perform the navigation.
    * @param extras - Controls how to perform the navigation.
    */
-  public ɵnavigate(onNavigate: (layout: ɵWorkbenchLayout) => ɵWorkbenchLayout | WorkbenchNavigation | null, extras?: NavigationExtras): Promise<boolean> {
+  public ɵnavigate(onNavigate: (layout: ɵWorkbenchLayout) => Promise<ɵWorkbenchLayout | WorkbenchNavigation | null> | ɵWorkbenchLayout | WorkbenchNavigation | null, extras?: NavigationExtras): Promise<boolean> {
     // Ensure to run in Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.ɵnavigate(onNavigate, extras));
