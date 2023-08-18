@@ -49,6 +49,7 @@ export class WorkbenchTestingModule {
         {provide: WORKBENCH_LAYOUT_INITIAL_PART_ID, useValue: 'main'},
         {provide: ComponentFixtureAutoDetect, useValue: true},
         {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => inject(Router).initialNavigation()},
+        {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => localStorage.clear()},
       ],
     };
   }

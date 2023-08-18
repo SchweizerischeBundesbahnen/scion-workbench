@@ -16,16 +16,17 @@ import {Injectable} from '@angular/core';
 export abstract class WorkbenchStorage {
 
   /**
-   * Method invoked to load data from persisted storage.
+   * Method invoked to load a value from persisted storage.
    */
-  public abstract load(): Promise<string | null> | string | null;
+  public abstract load(key: string): Promise<string | null> | string | null;
 
   /**
-   * Method invoked to write data to persisted storage.
+   * Method invoked to write a value to persisted storage.
    *
-   * Among other things, this method is called during page unload. If sending data to a web server, use `navigator.sendBeacon()` instead of `window.fetch()` to reliably transmit data.
+   * This method may be called during page unload. If sending data to a web server,
+   * use `navigator.sendBeacon()` instead of `window.fetch()` to reliably transmit data.
    */
-  public abstract store(data: string): void;
+  public abstract store(key: string, value: string): Promise<void> | void;
 }
 
 /**
@@ -38,13 +39,11 @@ export abstract class WorkbenchStorage {
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered conditionally under `WorkbenchStorage` DI token. */)
 export class DefaultWorkbenchStorage implements WorkbenchStorage {
 
-  private readonly STORAGE_KEY = '@scion/workbench';
-
-  public load(): string | null {
-    return localStorage.getItem(this.STORAGE_KEY);
+  public load(key: string): string | null {
+    return localStorage.getItem(key);
   }
 
-  public store(data: string): void {
-    localStorage.setItem(this.STORAGE_KEY, data);
+  public store(key: string, value: string): void {
+    localStorage.setItem(key, value);
   }
 }

@@ -49,6 +49,7 @@ export class WorkbenchPerspectiveRegistry implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this._registry.objects.forEach(perspective => perspective.destroy());
     this._registry.clear();
   }
 }

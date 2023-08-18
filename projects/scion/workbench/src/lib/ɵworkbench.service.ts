@@ -91,8 +91,8 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public resetPerspective(): Promise<void> {
-    return this._perspectiveService.resetPerspective();
+  public async resetPerspective(): Promise<void> {
+    await this._perspectiveService.resetPerspective();
   }
 
   /** @inheritDoc */
