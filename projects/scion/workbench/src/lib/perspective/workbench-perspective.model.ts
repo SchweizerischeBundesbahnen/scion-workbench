@@ -9,7 +9,6 @@
  */
 import {Observable} from 'rxjs';
 import {WorkbenchLayout} from '../layout/workbench-layout';
-import {Commands} from '../routing/workbench-router.service';
 
 /**
  * A perspective is an arrangement of views around the main area.
@@ -111,21 +110,3 @@ export type WorkbenchLayoutFn = (layout: WorkbenchLayout) => Promise<WorkbenchLa
  * The function is passed a list of registered perspectives. The function can call `inject` to get any required dependencies.
  */
 export type WorkbenchPerspectiveSelectionFn = (perspectives: WorkbenchPerspective[]) => Promise<WorkbenchPerspective | null> | WorkbenchPerspective | null;
-
-/**
- * Perspective data stored in persistent storage.
- */
-export interface ɵStoredPerspectiveData {
-  /**
-   * The actual peripheral grid.
-   */
-  actualPeripheralGrid: string | null;
-  /**
-   * The initial peripheral grid.
-   */
-  initialPeripheralGrid: string | null;
-  /**
-   * Commands of views contained in the peripheral grid.
-   */
-  viewOutlets: {[viewId: string]: Commands};
-}

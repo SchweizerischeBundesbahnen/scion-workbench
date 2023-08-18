@@ -7,25 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DestroyRef, EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
-import {Router} from '@angular/router';
-import {WorkbenchNavigation, WorkbenchRouter} from '../routing/workbench-router.service';
-import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
+import {EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
 import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
-import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
-import {RouterUtils} from '../routing/router.util';
-import {WorkbenchPerspectiveDefinition, ɵStoredPerspectiveData} from './workbench-perspective.model';
+import {WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {WorkbenchInitializer} from '../startup/workbench-initializer';
 import {Logger} from '../logging/logger';
-import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
-import {WorkbenchLayoutSerializer} from '../layout/workench-layout-serializer.service';
-import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {WorkbenchStorageService} from '../storage/workbench-storage.service';
-import {Dictionary} from '@scion/toolkit/util';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
 
 /**
  * Provides access to perspectives.
@@ -38,20 +28,12 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
   constructor(private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _perspectiveRegistry: WorkbenchPerspectiveRegistry,
-              private _workbenchRouter: WorkbenchRouter,
-              private _router: Router,
-              private _perspectiveViewConflictResolver: WorkbenchPerspectiveViewConflictResolver,
               private _environmentInjector: EnvironmentInjector,
-              private _workbenchLayoutFactory: WorkbenchLayoutFactory,
-              private _workbenchStorageService: WorkbenchStorageService,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _workbenchLayoutSerializer: WorkbenchLayoutSerializer,
-              private _destroyRef: DestroyRef,
+              private _workbenchPerspectiveStorageService: WorkbenchPerspectiveStorageService,
               workbenchStartup: WorkbenchStartup,
               logger: Logger) {
     workbenchStartup.whenStarted
       .then(() => this.activateInitialPerspective())
-      .then(() => this.installStorageSynchronizer())
       .catch(error => logger.error(() => 'Failed to initialize perspectives', error));
   }
 
@@ -92,8 +74,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       return;
     }
 
-    const storedPerspectiveData: Dictionary<ɵStoredPerspectiveData> | null = this._workbenchStorageService.get(PERSPECTIVES_STORAGE_KEY);
-    const perspective = runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchPerspective(definition, storedPerspectiveData?.[perspectiveId]));
+    const perspective = runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchPerspective(definition));
     this._perspectiveRegistry.register(perspective);
   }
 
@@ -101,73 +82,21 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
    * Switches to the specified perspective. The main area will not change.
    */
   public async switchPerspective(id: string): Promise<boolean> {
-    const activePerspective = this.getActivePerspective();
-    if (activePerspective?.id === id) {
+    if (this.activePerspective?.id === id) {
       return true;
     }
-    const perspective = this._perspectiveRegistry.get(id);
-
-    // Memoize layout and outlets of the active perspective.
-    this.memoizeActivePerspectiveLayout();
-
-    // Construct the perspective when it is activated for the first time.
-    if (!perspective.constructed) {
-      await perspective.construct();
+    const activated = await this._perspectiveRegistry.get(id).activate();
+    if (activated) {
+      await this._workbenchPerspectiveStorageService.storeActivePerspectiveId(id);
     }
-
-    const success = await this._workbenchRouter.ɵnavigate(currentLayout => {
-      activePerspective?.activate(false);
-      perspective.activate(true);
-      return this.createPerspectiveActivationNavigation(currentLayout, perspective);
-    });
-    if (!success) {
-      activePerspective?.activate(true);
-      perspective.activate(false);
-      return false;
-    }
-
-    return true;
+    return activated;
   }
 
   /**
    * Resets the currently active perspective to its initial layout. The main area will not change.
    */
   public async resetPerspective(): Promise<void> {
-    const activePerspective = this.getActivePerspective();
-    if (!activePerspective) {
-      throw Error('[WorkbenchPerspectiveError] Failed to reset perspective. No active perspective found.');
-    }
-
-    await activePerspective.reset();
-    const reset = await this._workbenchRouter.ɵnavigate(currentLayout => this.createPerspectiveActivationNavigation(currentLayout, activePerspective));
-    if (!reset) {
-      throw Error(`[WorkbenchPerspectiveError] Failed to reset perspective '${activePerspective.id}.`);
-    }
-  }
-
-  /**
-   * Creates the {@link WorkbenchNavigation} object to activate given perspective.
-   *
-   * When switching to another perspective, name clashes between the views contained in the perspective
-   * and the views contained in the main area are possible. This navigation detects and resolves name conflicts,
-   * changing the specified {@link WorkbenchPerspective} object if necessary.
-   *
-   * @param currentLayout - Specifies the current layout.
-   * @param perspective - Specifies the perspective to activate.
-   */
-  private createPerspectiveActivationNavigation(currentLayout: ɵWorkbenchLayout, perspective: ɵWorkbenchPerspective): WorkbenchNavigation {
-    // Resolve name clashes between views defined by the perspective and views contained in the main area.
-    this._perspectiveViewConflictResolver.resolve(currentLayout.mainGrid, perspective);
-
-    return {
-      layout: this._workbenchLayoutFactory.create({mainGrid: currentLayout.mainGrid, peripheralGrid: perspective.grid}),
-      viewOutlets: {
-        // Remove outlets of current perspective from the URL.
-        ...RouterUtils.outletsFromCurrentUrl(this._router, currentLayout.views({scope: 'peripheral'}).map(view => view.id), () => null),
-        // Add outlets of the perspective to activate to the URL.
-        ...perspective.viewOutlets,
-      },
-    };
+    await this.activePerspective?.reset();
   }
 
   /**
@@ -177,7 +106,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
     // Determine the initial perspective.
     const initialPerspectiveId = await (async (): Promise<string | undefined> => {
       // Read initial perspective from storage.
-      const storedActivePerspectiveId = this._workbenchStorageService.get<string>(ACTIVE_PERSPECTIVE_ID_STORAGE_KEY);
+      const storedActivePerspectiveId = await this._workbenchPerspectiveStorageService.loadActivePerspectiveId();
       if (storedActivePerspectiveId && this._perspectiveRegistry.get(storedActivePerspectiveId, {orElse: null}) !== null) {
         return storedActivePerspectiveId;
       }
@@ -204,63 +133,12 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
   }
 
   /**
-   * Memoizes layout and outlets of the active perspective, if any.
-   */
-  private memoizeActivePerspectiveLayout(): void {
-    const activePerspective = this.getActivePerspective();
-    if (!activePerspective) {
-      return;
-    }
-
-    const currentLayout = this._workbenchLayoutService.layout!;
-    activePerspective.grid = currentLayout.peripheralGrid;
-    activePerspective.viewOutlets = RouterUtils.outletsFromCurrentUrl(this._router, currentLayout.views({scope: 'peripheral'}).map(view => view.id));
-  }
-
-  /**
    * Returns the currently active perspective, or `null` if there is no current perspective.
    */
-  private getActivePerspective(): ɵWorkbenchPerspective | null {
+  private get activePerspective(): ɵWorkbenchPerspective | null {
     return this._perspectiveRegistry.perspectives.find(perspective => perspective.active) ?? null;
   }
-
-  /**
-   * Installs the synchronizer to update the storage on layout change.
-   */
-  private installStorageSynchronizer(): void {
-    this._workbenchLayoutService.layout$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(() => {
-        // Memoize layout and outlets of the active perspective.
-        this.memoizeActivePerspectiveLayout();
-
-        // Collect data to be stored.
-        const storedPerspectiveData: Dictionary<ɵStoredPerspectiveData> = this._workbenchStorageService.get(PERSPECTIVES_STORAGE_KEY) ?? {};
-        this._perspectiveRegistry.perspectives
-          .filter(perspective => perspective.constructed)
-          .forEach(perspective => {
-            storedPerspectiveData[perspective.id] = {
-              initialPeripheralGrid: this._workbenchLayoutSerializer.serialize(perspective.initialGrid!, {nullIfEmpty: true}),
-              actualPeripheralGrid: this._workbenchLayoutSerializer.serialize(perspective.grid!, {nullIfEmpty: true}),
-              viewOutlets: perspective.viewOutlets,
-            };
-          });
-
-        this._workbenchStorageService.set(PERSPECTIVES_STORAGE_KEY, storedPerspectiveData);
-        this._workbenchStorageService.set(ACTIVE_PERSPECTIVE_ID_STORAGE_KEY, this.getActivePerspective()?.id);
-      });
-  }
 }
-
-/**
- * Key to associate perspective data in the workbench storage.
- */
-const PERSPECTIVES_STORAGE_KEY = 'perspectives';
-
-/**
- * Key to associate the active perspective in the workbench storage.
- */
-const ACTIVE_PERSPECTIVE_ID_STORAGE_KEY = 'activePerspectiveId';
 
 /**
  * Identifier for the "synthetic" perspective that the workbench creates if using a workbench layout without configuring perspectives.

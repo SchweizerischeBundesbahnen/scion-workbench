@@ -22,10 +22,9 @@ import {ViewMoveHandler} from './view/view-move-handler.service';
 import {provideWorkbenchMicrofrontendSupport} from './microfrontend-platform/workbench-microfrontend-support';
 import {provideWorkbenchLauncher} from './startup/workbench-launcher.service';
 import {provideLogging} from './logging';
-import {WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './startup/workbench-initializer';
+import {WORKBENCH_POST_STARTUP, WORKBENCH_STARTUP} from './startup/workbench-initializer';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
 import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-storage';
-import {WorkbenchStorageService} from './storage/workbench-storage.service';
 import {provideLocationPatch} from './routing/ɵlocation';
 
 /**
@@ -94,11 +93,6 @@ export class WorkbenchModule {
           provide: WORKBENCH_FORROOT_GUARD,
           useFactory: provideForRootGuard,
           deps: [[WorkbenchService, new Optional(), new SkipSelf()]],
-        },
-        {
-          provide: WORKBENCH_PRE_STARTUP,
-          multi: true,
-          useExisting: WorkbenchStorageService,
         },
         {
           provide: WORKBENCH_STARTUP,
