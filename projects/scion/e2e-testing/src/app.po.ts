@@ -61,7 +61,19 @@ export class AppPO {
       featureQueryParams.append('showNewTabAction', `${options.showNewTabAction}`);
     }
 
-    await this.page.goto(`${options?.url ?? ''}/?${this._workbenchStartupQueryParams.toString()}#/${featureQueryParams.toString() ? `?${featureQueryParams.toString()}` : ''}`);
+    // Perform navigation.
+    await this.page.goto((() => {
+      const [baseUrl = '/', hashedUrl = ''] = (options?.url?.split('#') ?? []);
+
+      // Add startup query params to the base URL part.
+      const url = `${baseUrl}?${this._workbenchStartupQueryParams.toString()}#${hashedUrl}`;
+      if (!featureQueryParams.size) {
+        return url;
+      }
+      // Add feature query params to the hashed URL part.
+      return hashedUrl.includes('?') ? `${url}&${featureQueryParams}` : `${url}?${featureQueryParams}`;
+    })());
+
     // Wait until the workbench completed startup.
     await this.waitUntilWorkbenchStarted();
   }

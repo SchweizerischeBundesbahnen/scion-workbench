@@ -12,6 +12,9 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {LayoutPagePO} from './page-object/layout-page.po';
+import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {MAIN_AREA_PART_ID} from '../workbench.model';
 
 test.describe('Workbench Router', () => {
 
@@ -1164,5 +1167,82 @@ test.describe('Workbench Router', () => {
 
     // expect the test view to be the active view
     await expect(await testee1ViewPO.viewTab.isActive()).toBe(true);
+  });
+
+  test('should support app URL to contain view outlets of views in the perspectival grid', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
+
+    // Define perspective with a part on the left.
+    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
+    await perspectiveToggleButtonPO.click();
+    const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPagePO.addPart('left', {align: 'left', ratio: .25});
+
+    // Add view to the left perspectival part.
+    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPagePO.enterPath('test-view');
+    await routerPagePO.enterTarget('blank');
+    await routerPagePO.enterBlankPartId('left');
+    await routerPagePO.clickNavigate();
+
+    // Expect the view to be opened in the left part.
+    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      peripheralGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .25,
+          child1: new MPart({
+            id: 'left',
+            views: [{id: 'view.3'}], // test view page
+            activeViewId: 'view.3',
+          }),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
+        }),
+      },
+      mainGrid: {
+        root: new MPart({
+          id: await layoutPagePO.viewPO.part.getPartId(),
+          views: [{id: 'view.1'}, {id: 'view.2'}], // layout page, router page
+          activeViewId: 'view.2',
+        }),
+        activePartId: await layoutPagePO.viewPO.part.getPartId(),
+      },
+    });
+
+    // Capture current URL.
+    const url = page.url();
+
+    // Clear the browser URL.
+    await page.goto('about:blank');
+
+    // WHEN: Opening the app with a URL that contains view outlets of views from the perspective grid
+    await appPO.navigateTo({url, microfrontendSupport: false, perspectives: ['perspective']});
+
+    // THEN: Expect the workbench layout to be restored.
+    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      peripheralGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .25,
+          child1: new MPart({
+            id: 'left',
+            views: [{id: 'view.3'}], // test view page
+            activeViewId: 'view.3',
+          }),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
+        }),
+      },
+      mainGrid: {
+        root: new MPart({
+          id: await layoutPagePO.viewPO.part.getPartId(),
+          views: [{id: 'view.1'}, {id: 'view.2'}], // layout page, router page
+          activeViewId: 'view.2',
+        }),
+        activePartId: await layoutPagePO.viewPO.part.getPartId(),
+      },
+    });
+
+    // Expect the test view to display.
+    await expect(new ViewPagePO(appPO, 'view.3').locator).toBeVisible();
   });
 });

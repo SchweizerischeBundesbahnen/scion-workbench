@@ -23,38 +23,37 @@ import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
  */
 export class ViewPagePO {
 
-  private readonly _locator: Locator;
-
+  public readonly locator: Locator;
   public readonly viewPO: ViewPO;
   public readonly viewTabPO: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
     this.viewPO = appPO.view({viewId});
     this.viewTabPO = appPO.view({viewId}).viewTab;
-    this._locator = this.viewPO.locator('app-view-page');
+    this.locator = this.viewPO.locator('app-view-page');
   }
 
   public async isPresent(): Promise<boolean> {
-    return await this.viewTabPO.isPresent() && await isPresent(this._locator);
+    return await this.viewTabPO.isPresent() && await isPresent(this.locator);
   }
 
   public async isVisible(): Promise<boolean> {
-    return await this.viewPO.isVisible() && await this._locator.isVisible();
+    return await this.viewPO.isVisible() && await this.locator.isVisible();
   }
 
   public async getViewId(): Promise<string> {
-    return this._locator.locator('span.e2e-view-id').innerText();
+    return this.locator.locator('span.e2e-view-id').innerText();
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    return this._locator.locator('span.e2e-component-instance-id').innerText();
+    return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getRouteParams(): Promise<Params> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
+    const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-params'));
     await accordionPO.expand();
     try {
-      return await new SciKeyValuePO(this._locator.locator('sci-key-value.e2e-route-params')).readEntries();
+      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-route-params')).readEntries();
     }
     finally {
       await accordionPO.collapse();
@@ -62,32 +61,32 @@ export class ViewPagePO {
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await this._locator.locator('input.e2e-title').fill(title);
+    await this.locator.locator('input.e2e-title').fill(title);
   }
 
   public async enterHeading(heading: string): Promise<void> {
-    await this._locator.locator('input.e2e-heading').fill(heading);
+    await this.locator.locator('input.e2e-heading').fill(heading);
   }
 
   public async checkDirty(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-dirty')).toggle(check);
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-dirty')).toggle(check);
   }
 
   public async checkClosable(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-closable')).toggle(check);
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-closable')).toggle(check);
   }
 
   public async clickClose(): Promise<void> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-view-actions'));
+    const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-actions'));
     await accordionPO.expand();
-    await this._locator.locator('button.e2e-close').click();
+    await this.locator.locator('button.e2e-close').click();
   }
 
   public async addViewAction(partAction: WorkbenchPartActionDescriptor, options?: {append?: boolean}): Promise<void> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-part-actions'));
+    const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-part-actions'));
     await accordionPO.expand();
     try {
-      const inputLocator = this._locator.locator('input.e2e-part-actions');
+      const inputLocator = this.locator.locator('input.e2e-part-actions');
       if (options?.append ?? true) {
         const input = await inputLocator.inputValue() || null;
         const presentActions: WorkbenchPartActionDescriptor[] = coerceArray(input ? JSON.parse(input) : null);
@@ -103,11 +102,11 @@ export class ViewPagePO {
   }
 
   public async enterFreeText(text: string): Promise<void> {
-    await this._locator.locator('input.e2e-free-text').fill(text);
+    await this.locator.locator('input.e2e-free-text').fill(text);
   }
 
   public getFreeText(): Promise<string> {
-    return this._locator.locator('input.e2e-free-text').inputValue();
+    return this.locator.locator('input.e2e-free-text').inputValue();
   }
 }
 
