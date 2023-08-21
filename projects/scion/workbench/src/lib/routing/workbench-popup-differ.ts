@@ -39,18 +39,18 @@ export class WorkbenchPopupDiffer {
  */
 export class WorkbenchPopupDiff {
 
-  public readonly addedPopups = new Array<string>();
-  public readonly removedPopups = new Array<string>();
+  public readonly addedPopupOutlets = new Array<string>();
+  public readonly removedPopupOutlets = new Array<string>();
 
   constructor(changes: IterableChanges<string> | null) {
-    changes?.forEachAddedItem(({item}) => this.addedPopups.push(item));
-    changes?.forEachRemovedItem(({item}) => this.removedPopups.push(item));
+    changes?.forEachAddedItem(({item}) => this.addedPopupOutlets.push(item));
+    changes?.forEachRemovedItem(({item}) => this.removedPopupOutlets.push(item));
   }
 
   public toString(): string {
     return `${new Array<string>()
-      .concat(this.addedPopups.length ? `addedPopups=[${this.addedPopups}]` : [])
-      .concat(this.removedPopups.length ? `removedPopups=[${this.removedPopups}]` : [])
+      .concat(this.addedPopupOutlets.length ? `addedPopupOutlets=[${this.addedPopupOutlets}]` : [])
+      .concat(this.removedPopupOutlets.length ? `removedPopupOutlets=[${this.removedPopupOutlets}]` : [])
       .join(', ')}`;
   }
 }

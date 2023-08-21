@@ -29,7 +29,6 @@ import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
 import {PartComponent} from '../part/part.component';
 import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
-import {RouterUtils} from './router.util';
 import {canDeactivateWorkbenchView} from '../view/workbench-view-pre-destroy.guard';
 import {resolveWorkbenchNavigationState} from './navigation-state.resolver';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -85,7 +84,7 @@ export class WorkbenchUrlObserver {
     this._logger.debug(() => 'onNavigationCancel', LoggerNames.ROUTING, event);
     this.undoAuxiliaryRoutesRegistration();
     this.undoWorkbenchLayoutDiffer();
-    this.undoWorkbenchPoupDiffer();
+    this.undoWorkbenchPopupDiffer();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
 
@@ -94,7 +93,7 @@ export class WorkbenchUrlObserver {
     this._logger.debug(() => 'onNavigationError', LoggerNames.ROUTING, event);
     this.undoAuxiliaryRoutesRegistration();
     this.undoWorkbenchLayoutDiffer();
-    this.undoWorkbenchPoupDiffer();
+    this.undoWorkbenchPopupDiffer();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
 
@@ -138,7 +137,7 @@ export class WorkbenchUrlObserver {
     });
     return {
       layout,
-      layoutDiff: this._workbenchLayoutDiffer.diff(layout),
+      layoutDiff: this._workbenchLayoutDiffer.diff(layout, urlTree),
       popupDiff: this._workbenchPopupDiffer.diff(urlTree),
     };
   }
@@ -148,14 +147,14 @@ export class WorkbenchUrlObserver {
    */
   private registerAddedViewAuxiliaryRoutes(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    const addedViewIds = navigationContext.layoutDiff.addedViews.filter(RouterUtils.isPrimaryRouteTarget);
+    const addedViewOutlets = navigationContext.layoutDiff.addedViewOutlets;
 
-    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewIds, {
+    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewOutlets, {
       canDeactivate: [canDeactivateWorkbenchView],
       resolve: {[WorkbenchRouteData.state]: resolveWorkbenchNavigationState},
     });
     if (newAuxiliaryRoutes.length) {
-      this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewIds}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
+      this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
     }
   }
 
@@ -164,11 +163,11 @@ export class WorkbenchUrlObserver {
    */
   public registerAddedPopupAuxiliaryRoutes(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    const addedPopupIds = navigationContext.popupDiff.addedPopups;
+    const addedPopupOutlets = navigationContext.popupDiff.addedPopupOutlets;
 
-    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedPopupIds);
+    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedPopupOutlets);
     if (newAuxiliaryRoutes.length) {
-      this._logger.debug(() => `Registered auxiliary routes for popups: ${addedPopupIds}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
+      this._logger.debug(() => `Registered auxiliary routes for popups: ${addedPopupOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
     }
   }
 
@@ -179,7 +178,8 @@ export class WorkbenchUrlObserver {
    */
   private undoWorkbenchLayoutDiffer(): void {
     const prevNavigateLayout = this._workbenchLayoutService.layout; // Layout in `WorkbenchLayoutService` is only updated after successful navigation
-    this._workbenchLayoutDiffer.diff(prevNavigateLayout ?? undefined);
+    const prevNavigateUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
+    this._workbenchLayoutDiffer.diff(prevNavigateLayout, prevNavigateUrl);
   }
 
   /**
@@ -187,9 +187,9 @@ export class WorkbenchUrlObserver {
    *
    * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
    */
-  private undoWorkbenchPoupDiffer(): void {
-    const prevNavigateUrl = this._router.url; // Browser URL is only updated after successful navigation
-    this._workbenchPopupDiffer.diff(this._router.parseUrl(prevNavigateUrl));
+  private undoWorkbenchPopupDiffer(): void {
+    const prevNavigateUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
+    this._workbenchPopupDiffer.diff(prevNavigateUrl);
   }
 
   /**
@@ -200,7 +200,7 @@ export class WorkbenchUrlObserver {
   private undoAuxiliaryRoutesRegistration(): void {
     const layoutDiff = this._workbenchRouter.getCurrentNavigationContext().layoutDiff;
     const popupDiff = this._workbenchRouter.getCurrentNavigationContext().popupDiff;
-    const addedOutlets: string[] = [...layoutDiff.addedViews.filter(RouterUtils.isPrimaryRouteTarget), ...popupDiff.addedPopups];
+    const addedOutlets: string[] = [...layoutDiff.addedViewOutlets, ...popupDiff.addedPopupOutlets];
     if (addedOutlets.length) {
       this._auxRoutesRegistrator.unregisterOutletAuxiliaryRoutes(addedOutlets);
       this._logger.debug(() => `Undo auxiliary routes registration for outlet(s): ${addedOutlets}`, LoggerNames.ROUTING);
@@ -237,7 +237,7 @@ export class WorkbenchUrlObserver {
   private unregisterRemovedOutletAuxiliaryRoutes(): void {
     const layoutDiff = this._workbenchRouter.getCurrentNavigationContext().layoutDiff;
     const popupDiff = this._workbenchRouter.getCurrentNavigationContext().popupDiff;
-    const removedOutlets: string[] = [...layoutDiff.removedViews.filter(RouterUtils.isPrimaryRouteTarget), ...popupDiff.removedPopups];
+    const removedOutlets: string[] = [...layoutDiff.removedViewOutlets, ...popupDiff.removedPopupOutlets];
     if (removedOutlets.length) {
       this._logger.debug(() => 'Unregistering outlet auxiliary routes: ', LoggerNames.ROUTING, removedOutlets);
       this._auxRoutesRegistrator.unregisterOutletAuxiliaryRoutes(removedOutlets);
