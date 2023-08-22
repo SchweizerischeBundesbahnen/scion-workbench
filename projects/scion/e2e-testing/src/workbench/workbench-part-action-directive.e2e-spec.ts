@@ -26,18 +26,18 @@ test.describe('Workbench Part Action Directive', () => {
     await viewPagePO2.addViewAction({content: 'launch', cssClass: 'view-2-launch-action'});
 
     await viewTabPO1.click();
-    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(true);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-1-search-action'}).isPresent()).toBe(true);
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
 
     await viewTabPO2.click();
-    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(true);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(true);
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(true);
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(true);
 
-    await appPO.activePart.closeViewTabs();
-    await expect(await appPO.activePart.action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
-    await expect(await appPO.activePart.action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
+    await appPO.activePart({scope: 'mainArea'}).closeViewTabs();
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
+    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
   });
 });

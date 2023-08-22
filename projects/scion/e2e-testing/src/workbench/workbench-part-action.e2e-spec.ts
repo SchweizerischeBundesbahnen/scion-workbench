@@ -315,7 +315,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -334,7 +334,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -353,7 +353,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -372,7 +372,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -391,7 +391,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -410,7 +410,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -429,7 +429,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -448,7 +448,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -467,7 +467,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -486,7 +486,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
     await layoutPagePO.registerPartAction('View Action', {viewId: viewPO.viewId, cssClass: 'e2e-action-view'});
 
     // Drag the view
@@ -502,7 +502,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
 
     // Register view-specific action
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
@@ -522,7 +522,7 @@ test.describe('Workbench Part Action', () => {
 
     // Open a view
     const viewPO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const mainPartId = await appPO.activePart.getPartId();
+    const mainPartId = await appPO.activePart({scope: 'mainArea'}).getPartId();
 
     // Register view-specific action
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);

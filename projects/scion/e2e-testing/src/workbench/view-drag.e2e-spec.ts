@@ -27,7 +27,7 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the center quickly
-      const partId = await appPO.activePart.getPartId();
+      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
       await view2PO.viewTabPO.dragToPart({region: 'center'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
@@ -49,7 +49,7 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the north quickly
-      const partId = await appPO.activePart.getPartId();
+      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
       await view2PO.viewTabPO.dragToPart({region: 'north'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
@@ -71,7 +71,7 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the center quickly
-      const partId = await appPO.activePart.getPartId();
+      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
       await view2PO.viewTabPO.dragToPart({region: 'east'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
@@ -93,7 +93,7 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the south quickly
-      const partId = await appPO.activePart.getPartId();
+      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
       await view2PO.viewTabPO.dragToPart({region: 'south'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
@@ -115,7 +115,7 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the west quickly
-      const partId = await appPO.activePart.getPartId();
+      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
       await view2PO.viewTabPO.dragToPart({region: 'west'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated

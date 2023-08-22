@@ -40,6 +40,6 @@ test.describe('Startup', () => {
     // Expect the test view to show.
     const testingViewPO = appPO.view({cssClass: 'e2e-test-view'});
     await expect(await testingViewPO.isPresent()).toBe(true);
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(1);
   });
 });
