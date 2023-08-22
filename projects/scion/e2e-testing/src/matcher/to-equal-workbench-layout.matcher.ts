@@ -122,7 +122,7 @@ async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLoc
  */
 async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Locator, expectedWorkbenchLayout: ExpectedWorkbenchLayout): Promise<void> {
   const partId = await gridElementLocator.getAttribute('data-partid');
-  if (partId !== expectedPart.id) {
+  if (expectedPart.id && partId !== expectedPart.id) {
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute '[data-partid="${expectedPart.id}"]', but is '[data-partid="${partId}"]'. [MPart=${JSON.stringify(expectedPart)}, locator=${gridElementLocator}]`);
   }
 
@@ -353,7 +353,7 @@ export class MTreeNode {
 export class MPart {
 
   public readonly type = 'MPart';
-  public readonly id!: string;
+  public readonly id?: string;
   public views?: MView[];
   public activeViewId?: string;
 
