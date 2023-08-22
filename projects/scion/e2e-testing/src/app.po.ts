@@ -24,10 +24,6 @@ export class AppPO {
   private _workbenchStartupQueryParams!: URLSearchParams;
 
   /**
-   * Handle for interacting with the currently active workbench part.
-   */
-  public readonly activePart = new PartPO(this.page.locator('wb-part.active'));
-  /**
    * Handle for interacting with the header of the testing application.
    */
   public readonly header = new AppHeaderPO(this.page.locator('app-header'));
@@ -107,6 +103,18 @@ export class AppPO {
   public async navigateForward(): Promise<void> {
     await this.page.goForward();
     await waitUntilStable(() => this.getCurrentNavigationId());
+  }
+
+  /**
+   * Handle for interacting with the currently active workbench part in the specified area.
+   */
+  public activePart(locateBy: {scope: 'mainArea' | 'perspective'}): PartPO {
+    if (locateBy.scope === 'perspective') {
+      return new PartPO(this.page.locator('wb-part.e2e-peripheral.active'));
+    }
+    else {
+      return new PartPO(this.page.locator('wb-part:not(.e2e-peripheral).active'));
+    }
   }
 
   /**
@@ -232,12 +240,12 @@ export class AppPO {
    * Opens a new view tab.
    */
   public async openNewViewTab(): Promise<StartPagePO> {
-    const newTabPartActionPO = this.activePart.action({cssClass: 'e2e-open-new-tab'});
+    const newTabPartActionPO = this.activePart({scope: 'mainArea'}).action({cssClass: 'e2e-open-new-tab'});
     if (!await newTabPartActionPO.isPresent()) {
       throw Error('Opening a new view tab requires the part action \'e2e-open-new-tab\' to be present, but it could not be found. Have you disabled the \'showNewTabAction\' feature?');
     }
     await newTabPartActionPO.locate('button').click();
-    return new StartPagePO(this, await this.activePart.activeView.getViewId());
+    return new StartPagePO(this, await this.activePart({scope: 'mainArea'}).activeView.getViewId());
   }
 
   /**

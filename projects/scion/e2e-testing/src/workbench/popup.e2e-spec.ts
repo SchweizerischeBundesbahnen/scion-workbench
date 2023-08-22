@@ -135,7 +135,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPagePO.clickOpen();
 
-      const viewPO = await appPO.activePart.activeView;
+      const viewPO = await appPO.activePart({scope: 'mainArea'}).activeView;
       const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
@@ -157,7 +157,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const viewPO = await appPO.activePart.activeView;
+      const viewPO = await appPO.activePart({scope: 'mainArea'}).activeView;
       const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
@@ -179,7 +179,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const viewPO = await appPO.activePart.activeView;
+      const viewPO = await appPO.activePart({scope: 'mainArea'}).activeView;
       const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
@@ -201,7 +201,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const viewPO = await appPO.activePart.activeView;
+      const viewPO = await appPO.activePart({scope: 'mainArea'}).activeView;
       const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
@@ -223,7 +223,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const viewPO = await appPO.activePart.activeView;
+      const viewPO = await appPO.activePart({scope: 'mainArea'}).activeView;
       const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = await appPO.popup({cssClass: 'testee'});
@@ -340,7 +340,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPagePO.enterPreferredOverlaySize({width: '100px', height: '100px'});
       await popupOpenerPagePO.clickOpen();
 
-      const viewPO = await appPO.activePart.activeView;
+      const viewPO = await appPO.activePart({scope: 'mainArea'}).activeView;
       const viewBounds = await viewPO.getBoundingBox();
 
       const popupPO = appPO.popup({cssClass: 'testee'});

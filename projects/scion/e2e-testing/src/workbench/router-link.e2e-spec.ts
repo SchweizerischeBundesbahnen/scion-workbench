@@ -23,7 +23,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(1);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -37,7 +37,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterTarget('auto');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -51,7 +51,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -64,7 +64,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink(['Control']);
 
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(false);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
@@ -82,7 +82,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink(['Meta']);
 
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(false);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
@@ -97,7 +97,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.checkActivate(true);
     await routerPagePO.clickNavigateViaRouterLink(['Control']);
 
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -115,7 +115,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.checkActivate(true);
     await routerPagePO.clickNavigateViaRouterLink(['Meta']);
 
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -255,7 +255,7 @@ test.describe('Workbench RouterLink', () => {
     // THEN
     await expect(await appPO.view({cssClass: 'testee-1'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(false);
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
   });
 
   test('should replace the current view if navigating inside a view (and not activate a matching view)', async ({appPO, workbenchNavigator}) => {
@@ -278,7 +278,7 @@ test.describe('Workbench RouterLink', () => {
     await expect(await appPO.view({cssClass: 'testee-1'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.getViewId()).toEqual(routerPagePO.viewId);
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
   });
 
   test('should not navigate current view if not the target of primary routes', async ({appPO, workbenchNavigator}) => {

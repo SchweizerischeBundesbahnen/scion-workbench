@@ -215,7 +215,7 @@ test.describe('Workbench View', () => {
     // close the view
     await viewPagePO.clickClose();
 
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(0);
     await expect(await viewTabPO.isPresent()).toBe(false);
     await expect(await viewPagePO.isPresent()).toBe(false);
   });
@@ -289,28 +289,28 @@ test.describe('Workbench View', () => {
     await contextMenu.closeAllTabs();
 
     // expect all views being still open
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(3);
 
     // confirm closing view 1
     const msgboxPO1 = appPO.messagebox({cssClass: ['e2e-close-view', viewPagePO1.viewId]});
     await msgboxPO1.clickActionButton('yes');
 
     // expect view 1 being closed
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
 
     // prevent closing view 2
     const msgboxPO2 = appPO.messagebox({cssClass: ['e2e-close-view', viewPagePO2.viewId]});
     await msgboxPO2.clickActionButton('no');
 
     // expect view 2 being still open
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
 
     // confirm closing view 3
     const msgboxPO3 = appPO.messagebox({cssClass: ['e2e-close-view', viewPagePO3.viewId]});
     await msgboxPO3.clickActionButton('yes');
 
     // expect view 3 to be closed
-    await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
+    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(1);
     await expect(await viewTabPO3.isPresent()).toBe(false);
     await expect(await viewPagePO3.isPresent()).toBe(false);
 
@@ -698,7 +698,7 @@ test.describe('Workbench View', () => {
     await routerPagePO.clickNavigate();
 
     // Construct the PO to interact with the opened view
-    const viewId = await appPO.activePart.activeView.getViewId();
+    const viewId = await appPO.activePart({scope: 'mainArea'}).activeView.getViewId();
     const viewTabPO = appPO.view({viewId}).viewTab;
     const viewPagePO = new ViewPagePO(appPO, viewId);
 
@@ -821,13 +821,13 @@ test.describe('Workbench View', () => {
       const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
       const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-      await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
+      await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+k' in view 2
       await viewPage2PO.view.viewTab.click();
       await viewPage2PO.sendKeys('Control+K');
 
-      await expect(await appPO.activePart.getViewIds()).toHaveLength(2);
+      await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
       await expect(await viewPage1PO.isPresent()).toBe(true);
       await expect(await viewPage2PO.isPresent()).toBe(false);
       await expect(await viewPage3PO.isPresent()).toBe(true);
@@ -839,13 +839,13 @@ test.describe('Workbench View', () => {
       const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
       const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-      await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
+      await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+shift+k' in view 2
       await viewPage2PO.view.viewTab.click();
       await viewPage2PO.sendKeys('Control+Shift+K');
 
-      await expect(await appPO.activePart.getViewIds()).toHaveLength(1);
+      await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(1);
       await expect(await viewPage1PO.isPresent()).toBe(false);
       await expect(await viewPage2PO.isPresent()).toBe(true);
       await expect(await viewPage3PO.isPresent()).toBe(false);
@@ -857,13 +857,13 @@ test.describe('Workbench View', () => {
       const viewPage2PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
       const viewPage3PO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-      await expect(await appPO.activePart.getViewIds()).toHaveLength(3);
+      await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(3);
 
       // Press 'ctrl+shift+alt+k' in view 2
       await viewPage2PO.view.viewTab.click();
       await viewPage2PO.sendKeys('Control+Shift+Alt+K');
 
-      await expect(await appPO.activePart.getViewIds()).toHaveLength(0);
+      await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(0);
       await expect(await viewPage1PO.isPresent()).toBe(false);
       await expect(await viewPage2PO.isPresent()).toBe(false);
       await expect(await viewPage3PO.isPresent()).toBe(false);

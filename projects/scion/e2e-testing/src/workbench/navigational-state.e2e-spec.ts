@@ -25,7 +25,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data emitted undefined as state
-      const testeeViewId = await appPO.activePart.activeView.getViewId();
+      const testeeViewId = await appPO.activePart({scope: 'mainArea'}).activeView.getViewId();
       await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
       ]);
@@ -41,7 +41,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data emitted the passed state
-      const testeeViewId = await appPO.activePart.activeView.getViewId();
+      const testeeViewId = await appPO.activePart({scope: 'mainArea'}).activeView.getViewId();
       await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
       ]);
@@ -57,7 +57,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.clickNavigate();
 
       // expect ActivatedRoute.data emitted the passed state
-      const testeeViewId = await appPO.activePart.activeView.getViewId();
+      const testeeViewId = await appPO.activePart({scope: 'mainArea'}).activeView.getViewId();
       await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
         `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
       ]);
@@ -80,7 +80,7 @@ test.describe('Navigational State', () => {
       await routerPagePO.enterMatrixParams({'param': 'value 1'});
       await routerPagePO.clickNavigate();
 
-      const testeeViewId = await appPO.activePart.activeView.getViewId();
+      const testeeViewId = await appPO.activePart({scope: 'mainArea'}).activeView.getViewId();
 
       // expect ActivatedRoute.data emitted undefined as state
       await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
