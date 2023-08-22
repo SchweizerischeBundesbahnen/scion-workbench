@@ -15,6 +15,9 @@
   box-shadow: 8px 8px 9px -9px rgba(0, 0, 0, 0.2);
 
   > div.menu-item-group {
+    display: flex;
+    flex-direction: column;
+
     &:not(:last-child) {
       border-bottom: 1px solid colors.$viewlistitem-border-color;
     }
