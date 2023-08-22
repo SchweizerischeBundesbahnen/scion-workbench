@@ -1,0 +1,22 @@
+<form [formGroup]="form" autocomplete="off">
+  <section>
+    <sci-form-field label="ID">
+      <input [formControl]="form.controls.id" class="e2e-id">
+    </sci-form-field>
+    <sci-form-field label="Data">
+      <sci-key-value-field [keyValueFormArray]="form.controls.data" [addable]="true" [removable]="true" class="e2e-data"></sci-key-value-field>
+    </sci-form-field>
+  </section>
+
+  <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register">
+    Register
+  </button>
+</form>
+
+<output class="register-success e2e-register-success" *ngIf="registerError === false">
+  Success
+</output>
+
+<output class="register-error e2e-register-error" *ngIf="registerError">
+  {{registerError}}
+</output>

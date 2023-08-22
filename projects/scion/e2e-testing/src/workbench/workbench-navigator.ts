@@ -15,6 +15,7 @@ import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
+import {PerspectivePagePO} from './page-object/perspective-page.po';
 
 export interface Type<T> extends Function {
   new(...args: any[]): T;
@@ -49,6 +50,10 @@ export class WorkbenchNavigator {
    */
   public openInNewTab(page: Type<LayoutPagePO>): Promise<LayoutPagePO>;
   /**
+   * Opens the page to register a perspective in a new workbench tab.
+   */
+  public openInNewTab(page: Type<PerspectivePagePO>): Promise<PerspectivePagePO>;
+  /**
    * Opens the page to inspect view properties in a new workbench tab.
    */
   public openInNewTab(page: Type<ViewPagePO>): Promise<ViewPagePO>;
@@ -77,6 +82,10 @@ export class WorkbenchNavigator {
       case LayoutPagePO: {
         await startPO.openWorkbenchView('e2e-test-layout');
         return new LayoutPagePO(this._appPO, viewId);
+      }
+      case PerspectivePagePO: {
+        await startPO.openWorkbenchView('e2e-test-perspective');
+        return new PerspectivePagePO(this._appPO, viewId);
       }
       case ViewPagePO: {
         await startPO.openWorkbenchView('e2e-test-view');
