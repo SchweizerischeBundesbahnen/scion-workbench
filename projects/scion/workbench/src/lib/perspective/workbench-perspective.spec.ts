@@ -14,11 +14,19 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {styleFixture, waitForInitialWorkbenchLayout} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
-import {withComponentContent} from '../testing/test.component';
+import {TestComponent, withComponentContent} from '../testing/test.component';
 import {By} from '@angular/platform-browser';
 import {inject} from '@angular/core';
+import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
+import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
+import {MPart, MTreeNode} from '../layout/workbench-layout.model';
+import {delay, of} from 'rxjs';
+import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
 
 describe('Workbench Perspective', () => {
+
+  beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
 
   it('should support configuring different start page per perspective', async () => {
     TestBed.configureTestingModule({
@@ -61,5 +69,47 @@ describe('Workbench Perspective', () => {
     await workbenchService.switchPerspective('perspective-1');
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="main"] > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
   });
-});
 
+  /**
+   * Regression test for a bug where the perspective grid of the initial layout got replaced by the "default" grid deployed during the initial navigation,
+   * resulting in only the main area being displayed.
+   */
+  it('should display the perspective also for asynchronous/slow initial navigation', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({
+          layout: layout => layout
+            .addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left', ratio: .25})
+            .addView('navigator', {partId: 'left', activateView: true}),
+        }),
+        RouterTestingModule.withRoutes([
+          {
+            path: '',
+            outlet: 'navigator',
+            component: TestComponent,
+            canActivate: [
+              () => of(true).pipe(delay(1000)), // simulate slow initial navigation
+            ],
+          },
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+      peripheralGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'left', views: [{id: 'navigator'}], activeViewId: 'navigator'}),
+          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          direction: 'row',
+          ratio: .25,
+        }),
+      },
+      mainGrid: {
+        root: new MPart({id: 'main', views: []}),
+      },
+    });
+  });
+});

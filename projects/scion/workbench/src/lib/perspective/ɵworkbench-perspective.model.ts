@@ -93,12 +93,18 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     // Memoize currently active perspective for a potential rollback in case the activation fails.
     const currentActivePerspectiveId = this._activePerspectiveId$.value;
 
-    // Mark this perspective as active; must be set before routing for routes to evaluate the current perspective in a `canMatch` guard,
-    // e.g., to display a perspective-specific start page.
-    this._activePerspectiveId$.next(this.id);
+    // Perform navigation to activate the layout of this perspective.
+    const navigated = await this._workbenchRouter.ɵnavigate(currentLayout => {
+      // Mark this perspective as active after the initial navigation (1) but before the actual Angular routing (2).
+      //
+      // (1) Otherwise, if the initial navigation is asynchronous, such as when lazy loading components or using asynchronous guards,
+      //     the activation of the initial perspective would apply the "default" grid with only the main area.
+      // (2) Enables routes to evaluate the active perspective in a `canMatch` guard, e.g., to display a perspective-specific start page.
+      this._activePerspectiveId$.next(this.id);
 
-    // Apply the perspective layout.
-    const navigated = await this._workbenchRouter.ɵnavigate(currentLayout => this.createActivationNavigation(currentLayout));
+      // Apply the layout of this perspective.
+      return this.createActivationNavigation(currentLayout);
+    });
     if (!navigated) {
       this._activePerspectiveId$.next(currentActivePerspectiveId);
     }
