@@ -5,7 +5,7 @@
           [attr.data-perspectiveid]="perspective.id"
           [class.active]="perspective.active$ | async"
           [class.e2e-active]="perspective.active$ | async">
-    {{perspective.data[PerspectiveData.label]}}
+    {{perspective.data[PerspectiveData.label] ?? perspective.id}}
   </button>
 </div>
 <button class="material-icons menu-button e2e-menu-button" (click)="onMenuOpen($event)">

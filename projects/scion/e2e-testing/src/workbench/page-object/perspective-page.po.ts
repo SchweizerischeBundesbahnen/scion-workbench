@@ -12,6 +12,7 @@ import {rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPerspectiveDefinition} from '@scion/workbench';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
@@ -34,6 +35,7 @@ export class PerspectivePagePO {
 
   public async registerPerspective(definition: Omit<WorkbenchPerspectiveDefinition, 'layout'>): Promise<void> {
     await this._locator.locator('input.e2e-id').fill(definition.id);
+    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-transient')).toggle(definition.transient === true);
     await this.enterData(definition.data);
     await this._locator.locator('button.e2e-register').click();
 

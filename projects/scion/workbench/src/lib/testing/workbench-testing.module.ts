@@ -50,6 +50,7 @@ export class WorkbenchTestingModule {
         {provide: ComponentFixtureAutoDetect, useValue: true},
         {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => inject(Router).initialNavigation()},
         {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => localStorage.clear()},
+        {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => window.name = ''},
       ],
     };
   }

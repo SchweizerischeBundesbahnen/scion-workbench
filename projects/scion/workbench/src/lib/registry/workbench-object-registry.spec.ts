@@ -119,6 +119,13 @@ describe('WorkbenchObjectRegistry', () => {
       [{id: '1', version: 1}, {id: '3', version: 1}],
     ]);
   });
+
+  it('should test whether an object exists', () => {
+    registry.register({id: '1'});
+
+    expect(registry.has('1')).toBeTrue();
+    expect(registry.has('2')).toBeFalse();
+  });
 });
 
 interface TestObject {

@@ -82,6 +82,13 @@ export class WorkbenchObjectRegistry<KEY, T> {
   }
 
   /**
+   * Indicates whether an object with the specified key exists or not.
+   */
+  public has(key: KEY): boolean {
+    return this._objectsById.has(key);
+  }
+
+  /**
    * Readonly reference to registered objects.
    */
   public get objects(): readonly T[] {

@@ -82,8 +82,13 @@ export class ViewTabPO {
     const contextMenuLocator = this._locator.page().locator('wb-view-menu');
 
     return new class implements ViewTabContextMenuPO {
-      public async closeAllTabs(): Promise<void> {
-        return contextMenuLocator.locator('.e2e-close-all-tabs').click();
+
+      public async clickCloseAllTabs(): Promise<void> {
+        await contextMenuLocator.locator('button.e2e-close-all-tabs').click();
+      }
+
+      public async clickMoveToNewWindow(): Promise<void> {
+        await contextMenuLocator.locator('button.e2e-move-to-new-window').click();
       }
     };
   }
@@ -203,5 +208,8 @@ export class ViewTabPO {
 }
 
 export interface ViewTabContextMenuPO {
-  closeAllTabs(): Promise<void>;
+
+  clickCloseAllTabs(): Promise<void>;
+
+  clickMoveToNewWindow(): Promise<void>;
 }

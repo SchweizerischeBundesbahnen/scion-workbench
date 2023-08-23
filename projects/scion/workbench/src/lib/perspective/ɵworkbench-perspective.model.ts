@@ -55,23 +55,17 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private _viewOutlets: {[viewId: string]: Commands} = {};
 
   public id: string;
+  public transient: boolean;
   public data: {[key: string]: any};
   public active$: Observable<boolean>;
 
   constructor(definition: WorkbenchPerspectiveDefinition) {
     this.id = definition.id;
+    this.transient = definition.transient ?? false;
     this.data = definition.data ?? {};
     this.active$ = this._activePerspectiveId$.pipe(map(activePerspectiveId => activePerspectiveId === this.id));
     this._initialLayoutFn = definition.layout;
-
-    // Store perspective layout on layout change.
-    this._workbenchLayoutService.layout$
-      .pipe(
-        filter(() => this.active),
-        serializeExecution(layout => this.onPerspectiveLayoutChange(layout)),
-        takeUntil(this._destroy$),
-      )
-      .subscribe();
+    this.onLayoutChange(layout => this.storePerspectiveLayout(layout));
   }
 
   /**
@@ -82,7 +76,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     this._initialGrid ??= await this.createInitialGrid();
 
     // Load perspective data from storage.
-    const perspectiveData = await this._workbenchPerspectiveStorageService.loadPerspectiveData(this.id);
+    const perspectiveData = !this.transient ? await this._workbenchPerspectiveStorageService.loadPerspectiveData(this.id) : null;
     if (perspectiveData) {
       this._grid = this._workbenchPeripheralGridMerger.merge({
         local: this._workbenchLayoutFactory.create({peripheralGrid: perspectiveData.grid}).peripheralGrid,
@@ -92,8 +86,8 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       this._viewOutlets = perspectiveData.viewOutlets;
     }
     else {
-      this._grid = this._initialGrid;
-      this._viewOutlets = {};
+      this._grid ??= this._initialGrid;
+      this._viewOutlets ??= {};
     }
 
     // Memoize currently active perspective for a potential rollback in case the activation fails.
@@ -168,19 +162,36 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   /**
-   * Method invoked each time the layout of this perspective changes.
+   * Invokes the callback when the layout of this perspective changes.
    */
-  private async onPerspectiveLayoutChange(layout: ɵWorkbenchLayout): Promise<void> {
+  private onLayoutChange(callback: (layout: ɵWorkbenchLayout) => Promise<void>): void {
+    this._workbenchLayoutService.layout$
+      .pipe(
+        filter(() => this.active),
+        serializeExecution(callback),
+        takeUntil(this._destroy$),
+      )
+      .subscribe();
+  }
+
+  /**
+   * Stores the layout of this perspective.
+   *
+   * If an anonymous perspective, only memoizes the layout, but does not write it to storage.
+   */
+  private async storePerspectiveLayout(layout: ɵWorkbenchLayout): Promise<void> {
     // Memoize layout and outlets.
     this._grid = layout.peripheralGrid;
     this._viewOutlets = RouterUtils.outletsFromCurrentUrl(this._router, layout.views({scope: 'peripheral'}).map(view => view.id));
 
-    // Store the perspective layout.
-    await this._workbenchPerspectiveStorageService.storePerspectiveData(this.id, {
-      initialGrid: this._workbenchLayoutSerializer.serialize(this._initialGrid!, {nullIfEmpty: true}),
-      grid: this._workbenchLayoutSerializer.serialize(this._grid!, {nullIfEmpty: true}),
-      viewOutlets: this._viewOutlets,
-    });
+    // Store the layout if not a transient perspective.
+    if (!this.transient) {
+      await this._workbenchPerspectiveStorageService.storePerspectiveData(this.id, {
+        initialGrid: this._workbenchLayoutSerializer.serialize(this._initialGrid!, {nullIfEmpty: true}),
+        grid: this._workbenchLayoutSerializer.serialize(this._grid!, {nullIfEmpty: true}),
+        viewOutlets: this._viewOutlets,
+      });
+    }
   }
 
   public destroy(): void {

@@ -40,6 +40,13 @@ export class WorkbenchPerspectiveRegistry implements OnDestroy {
     return this._registry.get(perspectiveId, options);
   }
 
+  /**
+   * Indicates whether a perspective with the specified identity exists or not.
+   */
+  public has(perspectiveId: string): boolean {
+    return this._registry.has(perspectiveId);
+  }
+
   public get perspectives(): readonly ɵWorkbenchPerspective[] {
     return this._registry.objects;
   }

@@ -47,3 +47,8 @@ export declare type ViewTabContext = 'tabbar' | 'tabbar-dropdown' | 'drag-image'
  * DI injection token to inject the context in which the viewtab is rendered.
  */
 export const VIEW_TAB_CONTEXT = new InjectionToken<ViewTabContext>('VIEW_TAB_CONTEXT');
+
+/**
+ * Prefix used to identify an anonymous perspective that the workbench creates for views moved to a new window.
+ */
+export const ANONYMOUS_PERSPECTIVE_ID_PREFIX = 'anonymous.';
