@@ -15,6 +15,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 @Component({
   selector: 'app-perspective-page',
@@ -25,6 +26,7 @@ import {NgIf} from '@angular/common';
     NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
+    SciCheckboxComponent,
     SciKeyValueFieldComponent,
   ],
 })
@@ -32,6 +34,7 @@ export default class PerspectivePageComponent {
 
   public form = this._formBuilder.group({
     id: this._formBuilder.control('', Validators.required),
+    transient: this._formBuilder.control<boolean | undefined>(undefined),
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
   });
   public registerError: string | false | undefined;
@@ -43,6 +46,7 @@ export default class PerspectivePageComponent {
     try {
       await this._workbenchService.registerPerspective({
         id: this.form.controls.id.value,
+        transient: this.form.controls.transient.value || undefined,
         layout: layout => layout,
         data: SciKeyValueFieldComponent.toDictionary(this.form.controls.data) ?? undefined,
       });

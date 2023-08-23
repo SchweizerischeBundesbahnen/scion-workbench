@@ -322,7 +322,7 @@ export class ViewMenuService {
   }
 
   private registerMoveToNewWindowMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move to new window', group: 'open'};
+    const defaults: MenuItemConfig = {visible: true, text: 'Move to new window', group: 'open', cssClass: 'e2e-move-to-new-window'};
     const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveBlank;
     const config = {...defaults, ...appConfig};
 

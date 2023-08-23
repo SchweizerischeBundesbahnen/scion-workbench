@@ -35,6 +35,10 @@ export interface WorkbenchPerspective {
    * emits continuously when its active state changes. The Observable never completes.
    */
   readonly active$: Observable<boolean>;
+  /**
+   * Indicates whether this perspective is transient, with its layout only memoized, not persisted.
+   */
+  readonly transient: boolean;
 }
 
 /**
@@ -77,6 +81,10 @@ export interface WorkbenchPerspectiveDefinition {
    * Decides if the perspective can be activated. The function can call `inject` to get any required dependencies.
    */
   canActivate?: () => Promise<boolean> | boolean;
+  /**
+   * Defines the perspective as transient, with its layout only memoized, not persisted.
+   */
+  transient?: true;
 }
 
 /**

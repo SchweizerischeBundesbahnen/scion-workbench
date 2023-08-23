@@ -3,6 +3,9 @@
     <sci-form-field label="ID">
       <input [formControl]="form.controls.id" class="e2e-id">
     </sci-form-field>
+    <sci-form-field label="Transient">
+      <sci-checkbox [formControl]="form.controls.transient" class="e2e-transient"></sci-checkbox>
+    </sci-form-field>
     <sci-form-field label="Data">
       <sci-key-value-field [keyValueFormArray]="form.controls.data" [addable]="true" [removable]="true" class="e2e-data"></sci-key-value-field>
     </sci-form-field>

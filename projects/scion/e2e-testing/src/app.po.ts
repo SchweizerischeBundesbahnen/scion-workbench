@@ -21,7 +21,7 @@ import {AppHeaderPO} from './app-header.po';
 
 export class AppPO {
 
-  private _workbenchStartupQueryParams!: URLSearchParams;
+  private _workbenchStartupQueryParams = new URLSearchParams();
 
   /**
    * Handle for interacting with the header of the testing application.
@@ -280,6 +280,26 @@ export class AppPO {
   public async getDropZoneBoundingBox(target: {area: 'main-area' | 'peripheral-area'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<DOMRect & {hcenter: number; vcenter: number}> {
     const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-${target.area}`);
     return fromRect(await dropZoneLocator.boundingBox());
+  }
+
+  /**
+   * Waits for the specified window to open; must be invoked prior to opening the window.
+   *
+   * Example:
+   *
+   * ```ts
+   * const [newAppPO] = await Promise.all([
+   *   appPO.waitForWindow(async page => (await getPerspectiveName(page)) === 'testee'),
+   *   buttonPO.openInNewWindow(),
+   * ]);
+   * ```
+   */
+  public async waitForWindow(predicate: (page: Page) => Promise<boolean>): Promise<AppPO> {
+    const page = await this.page.waitForEvent('popup', {predicate});
+    const newAppPO = new AppPO(page);
+    // Wait until the workbench completed startup.
+    await newAppPO.waitUntilWorkbenchStarted();
+    return newAppPO;
   }
 }
 

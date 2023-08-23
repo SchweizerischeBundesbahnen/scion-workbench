@@ -286,7 +286,7 @@ test.describe('Workbench View', () => {
     const contextMenu = await viewTabPO3.openContextMenu();
 
     // click to close all tabs
-    await contextMenu.closeAllTabs();
+    await contextMenu.clickCloseAllTabs();
 
     // expect all views being still open
     await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(3);

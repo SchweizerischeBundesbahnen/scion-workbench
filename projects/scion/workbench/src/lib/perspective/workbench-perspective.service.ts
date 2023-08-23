@@ -16,6 +16,7 @@ import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
+import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 
 /**
  * Provides access to perspectives.
@@ -39,6 +40,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
   public async init(): Promise<void> {
     await this.registerPerspectivesFromModuleConfig();
+    await this.registerAnonymousPerspectiveFromWindowName();
   }
 
   /**
@@ -62,12 +64,27 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
   }
 
   /**
+   * Registers an anonymous perspective if the window name indicates it.
+   * The perspective is marked transient, with its layout only memoized, not persisted.
+   */
+  private async registerAnonymousPerspectiveFromWindowName(): Promise<void> {
+    const windowPerspectiveId = parsePerspectiveIdFromWindowName();
+    if (windowPerspectiveId?.startsWith(ANONYMOUS_PERSPECTIVE_ID_PREFIX)) {
+      await this.registerPerspective({
+        id: windowPerspectiveId,
+        layout: layout => layout,
+        transient: true,
+      });
+    }
+  }
+
+  /**
    * Registers the given perspective to arrange views around the main area.
    */
   public async registerPerspective(definition: WorkbenchPerspectiveDefinition): Promise<void> {
     const perspectiveId = definition.id;
 
-    if (this._perspectiveRegistry.get(perspectiveId, {orElse: null}) !== null) {
+    if (this._perspectiveRegistry.has(perspectiveId)) {
       throw Error(`Failed to register perspective '${perspectiveId}'. Another perspective is already registered under that identity.`);
     }
     if (definition.canActivate && !(await runInInjectionContext(this._environmentInjector, () => definition.canActivate!()))) {
@@ -88,6 +105,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
     const activated = await this._perspectiveRegistry.get(id).activate();
     if (activated) {
       await this._workbenchPerspectiveStorageService.storeActivePerspectiveId(id);
+      window.name = generatePerspectiveWindowName(id);
     }
     return activated;
   }
@@ -105,23 +123,28 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
   private async activateInitialPerspective(): Promise<void> {
     // Determine the initial perspective.
     const initialPerspectiveId = await (async (): Promise<string | undefined> => {
-      // Read initial perspective from storage.
-      const storedActivePerspectiveId = await this._workbenchPerspectiveStorageService.loadActivePerspectiveId();
-      if (storedActivePerspectiveId && this._perspectiveRegistry.get(storedActivePerspectiveId, {orElse: null}) !== null) {
-        return storedActivePerspectiveId;
+      // Determine the initial perspective using information from the window name.
+      const perspectiveFromWindow = parsePerspectiveIdFromWindowName();
+      if (perspectiveFromWindow && this._perspectiveRegistry.has(perspectiveFromWindow)) {
+        return perspectiveFromWindow;
       }
 
-      // Read initial perspective from config.
-      const layout = this._workbenchModuleConfig.layout;
-      const initialPerspective = typeof layout === 'object' ? layout.initialPerspective : null;
-      if (!initialPerspective) {
+      // Determine the initial perspective using information from the storage.
+      const perspectiveFromStorage = await this._workbenchPerspectiveStorageService.loadActivePerspectiveId();
+      if (perspectiveFromStorage && this._perspectiveRegistry.has(perspectiveFromStorage)) {
+        return perspectiveFromStorage;
+      }
+
+      // Determine the initial perspective using information from the config.
+      const perspectiveFromConfig = typeof this._workbenchModuleConfig.layout === 'object' ? this._workbenchModuleConfig.layout.initialPerspective : null;
+      if (!perspectiveFromConfig) {
         return this._perspectiveRegistry.perspectives[0]?.id;
       }
-      if (typeof initialPerspective === 'string') {
-        return initialPerspective;
+      if (typeof perspectiveFromConfig === 'string') {
+        return perspectiveFromConfig;
       }
-      if (typeof initialPerspective === 'function') {
-        return (await runInInjectionContext(this._environmentInjector, () => initialPerspective([...this._perspectiveRegistry.perspectives])))?.id;
+      if (typeof perspectiveFromConfig === 'function') {
+        return (await runInInjectionContext(this._environmentInjector, () => perspectiveFromConfig([...this._perspectiveRegistry.perspectives])))?.id;
       }
       return undefined;
     })();
@@ -144,3 +167,18 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
  * Identifier for the "synthetic" perspective that the workbench creates if using a workbench layout without configuring perspectives.
  */
 const SYNTHETIC_WORKBENCH_PERSPECTIVE_ID = '@scion/workbench/synthetic';
+
+/**
+ * Generates the window name for given perspective to control which perspective to display in a window.
+ */
+export function generatePerspectiveWindowName(perspectiveId: string): string {
+  return `scion.workbench.perspective.${perspectiveId}`;
+}
+
+/**
+ * Parses the perspective identity from the window name, returning `null` if not set.
+ */
+function parsePerspectiveIdFromWindowName(): string | null {
+  const windowNameRegex = new RegExp(`^${generatePerspectiveWindowName('(?<perspective>.+)')}$`);
+  return window.name.match(windowNameRegex)?.groups!['perspective'] ?? null;
+}

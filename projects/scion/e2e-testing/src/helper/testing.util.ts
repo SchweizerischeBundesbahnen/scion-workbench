@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Locator} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 import {exhaustMap, filter, firstValueFrom, map, noop, pairwise, timer} from 'rxjs';
 
 /**
@@ -133,4 +133,16 @@ export function withoutUndefinedEntries<T>(object: Record<string, T>): Record<st
     }
     return acc;
   }, {} as Record<string, T>);
+}
+
+/**
+ * Resolves to the identity of the perspective active in the given {@link Page}, or rejects if no perspective is active.
+ */
+export async function getPerspectiveId(page: Page): Promise<string> {
+  const windowName = await page.evaluate((): string => window.name);
+  const match = windowName.match(/^scion\.workbench\.perspective\.(?<perspective>.+)$/);
+  if (!match) {
+    throw Error('[IllegalStateError] No perspective active in page.');
+  }
+  return match?.groups!['perspective'];
 }

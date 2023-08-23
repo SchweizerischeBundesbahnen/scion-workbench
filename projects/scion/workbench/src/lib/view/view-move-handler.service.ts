@@ -10,6 +10,8 @@ import {MPart} from '../layout/workbench-layout.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Defined} from '@scion/toolkit/util';
+import {generatePerspectiveWindowName} from '../perspective/workbench-perspective.service';
+import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 
 /**
  * Updates the workbench layout when the user moves a view.
@@ -105,6 +107,7 @@ export class ViewMoveHandler {
   }
 
   private async moveViewToNewWindow(event: ViewMoveEvent): Promise<void> {
+    // Open the view "standalone" in a blank window in an anonymous perspective.
     const urlTree = await this._workbenchRouter.createUrlTree(layout => {
       const viewId = event.source.viewId;
       const partId = UUID.randomUUID();
@@ -112,13 +115,14 @@ export class ViewMoveHandler {
       return {
         layout: this._workbenchLayoutFactory.create({mainGrid: {root: new MPart({id: partId, structural: false}), activePartId: partId}})
           .addView(viewId, {partId, activateView: true, activatePart: true}),
-        viewOutlets: layout.views()
+        viewOutlets: layout.views() // Remove other views
           .map(view => view.id)
           .filter(viewId => viewId !== event.source.viewId)
           .reduce((acc, viewId) => ({...acc, [viewId]: null}), {}),
       };
     });
-    if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree)))) {
+    const target = generatePerspectiveWindowName(`${ANONYMOUS_PERSPECTIVE_ID_PREFIX}${UUID.randomUUID()}`);
+    if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree)), target)) {
       await this.removeView(event);
     }
   }
