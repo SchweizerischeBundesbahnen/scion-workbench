@@ -22,7 +22,7 @@ import {By} from '@angular/platform-browser';
 import {MAIN_AREA_PART_ID} from './workbench-layout';
 import {toHaveTransientStateCustomMatcher} from '../testing/jasmine/matcher/to-have-transient-state.matcher';
 import {enterTransientViewState, TestComponent, withComponentContent, withTransientStateInputElement} from '../testing/test.component';
-import {styleFixture, waitForInitialWorkbenchLayout, waitForWorkbenchLayoutChange} from '../testing/testing.util';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -71,7 +71,7 @@ describe('WorkbenchLayout', () => {
         },
       };
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Assert initial workbench layout
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
@@ -95,7 +95,7 @@ describe('WorkbenchLayout', () => {
 
     // Navigate using the Angular router.
     await TestBed.inject(Router).navigate([{outlets: {outlet: ['outlet']}}]);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Expect the layout not to be discarded.
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
@@ -119,7 +119,7 @@ describe('WorkbenchLayout', () => {
 
     // Navigate using the Workbench router.
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Expect the layout to be changed.
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
@@ -174,7 +174,7 @@ describe('WorkbenchLayout', () => {
         insertionIndex: 0,
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN expect view.3 to be moved: ['view.3', 'view.1', 'view.2', 'view.4']
     expect('view.3').toBeRegistered({partId: 'main', active: true});
@@ -194,7 +194,7 @@ describe('WorkbenchLayout', () => {
         insertionIndex: 1,
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN expect view.3 not to be moved
     expect('view.3').toBeRegistered({partId: 'main', active: true});
@@ -214,7 +214,7 @@ describe('WorkbenchLayout', () => {
         insertionIndex: 2,
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN view.3 to be moved as follows: ['view.1', 'view.3', 'view.2', 'view.4']
     expect('view.3').toBeRegistered({partId: 'main', active: true});
@@ -234,7 +234,7 @@ describe('WorkbenchLayout', () => {
         insertionIndex: 3,
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.3', 'view.4']
     expect('view.3').toBeRegistered({partId: 'main', active: true});
@@ -254,7 +254,7 @@ describe('WorkbenchLayout', () => {
         insertionIndex: undefined,
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.4', 'view.3']
     expect('view.3').toBeRegistered({partId: 'main', active: true});
@@ -276,7 +276,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -289,7 +289,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -317,7 +317,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -350,7 +350,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -363,7 +363,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -391,7 +391,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -424,7 +424,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -437,7 +437,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -465,7 +465,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'NORTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -498,7 +498,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -511,7 +511,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -539,7 +539,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'SOUTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -572,7 +572,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -585,7 +585,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -612,7 +612,7 @@ describe('WorkbenchLayout', () => {
         region: 'center',
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -641,7 +641,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -654,7 +654,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -669,7 +669,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 3
     await TestBed.inject(WorkbenchRouter).navigate(['view-3']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -699,7 +699,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -733,7 +733,7 @@ describe('WorkbenchLayout', () => {
         region: 'center',
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -766,7 +766,7 @@ describe('WorkbenchLayout', () => {
         region: 'center',
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -797,7 +797,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -810,7 +810,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -838,7 +838,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST-1'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -871,7 +871,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST-2'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -904,7 +904,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -917,7 +917,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -945,7 +945,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -978,7 +978,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST-2'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1011,7 +1011,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1024,7 +1024,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1052,7 +1052,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1084,7 +1084,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'NORTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1117,7 +1117,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1130,7 +1130,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1158,7 +1158,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1190,7 +1190,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'SOUTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1224,7 +1224,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1237,7 +1237,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1252,7 +1252,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 3
     await TestBed.inject(WorkbenchRouter).navigate(['view-3']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1282,7 +1282,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1317,7 +1317,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'SOUTH-EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1356,7 +1356,7 @@ describe('WorkbenchLayout', () => {
         region: 'south',
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1396,7 +1396,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1409,7 +1409,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1437,7 +1437,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'SOUTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1468,7 +1468,7 @@ describe('WorkbenchLayout', () => {
         region: 'center',
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1496,7 +1496,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1509,7 +1509,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1537,7 +1537,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1569,7 +1569,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'SOUTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1602,7 +1602,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1615,7 +1615,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1643,7 +1643,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1675,7 +1675,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'SOUTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1708,7 +1708,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1722,7 +1722,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1737,7 +1737,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2 again
     await TestBed.inject(WorkbenchRouter).navigate(['view-2'], {blankPartId: 'main'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1765,7 +1765,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1778,7 +1778,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1793,7 +1793,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2 again
     await TestBed.inject(WorkbenchRouter).navigate(['view-2'], {blankPartId: 'main', target: 'blank'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1826,7 +1826,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1839,7 +1839,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1867,7 +1867,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST-1'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1886,7 +1886,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 3 to part EAST-1
     await TestBed.inject(WorkbenchRouter).navigate(['view-3']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1921,7 +1921,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST-2'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -1947,7 +1947,7 @@ describe('WorkbenchLayout', () => {
 
     // Add view 4 to part EAST-2
     await TestBed.inject(WorkbenchRouter).navigate(['view-4']);
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.4', 'D');
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1989,7 +1989,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST-1'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2035,7 +2035,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST-2'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2081,7 +2081,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'NORTH-1'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2115,7 +2115,7 @@ describe('WorkbenchLayout', () => {
 
     // Close view 1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1'], {close: true});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2142,7 +2142,7 @@ describe('WorkbenchLayout', () => {
 
     // Close view 3
     await TestBed.inject(WorkbenchRouter).navigate(['view-3'], {close: true});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2163,7 +2163,7 @@ describe('WorkbenchLayout', () => {
 
     // Close view 4
     await TestBed.inject(WorkbenchRouter).navigate(['view-4'], {close: true});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2204,19 +2204,19 @@ describe('WorkbenchLayout', () => {
         },
       };
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     // Move view.2 to the east
@@ -2234,7 +2234,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'right'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2265,7 +2265,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'top-right'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2314,19 +2314,19 @@ describe('WorkbenchLayout', () => {
         },
       };
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     // Move view 2 to a new part in the east
@@ -2344,7 +2344,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2375,7 +2375,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST-2'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2421,23 +2421,23 @@ describe('WorkbenchLayout', () => {
         },
       };
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.4'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.4', 'D');
 
     // Move view 2 to a new part in the east
@@ -2455,7 +2455,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST-1'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2487,7 +2487,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST-2'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2524,7 +2524,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST-1'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2566,7 +2566,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST-2'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2608,7 +2608,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'NORTH-1'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2637,7 +2637,7 @@ describe('WorkbenchLayout', () => {
 
     // Close view 1
     await TestBed.inject(WorkbenchRouter).navigate([], {target: 'view.1', close: true});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2660,7 +2660,7 @@ describe('WorkbenchLayout', () => {
 
     // Close view 3
     await TestBed.inject(WorkbenchRouter).navigate([], {target: 'view.3', close: true});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2677,7 +2677,7 @@ describe('WorkbenchLayout', () => {
 
     // Close view 4
     await TestBed.inject(WorkbenchRouter).navigate([], {target: 'view.4', close: true});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2714,19 +2714,19 @@ describe('WorkbenchLayout', () => {
         },
       };
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     // Move view 3 to a new part in the east
@@ -2744,7 +2744,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2775,7 +2775,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'SOUTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2811,7 +2811,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'NORTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2860,19 +2860,19 @@ describe('WorkbenchLayout', () => {
         },
       };
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
     // Move view 3 to a new part in the east
@@ -2890,7 +2890,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2921,7 +2921,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'NORTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -2957,7 +2957,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'SOUTH'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -3004,15 +3004,15 @@ describe('WorkbenchLayout', () => {
         },
       };
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
     // Move view 2 to a new part in the east
@@ -3030,7 +3030,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'EAST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
@@ -3060,7 +3060,7 @@ describe('WorkbenchLayout', () => {
         newPart: {id: 'WEST'},
       },
     });
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {

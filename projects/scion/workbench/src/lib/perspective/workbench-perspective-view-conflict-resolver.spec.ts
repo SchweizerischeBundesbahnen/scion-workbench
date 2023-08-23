@@ -16,7 +16,7 @@ import {TestComponent, withComponentContent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchService} from '../workbench.service';
 import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
-import {styleFixture, waitForInitialWorkbenchLayout, waitForWorkbenchLayoutChange} from '../testing/testing.util';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
@@ -52,19 +52,19 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
 
     // Open view.1 in perspective-1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1'], {blankPartId: 'left', target: 'view.1'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Switch to perspective-2
     await TestBed.inject(WorkbenchService).switchPerspective('perspective-2');
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Open view.1 in main area
     await TestBed.inject(WorkbenchRouter).navigate(['view-2'], {target: 'view.1'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Switch back to perspective-1
     await TestBed.inject(WorkbenchService).switchPerspective('perspective-1');
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Expect view.1 in perspective-1 to be renamed to view.2
     expect(fixture).toEqualWorkbenchLayout({
