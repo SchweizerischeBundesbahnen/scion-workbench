@@ -6,6 +6,24 @@
 ## [Changelog][menu-changelog] > Workbench (@scion/workbench)
 
 
+# [16.0.0-beta.5](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.4...16.0.0-beta.5) (2023-08-23)
+
+
+### Bug Fixes
+
+* **workbench:** display view 'standalone' when moving it to a new window ([3d851af](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3d851af237a1f5126b2292ea6a6c945905344759)), closes [#477](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/477)
+* **workbench:** ensure menu items in view context-menu to display in full-width ([0702fb1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0702fb119a40273f4c0dfb09d1596a313b71ee88))
+* **workbench:** resolve perspective layout storage issues ([754747a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/754747a973e576377712ba23d9f28ed785f4d110)), closes [#470](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/470) [#471](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/471) [#472](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/472)
+* **workbench:** support application URL to contain view outlets of views contained the perspective grid ([1eead4b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/1eead4b3976e5b84400c3f40a324e1a97977f6ee)), closes [#474](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/474)
+
+
+### Features
+
+* **workbench:** allow for navigation to empty path auxiliary routes ([5397bee](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5397beeee3c9441108b7d83b27ca5476b70ad499)), closes [#476](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/476)
+* **workbench:** support asynchronous navigation in `WorkbenchRouter.ɵnavigate` ([e82495f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e82495f8b226083ab82d64fef8beb963ce6d2bcd))
+
+
+
 # [16.0.0-beta.4](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.3...16.0.0-beta.4) (2023-08-11)
 
 
