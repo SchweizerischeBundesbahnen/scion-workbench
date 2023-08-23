@@ -15,7 +15,7 @@ import {By} from '@angular/platform-browser';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MessageBoxService} from './message-box.service';
 import {WorkbenchModule} from '../workbench.module';
-import {styleFixture, waitForInitialWorkbenchLayout, waitForWorkbenchLayoutChange} from '../testing/testing.util';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 
@@ -57,7 +57,7 @@ describe('MessageBox', () => {
 
       // Open view
       await TestBed.inject(WorkbenchRouter).navigate(['view']);
-      await waitForWorkbenchLayoutChange();
+      await waitUntilStable();
 
       // Open view-modal message box
       const viewDebugElement = fixture.debugElement.query(By.directive(ViewTestComponent))!;

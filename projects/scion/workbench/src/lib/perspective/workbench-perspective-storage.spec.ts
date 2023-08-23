@@ -14,7 +14,7 @@ import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to
 import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA_PART_ID, WorkbenchLayout} from '../layout/workbench-layout';
-import {styleFixture, waitForInitialWorkbenchLayout, waitForWorkbenchLayoutChange} from '../testing/testing.util';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
@@ -57,7 +57,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // WHEN: Opening view.1 in part 'left-top'
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left-top', target: 'view.1'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN: Expect the layout to be stored.
     expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective'))).toEqualWorkbenchLayout({
@@ -74,7 +74,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // WHEN: Opening view.2 in part 'left-bottom'
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left-bottom', target: 'view.2'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN: Expect the layout to be stored.
     expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective'))).toEqualWorkbenchLayout({
@@ -120,7 +120,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // Open view.1 in perspective-1.
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left', target: 'view.1'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       peripheralGrid: {
@@ -136,7 +136,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // Open view.2 in perspective-1.
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left', target: 'view.2'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       peripheralGrid: {
@@ -149,14 +149,14 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // Switch to perspective-2.
     await TestBed.inject(WorkbenchService).switchPerspective('perspective-2');
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Simulate the storage to change.
     localStorage.setItem('scion.workbench.perspectives.perspective-1', layout);
 
     // WHEN: Switching to perspective-1
     await TestBed.inject(WorkbenchService).switchPerspective('perspective-1');
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN: Expect the perspective to have the stored layout.
     expect(fixture).toEqualWorkbenchLayout({
@@ -199,7 +199,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // WHEN: Opening view.1 in perspective-1
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left', target: 'view.1'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN: Expect the layout of perspective-1 to be stored.
     expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective-1'))).toEqualWorkbenchLayout({
@@ -215,14 +215,14 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // Switch to perspective-2.
     await TestBed.inject(WorkbenchService).switchPerspective('perspective-2');
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // Clear storage.
     localStorage.clear();
 
     // WHEN: Opening view.1 in perspective-2
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left', target: 'view.1'});
-    await waitForWorkbenchLayoutChange();
+    await waitUntilStable();
 
     // THEN: Expect the layout of perspective-2 to be stored.
     expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective-2'))).toEqualWorkbenchLayout({

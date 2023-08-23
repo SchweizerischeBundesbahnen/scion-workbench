@@ -9,11 +9,12 @@
  */
 
 import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
-import {Type} from '@angular/core';
+import {ApplicationRef, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
-import {firstValueFrom, timeout} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
+import {filter} from 'rxjs/operators';
 
 /**
  * Simulates the asynchronous passage of time for the timers and detects the fixture for changes.
@@ -29,17 +30,17 @@ export function advance(fixture: ComponentFixture<any>): void {
  */
 export async function waitForInitialWorkbenchLayout(): Promise<void> {
   await TestBed.inject(WorkbenchStartup).whenStarted;
-  await waitForWorkbenchLayoutChange();
-
+  // Wait for the first layout emission.
+  await firstValueFrom(TestBed.inject(WorkbenchLayoutService).layout$);
+  // Wait for Angular to update the DOM.
+  await waitUntilStable();
 }
 
 /**
- * Waits for the layout to change, but for a maximum of 100ms.
+ * Waits for the application to become stable.
  */
-export async function waitForWorkbenchLayoutChange(): Promise<void> {
-  await firstValueFrom(TestBed.inject(WorkbenchLayoutService).onLayoutChange$
-    .pipe(timeout({first: 100, with: () => Promise.resolve()})),
-  );
+export async function waitUntilStable(): Promise<void> {
+  await firstValueFrom(TestBed.inject(ApplicationRef).isStable.pipe(filter(Boolean)));
 }
 
 /**
