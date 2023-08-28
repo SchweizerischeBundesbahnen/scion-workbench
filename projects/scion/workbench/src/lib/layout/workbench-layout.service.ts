@@ -8,11 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {animationFrameScheduler, firstValueFrom, merge, Observable, Subject, timer} from 'rxjs';
+import {BehaviorSubject, merge, Observable, skip, Subject} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {debounce, filter, map, startWith} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
+import {filterNull} from '../common/operators';
 
 /**
  * Provides access to the workbench layout.
@@ -20,30 +21,23 @@ import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutService {
 
-  private _layout: ɵWorkbenchLayout | null = null;
-  private _layoutChange$ = new Subject<void>();
+  private _layout$ = new BehaviorSubject<ɵWorkbenchLayout | null>(null);
   private _dragStart$ = new Subject<void>();
   private _dragEnd$ = new Subject<void>();
 
   /**
    * Emits the current {@link WorkbenchLayout}.
    *
-   * Upon subscription, the current layout is emitted, and then emits continuously when the layout changes.
-   * If Angular's initial navigation is not performed yet, blocks until the initial navigation is complete. It never
-   * emits `null` and never completes.
+   * Upon subscription, emits the current layout, and then emits the updated layout every time it changes.
+   *
+   * The Observable will not emit until Angular has performed the initial navigation.
    */
-  public readonly layout$: Observable<ɵWorkbenchLayout> = this._layoutChange$
-    .pipe(
-      startWith(undefined as void),
-      map<void, ɵWorkbenchLayout | null>(() => this.layout),
-      filter((layout: ɵWorkbenchLayout | null): layout is ɵWorkbenchLayout => layout !== null),
-    );
+  public readonly layout$: Observable<ɵWorkbenchLayout> = this._layout$.pipe(filterNull());
 
   /**
-   * Notifies upon a workbench layout change. When this Observable emits, the layout has already been flushed to the DOM.
+   * Notifies when the workbench layout has changed.
    */
-  public readonly onLayoutChange$: Observable<void> = this._layoutChange$
-    .pipe(debounce(() => timer(0, animationFrameScheduler)));
+  public readonly onLayoutChange$: Observable<ɵWorkbenchLayout> = this._layout$.pipe(skip(1), filterNull());
 
   /**
    * Notifies when the user starts or ends modifying the layout using drag and drop, e.g., moving the splitter between parts,
@@ -73,25 +67,16 @@ export class WorkbenchLayoutService {
   }
 
   /**
-   * Returns a Promise that resolves on the next layout change. When this Promise resolves,
-   * the layout has already been flushed to the DOM.
-   */
-  public async whenLayoutChange(): Promise<void> {
-    return firstValueFrom(this.onLayoutChange$);
-  }
-
-  /**
    * Sets the given {@link WorkbenchLayout}.
    */
   public setLayout(layout: ɵWorkbenchLayout): void {
-    this._layout = layout;
-    this._layoutChange$.next();
+    this._layout$.next(layout);
   }
 
   /**
-   * Returns a reference to current {@link WorkbenchLayout}, if any. Is `null` until the initial navigation is performed.
+   * Returns a reference to current {@link WorkbenchLayout}, if any. Is `null` until Angular has performed the initial navigation.
    */
   public get layout(): ɵWorkbenchLayout | null {
-    return this._layout;
+    return this._layout$.value;
   }
 }
