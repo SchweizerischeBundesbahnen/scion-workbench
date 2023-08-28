@@ -12,7 +12,7 @@ import {Component, DestroyRef, ElementRef, HostListener, NgZone, OnInit, QueryLi
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {filter, map, mergeMap, startWith, switchMap, take, takeUntil} from 'rxjs/operators';
-import {animationFrameScheduler, BehaviorSubject, combineLatest, from, interval, Observable, Subject} from 'rxjs';
+import {animationFrameScheduler, BehaviorSubject, combineLatest, firstValueFrom, from, interval, Observable, Subject} from 'rxjs';
 import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
@@ -292,7 +292,7 @@ export class PartBarComponent implements OnInit {
     // Wait undoing the drag state until flushed tab changes to the DOM, i.e., after the layout routing cycle completes.
     // If we were to undo the drag state immediately during the course of the drop event, the tab layout would temporarily
     // revert to the state before the drag operation, resulting in an ugly flicker.
-    this._workbenchLayoutService.whenLayoutChange().then(() => {
+    firstValueFrom(this._workbenchLayoutService.onLayoutChange$).then(() => {
       this.unsetDragState();
     });
   }
