@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, EMPTY, Observable, Subject, switchMap} from 'rxjs';
 import {ChildrenOutletContexts, Router, UrlSegment} from '@angular/router';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
-import {map} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
-import {Arrays} from '@scion/toolkit/util';
+import {Arrays, Defined} from '@scion/toolkit/util';
 import {Disposable} from '../common/disposable';
 import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
 import {WorkbenchView} from './workbench-view.model';
@@ -25,6 +24,9 @@ import {WbComponentPortal} from '../portal/wb-component-portal';
 import {inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
+import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {bufferLatestUntilLayoutChange} from '../common/operators';
 
 export class ɵWorkbenchView implements WorkbenchView {
 
@@ -34,10 +36,11 @@ export class ɵWorkbenchView implements WorkbenchView {
   private readonly _router = inject(Router);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
 
+  private readonly _part$ = new BehaviorSubject<ɵWorkbenchPart | undefined>(undefined);
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private readonly _scrolledIntoView$ = new BehaviorSubject<boolean>(true);
+  private readonly _destroy$ = new Subject<void>();
 
-  private _partId: string | null = null;
   private _activationInstant: number | undefined;
 
   public title: string | null = null;
@@ -47,24 +50,22 @@ export class ɵWorkbenchView implements WorkbenchView {
   public scrollTop = 0;
   public scrollLeft = 0;
 
-  public readonly active$: BehaviorSubject<boolean>;
-  public readonly cssClasses$: BehaviorSubject<string[]>;
+  public readonly active$ = new BehaviorSubject<boolean>(false);
+  public readonly cssClasses$ = new BehaviorSubject<string[]>([]);
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
   public readonly blocked$ = new BehaviorSubject(false);
   public readonly portal: WbComponentPortal;
 
   constructor(public readonly id: string, options: {component: ComponentType<ViewComponent>}) {
-    this.active$ = new BehaviorSubject<boolean>(false);
-    this.cssClasses$ = new BehaviorSubject<string[]>([]);
-
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
       .pipe(
         map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
         mapArray<WorkbenchMenuItemFactoryFn, WorkbenchMenuItem>(menuItemFactoryFn => menuItemFactoryFn(this)),
         filterArray<WorkbenchMenuItem>(Boolean),
       );
-
     this.portal = this.createPortal(options.component);
+    this.trackViewActivation();
+    this.touchOnActivate();
   }
 
   private createPortal(viewComponent: ComponentType<ViewComponent>): WbComponentPortal {
@@ -83,8 +84,12 @@ export class ɵWorkbenchView implements WorkbenchView {
     });
   }
 
-  public setPartId(partId: string): void {
-    this._partId = partId;
+  /**
+   * Method invoked to update this workbench model object when the workbench layout changes.
+   */
+  public onLayoutChange(layout: ɵWorkbenchLayout): void {
+    const partId = layout.part({by: {viewId: this.id}}).id;
+    this._part$.next(this._partRegistry.get(partId));
   }
 
   public get first(): boolean {
@@ -108,17 +113,7 @@ export class ɵWorkbenchView implements WorkbenchView {
   }
 
   public get active(): boolean {
-    return this.active$.getValue();
-  }
-
-  public activate(activate: boolean): void {
-    if (activate === this.active) {
-      return;
-    }
-    if (activate) {
-      this._activationInstant = this._activationInstantProvider.now();
-    }
-    this.active$.next(activate);
+    return this.active$.value;
   }
 
   /**
@@ -150,11 +145,7 @@ export class ɵWorkbenchView implements WorkbenchView {
   }
 
   public get part(): WorkbenchPart {
-    // DO NOT resolve the part at construction time because it can change, e.g. when this view is moved to another part.
-    if (this._partId) {
-      return this._partRegistry.get(this._partId);
-    }
-    throw Error(`[NullPartError] View not added to a part [view=${this.id}].`);
+    return Defined.orElseThrow(this._part$.value, () => Error(`[NullPartError] Part reference missing for view '${this.id}'.`));
   }
 
   public close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean> {
@@ -228,7 +219,37 @@ export class ɵWorkbenchView implements WorkbenchView {
     return this.portal.isDestroyed;
   }
 
+  /**
+   * Monitors the associated part to check if this view is currently active, updating the active state of this view accordingly.
+   */
+  private trackViewActivation(): void {
+    this._part$
+      .pipe(
+        switchMap(part => part?.activeViewId$ ?? EMPTY),
+        map(activeViewId => activeViewId === this.id),
+        bufferLatestUntilLayoutChange(), // Prevent the (de-)activation of potentially wrong views while updating the layout.
+        distinctUntilChanged(),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(this.active$);
+  }
+
+  /**
+   * Updates the activation instant when this view is activated.
+   */
+  private touchOnActivate(): void {
+    this.active$
+      .pipe(
+        filter(Boolean),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        this._activationInstant = this._activationInstantProvider.now();
+      });
+  }
+
   public destroy(): void {
+    this._destroy$.next();
     this.portal.destroy();
   }
 }

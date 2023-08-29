@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {MPart} from '../layout/workbench-layout.model';
-import {BehaviorSubject, Observable, switchMap} from 'rxjs';
+import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
 import {inject, Injector} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
@@ -19,29 +18,33 @@ import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WorkbenchPartActionRegistry} from './workbench-part-action.registry';
 import {filterArray} from '@scion/toolkit/operators';
-import {distinctUntilChanged, map} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
-  private _part!: MPart;
   private _activationInstant: number | undefined;
 
   private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _partActionRegistry = inject(WorkbenchPartActionRegistry);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaLayoutComponent>;
+  private readonly _destroy$ = new Subject<void>();
 
   public readonly active$ = new BehaviorSubject<boolean>(false);
   public readonly viewIds$ = new BehaviorSubject<string[]>([]);
   public readonly activeViewId$ = new BehaviorSubject<string | null>(null);
   public readonly actions$: Observable<readonly WorkbenchPartAction[]>;
-  public readonly isInMainArea: boolean;
 
-  constructor(public readonly id: string, options: {component: ComponentType<PartComponent | MainAreaLayoutComponent>; isInMainArea: boolean}) {
+  private _isInMainArea: boolean | undefined;
+
+  constructor(public readonly id: string, options: {component: ComponentType<PartComponent | MainAreaLayoutComponent>}) {
     this._partComponent = options.component;
-    this.isInMainArea = options.isInMainArea;
     this.actions$ = this.observePartActions$();
+    this.touchOnActivate();
   }
 
   /**
@@ -58,10 +61,15 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     return new ComponentPortal(this._partComponent, null, injector, null, null);
   }
 
-  public setPart(part: MPart, active: boolean): void {
-    const prevViewIds = this._part?.views.map(view => view.id);
+  /**
+   * Method invoked to update this workbench model object when the workbench layout changes.
+   */
+  public onLayoutChange(layout: ɵWorkbenchLayout): void {
+    this._isInMainArea ??= layout.isInMainArea(this.id);
+    const part = layout.part({by: {partId: this.id}});
+    const active = layout.activePart({scope: this._isInMainArea ? 'main' : 'peripheral'}).id === this.id;
+    const prevViewIds = this.viewIds$.value;
     const currViewIds = part.views.map(view => view.id);
-    this._part = part;
 
     // Update active part if changed
     if (this.active !== active) {
@@ -77,7 +85,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     if (this.activeViewId !== part.activeViewId) {
       this.activeViewId$.next(part.activeViewId ?? null);
     }
-    part.views.forEach(view => this._viewRegistry.get(view.id).activate(view.id === part.activeViewId));
   }
 
   public get viewIds(): string[] {
@@ -89,7 +96,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   /**
-   * Makes the associated part the active workbench part.
+   * Activates this part.
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
@@ -98,9 +105,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       return true;
     }
 
-    this._activationInstant = this._activationInstantProvider.now();
+    const currentLayout = this._workbenchLayoutService.layout;
     return this._workbenchRouter.ɵnavigate(
-      layout => layout.activatePart(this.id),
+      layout => currentLayout === layout ? layout.activatePart(this.id) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: true}, // do not add part activation into browser history stack
     );
   }
@@ -119,11 +126,19 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       return true;
     }
 
-    return this._workbenchRouter.ɵnavigate(layout => layout.activateView(viewId, {activatePart: true}), {skipLocationChange: options?.skipLocationChange});
+    const currentLayout = this._workbenchLayoutService.layout;
+    return this._workbenchRouter.ɵnavigate(
+      layout => currentLayout === layout ? layout.activateView(viewId, {activatePart: true}) : null, // cancel navigation if the layout has become stale
+      {skipLocationChange: options?.skipLocationChange},
+    );
   }
 
   public get activationInstant(): number | undefined {
     return this._activationInstant;
+  }
+
+  public get isInMainArea(): boolean {
+    return this._isInMainArea ?? false;
   }
 
   /**
@@ -152,7 +167,22 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       );
   }
 
+  /**
+   * Updates the activation instant when this part is activated.
+   */
+  private touchOnActivate(): void {
+    this.active$
+      .pipe(
+        filter(Boolean),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        this._activationInstant = this._activationInstantProvider.now();
+      });
+  }
+
   public destroy(): void {
+    this._destroy$.next();
     // IMPORTANT: Only detach the active view, not destroy it, because views are explicitly destroyed when view handles are removed.
     // Otherwise, moving the last view to another part would fail because the view would already be destroyed.
     if (this.activeViewId) {

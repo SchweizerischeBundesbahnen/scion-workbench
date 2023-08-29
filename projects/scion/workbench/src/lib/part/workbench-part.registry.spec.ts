@@ -33,7 +33,7 @@ describe('WorkbenchPartRegistry', () => {
     });
 
     // Register part 'part.1'.
-    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.1', {component: PartComponent, isInMainArea: false})));
+    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.1', {component: PartComponent})));
 
     // Expect registry to emit registered parts upon subscription.
     const partsCaptor = new ObserveCaptor();
@@ -43,9 +43,9 @@ describe('WorkbenchPartRegistry', () => {
     ]);
 
     // Register part 'part.2'.
-    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.2', {component: PartComponent, isInMainArea: false})));
+    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.2', {component: PartComponent})));
     // Register part 'part.3'.
-    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.3', {component: PartComponent, isInMainArea: false})));
+    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.3', {component: PartComponent})));
 
     // Expect registry not to emit until the next layout change.
     expect(partsCaptor.getValues()).toEqual([

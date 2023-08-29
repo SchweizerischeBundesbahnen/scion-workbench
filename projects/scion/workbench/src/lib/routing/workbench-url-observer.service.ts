@@ -72,9 +72,8 @@ export class WorkbenchUrlObserver {
   private onNavigationEnd(event: NavigationEnd): void {
     this._logger.debug(() => 'onNavigationEnd', LoggerNames.ROUTING, event);
     this.unregisterRemovedOutletAuxiliaryRoutes();
-    this.updateViewRegistry();
-    this.updatePartRegistry();
-    this.applyWorkbenchLayout();
+    this.applyWorkbenchLayoutChanges();
+    this.publishWorkbenchLayout();
     this.migrateURL();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
@@ -208,14 +207,26 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * Sets the workbench layout to {@link WorkbenchLayoutService}, but only if navigating through the workbench router.
-   *
-   * Note: Apply the layout after navigation ended to not run into the following error: 'Cannot activate an already activated outlet'.
+   * Updates registries and workbench handles to reflect the new layout.
    */
-  private applyWorkbenchLayout(): void {
-    const layout = this._workbenchRouter.getCurrentNavigationContext().layout;
+  private applyWorkbenchLayoutChanges(): void {
+    const {layout} = this._workbenchRouter.getCurrentNavigationContext();
     if (layout !== this._workbenchLayoutService.layout) { // Layout instance does not change if navigating through the Angular router.
-      this._logger.debug(() => 'Applying workbench layout', LoggerNames.ROUTING, layout);
+      this.updateViewRegistry();
+      this.updatePartRegistry();
+
+      this._viewRegistry.views.forEach(view => view.onLayoutChange(layout));
+      this._partRegistry.parts.forEach(part => part.onLayoutChange(layout));
+    }
+  }
+
+  /**
+   * Publishes the workbench layout via {@link WorkbenchLayoutService}, similar to a transactional commit.
+   */
+  private publishWorkbenchLayout(): void {
+    const {layout} = this._workbenchRouter.getCurrentNavigationContext();
+    if (layout !== this._workbenchLayoutService.layout) { // Layout instance does not change if navigating through the Angular router.
+      this._logger.debug(() => 'Publishing workbench layout', LoggerNames.ROUTING, layout);
       this._workbenchLayoutService.setLayout(layout);
     }
   }
@@ -249,7 +260,7 @@ export class WorkbenchUrlObserver {
    * - For each removed view, destroys the {@link WorkbenchView} and unregisters it in {@link WorkbenchViewRegistry}
    */
   private updateViewRegistry(): void {
-    const {layoutDiff, layout} = this._workbenchRouter.getCurrentNavigationContext();
+    const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();
 
     layoutDiff.addedViews.forEach(viewId => {
       this._logger.debug(() => `Constructing ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
@@ -259,44 +270,28 @@ export class WorkbenchUrlObserver {
       this._logger.debug(() => `Destroying ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
       this._viewRegistry.unregister(viewId);
     });
-
-    // Update view properties.
-    layout.views().forEach(view => {
-      this._viewRegistry.get(view.id).setPartId(layout.part({by: {viewId: view.id}}).id);
-    });
   }
 
   /**
    * - For each added part, constructs a {@link WorkbenchPart} and registers it in {@link WorkbenchPartRegistry}
    * - For each removed part, destroys the {@link WorkbenchPart} and unregisters it in {@link WorkbenchPartRegistry}
-   * - Updates part properties, e.g., the active view
    */
   private updatePartRegistry(): void {
-    const {layoutDiff, layout} = this._workbenchRouter.getCurrentNavigationContext();
+    const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();
 
     layoutDiff.addedParts.forEach(partId => {
       this._logger.debug(() => `Constructing ɵWorkbenchPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
-      this._partRegistry.register(this.createWorkbenchPart(partId, layout.isInMainArea(partId)));
+      this._partRegistry.register(this.createWorkbenchPart(partId));
     });
     layoutDiff.removedParts.forEach(partId => {
       this._logger.debug(() => `Destroying ɵWorkbenchPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
       this._partRegistry.unregister(partId);
     });
-
-    // Update part properties.
-    const activePartIds = new Set<string>()
-      .add(layout.activePart({scope: 'peripheral'}).id)
-      .add(layout.activePart({scope: 'main'}).id);
-
-    layout.parts().forEach(part => {
-      this._partRegistry.get(part.id).setPart(part, activePartIds.has(part.id));
-    });
   }
 
-  private createWorkbenchPart(partId: string, isInMainArea: boolean): ɵWorkbenchPart {
+  private createWorkbenchPart(partId: string): ɵWorkbenchPart {
     return runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchPart(partId, {
       component: partId === MAIN_AREA_PART_ID ? MainAreaLayoutComponent : PartComponent,
-      isInMainArea,
     }));
   }
 
