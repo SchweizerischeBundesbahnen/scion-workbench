@@ -24,13 +24,17 @@ import {WbComponentPortal} from '../portal/wb-component-portal';
 import {inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {bufferLatestUntilLayoutChange} from '../common/operators';
 
 export class ɵWorkbenchView implements WorkbenchView {
 
   private readonly _workbenchService = inject(ɵWorkbenchService);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _partRegistry = inject(WorkbenchPartRegistry);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _router = inject(Router);
@@ -114,6 +118,18 @@ export class ɵWorkbenchView implements WorkbenchView {
 
   public get active(): boolean {
     return this.active$.value;
+  }
+
+  public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
+    if (this.active) {
+      return true;
+    }
+
+    const currentLayout = this._workbenchLayoutService.layout;
+    return this._workbenchRouter.ɵnavigate(
+      layout => currentLayout === layout ? layout.activateView(this.id, {activatePart: true}) : null, // cancel navigation if the layout has become stale
+      {skipLocationChange: options?.skipLocationChange},
+    );
   }
 
   /**
