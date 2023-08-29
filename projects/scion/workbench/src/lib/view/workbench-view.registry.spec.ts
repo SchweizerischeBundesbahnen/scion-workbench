@@ -1,0 +1,102 @@
+/*
+ * Copyright (c) 2018-2023 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {TestBed} from '@angular/core/testing';
+import {WorkbenchViewRegistry} from './workbench-view.registry';
+import {ObserveCaptor} from '@scion/toolkit/testing';
+import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
+import {WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {ViewComponent} from './view.component';
+import {ɵWorkbenchView} from './ɵworkbench-view.model';
+import {WORKBENCH_LAYOUT_INITIAL_PART_ID, WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
+import {WorkbenchUrlObserver} from '../routing/workbench-url-observer.service';
+import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {RouterTestingModule} from '@angular/router/testing';
+import {TestComponent} from '../testing/test.component';
+import {mapArray} from '@scion/toolkit/operators';
+
+describe('WorkbenchViewRegistry', () => {
+
+  it('should delay emitting views until the next layout change', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest(),
+      ],
+      providers: [
+        {provide: WorkbenchUrlObserver, useValue: null}, // disable WorkbenchUrlObserver
+      ],
+    });
+
+    // Register view 'view.1'.
+    TestBed.inject(WorkbenchViewRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchView('view.1', {component: ViewComponent})));
+
+    // Expect registry to emit registered views upon subscription.
+    const viewsCaptor = new ObserveCaptor();
+    TestBed.inject(WorkbenchViewRegistry).views$.subscribe(viewsCaptor);
+    expect(viewsCaptor.getValues()).toEqual([
+      [jasmine.objectContaining<WorkbenchView>({id: 'view.1'})],
+    ]);
+
+    // Register view 'view.2'.
+    TestBed.inject(WorkbenchViewRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchView('view.2', {component: ViewComponent})));
+    // Register view 'view.3'.
+    TestBed.inject(WorkbenchViewRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchView('view.3', {component: ViewComponent})));
+
+    // Expect registry not to emit until the next layout change.
+    expect(viewsCaptor.getValues()).toEqual([
+      [jasmine.objectContaining<WorkbenchView>({id: 'view.1'})],
+    ]);
+
+    // Simulate the layout to change.
+    TestBed.inject(WorkbenchLayoutService).setLayout(TestBed.inject(WorkbenchLayoutFactory).create());
+
+    // Expect registry to emit registered views.
+    expect(viewsCaptor.getValues()).toEqual([
+      [
+        jasmine.objectContaining<WorkbenchView>({id: 'view.1'}),
+      ],
+      [
+        jasmine.objectContaining<WorkbenchView>({id: 'view.1'}),
+        jasmine.objectContaining<WorkbenchView>({id: 'view.2'}),
+        jasmine.objectContaining<WorkbenchView>({id: 'view.3'}),
+      ],
+    ]);
+  });
+
+  it('should have part associated when views are emitted', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest(),
+        RouterTestingModule.withRoutes([
+          {path: '', outlet: 'view', component: TestComponent},
+        ]),
+      ],
+      providers: [
+        {provide: WORKBENCH_LAYOUT_INITIAL_PART_ID, useValue: 'main'},
+      ],
+    });
+
+    // Subscribe for view changes (before routing).
+    const captor = new ObserveCaptor<string[]>();
+    TestBed.inject(WorkbenchViewRegistry).views$.pipe(mapArray(view => view.part.id)).subscribe(captor);
+
+    // Open view in the right part.
+    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+      .addPart('right', {relativeTo: 'main', align: 'right'})
+      .addView('view', {partId: 'right'}),
+    );
+
+    // Expect the part to be resolved when `WorkbenchViewRegistry.views$` emits.
+    expect(captor.hasErrored()).toBeFalse();
+    expect(captor.getLastValue()).toEqual(['right']);
+  });
+});

@@ -10,8 +10,10 @@
 
 import {Injectable, OnDestroy} from '@angular/core';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
-import {Observable} from 'rxjs';
+import {concat, Observable} from 'rxjs';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {take} from 'rxjs/operators';
+import {bufferLatestUntilLayoutChange} from '../common/operators';
 
 /**
  * Registry for {@link WorkbenchPart} model objects.
@@ -23,6 +25,11 @@ export class WorkbenchPartRegistry implements OnDestroy {
     keyFn: part => part.id,
     nullObjectErrorFn: partId => Error(`[NullPartError] Part '${partId}' not found.`),
   });
+
+  public parts$: Observable<readonly ɵWorkbenchPart[]> = concat(
+    this._registry.objects$.pipe(take(1)), // immediate emission upon subscription
+    this._registry.objects$.pipe(bufferLatestUntilLayoutChange()),
+  );
 
   /**
    * Registers given part.
@@ -49,10 +56,6 @@ export class WorkbenchPartRegistry implements OnDestroy {
 
   public get parts(): readonly ɵWorkbenchPart[] {
     return this._registry.objects;
-  }
-
-  public get parts$(): Observable<readonly ɵWorkbenchPart[]> {
-    return this._registry.objects$;
   }
 
   public ngOnDestroy(): void {
