@@ -106,6 +106,13 @@ export abstract class WorkbenchView {
   public abstract readonly urlSegments: UrlSegment[];
 
   /**
+   * Activates this view.
+   *
+   * Note: This instruction runs asynchronously via URL routing.
+   */
+  public abstract activate(): Promise<boolean>;
+
+  /**
    * Destroys this view (or sibling views) and the associated routed component.
    *
    * Note: This instruction runs asynchronously via URL routing.

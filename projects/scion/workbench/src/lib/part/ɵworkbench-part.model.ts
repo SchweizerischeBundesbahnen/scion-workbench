@@ -116,23 +116,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     return this.active$.value;
   }
 
-  /**
-   * Activates the specified view.
-   *
-   * Note: This instruction runs asynchronously via URL routing.
-   */
-  public async activateView(viewId: string, options?: {skipLocationChange?: boolean}): Promise<boolean> {
-    if (this.activeViewId === viewId) {
-      return true;
-    }
-
-    const currentLayout = this._workbenchLayoutService.layout;
-    return this._workbenchRouter.ɵnavigate(
-      layout => currentLayout === layout ? layout.activateView(viewId, {activatePart: true}) : null, // cancel navigation if the layout has become stale
-      {skipLocationChange: options?.skipLocationChange},
-    );
-  }
-
   public get activationInstant(): number | undefined {
     return this._activationInstant;
   }

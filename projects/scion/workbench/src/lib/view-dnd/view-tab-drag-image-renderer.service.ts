@@ -276,4 +276,8 @@ class DragImageWorkbenchView implements WorkbenchView {
   public get part(): WorkbenchPart {
     throw Error('[UnsupportedOperationError]');
   }
+
+  public activate(): Promise<boolean> {
+    throw Error('[UnsupportedOperationError]');
+  }
 }

@@ -21,7 +21,6 @@ import {WorkbenchModuleConfig} from '../../workbench-module-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {subscribeInside} from '@scion/toolkit/operators';
@@ -70,7 +69,6 @@ export class ViewTabComponent {
               private _viewRegistry: WorkbenchViewRegistry,
               private _router: WorkbenchRouter,
               private _viewport: SciViewportComponent,
-              private _part: ɵWorkbenchPart,
               private _viewDragService: ViewDragService,
               private _differs: IterableDiffers,
               private _viewContextMenuService: ViewMenuService,
@@ -100,7 +98,7 @@ export class ViewTabComponent {
 
   @HostListener('click')
   public onClick(): void {
-    this._part.activateView(this.viewId).then();
+    this.view.activate().then();
   }
 
   @HostListener('mousedown', ['$event'])
@@ -131,7 +129,7 @@ export class ViewTabComponent {
 
   @HostListener('dragstart', ['$event'])
   public onDragStart(event: DragEvent): void {
-    this._part.activateView(this.viewId).then(() => {
+    this.view.activate().then(() => {
       if (!event.dataTransfer) {
         return;
       }
@@ -162,7 +160,7 @@ export class ViewTabComponent {
   public onDragEnd(event: DragEvent): void {
     // Ensure this view stays activated if the user cancels the drag operation. But, do not push the navigation into browsing history stack.
     if (event.dataTransfer?.dropEffect === 'none') {
-      this._part.activateView(this.viewId, {skipLocationChange: true}).then();
+      this.view.activate({skipLocationChange: true}).then();
     }
     this._viewDragService.unsetViewDragData();
   }
@@ -210,7 +208,7 @@ export class ViewTabComponent {
       )
       .subscribe(([event, enabled]) => {
         event.stopPropagation(); // prevent `PartBarComponent` handling the dblclick event which would undo maximization/minimization
-        if (enabled && this._part.isInMainArea) {
+        if (enabled && this.view.part.isInMainArea) {
           this._router.ɵnavigate(layout => layout.toggleMaximized()).then();
         }
       });
