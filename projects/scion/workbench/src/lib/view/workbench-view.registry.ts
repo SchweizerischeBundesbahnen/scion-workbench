@@ -9,9 +9,11 @@
  */
 
 import {Injectable, OnDestroy} from '@angular/core';
-import {Observable} from 'rxjs';
+import {concat, Observable} from 'rxjs';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {take} from 'rxjs/operators';
+import {bufferLatestUntilLayoutChange} from '../common/operators';
 
 /**
  * Registry for {@link WorkbenchView} model objects.
@@ -23,6 +25,11 @@ export class WorkbenchViewRegistry implements OnDestroy {
     keyFn: view => view.id,
     nullObjectErrorFn: viewId => Error(`[NullViewError] View '${viewId}' not found.`),
   });
+
+  public views$: Observable<readonly ɵWorkbenchView[]> = concat(
+    this._registry.objects$.pipe(take(1)), // immediate emission upon subscription
+    this._registry.objects$.pipe(bufferLatestUntilLayoutChange()),
+  );
 
   /**
    * Registers given view.
@@ -49,10 +56,6 @@ export class WorkbenchViewRegistry implements OnDestroy {
 
   public get views(): readonly ɵWorkbenchView[] {
     return this._registry.objects;
-  }
-
-  public get views$(): Observable<readonly ɵWorkbenchView[]> {
-    return this._registry.objects$;
   }
 
   public ngOnDestroy(): void {

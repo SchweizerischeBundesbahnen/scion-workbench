@@ -8,8 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable, OperatorFunction} from 'rxjs';
+import {audit, MonoTypeOperatorFunction, Observable, OperatorFunction} from 'rxjs';
 import {filter, mergeMap} from 'rxjs/operators';
+import {inject} from '@angular/core';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 
 /**
  * Serializes the execution of elements emitted by the source Observable.
@@ -27,4 +29,13 @@ export function serializeExecution<IN, OUT>(fn: (value: IN) => Observable<OUT> |
  */
 export function filterNull<T>(): OperatorFunction<T | null, T> {
   return filter((item: T | null): item is T => item !== null);
+}
+
+/**
+ * Buffers the most recent value from the source Observable until the next layout change.
+ * Use this operator to avoid emitting a partially updated layout.
+ */
+export function bufferLatestUntilLayoutChange<T>(): MonoTypeOperatorFunction<T> {
+  const onLayoutChange$ = inject(WorkbenchLayoutService).onLayoutChange$;
+  return audit(() => onLayoutChange$);
 }
