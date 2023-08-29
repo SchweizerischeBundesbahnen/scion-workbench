@@ -72,7 +72,7 @@ export class PartComponent implements OnInit, OnDestroy {
               private _cd: ChangeDetectorRef,
               public part: ɵWorkbenchPart) {
     this._logger.debug(() => `Constructing PartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
-    this.installPartActivator();
+    this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
   }
 
@@ -121,9 +121,9 @@ export class PartComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Activates this part when it gets the focus.
+   * Activates this part when it gains focus.
    */
-  private installPartActivator(): void {
+  private activatePartOnFocusIn(): void {
     const host = inject(ElementRef).nativeElement;
 
     this.part.active$
