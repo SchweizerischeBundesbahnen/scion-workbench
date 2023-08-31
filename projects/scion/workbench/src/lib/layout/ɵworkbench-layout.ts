@@ -11,78 +11,70 @@ import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layou
 import {VIEW_ID_PREFIX} from '../workbench.constants';
 import {assertType} from '../common/asserts.util';
 import {UUID} from '@scion/toolkit/uuid';
-import {MAIN_AREA_PART_ID, ReferencePart, WorkbenchLayout} from './workbench-layout';
+import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
+import {inject, Injectable, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
 
 /**
- * The workbench layout defines the arrangement of parts in a grid. A part is a stack of views.
- *
  * @inheritDoc
  *
- * ## Grids
- * The workbench layout consists of two grids:
+ * The workbench layout is a grid of parts. It contains at least one part. A special part, the main area part, is not a stack of views
+ * but embeds a sub-grid, the main area grid. It defines the arrangement of parts in the main area. The main area is optional.
  *
- * - Main Grid:
- *   The main grid is the primary grid and common to all perspectives.
+ * The layout is serializable into a URL-safe base64 string.
  *
- * - Peripheral Grid:
- *   The peripheral grid arranges parts around the main grid. It contains at least the main area part {@link MAIN_AREA_PART_ID},
- *   which is always present and common to all perspectives. The main area part embeds the main grid.
+ * The layout is an immutable object that provides methods to modify the layout. Modifications have no
+ * side effects. Each modification creates a new layout instance that can be used for further modifications.
  *
- * ## Immutable Layout
- * The workbench layout is an immutable object that provides methods to modify the layout. Modifications have no side effects.
- * Each modification creates a new layout instance that can be used for further modifications. The layout is serializable into a URL-safe base64 string.
- *
- * NOTE: Methods starting with an underscore indicate they are not working on a working copy, but modifying the layout instance.
- *
- * @inheritDoc
+ * IMPORTANT: Methods starting with an underscore indicate they are not working on a working copy, but modifying the layout instance.
  */
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   private readonly _grids: Grids;
-  private readonly _scopes: Scope[];
-  private readonly _workbenchAccessor: WorkbenchAccessor;
+  private readonly _gridNames: Array<keyof Grids>;
+  private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
+  private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
+  private readonly _serializer = inject(WorkbenchLayoutSerializer);
+  private readonly _injector = inject(Injector);
 
   private _maximized: boolean;
 
   /** @internal **/
-  constructor(config: {mainGrid?: string | MPartGrid | null; peripheralGrid?: string | MPartGrid | null; maximized?: boolean; workbenchAccessor: WorkbenchAccessor}) {
-    const {mainGrid, peripheralGrid} = config;
-    const serializer = config.workbenchAccessor.serializer;
+  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; maximized?: boolean}) {
     this._grids = {
-      main: coerceMPartGrid(mainGrid, {serializer, createInitialPartFn: () => ({id: config.workbenchAccessor.getInitialPartId()})}),
-      peripheral: coerceMPartGrid(peripheralGrid, {serializer, createInitialPartFn: () => ({id: MAIN_AREA_PART_ID, structural: true})}),
+      workbench: coerceMPartGrid(config.workbenchGrid ?? createDefaultWorkbenchGrid()),
     };
-    this._scopes = Object.keys(this._grids) as Scope[];
-    this._workbenchAccessor = config.workbenchAccessor;
+    if (this.hasPart(MAIN_AREA, {grid: 'workbench'})) {
+      this._grids.mainArea = coerceMPartGrid(config.mainAreaGrid ?? createInitialMainAreaGrid());
+    }
+    this._gridNames = Object.keys(this._grids) as Array<keyof Grids>;
     this._maximized = config.maximized ?? false;
     this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
   }
 
   /**
-   * Reference to the grid of the main area.
-   *
-   * The main grid is the primary grid and common to all perspectives.
+   * Reference to the grid of the workbench.
    */
-  public get mainGrid(): Readonly<ɵMPartGrid> {
-    return this._grids.main;
+  public get workbenchGrid(): Readonly<ɵMPartGrid> {
+    return this._grids.workbench;
   }
 
   /**
-   * Reference to the grid of the peripheral area.
+   * Reference to the grid of the main area, if any.
    *
-   * The peripheral grid arranges parts around the main grid. It contains at least the main area part {@link MAIN_AREA_PART_ID},
-   * which is always present and common to all perspectives. The main area part embeds the main grid.
+   * The main area grid is a sub-grid included by the main area part, if any. It defines the arrangement of parts in the main area.
    */
-  public get peripheralGrid(): Readonly<ɵMPartGrid> {
-    return this._grids.peripheral;
+  public get mainAreaGrid(): Readonly<ɵMPartGrid> | null {
+    return this._grids.mainArea ?? null;
   }
 
   /**
-   * Checks if the specified part is contained in the main area.
+   * Tests if given part is contained in specified grid.
    */
-  public isInMainArea(partId: string): boolean {
-    return this.part({by: {partId}, scope: 'main'}, {orElse: null}) !== null;
+  public hasPart(partId: string, options?: {grid?: keyof Grids}): boolean {
+    return this.part({by: {partId}, grid: options?.grid}, {orElse: null}) !== null;
   }
 
   /**
@@ -102,14 +94,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Returns parts contained in the specified scope, or parts in any scope if not specifying a search scope.
+   * Returns parts contained in the specified grid, or parts in any grid if not specifying a search grid.
    *
    * @param find - Search constraints
-   *       @property scope - Limits the search scope. If not specified, all scopes are searched.
-   * @return parts maching the filter criteria.
+   *       @property grid - Limits the search scope. If not specified, all grids are searched.
+   * @return parts matching the filter criteria.
    */
-  public parts(find?: {scope?: Scope}): readonly MPart[] {
-    return this.findTreeElements((element: MTreeNode | MPart): element is MPart => element instanceof MPart, {scope: find?.scope});
+  public parts(find?: {grid?: keyof Grids}): readonly MPart[] {
+    return this.findTreeElements((element: MTreeNode | MPart): element is MPart => element instanceof MPart, {grid: find?.grid});
   }
 
   /**
@@ -119,14 +111,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *        @property by
    *          @property partId - If specified, searches the part of given identity.
    *          @property viewId - If specified, searches the part that contains given view.
-   *        @property scope - Limits the search scope. If not specified, all scopes are searched.
+   *        @property grid - Limits the search scope. If not specified, all grids are searched.
    * @param options - Search options
    *       @property orElse - If set, returns `null` instead of throwing an error if no part is found.
-   * @return part maching the filter criteria.
+   * @return part matching the filter criteria.
    */
-  public part(find: {by: {partId?: string; viewId?: string}; scope?: Scope}): MPart;
-  public part(find: {by: {partId?: string; viewId?: string}; scope?: Scope}, options: {orElse: null}): MPart | null;
-  public part(find: {by: {partId?: string; viewId?: string}; scope?: Scope}, options?: {orElse: null}): MPart | null {
+  public part(find: {by: {partId?: string; viewId?: string}; grid?: keyof Grids}): MPart;
+  public part(find: {by: {partId?: string; viewId?: string}; grid?: keyof Grids}, options: {orElse: null}): MPart | null;
+  public part(find: {by: {partId?: string; viewId?: string}; grid?: keyof Grids}, options?: {orElse: null}): MPart | null {
     if (!find.by.partId && !find.by.viewId) {
       throw Error('[IllegalArgumentError] Missing required argument. Specify either "partId" or "viewId".');
     }
@@ -141,7 +133,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         return false;
       }
       return true;
-    }, {findFirst: true, scope: find.scope})[0];
+    }, {findFirst: true, grid: find.grid})[0];
 
     if (!part && !options) {
       throw Error(`[NullPartError] No part found matching "${JSON.stringify(find)}".`);
@@ -158,7 +150,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *        @property structural - Specifies whether this is a structural part. A structural part is not removed
    *                               from the layout when removing its last view. If not set, defaults to `true`.
    */
-  public addPart(id: string, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout {
+  public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout {
     return this.workingCopy().__addPart(id, relativeTo, options);
   }
 
@@ -170,12 +162,16 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Returns the active part in specified grid. At any given time, only a single part can be the active part in a grid.
-   * There is always an active part present.
+   * Returns the active part of the specified grid, or `null` if specified grid is not present.
    */
-  public activePart(find: {scope: Scope}): Readonly<MPart> {
-    const activePartId = this._grids[find.scope].activePartId;
-    return this.part({by: {partId: activePartId}, scope: find.scope});
+  public activePart(find: {grid: 'workbench'}): Readonly<MPart>;
+  public activePart(find: {grid: keyof Grids}): Readonly<MPart> | null;
+  public activePart(find: {grid: keyof Grids}): Readonly<MPart> | null {
+    const grid = this._grids[find.grid];
+    if (!grid) {
+      return null;
+    }
+    return this.part({by: {partId: grid.activePartId}, grid: find.grid});
   }
 
   /**
@@ -186,13 +182,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Returns views contained in the specified scope, or views in any scope if not specifying a search scope.
+   * Returns views contained in the specified grid, or views in any grid if not specifying any.
    *
    * @param find - Search constraints
-   *       @property scope - Limits the search scope. If not specified, all scopes are searched.
+   *       @property grid - Limits the search scope. If not specified, all grids are searched.
    * @return views maching the filter criteria.
    */
-  public views(find?: {scope?: Scope}): readonly MView[] {
+  public views(find?: {grid?: keyof Grids}): readonly MView[] {
     return this.parts(find).reduce((views, part) => views.concat(part.views), new Array<MView>());
   }
 
@@ -206,7 +202,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * @inheritDoc
    */
-  public removeView(id: string, options?: {scope?: Scope}): ɵWorkbenchLayout {
+  public removeView(id: string, options?: {grid?: keyof Grids}): ɵWorkbenchLayout {
     return this.workingCopy().__removeView(id, options);
   }
 
@@ -251,29 +247,21 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param id - The id of the view which to give a new identity.
    * @param newViewId - The new identity of the view.
    * @param options - Controls how to locate the view.
-   *       @property scope - Scope to constrain where to find the view for rename.
+   *       @property grid - Grid to constrain where to find the view for rename.
    * @return a copy of this layout with the view renamed.
    */
-  public renameView(id: string, newViewId: string, options?: {scope?: Scope}): ɵWorkbenchLayout {
+  public renameView(id: string, newViewId: string, options?: {grid?: keyof Grids}): ɵWorkbenchLayout {
     return this.workingCopy().__renameView(id, newViewId, options);
   }
 
   /**
    * Serializes this layout into a URL-safe base64 string.
-   *
-   * @param options - Controls the serialization.
-   *                  @property nullIfEmpty - If `true` or if not specified, returns `null` for the grid if it contains a single part with no views added to it.
-   *                  @property includeNodeId - Controls if to include the `nodeId`. By default, if not set, the `nodeId` is excluded from serialization.
    */
-  public serialize(options: {nullIfEmpty: false; includeNodeId?: boolean}): {mainGrid: string; peripheralGrid: string};
-  public serialize(options?: {nullIfEmpty?: true; includeNodeId?: boolean} | {}): {mainGrid: string | null; peripheralGrid: string | null};
-  public serialize(options?: {nullIfEmpty?: boolean; includeNodeId?: boolean}): {mainGrid: string | null; peripheralGrid: string | null} {
-    const nullIfEmpty = options?.nullIfEmpty ?? true;
-    const includeNodeId = options?.includeNodeId;
-    const serializer = this._workbenchAccessor.serializer;
+  public serialize(): {workbenchGrid: string; mainAreaGrid: string | null} {
+    const isMainAreaEmpty = (this.mainAreaGrid?.root instanceof MPart && this.mainAreaGrid.root.views.length === 0) ?? true;
     return {
-      mainGrid: serializer.serialize(this.mainGrid, {nullIfEmpty, includeNodeId}),
-      peripheralGrid: serializer.serialize(this.peripheralGrid, {nullIfEmpty, includeNodeId}),
+      workbenchGrid: this._serializer.serialize(this.workbenchGrid),
+      mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serialize(this._grids.mainArea),
     };
   }
 
@@ -334,14 +322,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __addPart(id: string, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): this {
-    if (this.part({by: {partId: id}}, {orElse: null})) {
+    if (this.hasPart(id)) {
       throw Error(`[IllegalArgumentError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
     const newPart = new MPart({id, structural: options?.structural ?? true});
 
     // Find the reference element, if specified, or use the layout root as reference otherwise.
-    const referenceElement = relativeTo.relativeTo ? this.element({by: {id: relativeTo.relativeTo}}) : this.peripheralGrid.root;
+    const referenceElement = relativeTo.relativeTo ? this.element({by: {id: relativeTo.relativeTo}}) : this.workbenchGrid.root;
     const addBefore = relativeTo.align === 'left' || relativeTo.align === 'top';
     const ratio = relativeTo.ratio ?? .5;
 
@@ -380,16 +368,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __removePart(id: string): this {
-    if (id === MAIN_AREA_PART_ID) {
-      throw Error('[IllegalArgumentError] The main area part cannot be removed.');
-    }
-
     const part = this.part({by: {partId: id}});
     const grid = this.grid({by: {element: part}});
-    const scope = this._scopes.find(scope => this._grids[scope] === grid);
+    const gridName = this._gridNames.find(gridName => this._grids[gridName] === grid);
 
     // The last part is never removed.
-    const parts = this.parts({scope});
+    const parts = this.parts({grid: gridName});
     if (parts.length === 1) {
       return this;
     }
@@ -398,6 +382,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const siblingElement = (part.parent!.child1 === part ? part.parent!.child2 : part.parent!.child1);
     if (!part.parent!.parent) {
       grid.root = siblingElement;
+      grid.root.parent = undefined;
     }
     else if (part.parent!.parent.child1 === part.parent) {
       part.parent!.parent.child1 = siblingElement;
@@ -410,7 +395,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     if (grid.activePartId === id) {
       const activePart = parts
         .filter(part => part.id !== id)
-        .sort((part1, part2) => this._workbenchAccessor.getPartActivationInstant(part2.id) - this._workbenchAccessor.getPartActivationInstant(part1.id))[0];
+        .sort((part1, part2) => {
+          const activationInstantPart1 = this._partActivationInstantProvider.getActivationInstant(part1.id);
+          const activationInstantPart2 = this._partActivationInstantProvider.getActivationInstant(part2.id);
+          return activationInstantPart2 - activationInstantPart1;
+        })[0];
       grid.activePartId = activePart!.id;
     }
 
@@ -475,8 +464,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __removeView(id: string, options?: {scope?: Scope}): this {
-    const part = this.part({by: {viewId: id}, scope: options?.scope});
+  private __removeView(id: string, options?: {grid?: keyof Grids}): this {
+    const part = this.part({by: {viewId: id}, grid: options?.grid});
 
     // Remove the view.
     const viewIndex = part.views.findIndex(view => view.id === id);
@@ -490,7 +479,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     if (part.activeViewId === id) {
       part.activeViewId = part.views
         .map(view => view.id)
-        .sort((viewId1, viewId2) => this._workbenchAccessor.getViewActivationInstant(viewId2) - this._workbenchAccessor.getViewActivationInstant(viewId1))[0];
+        .sort((viewId1, viewId2) => {
+          const activationInstantView1 = this._viewActivationInstantProvider.getActivationInstant(viewId1);
+          const activationInstantView2 = this._viewActivationInstantProvider.getActivationInstant(viewId2);
+          return activationInstantView2 - activationInstantView1;
+        })[0];
     }
 
     // Remove the part if this is the last view of the part and not a structural part.
@@ -563,12 +556,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __renameView(id: string, newViewId: string, options?: {scope?: Scope}): this {
+  private __renameView(id: string, newViewId: string, options?: {grid?: keyof Grids}): this {
     if (this.views().find(view => view.id === newViewId)) {
       throw Error(`[IllegalArgumentError] View id must be unique. The layout already contains a view with the id '${newViewId}'.`);
     }
 
-    const part = this.part({by: {viewId: id}, scope: options?.scope});
+    const part = this.part({by: {viewId: id}, grid: options?.grid});
     const viewIndex = part.views.findIndex(view => view.id === id);
     part.views[viewIndex] = {...part.views[viewIndex], id: newViewId};
 
@@ -583,11 +576,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Returns the grid that contains the given element. If not found, throws an error.
    */
   private grid(find: {by: {element: MPart | MTreeNode}}): MPartGrid {
-    const scope = this._scopes.find(scope => {
-      return this.findTreeElements((element: MTreeNode | MPart): element is MPart | MTreeNode => element === find.by.element, {findFirst: true, scope}).length > 0;
+    const gridName = this._gridNames.find(gridName => {
+      return this.findTreeElements((element: MTreeNode | MPart): element is MPart | MTreeNode => element === find.by.element, {findFirst: true, grid: gridName}).length > 0;
     });
 
-    if (!scope) {
+    if (!gridName) {
       if (find.by.element instanceof MPart) {
         throw Error(`[NullGridError] No grid found that contains the part '${find.by.element.id}'".`);
       }
@@ -596,7 +589,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       }
     }
 
-    return this._grids[scope];
+    return this._grids[gridName]!;
   }
 
   /**
@@ -605,17 +598,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param find - Search constraints
    *        @property by
    *          @property id - Specifies the identity of the element.
-   *        @property scope - Limits the search scope. If not specified, all scopes are searched.
+   *        @property grid - Limits the search scope. If not specified, all grids are searched.
    * @param options - Search options
    *       @property orElse - If set, returns `null` instead of throwing an error if no element is found.
    * @return part maching the filter criteria.
    */
-  private element(find: {by: {id: string}; scope?: Scope}): MPart | MTreeNode;
-  private element(find: {by: {id: string}; scope?: Scope}, options: {orElse: null}): MPart | MTreeNode | null;
-  private element(find: {by: {id: string}; scope?: Scope}, options?: {orElse: null}): MPart | MTreeNode | null {
+  private element(find: {by: {id: string}; grid?: keyof Grids}): MPart | MTreeNode;
+  private element(find: {by: {id: string}; grid?: keyof Grids}, options: {orElse: null}): MPart | MTreeNode | null;
+  private element(find: {by: {id: string}; grid?: keyof Grids}, options?: {orElse: null}): MPart | MTreeNode | null {
     const element = this.findTreeElements((element: MTreeNode | MPart): element is MPart | MTreeNode => {
       return element instanceof MPart ? element.id === find.by.id : element.nodeId === find.by.id;
-    }, {findFirst: true, scope: find.scope})[0];
+    }, {findFirst: true, grid: find.grid})[0];
 
     if (!element && !options) {
       throw Error(`[NullElementError] Element with id '${find.by.id}' not found in the layout.`);
@@ -640,9 +633,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param predicateFn - Predicate function to match.
    * @param options - Search options
    *        @property findFirst - If specified, stops traversing on first match. If not set, defaults to `false`.
-   *        @property scope - Limits the search scope. If not specified, all scopes are searched.
+   *        @property grid - Limits the search scope. If not specified, all grids are searched.
    */
-  private findTreeElements<T extends MTreeNode | MPart>(predicateFn: (element: MTreeNode | MPart) => element is T, options?: {findFirst?: boolean; scope?: Scope}): T[] {
+  private findTreeElements<T extends MTreeNode | MPart>(predicateFn: (element: MTreeNode | MPart) => element is T, options?: {findFirst?: boolean; grid?: keyof Grids}): T[] {
+    if (options?.grid && !this._grids[options.grid]) {
+      return [];
+    }
+
     const result: T[] = [];
 
     function visitParts(node: MTreeNode | MPart): boolean {
@@ -659,12 +656,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       return true;
     }
 
-    if (options?.scope) {
-      visitParts(this._grids[options.scope].root);
+    if (options?.grid) {
+      visitParts(this._grids[options.grid]!.root);
     }
     else {
       for (const grid of Object.values(this._grids)) {
-        if (!visitParts(grid.root)) {
+        if (grid && !visitParts(grid.root)) {
           break;
         }
       }
@@ -677,82 +674,60 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Creates a copy of this layout.
    */
   private workingCopy(): ɵWorkbenchLayout {
-    const {mainGrid, peripheralGrid} = this.serialize({nullIfEmpty: false, includeNodeId: true});
-    return new ɵWorkbenchLayout({
-      mainGrid,
-      peripheralGrid,
-      workbenchAccessor: this._workbenchAccessor,
+    return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
+      workbenchGrid: this._serializer.serialize(this.workbenchGrid, {includeNodeId: true}),
+      mainAreaGrid: this._serializer.serialize(this._grids.mainArea, {includeNodeId: true}),
       maximized: this._maximized,
-    });
+    }));
   }
+}
+
+/**
+ * Creates a default workbench grid with a main area.
+ */
+function createDefaultWorkbenchGrid(): MPartGrid {
+  return {
+    root: new MPart({id: MAIN_AREA, structural: true}),
+    activePartId: MAIN_AREA,
+  };
+}
+
+/**
+ * Creates a main area grid with an initial part.
+ *
+ * The DI token {@link MAIN_AREA_INITIAL_PART_ID} is used to assign the initial part its identity.
+ */
+function createInitialMainAreaGrid(): MPartGrid {
+  return {
+    root: new MPart({id: inject(MAIN_AREA_INITIAL_PART_ID)}),
+    activePartId: inject(MAIN_AREA_INITIAL_PART_ID),
+  };
 }
 
 /**
  * Coerces {@link MPartGrid}, applying necessary migrations if the serialized grid is outdated.
  */
-function coerceMPartGrid(grid: string | MPartGrid | null | undefined, options: {serializer: WorkbenchLayoutSerializer; createInitialPartFn: () => Partial<MPart> & {id: string}}): ɵMPartGrid {
-  if (grid === null || grid === undefined) {
-    const initialPart = options.createInitialPartFn();
-    return {root: new MPart(initialPart), activePartId: initialPart.id, migrated: false};
-  }
+function coerceMPartGrid(grid: string | MPartGrid): ɵMPartGrid {
   if (typeof grid === 'string') {
-    return {...options.serializer.deserialize(grid)};
+    return {...inject(WorkbenchLayoutSerializer).deserialize(grid)};
   }
   return {...grid, migrated: false};
 }
-
-/**
- * Provides {@link WorkbenchLayout} access to workbench resources.
- *
- * @internal
- */
-export interface WorkbenchAccessor {
-  /**
-   * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
-   */
-  readonly serializer: WorkbenchLayoutSerializer;
-
-  /**
-   * Returns the instant when the specified view was last activated.
-   */
-  getViewActivationInstant(viewId: string): number;
-
-  /**
-   * Returns the instant when the specified part was last activated.
-   */
-  getPartActivationInstant(partId: string): number;
-
-  /**
-   * Returns the identity to use when creating the initial part in the main area.
-   *
-   * The initial part is automatically created by the workbench if the main area has no part, but it has no
-   * special meaning to the workbench and can be removed by the user.
-   */
-  getInitialPartId(): string;
-}
-
-/**
- * Controls in which scope to search for elements in the layout.
- */
-export type Scope = keyof Grids;
 
 /**
  * Grids of the workbench layout.
  */
 interface Grids {
   /**
-   * Reference to the grid of the main area.
-   *
-   * The main grid is the primary grid and common to all perspectives.
+   * Reference to the grid of the workbench.
    */
-  main: ɵMPartGrid;
+  workbench: ɵMPartGrid;
   /**
-   * Reference to the grid of the peripheral area.
+   * Reference to the grid of the main area, if any.
    *
-   * The peripheral grid arranges parts around the main grid. It contains at least the main area part {@link MAIN_AREA_PART_ID},
-   * which is always present and common to all perspectives. The main area part embeds the main grid.
+   * The main area grid is a sub-grid embedded in the main area part, if any. It defines the arrangement of parts in the main area.
    */
-  peripheral: ɵMPartGrid;
+  mainArea?: ɵMPartGrid;
 }
 
 /**
@@ -763,7 +738,7 @@ interface Grids {
  */
 export function isGridElementVisible(element: MTreeNode | MPart): boolean {
   if (element instanceof MPart) {
-    return element.id === MAIN_AREA_PART_ID || element.views.length > 0;
+    return element.id === MAIN_AREA || element.views.length > 0;
   }
   return isGridElementVisible(element.child1) || isGridElementVisible(element.child2);
 }
@@ -777,4 +752,64 @@ export interface ReferenceElement extends ReferencePart {
    * If not set, the part will be aligned relative to the root of the workbench layout.
    */
   relativeTo?: string;
+}
+
+/**
+ * DI token to control the identity of the initial part in the main area.
+ *
+ * The initial part is automatically created by the workbench if the main area has no part, but it has no
+ * special meaning to the workbench and can be removed by the user. If not set, a UUID is assigned.
+ *
+ * Overwrite this DI token in tests to control the identity of the initial part.
+ * ```
+ * TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'})
+ * ```
+ */
+export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<string>('MAIN_AREA_INITIAL_PART_ID', {
+  providedIn: 'root',
+  factory: () => UUID.randomUUID(),
+});
+
+/**
+ * Provides the instant when a part was last activated.
+ *
+ * Overwrite DI token in tests to control part activation instants.
+ * ```
+ * TestBed.overrideProvider(PartActivationInstantProvider, {useValue: ...});
+ * ```
+ */
+@Injectable({providedIn: 'root'})
+export class PartActivationInstantProvider {
+
+  constructor(private _partRegistry: WorkbenchPartRegistry) {
+  }
+
+  /**
+   * Returns the instant when the specified part was last activated.
+   */
+  public getActivationInstant(partId: string): number {
+    return this._partRegistry.get(partId, {orElse: null})?.activationInstant ?? 0;
+  }
+}
+
+/**
+ * Provides the instant when a view was last activated.
+ *
+ * Overwrite DI token in tests to control view activation instants.
+ * ```
+ * TestBed.overrideProvider(ViewActivationInstantProvider, {useValue: ...});
+ * ```
+ */
+@Injectable({providedIn: 'root'})
+export class ViewActivationInstantProvider {
+
+  constructor(private _viewRegistry: WorkbenchViewRegistry) {
+  }
+
+  /**
+   * Returns the instant when the specified view was last activated.
+   */
+  public getActivationInstant(viewId: string): number {
+    return this._viewRegistry.get(viewId, {orElse: null})?.activationInstant ?? 0;
+  }
 }

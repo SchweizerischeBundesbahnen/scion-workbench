@@ -21,13 +21,10 @@ import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 
 /**
- * Renders the workbench layout.
+ * Renders the layout of the workbench.
  *
- * The workbench layout defines the arrangement of parts. A part is a stack of views.
- *
- * The workbench layout consists of a main and peripheral grid. The peripheral grid arranges parts around the main grid.
- * It contains at least the main area part {@link MAIN_AREA_PART_ID}, which is always present and common to all perspectives.
- * The main area part embeds the main grid.
+ * The workbench layout is a grid of parts. It contains at least one part. A special part, the main area part, is not a stack of views
+ * but embeds a sub-grid, the main area grid. It defines the arrangement of parts in the main area. The main area is optional.
  *
  * The layout is modeled as a tree of nodes `{@link MTreeNode}` and parts `{@link MPart}`. Each node has two children, which can be either
  * another node or a part (leaf). A node defines a split layout in which the two children are arranged vertically or horizontally.
@@ -37,7 +34,7 @@ import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone
  *            +--------------+--------------+
  *            |                             |                        +--------+-----------------------+
  *        MTreeNode                       MPart                      |  left  | +---------+---------+ |
- *     +------+------+              (MAIN_AREA_PART_ID)              |  top   | |         |         | |
+ *     +------+------+                 (MAIN_AREA)                   |  top   | |         |         | |
  *     |             |                      |              ======>   |--------+ | left    | right   | |
  *   MPart         MPart                 MTreeNode         renders   |  left  | |         |         | |
  * (left-top)  (left-bottom)         +------+------+                 | bottom | +---------+---------+ |
@@ -45,7 +42,6 @@ import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone
  *                                 MPart         MPart
  *                                (left)        (right)
  *
- * @see WorkbenchLayoutComponent
  * @see MainAreaLayoutComponent
  */
 @Component({
@@ -72,7 +68,7 @@ export class WorkbenchLayoutComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(layout => {
         this.layout = layout;
-        this.root = layout.maximized ? layout.mainGrid.root : layout.peripheralGrid.root;
+        this.root = layout.maximized && layout.mainAreaGrid ? layout.mainAreaGrid.root : layout.workbenchGrid.root;
       });
   }
 

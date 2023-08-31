@@ -1,0 +1,22 @@
+:host {
+  > form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    div.parts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) min-content auto;
+      gap: .5em .75em;
+      align-items: center;
+
+      > span.checkbox {
+        text-align: center;
+      }
+
+      > sci-checkbox {
+        justify-self: center;
+      }
+    }
+  }
+}

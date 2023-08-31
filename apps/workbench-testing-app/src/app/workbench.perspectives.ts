@@ -9,7 +9,7 @@
  */
 
 import {ROUTES} from '@angular/router';
-import {WorkbenchLayout, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
+import {MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
 import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
 
@@ -41,7 +41,7 @@ export namespace PerspectiveDefinitions {
     },
     {
       id: 'empty',
-      layout: layout => layout,
+      layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
       data: {[PerspectiveData.label]: 'Empty'},
     },
   ];
@@ -51,7 +51,7 @@ export namespace PerspectiveDefinitions {
    */
   export const perspectivesFromQueryParam: WorkbenchPerspectiveDefinition[] = WorkbenchStartupQueryParams.perspectives().map(perspective => ({
     id: perspective,
-    layout: layout => layout,
+    layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
     data: {[PerspectiveData.label]: perspective.toUpperCase()},
   }));
 
@@ -60,8 +60,9 @@ export namespace PerspectiveDefinitions {
    */
   export const initialPerspective = 'empty';
 
-  function provideDeveloperPerspectiveLayout(layout: WorkbenchLayout): WorkbenchLayout { // eslint-disable-line no-inner-declarations
-    return layout
+  function provideDeveloperPerspectiveLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout { // eslint-disable-line no-inner-declarations
+    return factory
+      .addPart(MAIN_AREA)
       .addPart('right', {align: 'right', ratio: .2})
       .addPart('bottom', {align: 'bottom', ratio: .3})
       .addPart('topLeft', {align: 'left', ratio: .125})
@@ -83,8 +84,9 @@ export namespace PerspectiveDefinitions {
       .activateView('outline');
   }
 
-  function provideDebugPerspectiveLayout(layout: WorkbenchLayout): WorkbenchLayout { // eslint-disable-line no-inner-declarations
-    return layout
+  function provideDebugPerspectiveLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout { // eslint-disable-line no-inner-declarations
+    return factory
+      .addPart(MAIN_AREA)
       .addPart('left', {align: 'left', ratio: .147})
       .addPart('bottom', {align: 'bottom', ratio: .3})
       .addPart('right', {align: 'right', ratio: .175})

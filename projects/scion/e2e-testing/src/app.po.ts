@@ -108,12 +108,12 @@ export class AppPO {
   /**
    * Handle for interacting with the currently active workbench part in the specified area.
    */
-  public activePart(locateBy: {scope: 'mainArea' | 'perspective'}): PartPO {
-    if (locateBy.scope === 'perspective') {
-      return new PartPO(this.page.locator('wb-part.e2e-peripheral.active'));
+  public activePart(locateBy: {inMainArea: boolean}): PartPO {
+    if (locateBy.inMainArea) {
+      return new PartPO(this.page.locator('wb-part.e2e-main-area.active'));
     }
     else {
-      return new PartPO(this.page.locator('wb-part:not(.e2e-peripheral).active'));
+      return new PartPO(this.page.locator('wb-part:not(.e2e-main-area).active'));
     }
   }
 
@@ -240,12 +240,12 @@ export class AppPO {
    * Opens a new view tab.
    */
   public async openNewViewTab(): Promise<StartPagePO> {
-    const newTabPartActionPO = this.activePart({scope: 'mainArea'}).action({cssClass: 'e2e-open-new-tab'});
+    const newTabPartActionPO = this.activePart({inMainArea: true}).action({cssClass: 'e2e-open-new-tab'});
     if (!await newTabPartActionPO.isPresent()) {
       throw Error('Opening a new view tab requires the part action \'e2e-open-new-tab\' to be present, but it could not be found. Have you disabled the \'showNewTabAction\' feature?');
     }
     await newTabPartActionPO.locate('button').click();
-    return new StartPagePO(this, await this.activePart({scope: 'mainArea'}).activeView.getViewId());
+    return new StartPagePO(this, await this.activePart({inMainArea: true}).activeView.getViewId());
   }
 
   /**
@@ -269,16 +269,18 @@ export class AppPO {
   /**
    * Tests if specified drop zone is active, i.e., present in the DOM and armed for pointed events.
    */
-  public async isDropZoneActive(target: {area: 'main-area' | 'peripheral-area'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<boolean> {
-    const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-${target.area}`);
+  public async isDropZoneActive(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<boolean> {
+    const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
+    const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
     return await isPresent(dropZoneLocator) && await dropZoneLocator.evaluate((element: HTMLElement) => getComputedStyle(element).pointerEvents) !== 'none';
   }
 
   /**
    * Returns the bounding box of the specified drop zone.
    */
-  public async getDropZoneBoundingBox(target: {area: 'main-area' | 'peripheral-area'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<DOMRect & {hcenter: number; vcenter: number}> {
-    const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-${target.area}`);
+  public async getDropZoneBoundingBox(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<DOMRect & {hcenter: number; vcenter: number}> {
+    const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
+    const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
     return fromRect(await dropZoneLocator.boundingBox());
   }
 

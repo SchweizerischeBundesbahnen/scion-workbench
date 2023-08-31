@@ -117,15 +117,40 @@ export abstract class WorkbenchModuleConfig {
   public abstract microfrontendPlatform?: MicrofrontendPlatformConfig | Type<MicrofrontendPlatformConfigLoader>;
 
   /**
-   * Defines the arrangement of views in the peripheral area. Multiple arrangements, called perspectives, are supported.
-   * Different perspectives provide a different perspective on the application while sharing the main area.
-   * Only one perspective can be active at a time.
    *
-   * ## Example of an initial arrangement of views
+   * Defines the workbench layout. Multiple layouts can be defined in the form of perspectives.
+   * If not set, defaults to a layout with only a main area.
+   *
+   * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is
+   * displayed in views.
+   *
+   * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
+   * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
+   * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
+   * area for user interaction.
+   *
+   * Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time.
+   * Perspectives share the same main area, if any.
+   *
+   *
+   * ## Example of a layout that has a main area and three parts in the peripheral area:
+   *
+   * ```plain
+   * +--------+----------------+
+   * |  top   |                |
+   * |  left  |                |
+   * |--------+   main area    |
+   * | bottom |                |
+   * |  left  |                |
+   * +--------+----------------+
+   * |          bottom         |
+   * +-------------------------+
+   * ```
    *
    * ```ts
    * WorkbenchModule.forRoot({
-   *   layout: layout => layout
+   *   layout: (factory: WorkbenchLayoutFactory) => factory
+   *     .addPart(MAIN_AREA)
    *     .addPart('topLeft', {align: 'left', ratio: .25})
    *     .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
    *     .addPart('bottom', {align: 'bottom', ratio: .3})

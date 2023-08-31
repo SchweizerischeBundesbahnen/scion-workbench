@@ -48,10 +48,10 @@ test.describe('Workbench Popup Position', () => {
     // +--------+------------+--------+
     // |             SOUTH            |
     // +------------------------------+
-    await northViewTab.dragToPart({region: 'north'});
-    await southViewTab.dragToPart({region: 'south'});
-    await westViewTab.dragToPart({region: 'west'});
-    await eastViewTab.dragToPart({region: 'east'});
+    await northViewTab.dragTo({partId: await northViewTab.part.getPartId(), region: 'north'});
+    await southViewTab.dragTo({partId: await southViewTab.part.getPartId(), region: 'south'});
+    await westViewTab.dragTo({partId: await westViewTab.part.getPartId(), region: 'west'});
+    await eastViewTab.dragTo({partId: await eastViewTab.part.getPartId(), region: 'east'});
 
     // Enlarge center part size
     const {width, height} = appPO.page.viewportSize()!;

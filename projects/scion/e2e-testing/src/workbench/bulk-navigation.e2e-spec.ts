@@ -22,7 +22,7 @@ test.describe('Bulk Navigation', () => {
     await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
     await bulkNavigationTestPagePO.clickNavigateAwait();
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
   });
 
   test('should navigate to multiple views if not waiting for each navigation to complete', async ({appPO, workbenchNavigator}) => {
@@ -33,6 +33,6 @@ test.describe('Bulk Navigation', () => {
     await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
     await bulkNavigationTestPagePO.clickNavigateNoAwait();
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
   });
 });

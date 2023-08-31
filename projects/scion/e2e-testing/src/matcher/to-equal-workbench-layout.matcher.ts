@@ -10,7 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {ExpectationResult} from './custom-matchers.definition';
-import {MAIN_AREA_PART_ID} from '../workbench.model';
+import {MAIN_AREA} from '../workbench.model';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -29,28 +29,28 @@ export async function toEqualWorkbenchLayout(locator: Locator, expected: Expecte
  * Asserts expected workbench layout.
  */
 async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator: Locator): Promise<void> {
-  // Assert the peripheral grid plus the main grid if expected.
-  if (expected.peripheralGrid) {
-    await assertGridElement(expected.peripheralGrid.root, locator.locator('wb-workbench-layout > wb-grid-element:not([data-parentnodeid])'), expected);
+  // Assert the workbench grid plus the main area grid if expected.
+  if (expected.workbenchGrid) {
+    await assertGridElement(expected.workbenchGrid.root, locator.locator('wb-workbench-layout > wb-grid-element:not([data-parentnodeid])'), expected);
   }
-  // Assert only the main grid, but not the peripheral grid since not expected.
-  else if (expected.mainGrid) {
-    await assertGridElement(expected.mainGrid.root, locator.locator(`wb-main-area-layout[data-partid="${MAIN_AREA_PART_ID}"] > wb-grid-element`), expected);
+  // Assert only the main area grid, but not the workbench grid since not expected.
+  else if (expected.mainAreaGrid) {
+    await assertGridElement(expected.mainAreaGrid.root, locator.locator(`wb-main-area-layout[data-partid="${MAIN_AREA}"] > wb-grid-element`), expected);
   }
 
-  // Assert active part of the main grid.
-  if (expected.mainGrid?.activePartId) {
-    const activePartId = expected.mainGrid.activePartId;
+  // Assert active part of the main area grid.
+  if (expected.mainAreaGrid?.activePartId) {
+    const activePartId = expected.mainAreaGrid.activePartId;
     const activePartLocator = locator.locator(`wb-workbench-layout wb-main-area-layout wb-part[data-partid="${activePartId}"].active`);
-    await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main grid, but is not.`));
-    await throwIfPresent(locator.locator(`wb-workbench-layout wb-main-area-layout wb-part:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main grid, but is not.`));
+    await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main area grid, but is not.`));
+    await throwIfPresent(locator.locator(`wb-workbench-layout wb-main-area-layout wb-part:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
   }
-  // Assert active part of the peripheral grid.
-  if (expected.peripheralGrid?.activePartId) {
-    const activePartId = expected.peripheralGrid.activePartId;
-    const activePartLocator = locator.locator(`wb-workbench-layout wb-part[data-partid="${activePartId}"].e2e-peripheral.active`);
-    await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the peripheral grid, but is not.`));
-    await throwIfPresent(locator.locator(`wb-workbench-layout wb-part:not([data-partid="${activePartId}"]).e2e-peripheral.active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the peripheral grid, but is not.`));
+  // Assert active part of the workbench grid.
+  if (expected.workbenchGrid?.activePartId) {
+    const activePartId = expected.workbenchGrid.activePartId;
+    const activePartLocator = locator.locator(`wb-workbench-layout wb-part[data-partid="${activePartId}"]:not(.e2e-main-area).active`);
+    await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the workbench grid, but is not.`));
+    await throwIfPresent(locator.locator(`wb-workbench-layout wb-part:not([data-partid="${activePartId}"]):not(.e2e-main-area).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the workbench grid, but is not.`));
   }
 }
 
@@ -126,11 +126,11 @@ async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Lo
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute '[data-partid="${expectedPart.id}"]', but is '[data-partid="${partId}"]'. [MPart=${JSON.stringify(expectedPart)}, locator=${gridElementLocator}]`);
   }
 
-  if (partId === MAIN_AREA_PART_ID) {
-    const mainAreaLayoutLocator = gridElementLocator.locator(`wb-main-area-layout[data-partid="${MAIN_AREA_PART_ID}"]`);
-    await throwIfAbsent(mainAreaLayoutLocator, () => Error(`[DOMAssertError] Expected element 'wb-main-area-layout[data-partid="${MAIN_AREA_PART_ID}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${mainAreaLayoutLocator}]`));
-    if (expectedWorkbenchLayout.mainGrid) {
-      await assertGridElement(expectedWorkbenchLayout.mainGrid.root, mainAreaLayoutLocator.locator(`> wb-grid-element`), expectedWorkbenchLayout);
+  if (partId === MAIN_AREA) {
+    const mainAreaLayoutLocator = gridElementLocator.locator(`wb-main-area-layout[data-partid="${MAIN_AREA}"]`);
+    await throwIfAbsent(mainAreaLayoutLocator, () => Error(`[DOMAssertError] Expected element 'wb-main-area-layout[data-partid="${MAIN_AREA}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${mainAreaLayoutLocator}]`));
+    if (expectedWorkbenchLayout.mainAreaGrid) {
+      await assertGridElement(expectedWorkbenchLayout.mainAreaGrid.root, mainAreaLayoutLocator.locator(`> wb-grid-element`), expectedWorkbenchLayout);
     }
     return;
   }
@@ -307,13 +307,13 @@ function isEqualArray(array1: Array<unknown>, array2: Array<unknown>): boolean {
  */
 export interface ExpectedWorkbenchLayout {
   /**
-   * Specifies the expected main grid. If not set, defaults to a grid with only the initial part.
+   * Specifies the expected workbench grid. If not set, does not assert the workbench grid.
    */
-  mainGrid?: MPartGrid;
+  workbenchGrid?: MPartGrid;
   /**
-   * Specifies the expected peripheral grid. If not set, defaults to a grid with only the main area part.
+   * Specifies the expected main area grid. If not set, does not assert the main area grid.
    */
-  peripheralGrid?: MPartGrid;
+  mainAreaGrid?: MPartGrid;
 }
 
 interface BoundingBox {

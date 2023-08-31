@@ -13,7 +13,7 @@ import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {fromRect} from '../helper/testing.util';
-import {MAIN_AREA_PART_ID} from '../workbench.model';
+import {MAIN_AREA} from '../workbench.model';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 
 test.describe('View Drag Main Area', () => {
@@ -38,16 +38,16 @@ test.describe('View Drag Main Area', () => {
 
       // Move view 2 to the west of the main area.
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragToArea({area: 'main-area', region: 'west'});
+      await view2PO.viewTab.dragTo({grid: 'mainArea', region: 'west'});
 
       // Expect view 2 to be moved to the west of the main area.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MPart({
-            id: MAIN_AREA_PART_ID,
+            id: MAIN_AREA,
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .2,
@@ -94,16 +94,16 @@ test.describe('View Drag Main Area', () => {
 
       // Move view 2 to the east of the main area.
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragToArea({area: 'main-area', region: 'east'});
+      await view2PO.viewTab.dragTo({grid: 'mainArea', region: 'east'});
 
       // Expect view 2 to be moved to the east of the main area.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MPart({
-            id: MAIN_AREA_PART_ID,
+            id: MAIN_AREA,
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .8,
@@ -150,16 +150,16 @@ test.describe('View Drag Main Area', () => {
 
       // Move view 2 to the south of the main area.
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragToArea({area: 'main-area', region: 'south'});
+      await view2PO.viewTab.dragTo({grid: 'mainArea', region: 'south'});
 
       // Expect view 2 to be moved to the south of the main area.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MPart({
-            id: MAIN_AREA_PART_ID,
+            id: MAIN_AREA,
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'column',
             ratio: .8,
@@ -204,12 +204,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.3', {partId: 'right', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(false);
     });
 
     /**
@@ -229,12 +229,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(true);
     });
 
     /**
@@ -256,12 +256,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.4', {partId: 'right', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(false);
     });
 
     /**
@@ -283,12 +283,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.4', {partId: 'left', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(true);
     });
 
     /**
@@ -315,12 +315,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.5', {partId: 'bottom', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(true);
     });
 
     /**
@@ -349,12 +349,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.6', {partId: 'right', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(false);
     });
 
     /**
@@ -376,12 +376,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.3', {partId: 'bottom-middle', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(true);
     });
 
     /**
@@ -404,12 +404,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.3', {partId: 'right-bottom', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(false);
     });
 
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (9)', async ({appPO, workbenchNavigator}) => {
@@ -421,12 +421,12 @@ test.describe('View Drag Main Area', () => {
       await view1PO.addView('view.3', {partId: 'right', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('main-area');
+      await viewTab2PO.moveTo({grid: 'mainArea'});
 
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'east'})).toBe(false);
     });
 
     /**
@@ -444,8 +444,8 @@ test.describe('View Drag Main Area', () => {
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
       await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom', ratio: .25});
       await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
-      const mainAreaDropZoneSize = 100;
-      const peripheralAreaDropZoneSize = 50;
+      const workbenchGridDropZoneSize = 50;
+      const mainAreaGridDropZoneSize = 100;
 
       // Get bounding box of the tabbar of the 'bottom' part.
       const bottomPartPO = appPO.part({partId: 'bottom'});
@@ -461,10 +461,10 @@ test.describe('View Drag Main Area', () => {
       await page.mouse.move(bottomTabbarBounds.hcenter, bottomTabbarBounds.vcenter, {steps: 100});
 
       // Move tab to the beginning of the tabbar.
-      await page.mouse.move(mainAreaDropZoneSize - peripheralAreaDropZoneSize + 1, bottomTabbarBounds.vcenter, {steps: 100});
+      await page.mouse.move(mainAreaGridDropZoneSize - workbenchGridDropZoneSize + 1, bottomTabbarBounds.vcenter, {steps: 100});
 
       // Expect the drop zone to be inactive.
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(false);
     });
 
     /**
@@ -494,8 +494,8 @@ test.describe('View Drag Main Area', () => {
       await view2PO.viewTabPO.mousedown();
 
       // Move mouse over main area to activate the drop zone.
-      await view2PO.viewTabPO.moveToArea('main-area');
-      const westDropZoneBounds = await appPO.getDropZoneBoundingBox({area: 'main-area', region: 'west'});
+      await view2PO.viewTabPO.moveTo({grid: 'mainArea'});
+      const westDropZoneBounds = await appPO.getDropZoneBoundingBox({grid: 'mainArea', region: 'west'});
 
       // Move mouse to the right edge of the drop zone.
       await page.mouse.move(westDropZoneBounds.right - 1, 0, {steps: 1});
@@ -504,7 +504,7 @@ test.describe('View Drag Main Area', () => {
       await page.mouse.move(westDropZoneBounds.right - 1, bottomTabbarBounds.vcenter, {steps: 100});
 
       // Expect the drop zone to be active.
-      await expect(await appPO.isDropZoneActive({area: 'main-area', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'west'})).toBe(true);
     });
   });
 });

@@ -10,7 +10,7 @@
 import {Injectable} from '@angular/core';
 import {MPartGrid} from '../layout/workbench-layout.model';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
-import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
+import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {RouterUtils} from '../routing/router.util';
 import {Commands} from '../routing/workbench-router.service';
 
@@ -20,57 +20,49 @@ import {Commands} from '../routing/workbench-router.service';
 @Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveViewConflictResolver {
 
-  constructor(private _workbenchLayoutFactory: WorkbenchLayoutFactory) {
+  constructor(private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory) {
   }
 
   /**
-   * Detects and resolves name clashes between views defined by the perspective and views contained in the main area.
+   * Detects and resolves name clashes between views defined by the perspective and views in the main area.
    *
-   * Conflict resolution of conflicting peripheral views:
+   * Conflict resolution for views defined by the perspective:
    * - Assigns views a new identity if target of a primary route. The id of such views begin with the view prefix.
    * - Removes views if target of a secondary route. The id of such views does not begin with the view prefix.
    *
-   * @param mainGrid - The grid of the main area.
-   * @param perspectiveLayout - The layout to resolve conflicts in.
-   * @return resolved layout, or `null` if the layout of the perspective has no conflicts with the main area.
+   * @param mainAreaGrid - The grid of the main area.
+   * @param perspective - The workbench grid and views of the perspective.
+   * @return workbench grid and views of the provided perspective with conflicts resolved, if any.
    */
-  public resolve(mainGrid: MPartGrid, perspectiveLayout: PerspectiveLayout): PerspectiveLayout | null {
-    const conflictingLayout = this._workbenchLayoutFactory.create({mainGrid, peripheralGrid: perspectiveLayout.grid});
+  public resolve(mainAreaGrid: MPartGrid, perspective: {workbenchGrid: MPartGrid; viewOutlets: {[viewId: string]: Commands}}): {workbenchGrid: MPartGrid; viewOutlets: {[viewId: string]: Commands}} {
+    const conflictingLayout = this._workbenchLayoutFactory.create({mainAreaGrid, workbenchGrid: perspective.workbenchGrid});
     const conflictingViewIds = Arrays.intersect(
-      conflictingLayout.views({scope: 'peripheral'}).map(view => view.id),
-      conflictingLayout.views({scope: 'main'}).map(view => view.id),
+      conflictingLayout.views({grid: 'workbench'}).map(view => view.id),
+      conflictingLayout.views({grid: 'mainArea'}).map(view => view.id),
     );
     if (!conflictingViewIds.length) {
-      return null;
+      return perspective;
     }
 
-    const viewOutlets = Maps.coerce(perspectiveLayout.viewOutlets);
+    const viewOutlets = Maps.coerce(perspective.viewOutlets);
     const resolvedLayout = conflictingViewIds.reduce((layout, conflictingViewId) => {
       if (RouterUtils.isPrimaryRouteTarget(conflictingViewId)) {
         const newViewId = layout.computeNextViewId();
         const path = viewOutlets.get(conflictingViewId)!;
         viewOutlets.delete(conflictingViewId);
 
-        // Rename view in the peripheral grid.
+        // Rename view in the perspective grid.
         viewOutlets.set(newViewId, path);
-        return layout.renameView(conflictingViewId, newViewId, {scope: 'peripheral'});
+        return layout.renameView(conflictingViewId, newViewId, {grid: 'workbench'});
       }
       else {
-        return layout.removeView(conflictingViewId, {scope: 'peripheral'});
+        return layout.removeView(conflictingViewId, {grid: 'workbench'});
       }
     }, conflictingLayout);
 
     return {
-      grid: resolvedLayout.peripheralGrid,
+      workbenchGrid: resolvedLayout.workbenchGrid,
       viewOutlets: Dictionaries.coerce(viewOutlets),
     };
   }
-}
-
-/**
- * Contains the perspective grid and associated view outlets.
- */
-export interface PerspectiveLayout {
-  grid: MPartGrid;
-  viewOutlets: {[viewId: string]: Commands};
 }

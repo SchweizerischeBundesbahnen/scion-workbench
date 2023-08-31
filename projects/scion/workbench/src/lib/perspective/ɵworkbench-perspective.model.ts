@@ -7,14 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
+import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {MPartGrid} from '../layout/workbench-layout.model';
 import {EnvironmentInjector, inject, InjectionToken, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Commands, WorkbenchNavigation, WorkbenchRouter} from '../routing/workbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
-import {WorkbenchPeripheralGridMerger} from './workbench-peripheral-grid-merger.service';
+import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {filter, map, takeUntil} from 'rxjs/operators';
@@ -37,8 +37,8 @@ const ACTIVE_PERSPECTIVE_ID$ = new InjectionToken<BehaviorSubject<string | undef
  */
 export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
-  private _workbenchLayoutFactory = inject(WorkbenchLayoutFactory);
-  private _workbenchPeripheralGridMerger = inject(WorkbenchPeripheralGridMerger);
+  private _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
+  private _workbenchGridMerger = inject(WorkbenchGridMerger);
   private _workbenchPerspectiveStorageService = inject(WorkbenchPerspectiveStorageService);
   private _workbenchLayoutService = inject(WorkbenchLayoutService);
   private _workbenchLayoutSerializer = inject(WorkbenchLayoutSerializer);
@@ -50,8 +50,8 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
   private _destroy$ = new Subject<void>();
 
-  private _initialGrid: MPartGrid | undefined;
-  private _grid: MPartGrid | undefined;
+  private _initialWorkbenchGrid: MPartGrid | undefined;
+  private _workbenchGrid: MPartGrid | undefined;
   private _viewOutlets: {[viewId: string]: Commands} = {};
 
   public id: string;
@@ -72,21 +72,21 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    * Activates this perspective.
    */
   public async activate(): Promise<boolean> {
-    // Create the initial grid when constructed for the first time.
-    this._initialGrid ??= await this.createInitialGrid();
+    // Create the initial workbench grid when constructed for the first time.
+    this._initialWorkbenchGrid ??= await this.createInitialWorkbenchGrid();
 
     // Load perspective data from storage.
     const perspectiveData = !this.transient ? await this._workbenchPerspectiveStorageService.loadPerspectiveData(this.id) : null;
     if (perspectiveData) {
-      this._grid = this._workbenchPeripheralGridMerger.merge({
-        local: this._workbenchLayoutFactory.create({peripheralGrid: perspectiveData.grid}).peripheralGrid,
-        base: this._workbenchLayoutFactory.create({peripheralGrid: perspectiveData.initialGrid}).peripheralGrid,
-        remote: this._initialGrid,
+      this._workbenchGrid = this._workbenchGridMerger.merge({
+        local: this._workbenchLayoutFactory.create({workbenchGrid: perspectiveData.workbenchGrid}).workbenchGrid,
+        base: this._workbenchLayoutFactory.create({workbenchGrid: perspectiveData.initialWorkbenchGrid}).workbenchGrid,
+        remote: this._initialWorkbenchGrid,
       });
       this._viewOutlets = perspectiveData.viewOutlets;
     }
     else {
-      this._grid ??= this._initialGrid;
+      this._workbenchGrid ??= this._initialWorkbenchGrid;
       this._viewOutlets ??= {};
     }
 
@@ -115,7 +115,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    * Resets this perspective to its initial layout.
    */
   public async reset(): Promise<void> {
-    this._grid = this._initialGrid;
+    this._workbenchGrid = this._initialWorkbenchGrid;
     this._viewOutlets = {};
 
     // Apply the initial perspective layout.
@@ -130,25 +130,31 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    * changing the layout of this perspective if necessary.
    */
   private createActivationNavigation(currentLayout: ɵWorkbenchLayout): WorkbenchNavigation {
-    if (!this._grid) {
+    if (!this._workbenchGrid) {
       throw Error('[WorkbenchPerspectiveError] Perspective not yet constructed.');
     }
 
-    // Resolve name clashes between views defined by this perspective and views contained in the main area.
-    const resolved = this._perspectiveViewConflictResolver.resolve(currentLayout.mainGrid, {grid: this._grid, viewOutlets: this._viewOutlets});
-    if (resolved) {
-      this._grid = resolved.grid;
+    // If the current layout has a main area, resolve name clashes between views of this perspective and views contained in the main area.
+    if (currentLayout.mainAreaGrid) {
+      const resolved = this._perspectiveViewConflictResolver.resolve(currentLayout.mainAreaGrid, {workbenchGrid: this._workbenchGrid, viewOutlets: this._viewOutlets});
+      this._workbenchGrid = resolved.workbenchGrid;
       this._viewOutlets = resolved.viewOutlets;
     }
 
+    const newLayout = this._workbenchLayoutFactory.create({
+      workbenchGrid: this._workbenchGrid,
+      mainAreaGrid: currentLayout.mainAreaGrid,
+      // Do not preserve maximized state when switching between perspectives.
+    });
+
+    // Preserve view outlets defined in current layout's main area only if new layout contains a main area.
+    const outletsToRemove = newLayout.mainAreaGrid ? currentLayout.views({grid: 'workbench'}) : currentLayout.views();
+
     return {
-      layout: this._workbenchLayoutFactory.create({
-        peripheralGrid: this._grid,
-        mainGrid: currentLayout.mainGrid,
-      }),
+      layout: newLayout,
       viewOutlets: {
         // Remove outlets of current perspective from the URL.
-        ...RouterUtils.outletsFromCurrentUrl(this._router, currentLayout.views({scope: 'peripheral'}).map(view => view.id), () => null),
+        ...RouterUtils.outletsFromCurrentUrl(this._router, outletsToRemove.map(view => view.id), () => null),
         // Add outlets of the perspective to activate to the URL.
         ...this._viewOutlets,
       },
@@ -160,11 +166,11 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   /**
-   * Creates the initial grid of this perspective as defined in the perspective definition.
+   * Creates the initial workbench grid of this perspective as defined in the perspective definition.
    */
-  private async createInitialGrid(): Promise<MPartGrid> {
-    const layout = await runInInjectionContext(this._environmentInjector, () => this._initialLayoutFn(this._workbenchLayoutFactory.create()));
-    return (layout as ɵWorkbenchLayout).peripheralGrid;
+  private async createInitialWorkbenchGrid(): Promise<MPartGrid> {
+    const layout = await runInInjectionContext(this._environmentInjector, () => this._initialLayoutFn(this._workbenchLayoutFactory));
+    return (layout as ɵWorkbenchLayout).workbenchGrid;
   }
 
   /**
@@ -187,14 +193,14 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    */
   private async storePerspectiveLayout(layout: ɵWorkbenchLayout): Promise<void> {
     // Memoize layout and outlets.
-    this._grid = layout.peripheralGrid;
-    this._viewOutlets = RouterUtils.outletsFromCurrentUrl(this._router, layout.views({scope: 'peripheral'}).map(view => view.id));
+    this._workbenchGrid = layout.workbenchGrid;
+    this._viewOutlets = RouterUtils.outletsFromCurrentUrl(this._router, layout.views({grid: 'workbench'}).map(view => view.id));
 
     // Store the layout if not a transient perspective.
     if (!this.transient) {
       await this._workbenchPerspectiveStorageService.storePerspectiveData(this.id, {
-        initialGrid: this._workbenchLayoutSerializer.serialize(this._initialGrid!, {nullIfEmpty: true}),
-        grid: this._workbenchLayoutSerializer.serialize(this._grid!, {nullIfEmpty: true}),
+        initialWorkbenchGrid: this._workbenchLayoutSerializer.serialize(this._initialWorkbenchGrid),
+        workbenchGrid: this._workbenchLayoutSerializer.serialize(this._workbenchGrid),
         viewOutlets: this._viewOutlets,
       });
     }

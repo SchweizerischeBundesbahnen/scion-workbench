@@ -322,7 +322,7 @@ test.describe('Workbench Message Box', () => {
     // close message box and view 2
     await msgboxPO.clickActionButton('ok');
     await viewTab2PO.close();
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(0);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(0);
     await expect(await msgboxPO.isPresent()).toBe(false);
     await expect(await appPO.getMessageBoxCount()).toEqual(0);
   });

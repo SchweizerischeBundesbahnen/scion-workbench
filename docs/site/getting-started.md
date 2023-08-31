@@ -263,7 +263,7 @@ Open `app.module.ts` and pass `WorkbenchModule.forRoot()` a configuration object
 ```ts
     import {NgModule} from '@angular/core';
     import {AppComponent} from './app.component';
-[+] import {MAIN_AREA_PART_ID, WorkbenchLayout, WorkbenchModule} from '@scion/workbench';
+[+] import {MAIN_AREA, WorkbenchLayoutFactory, WorkbenchModule} from '@scion/workbench';
     import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     import {RouterModule} from '@angular/router';
     import {BrowserModule} from '@angular/platform-browser';
@@ -272,8 +272,9 @@ Open `app.module.ts` and pass `WorkbenchModule.forRoot()` a configuration object
       declarations: [AppComponent],
       imports: [
         WorkbenchModule.forRoot({
-[+]       layout: (layout: WorkbenchLayout) => layout
-[+]         .addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left', ratio: .25})
+[+]       layout: (factory: WorkbenchLayoutFactory) => factory
+[+]         .addPart(MAIN_AREA)
+[+]         .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
 [+]         .addView('todos', {partId: 'left', activateView: true}),
         }),
         RouterModule.forRoot([
@@ -289,11 +290,12 @@ Open `app.module.ts` and pass `WorkbenchModule.forRoot()` a configuration object
     }
 ```
 
-We configure a layout function to define the initial arrangement of views. The function is passed an empty layout to which we add the todos view. The layout is an immutable object, meaning that modifications have no side effects. Each modification creates a new layout instance that can be used for further modifications.
+We define the initial arrangement of views by specifying a layout function. The function is passed a factory to create the layout.
 
-> To be exact, the workbench layout defines an arrangement of parts. A part is a stack of views. The workbench has a main area part as the primary place to open views. Parts are aligned relative to each other. Views are added to parts.
+> The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+> The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views. The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable area for user interaction.
 
-In this example, we first add a new part to the layout. We name it `left` and align it to the left of the main area. We want it to take up 25% of the available space. Next, we add the todos view to the part. We name the view `todos`, the same name we used in the previous step where we created the secondary route for the view. This is how we link a view to a route.
+In this example, we create a layout with two parts, the main area and a part left to it. We name the left part `left` and align it to the left of the main area. We want it to take up 25% of the available space. Next, we add the todos view to the part. We name the view `todos`, the same name we used in the previous step where we created the secondary route for the view. This is how we link a view to a route.
 
 Open a browser to http://localhost:4200. You should see the todo list left to the main area. However, when you click on a todo, you will get an error because we have not registered the route yet.
 </details>
@@ -391,7 +393,12 @@ In this step, we will create a component to open a todo in a view.
         @NgModule({
           declarations: [AppComponent],
           imports: [
-            WorkbenchModule.forRoot(),
+            WorkbenchModule.forRoot({
+              layout: (factory: WorkbenchLayoutFactory) => factory
+                .addPart(MAIN_AREA)
+                .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+                .addView('todos', {partId: 'left', activateView: true}),
+            }),
             RouterModule.forRoot([
               {path: '', loadComponent: () => import('./welcome/welcome.component')},
               {path: '', outlet: 'todos', loadComponent: () => import('./todos/todos.component')},    

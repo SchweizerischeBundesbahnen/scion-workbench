@@ -19,9 +19,15 @@ import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-z
 import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 
 /**
- * Renders main area layout.
+ * Renders the layout of the {@link MAIN_AREA} part.
  *
- * The main area layout defines the arrangement of parts in the main area. The main area is the primary place to open views.
+ * The main area is a special part that is a subgrid, not a stack of views.
+ *
+ * The main area has the following characteristics:
+ * - is optional;
+ * - is the primary place to open views;
+ * - is shared by perspectives having a main area;
+ * - can be maximized;
  *
  * The layout is modeled as a tree of nodes `{@link MTreeNode}` and parts `{@link MPart}`. Each node has two children, which can be either
  * another node or a part (leaf). A node defines a split layout in which the two children are arranged vertically or horizontally.
@@ -34,7 +40,6 @@ import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
  *  (left)        (right)
  *
  * @see WorkbenchLayoutComponent
- * @see MainAreaLayoutComponent
  */
 @Component({
   selector: 'wb-main-area-layout',
@@ -66,7 +71,7 @@ export class MainAreaLayoutComponent {
   public get root(): MTreeNode | MPart {
     // It is critical that both `WorkbenchLayoutComponent` and `MainAreaLayoutComponent` operate on the same layout,
     // so we do not subscribe to the layout but reference it directly.
-    return this._workbenchLayoutService.layout!.mainGrid.root;
+    return this._workbenchLayoutService.layout!.mainAreaGrid!.root;
   }
 
   public onViewDrop(event: WbViewDropEvent): void {

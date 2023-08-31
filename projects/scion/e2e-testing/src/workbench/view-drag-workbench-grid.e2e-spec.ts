@@ -13,12 +13,12 @@ import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {fromRect} from '../helper/testing.util';
-import {MAIN_AREA_PART_ID} from '../workbench.model';
+import {MAIN_AREA} from '../workbench.model';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 
-test.describe('View Drag Peripheral Area', () => {
+test.describe('View Drag Workbench Grid', () => {
 
-  test.describe('should allow dragging a view to the side of the peripheral area', () => {
+  test.describe('should allow dragging a view to the side of the workbench grid', () => {
 
     /**
      * +------------------+    +----------+-----------+
@@ -26,18 +26,18 @@ test.describe('View Drag Peripheral Area', () => {
      * | [view.1, view.2] |    | [view.2] | [view.1]  |
      * +------------------+    +----------+-----------+
      */
-    test('should allow dragging a view to the west in the peripheral area (1)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the west in the workbench grid (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
 
-      // Move view 2 to the west of the peripheral area.
-      await view2PO.viewTab.dragToArea({area: 'peripheral-area', region: 'west'});
+      // Move view 2 to the west of the workbench grid.
+      await view2PO.viewTab.dragTo({grid: 'workbench', region: 'west'});
 
-      // Expect view 2 to be moved to the west of the peripheral area.
+      // Expect view 2 to be moved to the west of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .2,
@@ -46,10 +46,10 @@ test.describe('View Drag Peripheral Area', () => {
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
-            child2: new MPart({id: MAIN_AREA_PART_ID}),
+            child2: new MPart({id: MAIN_AREA}),
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MPart({
             id: await view1PO.viewPO.part.getPartId(),
             views: [{id: 'view.1'}],
@@ -69,22 +69,22 @@ test.describe('View Drag Peripheral Area', () => {
      * |  [view.4]   |                |    |          |  [view.4]   |            |
      * +-------------+----------------+    +----------+-------------+------------+
      */
-    test('should allow dragging a view to the west in the peripheral area (2)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the west in the workbench grid (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('left-top', {relativeTo: MAIN_AREA_PART_ID, align: 'left', ratio: .25});
+      await view1PO.addPart('left-top', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
       await view1PO.addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom', ratio: .25});
       await view1PO.addView('view.3', {partId: 'left-top', activateView: true});
       await view1PO.addView('view.4', {partId: 'left-bottom', activateView: true});
 
-      // Move view 2 to the west of the peripheral area.
+      // Move view 2 to the west of the workbench grid.
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragToArea({area: 'peripheral-area', region: 'west'});
+      await view2PO.viewTab.dragTo({grid: 'workbench', region: 'west'});
 
-      // Expect view 2 to be moved to the west of the peripheral area.
+      // Expect view 2 to be moved to the west of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .2,
@@ -110,11 +110,11 @@ test.describe('View Drag Peripheral Area', () => {
                   activeViewId: 'view.4',
                 }),
               }),
-              child2: new MPart({id: MAIN_AREA_PART_ID}),
+              child2: new MPart({id: MAIN_AREA}),
             }),
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MPart({
             id: await view1PO.viewPO.part.getPartId(),
             views: [{id: 'view.1'}],
@@ -131,22 +131,22 @@ test.describe('View Drag Peripheral Area', () => {
      * | [view.1, view.2] |    | [view.2] | [view.1]  |
      * +------------------+    +----------+-----------+
      */
-    test('should allow dragging a view to the east in the peripheral area (1)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the east in the workbench grid (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
 
-      // Move view 2 to the east of the peripheral area.
-      await view2PO.viewTab.dragToArea({area: 'peripheral-area', region: 'east'});
+      // Move view 2 to the east of the workbench grid.
+      await view2PO.viewTab.dragTo({grid: 'workbench', region: 'east'});
 
-      // Expect view 2 to be moved to the east of the peripheral area.
+      // Expect view 2 to be moved to the east of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .8,
-            child1: new MPart({id: MAIN_AREA_PART_ID}),
+            child1: new MPart({id: MAIN_AREA}),
             child2: new MPart({
               id: await view2PO.part.getPartId(),
               views: [{id: 'view.2'}],
@@ -154,7 +154,7 @@ test.describe('View Drag Peripheral Area', () => {
             }),
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MPart({
             id: await view1PO.viewPO.part.getPartId(),
             views: [{id: 'view.1'}],
@@ -174,29 +174,29 @@ test.describe('View Drag Peripheral Area', () => {
      * |                |  [view.4]    |    |           |  [view.4]    |          |
      * +----------------+--------------+    +-----------+--------------+----------+
      */
-    test('should allow dragging a view to the east in the peripheral area (2)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the east in the workbench grid (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('right-top', {relativeTo: MAIN_AREA_PART_ID, align: 'right', ratio: .25});
+      await view1PO.addPart('right-top', {relativeTo: MAIN_AREA, align: 'right', ratio: .25});
       await view1PO.addPart('right-bottom', {relativeTo: 'right-top', align: 'bottom', ratio: .25});
       await view1PO.addView('view.3', {partId: 'right-top', activateView: true});
       await view1PO.addView('view.4', {partId: 'right-bottom', activateView: true});
 
-      // Move view 2 to the east of the peripheral area.
+      // Move view 2 to the east of the workbench grid.
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragToArea({area: 'peripheral-area', region: 'east'});
+      await view2PO.viewTab.dragTo({grid: 'workbench', region: 'east'});
 
-      // Expect view 2 to be moved to the east of the peripheral area.
+      // Expect view 2 to be moved to the east of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .8,
             child1: new MTreeNode({
               direction: 'row',
               ratio: .75,
-              child1: new MPart({id: MAIN_AREA_PART_ID}),
+              child1: new MPart({id: MAIN_AREA}),
               child2: new MTreeNode({
                 direction: 'column',
                 ratio: .75,
@@ -219,7 +219,7 @@ test.describe('View Drag Peripheral Area', () => {
             }),
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MPart({
             id: await view1PO.viewPO.part.getPartId(),
             views: [{id: 'view.1'}],
@@ -239,22 +239,22 @@ test.describe('View Drag Peripheral Area', () => {
      * |                  |    | [view.2]  |
      * +------------------+    +-----------+
      */
-    test('should allow dragging a view to the south in the peripheral area (1)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the south in the workbench grid (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
 
-      // Move view 2 to the south of the peripheral area.
-      await view2PO.viewTab.dragToArea({area: 'peripheral-area', region: 'south'});
+      // Move view 2 to the south of the workbench grid.
+      await view2PO.viewTab.dragTo({grid: 'workbench', region: 'south'});
 
-      // Expect view 2 to be moved to the south of the peripheral area.
+      // Expect view 2 to be moved to the south of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MTreeNode({
             direction: 'column',
             ratio: .8,
-            child1: new MPart({id: MAIN_AREA_PART_ID}),
+            child1: new MPart({id: MAIN_AREA}),
             child2: new MPart({
               id: await view2PO.part.getPartId(),
               views: [{id: 'view.2'}],
@@ -262,7 +262,7 @@ test.describe('View Drag Peripheral Area', () => {
             }),
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MPart({
             id: await view1PO.viewPO.part.getPartId(),
             views: [{id: 'view.1'}],
@@ -285,29 +285,29 @@ test.describe('View Drag Peripheral Area', () => {
      * |  [view.3]   |   [view.4]   |    |         [view.2]           |
      * +----------------------------+    +----------------------------+
      */
-    test('should allow dragging a view to the south in the peripheral area (2)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the south in the workbench grid (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom-left', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom', ratio: .25});
+      await view1PO.addPart('bottom-left', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .25});
       await view1PO.addPart('bottom-right', {relativeTo: 'bottom-left', align: 'right', ratio: .6});
       await view1PO.addView('view.3', {partId: 'bottom-left', activateView: true});
       await view1PO.addView('view.4', {partId: 'bottom-right', activateView: true});
 
-      // Move view 2 to the south of the peripheral area.
+      // Move view 2 to the south of the workbench grid.
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragToArea({area: 'peripheral-area', region: 'south'});
+      await view2PO.viewTab.dragTo({grid: 'workbench', region: 'south'});
 
-      // Expect view 2 to be moved to the south of the peripheral area.
+      // Expect view 2 to be moved to the south of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        peripheralGrid: {
+        workbenchGrid: {
           root: new MTreeNode({
             direction: 'column',
             ratio: .8,
             child1: new MTreeNode({
               direction: 'column',
               ratio: .75,
-              child1: new MPart({id: MAIN_AREA_PART_ID}),
+              child1: new MPart({id: MAIN_AREA}),
               child2: new MTreeNode({
                 direction: 'row',
                 ratio: .4,
@@ -330,7 +330,7 @@ test.describe('View Drag Peripheral Area', () => {
             }),
           }),
         },
-        mainGrid: {
+        mainAreaGrid: {
           root: new MPart({
             id: await view1PO.viewPO.part.getPartId(),
             views: [{id: 'view.1'}],
@@ -349,20 +349,20 @@ test.describe('View Drag Peripheral Area', () => {
      * |                 |          |
      * +-----------------+----------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (1)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('right', {relativeTo: MAIN_AREA_PART_ID, align: 'right'});
+      await view1PO.addPart('right', {relativeTo: MAIN_AREA, align: 'right'});
       await view1PO.addView('view.3', {partId: 'right', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -374,20 +374,20 @@ test.describe('View Drag Peripheral Area', () => {
      * |     [view.3]    |
      * +-----------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (2)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
+      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom'});
       await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
     });
 
     /**
@@ -399,22 +399,22 @@ test.describe('View Drag Peripheral Area', () => {
      * |     [view.3]    |          |
      * +-----------------+----------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (3)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (3)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('right', {relativeTo: MAIN_AREA_PART_ID, align: 'right'});
-      await view1PO.addPart('bottom-left', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
+      await view1PO.addPart('right', {relativeTo: MAIN_AREA, align: 'right'});
+      await view1PO.addPart('bottom-left', {relativeTo: MAIN_AREA, align: 'bottom'});
       await view1PO.addView('view.3', {partId: 'bottom-left', activateView: true});
       await view1PO.addView('view.4', {partId: 'right', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -426,22 +426,22 @@ test.describe('View Drag Peripheral Area', () => {
      * |          |     [view.3]    |
      * +----------+-----------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (4)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (4)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left'});
-      await view1PO.addPart('bottom-right', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
+      await view1PO.addPart('left', {relativeTo: MAIN_AREA, align: 'left'});
+      await view1PO.addPart('bottom-right', {relativeTo: MAIN_AREA, align: 'bottom'});
       await view1PO.addView('view.3', {partId: 'bottom-right', activateView: true});
       await view1PO.addView('view.4', {partId: 'left', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
     });
 
     /**
@@ -456,24 +456,24 @@ test.describe('View Drag Peripheral Area', () => {
      * |          [view.5]          |
      * +----------------------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (5)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (5)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
-      await view1PO.addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left'});
-      await view1PO.addPart('bottom-right', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
+      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom'});
+      await view1PO.addPart('left', {relativeTo: MAIN_AREA, align: 'left'});
+      await view1PO.addPart('bottom-right', {relativeTo: MAIN_AREA, align: 'bottom'});
       await view1PO.addView('view.3', {partId: 'bottom-right', activateView: true});
       await view1PO.addView('view.4', {partId: 'left', activateView: true});
       await view1PO.addView('view.5', {partId: 'bottom', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
     });
 
     /**
@@ -488,26 +488,26 @@ test.describe('View Drag Peripheral Area', () => {
      * |          [view.5]          |          |
      * +----------------------------+----------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (6)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (6)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('right', {relativeTo: MAIN_AREA_PART_ID, align: 'right'});
-      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
-      await view1PO.addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left'});
-      await view1PO.addPart('middle', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
+      await view1PO.addPart('right', {relativeTo: MAIN_AREA, align: 'right'});
+      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom'});
+      await view1PO.addPart('left', {relativeTo: MAIN_AREA, align: 'left'});
+      await view1PO.addPart('middle', {relativeTo: MAIN_AREA, align: 'bottom'});
       await view1PO.addView('view.3', {partId: 'middle', activateView: true});
       await view1PO.addView('view.4', {partId: 'left', activateView: true});
       await view1PO.addView('view.5', {partId: 'bottom', activateView: true});
       await view1PO.addView('view.6', {partId: 'right', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -519,22 +519,22 @@ test.describe('View Drag Peripheral Area', () => {
      * |            |     [view.3]    |          |
      * +------------+-----------------+----------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (7)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (7)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left'});
-      await view1PO.addPart('right', {relativeTo: MAIN_AREA_PART_ID, align: 'right'});
-      await view1PO.addPart('bottom-middle', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
+      await view1PO.addPart('left', {relativeTo: MAIN_AREA, align: 'left'});
+      await view1PO.addPart('right', {relativeTo: MAIN_AREA, align: 'right'});
+      await view1PO.addPart('bottom-middle', {relativeTo: MAIN_AREA, align: 'bottom'});
       await view1PO.addView('view.3', {partId: 'bottom-middle', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
     });
 
     /**
@@ -546,23 +546,23 @@ test.describe('View Drag Peripheral Area', () => {
      * | <no views>  |                 |   [view.3]   |
      * +-------------+-----------------+--------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (8)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (8)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('left-top', {relativeTo: MAIN_AREA_PART_ID, align: 'left'});
-      await view1PO.addPart('right-top', {relativeTo: MAIN_AREA_PART_ID, align: 'right'});
+      await view1PO.addPart('left-top', {relativeTo: MAIN_AREA, align: 'left'});
+      await view1PO.addPart('right-top', {relativeTo: MAIN_AREA, align: 'right'});
       await view1PO.addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'});
       await view1PO.addPart('right-bottom', {relativeTo: 'right-top', align: 'bottom'});
       await view1PO.addView('view.3', {partId: 'right-bottom', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -574,21 +574,21 @@ test.describe('View Drag Peripheral Area', () => {
      * |         <no views>          |
      * +-----------------------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the peripheral area (9)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (9)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom'});
-      await view1PO.addPart('right', {relativeTo: MAIN_AREA_PART_ID, align: 'right'});
+      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom'});
+      await view1PO.addPart('right', {relativeTo: MAIN_AREA, align: 'right'});
       await view1PO.addView('view.3', {partId: 'right', activateView: true});
 
       const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveToArea('peripheral-area');
+      await viewTab2PO.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'east'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -604,7 +604,7 @@ test.describe('View Drag Peripheral Area', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom', ratio: .25});
+      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .25});
       await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
 
       // Get bounding box of the tabbar of the 'bottom' part.
@@ -624,7 +624,7 @@ test.describe('View Drag Peripheral Area', () => {
       await page.mouse.move(0, bottomTabbarBounds.vcenter, {steps: 100});
 
       // Expect the drop zone to be inactive.
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(false);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(false);
     });
 
     /**
@@ -640,7 +640,7 @@ test.describe('View Drag Peripheral Area', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA_PART_ID, align: 'bottom', ratio: .25});
+      await view1PO.addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .25});
       await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
 
       // Get bounding box of the tabbar of the 'bottom' part.
@@ -660,7 +660,7 @@ test.describe('View Drag Peripheral Area', () => {
       await page.mouse.move(0, bottomTabbarBounds.vcenter, {steps: 100});
 
       // Expect the drop zone to be active.
-      await expect(await appPO.isDropZoneActive({area: 'peripheral-area', region: 'west'})).toBe(true);
+      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
     });
   });
 });

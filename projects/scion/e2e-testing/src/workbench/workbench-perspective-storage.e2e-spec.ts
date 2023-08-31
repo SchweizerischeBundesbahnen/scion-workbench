@@ -11,19 +11,20 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {LayoutPagePO} from './page-object/layout-page.po';
+import {MAIN_AREA} from '../workbench.model';
 
 test.describe('Workbench Perspective Storage', () => {
 
-  test('should restore peripheral grid from storage', async ({page, appPO, workbenchNavigator}) => {
+  test('should restore workbench grid from storage', async ({page, appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
 
     // Switch to perspective-1
     const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective-1'});
     await perspectiveToggleButtonPO.click();
 
-    // Add part and view to the peripheral grid
+    // Add part and view to the workbench grid
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPagePO.addPart('left', {relativeTo: 'main-area', align: 'left', ratio: .25});
+    await layoutPagePO.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
     await layoutPagePO.addView('view-1', {partId: 'left', activateView: true});
     await layoutPagePO.addView('view-2', {partId: 'left', activateView: true});
 

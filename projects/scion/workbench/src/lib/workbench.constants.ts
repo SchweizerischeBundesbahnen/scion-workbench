@@ -9,9 +9,10 @@
  */
 
 import {InjectionToken} from '@angular/core';
+import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 
 /**
- * DI injection token to ensure `WorkbenchModule.forRoot()` is not used in a lazy context.
+ * DI token to ensure `WorkbenchModule.forRoot()` is not used in a lazy context.
  */
 export const WORKBENCH_FORROOT_GUARD = new InjectionToken<void>('WORKBENCH_FORROOT_GUARD');
 
@@ -44,9 +45,14 @@ export const MAIN_AREA_LAYOUT_QUERY_PARAM = 'main_area';
 export declare type ViewTabContext = 'tabbar' | 'tabbar-dropdown' | 'drag-image';
 
 /**
- * DI injection token to inject the context in which the viewtab is rendered.
+ * DI token to inject the context in which the viewtab is rendered.
  */
 export const VIEW_TAB_CONTEXT = new InjectionToken<ViewTabContext>('VIEW_TAB_CONTEXT');
+
+/**
+ * DI token representing the configured workbench layout.
+ */
+export const WORKBENCH_LAYOUT_CONFIG = new InjectionToken<WorkbenchLayoutFn | WorkbenchPerspectives>('WORKBENCH_LAYOUT_CONFIG');
 
 /**
  * Prefix used to identify an anonymous perspective that the workbench creates for views moved to a new window.

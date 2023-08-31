@@ -12,10 +12,10 @@ import {ResolveFn, Router} from '@angular/router';
 import {inject} from '@angular/core';
 import {Dictionary} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from './workbench-route-data';
-import {WorkbenchNavigationalState, WorkbenchNavigationalStates} from './workbench-navigational-states';
+import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 
 /**
- * Makes navigational state available to the activated route via {@link ActivatedRoute#data} under the key {@link WorkbenchRouteData.state}.
+ * Makes navigational view state available to the activated route via {@link ActivatedRoute#data} under the key {@link WorkbenchRouteData.state}.
  *
  * Depending on the route configuration, the Angular router runs this resolver on every navigation. See {@link Route#runGuardsAndResolvers}.
  * Then, we resolve to the current state of the activated route.
@@ -23,7 +23,7 @@ import {WorkbenchNavigationalState, WorkbenchNavigationalStates} from './workben
  * Note that Angular performs a reference equality check to decide whether resolved data has changed.
  * Therefore, we resolve to `undefined` if the state object is empty.
  */
-export const resolveWorkbenchNavigationState: ResolveFn<Dictionary | undefined | null> = route => {
+export const resolveNavigationalViewState: ResolveFn<Dictionary | undefined | null> = route => {
   const navigationalViewState = getNavigationalViewState(route.outlet);
   return isEmpty(navigationalViewState) ? undefined : navigationalViewState;
 };
@@ -31,10 +31,10 @@ export const resolveWorkbenchNavigationState: ResolveFn<Dictionary | undefined |
 /**
  * Returns navigational view state from either the navigation or the activated route.
  */
-function getNavigationalViewState(viewId: string): WorkbenchNavigationalState | undefined {
+function getNavigationalViewState(viewId: string): Dictionary | undefined {
   const router = inject(Router);
 
-  const navigationalViewState = WorkbenchNavigationalStates.fromNavigation(router.getCurrentNavigation()!)?.viewStates?.[viewId];
+  const navigationalViewState = WorkbenchNavigationalStates.fromNavigation(router.getCurrentNavigation()!)?.viewStates[viewId];
   if (navigationalViewState) {
     return navigationalViewState;
   }

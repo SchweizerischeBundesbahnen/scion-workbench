@@ -16,7 +16,7 @@ import {DebugElement} from '@angular/core';
 import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
 import {MPart, MPartGrid, MTreeNode} from '../../../layout/workbench-layout.model';
 import {isGridElementVisible, ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
-import {MAIN_AREA_PART_ID} from '../../../layout/workbench-layout';
+import {MAIN_AREA} from '../../../layout/workbench-layout';
 import {ComponentFixture} from '@angular/core/testing';
 import {Arrays} from '@scion/toolkit/util';
 
@@ -49,14 +49,14 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
 
 function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, actual: ɵWorkbenchLayout | ComponentFixture<WorkbenchLayoutComponent> | DebugElement, util: MatchersUtil): void {
   if (actual instanceof ɵWorkbenchLayout) {
-    expected.peripheralGrid && assertPartGridModel(expected.peripheralGrid, actual.peripheralGrid, util);
-    expected.mainGrid && assertPartGridModel(expected.mainGrid, actual.mainGrid, util);
+    expected.workbenchGrid && assertPartGridModel(expected.workbenchGrid, actual.workbenchGrid, util);
+    expected.mainAreaGrid && assertPartGridModel(expected.mainAreaGrid, actual.mainAreaGrid, util);
   }
   else if ((actual instanceof ComponentFixture || actual instanceof DebugElement) && actual.componentInstance instanceof WorkbenchLayoutComponent) {
     const actualDebugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
     const workbenchLayoutComponent: WorkbenchLayoutComponent = actualDebugElement.componentInstance;
-    expected.peripheralGrid && assertPartGridModel(expected.peripheralGrid, workbenchLayoutComponent.layout!.peripheralGrid, util);
-    expected.mainGrid && assertPartGridModel(expected.mainGrid, workbenchLayoutComponent.layout!.mainGrid, util);
+    expected.workbenchGrid && assertPartGridModel(expected.workbenchGrid, workbenchLayoutComponent.layout!.workbenchGrid, util);
+    expected.mainAreaGrid && assertPartGridModel(expected.mainAreaGrid, workbenchLayoutComponent.layout!.mainAreaGrid, util);
     assertWorkbenchLayoutDOM(expected, actualDebugElement.nativeElement);
   }
   else {
@@ -80,13 +80,13 @@ function assertPartGridModel(expectedLayout: Partial<MPartGrid>, actualLayout: M
  * Note: To pierce the shadow DOM and use the `:scope` selector, we use `Element.querySelector` instead of `DebugElement.query(By.css(...))`, i.e., to access the light DOM of sci-viewport.
  */
 function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualElement: Element): void {
-  // Assert the perspective grid plus the main grid if expected.
-  if (expected.peripheralGrid) {
-    assertGridElementDOM(expected.peripheralGrid.root, actualElement.querySelector(':scope > wb-grid-element:not([data-parentnodeid])'), expected);
+  // Assert the workbench grid plus the main area grid if expected.
+  if (expected.workbenchGrid) {
+    assertGridElementDOM(expected.workbenchGrid.root, actualElement.querySelector(':scope > wb-grid-element:not([data-parentnodeid])'), expected);
   }
-  // Assert only the main grid, but not the peripheral grid since not expected.
-  else if (expected.mainGrid) {
-    assertGridElementDOM(expected.mainGrid.root, actualElement.querySelector(`wb-main-area-layout[data-partid="${MAIN_AREA_PART_ID}"] > wb-grid-element`), expected);
+  // Assert only the main area grid, but not the workbench grid since not expected.
+  else if (expected.mainAreaGrid) {
+    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector(`wb-main-area-layout[data-partid="${MAIN_AREA}"] > wb-grid-element`), expected);
   }
 }
 
@@ -167,13 +167,13 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, ex
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute '[data-partid="${expectedPart.id}"]', but is '[data-partid="${partId}"]'. [MPart=${JSON.stringify(expectedPart)}]`);
   }
 
-  if (partId === MAIN_AREA_PART_ID) {
+  if (partId === MAIN_AREA) {
     const actualPartElement = actualElement.querySelector(`wb-main-area-layout[data-partid="${partId}"]`);
     if (!actualPartElement) {
       throw Error(`[DOMAssertError]: Expected element 'wb-main-area-layout[data-partid="${partId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
-    if (expectedWorkbenchLayout.mainGrid) {
-      assertGridElementDOM(expectedWorkbenchLayout.mainGrid.root, actualPartElement.querySelector(`:scope > wb-grid-element`), expectedWorkbenchLayout);
+    if (expectedWorkbenchLayout.mainAreaGrid) {
+      assertGridElementDOM(expectedWorkbenchLayout.mainAreaGrid.root, actualPartElement.querySelector(`:scope > wb-grid-element`), expectedWorkbenchLayout);
     }
     return;
   }
@@ -243,11 +243,11 @@ function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFail
  */
 export interface ExpectedWorkbenchLayout {
   /**
-   * Specifies the expected perspective grid. If not set, does not assert the perspective grid.
+   * Specifies the expected workbench grid. If not set, does not assert the workbench grid.
    */
-  peripheralGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
+  workbenchGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
   /**
    * Specifies the expected main area grid. If not set, does not assert the main area grid.
    */
-  mainGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
+  mainAreaGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
 }

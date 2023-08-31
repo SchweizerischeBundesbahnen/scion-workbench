@@ -15,7 +15,7 @@ import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {combineLatest, Observable} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {WorkbenchModule, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 
 @Component({
   selector: 'app-workbench',
@@ -39,6 +39,13 @@ export class WorkbenchComponent implements OnDestroy {
     this.showNewTabAction$ = this._route.queryParamMap.pipe(map(params => !params.has('showNewTabAction') || coerceBooleanProperty(params.get('showNewTabAction'))));
     this.installStickyStartViewTab();
   }
+
+  /**
+   * Tests if given part is in the main area.
+   */
+  protected isPartInMainArea = (part: WorkbenchPart): boolean => {
+    return part.isInMainArea;
+  };
 
   /**
    * If enabled, installs the handler to automatically open the start tab when the user closes the last tab.

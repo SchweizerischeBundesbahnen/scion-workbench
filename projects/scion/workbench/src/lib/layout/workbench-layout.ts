@@ -9,15 +9,18 @@
  */
 
 /**
- * The workbench layout defines the arrangement of parts. A part is a stack of views.
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is
+ * displayed in views.
  *
- * The workbench has a main area and a peripheral area for placing views. The main area is the primary
- * place for views to interact with the application. The peripheral area arranges views around the main
- * area to support the user's workflow. Multiple arrangements of peripheral views, called perspectives,
- * are supported. Different perspectives provide a different perspective on the application while sharing
- * the main area. Only one perspective can be active at a time.
+ * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
+ * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
+ * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
+ * area for user interaction.
  *
- * This layout is an immutable object that provides methods to modify the layout. Modifications have no
+ * Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time.
+ * Perspectives share the same main area, if any.
+ *
+ * The layout is an immutable object that provides methods to modify the layout. Modifications have no
  * side effects. Each modification creates a new layout instance that can be used for further modifications.
  */
 export interface WorkbenchLayout {
@@ -25,13 +28,13 @@ export interface WorkbenchLayout {
   /**
    * Adds a part with the given id to this layout. Position and size are expressed relative to a reference part.
    *
-   * @param id - The id of the part. The id must be unique to avoid collisions with other parts.
+   * @param id - Unique id of the part. Use {@link MAIN_AREA} to add the main area.
    * @param relativeTo - Specifies the reference part to lay out the part.
    * @param options - Controls how to add the part to the layout.
    *        @property activate - Controls whether to activate the part. If not set, defaults to `false`.
    * @return a copy of this layout with the part added.
    */
-  addPart(id: string, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
+  addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
 
   /**
    * Adds a view to the specified part.
@@ -109,7 +112,11 @@ export interface ReferencePart {
 /**
  * Identifies the part that represents the main area.
  *
- * This part is automatically added to the layout and cannot be removed.
  * Refer to this part to align parts relative to the main area.
  */
-export const MAIN_AREA_PART_ID = 'main-area';
+export const MAIN_AREA: MAIN_AREA = 'main-area';
+
+/**
+ * Represents the type of the constant {@link MAIN_AREA}.
+ */
+export type MAIN_AREA = 'main-area';

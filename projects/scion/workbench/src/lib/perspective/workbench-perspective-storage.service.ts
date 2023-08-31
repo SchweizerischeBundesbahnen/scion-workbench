@@ -72,15 +72,18 @@ const storageKeys = {
  */
 export interface PerspectiveData {
   /**
-   * The actual peripheral grid.
+   * The actual workbench grid.
+   *
+   * When activated the perspective for the first time, this grid is identical to the {@link initialWorkbenchGrid},
+   * but changes when the user customizes the layout.
    */
-  grid: string | null;
+  workbenchGrid: string | null;
   /**
-   * The initial peripheral grid.
+   * The initial definition used to create the workbench grid.
    */
-  initialGrid: string | null;
+  initialWorkbenchGrid: string | null;
   /**
-   * Commands of views contained in the peripheral grid.
+   * Commands of views contained in the workbench grid.
    */
   viewOutlets: {[viewId: string]: Commands};
 }

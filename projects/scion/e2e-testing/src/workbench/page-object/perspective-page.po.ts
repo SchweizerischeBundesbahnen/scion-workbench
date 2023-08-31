@@ -14,8 +14,8 @@ import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {WorkbenchPerspectiveDefinition} from '@scion/workbench';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
+import {MAIN_AREA} from '../../workbench.model';
 
 /**
  * Page object to interact {@link PerspectivePageComponent}.
@@ -33,10 +33,19 @@ export class PerspectivePagePO {
     this._locator = this.viewPO.locator('app-perspective-page');
   }
 
-  public async registerPerspective(definition: Omit<WorkbenchPerspectiveDefinition, 'layout'>): Promise<void> {
+  public async registerPerspective(definition: PerspectiveDefinition): Promise<void> {
+    // Enter perspective definition.
     await this._locator.locator('input.e2e-id').fill(definition.id);
     await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-transient')).toggle(definition.transient === true);
     await this.enterData(definition.data);
+
+    // Enter parts.
+    await this.enterParts(definition.parts);
+
+    // Enter views.
+    await this.enterViews(definition.views);
+
+    // Register perspective.
     await this._locator.locator('button.e2e-register').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
@@ -51,4 +60,54 @@ export class PerspectivePagePO {
     await keyValueFieldPO.clear();
     await keyValueFieldPO.addEntries(data ?? {});
   }
+
+  private async enterParts(parts: PerspectivePartDescriptor[]): Promise<void> {
+    const partsLocator = await this._locator.locator('app-perspective-page-parts');
+    for (const [i, part] of parts.entries()) {
+      await partsLocator.locator('button.e2e-add').click();
+      await partsLocator.locator('input.e2e-part-id').nth(i).fill(part.id);
+      await new SciCheckboxPO(partsLocator.locator('sci-checkbox.e2e-part-activate').nth(i)).toggle(part.activate === true);
+      if (i > 0) {
+        await partsLocator.locator('select.e2e-part-align').nth(i).selectOption(part.align!);
+        await partsLocator.locator('input.e2e-part-relative-to').nth(i).fill(part.relativeTo ?? '');
+        await partsLocator.locator('input.e2e-part-ratio').nth(i).fill(part.ratio?.toString() ?? '');
+      }
+    }
+  }
+
+  private async enterViews(views: PerspectiveViewDescriptor[] = []): Promise<void> {
+    const viewsLocator = await this._locator.locator('app-perspective-page-views');
+    for (const [i, view] of views.entries()) {
+      await viewsLocator.locator('button.e2e-add').click();
+      await viewsLocator.locator('input.e2e-view-id').nth(i).fill(view.id);
+      await viewsLocator.locator('input.e2e-view-part-id').nth(i).fill(view.partId);
+      await viewsLocator.locator('input.e2e-view-position').nth(i).fill(view.position?.toString() ?? '');
+      await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-view-activate-view').nth(i)).toggle(view.activateView === true);
+      await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-view-activate-part').nth(i)).toggle(view.activatePart === true);
+    }
+  }
+}
+
+export interface PerspectiveDefinition {
+  id: string;
+  transient?: true;
+  parts: PerspectivePartDescriptor[];
+  views?: PerspectiveViewDescriptor[];
+  data?: {[key: string]: any};
+}
+
+export interface PerspectivePartDescriptor {
+  id: string | MAIN_AREA;
+  relativeTo?: string;
+  align?: 'left' | 'right' | 'top' | 'bottom';
+  ratio?: number;
+  activate?: boolean;
+}
+
+export interface PerspectiveViewDescriptor {
+  id: string;
+  partId: string;
+  position?: number;
+  activateView?: boolean;
+  activatePart?: boolean;
 }

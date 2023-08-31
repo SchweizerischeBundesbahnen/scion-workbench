@@ -15,7 +15,7 @@ import {By} from '@angular/platform-browser';
 import {TestComponent, withComponentContent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchService} from '../workbench.service';
-import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
+import {MAIN_AREA} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -34,8 +34,8 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
         WorkbenchTestingModule.forTest({
           layout: {
             perspectives: [
-              {id: 'perspective-1', layout: layout => layout.addPart('left', {align: 'left'})},
-              {id: 'perspective-2', layout: layout => layout},
+              {id: 'perspective-1', layout: factory => factory.addPart(MAIN_AREA).addPart('left', {align: 'left'})},
+              {id: 'perspective-2', layout: factory => factory.addPart(MAIN_AREA)},
             ],
             initialPerspective: 'perspective-1',
           },
@@ -68,13 +68,13 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
 
     // Expect view.1 in perspective-1 to be renamed to view.2
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
@@ -82,7 +82,7 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
     // Expect view in main area to have TestComponent mounted with content 'b'
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="main"] wb-view[data-viewid="view.1"] spec-test-component')).nativeElement.innerText).toEqual('b');
 
-    // Expect view in peripheral grid to have TestComponent mounted with content 'a'
+    // Expect view in workbench grid to have TestComponent mounted with content 'a'
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="left"] wb-view[data-viewid="view.2"] spec-test-component')).nativeElement.innerText).toEqual('a');
   });
 });

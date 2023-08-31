@@ -7,27 +7,25 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
+import {EnvironmentInjector, Inject, Injectable, runInInjectionContext} from '@angular/core';
 import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
-import {WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
+import {WorkbenchLayoutFn, WorkbenchPerspectiveDefinition, WorkbenchPerspectives} from './workbench-perspective.model';
 import {WorkbenchInitializer} from '../startup/workbench-initializer';
 import {Logger} from '../logging/logger';
-import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
+import {WORKBENCH_LAYOUT_CONFIG} from '../workbench.constants';
 import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
+import {MAIN_AREA} from '../layout/workbench-layout';
 
 /**
- * Provides access to perspectives.
- *
- * A perspective defines the layout around the main area, which can be switched independently of the main area.
- * There can only be one perspective active at a time.
+ * Enables registration and activation of perspectives.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
-  constructor(private _workbenchModuleConfig: WorkbenchModuleConfig,
+  constructor(@Inject(WORKBENCH_LAYOUT_CONFIG) private _layoutConfig: WorkbenchLayoutFn | WorkbenchPerspectives,
               private _perspectiveRegistry: WorkbenchPerspectiveRegistry,
               private _environmentInjector: EnvironmentInjector,
               private _workbenchPerspectiveStorageService: WorkbenchPerspectiveStorageService,
@@ -47,17 +45,12 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
    * Registers perspectives configured in {@link WorkbenchModuleConfig}.
    */
   private async registerPerspectivesFromModuleConfig(): Promise<void> {
-    const layoutConfig = this._workbenchModuleConfig.layout;
-    if (!layoutConfig) {
-      return;
-    }
-
     // Register perspective either from function or object config.
-    if (typeof layoutConfig === 'function') {
-      await this.registerPerspective({id: SYNTHETIC_WORKBENCH_PERSPECTIVE_ID, layout: layoutConfig});
+    if (typeof this._layoutConfig === 'function') {
+      await this.registerPerspective({id: DEFAULT_WORKBENCH_PERSPECTIVE_ID, layout: this._layoutConfig});
     }
     else {
-      for (const perspective of layoutConfig.perspectives) {
+      for (const perspective of this._layoutConfig.perspectives) {
         await this.registerPerspective(perspective);
       }
     }
@@ -72,7 +65,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
     if (windowPerspectiveId?.startsWith(ANONYMOUS_PERSPECTIVE_ID_PREFIX)) {
       await this.registerPerspective({
         id: windowPerspectiveId,
-        layout: layout => layout,
+        layout: factory => factory.addPart(MAIN_AREA),
         transient: true,
       });
     }
@@ -96,7 +89,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
   }
 
   /**
-   * Switches to the specified perspective. The main area will not change.
+   * Switches to the specified perspective. The main area will not change, if any.
    */
   public async switchPerspective(id: string): Promise<boolean> {
     if (this.activePerspective?.id === id) {
@@ -136,7 +129,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       }
 
       // Determine the initial perspective using information from the config.
-      const perspectiveFromConfig = typeof this._workbenchModuleConfig.layout === 'object' ? this._workbenchModuleConfig.layout.initialPerspective : null;
+      const perspectiveFromConfig = typeof this._layoutConfig === 'object' ? this._layoutConfig.initialPerspective : null;
       if (!perspectiveFromConfig) {
         return this._perspectiveRegistry.perspectives[0]?.id;
       }
@@ -164,9 +157,9 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 }
 
 /**
- * Identifier for the "synthetic" perspective that the workbench creates if using a workbench layout without configuring perspectives.
+ * Identifier for the "default" perspective that the workbench creates if not providing a named layout.
  */
-const SYNTHETIC_WORKBENCH_PERSPECTIVE_ID = '@scion/workbench/synthetic';
+const DEFAULT_WORKBENCH_PERSPECTIVE_ID = 'default';
 
 /**
  * Generates the window name for given perspective to control which perspective to display in a window.

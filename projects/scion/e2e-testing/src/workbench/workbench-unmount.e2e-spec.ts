@@ -195,7 +195,7 @@ test.describe('Workbench Component', () => {
     await expect(await appPO.viewCount()).toBeGreaterThan(0);
 
     // Expect part action modelled as content of the workbench component to display.
-    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'e2e-open-new-tab'}).isVisible()).toBe(true);
+    await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'e2e-open-new-tab'}).isVisible()).toBe(true);
 
     // Unmount the workbench component by navigating the primary router outlet.
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
@@ -204,9 +204,9 @@ test.describe('Workbench Component', () => {
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
 
     // Expect part action to display.
-    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'e2e-open-new-tab'}).isVisible()).toBe(true);
+    await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'e2e-open-new-tab'}).isVisible()).toBe(true);
 
     // Expect previous part action to be destroyed.
-    await expect(await appPO.activePart({scope: 'mainArea'}).action({cssClass: 'e2e-open-new-tab'}).count()).toBe(1);
+    await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'e2e-open-new-tab'}).count()).toBe(1);
   });
 });

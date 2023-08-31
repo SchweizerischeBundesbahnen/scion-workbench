@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
-import {inject, Injector} from '@angular/core';
+import {inject, Injector, runInInjectionContext} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
@@ -65,9 +65,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    * Method invoked to update this workbench model object when the workbench layout changes.
    */
   public onLayoutChange(layout: ɵWorkbenchLayout): void {
-    this._isInMainArea ??= layout.isInMainArea(this.id);
+    this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});
     const part = layout.part({by: {partId: this.id}});
-    const active = layout.activePart({scope: this._isInMainArea ? 'main' : 'peripheral'}).id === this.id;
+    const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'workbench'})?.id === this.id;
     const prevViewIds = this.viewIds$.value;
     const currViewIds = part.views.map(view => view.id);
 
@@ -128,24 +128,12 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    * Emits actions that have contributed to this part and the currently active view.
    */
   private observePartActions$(): Observable<WorkbenchPartAction[]> {
+    const injector = inject(Injector);
     return this._partActionRegistry.actions$
       .pipe(
         switchMap(actions => this.activeViewId$.pipe(map(() => actions))),
-        filterArray((action: WorkbenchPartAction): boolean => {
-          const actionPartId = action.target?.partId;
-          if (actionPartId && !Arrays.coerce(actionPartId).includes(this.id)) {
-            return false;
-          }
-          const actionViewId = action.target?.viewId;
-          if (actionViewId && this.activeViewId && !Arrays.coerce(actionViewId).includes(this.activeViewId)) {
-            return false;
-          }
-          const actionArea = action.target?.area;
-          if (actionArea && actionArea !== (this.isInMainArea ? 'main' : 'peripheral')) {
-            return false;
-          }
-          return true;
-        }),
+        // Run in injection context for `canMatch` function to inject dependencies.
+        filterArray((action: WorkbenchPartAction): boolean => runInInjectionContext(injector, () => action.canMatch?.(this) ?? true)),
         distinctUntilChanged(),
       );
   }

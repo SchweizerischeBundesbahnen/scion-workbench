@@ -54,9 +54,9 @@ export class PartComponent implements OnInit, OnDestroy {
     return this.part.id;
   }
 
-  @HostBinding('class.e2e-peripheral')
-  public get isPeripheral(): boolean {
-    return !this.part.isInMainArea;
+  @HostBinding('class.e2e-main-area')
+  public get isInMainArea(): boolean {
+    return this.part.isInMainArea;
   }
 
   @HostBinding('class.active')

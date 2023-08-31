@@ -11,7 +11,7 @@
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
-import {styleFixture, waitForInitialWorkbenchLayout} from '../testing/testing.util';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
@@ -22,7 +22,9 @@ import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {delay, of} from 'rxjs';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
-import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
+import {MAIN_AREA} from '../layout/workbench-layout';
+import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
 
 describe('Workbench Perspective', () => {
 
@@ -34,8 +36,8 @@ describe('Workbench Perspective', () => {
         WorkbenchTestingModule.forTest({
           layout: {
             perspectives: [
-              {id: 'perspective-1', layout: layout => layout},
-              {id: 'perspective-2', layout: layout => layout},
+              {id: 'perspective-1', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
+              {id: 'perspective-2', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
             ],
           },
         }),
@@ -71,15 +73,16 @@ describe('Workbench Perspective', () => {
   });
 
   /**
-   * Regression test for a bug where the perspective grid of the initial layout got replaced by the "default" grid deployed during the initial navigation,
+   * Regression test for a bug where the workbench grid of the initial layout got replaced by the "default" grid deployed during the initial navigation,
    * resulting in only the main area being displayed.
    */
   it('should display the perspective also for asynchronous/slow initial navigation', async () => {
     TestBed.configureTestingModule({
       imports: [
         WorkbenchTestingModule.forTest({
-          layout: layout => layout
-            .addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left', ratio: .25})
+          layout: factory => factory
+            .addPart(MAIN_AREA)
+            .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
             .addView('navigator', {partId: 'left', activateView: true}),
         }),
         RouterTestingModule.withRoutes([
@@ -99,16 +102,66 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
 
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'navigator'}], activeViewId: 'navigator'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .25,
         }),
       },
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: []}),
+      },
+    });
+  });
+
+  it('should open an unnamed view in the active part of perspective without main area', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({
+          layout: factory => factory
+            .addPart('left')
+            .addPart('right', {align: 'right'})
+            .addView('list', {partId: 'left', activateView: true})
+            .addView('overview', {partId: 'right', activateView: true})
+            .activatePart('right'),
+        }),
+        RouterTestingModule.withRoutes([
+          {path: '', outlet: 'list', component: TestComponent},
+          {path: '', outlet: 'overview', component: TestComponent},
+          {path: 'details/:id', component: TestComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'left', views: [{id: 'list'}], activeViewId: 'list'}),
+          child2: new MPart({id: 'right', views: [{id: 'overview'}], activeViewId: 'overview'}),
+          direction: 'row',
+          ratio: .5,
+        }),
+      },
+    });
+
+    // open new details view
+    await TestBed.inject(WorkbenchRouter).navigate(['details/1']);
+    await waitUntilStable();
+
+    // unnamed view should be opened in the active part (right) of the workbench grid
+    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'left', views: [{id: 'list'}], activeViewId: 'list'}),
+          child2: new MPart({id: 'right', views: [{id: 'overview'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+          direction: 'row',
+          ratio: .5,
+        }),
       },
     });
   });

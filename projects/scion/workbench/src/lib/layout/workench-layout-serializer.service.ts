@@ -27,16 +27,17 @@ export class WorkbenchLayoutSerializer {
    *
    * @param grid - Specifies the grid to be serialized.
    * @param options - Controls the serialization.
-   *                  @property nullIfEmpty - If `true` or if not specified, returns `null` for the grid if it contains a single part with no views added to it.
    *                  @property includeNodeId - Controls if to include the `nodeId`. By default, if not set, the `nodeId` is excluded from serialization.
    */
-  public serialize(grid: MPartGrid, options: {nullIfEmpty: boolean; includeNodeId?: boolean}): string | null {
-    if (options.nullIfEmpty && grid.root instanceof MPart && !grid.root.views.length) {
+  public serialize(grid: MPartGrid, options?: {includeNodeId?: boolean}): string;
+  public serialize(grid: MPartGrid | undefined | null, options?: {includeNodeId?: boolean}): null | string;
+  public serialize(grid: MPartGrid | undefined | null, options?: {includeNodeId?: boolean}): string | null {
+    if (grid === null || grid === undefined) {
       return null;
     }
 
     const transientFields = new Set<string>(TRANSIENT_FIELDS);
-    if (!options.includeNodeId) {
+    if (!options?.includeNodeId) {
       transientFields.add('nodeId');
     }
 

@@ -10,7 +10,7 @@
 
 import {provideWorkbench} from './workbench.provider';
 import {ApplicationConfig} from '@angular/core';
-import {MAIN_AREA_PART_ID, WorkbenchLayout} from '@scion/workbench';
+import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
 import {provideRouter, withHashLocation} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 
@@ -20,8 +20,9 @@ import {provideAnimations} from '@angular/platform-browser/animations';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideWorkbench({
-      layout: (layout: WorkbenchLayout) => layout
-        .addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left', ratio: .25})
+      layout: (factory: WorkbenchLayoutFactory) => factory
+        .addPart(MAIN_AREA)
+        .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
         .addView('todos', {partId: 'left', activateView: true}),
     }),
     provideRouter([

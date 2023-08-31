@@ -9,12 +9,13 @@
  */
 import {Observable} from 'rxjs';
 import {WorkbenchLayout} from '../layout/workbench-layout';
+import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 
 /**
- * A perspective is an arrangement of views around the main area.
+ * A perspective is a named workbench layout.
  *
- * Multiple perspectives are supported. Different perspectives provide a different perspective on the application
- * while sharing the main area. Only one perspective can be active at a time.
+ * Multiple perspectives are supported. Perspectives can be switched. Only one perspective is active at a time.
+ * Perspectives share the same main area, if any.
  */
 export interface WorkbenchPerspective {
   /**
@@ -88,29 +89,31 @@ export interface WorkbenchPerspectiveDefinition {
 }
 
 /**
- * Signature of a function to provide the arrangement of views around the main area.
+ * Signature of a function to provide a workbench layout.
  *
- * The function is passed a layout instance to add parts and views. The layout is an immutable object,
- * meaning that modifications have no side effects. Each modification creates a new layout instance that
- * can be used for further modifications.
+ * The function is passed a factory to create the layout. The layout has methods to modify it.
+ * Each modification creates a new layout instance that can be used for further modifications.
+ *
+ * The layout is an immutable object, i.e., modifications have no side effects.
  *
  * The function can call `inject` to get any required dependencies.
  *
  * ```ts
- * function defineLayout(layout: WorkbenchLayout): WorkbenchLayout {
- *   return layout.addPart('topLeft', {align: 'left', ratio: .25})
- *                .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
- *                .addPart('bottom', {align: 'bottom', ratio: .3})
- *                .addView('navigator', {partId: 'topLeft', activateView: true})
- *                .addView('explorer', {partId: 'topLeft'})
- *                .addView('repositories', {partId: 'bottomLeft', activateView: true})
- *                .addView('console', {partId: 'bottom', activateView: true})
- *                .addView('problems', {partId: 'bottom'})
- *                .addView('search', {partId: 'bottom'});
+ * function defineLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+ *   return factory.addPart(MAIN_AREA)
+ *                 .addPart('topLeft', {align: 'left', ratio: .25})
+ *                 .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+ *                 .addPart('bottom', {align: 'bottom', ratio: .3})
+ *                 .addView('navigator', {partId: 'topLeft', activateView: true})
+ *                 .addView('explorer', {partId: 'topLeft'})
+ *                 .addView('repositories', {partId: 'bottomLeft', activateView: true})
+ *                 .addView('console', {partId: 'bottom', activateView: true})
+ *                 .addView('problems', {partId: 'bottom'})
+ *                 .addView('search', {partId: 'bottom'});
  * }
  * ```
  */
-export type WorkbenchLayoutFn = (layout: WorkbenchLayout) => Promise<WorkbenchLayout> | WorkbenchLayout;
+export type WorkbenchLayoutFn = (factory: WorkbenchLayoutFactory) => Promise<WorkbenchLayout> | WorkbenchLayout;
 
 /**
  * Signature of a function that can be provided in {@link WorkbenchPerspectives#initialPerspective} to select the perspective for the initial workbench layout.

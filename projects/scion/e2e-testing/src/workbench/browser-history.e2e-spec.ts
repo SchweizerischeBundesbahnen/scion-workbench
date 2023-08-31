@@ -14,20 +14,21 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {StandaloneViewTestPagePO} from './page-object/test-pages/standalone-view-test-page.po';
 import {NonStandaloneViewTestPagePO} from './page-object/test-pages/non-standalone-view-test-page.po';
+import {MAIN_AREA} from '../workbench.model';
 
 test.describe('Browser History', () => {
 
-  test('should put peripheral grid-related navigations into browser history', async ({appPO, workbenchNavigator}) => {
+  test('should put workbench grid-related navigations into browser history', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const view1PO = appPO.view({cssClass: 'e2e-test-view-1'});
     const view2PO = appPO.view({cssClass: 'e2e-test-view-2'});
 
-    // Add part to the peripheral grid
+    // Add part to the workbench grid
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPagePO.addPart('left', {relativeTo: 'main-area', align: 'left', ratio: .25});
+    await layoutPagePO.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
 
-    // Add view-1 to the peripheral part
+    // Add view-1 to the left part
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPagePO.enterPath('test-view');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1'});
@@ -38,7 +39,7 @@ test.describe('Browser History', () => {
     // Expect view-1 to be active
     await expect(await view1PO.isActive()).toBe(true);
 
-    // Add view-2 to the peripheral part
+    // Add view-2 to the left part
     await routerPagePO.enterPath('test-view');
     await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2'});
     await routerPagePO.enterTarget('blank');

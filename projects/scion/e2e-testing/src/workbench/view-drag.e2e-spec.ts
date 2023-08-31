@@ -27,8 +27,8 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the center quickly
-      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
-      await view2PO.viewTabPO.dragToPart({region: 'center'}, {steps: 1, performDrop: false});
+      const partId = await appPO.activePart({inMainArea: true}).getPartId();
+      await view2PO.viewTabPO.dragTo({partId, region: 'center'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
       expect(await view1PO.viewPO.isActive()).toBe(true);
@@ -49,8 +49,8 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the north quickly
-      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
-      await view2PO.viewTabPO.dragToPart({region: 'north'}, {steps: 1, performDrop: false});
+      const partId = await appPO.activePart({inMainArea: true}).getPartId();
+      await view2PO.viewTabPO.dragTo({partId, region: 'north'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
       expect(await view1PO.viewPO.isActive()).toBe(true);
@@ -71,8 +71,8 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the center quickly
-      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
-      await view2PO.viewTabPO.dragToPart({region: 'east'}, {steps: 1, performDrop: false});
+      const partId = await appPO.activePart({inMainArea: true}).getPartId();
+      await view2PO.viewTabPO.dragTo({partId, region: 'east'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
       expect(await view1PO.viewPO.isActive()).toBe(true);
@@ -93,8 +93,8 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the south quickly
-      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
-      await view2PO.viewTabPO.dragToPart({region: 'south'}, {steps: 1, performDrop: false});
+      const partId = await appPO.activePart({inMainArea: true}).getPartId();
+      await view2PO.viewTabPO.dragTo({partId, region: 'south'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
       expect(await view1PO.viewPO.isActive()).toBe(true);
@@ -115,8 +115,8 @@ test.describe('View Drag', () => {
       const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the west quickly
-      const partId = await appPO.activePart({scope: 'mainArea'}).getPartId();
-      await view2PO.viewTabPO.dragToPart({region: 'west'}, {steps: 1, performDrop: false});
+      const partId = await appPO.activePart({inMainArea: true}).getPartId();
+      await view2PO.viewTabPO.dragTo({partId, region: 'west'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
       expect(await view1PO.viewPO.isActive()).toBe(true);
@@ -144,11 +144,11 @@ test.describe('View Drag', () => {
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
 
       // Move view 2 to the center.
-      await view2PO.viewTab.dragToPart({region: 'center'});
+      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'center'});
 
       // Expect view 2 not to be moved.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MPart({
             id: await view1PO.part.getPartId(),
             views: [{id: 'view.1'}, {id: 'view.2'}],
@@ -173,11 +173,11 @@ test.describe('View Drag', () => {
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
 
       // Move view 2 to a new part in the west.
-      await view2PO.viewTab.dragToPart({region: 'west'});
+      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'west'});
 
       // Expect view 2 to be moved to a new part in the west.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
@@ -211,11 +211,11 @@ test.describe('View Drag', () => {
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
 
       // Move view 2 to a new part in the east.
-      await view2PO.viewTab.dragToPart({region: 'east'});
+      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'east'});
 
       // Expect view 2 to be moved to a new part in the east.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
@@ -252,11 +252,11 @@ test.describe('View Drag', () => {
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
 
       // Move view 2 to a new part in the north.
-      await view2PO.viewTab.dragToPart({region: 'north'});
+      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'north'});
 
       // Expect view 2 to be moved to a new part in the north.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'column',
             ratio: .5,
@@ -293,11 +293,11 @@ test.describe('View Drag', () => {
       const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
 
       // Move view 2 to a new part in the south.
-      await view2PO.viewTab.dragToPart({region: 'south'});
+      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'south'});
 
       // Expect view 2 to be moved to a new part in the south.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'column',
             ratio: .5,
@@ -340,11 +340,11 @@ test.describe('View Drag', () => {
       await view1PO.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to the center of the initial part.
-      await view2PO.viewTab.dragToPart({partId: await view1PO.viewPO.part.getPartId(), region: 'center'});
+      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'center'});
 
       // Expect view 2 to be moved to the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
@@ -384,11 +384,11 @@ test.describe('View Drag', () => {
       await view1PO.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the west of the initial part.
-      await view2PO.viewTab.dragToPart({partId: await view1PO.viewPO.part.getPartId(), region: 'west'});
+      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'west'});
 
       // Expect view 2 to be moved to a new part in the west of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
@@ -437,11 +437,11 @@ test.describe('View Drag', () => {
       await view1PO.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the east of the initial part.
-      await view2PO.viewTab.dragToPart({partId: await view1PO.viewPO.part.getPartId(), region: 'east'});
+      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'east'});
 
       // Expect view 2 to be moved to a new part in the east of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
@@ -493,11 +493,11 @@ test.describe('View Drag', () => {
       await view1PO.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the north of the initial part.
-      await view2PO.viewTab.dragToPart({partId: await view1PO.viewPO.part.getPartId(), region: 'north'});
+      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'north'});
 
       // Expect view 2 to be moved to a new part in the north of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
@@ -549,11 +549,11 @@ test.describe('View Drag', () => {
       await view1PO.addView('view.3', {partId: 'another'});
 
       // Move view 2 to a new part in the south of the initial part.
-      await view2PO.viewTab.dragToPart({partId: await view1PO.viewPO.part.getPartId(), region: 'south'});
+      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'south'});
 
       // Expect view 2 to be moved to a new part in the south of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-        mainGrid: {
+        mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
