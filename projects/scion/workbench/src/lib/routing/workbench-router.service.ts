@@ -39,8 +39,8 @@ export class WorkbenchRouter implements OnDestroy {
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _zone: NgZone) {
     // Instruct the Angular router to process navigations that do not change the current URL, i.e., when only updating navigation state.
-    // For example, the peripheral grid is passed to the navigation as state, not as a query parameter. Without this flag set, changes to
-    // the peripheral grid would not be added to the browsing history stack.
+    // For example, the workbench grid is passed to the navigation as state, not as a query parameter. Without this flag set, changes to
+    // the workbench grid would not be added to the browsing history stack.
     // Although the `onSameUrlNavigation` flag can be set per navigation via the navigation extras, this is not sufficient because the
     // Angular router ignores it when navigating back and forth in the browsing history.
     // See Angular router.ts#setUpLocationChangeListener and router.ts#navigateToSyncWithBrowser
@@ -127,7 +127,14 @@ export class WorkbenchRouter implements OnDestroy {
      * Creates the navigation for adding the specified view to the workbench layout.
      */
     function addView(viewId: string, layout: ɵWorkbenchLayout): WorkbenchNavigation {
-      const partId = (extras.blankPartId && layout.parts().some(part => part.id === extras.blankPartId)) ? extras.blankPartId : layout.activePart({scope: 'main'}).id;
+      const partId = ((): string => {
+        if (extras.blankPartId && layout.hasPart(extras.blankPartId)) {
+          return extras.blankPartId;
+        }
+
+        return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'workbench'}).id;
+      })();
+
       return {
         layout: layout.addView(viewId, {
           partId,
@@ -200,7 +207,7 @@ export class WorkbenchRouter implements OnDestroy {
         return viewStates;
       }, navigation.viewStates || {});
 
-      // Instruct the router to process the navigation even if the URL does not change, e.g., when changing the peripheral grid which is not contained in the URL.
+      // Instruct the router to process the navigation even if the URL does not change, e.g., when changing the workbench grid which is not contained in the URL.
       extras = {...extras, onSameUrlNavigation: 'reload'};
 
       // Serialize the layout.
@@ -208,13 +215,13 @@ export class WorkbenchRouter implements OnDestroy {
 
       // Associate workbench-specific state with the navigation.
       WorkbenchNavigationalStates.addToNavigationExtras(extras, {
-        peripheralGrid: serializedLayout.peripheralGrid ?? undefined,
+        workbenchGrid: serializedLayout.workbenchGrid,
         maximized: navigation.layout.maximized,
         viewStates,
       });
 
       // Compute the new URL tree.
-      const urlTree = this.__createUrlTree(navigation.viewOutlets, serializedLayout.mainGrid, extras);
+      const urlTree = this.__createUrlTree(navigation.viewOutlets, serializedLayout.mainAreaGrid, extras);
 
       // Perform the navigation.
       if (!(await this._router.navigateByUrl(urlTree, extras))) {
@@ -254,14 +261,14 @@ export class WorkbenchRouter implements OnDestroy {
       const navigation: WorkbenchNavigation = coerceNavigation(await onNavigate(this._workbenchLayoutService.layout!))!;
 
       // create the URL tree.
-      return this.__createUrlTree(navigation.viewOutlets, navigation.layout.serialize().mainGrid, extras);
+      return this.__createUrlTree(navigation.viewOutlets, navigation.layout.serialize().mainAreaGrid, extras);
     });
   }
 
   /**
    * This method name begins with underscores to indicate that it must only be invoked from within {@link SingleTaskExecutor}.
    */
-  private __createUrlTree(viewOutlets: {[outlet: string]: Commands | null} | undefined, serializedMainGrid: string | null, extras?: NavigationExtras): UrlTree {
+  private __createUrlTree(viewOutlets: {[outlet: string]: Commands | null} | undefined, serializedMainAreaGrid: string | null, extras?: NavigationExtras): UrlTree {
     // Normalize commands of the outlets to their absolute form and resolve relative navigational symbols.
     const normalizedViewOutlets = this.normalizeOutletCommands(viewOutlets, extras?.relativeTo);
 
@@ -271,7 +278,7 @@ export class WorkbenchRouter implements OnDestroy {
     // Let Angular Router construct the URL tree.
     return this._router.createUrlTree(commands, {
       ...extras,
-      queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: serializedMainGrid},
+      queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: serializedMainAreaGrid},
       // Merge with existing query params unless specified an explicit strategy, e.g., for migrating an outdated layout URL.
       // Note that `null` is a valid strategy for clearing existing query params, so do not use the nullish coalescing operator (??).
       queryParamsHandling: Defined.orElse(extras?.queryParamsHandling, 'merge'),
@@ -442,7 +449,8 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    */
   target?: string | 'blank' | 'auto';
   /**
-   * Specifies in which part to open the view. By default, if not specified, opens the view in the active part of the main area.
+   * Specifies in which part to open the view. By default, if not specified, opens the view in the active part of the main area,
+   * if the layout has one, otherwise in the active part of the layout.
    */
   blankPartId?: string;
   /**

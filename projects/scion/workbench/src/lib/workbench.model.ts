@@ -11,6 +11,7 @@
 import {Observable} from 'rxjs';
 import {ComponentPortal, Portal, TemplatePortal} from '@angular/cdk/portal';
 import {WorkbenchView} from './view/workbench-view.model';
+import {WorkbenchPart} from './part/workbench-part.model';
 
 /**
  * Lifecycle hook that is called when a view component is to be destroyed, and which is called before 'ngOnDestroy'.
@@ -28,46 +29,41 @@ export interface WorkbenchViewPreDestroy {
 }
 
 /**
- * Represents an action displayed to the right of the view tabs, either left- or right-aligned.
- * Actions can be associated with specific view(s), part(s), and/or an area.
+ * Describes an action contributed to a part.
+ *
+ * Part actions are displayed to the right of the view tab bar and enable interaction with the part and its content.
  */
 export interface WorkbenchPartAction {
   /**
    * Specifies the portal to render the action.
    *
-   * Specify a {@link ComponentPortal} to render a component, or a {@link TemplatePortal} to render a template,
-   * optionally passing an injector to control the injection context.
+   * Use a {@link ComponentPortal} to render a component, or a {@link TemplatePortal} to render a template.
    */
   portal: Portal<unknown>;
   /**
-   * Specifies where to place this action in the part bar.
+   * Specifies where to place this action in the action bar.
    */
   align?: 'start' | 'end';
   /**
-   * Associates this action with specific target(s).
+   * Predicate to match a specific part, parts in a specific area, or parts from a specific perspective.
+   *
+   * By default, if not specified, matches any part.
+   *
+   * The function can call `inject` to get any required dependencies.
    */
-  target?: {
-    /**
-     * Identifies the views(s) to associate this action with.
-     *
-     * If not specified, associates it with any view, or with the contextual view if modeled in the context of a view.
-     * Passing `null` or any other view(s) overrides the contextual view default behavior.
-     */
-    viewId?: string | string[];
-    /**
-     * Identifies the part(s) to associate this action with. If not specified, associates it with any part.
-     */
-    partId?: string | string[];
-    /**
-     * Identifies the area to associate this action with. If not specified, associates it with any area.
-     */
-    area?: 'main' | 'peripheral';
-  };
+  canMatch?: CanMatchPartFn;
   /**
    * Specifies CSS class(es) to be associated with the action, useful in end-to-end tests for locating it.
    */
   cssClass?: string | string[];
 }
+
+/**
+ * The signature of a function used as a `canMatch` condition for a part.
+ *
+ * The function can call `inject` to get any required dependencies.
+ */
+export type CanMatchPartFn = (part: WorkbenchPart) => boolean;
 
 /**
  * Factory function to create a {@link WorkbenchMenuItem}.

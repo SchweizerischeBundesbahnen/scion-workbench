@@ -17,29 +17,29 @@
     </sci-form-field>
   </section>
 
-  <section [formGroup]="form.controls.target" class="e2e-target">
-    <header>Target</header>
+  <section [formGroup]="form.controls.canMatch" class="e2e-can-match">
+    <header>CanMatch</header>
 
     <sci-form-field label="View(s)">
-      <input [formControl]="form.controls.target.controls.view" class="e2e-view-id" list="views" placeholder="Separate multiple views by space">
+      <input [formControl]="form.controls.canMatch.controls.view" class="e2e-view-id" list="views" placeholder="Separate multiple views by space">
       <datalist id="views">
         <option *ngFor="let view of workbenchService.views$ | async" [value]="view.id">{{view.id}}</option>
       </datalist>
     </sci-form-field>
 
     <sci-form-field label="Part(s)">
-      <input [formControl]="form.controls.target.controls.part" class="e2e-part-id" list="parts" placeholder="Separate multiple parts by space">
+      <input [formControl]="form.controls.canMatch.controls.part" class="e2e-part-id" list="parts" placeholder="Separate multiple parts by space">
       <datalist id="parts">
         <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
       </datalist>
     </sci-form-field>
 
-    <sci-form-field label="Area">
-      <input [formControl]="form.controls.target.controls.area" class="e2e-area" list="areas">
-      <datalist id="areas">
+    <sci-form-field label="Grid">
+      <input [formControl]="form.controls.canMatch.controls.grid" class="e2e-grid" list="grids">
+      <datalist id="grids">
         <option value="">--</option>
-        <option value="main">Main Area</option>
-        <option value="peripheral">Peripheral Area</option>
+        <option value="workbench">Workbench</option>
+        <option value="mainArea">Main Area</option>
       </datalist>
     </sci-form-field>
   </section>

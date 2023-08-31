@@ -90,7 +90,7 @@ export class LayoutPagePO {
     ]);
   }
 
-  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: string | string[]; partId?: string | string[]; area?: 'main' | 'peripheral'; cssClass?: string | string[]}): Promise<void> {
+  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: string | string[]; partId?: string | string[]; grid?: 'workbench' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
     const locator = this._locator.locator('app-register-part-action-page');
 
     await this.viewPO.viewTab.click();
@@ -98,9 +98,9 @@ export class LayoutPagePO {
     await locator.locator('section').locator('input.e2e-content').fill(content);
     await locator.locator('section').locator('select.e2e-align').selectOption(options?.align ?? '');
     await locator.locator('section').locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
-    await locator.locator('section.e2e-target').locator('input.e2e-view-id').fill(coerceArray(options?.viewId).join(' '));
-    await locator.locator('section.e2e-target').locator('input.e2e-part-id').fill(coerceArray(options?.partId).join(' '));
-    await locator.locator('section.e2e-target').locator('input.e2e-area').fill(options?.area ?? '');
+    await locator.locator('section.e2e-can-match').locator('input.e2e-view-id').fill(coerceArray(options?.viewId).join(' '));
+    await locator.locator('section.e2e-can-match').locator('input.e2e-part-id').fill(coerceArray(options?.partId).join(' '));
+    await locator.locator('section.e2e-can-match').locator('input.e2e-grid').fill(options?.grid ?? '');
     await locator.locator('button.e2e-register').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.

@@ -12,6 +12,9 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
+import {PerspectivePagePO} from './page-object/perspective-page.po';
+import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {MAIN_AREA} from '../workbench.model';
 
 test.describe('Workbench RouterLink', () => {
 
@@ -23,7 +26,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(1);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -37,7 +40,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterTarget('auto');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -51,7 +54,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigateViaRouterLink();
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -64,7 +67,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink(['Control']);
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(false);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
@@ -82,7 +85,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.enterCssClass('testee');
     await routerPagePO.clickNavigateViaRouterLink(['Meta']);
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(false);
     await expect(await routerPagePO.viewTabPO.isActive()).toBe(true);
@@ -97,7 +100,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.checkActivate(true);
     await routerPagePO.clickNavigateViaRouterLink(['Control']);
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -115,7 +118,7 @@ test.describe('Workbench RouterLink', () => {
     await routerPagePO.checkActivate(true);
     await routerPagePO.clickNavigateViaRouterLink(['Meta']);
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee'}).viewTab.isActive()).toBe(true);
   });
@@ -255,7 +258,7 @@ test.describe('Workbench RouterLink', () => {
     // THEN
     await expect(await appPO.view({cssClass: 'testee-1'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(false);
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
   });
 
   test('should replace the current view if navigating inside a view (and not activate a matching view)', async ({appPO, workbenchNavigator}) => {
@@ -278,15 +281,15 @@ test.describe('Workbench RouterLink', () => {
     await expect(await appPO.view({cssClass: 'testee-1'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.isPresent()).toBe(true);
     await expect(await appPO.view({cssClass: 'testee-2'}).viewTab.getViewId()).toEqual(routerPagePO.viewId);
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(2);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
   });
 
   test('should not navigate current view if not the target of primary routes', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Add router page to the peripheral grid as named view
+    // Add router page to the workbench grid as named view
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPagePO.addPart('left', {relativeTo: 'main-area', align: 'left', ratio: .25});
+    await layoutPagePO.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
     await layoutPagePO.addView('router', {partId: 'left', activateView: true});
     await layoutPagePO.registerRoute({path: '', component: 'router-page', outlet: 'router'}, {title: 'Workbench Router'});
 
@@ -301,7 +304,7 @@ test.describe('Workbench RouterLink', () => {
     await expect(await testeeViewPO.isVisible()).toBe(true);
     await expect(await testeeViewPO.isInMainArea()).toBe(true);
 
-    // Expect the router page to be still opened in the peripheral grid
+    // Expect the router page to be still opened in the workbench grid
     await expect(await routerPagePO.viewPO.part.getPartId()).toEqual('left');
     await expect(await routerPagePO.isVisible()).toBe(true);
     await expect(await routerPagePO.viewPO.isInMainArea()).toBe(false);
@@ -310,11 +313,11 @@ test.describe('Workbench RouterLink', () => {
   test('should navigate current view if the target of primary routes', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Add part to peripheral grid
+    // Add part to workbench grid
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPagePO.addPart('left', {relativeTo: 'main-area', align: 'left', ratio: .25});
+    await layoutPagePO.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
 
-    // Add router page to the peripheral part as unnamed view
+    // Add router page to the part as unnamed view
     {
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath('/test-router');
@@ -337,5 +340,72 @@ test.describe('Workbench RouterLink', () => {
     await expect(await testeeViewPO.isInMainArea()).toBe(false);
     await expect(await testeeViewPO.getViewId()).toEqual(routerPagePO.viewId);
     await expect(await routerPagePO.isVisible()).toBe(false);
+  });
+
+  test('should open view in the current part (layout without main area)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Register Angular routes.
+    const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPagePO.registerRoute({path: '', component: 'router-page', outlet: 'router'});
+    await layoutPagePO.registerRoute({path: '', component: 'view-page', outlet: 'other'});
+    await layoutPagePO.registerRoute({path: 'testee', component: 'view-page'});
+    await layoutPagePO.viewTabPO.close();
+
+    // Register new perspective.
+    const perspectivePagePO = await workbenchNavigator.openInNewTab(PerspectivePagePO);
+    await perspectivePagePO.registerPerspective({
+      id: 'test',
+      data: {
+        label: 'test',
+      },
+      parts: [
+        {id: 'left'},
+        {id: 'right', align: 'right'},
+      ],
+      views: [
+        {id: 'router', partId: 'left', activateView: true},
+        {id: 'other', partId: 'right', activateView: true},
+      ],
+    });
+    await perspectivePagePO.viewTabPO.close();
+
+    // Switch to the newly created perspective.
+    await appPO.header.perspectiveToggleButton({perspectiveId: 'test'}).click();
+
+    // Expect layout to match the perspective definition.
+    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .5,
+          child1: new MPart({id: 'left', views: [{id: 'router'}], activeViewId: 'router'}),
+          child2: new MPart({id: 'right', views: [{id: 'other'}], activeViewId: 'other'}),
+        }),
+      },
+    });
+
+    // Open new view via workbench router link.
+    const routerPagePO = new RouterPagePO(appPO, 'router');
+    await routerPagePO.enterPath('/testee');
+    await routerPagePO.enterCssClass('testee');
+    await routerPagePO.clickNavigateViaRouterLink();
+
+    // Expect new view to be opened.
+    const testee = appPO.view({cssClass: 'testee'});
+    await expect(await testee.viewTab.isPresent()).toBe(true);
+    const testeeViewId = await testee.getViewId();
+
+    // Expect new view to be opened in active part of the contextual view i.e. left
+    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .5,
+          child1: new MPart({id: 'left', views: [{id: 'router'}, {id: testeeViewId}], activeViewId: testeeViewId}),
+          child2: new MPart({id: 'right', views: [{id: 'other'}], activeViewId: 'other'}),
+        }),
+      },
+    });
   });
 });

@@ -16,13 +16,14 @@ import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ViewComponent} from './view.component';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
-import {WORKBENCH_LAYOUT_INITIAL_PART_ID, WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
 import {WorkbenchUrlObserver} from '../routing/workbench-url-observer.service';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TestComponent} from '../testing/test.component';
 import {mapArray} from '@scion/toolkit/operators';
+import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
+import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 
 describe('WorkbenchViewRegistry', () => {
 
@@ -57,7 +58,7 @@ describe('WorkbenchViewRegistry', () => {
     ]);
 
     // Simulate the layout to change.
-    TestBed.inject(WorkbenchLayoutService).setLayout(TestBed.inject(WorkbenchLayoutFactory).create());
+    TestBed.inject(WorkbenchLayoutService).setLayout(TestBed.inject(ɵWorkbenchLayoutFactory).create());
 
     // Expect registry to emit registered views.
     expect(viewsCaptor.getValues()).toEqual([
@@ -81,7 +82,7 @@ describe('WorkbenchViewRegistry', () => {
         ]),
       ],
       providers: [
-        {provide: WORKBENCH_LAYOUT_INITIAL_PART_ID, useValue: 'main'},
+        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
       ],
     });
 

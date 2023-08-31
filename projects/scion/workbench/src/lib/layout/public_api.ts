@@ -8,4 +8,5 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchLayout, ReferencePart, MAIN_AREA_PART_ID} from './workbench-layout';
+export {WorkbenchLayout, ReferencePart, MAIN_AREA} from './workbench-layout';
+export {WorkbenchLayoutFactory} from './workbench-layout.factory';

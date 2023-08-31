@@ -20,17 +20,19 @@ import {ɵWorkbenchService} from './ɵworkbench.service';
 /**
  * The central class of the SCION Workbench.
  *
- * SCION Workbench enables the creation of Angular web applications that require a flexible layout
- * to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.
+ * SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side
+ * or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows,
+ * enabling users to work on content in parallel.
  *
- * The workbench layout is ideal for applications with non-linear workflows, enabling users to work
- * on content in parallel.
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
  *
- * The workbench has a main area and a peripheral area for placing views. The main area is the primary
- * place for views to interact with the application. The peripheral area arranges views around the main
- * area to support the user's workflow. Multiple arrangements of peripheral views, called perspectives,
- * are supported. Different perspectives provide a different perspective on the application while sharing
- * the main area. Only one perspective can be active at a time.
+ * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
+ * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
+ * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
+ * area for user interaction.
+ *
+ * Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time.
+ * Perspectives share the same main area, if any.
  */
 @Injectable({providedIn: 'root', useExisting: ɵWorkbenchService})
 export abstract class WorkbenchService {
@@ -115,9 +117,9 @@ export abstract class WorkbenchService {
   public abstract closeViews(...viewIds: string[]): Promise<boolean>;
 
   /**
-   * Registers a part action. Part actions are displayed to the right of the view tabs,
-   * either left- or right-aligned. Actions can be associated with specific view(s),
-   * part(s), and/or an area.
+   * Contributes an action to a part's action bar.
+   *
+   * Part actions are displayed to the right of the view tab bar and enable interaction with the part and its content.
    *
    * @return handle to unregister the part action.
    */

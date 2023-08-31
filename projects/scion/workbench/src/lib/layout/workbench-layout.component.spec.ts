@@ -19,7 +19,7 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WorkbenchModule} from '../workbench.module';
 import {By} from '@angular/platform-browser';
-import {MAIN_AREA_PART_ID} from './workbench-layout';
+import {MAIN_AREA} from './workbench-layout';
 import {toHaveTransientStateCustomMatcher} from '../testing/jasmine/matcher/to-have-transient-state.matcher';
 import {enterTransientViewState, TestComponent, withComponentContent, withTransientStateInputElement} from '../testing/test.component';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
@@ -58,7 +58,7 @@ describe('WorkbenchLayout', () => {
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
       return {
         layout: layout
-          .addPart('left', {relativeTo: MAIN_AREA_PART_ID, align: 'left', ratio: .2})
+          .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
           .addPart('right', {relativeTo: 'main', align: 'right', ratio: .5})
           .addView('view.1', {partId: 'left', activateView: true})
           .addView('view.2', {partId: 'main', activateView: true})
@@ -75,15 +75,15 @@ describe('WorkbenchLayout', () => {
 
     // Assert initial workbench layout
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .2,
         }),
       },
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -99,15 +99,15 @@ describe('WorkbenchLayout', () => {
 
     // Expect the layout not to be discarded.
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .2,
         }),
       },
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -123,15 +123,15 @@ describe('WorkbenchLayout', () => {
 
     // Expect the layout to be changed.
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .2,
         }),
       },
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.2'}, {id: 'view.4'}], activeViewId: 'view.4'}),
           child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -280,7 +280,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -293,7 +293,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -320,7 +320,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -354,7 +354,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -367,7 +367,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -394,7 +394,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -428,7 +428,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -441,7 +441,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -468,7 +468,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -502,7 +502,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -515,7 +515,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -542,7 +542,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -576,7 +576,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -589,7 +589,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -615,7 +615,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -645,7 +645,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -658,7 +658,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -673,7 +673,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
@@ -702,7 +702,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -736,7 +736,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.3'}, {id: 'view.2'}], activeViewId: 'view.2'}),
@@ -769,7 +769,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'EAST', views: [{id: 'view.3'}, {id: 'view.2'}, {id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -801,7 +801,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -814,7 +814,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -841,7 +841,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -874,7 +874,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -908,7 +908,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -921,7 +921,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -948,7 +948,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -981,7 +981,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -1015,7 +1015,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1028,7 +1028,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1055,7 +1055,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -1087,7 +1087,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -1121,7 +1121,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1134,7 +1134,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1161,7 +1161,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -1193,7 +1193,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -1228,7 +1228,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1241,7 +1241,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1256,7 +1256,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
@@ -1285,7 +1285,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -1320,7 +1320,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
@@ -1359,7 +1359,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -1400,7 +1400,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1413,7 +1413,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1440,7 +1440,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -1471,7 +1471,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1500,7 +1500,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1513,7 +1513,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1540,7 +1540,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -1572,7 +1572,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -1606,7 +1606,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1619,7 +1619,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1646,7 +1646,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -1678,7 +1678,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -1712,7 +1712,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1726,7 +1726,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1740,7 +1740,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1769,7 +1769,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1782,7 +1782,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1797,7 +1797,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
@@ -1830,7 +1830,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
@@ -1843,7 +1843,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -1870,7 +1870,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -1890,7 +1890,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
@@ -1924,7 +1924,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
@@ -1951,7 +1951,7 @@ describe('WorkbenchLayout', () => {
     enterTransientViewState(fixture, 'view.4', 'D');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
@@ -1992,7 +1992,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
@@ -2038,7 +2038,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MTreeNode({
@@ -2084,7 +2084,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -2118,7 +2118,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -2145,7 +2145,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
           child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -2166,7 +2166,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -2237,7 +2237,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
           child2: new MPart({id: 'right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -2268,7 +2268,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
@@ -2347,7 +2347,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -2378,7 +2378,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
@@ -2458,7 +2458,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
           child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -2490,7 +2490,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.4'}], activeViewId: 'view.4'}),
           child2: new MTreeNode({
@@ -2527,7 +2527,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
@@ -2569,7 +2569,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MTreeNode({
@@ -2611,7 +2611,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -2640,7 +2640,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -2663,7 +2663,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
           child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -2680,7 +2680,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
@@ -2747,7 +2747,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -2778,7 +2778,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
@@ -2814,7 +2814,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
@@ -2893,7 +2893,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
@@ -2924,7 +2924,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
@@ -2960,7 +2960,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
@@ -3033,7 +3033,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
@@ -3063,7 +3063,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
+      mainAreaGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),

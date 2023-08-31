@@ -17,7 +17,11 @@
 /**
  * Identifies the part that represents the main area.
  *
- * This part is automatically added to the layout and cannot be removed.
  * Refer to this part to align parts relative to the main area.
  */
-export const MAIN_AREA_PART_ID = 'main-area';
+export const MAIN_AREA: MAIN_AREA = 'main-area';
+
+/**
+ * Represents the type of the constant {@link MAIN_AREA}.
+ */
+export type MAIN_AREA = 'main-area';

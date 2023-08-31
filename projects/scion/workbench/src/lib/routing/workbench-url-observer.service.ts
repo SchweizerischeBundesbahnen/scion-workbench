@@ -20,7 +20,6 @@ import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {ViewComponent} from '../view/view.component';
 import {WorkbenchNavigationContext, WorkbenchRouter} from './workbench-router.service';
-import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
 import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
 import {WorkbenchPopupDiffer} from './workbench-popup-differ';
 import {Logger, LoggerNames} from '../logging';
@@ -28,10 +27,11 @@ import {WorkbenchRouteData} from './workbench-route-data';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
 import {PartComponent} from '../part/part.component';
-import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
+import {MAIN_AREA} from '../layout/workbench-layout';
 import {canDeactivateWorkbenchView} from '../view/workbench-view-pre-destroy.guard';
-import {resolveWorkbenchNavigationState} from './navigation-state.resolver';
+import {resolveNavigationalViewState} from './navigation-state.resolver';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -52,7 +52,7 @@ export class WorkbenchUrlObserver {
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _environmentInjector: EnvironmentInjector,
               private _workbenchRouter: WorkbenchRouter,
-              private _workbenchLayoutFactory: WorkbenchLayoutFactory,
+              private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory,
               private _workbenchLayoutDiffer: WorkbenchLayoutDiffer,
               private _workbenchPopupDiffer: WorkbenchPopupDiffer,
               private _logger: Logger) {
@@ -109,8 +109,8 @@ export class WorkbenchUrlObserver {
     const workbenchNavigationalState = WorkbenchNavigationalStates.fromNavigation(this._router.getCurrentNavigation()!);
 
     const layout = this._workbenchLayoutFactory.create({
-      mainGrid: (() => {
-        // Read the main grid from the query parameter.
+      mainAreaGrid: (() => {
+        // Read the main area grid from the query parameter.
         const mainAreaLayout = urlTree.queryParamMap.get(MAIN_AREA_LAYOUT_QUERY_PARAM) ?? urlTree.queryParamMap.get('parts'); // TODO [Angular 17] Remove fallback to 'parts' query parameter
         if (mainAreaLayout) {
           return mainAreaLayout;
@@ -129,10 +129,10 @@ export class WorkbenchUrlObserver {
         }
 
         // Fall back to the current layout if the navigation was performed via the Angular router, i.e., the navigator did not preserve the query params.
-        return this._workbenchLayoutService.layout?.mainGrid ?? null;
+        return this._workbenchLayoutService.layout?.mainAreaGrid;
       })(),
-      peripheralGrid: workbenchNavigationalState ? workbenchNavigationalState.peripheralGrid : this._workbenchLayoutService.layout?.peripheralGrid,
-      maximized: workbenchNavigationalState ? workbenchNavigationalState.maximized : this._workbenchLayoutService.layout?.maximized,
+      workbenchGrid: workbenchNavigationalState?.workbenchGrid ?? this._workbenchLayoutService.layout?.workbenchGrid,
+      maximized: workbenchNavigationalState?.maximized ?? this._workbenchLayoutService.layout?.maximized,
     });
     return {
       layout,
@@ -150,7 +150,7 @@ export class WorkbenchUrlObserver {
 
     const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewOutlets, {
       canDeactivate: [canDeactivateWorkbenchView],
-      resolve: {[WorkbenchRouteData.state]: resolveWorkbenchNavigationState},
+      resolve: {[WorkbenchRouteData.state]: resolveNavigationalViewState},
     });
     if (newAuxiliaryRoutes.length) {
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
@@ -236,7 +236,7 @@ export class WorkbenchUrlObserver {
    */
   private migrateURL(): void {
     const layout = this._workbenchRouter.getCurrentNavigationContext().layout;
-    if (layout.mainGrid.migrated) {
+    if (layout.mainAreaGrid?.migrated) {
       // Update the URL with the migrated URL and clear existing query params, for example, if the layout query parameter has been renamed.
       this._workbenchRouter.ɵnavigate(layout => layout, {queryParamsHandling: null, replaceUrl: true}).then();
     }
@@ -291,7 +291,7 @@ export class WorkbenchUrlObserver {
 
   private createWorkbenchPart(partId: string): ɵWorkbenchPart {
     return runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchPart(partId, {
-      component: partId === MAIN_AREA_PART_ID ? MainAreaLayoutComponent : PartComponent,
+      component: partId === MAIN_AREA ? MainAreaLayoutComponent : PartComponent,
     }));
   }
 

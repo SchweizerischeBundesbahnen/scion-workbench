@@ -233,13 +233,13 @@ test.describe('Workbench View', () => {
   test('should allow to close the view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(1);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
     await expect(await viewPagePO.viewTabPO.isPresent()).toBe(true);
     await expect(await viewPagePO.viewPO.isPresent()).toBe(true);
 
     await viewPagePO.clickClose();
 
-    await expect(await appPO.activePart({scope: 'mainArea'}).getViewIds()).toHaveLength(0);
+    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(0);
     await expect(await viewPagePO.viewTabPO.isPresent()).toBe(false);
     await expect(await viewPagePO.viewPO.isPresent()).toBe(false);
   });

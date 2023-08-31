@@ -1,0 +1,37 @@
+<form [formGroup]="form">
+  <sci-form-field label="Views">
+    <div class="views">
+      <span>View ID</span>
+      <span>Part ID</span>
+      <span>Position</span>
+      <span class="checkbox">Activate View</span>
+      <span class="checkbox">Activate Part</span>
+
+      <div class="actions">
+        <!-- add button -->
+        <button (click)="onAddView()" class="e2e-add material-icons" type="button" title="Add view">add</button>
+        <!-- remove button -->
+        <button (click)="onClearViews()" class="e2e-clear material-icons" type="button" title="Remove all views">clear</button>
+      </div>
+
+      <ng-container *ngFor="let partsGroup of form.controls.views.controls; index as i;">
+        <!-- id -->
+        <input [formControl]="partsGroup.controls.id" [class]="'e2e-view-id'">
+        <!-- partId -->
+        <input [formControl]="partsGroup.controls.partId" [class]="'e2e-view-part-id'" list="parts">
+        <!-- position -->
+        <input [formControl]="partsGroup.controls.position" type="number" [class]="'e2e-view-position'">
+        <!-- activateView -->
+        <sci-checkbox [formControl]="partsGroup.controls.activateView" [class]="'e2e-view-activate-view'"></sci-checkbox>
+        <!-- activatePart -->
+        <sci-checkbox [formControl]="partsGroup.controls.activatePart" [class]="'e2e-view-activate-part'"></sci-checkbox>
+        <!-- 'remove' button -->
+        <button class="material-icons e2e-remove" type="button" (click)="onRemoveView(i)" title="Remove view">remove</button>
+      </ng-container>
+    </div>
+  </sci-form-field>
+</form>
+
+<datalist id="parts">
+  <option *ngFor="let part of partEntries" [value]="part.id">{{part.id}}</option>
+</datalist>

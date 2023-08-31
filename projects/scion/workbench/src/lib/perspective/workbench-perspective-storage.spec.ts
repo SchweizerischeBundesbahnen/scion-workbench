@@ -13,16 +13,16 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {MAIN_AREA_PART_ID, WorkbenchLayout} from '../layout/workbench-layout';
+import {MAIN_AREA, WorkbenchLayout} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
-import {WorkbenchLayoutFactory} from '../layout/workbench-layout-factory.service';
 import {WorkbenchService} from '../workbench.service';
 
 import {PerspectiveData} from './workbench-perspective-storage.service';
+import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 
 describe('WorkbenchPerspectiveStorage', () => {
 
@@ -40,6 +40,7 @@ describe('WorkbenchPerspectiveStorage', () => {
               {
                 id: 'perspective',
                 layout: layout => layout
+                  .addPart(MAIN_AREA)
                   .addPart('left-top', {align: 'left'})
                   .addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'}),
               },
@@ -61,13 +62,13 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout to be stored.
     expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective'))).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             child2: new MPart({id: 'left-bottom', views: []}),
           }),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
@@ -78,13 +79,13 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout to be stored.
     expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective'))).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             child2: new MPart({id: 'left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           }),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
@@ -99,11 +100,11 @@ describe('WorkbenchPerspectiveStorage', () => {
             perspectives: [
               {
                 id: 'perspective-1',
-                layout: layout => layout.addPart('left', {align: 'left'}),
+                layout: factory => factory.addPart(MAIN_AREA).addPart('left', {align: 'left'}),
               },
               {
                 id: 'perspective-2',
-                layout: layout => layout.addPart('right', {align: 'right'}),
+                layout: factory => factory.addPart(MAIN_AREA).addPart('right', {align: 'right'}),
               },
             ],
             initialPerspective: 'perspective-1',
@@ -123,10 +124,10 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
@@ -139,10 +140,10 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
@@ -160,10 +161,10 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the perspective to have the stored layout.
     expect(fixture).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
@@ -178,11 +179,11 @@ describe('WorkbenchPerspectiveStorage', () => {
             perspectives: [
               {
                 id: 'perspective-1',
-                layout: layout => layout.addPart('left', {align: 'left'}),
+                layout: factory => factory.addPart(MAIN_AREA).addPart('left', {align: 'left'}),
               },
               {
                 id: 'perspective-2',
-                layout: layout => layout.addPart('left', {align: 'left'}),
+                layout: factory => factory.addPart(MAIN_AREA).addPart('left', {align: 'left'}),
               },
             ],
             initialPerspective: 'perspective-1',
@@ -203,10 +204,10 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout of perspective-1 to be stored.
     expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective-1'))).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
@@ -226,10 +227,10 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout of perspective-2 to be stored.
     expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective-2'))).toEqualWorkbenchLayout({
-      peripheralGrid: {
+      workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA_PART_ID}),
+          child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
@@ -246,5 +247,5 @@ function deserializePerspectiveData(serializedPerspectiveData: string | null): W
     return null;
   }
   const perspectiveData: PerspectiveData = JSON.parse(window.atob(serializedPerspectiveData));
-  return TestBed.inject(WorkbenchLayoutFactory).create({peripheralGrid: perspectiveData.grid});
+  return TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: perspectiveData.workbenchGrid});
 }

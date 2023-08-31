@@ -13,10 +13,13 @@ import {Disposable} from '../../common/disposable';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {TemplatePortal} from '@angular/cdk/portal';
+import {WorkbenchPart} from '../workbench-part.model';
+import {CanMatchPartFn} from '../../workbench.model';
 
 /**
- * Use this directive to model a part action. Part actions are displayed to the right of the view tabs, either left- or
- * right-aligned. Actions can be associated with specific view(s), part(s), and/or an area.
+ * Use this directive to contribute an action to a part's action bar.
+ *
+ * Part actions are displayed to the right of the view tab bar and enable interaction with the part and its content.
  *
  * The host element of this modeling directive must be a <ng-template>. The action shares the lifecycle of the host element.
  *
@@ -28,16 +31,10 @@ import {TemplatePortal} from '@angular/cdk/portal';
  * </ng-template>
  * ```
  *
- * By default, if modeled in a view template, the action is associated with the view, i.e., it is displayed only
- * if the view is active. To contribute an action to any view, model the action in the body of `wb-workbench` element.
+ * If the action is modeled in a view template, it is inherently associated with that view, i.e., only displayed when active.
+ * To not associate an action with a view, model the action inside the `wb-workbench` HTML element or register it programmatically.
  *
- * ```html
- * <wb-workbench>
- *   <button wbRouterLink="/path/to/view" [wbRouterLinkExtras]="{target: 'blank'}" class="material-icons">
- *     add
- *   </button>
- * </wb-workbench>
- * ```
+ * Specify a `canMatch` function to match a specific part, parts in a specific area, or parts from a specific perspective.
  */
 @Directive({selector: 'ng-template[wbPartAction]', standalone: true})
 export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
@@ -51,25 +48,16 @@ export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
   public align: 'start' | 'end' = 'start';
 
   /**
-   * Identifies the views(s) to associate this action with.
+   * Predicate to match a specific part, parts in a specific area, or parts from a specific perspective.
    *
-   * If not specified, associates it with any view, or with the contextual view if modeled in the context of a view.
-   * Passing `null` or any other view(s) overrides the contextual view default behavior.
+   * If the action is modeled in a view template, it is inherently associated with that view, i.e., only displayed
+   * when active. To not associate an action with a view, model the action inside the `wb-workbench` HTML element
+   * or register it programmatically.
+   *
+   * The function can call `inject` to get any required dependencies.
    */
   @Input()
-  public view?: string | string [] | undefined | null;
-
-  /**
-   * Identifies the part(s) to associate this action with. If not specified, associates it with any part.
-   */
-  @Input()
-  public part?: string | string[] | undefined;
-
-  /**
-   * Identifies the area to associate this action with. If not specified, associates it with any area.
-   */
-  @Input()
-  public area?: 'main' | 'peripheral' | undefined;
+  public canMatch?: CanMatchPartFn;
 
   /**
    * Specifies CSS class(es) to be associated with the action, useful in end-to-end tests for locating it.
@@ -86,13 +74,16 @@ export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
     this._action = this._workbenchService.registerPartAction({
       portal: new TemplatePortal(this._template, null!),
       align: this.align,
-      target: {
-        viewId: this.view === null ? undefined : (this.view ?? this._view?.id),
-        partId: this.part,
-        area: this.area,
-      },
+      canMatch: ((part: WorkbenchPart) => this.matchesContextualView(part) && (this.canMatch?.(part) ?? true)),
       cssClass: this.cssClass,
     });
+  }
+
+  private matchesContextualView(part: WorkbenchPart): boolean {
+    if (this._view?.id) {
+      return part.activeViewId === this._view.id;
+    }
+    return true;
   }
 
   public ngOnDestroy(): void {

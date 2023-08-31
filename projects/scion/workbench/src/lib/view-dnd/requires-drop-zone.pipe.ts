@@ -10,7 +10,7 @@
 
 import {Pipe, PipeTransform} from '@angular/core';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
-import {MAIN_AREA_PART_ID} from '../layout/workbench-layout';
+import {MAIN_AREA} from '../layout/workbench-layout';
 import {isGridElementVisible} from '../layout/ɵworkbench-layout';
 
 /**
@@ -28,8 +28,8 @@ export class RequiresDropZonePipe implements PipeTransform {
 
 function requiresDropZone(element: MTreeNode | MPart, region: 'north' | 'south' | 'east' | 'west'): boolean {
   if (element instanceof MPart) {
-    // Return `false` for every part except the main part, allowing for dragging a first part to that side of the peripheral grid.
-    return element.id === MAIN_AREA_PART_ID;
+    // Return `false` for every part except the main area part, allowing for dragging a first part to that side in the workbench grid.
+    return element.id === MAIN_AREA;
   }
 
   const child1Visible = isGridElementVisible(element.child1);

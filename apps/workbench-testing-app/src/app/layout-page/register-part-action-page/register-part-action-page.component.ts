@@ -10,12 +10,13 @@
 
 import {Component, inject, InjectionToken, Injector} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {WorkbenchService} from '@scion/workbench';
+import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {Arrays} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-register-part-action-page',
@@ -36,10 +37,10 @@ export default class RegisterPartActionPageComponent {
     content: this._formBuilder.control('', {validators: Validators.required}),
     align: this._formBuilder.control<'start' | 'end' | ''>(''),
     cssClass: this._formBuilder.control(''),
-    target: this._formBuilder.group({
+    canMatch: this._formBuilder.group({
       view: this._formBuilder.control(''),
       part: this._formBuilder.control(''),
-      area: this._formBuilder.control<'main' | 'peripheral' | ''>(''),
+      grid: this._formBuilder.control<'workbench' | 'mainArea' | ''>(''),
     }),
   });
   public registerError: string | false | undefined;
@@ -49,6 +50,10 @@ export default class RegisterPartActionPageComponent {
 
   public onRegister(): void {
     this.registerError = undefined;
+    // Capture form values, since the `canMatch` function is evaluated independently of the form life-cycle
+    const canMatchPartIds = undefinedIfEmpty(this.form.controls.canMatch.controls.part.value.split(/\s+/).filter(Boolean));
+    const canMatchViewIds = undefinedIfEmpty(this.form.controls.canMatch.controls.view.value.split(/\s+/).filter(Boolean));
+    const canMatchGrid = this.form.controls.canMatch.controls.grid.value || undefined;
     try {
       this.workbenchService.registerPartAction({
         portal: new ComponentPortal(TextComponent, undefined, Injector.create({
@@ -57,11 +62,18 @@ export default class RegisterPartActionPageComponent {
           ],
         })),
         align: this.form.controls.align.value || undefined,
-        target: {
-          viewId: undefinedIfEmpty(this.form.controls.target.controls.view.value.split(/\s+/).filter(Boolean)),
-          partId: undefinedIfEmpty(this.form.controls.target.controls.part.value.split(/\s+/).filter(Boolean)),
-          area: this.form.controls.target.controls.area.value || undefined,
-        },
+        canMatch: ((part: WorkbenchPart) => {
+          if (canMatchPartIds && !Arrays.coerce(canMatchPartIds).includes(part.id)) {
+            return false;
+          }
+          if (canMatchViewIds && (!part.activeViewId || !Arrays.coerce(canMatchViewIds).includes(part.activeViewId))) {
+            return false;
+          }
+          if (canMatchGrid && canMatchGrid !== (part.isInMainArea ? 'mainArea' : 'workbench')) {
+            return false;
+          }
+          return true;
+        }),
         cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
       });
       this.registerError = false;

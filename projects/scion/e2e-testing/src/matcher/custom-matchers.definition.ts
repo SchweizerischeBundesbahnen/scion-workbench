@@ -33,7 +33,7 @@ declare global {
        *
        * ```ts
        * await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
-       *   mainGrid: {
+       *   mainAreaGrid: {
        *     root: new MTreeNode({
        *       direction: 'row',
        *       ratio: .25,

@@ -39,7 +39,7 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
    *
    * ```ts
    * expect(workbenchLayout).toEqualWorkbenchLayout({
-   *   mainGrid: {
+   *   mainAreaGrid: {
    *     root: new MTreeNode({
    *       direction: 'row',
    *       ratio: .25,

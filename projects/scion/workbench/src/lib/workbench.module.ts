@@ -14,7 +14,7 @@ import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouterLinkDirective} from './routing/workbench-router-link.directive';
 import {WorkbenchUrlObserver} from './routing/workbench-url-observer.service';
 import {WorkbenchModuleConfig} from './workbench-module-config';
-import {WORKBENCH_FORROOT_GUARD} from './workbench.constants';
+import {WORKBENCH_FORROOT_GUARD, WORKBENCH_LAYOUT_CONFIG} from './workbench.constants';
 import {WorkbenchPartActionDirective} from './part/part-action-bar/part-action.directive';
 import {WorkbenchViewMenuItemDirective} from './part/view-context-menu/view-menu.directive';
 import {ViewMenuService} from './part/view-context-menu/view-menu.service';
@@ -26,21 +26,25 @@ import {WORKBENCH_POST_STARTUP, WORKBENCH_STARTUP} from './startup/workbench-ini
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
 import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-storage';
 import {provideLocationPatch} from './routing/ɵlocation';
+import {WorkbenchLayoutFactory} from './layout/workbench-layout.factory';
+import {MAIN_AREA} from './layout/workbench-layout';
 
 /**
  * Module of the SCION Workbench.
  *
- * SCION Workbench enables the creation of Angular web applications that require a flexible layout
- * to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.
+ * SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side
+ * or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows,
+ * enabling users to work on content in parallel.
  *
- * The workbench layout is ideal for applications with non-linear workflows, enabling users to work
- * on content in parallel.
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
  *
- * The workbench has a main area and a peripheral area for placing views. The main area is the primary
- * place for views to interact with the application. The peripheral area arranges views around the main
- * area to support the user's workflow. Multiple arrangements of peripheral views, called perspectives,
- * are supported. Different perspectives provide a different perspective on the application while sharing
- * the main area. Only one perspective can be active at a time.
+ * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
+ * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
+ * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
+ * area for user interaction.
+ *
+ * Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time.
+ * Perspectives share the same main area, if any.
  */
 @NgModule({
   imports: [
@@ -62,7 +66,7 @@ export class WorkbenchModule {
   }
 
   /**
-   * To manifest a dependency to the 'workbench.module' from application module, AppModule.
+   * To manifest a dependency to the workbench module from the application module.
    *
    * Call `forRoot` only in the root application module. Calling it in any other module, particularly in a lazy-loaded module, will produce a runtime error.
    *
@@ -88,6 +92,10 @@ export class WorkbenchModule {
         {
           provide: WorkbenchStorage,
           useClass: config.storage ?? DefaultWorkbenchStorage,
+        },
+        {
+          provide: WORKBENCH_LAYOUT_CONFIG,
+          useFactory: () => config.layout ?? ((factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)),
         },
         {
           provide: WORKBENCH_FORROOT_GUARD,
@@ -123,7 +131,7 @@ export class WorkbenchModule {
   }
 
   /**
-   * To manifest a dependency to the 'workbench.module' from within a feature module.
+   * To manifest a dependency to the workbench module from a feature module.
    *
    * @deprecated since version 16.0.0-beta.1; Import {@link WorkbenchModule} or standalone directives directly; API will be removed in version 17.
    */

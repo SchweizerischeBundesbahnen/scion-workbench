@@ -33,7 +33,7 @@ export function provideLocationPatch(): EnvironmentProviders {
  * even if the URL does not change.
  *
  * Rationale:
- * If only the layout of the peripheral grid is changed, the URL does not change because the layout is passed to the
+ * If only the layout of the workbench grid is changed, the URL does not change because the layout is passed to the
  * navigation as state and not as a query parameter. By default, an unchanged URL does not create a new entry in the
  * browsing history stack, but replaces the current entry. See Angular router.ts#setBrowserUrl
  */

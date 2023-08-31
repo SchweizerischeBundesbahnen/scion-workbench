@@ -610,7 +610,7 @@ test.describe('Workbench Popup', () => {
       // Open test view
       const inputFieldPagePO = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
       // Move test page to the right
-      await inputFieldPagePO.view.viewTab.dragToPart({region: 'east'});
+      await inputFieldPagePO.view.viewTab.dragTo({partId: await inputFieldPagePO.view.part.getPartId(), region: 'east'});
 
       // Open popup
       await popupOpenerPagePO.enterQualifier({component: 'testee'});
@@ -651,7 +651,7 @@ test.describe('Workbench Popup', () => {
       // Open test view
       const inputFieldPagePO = await WorkbenchInputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
       // Move test page to the right
-      await inputFieldPagePO.view.viewTab.dragToPart({region: 'east'});
+      await inputFieldPagePO.view.viewTab.dragTo({partId: await inputFieldPagePO.view.part.getPartId(), region: 'east'});
 
       // Open popup
       await popupOpenerPagePO.enterQualifier({component: 'testee'});

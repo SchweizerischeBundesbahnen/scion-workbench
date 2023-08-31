@@ -5,22 +5,25 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Layout
 
-The workbench has a main area and a peripheral area for placing views. The main area is the primary place for views to interact with the application. Typically, it is initially blank or displays a start page. The peripheral area arranges views around the main area. Peripheral views can be used to provide entry points to the application, tools or context-sensitive assistance to support the user's workflow.
+The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+
+The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views. The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable area for user interaction.
 
 ### How to define an initial layout
 
-Arranging views in the peripheral area requires two steps.
+Arranging views in the workbench layout requires two steps.
 
 <details>
     <summary>1. Define the layout via workbench config</summary>
     <br>
 
 ```ts
-import {MAIN_AREA_PART_ID, WorkbenchModule} from '@scion/workbench';
+import {MAIN_AREA, WorkbenchLayoutFactory, WorkbenchModule} from '@scion/workbench';
 
 WorkbenchModule.forRoot({
-  layout: layout => layout
-    .addPart('topLeft', {relativeTo: MAIN_AREA_PART_ID, align: 'left', ratio: .25})
+  layout: (factory: WorkbenchLayoutFactory) => factory
+    .addPart(MAIN_AREA)
+    .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
     .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
     .addPart('bottom', {align: 'bottom', ratio: .3})
     .addView('navigator', {partId: 'topLeft', activateView: true})
@@ -44,7 +47,7 @@ The above code snippet defines the following layout.
 +-------------------------+
 ```   
 
-A layout is defined through a layout function in the workbench config. The layout function is passed an empty layout to which parts and views can be added. A part is a stack of views. Parts are aligned relative to each other. Views are added to parts. The layout is an immutable object, meaning that modifications have no side effects. Each modification creates a new layout instance that can be used for further modifications.
+A layout is defined through a layout function in the workbench config. The function is passed a factory to create the layout. The layout has methods to modify it. Each modification creates a new layout instance that can be used for further modifications.
 
 > The function can call `inject` to get required dependencies, if any.
 </details>
@@ -62,7 +65,7 @@ RouterModule.forRoot([
   {path: '', outlet: 'search', loadComponent: () => import('./search/search.component')},
 ]);
 ```
-A route for a view in the peripheral layout must be a secondary route with an empty path. The outlet refers to the view in the layout. Because the path is empty, no outlet needs to be added to the URL.   
+A route for a view in the initial layout must be a secondary route with an empty path. The outlet refers to the view in the layout. Because the path is empty, no outlet needs to be added to the URL.   
 </details>
 
 [menu-how-to]: /docs/site/howto/how-to.md

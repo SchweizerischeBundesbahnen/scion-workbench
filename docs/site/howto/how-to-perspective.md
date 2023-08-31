@@ -5,7 +5,7 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Layout
 
-A perspective is an arrangement of views around the main area. Multiple perspectives are supported. Different perspectives provide a different perspective on the application while sharing the main area. Only one perspective can be active at a time.
+This chapter requires a perspective to be registered. See [Providing a Perspective][link-how-to-provide-perspective] to learn how to provide a perspective.
 
 ### How to query perspectives
 Perspectives can be queried using the `WorkbenchService` via the `WorkbenchService.perspectives` or `WorkbenchService.perspectives$` properties.
@@ -39,6 +39,8 @@ export class PerspectivesComponent {
 </button>
 ```
 ***
+
+[link-how-to-provide-perspective]: /docs/site/howto/how-to-provide-perspective.md
 
 [menu-how-to]: /docs/site/howto/how-to.md
 

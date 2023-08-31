@@ -44,18 +44,20 @@ export namespace WorkbenchNavigationalStates {
  */
 export interface WorkbenchNavigationalState {
   /**
-   * Serialized peripheral grid. Unlike the peripheral grid, the main grid is passed to navigation via the query parameter {@link MAIN_AREA_LAYOUT_QUERY_PARAM}.
+   * Serialized workbench grid.
+   *
+   * Note: The main area grid is not passed as navigational state, but as query parameter {@link MAIN_AREA_LAYOUT_QUERY_PARAM}.
    */
-  peripheralGrid?: string;
+  workbenchGrid: string;
   /**
    * Indicates whether to maximize the main area.
    */
-  maximized?: boolean;
+  maximized: boolean;
   /**
    * View state to be associated with the navigation.
    * View state can be read from {@link ActivatedRoute.data} using the key {@link WorkbenchRouteData.state}.
    */
-  viewStates?: {
+  viewStates: {
     [viewId: string]: Dictionary;
   };
 }

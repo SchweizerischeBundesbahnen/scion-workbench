@@ -37,3 +37,9 @@ body {
   width: 100vw;
   height: 100vh;
 }
+
+// TODO [#110] Move to theme.
+input:disabled, select:disabled {
+  background-color: rgb(0, 0, 0);
+  opacity: .05;
+}

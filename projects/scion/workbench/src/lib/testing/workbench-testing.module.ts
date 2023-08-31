@@ -2,7 +2,7 @@ import {ENVIRONMENT_INITIALIZER, importProvidersFrom, inject, Injectable, Module
 import {WorkbenchModule} from '../workbench.module';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {ActivationInstantProvider} from '../activation-instant.provider';
-import {WORKBENCH_LAYOUT_INITIAL_PART_ID} from '../layout/workbench-layout-factory.service';
+import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {Router} from '@angular/router';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {ComponentFixtureAutoDetect} from '@angular/core/testing';
@@ -46,7 +46,7 @@ export class WorkbenchTestingModule {
         importProvidersFrom(WorkbenchModule.forRoot(config)),
         provideNoopAnimations(),
         {provide: ActivationInstantProvider, useClass: SequenceInstantProvider},
-        {provide: WORKBENCH_LAYOUT_INITIAL_PART_ID, useValue: 'main'},
+        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
         {provide: ComponentFixtureAutoDetect, useValue: true},
         {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => inject(Router).initialNavigation()},
         {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => localStorage.clear()},

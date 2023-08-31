@@ -11,6 +11,14 @@
     </sci-form-field>
   </section>
 
+  <section>
+    <app-perspective-page-parts [formControl]="form.controls.parts"/>
+  </section>
+
+  <section>
+    <app-perspective-page-views [formControl]="form.controls.views" [partEntries]="form.controls.parts.value"/>
+  </section>
+
   <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register">
     Register
   </button>
