@@ -121,7 +121,7 @@ export class ɵWorkbenchView implements WorkbenchView {
   }
 
   public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
-    if (this.active) {
+    if (this.active && this.part.active) {
       return true;
     }
 

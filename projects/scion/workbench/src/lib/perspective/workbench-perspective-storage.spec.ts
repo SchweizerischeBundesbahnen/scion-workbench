@@ -39,7 +39,7 @@ describe('WorkbenchPerspectiveStorage', () => {
             perspectives: [
               {
                 id: 'perspective',
-                layout: layout => layout
+                layout: factory => factory
                   .addPart(MAIN_AREA)
                   .addPart('left-top', {align: 'left'})
                   .addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'}),
