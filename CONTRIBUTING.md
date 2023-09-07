@@ -301,14 +301,15 @@ This chapter describes the tasks to publish a new release for `@scion/workbench`
 1. Run `npm run workbench:changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
 1. Commit the changed files using the following commit message: `release(workbench): vX.X.X`. Replace `X.X.X` with the current version. Later, when merging the branch into the master branch, a commit message of this format triggers the release action in our [GitHub Actions workflow][link-github-actions-workflow].
 1. Push the commit to the branch `release/X.X.X` and submit a pull request to the master branch. Replace `X.X.X` with the current version.
-1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
-1. Verify that: 
-   - **@scion/workbench** is published to: https://www.npmjs.com/package/@scion/workbench.
-   - **Testing Apps** are deployed to:
-      - https://scion-workbench-getting-started.vercel.app
-      - https://scion-workbench-testing-app.vercel.app
-      - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
-      - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
+1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] does the following:
+   - Creates a Git release tag
+   - Publishes `@scion/workbench` package to NPM (https://www.npmjs.com/package/@scion/workbench)
+   - Creates a release on GitHub (https://github.com/SchweizerischeBundesbahnen/scion-workbench/releases)
+   - Deploys following apps to Vercel:
+     - https://scion-workbench-getting-started.vercel.app
+     - https://scion-workbench-testing-app.vercel.app
+     - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
+     - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
 
 </details>
 
@@ -322,17 +323,18 @@ This chapter describes the tasks to publish a new release for `@scion/workbench-
 1. Run `npm run workbench-client:changelog` to generate the changelog. Then, review the generated changelog carefully and correct typos and formatting errors, if any.
 1. Commit the changed files using the following commit message: `release(workbench-client): vX.X.X`. Replace `X.X.X` with the current version. Later, when merging the branch into the master branch, a commit message of this format triggers the release action in our [GitHub Actions workflow][link-github-actions-workflow].
 1. Push the commit to the branch `release/workbench-client-X.X.X` and submit a pull request to the master branch. Replace `X.X.X` with the current version.
-1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] creates a Git release tag, publishes the package to NPM, and deploys related applications.
-1. Verify that: 
-   - **@scion/workbench-client** is published to: https://www.npmjs.com/package/@scion/workbench-client.
-   - **Testing Apps** are deployed to:
-      - https://scion-workbench-getting-started.vercel.app 
-      - https://scion-workbench-testing-app.vercel.app
-      - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
-      - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
-   - **API Documentation (TypeDoc)** is deployed to: 
-      - https://scion-workbench-client-api.vercel.app
-      - https://scion-workbench-client-api-vX-X-X.vercel.app
+1. When merged into the master branch, the release action in our [GitHub Actions workflow][link-github-actions-workflow] does the following:
+    - Creates a Git release tag (prefixed with workbench-client-)
+    - Publishes `@scion/workbench-client` package to NPM (https://www.npmjs.com/package/@scion/workbench-client)
+    - Creates a release on GitHub (https://github.com/SchweizerischeBundesbahnen/scion-workbench/releases)
+    - Deploys following apps to Vercel:
+        - https://scion-workbench-getting-started.vercel.app
+        - https://scion-workbench-testing-app.vercel.app
+        - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
+        - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
+    - Publishes API documentation (TypeDoc) to Vercel:
+        - https://scion-workbench-client-api.vercel.app
+        - https://scion-workbench-client-api-vX-X-X.vercel.app 
 </details>
 
 [link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions
