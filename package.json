@@ -24,12 +24,16 @@
     "workbench-client:lint": "ng lint @scion/workbench-client",
     "workbench-client:test": "ng test @scion/workbench-client",
     "workbench-client:typedoc": "typedoc --plugin typedoc-plugin-extras --tsconfig projects/scion/workbench-client/tsconfig.lib.prod.typedoc.json --favicon resources/branding/favicon.ico",
-    "workbench-client:changelog": "conventional-changelog --commit-path projects/scion/workbench-client -k projects/scion/workbench-client -t workbench-client- -p angular -i CHANGELOG_WORKBENCH_CLIENT.md -s && markdown-include docs/site/changelog-workbench-client/changelog.template.json",
+    "workbench-client:changelog": "run-p workbench-client:changelog:*",
+    "workbench-client:changelog:full": "conventional-changelog --commit-path projects/scion/workbench-client -k projects/scion/workbench-client -t workbench-client- -p angular -i CHANGELOG_WORKBENCH_CLIENT.md -s && markdown-include docs/site/changelog-workbench-client/changelog.template.json",
+    "workbench-client:changelog:latest": "conventional-changelog --commit-path projects/scion/workbench-client -k projects/scion/workbench-client -t workbench-client- -p angular -o CHANGELOG_WORKBENCH_CLIENT_LATEST.md",
 
     "workbench:build": "ng build --configuration production @scion/workbench",
     "workbench:lint": "ng lint @scion/workbench",
     "workbench:test": "ng test @scion/workbench",
-    "workbench:changelog": "conventional-changelog --commit-path projects/scion/workbench -k projects/scion/workbench -p angular -i CHANGELOG_WORKBENCH.md -s && markdown-include docs/site/changelog-workbench/changelog.template.json",
+    "workbench:changelog": "run-p workbench:changelog:*",
+    "workbench:changelog:full": "conventional-changelog --commit-path projects/scion/workbench -k projects/scion/workbench -p angular -i CHANGELOG_WORKBENCH.md -s && markdown-include docs/site/changelog-workbench/changelog.template.json",
+    "workbench:changelog:latest": "conventional-changelog --commit-path projects/scion/workbench -k projects/scion/workbench -p angular -o CHANGELOG_WORKBENCH_LATEST.md",
 
     "workbench-getting-started-app:build": "ng build workbench-getting-started-app --configuration=production",
     "workbench-getting-started-app:lint": "ng lint workbench-getting-started-app",

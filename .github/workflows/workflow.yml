@@ -304,6 +304,11 @@ jobs:
           dist-folder: dist/scion/workbench
           npm-token: ${{ secrets.NPM_TOKEN }}
           dry-run: false
+      - name: 'Creating GitHub Release'
+        run: gh release create $VERSION --title "$VERSION (@scion/workbench)" --notes-file CHANGELOG_WORKBENCH_LATEST.md --verify-tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.build-libs.outputs.workbench-version }}
   release-workbench-client:
     name: 'Releasing @scion/workbench-client'
     if: ${{ needs.workbench-client-release-guard.outputs.should-release == 'true' }}
@@ -340,4 +345,8 @@ jobs:
           dist-folder: dist/scion/workbench-client
           npm-token: ${{ secrets.NPM_TOKEN }}
           dry-run: false
-
+      - name: 'Creating GitHub Release'
+        run: gh release create workbench-client-$VERSION --title "$VERSION (@scion/workbench-client)" --notes-file CHANGELOG_WORKBENCH_CLIENT_LATEST.md --verify-tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.build-libs.outputs.workbench-client-version }}
