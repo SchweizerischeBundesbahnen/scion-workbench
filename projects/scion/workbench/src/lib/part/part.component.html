@@ -1,21 +1,10 @@
-<wb-part-bar *ngIf="(part.viewIds$ | async)?.length || (part.actions$ | async)?.length"></wb-part-bar>
+<wb-part-bar></wb-part-bar>
 
-<div *ngIf="(part.viewIds$ | async)?.length; else no_views_template" class="active-view e2e-active-view"
-     wbViewDropZone
+<div wbViewDropZone
      [wbViewDropZoneSize]=".3"
      [wbViewDropZonePlaceholderSize]=".5"
      [wbViewDropZoneCssClass]="'e2e-part'"
-     (wbViewDropZoneDrop)="onViewDrop($event)">
+     (wbViewDropZoneDrop)="onViewDrop($event)"
+     class="active-view e2e-active-view">
   <ng-container *wbPortalOutlet="part.activeViewId$ | async | wbViewPortal"></ng-container>
 </div>
-
-<ng-template #no_views_template>
-  <sci-viewport class="no-view e2e-no-view"
-                wbViewDropZone
-                [wbViewDropZoneSize]="1"
-                [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
-                [wbViewDropZoneCssClass]="'e2e-part'"
-                (wbViewDropZoneDrop)="onViewDrop($event)">
-    <router-outlet></router-outlet>
-  </sci-viewport>
-</ng-template>

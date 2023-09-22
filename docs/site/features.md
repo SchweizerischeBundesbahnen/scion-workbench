@@ -22,7 +22,7 @@ This page gives you an overview of existing and planned workbench features. Deve
 |Part Actions|layout|[![][done]](#)|Actions that are displayed in the tabbar of a part. Actions can stick to a view, so they are only visible if the view is active.
 |View Context Menu|layout|[![][done]](#)|A viewtab has a context menu. By default, the workbench adds some workbench-specific menu items to the context menu, such as for closing other views. Custom menu items can be added to the context menu as well.
 |Persistent Navigation|navigation|[![][done]](#)|The arrangement of the views is added to the browser URL or local storage, enabling persistent navigation.
-|Default Page|layout|[![][done]](#)|The workbench adds a primary router outlet to the main area when no view is open, enabling the display of a start page.
+|Start Page|layout|[![][done]](#)|A start page can be used to display content when all views are closed.
 |Microfrontend Support|microfrontend|[![][done]](#)|Microfrontends can be opened in views. Embedded microfrontends can interact with the workbench using a framework-angostic workbench API. The documentation is still missing. [#304](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/304).
 |Theming|customization|[![][planned]](#)|A custom theme can be applied to change the look of the workbench. [#110](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/110)
 |Responsive Design|layout|[![][planned]](#)|The workbench adapts its layout to the current display size and device. [#112](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/112) 

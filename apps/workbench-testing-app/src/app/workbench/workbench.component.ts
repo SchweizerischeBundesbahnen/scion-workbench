@@ -12,7 +12,7 @@ import {Component, OnDestroy} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {distinct, map} from 'rxjs/operators';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
-import {combineLatest, Observable} from 'rxjs';
+import {combineLatest} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
@@ -30,13 +30,10 @@ import {WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService} from 
 })
 export class WorkbenchComponent implements OnDestroy {
 
-  protected showNewTabAction$: Observable<boolean>;
-
   constructor(private _route: ActivatedRoute,
               private _wbRouter: WorkbenchRouter,
               protected workbenchService: WorkbenchService) {
     console.debug('[WorkbenchComponent#construct]');
-    this.showNewTabAction$ = this._route.queryParamMap.pipe(map(params => !params.has('showNewTabAction') || coerceBooleanProperty(params.get('showNewTabAction'))));
     this.installStickyStartViewTab();
   }
 

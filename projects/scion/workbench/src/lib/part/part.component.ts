@@ -18,14 +18,12 @@ import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {Logger, LoggerNames} from '../logging';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {RouterOutlet} from '@angular/router';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {ViewPortalPipe} from '../view/view-portal.pipe';
-import {SciViewportComponent} from '@scion/components/viewport';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
 
 @Component({
   selector: 'wb-part',
@@ -33,15 +31,12 @@ import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
   styleUrls: ['./part.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     RouterOutlet,
     PartBarComponent,
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
     ViewPortalPipe,
-    SciViewportComponent,
-    RequiresDropZonePipe,
   ],
 })
 export class PartComponent implements OnInit, OnDestroy {

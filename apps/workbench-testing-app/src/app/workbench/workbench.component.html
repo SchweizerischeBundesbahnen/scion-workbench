@@ -1,5 +1,5 @@
 <wb-workbench>
-  <ng-template wbPartAction *ngIf="showNewTabAction$ | async" [canMatch]="isPartInMainArea" cssClass="e2e-open-new-tab">
+  <ng-template wbPartAction [canMatch]="isPartInMainArea" cssClass="e2e-open-new-tab">
     <button [wbRouterLink]="'/start-page'" class="material-icons" [wbRouterLinkExtras]="{target: 'blank', blankInsertionIndex: 'end'}">
       add
     </button>

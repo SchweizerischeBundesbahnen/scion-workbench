@@ -75,13 +75,6 @@ export class PartPO {
   }
 
   /**
-   * Returns whether this part is displaying the default page because the part contains no view.
-   */
-  public async isDefaultPagePresent(componentSelector: string): Promise<boolean> {
-    return isPresent(this._locator.locator('sci-viewport.e2e-no-view').locator(componentSelector));
-  }
-
-  /**
    * Returns whether the tab bar is displaying.
    * The tab bar is displayed when this part contains at least one view or action.
    */

@@ -15,12 +15,4 @@
     display: grid;
     position: relative; // positioning context for view and drop zone
   }
-
-  > sci-viewport.no-view {
-    flex: 1 1 0;
-
-    > router-outlet {
-      position: absolute; // take router outlet out of the document flow
-    }
-  }
 }

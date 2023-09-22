@@ -61,15 +61,15 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
     const workbenchService = TestBed.inject(WorkbenchService);
 
-    expect(fixture.debugElement.query(By.css('wb-part[data-partid="main"] > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
+    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
 
     // Switch to perspective-2
     await workbenchService.switchPerspective('perspective-2');
-    expect(fixture.debugElement.query(By.css('wb-part[data-partid="main"] > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 2');
+    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 2');
 
     // Switch to perspective-1
     await workbenchService.switchPerspective('perspective-1');
-    expect(fixture.debugElement.query(By.css('wb-part[data-partid="main"] > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
+    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
   });
 
   /**
@@ -109,9 +109,6 @@ describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .25,
         }),
-      },
-      mainAreaGrid: {
-        root: new MPart({id: 'main', views: []}),
       },
     });
   });

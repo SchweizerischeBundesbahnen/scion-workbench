@@ -53,10 +53,6 @@ export class AppPO {
       featureQueryParams.append('stickyStartViewTab', `${options.stickyStartViewTab}`);
     }
 
-    if (options?.showNewTabAction !== undefined) {
-      featureQueryParams.append('showNewTabAction', `${options.showNewTabAction}`);
-    }
-
     // Perform navigation.
     await this.page.goto((() => {
       const [baseUrl = '/', hashedUrl = ''] = (options?.url?.split('#') ?? []);
@@ -240,11 +236,7 @@ export class AppPO {
    * Opens a new view tab.
    */
   public async openNewViewTab(): Promise<StartPagePO> {
-    const newTabPartActionPO = this.activePart({inMainArea: true}).action({cssClass: 'e2e-open-new-tab'});
-    if (!await newTabPartActionPO.isPresent()) {
-      throw Error('Opening a new view tab requires the part action \'e2e-open-new-tab\' to be present, but it could not be found. Have you disabled the \'showNewTabAction\' feature?');
-    }
-    await newTabPartActionPO.locate('button').click();
+    await this.header.clickMenuItem({cssClass: 'e2e-open-start-page'});
     return new StartPagePO(this, await this.activePart({inMainArea: true}).activeView.getViewId());
   }
 
@@ -326,11 +318,6 @@ export interface Options {
    * By default, if not specified, this feature is turned off.
    */
   stickyStartViewTab?: boolean;
-  /**
-   * Controls whether to display the part action for opening a new tab.
-   * By default, if not specified, this feature is turned on.
-   */
-  showNewTabAction?: boolean;
   /**
    * Allows pausing the workbench startup by displaying an alert dialog that the user must confirm in order to continue the workbench startup.
    */
