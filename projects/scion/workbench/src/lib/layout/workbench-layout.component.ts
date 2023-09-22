@@ -19,6 +19,9 @@ import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {MPart, MTreeNode} from './workbench-layout.model';
 import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
+import {RouterOutlet} from '@angular/router';
+import {SciViewportComponent} from '@scion/components/viewport';
+import {GridElementVisiblePipe} from '../common/grid-element-visible.pipe';
 
 /**
  * Renders the layout of the workbench.
@@ -51,9 +54,12 @@ import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone
   standalone: true,
   imports: [
     NgIf,
+    RouterOutlet,
     GridElementComponent,
+    GridElementVisiblePipe,
     ViewDropZoneDirective,
     RequiresDropZonePipe,
+    SciViewportComponent,
   ],
 })
 export class WorkbenchLayoutComponent {

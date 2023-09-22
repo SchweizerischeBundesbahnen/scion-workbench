@@ -15,7 +15,7 @@ import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
 import {MenuService} from '../menu/menu.service';
-import {WorkbenchService} from '@scion/workbench';
+import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 
 @Component({
   selector: 'app-header',
@@ -33,6 +33,7 @@ export class HeaderComponent {
   protected readonly PerspectiveData = PerspectiveData;
 
   constructor(private _router: Router,
+              private _wbRouter: WorkbenchRouter,
               private _menuService: MenuService,
               protected workbenchService: WorkbenchService) {
   }
@@ -46,6 +47,8 @@ export class HeaderComponent {
         ...this.contributePerspectiveMenuItems(),
         new MenuItemSeparator(),
         ...this.contributeLoggerMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributeStartPageMenuItem(),
         new MenuItemSeparator(),
         ...this.contributeStartupMenuItems(),
         new MenuItemSeparator(),
@@ -86,22 +89,32 @@ export class HeaderComponent {
     ];
   }
 
+  private contributeStartPageMenuItem(): MenuItem[] {
+    return [
+      new MenuItem({
+        text: 'Open start page in new view tab',
+        cssClass: 'e2e-open-start-page',
+        onAction: () => this._wbRouter.navigate(['start-page'], {target: 'blank'}),
+      }),
+    ];
+  }
+
   private contributeStartupMenuItems(): MenuItem[] {
     return [
       new MenuItem({
-        text: 'Open workbench in new tab (LAZY)',
+        text: 'Open workbench in new browser tab (LAZY)',
         onAction: () => this.openInNewWindow({standalone: false, launcher: 'LAZY'}),
       }),
       new MenuItem({
-        text: 'Open workbench in new tab (APP_INITIALIZER)',
+        text: 'Open workbench in new browser tab (APP_INITIALIZER)',
         onAction: () => this.openInNewWindow({standalone: false, launcher: 'APP_INITIALIZER'}),
       }),
       new MenuItem({
-        text: 'Open standalone workbench in new tab (LAZY)',
+        text: 'Open standalone workbench in new browser tab (LAZY)',
         onAction: () => this.openInNewWindow({standalone: true, launcher: 'LAZY'}),
       }),
       new MenuItem({
-        text: 'Open standalone workbench in new tab (APP_INITIALIZER)',
+        text: 'Open standalone workbench in new browser tab (APP_INITIALIZER)',
         onAction: () => this.openInNewWindow({standalone: true, launcher: 'APP_INITIALIZER'}),
       }),
     ];

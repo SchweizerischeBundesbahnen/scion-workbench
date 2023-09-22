@@ -1,15 +1,27 @@
-<wb-grid-element *ngIf="root"
-                 [element]="root"
-                 wbViewDropZone
-                 [wbViewDropZoneSize]="50"
-                 [wbViewDropZonePlaceholderSize]="50"
-                 [wbViewDropZoneRegions]="{
-                   north: false,
-                   south: root | wbRequiresDropZone:'south',
-                   west: root | wbRequiresDropZone:'west',
-                   east: root | wbRequiresDropZone:'east',
-                   center: false,
-                 }"
-                 [wbViewDropZoneCssClass]="'e2e-workbench-grid'"
-                 (wbViewDropZoneDrop)="onViewDrop($event)">
-</wb-grid-element>
+<ng-container *ngIf="root | wbGridElementVisible; else start_page_template">
+  <wb-grid-element [element]="root"
+                   wbViewDropZone
+                   [wbViewDropZoneSize]="50"
+                   [wbViewDropZonePlaceholderSize]="50"
+                   [wbViewDropZoneRegions]="{
+                     north: false,
+                     south: root | wbRequiresDropZone:'south',
+                     west: root | wbRequiresDropZone:'west',
+                     east: root | wbRequiresDropZone:'east',
+                     center: false,
+                   }"
+                   [wbViewDropZoneCssClass]="'e2e-workbench-grid'"
+                   (wbViewDropZoneDrop)="onViewDrop($event)">
+  </wb-grid-element>
+</ng-container>
+
+<ng-template #start_page_template>
+  <sci-viewport class="start-page"
+                wbViewDropZone
+                [wbViewDropZoneSize]="1"
+                [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
+                [wbViewDropZoneCssClass]="'e2e-workbench-grid'"
+                (wbViewDropZoneDrop)="onViewDrop($event)">
+    <router-outlet></router-outlet>
+  </sci-viewport>
+</ng-template>

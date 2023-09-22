@@ -1,8 +1,12 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
 
-  > wb-grid-element {
-    width: 100%;
-    height: 100%;
+  > wb-grid-element, > sci-viewport.start-page {
+    flex: 1 1 0; // set flex-basis to 0 to not exceed available vertical space
+  }
+
+  > sci-viewport.start-page > router-outlet {
+    position: absolute; // take router outlet out of the document flow
   }
 }

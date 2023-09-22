@@ -31,7 +31,7 @@ export class StartPagePO {
       this._locator = this.view.locator('app-start-page');
     }
     else {
-      this._locator = _appPO.activePart({inMainArea: true}).locator('app-start-page');
+      this._locator = _appPO.workbenchLocator.locator('app-start-page');
     }
     this._tabbarLocator = this._locator.locator('sci-tabbar');
     this._tabbarPO = new SciTabbarPO(this._tabbarLocator);

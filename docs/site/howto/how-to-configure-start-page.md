@@ -6,7 +6,9 @@
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
 ### How to configure a start page
-The workbench installs a primary router outlet when the main area is blank, i.e., no view is opened. By registering an empty path route, a component can be displayed instead. 
+A start page can be used to display content when all views are closed.
+
+To display a start page, register an empty path route, as follows:
 
 ```ts
 RouterModule.forRoot([

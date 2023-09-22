@@ -17,6 +17,10 @@ import {ɵWorkbenchService} from '../../ɵworkbench.service';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
 import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
+import {RouterOutlet} from '@angular/router';
+import {SciViewportComponent} from '@scion/components/viewport';
+import {GridElementVisiblePipe} from '../../common/grid-element-visible.pipe';
+import {NgIf} from '@angular/common';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -47,9 +51,13 @@ import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
   styleUrls: ['./main-area-layout.component.scss'],
   standalone: true,
   imports: [
+    NgIf,
     GridElementComponent,
     ViewDropZoneDirective,
     RequiresDropZonePipe,
+    RouterOutlet,
+    SciViewportComponent,
+    GridElementVisiblePipe,
   ],
 })
 export class MainAreaLayoutComponent {

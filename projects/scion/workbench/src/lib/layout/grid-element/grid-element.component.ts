@@ -86,14 +86,23 @@ export class GridElementComponent implements OnChanges {
   }
 
   private computeChildren(treeNode: MTreeNode): ChildElement[] {
-    if (isGridElementVisible(treeNode.child1) && isGridElementVisible(treeNode.child2)) {
+    const child1Visible = isGridElementVisible(treeNode.child1);
+    const child2Visible = isGridElementVisible(treeNode.child2);
+
+    if (child1Visible && child2Visible) {
       const [size1, size2] = calculateSashSizes(treeNode.ratio);
       return [
         {element: treeNode.child1, size: size1},
         {element: treeNode.child2, size: size2},
       ];
     }
-    return [{element: isGridElementVisible(treeNode.child1) ? treeNode.child1 : treeNode.child2}];
+    else if (child1Visible) {
+      return [{element: treeNode.child1}];
+    }
+    else if (child2Visible) {
+      return [{element: treeNode.child2}];
+    }
+    return [];
   }
 
   /**

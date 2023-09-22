@@ -15,35 +15,6 @@ import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('View Tabbar', () => {
 
-  test('should not show if no views are open and no part actions present', async ({appPO}) => {
-    await appPO.navigateTo({microfrontendSupport: false, showNewTabAction: false});
-    const startPagePO = new StartPagePO(appPO);
-
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(0);
-    await expect(await appPO.activePart({inMainArea: true}).isPartBarPresent()).toBe(false);
-
-    await startPagePO.openWorkbenchView('e2e-test-view');
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
-    await expect(await appPO.activePart({inMainArea: true}).isPartBarPresent()).toBe(true);
-
-    await appPO.view({cssClass: 'e2e-test-view'}).viewTab.close();
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(0);
-    await expect(await appPO.activePart({inMainArea: true}).isPartBarPresent()).toBe(false);
-
-    await appPO.navigateTo({microfrontendSupport: false, showNewTabAction: true});
-
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(0);
-    await expect(await appPO.activePart({inMainArea: true}).isPartBarPresent()).toBe(true);
-
-    await startPagePO.openWorkbenchView('e2e-test-view');
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
-    await expect(await appPO.activePart({inMainArea: true}).isPartBarPresent()).toBe(true);
-
-    await appPO.view({cssClass: 'e2e-test-view'}).viewTab.close();
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(0);
-    await expect(await appPO.activePart({inMainArea: true}).isPartBarPresent()).toBe(true);
-  });
-
   test('should activate the most recent view when closing a view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
