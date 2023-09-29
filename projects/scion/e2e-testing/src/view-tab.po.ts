@@ -26,79 +26,80 @@ export class ViewTabPO {
   /**
    * Locates the title of the view tab.
    */
-  public readonly titleLocator = this._locator.locator('.e2e-title');
+  public readonly title = this.locator.locator('.e2e-title');
 
   /**
    * Locates the heading of the view tab.
    */
-  public readonly headingLocator = this._locator.locator('.e2e-heading');
+  public readonly heading = this.locator.locator('.e2e-heading');
 
-  constructor(private readonly _locator: Locator, part: PartPO) {
+  /**
+   * Locates the close button of the view tab.
+   */
+  public readonly closeButton = this.locator.locator('.e2e-close');
+
+  constructor(public readonly locator: Locator, part: PartPO) {
     this.part = part;
   }
 
   public async getViewId(): Promise<string> {
-    return (await this._locator.getAttribute('data-viewid'))!;
+    return (await this.locator.getAttribute('data-viewid'))!;
   }
 
   public async isPresent(): Promise<boolean> {
-    return isPresent(this._locator);
+    return isPresent(this.locator);
   }
 
   public async click(): Promise<void> {
-    await this._locator.click();
+    await this.locator.click();
   }
 
   public async dblclick(): Promise<void> {
-    await this._locator.dblclick();
+    await this.locator.dblclick();
   }
 
   /**
    * Performs a mouse down on this view tab.
    */
   public async mousedown(): Promise<void> {
-    const bounds = fromRect(await this._locator.boundingBox());
-    const mouse = this._locator.page().mouse;
+    const bounds = fromRect(await this.locator.boundingBox());
+    const mouse = this.locator.page().mouse;
     await mouse.move(bounds.hcenter, bounds.vcenter);
     await mouse.down();
   }
 
   public async close(): Promise<void> {
-    await this._locator.hover();
-    await this._locator.locator('.e2e-close').click();
+    await this.locator.hover();
+    await this.locator.locator('.e2e-close').click();
   }
 
   public getTitle(): Promise<string> {
-    return waitUntilStable(() => this.titleLocator.innerText());
+    return waitUntilStable(() => this.title.innerText());
   }
 
   public getHeading(): Promise<string> {
-    return waitUntilStable(() => this.headingLocator.innerText());
+    return waitUntilStable(() => this.heading.innerText());
   }
 
   public isDirty(): Promise<boolean> {
-    return waitUntilStable(() => hasCssClass(this._locator, 'e2e-dirty'));
-  }
-
-  public async isClosable(): Promise<boolean> {
-    return (await waitUntilStable(() => this._locator.locator('.e2e-close').count()) !== 0);
+    return waitUntilStable(() => hasCssClass(this.locator, 'e2e-dirty'));
   }
 
   public isActive(): Promise<boolean> {
-    return hasCssClass(this._locator, 'active');
+    return hasCssClass(this.locator, 'active');
   }
 
   public getCssClasses(): Promise<string[]> {
-    return getCssClasses(this._locator);
+    return getCssClasses(this.locator);
   }
 
   /**
    * Opens the context menu of this view tab.
    */
   public async openContextMenu(): Promise<ViewTabContextMenuPO> {
-    await this._locator.click({button: 'right'});
+    await this.locator.click({button: 'right'});
     const viewId = await this.getViewId();
-    return new ViewTabContextMenuPO(this._locator.page().locator(`div.cdk-overlay-pane wb-view-menu[data-viewid="${viewId}"]`));
+    return new ViewTabContextMenuPO(this.locator.page().locator(`div.cdk-overlay-pane wb-view-menu[data-viewid="${viewId}"]`));
   }
 
   /**
@@ -108,16 +109,16 @@ export class ViewTabPO {
   public async moveTo(target: {grid: 'workbench' | 'mainArea'}, options?: {steps?: number}): Promise<void>;
   public async moveTo(target: {partId?: string; grid?: 'workbench' | 'mainArea'}, options?: {steps?: number}): Promise<void> {
     // 1. Perform a "mousedown" on the view tab.
-    const mouse = this._locator.page().mouse;
+    const mouse = this.locator.page().mouse;
     await this.mousedown();
 
     // 2. Locate the target.
     const targetLocator = (() => {
       if (target.partId) {
-        return this._locator.page().locator(`wb-part[data-partid="${target.partId}"]`).locator('div.e2e-active-view');
+        return this.locator.page().locator(`wb-part[data-partid="${target.partId}"]`).locator('div.e2e-active-view');
       }
       else {
-        return this._locator.page().locator(target.grid === 'mainArea' ? 'wb-main-area-layout' : 'wb-workbench-layout');
+        return this.locator.page().locator(target.grid === 'mainArea' ? 'wb-main-area-layout' : 'wb-workbench-layout');
       }
     })();
 
@@ -153,17 +154,17 @@ export class ViewTabPO {
     // 2. Locate the drop zone.
     const dropZoneLocator = (() => {
       if (target.partId) {
-        return this._locator.page().locator(`wb-part[data-partid="${target.partId}"]`).locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-part`);
+        return this.locator.page().locator(`wb-part[data-partid="${target.partId}"]`).locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-part`);
       }
       else {
         const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
-        return this._locator.page().locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
+        return this.locator.page().locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
       }
     })();
 
     // 3. Move the view tab over the drop zone.
     const dropZoneBounds = fromRect(await dropZoneLocator.boundingBox());
-    const mouse = this._locator.page().mouse;
+    const mouse = this.locator.page().mouse;
     switch (target.region) {
       case 'north':
         // Moves the mouse to the bottom edge, just one pixel inside the drop zone
@@ -189,7 +190,7 @@ export class ViewTabPO {
 
     // 4. Perform a "mouseup".
     if (options?.performDrop ?? true) {
-      await this._locator.page().mouse.up();
+      await this.locator.page().mouse.up();
     }
   }
 }

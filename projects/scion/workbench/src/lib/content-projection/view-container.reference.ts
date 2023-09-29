@@ -78,3 +78,11 @@ export const VIEW_DROP_PLACEHOLDER_HOST = new InjectionToken<ViewContainerRefere
   providedIn: 'root',
   factory: () => new ViewContainerReference(),
 });
+
+/**
+ * DI token to inject the DOM location of the {@link WorkbenchComponent} HTML element.
+ */
+export const WORKBENCH_ELEMENT_REF = new InjectionToken<ViewContainerReference>('WORKBENCH_ELEMENT_REF', {
+  providedIn: 'root',
+  factory: () => new ViewContainerReference(),
+});

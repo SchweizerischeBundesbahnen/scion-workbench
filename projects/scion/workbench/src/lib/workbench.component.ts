@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
-import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, VIEW_MODAL_MESSAGE_BOX_HOST} from './content-projection/view-container.reference';
+import {Component, ElementRef, inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, VIEW_MODAL_MESSAGE_BOX_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/view-container.reference';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchModuleConfig} from './workbench-module-config';
 import {ComponentType} from '@angular/cdk/portal';
@@ -19,8 +19,10 @@ import {AsyncPipe, NgComponentOutlet, NgIf} from '@angular/common';
 import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
 import {MessageBoxStackComponent} from './message-box/message-box-stack.component';
-import {combineLatest, lastValueFrom} from 'rxjs';
+import {combineLatest, EMPTY, fromEvent, lastValueFrom, switchMap} from 'rxjs';
 import {first, map} from 'rxjs/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -45,6 +47,7 @@ export class WorkbenchComponent implements OnDestroy {
    * View containers required for the workbench to attach elements.
    */
   private viewContainerReferences = {
+    workbenchElement: inject(WORKBENCH_ELEMENT_REF),
     iframeHost: inject(IFRAME_HOST),
     viewModalMessageBoxHost: inject(VIEW_MODAL_MESSAGE_BOX_HOST),
     viewDropPlaceholderHost: inject(VIEW_DROP_PLACEHOLDER_HOST),
@@ -80,12 +83,16 @@ export class WorkbenchComponent implements OnDestroy {
   }
 
   constructor(workbenchModuleConfig: WorkbenchModuleConfig,
+              private _host: ElementRef<HTMLElement>,
               private _workbenchLauncher: WorkbenchLauncher,
+              private _workbenchDialogRegistry: WorkbenchDialogRegistry,
               private _logger: Logger,
               protected workbenchStartup: WorkbenchStartup) {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
+    this.viewContainerReferences.workbenchElement.set(inject(ViewContainerRef));
     this.splash = workbenchModuleConfig?.startup?.splash || SplashComponent;
     this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();
+    this.preventFocusIfBlocked();
     this.startWorkbench();
   }
 
@@ -108,6 +115,20 @@ export class WorkbenchComponent implements OnDestroy {
         first(vcrs => vcrs.every(Boolean)),
         map(() => true),
       ));
+  }
+
+  /**
+   * Prevent parts of the workbench from gaining focus via sequential keyboard navigation when a dialog overlays it.
+   */
+  private preventFocusIfBlocked(): void {
+    this._workbenchDialogRegistry.top$()
+      .pipe(
+        switchMap(dialog => dialog ? fromEvent(this._host.nativeElement, 'focusin') : EMPTY),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        this._workbenchDialogRegistry.top()!.focus();
+      });
   }
 
   /**

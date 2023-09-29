@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, EMPTY, Observable, Subject, switchMap} from 'rxjs';
+import {BehaviorSubject, combineLatest, EMPTY, Observable, switchMap} from 'rxjs';
 import {ChildrenOutletContexts, Router, UrlSegment} from '@angular/router';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Arrays, Defined} from '@scion/toolkit/util';
 import {Disposable} from '../common/disposable';
@@ -29,6 +29,9 @@ import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {bufferLatestUntilLayoutChange} from '../common/operators';
+import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
+import {ɵDestroyRef} from '../common/ɵdestroy-ref';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 export class ɵWorkbenchView implements WorkbenchView {
 
@@ -39,24 +42,28 @@ export class ɵWorkbenchView implements WorkbenchView {
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _router = inject(Router);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
+  private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
 
   private readonly _part$ = new BehaviorSubject<ɵWorkbenchPart | undefined>(undefined);
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private readonly _scrolledIntoView$ = new BehaviorSubject<boolean>(true);
-  private readonly _destroy$ = new Subject<void>();
+  private readonly _destroyRef = new ɵDestroyRef();
 
   private _activationInstant: number | undefined;
+  private _closable = true;
 
   public title: string | null = null;
   public heading: string | null = null;
   public dirty = false;
-  public closable = true;
   public scrollTop = 0;
   public scrollLeft = 0;
 
   public readonly active$ = new BehaviorSubject<boolean>(false);
   public readonly cssClasses$ = new BehaviorSubject<string[]>([]);
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
+  /**
+   * Indicates whether this view is blocked by dialog(s) that overlay this view.
+   */
   public readonly blocked$ = new BehaviorSubject(false);
   public readonly portal: WbComponentPortal;
 
@@ -70,6 +77,7 @@ export class ɵWorkbenchView implements WorkbenchView {
     this.portal = this.createPortal(options.component);
     this.trackViewActivation();
     this.touchOnActivate();
+    this.blockWhenDialogOpened();
   }
 
   private createPortal(viewComponent: ComponentType<ViewComponent>): WbComponentPortal {
@@ -118,6 +126,14 @@ export class ɵWorkbenchView implements WorkbenchView {
 
   public get active(): boolean {
     return this.active$.value;
+  }
+
+  public set closable(closable: boolean) {
+    this._closable = closable;
+  }
+
+  public get closable(): boolean {
+    return this._closable && !this.blocked;
   }
 
   public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
@@ -227,6 +243,9 @@ export class ɵWorkbenchView implements WorkbenchView {
     return this.blocked$.value;
   }
 
+  /**
+   * TODO [#488] Remove when migrating message box to dialog.
+   */
   public set blocked(blocked: boolean) {
     this.blocked$.next(blocked);
   }
@@ -245,7 +264,7 @@ export class ɵWorkbenchView implements WorkbenchView {
         map(activeViewId => activeViewId === this.id),
         bufferLatestUntilLayoutChange(), // Prevent the (de-)activation of potentially wrong views while updating the layout.
         distinctUntilChanged(),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(this.active$);
   }
@@ -257,15 +276,28 @@ export class ɵWorkbenchView implements WorkbenchView {
     this.active$
       .pipe(
         filter(Boolean),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => {
         this._activationInstant = this._activationInstantProvider.now();
       });
   }
 
+  /**
+   * Blocks this view when a dialog overlays it.
+   */
+  private blockWhenDialogOpened(): void {
+    this._workbenchDialogRegistry.top$({viewId: this.id})
+      .pipe(
+        map(top => !!top),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(this.blocked$);
+  }
+
   public destroy(): void {
-    this._destroy$.next();
+    this._destroyRef.destroy();
+    this._workbenchDialogRegistry.dialogs({viewId: this.id}).forEach(dialog => dialog.destroy());
     this.portal.destroy();
   }
 }

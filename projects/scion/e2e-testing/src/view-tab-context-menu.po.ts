@@ -35,14 +35,10 @@ export class ViewTabContextMenuPO {
 
 export class ContextMenuItem {
 
-  constructor(private _locator: Locator) {
+  constructor(public locator: Locator) {
   }
 
   public async click(): Promise<void> {
-    await this._locator.click();
-  }
-
-  public isDisabled(): Promise<boolean> {
-    return this._locator.isDisabled();
+    await this.locator.click();
   }
 }

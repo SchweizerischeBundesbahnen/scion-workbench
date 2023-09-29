@@ -39,7 +39,7 @@ describe('MessageBox', () => {
       TestBed.inject(MessageBoxService).open({content: 'message', cssClass: 'testee'}).then();
 
       // Expect message box to show
-      expect(fixture.debugElement.query(By.css('wb-message-box.testee'))).toBeDefined();
+      expect(fixture.debugElement.query(By.css('wb-message-box.testee'))).not.toBeNull();
     });
 
     it('should display view-modal message box', async () => {
@@ -64,7 +64,7 @@ describe('MessageBox', () => {
       viewDebugElement.injector.get(MessageBoxService).open({content: 'Message from View', cssClass: 'testee'}).then();
 
       // Expect message box to show
-      expect(fixture.debugElement.query(By.css('wb-message-box.testee'))).toBeDefined();
+      expect(fixture.debugElement.query(By.css('wb-message-box.testee'))).not.toBeNull();
     });
 
     /****************************************************************************************************

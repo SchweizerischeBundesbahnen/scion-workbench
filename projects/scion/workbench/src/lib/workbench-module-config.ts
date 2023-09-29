@@ -170,6 +170,19 @@ export abstract class WorkbenchModuleConfig {
    * If not set, the workbench uses the browser's local storage as persistent storage.
    */
   public abstract storage?: Type<WorkbenchStorage>;
+  /**
+   * Configures the behavior of workbench dialogs.
+   */
+  public abstract dialog?: {
+    /**
+     * Configures the area to block for application-modal dialogs. If not set, defaults to `workbench`.
+     *
+     * - **workbench:** blocks the {@link WorkbenchComponent|workbench element}, still allowing interaction with elements outside the workbench element.
+     *
+     * - **viewport** blocks the browser viewport, preventing interaction with the application until application-modal dialogs are closed.
+     */
+    modalityScope?: 'workbench' | 'viewport';
+  };
 }
 
 /**

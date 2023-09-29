@@ -130,16 +130,16 @@ export class PopupPagePO {
     }
   }
 
-  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
+  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean; timeout?: number}): Promise<void> {
     if (options?.returnValue !== undefined) {
       await this.enterReturnValue(options.returnValue);
     }
 
     if (options?.closeWithError === true) {
-      await this.locator.locator('button.e2e-close-with-error').click();
+      await this.locator.locator('button.e2e-close-with-error').click({timeout: options?.timeout});
     }
     else {
-      await this.locator.locator('button.e2e-close').click();
+      await this.locator.locator('button.e2e-close').click({timeout: options?.timeout});
     }
   }
 

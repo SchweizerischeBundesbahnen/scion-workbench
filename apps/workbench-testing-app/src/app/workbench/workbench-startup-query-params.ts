@@ -44,10 +44,22 @@ export namespace WorkbenchStartupQueryParams {
   export const SIMULATE_SLOW_CAPABILITY_LOOKUP = 'simulateSlowCapabilityLookup';
 
   /**
+   * Query param to set the scope for workbench application-modal dialogs.
+   */
+  export const DIALOG_MODALITY_SCOPE = 'dialogModalityScope';
+
+  /**
    * Reads the query param to set the workbench launching strategy.
    */
   export function launcher(): 'APP_INITIALIZER' | 'LAZY' | undefined {
     return new URL(window.location.href).searchParams.get(LAUNCHER_QUERY_PARAM) as 'APP_INITIALIZER' | 'LAZY' ?? undefined;
+  }
+
+  /**
+   * Reads the query param to set the scope for workbench application-modal dialogs.
+   */
+  export function dialogModalityScope(): 'workbench' | 'viewport' | undefined {
+    return new URL(window.location.href).searchParams.get(DIALOG_MODALITY_SCOPE) as 'workbench' | 'viewport' ?? undefined;
   }
 
   /**

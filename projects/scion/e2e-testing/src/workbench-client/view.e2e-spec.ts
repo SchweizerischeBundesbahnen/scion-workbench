@@ -198,10 +198,10 @@ test.describe('Workbench View', () => {
     const viewTab = viewPage.view.viewTab;
 
     await viewPage.checkClosable(true);
-    await expect(await viewTab.isClosable()).toBe(true);
+    await expect(viewTab.closeButton).toBeVisible();
 
     await viewPage.checkClosable(false);
-    await expect(await viewTab.isClosable()).toBe(false);
+    await expect(viewTab.closeButton).not.toBeVisible();
   });
 
   test('should allow closing the view', async ({appPO, microfrontendNavigator}) => {

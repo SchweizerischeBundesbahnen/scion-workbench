@@ -129,6 +129,7 @@
 @use './design/workbench-icon-font' as workbench-icons;
 @use './design/workbench-popup-global-styles' as workbench-popup;
 @use './design/workbench-view-drag-image-global-styles' as workbench-view-drag-image;
+@use './design/workbench-dialog-global-styles' as workbench-dialog;
 
 // Install workbench theme
 $-built-in-themes: (
@@ -146,6 +147,7 @@ $icon-font: null !default;
 // Install global workbench styles
 @include workbench-popup.install-global-styles();
 @include workbench-view-drag-image.install-global-styles();
+@include workbench-dialog.install-global-styles();
 
 // Install Angular CDK styles
 @include cdk.a11y-visually-hidden();

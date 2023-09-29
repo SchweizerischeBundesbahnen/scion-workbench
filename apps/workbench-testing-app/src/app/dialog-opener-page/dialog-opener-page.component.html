@@ -1,0 +1,61 @@
+<form [formGroup]="form">
+  <section>
+    <sci-form-field label="Component">
+      <select [formControl]="form.controls.component" class="e2e-component">
+        <option value="dialog-page">DialogPageComponent</option>
+        <option value="focus-test-page">FocusTestPagePO</option>
+        <option value="dialog-opener-page">DialogOpenerPageComponent</option>
+        <option value="blank">BlankTestPageComponent</option>
+      </select>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <sci-form-field label="Input">
+      <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.inputs" [addable]="true" [removable]="true" class="e2e-inputs"/>
+    </sci-form-field>
+
+    <sci-form-field label="Modality">
+      <select [formControl]="form.controls.options.controls.modality" class="e2e-modality">
+        <option value="application">application</option>
+        <option value="view">view</option>
+        <option value="">default</option>
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="Contextual View ID">
+      <input [formControl]="form.controls.options.controls.contextualViewId" class="e2e-contextual-view-id">
+    </sci-form-field>
+
+    <sci-form-field label="Animate">
+      <sci-checkbox [formControl]="form.controls.options.controls.animate"></sci-checkbox>
+    </sci-form-field>
+
+    <sci-form-field label="CSS Class(es)">
+      <input [formControl]="form.controls.options.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+    </sci-form-field>
+  </section>
+
+  <section>
+    <sci-form-field label="View Context Active">
+      <sci-checkbox [formControl]="form.controls.viewContext" class="e2e-view-context"></sci-checkbox>
+    </sci-form-field>
+
+    <sci-form-field label="Count">
+      <input [formControl]="form.controls.count" class="e2e-count"
+             placeholder="Number of dialogs to open (1 by default). For every dialog, an 'index-$1' CSS class is added, where $1 is the index of the dialog, starting with 0.">
+    </sci-form-field>
+  </section>
+</form>
+
+<button (click)="onDialogOpen()" class="e2e-open" [disabled]="form.invalid" sci-primary>
+  Open dialog
+</button>
+
+<output class="return-value e2e-return-value" *ngIf="returnValue">
+  {{returnValue}}
+</output>
+
+<output class="dialog-error e2e-dialog-error" *ngIf="dialogError">
+  {{dialogError}}
+</output>
