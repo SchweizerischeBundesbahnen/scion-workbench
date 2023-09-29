@@ -16,6 +16,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {PerspectivePagePO} from './page-object/perspective-page.po';
+import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 
 export interface Type<T> extends Function {
   new(...args: any[]): T;
@@ -33,6 +34,10 @@ export class WorkbenchNavigator {
    * Opens the page to test the message box in a new workbench tab.
    */
   public openInNewTab(page: Type<MessageBoxOpenerPagePO>): Promise<MessageBoxOpenerPagePO>;
+  /**
+   * Opens the page to test the dialog in a new workbench tab.
+   */
+  public openInNewTab(page: Type<DialogOpenerPagePO>): Promise<DialogOpenerPagePO>;
   /**
    * Opens the page to test the notification in a new workbench tab.
    */
@@ -66,6 +71,10 @@ export class WorkbenchNavigator {
       case MessageBoxOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-message-box-opener');
         return new MessageBoxOpenerPagePO(this._appPO, viewId);
+      }
+      case DialogOpenerPagePO: {
+        await startPage.openWorkbenchView('e2e-test-dialog-opener');
+        return new DialogOpenerPagePO(this._appPO, {viewId});
       }
       case NotificationOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-notification-opener');

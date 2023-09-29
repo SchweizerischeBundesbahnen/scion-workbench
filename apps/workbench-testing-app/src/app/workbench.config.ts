@@ -28,4 +28,7 @@ export const workbenchModuleConfig: WorkbenchModuleConfig = {
     ],
     initialPerspective: PerspectiveDefinitions.initialPerspective,
   },
+  dialog: {
+    modalityScope: WorkbenchStartupQueryParams.dialogModalityScope(),
+  },
 };

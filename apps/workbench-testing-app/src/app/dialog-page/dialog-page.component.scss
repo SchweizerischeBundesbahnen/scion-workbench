@@ -1,0 +1,31 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > form {
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    > sci-accordion {
+      header {
+        font-weight: bold;
+      }
+
+      &.return-value input {
+        @include sci-design.style-input-field();
+      }
+    }
+  }
+
+  > div.buttons {
+    flex: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: .25em;
+    margin-top: 1em;
+  }
+}

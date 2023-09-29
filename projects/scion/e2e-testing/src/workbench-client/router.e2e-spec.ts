@@ -1132,7 +1132,7 @@ test.describe('Workbench Router', () => {
     await expect(await testeeView.viewTab.getTitle()).toEqual('VIEW TITLE 1');
     await expect(await testeeView.viewTab.getHeading()).toEqual('VIEW HEADING 1');
     await expect(await testeeView.viewTab.getCssClasses()).toEqual(expect.arrayContaining(['testee-1', 'class-1']));
-    await expect(await testeeView.viewTab.isClosable()).toBe(true);
+    await expect(testeeView.viewTab.closeButton).toBeVisible();
 
     // navigate to the testee-2 view
     await routerPage.viewTab.click();
@@ -1145,7 +1145,7 @@ test.describe('Workbench Router', () => {
     await expect(await testeeView.viewTab.getTitle()).toEqual('VIEW TITLE 2');
     await expect(await testeeView.viewTab.getHeading()).toEqual('VIEW HEADING 2');
     await expect(await testeeView.viewTab.getCssClasses()).toEqual(expect.arrayContaining(['testee-2', 'class-2']));
-    await expect(await testeeView.viewTab.isClosable()).toBe(false);
+    await expect(testeeView.viewTab.closeButton).not.toBeVisible();
   });
 
   test('should not set view properties when performing self navigation, e.g., when updating view params', async ({appPO, microfrontendNavigator}) => {

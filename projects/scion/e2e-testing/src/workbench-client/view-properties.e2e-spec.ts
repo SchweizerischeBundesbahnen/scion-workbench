@@ -204,7 +204,7 @@ test.describe('Workbench View Properties', () => {
       await routerPage.enterParams({closable: 'true,false'});
       await routerPage.enterTarget(viewId);
       await routerPage.clickNavigate();
-      await expect(await appPO.view({viewId}).viewTab.isClosable()).toBe(false);
+      await expect(appPO.view({viewId}).viewTab.closeButton).not.toBeVisible();
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
@@ -218,7 +218,7 @@ test.describe('Workbench View Properties', () => {
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
       await viewPropertiesTest.waitUntilPresent();
-      await expect(await viewPropertiesTest.viewTab.isClosable()).toBe(false);
+      await expect(viewPropertiesTest.viewTab.closeButton).not.toBeVisible();
     });
   });
 
@@ -245,7 +245,7 @@ test.describe('Workbench View Properties', () => {
       await routerPage.enterParams({closable: 'true,false,true'});
       await routerPage.enterTarget(viewId);
       await routerPage.clickNavigate();
-      await expect(await appPO.view({viewId}).viewTab.isClosable()).toBe(true);
+      await expect(appPO.view({viewId}).viewTab.closeButton).toBeVisible();
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
@@ -259,7 +259,7 @@ test.describe('Workbench View Properties', () => {
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
       await viewPropertiesTest.waitUntilPresent();
-      await expect(await viewPropertiesTest.viewTab.isClosable()).toBe(true);
+      await expect(viewPropertiesTest.viewTab.closeButton).toBeVisible();
     });
   });
 });

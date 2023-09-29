@@ -37,5 +37,13 @@ $tokens: (
   --sci-workbench-notification-severity-indicator-size: 6px,
   --sci-workbench-messagebox-max-width: 400px,
   --sci-workbench-messagebox-severity-indicator-size: 6px,
+  --sci-workbench-dialog-padding: .75em,
+  --sci-workbench-dialog-header-height: 2.75rem,
+  --sci-workbench-dialog-header-background-color: var(--sci-color-background-elevation),
+  --sci-workbench-dialog-header-divider-color: var(--sci-color-border),
+  --sci-workbench-dialog-title-font-family: inherit,
+  --sci-workbench-dialog-title-font-weight: normal,
+  --sci-workbench-dialog-title-font-size: 1.1rem,
+  --sci-workbench-dialog-title-align: center,
   --sci-workbench-contextmenu-width: 18rem,
 );

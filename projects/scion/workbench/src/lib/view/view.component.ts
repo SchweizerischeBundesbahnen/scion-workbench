@@ -9,8 +9,7 @@
  */
 
 import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild} from '@angular/core';
-import {AsyncSubject, combineLatest, EMPTY, fromEvent} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {AsyncSubject, combineLatest, EMPTY, fromEvent, switchMap} from 'rxjs';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {MessageBoxService} from '../message-box/message-box.service';
@@ -29,6 +28,9 @@ import {MessageBoxStackComponent} from '../message-box/message-box-stack.compone
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe} from '@angular/common';
 import {ViewDragService} from '../view-dnd/view-drag.service';
+import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
+import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
+import {ɵWorkbenchDialogService} from '../dialog/ɵworkbench-dialog.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -43,7 +45,12 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
   selector: 'wb-view',
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
-  providers: [MessageBoxService, PopupService],
+  providers: [
+    MessageBoxService,
+    PopupService,
+    ɵWorkbenchDialogService,
+    {provide: WorkbenchDialogService, useExisting: ɵWorkbenchDialogService},
+  ],
   standalone: true,
   imports: [
     RouterOutlet,
@@ -94,12 +101,13 @@ export class ViewComponent implements OnDestroy {
               private _host: ElementRef<HTMLElement>,
               private _cd: ChangeDetectorRef,
               private _viewDragService: ViewDragService,
-              messageBoxService: MessageBoxService,
+              private _workbenchDialogRegistry: WorkbenchDialogRegistry,
+              private _messageBoxService: MessageBoxService,
               viewContextMenuService: ViewMenuService,
               @Inject(VIEW_MODAL_MESSAGE_BOX_HOST) protected viewModalMessageBoxHostRef: ViewContainerReference) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
 
-    messageBoxService.messageBoxes$({includeParents: true})
+    this._messageBoxService.messageBoxes$({includeParents: true})
       .pipe(takeUntilDestroyed())
       .subscribe(messageBoxes => this._view.blocked = messageBoxes.length > 0);
 
@@ -111,10 +119,22 @@ export class ViewComponent implements OnDestroy {
       .pipe(takeUntilDestroyed())
       .subscribe(([active, viewport]) => active ? this.onActivateView(viewport) : this.onDeactivateView(viewport));
 
-    // Prevent this view from getting the focus when it is blocked, for example, when displaying a message box.
+    this.preventFocusIfBlocked();
+  }
+
+  /**
+   * Prevent view from gaining focus via sequential keyboard navigation when a dialog overlays it.
+   */
+  private preventFocusIfBlocked(): void {
     this._view.blocked$
-      .pipe(switchMap(blocked => blocked ? fromEvent(this._host.nativeElement, 'focusin', {capture: true}) : EMPTY))
-      .subscribe(() => messageBoxService.focusTop());
+      .pipe(
+        switchMap(blocked => blocked ? fromEvent(this._host.nativeElement, 'focusin') : EMPTY),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        this._workbenchDialogRegistry.top({viewId: this._view.id})!.focus();
+        this._messageBoxService.focusTop();
+      });
   }
 
   private onActivateView(viewport: SciViewportComponent): void {

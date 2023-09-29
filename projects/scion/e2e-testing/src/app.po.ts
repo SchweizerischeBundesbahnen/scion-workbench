@@ -18,6 +18,7 @@ import {PopupPO} from './popup.po';
 import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
+import {DialogPO} from './dialog.po';
 
 export class AppPO {
 
@@ -47,6 +48,7 @@ export class AppPO {
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${options?.confirmStartup ?? false}`);
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${options?.simulateSlowCapabilityLookup ?? false}`);
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${(options?.perspectives ?? []).join(';')}`);
+    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options?.dialogModalityScope ?? 'workbench');
 
     const featureQueryParams = new URLSearchParams();
     if (options?.stickyStartViewTab !== undefined) {
@@ -194,6 +196,20 @@ export class AppPO {
   }
 
   /**
+   * Returns bounding box of the 'wb-workbench' element.
+   */
+  public async workbenchBoundingBox(): Promise<DOMRect> {
+    return fromRect(await this.workbenchLocator.boundingBox());
+  }
+
+  /**
+   * Returns the bounding box of the browser page viewport.
+   */
+  public async pageBoundingBox(): Promise<DOMRect> {
+    return fromRect(await this.page.viewportSize());
+  }
+
+  /**
    * Handle to the specified notification.
    */
   public notification(locateBy?: {cssClass?: string | string[]; nth?: number}): NotificationPO {
@@ -212,10 +228,26 @@ export class AppPO {
   }
 
   /**
+   * Handle to the specified dialog.
+   */
+  public dialog(locateBy?: {cssClass?: string | string[]; nth?: number}): DialogPO {
+    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
+    const locator = this.page.locator(['wb-dialog'].concat(cssClasses).join('.'));
+    return new DialogPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
+  }
+
+  /**
    * Returns the number of opened message boxes.
    */
   public getMessageBoxCount(): Promise<number> {
     return this.page.locator('wb-message-box').count();
+  }
+
+  /**
+   * Returns the number of opened dialogs.
+   */
+  public getDialogCount(): Promise<number> {
+    return this.page.locator('wb-dialog').count();
   }
 
   /**
@@ -352,6 +384,10 @@ export interface Options {
    * Specifies perspectives to be registered in the testing app. Separate multiple perspectives by semicolon.
    */
   perspectives?: string[];
+  /**
+   * Controls the scope of application-modal workbench dialogs. By default, if not specified, workbench scope will be used.
+   */
+  dialogModalityScope?: 'workbench' | 'viewport';
 }
 
 /**
@@ -382,4 +418,9 @@ export enum WorkenchStartupQueryParams {
    * Query param to register perspectives. Multiple perspectives are separated by semicolon.
    */
   PERSPECTIVES = 'perspectives',
+
+  /**
+   * Query param to set the scope for application-modal dialogs.
+   */
+  DIALOG_MODALITY_SCOPE = 'dialogModalityScope',
 }

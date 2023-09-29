@@ -52,11 +52,6 @@ export abstract class WorkbenchView {
   public abstract dirty: boolean;
 
   /**
-   * Specifies if the view is blocked, e.g., not interactable because of showing a view-modal message box.
-   */
-  public abstract blocked: boolean;
-
-  /**
    * Specifies if a close button should be displayed in the view tab.
    */
   public abstract closable: boolean;

@@ -44,7 +44,7 @@ test.describe('Workbench View', () => {
 
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPage.enterHeading('heading');
-    await expect(viewPage.viewTab.headingLocator).not.toBeVisible();
+    await expect(viewPage.viewTab.heading).not.toBeVisible();
   });
 
   test('should not display the view tab heading if the tab height < 3.5rem', async ({appPO, workbenchNavigator}) => {
@@ -53,7 +53,7 @@ test.describe('Workbench View', () => {
 
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPage.enterHeading('heading');
-    await expect(viewPage.viewTab.headingLocator).not.toBeVisible();
+    await expect(viewPage.viewTab.heading).not.toBeVisible();
   });
 
   test('should display the view tab heading if the tab height >= 3.5rem', async ({appPO, workbenchNavigator}) => {
@@ -62,7 +62,7 @@ test.describe('Workbench View', () => {
 
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPage.enterHeading('heading');
-    await expect(viewPage.viewTab.headingLocator).toBeVisible();
+    await expect(viewPage.viewTab.heading).toBeVisible();
     await expect(await viewPage.viewTab.getHeading()).toEqual('heading');
   });
 
@@ -187,15 +187,15 @@ test.describe('Workbench View', () => {
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // View tab expected to be pristine for new views
-    await expect(await viewPage.viewTab.isClosable()).toBe(true);
+    await expect(viewPage.viewTab.closeButton).toBeVisible();
 
     // Prevent the view from being closed
     await viewPage.checkClosable(false);
-    await expect(await viewPage.viewTab.isClosable()).toBe(false);
+    await expect(viewPage.viewTab.closeButton).not.toBeVisible();
 
     // Mark the view closable
     await viewPage.checkClosable(true);
-    await expect(await viewPage.viewTab.isClosable()).toBe(true);
+    await expect(viewPage.viewTab.closeButton).toBeVisible();
   });
 
   test('should emit when activating or deactivating a viewtab', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -283,12 +283,12 @@ test.describe('Workbench View', () => {
 
     const contextMenu1 = await viewPage.view.viewTab.openContextMenu();
     // Expect menu item to be enabled.
-    await expect(await contextMenu1.menuItems.closeTab.isDisabled()).toBe(false);
+    await expect(contextMenu1.menuItems.closeTab.locator).not.toBeDisabled();
 
     await viewPage.checkClosable(false);
     const contextMenu2 = await viewPage.view.viewTab.openContextMenu();
     // Expect menu item to be disabled.
-    await expect(await contextMenu2.menuItems.closeTab.isDisabled()).toBe(true);
+    await expect(contextMenu2.menuItems.closeTab.locator).toBeDisabled();
   });
 
   test(`should not close 'non-closable' views via context menu 'Close all tabs'`, async ({appPO, workbenchNavigator}) => {

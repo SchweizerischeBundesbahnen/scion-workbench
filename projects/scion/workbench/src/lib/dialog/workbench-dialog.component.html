@@ -1,0 +1,21 @@
+<section class="dialog-pane e2e-dialog-pane"
+         [class.blinking]="blinking"
+         tabindex="-1"
+         (mousedown)="$event.stopPropagation()"
+         @enter
+         [@.disabled]="!dialog.animate"
+         #dialog_pane>
+  <header wbMove
+          (wbMoveStart)="onMoveStart()"
+          (wbMove)="onMove($event)"
+          (wbMoveEnd)="onMoveEnd()">
+    <div *ngIf="dialog.title | wbCoerceObservable$ | async as title" class="title e2e-title">
+      <span>{{title}}</span>
+    </div>
+    <button *ngIf="dialog.closable" class="close scion-workbench-icons e2e-close" (mousedown)="onCloseMouseDown($event)" (click)="onCloseClick()">close</button>
+  </header>
+
+  <sci-viewport class="content" cdkTrapFocus>
+    <ng-container *ngComponentOutlet="dialog.component; inputs: dialog.inputs"></ng-container>
+  </sci-viewport>
+</section>

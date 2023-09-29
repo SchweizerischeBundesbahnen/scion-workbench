@@ -59,6 +59,11 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'Workbench Messagebox', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-message-box-opener', pinToStartPage: true},
   },
   {
+    path: 'test-dialog-opener',
+    loadComponent: () => import('./dialog-opener-page/dialog-opener-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Dialog', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-dialog-opener', pinToStartPage: true},
+  },
+  {
     path: 'test-notification-opener',
     loadComponent: () => import('./notification-opener-page/notification-opener-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench Notification', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-notification-opener', pinToStartPage: true},

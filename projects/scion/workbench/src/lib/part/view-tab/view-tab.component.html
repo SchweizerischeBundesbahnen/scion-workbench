@@ -12,7 +12,7 @@
   <div class="circle"></div>
 </div>
 
-<button *ngIf="view.closable && !view.blocked"
+<button *ngIf="view.closable"
         class="close e2e-close scion-workbench-icons"
         (click)="onClose($event)">
   close

@@ -13,6 +13,7 @@ import {test} from '../fixtures';
 import {InspectMessageBoxComponentPO} from '../inspect-message-box-component.po';
 import {TextMessageComponentPO} from '../text-message-component.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
+import {ViewPagePO} from './page-object/view-page.po';
 
 test.describe('Workbench Message Box', () => {
 
@@ -149,19 +150,46 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.clickOpen();
 
     const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.isPresent()).toBe(true);
-    await expect(await msgbox.getModality()).toEqual('view');
+    await expect(msgbox.locator).toBeVisible();
 
     // activate another view
     await appPO.openNewViewTab();
-    await expect(await msgbox.isPresent()).toBe(true);
-    await expect(await msgbox.isVisible()).toBe(false);
+    await expect(msgbox.locator).toBeAttached();
+    await expect(msgbox.locator).not.toBeVisible();
 
     // re-activate the view
     await msgboxOpenerPage.viewTab.click();
-    await expect(await msgbox.isPresent()).toBe(true);
-    await expect(await msgbox.isVisible()).toBe(true);
+    await expect(msgbox.locator).toBeVisible();
+  });
+
+  test('should detach message box if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view in main area.
+    const viewPageInMainArea = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Open message box opener view.
+    const messageBoxOpenerView = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+
+    // Drag message box opener view into peripheral area.
+    await messageBoxOpenerView.viewTab.dragTo({grid: 'workbench', region: 'east'});
+
+    // Open message box.
+    await messageBoxOpenerView.enterCssClass('testee');
+    await messageBoxOpenerView.clickOpen();
+
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect(messageBox.locator).toBeVisible();
+
+    // Maximize the main area.
+    await viewPageInMainArea.viewTab.dblclick();
+    await expect(messageBoxOpenerView.view.locator).not.toBeVisible();
+    await expect(messageBox.locator).not.toBeVisible();
+
+    // Restore the layout.
+    await viewPageInMainArea.viewTab.dblclick();
+    await expect(messageBoxOpenerView.view.locator).toBeVisible();
+    await expect(messageBox.locator).toBeVisible();
   });
 
   test('should not destroy the message box when its contextual view (if any) is deactivated', async ({appPO, workbenchNavigator}) => {
@@ -258,8 +286,7 @@ test.describe('Workbench Message Box', () => {
     await expect(await appPO.getMessageBoxCount()).toEqual(1);
   });
 
-  test.fixme('should prevent closing a view if it displays a message box with view modality', async ({appPO, workbenchNavigator}) => {
-    // FIXME: this test will run as soon as https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/344 is fixed
+  test('should prevent closing a view if it displays a message box with view modality', async ({page, appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const viewTab1 = (await appPO.openNewViewTab()).view!.viewTab;
@@ -305,8 +332,13 @@ test.describe('Workbench Message Box', () => {
     await expect(await appPO.getMessageBoxCount()).toEqual(1);
 
     // close view 2, should not be possible
-    await viewTab2.close();
-    // also try to close by keystrokes and context menu
+    await expect(viewTab2.closeButton).not.toBeVisible();
+    // context menu should be disabled
+    const viewTab2ContextMenu = await viewTab2.openContextMenu();
+    await expect(viewTab2ContextMenu.menuItems.closeTab.locator).toBeDisabled();
+    // also try to close by keystrokes
+    await page.keyboard.press('Control+k');
+
     await expect(await viewTab2.isActive()).toBe(true);
     await expect(await msgbox.isVisible()).toBe(true);
     await expect(await msgbox.isPresent()).toBe(true);

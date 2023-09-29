@@ -1,0 +1,115 @@
+@mixin show-ellipsis-on-overflow {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+:host {
+  --ɵdialog-transform-translate-x: 0;
+  --ɵdialog-transform-translate-y: 0;
+  --ɵdialog-min-height: initial;
+  --ɵdialog-height: initial;
+  --ɵdialog-max-height: initial;
+  --ɵdialog-min-width: initial;
+  --ɵdialog-width: initial;
+  --ɵdialog-max-width: initial;
+  --ɵdialog-padding: var(--sci-workbench-dialog-padding);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative; // positioning context for the dialog pane
+  // Enable pointer events because disabled on CDK overlay (div.cdk-overlay-pane.wb-dialog-glass-pane).
+  pointer-events: auto;
+
+  &[data-viewid] {
+    // The overlay of view-modal dialogs covers the touch area of adjacent part dividers since rendered on top of the workbench layout.
+    // To improve usability, we shrink the overlay by a few pixels to make it easier for the user to grab the divider.
+    margin: 2px;
+  }
+
+  > section.dialog-pane {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 3%;
+    gap: calc(1.25 * var(--ɵdialog-padding));
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    color: var(--sci-color-text);
+    background-color: var(--sci-color-background-elevation);
+    box-shadow: var(--sci-elevation) var(--sci-static-color-black);
+    transform: translateX(calc(1px * var(--ɵdialog-transform-translate-x))) translateY(calc(1px * var(--ɵdialog-transform-translate-y)));
+    min-height: var(--ɵdialog-min-height);
+    height: var(--ɵdialog-height);
+    max-height: var(--ɵdialog-max-height);
+    min-width: var(--ɵdialog-min-width);
+    width: var(--ɵdialog-width);
+    max-width: var(--ɵdialog-max-width);
+
+    > header {
+      flex: none;
+      display: flex;
+      place-content: flex-end;
+      gap: var(--ɵdialog-padding);
+      background-color: var(--sci-workbench-dialog-header-background-color);
+      border-top-left-radius: inherit;
+      border-top-right-radius: inherit;
+      border-bottom: 1px solid var(--sci-workbench-dialog-header-divider-color);
+      height: var(--sci-workbench-dialog-header-height);
+      padding-inline: var(--ɵdialog-padding);
+
+      > div.title {
+        flex: auto;
+        display: flex;
+        align-items: center;
+        position: relative; // positioning context for the title span
+
+        > span {
+          position: absolute; // out of document flow to not contribute to the dialog width
+          left: 0;
+          right: 0;
+          @include show-ellipsis-on-overflow;
+          font-family: var(--sci-workbench-dialog-title-font-family);
+          font-size: var(--sci-workbench-dialog-title-font-size);
+          font-weight: var(--sci-workbench-dialog-title-font-weight);
+          text-align: var(--sci-workbench-dialog-title-align);
+        }
+      }
+
+      > button.close {
+        all: unset;
+        flex: none;
+        cursor: pointer;
+        align-self: center;
+
+        &:not(:hover) {
+          opacity: .75;
+        }
+      }
+    }
+
+    > sci-viewport {
+      flex: auto;
+
+      &::part(content) {
+        padding: var(--ɵdialog-padding);
+      }
+    }
+
+    &.blinking {
+      animation-duration: 50ms;
+      animation-iteration-count: infinite;
+      animation-name: blink-animation;
+
+      @keyframes blink-animation {
+        from {
+          transform: translateX(calc(calc(1px * var(--ɵdialog-transform-translate-x)) - 2px)) translateY(calc(calc(1px * var(--ɵdialog-transform-translate-y)) - 1px));
+        }
+        to {
+          transform: translateX(calc(calc(1px * var(--ɵdialog-transform-translate-x)) + 2px)) translateY(calc(calc(1px * var(--ɵdialog-transform-translate-y)) + 1px));
+        }
+      }
+    }
+  }
+}
