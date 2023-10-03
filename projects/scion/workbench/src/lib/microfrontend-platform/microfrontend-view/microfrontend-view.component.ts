@@ -65,7 +65,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
    */
   public keystrokesToBubble$: Observable<string[]>;
 
-  constructor(private _route: ActivatedRoute,
+  constructor(private _host: ElementRef<HTMLElement>,
+              private _route: ActivatedRoute,
               private _view: ɵWorkbenchView,
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
@@ -260,6 +261,13 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
 
     const doit = this._messageClient.request$<boolean>(closingTopic).pipe(mapToBody(), catchError(() => EMPTY));
     return firstValueFrom(doit, {defaultValue: true});
+  }
+
+  public onFocusWithin(event: Event): void {
+    const {detail: focusWithin} = event as CustomEvent<boolean>;
+    if (focusWithin) {
+      this._host.nativeElement.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
+    }
   }
 
   /**

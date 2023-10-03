@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectorRef, Component, ElementRef, HostBinding, inject, Injector, NgZone, OnDestroy, OnInit} from '@angular/core';
-import {combineLatestWith, EMPTY, from, fromEvent, mergeMap, switchMap} from 'rxjs';
+import {combineLatestWith, EMPTY, from, fromEvent, merge, mergeMap, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {take} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
@@ -126,8 +126,8 @@ export class PartComponent implements OnInit, OnDestroy {
         // Wait until the zone has stabilized to not activate the part on creation, but only on user interaction.
         // For example, if the view sets the initial focus, the related `focusin` event should not activate the part.
         combineLatestWith(inject(NgZone).onStable.pipe(take(1))),
-        // Suspend listening for `focusin` events while this part is active.
-        switchMap(([active]) => active ? EMPTY : fromEvent<FocusEvent>(host, 'focusin', {once: true})),
+        // Suspend listening for `focusin` or `sci-microfrontend-focusin` events while this part is active.
+        switchMap(([active]) => active ? EMPTY : merge(fromEvent<FocusEvent>(host, 'focusin', {once: true}), fromEvent(host, 'sci-microfrontend-focusin', {once: true}))),
         takeUntilDestroyed(),
       )
       .subscribe(() => {
