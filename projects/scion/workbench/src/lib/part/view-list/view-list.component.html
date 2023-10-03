@@ -8,14 +8,14 @@
                       wbFilterByText$:filterFormControl:viewTextFn | async
   } as views">
   <sci-viewport *ngIf="views.scrolledOutOfView?.length || views.scrolledIntoView?.length">
-    <ul>
-      <li *ngFor="let view of views.scrolledOutOfView">
-        <wb-view-tab [viewId]="view.id" context="tabbar-dropdown" (click)="onActivateView()"></wb-view-tab>
-      </li>
-      <li class="separator" *ngIf="views.scrolledOutOfView?.length && views.scrolledIntoView?.length"></li>
-      <li *ngFor="let view of views.scrolledIntoView">
-        <wb-view-tab [viewId]="view.id" context="tabbar-dropdown" (click)="onActivateView()"></wb-view-tab>
-      </li>
-    </ul>
+    <wb-view-list-item *ngFor="let view of views.scrolledOutOfView"
+                       [viewId]="view.id"
+                       (click)="onActivateView(view)">
+    </wb-view-list-item>
+    <hr *ngIf="views.scrolledOutOfView?.length && views.scrolledIntoView?.length">
+    <wb-view-list-item *ngFor="let view of views.scrolledIntoView"
+                       [viewId]="view.id"
+                       (click)="onActivateView(view)">
+    </wb-view-list-item>
   </sci-viewport>
 </ng-container>

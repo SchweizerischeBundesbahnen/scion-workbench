@@ -44,15 +44,16 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export class MessageBoxComponent implements OnInit {
 
-  private _accDeltaX = 0;
-  private _accDeltaY = 0;
+  @HostBinding('style.--ɵmessage-box-transform-translate-x')
+  protected _transformTranslateX = 0;
+
+  @HostBinding('style.--ɵmessage-box-transform-translate-y')
+  protected _transformTranslateY = 0;
+
   private _cancelBlinkTimer$ = new Subject<void>();
   private _activeActionButton: HTMLElement | undefined;
 
   public portal: ComponentPortal<any> | undefined;
-
-  @HostBinding('style.transform')
-  public transform: string | undefined;
 
   @HostBinding('class.blinking')
   public blinking = false;
@@ -110,9 +111,8 @@ export class MessageBoxComponent implements OnInit {
   }
 
   public onMove(delta: MoveDelta): void {
-    this._accDeltaX += delta.deltaX;
-    this._accDeltaY += delta.deltaY;
-    this.transform = `translate(${this._accDeltaX}px, ${this._accDeltaY}px)`;
+    this._transformTranslateX += delta.deltaX;
+    this._transformTranslateY += delta.deltaY;
   }
 
   public onMoveEnd(): void {
@@ -141,7 +141,7 @@ export class MessageBoxComponent implements OnInit {
     this.blinking = true;
     this._cd.markForCheck();
 
-    timer(500)
+    timer(300)
       .pipe(
         takeUntil(this._cancelBlinkTimer$),
         takeUntilDestroyed(this._destroyRef),

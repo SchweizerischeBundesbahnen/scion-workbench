@@ -1,19 +1,24 @@
 <sci-viewport class="tabbar" scrollbarStyle="hidden"
+              [class.dragover]="dragover$ | async"
               sciDimension (sciDimensionChange)="onTabbarViewportDimensionChange()"
               (scroll)="onScroll()">
-  <div class="viewport-client" sciDimension (sciDimensionChange)="onTabbarViewportClientDimensionChange()">
-    <wb-view-tab *ngFor="let viewId of viewIds$ | async"
-                 #viewtab
+  <ng-container *ngFor="let viewId of viewIds$ | async;">
+    <div class="divider" *ngIf="viewtab === dropTargetViewTab"></div>
+    <wb-view-tab #viewtab
                  [viewId]="viewId"
-                 context="tabbar"
                  [class.drag-source]="viewtab === dragSourceViewTab"
                  [class.drop-target]="viewtab === dropTargetViewTab">
     </wb-view-tab>
+    <div class="divider"></div>
+  </ng-container>
 
-    <!-- Add a placeholder element to grow the viewport to fit the drag image. -->
-    <div class="drag-image-placeholder"></div>
-  </div>
+  <!-- Placeholder element to grow the viewport to fit the drag image. -->
+  <div class="drag-image-placeholder"></div>
 </sci-viewport>
-
 <wb-part-action-bar/>
 <wb-view-list-button/>
+
+<!-- Element for injecting the corner radius into the component. -->
+<div class="tab-corner-radius" #tab_corner_radius></div>
+<!-- Element for injecting the tabbar padding into the component. -->
+<div class="padding-inline" #padding_inline></div>

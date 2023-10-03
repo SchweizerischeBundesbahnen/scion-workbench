@@ -1,11 +1,5 @@
 /**
- * Copyright (c) 2018-2023 Swiss Federal Railways
- *
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
+ * Installs icons used by the SCION Workbench.
  */
 
 @use 'sass:map';
@@ -15,13 +9,13 @@
  * This version is appended to the HTTP request as query parameter when fetching the icon font to support cache busting.
  * Update this version when adding, removing or changing icons.
  */
-$version: 2;
+$-version: 2;
 
-$default-icon-font-config: (
+$-default-icon-font-config: (
   // Path should be "root relative" to support HTML base href.
   directory: 'assets/fonts',
   filename: 'scion-workbench-icons',
-  version: $version,
+  version: $-version,
 );
 
 /**
@@ -34,10 +28,11 @@ $default-icon-font-config: (
  * <span class="scion-workbench-icons">close</span>
  * ```
  */
-@mixin icon-font($theme) {
-  $effective-config: map.merge($default-icon-font-config, if(map.has-key($theme, icon-font), map.get($theme, icon-font), ()));
-  $path: map.get($effective-config, directory) + '/' + map.get($effective-config, filename);
-  $version: map.get($effective-config, version);
+@mixin install-icon-font($config) {
+  $config: if($config, $config, ());
+  $config: map.merge($-default-icon-font-config, $config);
+  $path: map.get($config, directory) + '/' + map.get($config, filename);
+  $version: map.get($config, version);
 
   @font-face {
     font-family: 'scion-workbench-icons';

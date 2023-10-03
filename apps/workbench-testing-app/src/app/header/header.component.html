@@ -1,3 +1,9 @@
+<div class="theme-switcher">
+  <button (click)="onActivateDarkTheme()" sciMaterialIcon>dark_mode</button>
+  <sci-toggle-button [formControl]="lightThemeActiveFormControl"></sci-toggle-button>
+  <button (click)="onActivateLightTheme()" sciMaterialIcon>light_mode</button>
+</div>
+
 <div class="toggle-buttons e2e-perspective-toggles">
   <button *ngFor="let perspective of workbenchService.perspectives$ | async"
           (click)="onPerspectiveActivate(perspective.id)"
@@ -8,6 +14,6 @@
     {{perspective.data[PerspectiveData.label] ?? perspective.id}}
   </button>
 </div>
-<button class="material-icons menu-button e2e-menu-button" (click)="onMenuOpen($event)">
+<button (click)="onMenuOpen($event)" class="menu-button e2e-menu-button" sciMaterialIcon>
   more_vert
 </button>

@@ -23,18 +23,20 @@
         padding: 1em;
         border-width: 1px;
         border-style: solid;
+        border-radius: var(--sci-corner);
         text-align: center;
+        font-family: monospace;
 
         &[data-zone="inside-angular"] {
-          color: #004d00;
-          background-color: #dff5df;
-          border-color: #004d00;
+          color: var(--sci-color-positive);
+          background-color: var(--sci-color-background-positive);
+          border-color: var(--sci-color-positive);
         }
 
         &[data-zone="outside-angular"] {
-          color: var(--sci-color-W900);
-          background-color: var(--sci-color-W50);
-          border-color: var(--sci-color-W900);
+          color: var(--sci-color-negative);
+          background-color: var(--sci-color-background-negative);
+          border-color: var(--sci-color-negative);
         }
       }
     }

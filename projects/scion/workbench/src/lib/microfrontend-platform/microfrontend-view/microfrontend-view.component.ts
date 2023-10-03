@@ -13,7 +13,7 @@ import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
 import {asapScheduler, combineLatest, EMPTY, firstValueFrom, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
 import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
-import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
+import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵTHEME_CONTEXT_KEY, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchViewPreDestroy} from '../../workbench.model';
@@ -32,6 +32,8 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {ContentAsOverlayComponent} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {WorkbenchService} from '../../workbench.service';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -65,6 +67,11 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
    */
   public keystrokesToBubble$: Observable<string[]>;
 
+  /**
+   * Indicates whether a workbench drag operation is in progress, such as when dragging a view or moving a sash.
+   */
+  public isWorkbenchDrag = false;
+
   constructor(private _host: ElementRef<HTMLElement>,
               private _route: ActivatedRoute,
               private _view: ɵWorkbenchView,
@@ -74,11 +81,14 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
               private _destroyRef: DestroyRef,
               private _logger: Logger,
               private _viewContextMenuService: ViewMenuService,
+              private _workbenchLayoutService: WorkbenchLayoutService,
               private _workbenchRouter: WorkbenchRouter,
+              private _workbenchService: WorkbenchService,
               @Inject(IFRAME_HOST) protected iframeHostRef: ViewContainerReference) {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this._view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
       .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
+    this.installWorkbenchDragDetector();
   }
 
   public ngOnInit(): void {
@@ -107,6 +117,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
+
+    this.installThemePropagator();
   }
 
   private async onNavigate(prevRouteSnapshot: ActivatedMicrofrontendRouteSnapshot | undefined, currRouteSnapshot: ActivatedMicrofrontendRouteSnapshot): Promise<void> {
@@ -293,6 +305,34 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
         })),
         mapArray(accelerator => ['keydown'].concat(accelerator).join('.')),
       );
+  }
+
+  /**
+   * Sets the {@link isWorkbenchDrag} property when a workbench drag operation is detected,
+   * such as when dragging a view or moving a sash.
+   */
+  private installWorkbenchDragDetector(): void {
+    this._workbenchLayoutService.dragging$
+      .pipe(takeUntilDestroyed())
+      .subscribe(event => {
+        this.isWorkbenchDrag = (event === 'start');
+      });
+  }
+
+  /**
+   * Propagates the current workbench theme to the view microfrontend via router outlet context.
+   */
+  private installThemePropagator(): void {
+    this._workbenchService.theme$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(theme => {
+        if (theme) {
+          this.routerOutletElement.nativeElement.setContextValue(ɵTHEME_CONTEXT_KEY, theme);
+        }
+        else {
+          this.routerOutletElement.nativeElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
+        }
+      });
   }
 
   public ngOnDestroy(): void {

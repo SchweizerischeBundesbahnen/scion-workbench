@@ -1,15 +1,8 @@
-<div class="title e2e-title">
+<span class="title e2e-title">
   <span *ngIf="view.dirty" class="scion-workbench-icons dirty">dirty</span>
   {{view.title}}
-</div>
+</span>
 
-<div class="heading e2e-heading" *ngIf="view.heading">
+<span class="heading e2e-heading" *ngIf="view.heading">
   {{view.heading}}
-</div>
-
-<button *ngIf="view.closable"
-        type="button"
-        class="close e2e-close scion-workbench-icons"
-        (click)="onClose($event)">
-  close
-</button>
+</span>

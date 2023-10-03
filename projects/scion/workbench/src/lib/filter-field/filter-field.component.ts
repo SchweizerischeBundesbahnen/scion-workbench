@@ -50,7 +50,6 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
   @Input()
   public placeholder?: string | undefined;
 
-  @HostBinding('class.disabled')
   @Input()
   public set disabled(disabled: boolean | string | undefined | null) {
     coerceBooleanProperty(disabled) ? this.formControl.disable() : this.formControl.enable();

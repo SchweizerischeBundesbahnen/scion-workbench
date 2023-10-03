@@ -32,3 +32,5 @@ export {WorkbenchMessageBoxConfig} from './lib/message-box/workbench-message-box
 export {WorkbenchNotificationCapability} from './lib/notification/workbench-notification-capability';
 export {WorkbenchNotificationService} from './lib/notification/workbench-notification-service';
 export {WorkbenchNotificationConfig} from './lib/notification/workbench-notification.config';
+export {WorkbenchThemeMonitor} from './lib/theme/workbench-theme-monitor';
+export {ɵTHEME_CONTEXT_KEY} from './lib/theme/ɵworkbench-theme-monitor';

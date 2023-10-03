@@ -1,5 +1,3 @@
-@use '../../../../theme/colors';
-
 @mixin show-ellipsis-on-overflow {
   text-overflow: ellipsis;
   overflow: hidden;
@@ -9,45 +7,55 @@
 :host {
   display: flex;
   flex-direction: column;
-  width: 250px;
-  border: 1px solid colors.$viewlistitem-border-color;
-  background-color: colors.$part_tab-active-bgcolor;
-  box-shadow: 8px 8px 9px -9px rgba(0, 0, 0, 0.2);
+  gap: 1px; // space for top/bottom borders when hovering the menu item
+  width: var(--sci-workbench-contextmenu-width);
+  border: 1px solid var(--sci-color-border);
+  color: var(--sci-color-text);
+  background-color: var(--sci-color-background-elevation);
+  border-radius: var(--sci-corner);
+  overflow: hidden;
 
-  > div.menu-item-group {
+  > button.menu-item {
+    all: unset;
     display: flex;
-    flex-direction: column;
+    flex-flow: row nowrap;
+    padding: .6em 1.5em;
+    font-size: smaller;
+    position: relative; // positioning context for separator pseudo element
 
-    &:not(:last-child) {
-      border-bottom: 1px solid colors.$viewlistitem-border-color;
+    > div.text {
+      flex: auto;
+      @include show-ellipsis-on-overflow;
     }
 
-    > button.menu-item {
-      all: unset;
-      display: flex;
-      flex-flow: row nowrap;
-      padding: .6em 1.5em;
-      font-size: smaller;
-
-      > div.text {
-        flex: auto;
-        @include show-ellipsis-on-overflow;
-      }
-
-      > div.accelerator {
-        flex: none;
-        margin-left: 1em;
-      }
-
-      &:hover {
-        background-color: rgba(239, 239, 239, .5);
-        box-shadow: 0 0 0 1px colors.$viewlistitem-border-color;
-      }
-
-      &:disabled {
-        opacity: .5;
-        pointer-events: none;
-      }
+    > div.accelerator {
+      flex: none;
+      margin-left: 1em;
     }
+
+    &:hover {
+      background-color: var(--sci-color-background-elevation-hover);
+      box-shadow: 0 0 0 1px var(--sci-color-border);
+    }
+
+    &:disabled {
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    // separator
+    &:has(+ hr):after {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background-color: var(--sci-color-border);
+      content: '';
+    }
+  }
+
+  > hr {
+    display: none; // remove from flex container to not render the gap between flex items
   }
 }

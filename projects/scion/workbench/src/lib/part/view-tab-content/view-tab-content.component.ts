@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Inject} from '@angular/core';
-import {VIEW_TAB_CONTEXT, ViewTabContext} from '../../workbench.constants';
+import {Component, HostBinding, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {NgIf} from '@angular/common';
+import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 
 @Component({
   selector: 'wb-view-tab-content',
@@ -23,34 +23,8 @@ import {NgIf} from '@angular/common';
 export class ViewTabContentComponent {
 
   @HostBinding('attr.context')
-  public context: ViewTabContext;
+  public readonly context = inject<ViewTabRenderingContext>(VIEW_TAB_RENDERING_CONTEXT);
 
-  @HostBinding('class.has-heading')
-  public get hasHeading(): boolean {
-    return !!this.view.heading;
-  }
-
-  @HostBinding('class.active')
-  public get active(): boolean {
-    return this.view.active;
-  }
-
-  @HostBinding('class.blocked')
-  public get blocked(): boolean {
-    return this.view.blocked;
-  }
-
-  @HostBinding('class.scrolled-into-view')
-  public get isScrolledIntoView(): boolean {
-    return this.view.scrolledIntoView;
-  }
-
-  constructor(public view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {
-    this.context = context;
-  }
-
-  public onClose(event: Event): void {
-    event.stopPropagation(); // prevent the view from being activated
-    this.view.close().then();
+  constructor(public view: WorkbenchView) {
   }
 }

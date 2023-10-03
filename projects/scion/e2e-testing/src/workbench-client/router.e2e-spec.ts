@@ -1025,6 +1025,7 @@ test.describe('Workbench Router', () => {
 
   test('should set view properties upon initial view tab navigation', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
     // register testee view
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
@@ -1054,6 +1055,7 @@ test.describe('Workbench Router', () => {
 
   test('should set view properties upon initial view tab navigation when replacing an existing workbench view', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
     // register testee view
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
@@ -1088,6 +1090,7 @@ test.describe('Workbench Router', () => {
 
   test('should set view properties when navigating in the current view tab', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
     // register testee-1 view
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
@@ -1147,6 +1150,7 @@ test.describe('Workbench Router', () => {
 
   test('should not set view properties when performing self navigation, e.g., when updating view params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
     // register testee-1 view
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
@@ -2165,6 +2169,7 @@ test.describe('Workbench Router', () => {
 
   test('should substitute named parameter in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
     // register testee microfrontend
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
@@ -2197,6 +2202,7 @@ test.describe('Workbench Router', () => {
 
   test('should substitute multiple named parameters in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
     // register testee microfrontend
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');

@@ -16,6 +16,10 @@ import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-
 import {Router} from '@angular/router';
 import {MenuService} from '../menu/menu.service';
 import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button';
 
 @Component({
   selector: 'app-header',
@@ -26,16 +30,21 @@ import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
   imports: [
     NgFor,
     AsyncPipe,
+    ReactiveFormsModule,
+    SciMaterialIconDirective,
+    SciToggleButtonComponent,
   ],
 })
 export class HeaderComponent {
 
   protected readonly PerspectiveData = PerspectiveData;
+  protected readonly lightThemeActiveFormControl = new FormControl<boolean>(true);
 
   constructor(private _router: Router,
               private _wbRouter: WorkbenchRouter,
               private _menuService: MenuService,
               protected workbenchService: WorkbenchService) {
+    this.installThemeSwitcher();
   }
 
   protected async onPerspectiveActivate(id: string): Promise<void> {
@@ -145,5 +154,27 @@ export class HeaderComponent {
     href.searchParams.append(WorkbenchStartupQueryParams.LAUNCHER_QUERY_PARAM, options.launcher);
     href.searchParams.append(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM, `${options.standalone}`);
     window.open(href);
+  }
+
+  protected onActivateLightTheme(): void {
+    this.lightThemeActiveFormControl.setValue(true);
+  }
+
+  protected onActivateDarkTheme(): void {
+    this.lightThemeActiveFormControl.setValue(false);
+  }
+
+  private installThemeSwitcher(): void {
+    this.workbenchService.theme$
+      .pipe(takeUntilDestroyed())
+      .subscribe(theme => {
+        this.lightThemeActiveFormControl.setValue(theme === 'scion-light', {emitEvent: false});
+      });
+
+    this.lightThemeActiveFormControl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(lightTheme => {
+        this.workbenchService.switchTheme(lightTheme ? 'scion-light' : 'scion-dark').then();
+      });
   }
 }

@@ -39,7 +39,7 @@ export class ViewDragService implements OnDestroy {
   private _viewDragStartBroadcastChannel = new WorkbenchBroadcastChannel<ViewDragData>('workbench/view/dragstart');
   private _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
   private _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
-  private _tabbarDragOver$ = new BehaviorSubject<boolean>(false);
+  private _tabbarDragOver$ = new BehaviorSubject<string /* partId */ | null>(null);
 
   /**
    * Emits when the user starts dragging a viewtab. The event is received across app instances of the same origin.
@@ -57,11 +57,12 @@ export class ViewDragService implements OnDestroy {
   public readonly viewMove$: Observable<ViewMoveEvent> = this._viewMoveBroadcastChannel.observe$;
 
   /**
-   * Emits when the user is dragging a view over the tabbar of the current document.
+   * Emits the identity of the part when the user is dragging a view over its tabbar, or `null` if not dragging over a tabbar.
+   * The event is NOT received across app instances.
    *
    * Upon subscription, emits the current state, and then each time the state changes. The observable never completes.
    */
-  public readonly tabbarDragOver$: Observable<boolean> = this._tabbarDragOver$;
+  public readonly tabbarDragOver$: Observable<string | null> = this._tabbarDragOver$;
 
   constructor(private _zone: NgZone) {
     this.viewDragStart$
@@ -77,12 +78,28 @@ export class ViewDragService implements OnDestroy {
   }
 
   /**
-   * Invoke to inform when the user is dragging a view over the tabbar.
+   * Set when dragging a view over specified tabbar.
    */
-  public notifyDragOverTabbar(dragOverTabbar: boolean): void {
-    if (this._tabbarDragOver$.value !== dragOverTabbar) {
-      this._tabbarDragOver$.next(dragOverTabbar);
+  public setTabbarDragover(partId: string): void {
+    this._tabbarDragOver$.next(partId);
+  }
+
+  /**
+   * Unset when not dragging a view over specified tabbar anymore.
+   */
+  public unsetTabbarDragover(partId: string): void {
+    if (this._tabbarDragOver$.value === partId) {
+      this._tabbarDragOver$.next(null);
     }
+  }
+
+  /**
+   * Indicates if dragging a view tab over a tabbar.
+   *
+   * Returns the identity of the part if the user is dragging a view over its tabbar, or `null` if not dragging over a tabbar.
+   */
+  public get isDragOverTabbar(): string | null {
+    return this._tabbarDragOver$.value;
   }
 
   /**

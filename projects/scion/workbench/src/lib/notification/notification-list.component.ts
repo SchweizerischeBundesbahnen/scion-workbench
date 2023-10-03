@@ -61,9 +61,6 @@ export class NotificationListComponent {
         style({opacity: 0, left: '100%'}),
         animate('.3s ease-out', style({opacity: 1, left: 0})),
       ]),
-      transition(':leave', [
-        animate('.3s ease-out', style({opacity: 0})),
-      ]),
     ];
   }
 }

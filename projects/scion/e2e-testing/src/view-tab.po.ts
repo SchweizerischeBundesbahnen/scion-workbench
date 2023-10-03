@@ -23,6 +23,16 @@ export class ViewTabPO {
    */
   public readonly part: PartPO;
 
+  /**
+   * Locates the title of the view tab.
+   */
+  public readonly titleLocator = this._locator.locator('.e2e-title');
+
+  /**
+   * Locates the heading of the view tab.
+   */
+  public readonly headingLocator = this._locator.locator('.e2e-heading');
+
   constructor(private readonly _locator: Locator, part: PartPO) {
     this.part = part;
   }
@@ -55,15 +65,15 @@ export class ViewTabPO {
   }
 
   public getTitle(): Promise<string> {
-    return waitUntilStable(() => this._locator.locator('.e2e-title').innerText());
+    return waitUntilStable(() => this.titleLocator.innerText());
   }
 
   public getHeading(): Promise<string> {
-    return waitUntilStable(() => this._locator.locator('.e2e-heading').innerText());
+    return waitUntilStable(() => this.headingLocator.innerText());
   }
 
   public isDirty(): Promise<boolean> {
-    return waitUntilStable(() => hasCssClass(this._locator, 'dirty'));
+    return waitUntilStable(() => hasCssClass(this._locator, 'e2e-dirty'));
   }
 
   public async isClosable(): Promise<boolean> {

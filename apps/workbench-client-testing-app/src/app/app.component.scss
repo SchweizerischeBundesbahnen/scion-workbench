@@ -1,4 +1,4 @@
-@use '@scion/components.internal' as sci-ɵcomponents;
+@use '@scion/components.internal/design' as sci-design;
 
 :host {
   display: grid;
@@ -16,11 +16,15 @@
     padding: .25em;
 
     > span.chip.has-focus {
-      @include sci-ɵcomponents.theme-chip(var(--sci-color-primary-darker), var(--sci-color-background), var(--sci-color-P900));
+      @include sci-design.style-chip(var(--sci-color-accent), var(--sci-color-background-primary), var(--sci-color-accent));
     }
 
     > span.chip.app-symbolic-name {
-      @include sci-ɵcomponents.theme-chip(var(--app-color), var(--app-color), var(--sci-color-background));
+      @include sci-design.style-chip(var(--sci-color-text), var(--sci-color-background-primary), var(--sci-color-text));
+
+      &.has-focus {
+        @include sci-design.style-chip(var(--sci-color-accent), var(--sci-color-background-primary), var(--sci-color-accent));
+      }
     }
   }
 

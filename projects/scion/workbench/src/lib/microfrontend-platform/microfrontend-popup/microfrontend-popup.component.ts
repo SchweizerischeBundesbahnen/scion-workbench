@@ -8,13 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Application, ManifestService, MessageClient, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
+import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵTHEME_CONTEXT_KEY, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {Popup} from '../../popup/popup.config';
 import {NgClass} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {WorkbenchService} from '../../workbench.service';
 
 /**
  * Displays the microfrontend of a popup capability inside a workbench popup.
@@ -33,6 +35,12 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
   public popupCapability: WorkbenchPopupCapability;
 
+  /**
+   * Indicates whether a workbench drag operation is in progress, such as when dragging a view or moving a sash.
+   */
+  @HostBinding('class.workbench-drag')
+  public isWorkbenchDrag = false;
+
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
@@ -42,9 +50,12 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
               private _manifestService: ManifestService,
               private _messageClient: MessageClient,
               private _destroyRef: DestroyRef,
+              private _workbenchLayoutService: WorkbenchLayoutService,
+              private _workbenchService: WorkbenchService,
               private _logger: Logger) {
     this._popupContext = this.popup.input!;
     this.popupCapability = this._popupContext.capability;
+    this.installWorkbenchDragDetector();
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
   }
 
@@ -79,6 +90,8 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       params: this._popupContext.params,
       pushStateToSessionHistoryStack: false,
     }).then();
+
+    this.installThemePropagator();
   }
 
   public onFocusWithin(event: Event): void {
@@ -106,6 +119,34 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
    */
   public get popupId(): string {
     return this._popupContext.popupId;
+  }
+
+  /**
+   * Sets the {@link isWorkbenchDrag} property when a workbench drag operation is detected,
+   * such as when dragging a view or moving a sash.
+   */
+  private installWorkbenchDragDetector(): void {
+    this._workbenchLayoutService.dragging$
+      .pipe(takeUntilDestroyed())
+      .subscribe(event => {
+        this.isWorkbenchDrag = (event === 'start');
+      });
+  }
+
+  /**
+   * Propagates the current workbench theme to the popup microfrontend via router outlet context.
+   */
+  private installThemePropagator(): void {
+    this._workbenchService.theme$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(theme => {
+        if (theme) {
+          this.routerOutletElement.nativeElement.setContextValue(ɵTHEME_CONTEXT_KEY, theme);
+        }
+        else {
+          this.routerOutletElement.nativeElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
+        }
+      });
   }
 
   public ngOnDestroy(): void {

@@ -7,8 +7,14 @@
 
 On this page you will find the latest news about the development of the SCION Workbench.
 
-- **2023-05: Support Perspectives**\
-  A perspective is an arrangement of views around the main area. Multiple perspectives are supported. Different perspectives provide a different perspective on the application while sharing the main area. Only one perspective can be active at a time.
+- **2023-10: Theming of SCION Workbench**\
+  SCION Workbench has introduced design tokens for applications to control the look of the workbench.
+ 
+- **2023-10: Reworked Tab Design**\
+  SCION Workbench has a new tab design for improved user experience and a modern and consistent look.
+
+- **2023-05: Introduction of Perspectives**\
+  SCION Workbench now supports the definition of one or more view arrangements, referred to as perspectives. Perspectives can be switched. Perspectives share the same main area, if any.
  
 - **2023-05: Support Arranging Views Around the Main Area**\
   The workbench has a main area and a peripheral area for placing views. The main area is the primary place for views to interact with the application. The peripheral area arranges views around the main area. Peripheral views can be used to provide entry points to the application, tools or context-sensitive assistance to support the user's workflow.

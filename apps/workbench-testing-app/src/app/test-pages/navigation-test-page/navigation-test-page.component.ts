@@ -27,9 +27,6 @@ export class NavigationTestPageComponent {
         if (params.has('title')) {
           view.title = params.get('title');
         }
-        if (params.has('heading')) {
-          view.heading = params.get('heading');
-        }
         if (params.has('cssClass')) {
           view.cssClass = params.get('cssClass')!;
         }

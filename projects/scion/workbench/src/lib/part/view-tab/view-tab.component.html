@@ -1,1 +1,19 @@
-<ng-container *cdkPortalOutlet="viewTabContentPortal"></ng-container>
+<!-- IMPORTANT: THIS HTML FILE IS ALSO USED BY `ViewTabDragImageComponent` -->
+
+<div class="corner-radius start" *ngIf="view.active">
+  <div class="circle"></div>
+</div>
+
+<div class="content">
+  <ng-container *cdkPortalOutlet="viewTabContentPortal"></ng-container>
+</div>
+
+<div class="corner-radius end" *ngIf="view.active">
+  <div class="circle"></div>
+</div>
+
+<button *ngIf="view.closable && !view.blocked"
+        class="close e2e-close scion-workbench-icons"
+        (click)="onClose($event)">
+  close
+</button>

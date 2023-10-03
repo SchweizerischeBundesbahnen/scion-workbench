@@ -8,15 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Attribute, Component, ElementRef, HostBinding, HostListener, Injector, Input, IterableChanges, IterableDiffers, NgZone} from '@angular/core';
-import {SciViewportComponent} from '@scion/components/viewport';
+import {Component, ElementRef, HostBinding, HostListener, inject, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnChanges, SimpleChanges} from '@angular/core';
 import {fromEvent, merge, Subject, withLatestFrom} from 'rxjs';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {filter, map, switchMap} from 'rxjs/operators';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
-import {VIEW_TAB_CONTEXT} from '../../workbench.constants';
+import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 import {WorkbenchModuleConfig} from '../../workbench-module-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
@@ -26,59 +25,68 @@ import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {NgIf} from '@angular/common';
 
 /**
- * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
+ * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
+ *
+ * @see ViewTabDragImageComponent
  */
-const AUXILARY_MOUSE_BUTTON = 4;
-
 @Component({
   selector: 'wb-view-tab',
   templateUrl: './view-tab.component.html',
   styleUrls: ['./view-tab.component.scss'],
   standalone: true,
-  imports: [PortalModule],
+  imports: [
+    NgIf,
+    PortalModule,
+  ],
 })
-export class ViewTabComponent {
+export class ViewTabComponent implements OnChanges {
 
-  private _viewIdChange$ = new Subject<void>();
-  private _context: 'tabbar' | 'tabbar-dropdown';
+  private _ngOnChanges$ = new Subject<void>();
 
   public host: HTMLElement;
   public view!: ɵWorkbenchView;
-  public viewTabContentPortal!: ComponentPortal<any>;
+  public viewTabContentPortal!: ComponentPortal<unknown>;
 
   @Input({required: true})
   @HostBinding('attr.data-viewid')
-  public set viewId(viewId: string) {
-    this.view = this._viewRegistry.get(viewId);
-    this.viewTabContentPortal = this.createViewTabContentPortal();
-    this._viewIdChange$.next();
-  }
+  public viewId!: string;
 
-  public get viewId(): string {
-    return this.view.id;
+  @HostBinding('attr.draggable')
+  public draggable = true;
+
+  @HostBinding('attr.tabindex')
+  public tabindex = -1; // make the view focusable to install view menu accelerators
+
+  /**
+   * Indicates if dragging a view tab over this view tab's tabbar.
+   */
+  @HostBinding('class.drag-over-tabbar')
+  public get isDragOverTabbar(): boolean {
+    return this._viewDragService.isDragOverTabbar === this.view.part.id;
   }
 
   constructor(host: ElementRef<HTMLElement>,
-              // The context must be available during construction to create the portal for the view tab content.
-              // The param is weak typed as a string (instead as a string literal) due to Angular restrictions when building prod.
-              @Attribute('context') context: string,
               private _workbenchService: ɵWorkbenchService,
               private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _viewRegistry: WorkbenchViewRegistry,
               private _router: WorkbenchRouter,
-              private _viewport: SciViewportComponent,
               private _viewDragService: ViewDragService,
               private _differs: IterableDiffers,
               private _viewContextMenuService: ViewMenuService,
-              private _injector: Injector,
-              zone: NgZone) {
-    this._context = context as 'tabbar' | 'tabbar-dropdown';
+              private _injector: Injector) {
     this.host = host.nativeElement;
-    this.installMaximizeListener(zone);
+    this.installMaximizeListener();
     this.installViewCssClassListener();
     this.installViewMenuItemAccelerators();
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    this.view = this._viewRegistry.get(this.viewId);
+    this.viewTabContentPortal = this.createViewTabContentPortal();
+    this._ngOnChanges$.next();
   }
 
   @HostBinding('class.active')
@@ -86,19 +94,24 @@ export class ViewTabComponent {
     return this.view.active;
   }
 
-  @HostBinding('class.dirty')
-  public get dirty(): boolean {
-    return this.view.dirty;
+  @HostBinding('class.part-active')
+  public get partActive(): boolean {
+    return this.view.part.active;
   }
 
-  @HostBinding('class.blocked')
-  public get blocked(): boolean {
-    return this.view.blocked;
+  @HostBinding('class.e2e-dirty')
+  public get dirty(): boolean {
+    return this.view.dirty;
   }
 
   @HostListener('click')
   public onClick(): void {
     this.view.activate().then();
+  }
+
+  public onClose(event: Event): void {
+    event.stopPropagation(); // prevent the view from being activated
+    this.view.close().then();
   }
 
   @HostListener('mousedown', ['$event'])
@@ -112,19 +125,9 @@ export class ViewTabComponent {
 
   @HostListener('contextmenu', ['$event'])
   public onContextmenu(event: MouseEvent): void {
-    this._viewContextMenuService.showMenu({x: event.clientX, y: event.clientY}, this.viewId).then();
+    this._viewContextMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view.id).then();
     event.stopPropagation();
     event.preventDefault();
-  }
-
-  @HostBinding('attr.tabindex')
-  public get tabindex(): number {
-    return -1; // make the view focusable to install view menu accelerators
-  }
-
-  @HostBinding('attr.draggable')
-  public get draggable(): boolean {
-    return this._context === 'tabbar';
   }
 
   @HostListener('dragstart', ['$event'])
@@ -149,8 +152,8 @@ export class ViewTabComponent {
         partId: this.view.part.id,
         viewTabPointerOffsetX: event.offsetX,
         viewTabPointerOffsetY: event.offsetY,
-        viewTabWidth: (event.target as HTMLElement).offsetWidth,
-        viewTabHeight: (event.target as HTMLElement).offsetHeight,
+        viewTabWidth: this.host.getBoundingClientRect().width,
+        viewTabHeight: this.host.getBoundingClientRect().height,
         appInstanceId: this._workbenchService.appInstanceId,
       });
     });
@@ -166,35 +169,13 @@ export class ViewTabComponent {
   }
 
   /**
-   * Indicates whether this view tab is the drag source of a current view drag operation.
-   */
-  public isDragSource(): boolean {
-    return this._viewDragService.viewDragData?.viewId === this.viewId;
-  }
-
-  /**
-   * Returns whether this tab is fully scrolled into view.
-   */
-  public isScrolledIntoView(): boolean {
-    return this._viewport.isElementInView(this.host, 'full');
-  }
-
-  /**
-   * Scrolls this tab into view.
-   */
-  public scrollIntoView(): void {
-    if (!this.isScrolledIntoView()) {
-      this._viewport.scrollIntoView(this.host);
-    }
-  }
-
-  /**
    * Listens for 'dblclick' events to maximize or minimize the main area.
    *
    * Note that the listener is not activated until the mouse is moved. Otherwise, closing successive
    * views (if they have different tab widths) could result in unintended maximization or minimization.
    */
-  private installMaximizeListener(zone: NgZone): void {
+  private installMaximizeListener(): void {
+    const zone = inject(NgZone);
     const enabled$ = merge(fromEvent(this.host, 'mouseenter'), fromEvent(this.host, 'mousemove'), fromEvent(this.host, 'mouseleave'))
       .pipe(
         map(event => event.type === 'mousemove'), // the 'mousemove' event arms the listener
@@ -215,12 +196,12 @@ export class ViewTabComponent {
   }
 
   /**
-   * Adds view specific CSS classes to the <view-tab>.
+   * Adds view specific CSS classes to the view-tab.
    */
   private installViewCssClassListener(): void {
     const differ = this._differs.find([]).create<string>();
 
-    this._viewIdChange$
+    this._ngOnChanges$
       .pipe(
         switchMap(() => this.view.cssClasses$),
         map(cssClasses => differ.diff(cssClasses)),
@@ -234,7 +215,7 @@ export class ViewTabComponent {
   }
 
   private installViewMenuItemAccelerators(): void {
-    this._viewIdChange$
+    this._ngOnChanges$
       .pipe(
         switchMap(() => this._viewContextMenuService.installMenuItemAccelerators$(this.host, this.view)),
         takeUntilDestroyed(),
@@ -242,14 +223,19 @@ export class ViewTabComponent {
       .subscribe();
   }
 
-  private createViewTabContentPortal(): ComponentPortal<any> {
-    const injector = Injector.create({
+  private createViewTabContentPortal(): ComponentPortal<unknown> {
+    const componentType = this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent;
+    return new ComponentPortal(componentType, null, Injector.create({
       parent: this._injector,
       providers: [
         {provide: WorkbenchView, useValue: this.view},
-        {provide: VIEW_TAB_CONTEXT, useValue: this._context},
+        {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'tab' satisfies ViewTabRenderingContext},
       ],
-    });
-    return new ComponentPortal(this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent, null, injector);
+    }));
   }
 }
+
+/**
+ * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
+ */
+const AUXILARY_MOUSE_BUTTON = 4;

@@ -22,7 +22,7 @@ import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {FilterByPredicatePipe} from '../../common/filter-by-predicate.pipe';
 import {FilterByTextPipe} from '../../common/filter-by-text.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {ViewTabComponent} from '../view-tab/view-tab.component';
+import {ViewListItemComponent} from '../view-list-item/view-list-item.component';
 
 /**
  * Reference to inputs of {@link ViewListComponent}.
@@ -45,7 +45,7 @@ export const ViewListComponentInputs = {
     FilterFieldComponent,
     FilterByPredicatePipe,
     FilterByTextPipe,
-    ViewTabComponent,
+    ViewListItemComponent,
     SciViewportComponent,
   ],
 })
@@ -84,8 +84,8 @@ export class ViewListComponent implements OnInit {
     this._filterFieldComponent.focus();
   }
 
-  public onActivateView(): void {
-    // The view is activated in 'wb-view-tab' component.
+  public onActivateView(view: WorkbenchView): void {
+    view.activate().then();
     this._overlayRef.dispose();
   }
 

@@ -11,12 +11,12 @@
     align-items: center;
 
     &.start {
-      padding-left: .75em;
+      padding-left: var(--sci-workbench-part-bar-actions-padding-inline);
       place-content: flex-start;
     }
 
     &.end {
-      padding-right: .75em;
+      padding-right: var(--sci-workbench-part-bar-actions-padding-inline);
       place-content: flex-end;
     }
 

@@ -1,6 +1,12 @@
 :host {
   display: flex;
   flex-direction: column;
+  background-color: var(--sci-workbench-view-background-color);
+  color: var(--sci-color-text);
+
+  wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+    background-color: var(--sci-workbench-view-peripheral-background-color);
+  }
 
   &.blocked, &.view-drag {
     pointer-events: none;

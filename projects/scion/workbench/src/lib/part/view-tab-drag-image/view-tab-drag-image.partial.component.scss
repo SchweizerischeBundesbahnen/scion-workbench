@@ -1,0 +1,14 @@
+:host {
+  &.drag-over-peripheral-tabbar {
+    background-color: var(--sci-workbench-view-peripheral-background-color);
+  }
+
+  &:not(.drag-over-tabbar) {
+    border-radius: var(--sci-workbench-tab-border-radius);
+    border: 1px solid var(--sci-workbench-tab-drag-border-color);
+
+    > div.corner-radius {
+      display: none;
+    }
+  }
+}

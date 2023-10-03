@@ -17,15 +17,16 @@ import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../vi
 import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
-import {observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {filterArray, mapArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
 import {SciDimensionModule} from '@scion/components/dimension';
-import {AsyncPipe, NgFor} from '@angular/common';
+import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {fromDimension$} from '@scion/toolkit/observable';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -63,6 +64,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     ViewTabComponent,
     PartActionBarComponent,
     ViewListButtonComponent,
+    NgIf,
   ],
 })
 export class PartBarComponent implements OnInit {
@@ -73,9 +75,19 @@ export class PartBarComponent implements OnInit {
   private readonly _dragenter$ = new Subject<void>();
   private readonly _dragleave$ = new Subject<void>();
   private readonly _dragend$ = new Subject<void>();
+  public readonly dragover$: Observable<boolean>;
+
+  @ViewChild(SciViewportComponent, {static: true, read: ElementRef})
+  private _viewportElement!: ElementRef<HTMLElement>;
 
   @ViewChild(SciViewportComponent, {static: true})
-  private _viewport!: SciViewportComponent;
+  private _viewportComponent!: SciViewportComponent;
+
+  @ViewChild('tab_corner_radius', {static: true})
+  private _tabCornerRadiusElement!: ElementRef<HTMLElement>;
+
+  @ViewChild('padding_inline', {static: true})
+  private _paddingInlineElement!: ElementRef<HTMLElement>;
 
   @ViewChildren(ViewTabComponent)
   public set injectViewTabs(queryList: QueryList<ViewTabComponent>) {
@@ -106,6 +118,14 @@ export class PartBarComponent implements OnInit {
   private _constrainFn: ConstrainFn | null = null;
 
   /**
+   * Tabbar indents where to display the rounded bottom corners of the first and last view tab.
+   */
+  private _tabbarIndent = {
+    left: 0,
+    right: 0,
+  };
+
+  /**
    * Notifies when the drag animation has finished, i.e., tabs have transitioned to their final position.
    */
   private _dragAnimationStable$ = interval(0, animationFrameScheduler)
@@ -126,12 +146,15 @@ export class PartBarComponent implements OnInit {
               private _destroyRef: DestroyRef,
               private _zone: NgZone) {
     this._host = host.nativeElement;
+    this.dragover$ = this._viewDragService.tabbarDragOver$.pipe(map(partId => partId === this._part.id));
   }
 
   public ngOnInit(): void {
     this.installActiveViewScroller();
     this.installScrolledIntoViewUpdater();
     this.installViewDragListener();
+    this.installTabbarIndentSizeDetector();
+    this.installViewportClientSizeDetector();
   }
 
   @HostListener('dblclick', ['$event'])
@@ -147,10 +170,6 @@ export class PartBarComponent implements OnInit {
   }
 
   public onTabbarViewportDimensionChange(): void {
-    this._viewportChange$.next();
-  }
-
-  public onTabbarViewportClientDimensionChange(): void {
     this._viewportChange$.next();
   }
 
@@ -172,14 +191,19 @@ export class PartBarComponent implements OnInit {
     const dragSourceViewTab = this._viewTabs[dragSourceIndex];
     const dropTargetViewTab = this._viewTabs[dragSourceIndex + 1] ?? 'end';
 
+    // Constrain function for snapping the drag image to the tabbar when dragging near it.
+    this._constrainFn = this.createDragImageConstrainFn();
+    this._viewTabDragImageRenderer.setConstrainDragImageRectFn(this._constrainFn);
+    this._viewDragService.setTabbarDragover(this._part.id);
+
     // When start dragging a view tab, we remove it from the tabbar by setting its `display` to `none` and render its drag image in `ViewTabDragImageRenderer` instead.
     // However, do not unset the `display` of the drag source during `dragstart`. Otherwise, the native drag operation would be corrupted in Chrome and Edge (but not in Firefox).
     animationFrameScheduler.schedule(() => {
       this.dragSourceViewTab = dragSourceViewTab;
       this.dropTargetViewTab = dropTargetViewTab; // Set drop target to avoid tab animation.
       setCssVariable(this._host, {
-        '--drag-source-width': `${dragData.viewTabWidth}px`,
-        '--drag-source-placeholder-width': `${dragData.viewTabWidth}px`,
+        '--ɵpart-bar-drag-source-width': `${dragData.viewTabWidth}px`,
+        '--ɵpart-bar-drag-image-placeholder-width': `${dragData.viewTabWidth}px`,
       });
     });
 
@@ -212,12 +236,14 @@ export class PartBarComponent implements OnInit {
    */
   private onTabbarDragEnter(event: DragEvent): void {
     this._dragenter$.next();
-    this._viewDragService.notifyDragOverTabbar(true);
+    this._viewDragService.setTabbarDragover(this._part.id);
     this._dragData = this._viewDragService.viewDragData!;
 
-    // Inject constrain function into the drag image renderer to snap the drag image to the tabbar when dragging near it.
-    this._constrainFn = this.createDragImageConstrainFn();
-    this._viewTabDragImageRenderer.setConstrainDragImageRectFn(this._constrainFn);
+    // Constrain function for snapping the drag image to the tabbar when dragging near it.
+    if (!this._constrainFn) {
+      this._constrainFn = this.createDragImageConstrainFn();
+      this._viewTabDragImageRenderer.setConstrainDragImageRectFn(this._constrainFn);
+    }
 
     // Locate drop target to have a nice animation for the drag source placeholder.
     this.dropTargetViewTab = this.computeDropTarget(event);
@@ -229,8 +255,8 @@ export class PartBarComponent implements OnInit {
       .subscribe({complete: () => unsetCssClass(this._host, 'drag-enter')});
 
     setCssVariable(this._host, {
-      '--drag-source-width': `${this._dragData.viewTabWidth}px`,
-      '--drag-source-placeholder-width': `${this._dragData.viewTabWidth}px`,
+      '--ɵpart-bar-drag-source-width': `${this._dragData.viewTabWidth}px`,
+      '--ɵpart-bar-drag-image-placeholder-width': `${this._dragData.viewTabWidth}px`,
     });
   }
 
@@ -239,7 +265,6 @@ export class PartBarComponent implements OnInit {
    */
   private onTabbarDragLeave(): void {
     this._dragleave$.next();
-    this._viewDragService.notifyDragOverTabbar(false);
 
     // Set the CSS class 'drag-leave' to indicate leaving the tabbar.
     setCssClass(this._host, 'drag-leave');
@@ -265,7 +290,7 @@ export class PartBarComponent implements OnInit {
     if (this.isDragAnimationStable()) {
       this.dropTargetViewTab = this.computeDropTarget(event);
       // Synchronize the width of the drag source placeholder with the drag pointer position to move actions along with the pointer.
-      setCssVariable(this._host, {'--drag-source-placeholder-width': `${this.calculateDragSourcePlaceholderWidth(event)}px`});
+      setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': `${this.calculateDragImagePlaceholderWidth(event)}px`});
     }
   }
 
@@ -274,7 +299,6 @@ export class PartBarComponent implements OnInit {
    */
   private onTabbarDrop(): void {
     const dropIndex = this.dropTargetViewTab === 'end' ? undefined : this._viewTabs.indexOf(this.dropTargetViewTab!);
-    this._viewDragService.notifyDragOverTabbar(false);
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         appInstanceId: this._dragData!.appInstanceId,
@@ -321,11 +345,12 @@ export class PartBarComponent implements OnInit {
     const hostLeft = this._host.getBoundingClientRect().left;
     const maxViewportWidth = this.calculateMaxViewportWidth();
     return (rect: ViewDragImageRect): ViewDragImageRect => {
+      const viewportBoundingBox = this._viewportElement.nativeElement.getBoundingClientRect();
       return new ViewDragImageRect({
-        x: Math.min(Math.max(hostLeft, rect.x), hostLeft + maxViewportWidth - rect.width),
-        y: this._host.getBoundingClientRect().top,
+        x: Math.min(Math.max(hostLeft + this._tabbarIndent.left, rect.x), hostLeft + maxViewportWidth - rect.width - this._tabbarIndent.right),
+        y: viewportBoundingBox.top,
         width: rect.width,
-        height: this._host.offsetHeight,
+        height: viewportBoundingBox.height, // fit into tabbar, e.g., when dragging a tab into a tabbar of a different height
       });
     };
   }
@@ -337,32 +362,32 @@ export class PartBarComponent implements OnInit {
    * from `dragover` and disable animations.
    */
   private calculateMaxViewportWidth(): number {
-    const currentWidth = this._host.style.getPropertyValue('--drag-source-placeholder-width');
+    const currentWidth = this._host.style.getPropertyValue('--ɵpart-bar-drag-image-placeholder-width');
 
     // Disable animations during calculation and force the viewport to overflow.
     setCssClass(this._host, 'calculating-max-viewport-width');
-    setCssVariable(this._host, {'--drag-source-placeholder-width': `${this._host.clientWidth}px`});
+    setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': `${this._host.clientWidth}px`});
     try {
-      return this._viewport.viewportElement.clientWidth;
+      return this._viewportElement.nativeElement.getBoundingClientRect().width;
     }
     finally {
-      setCssVariable(this._host, {'--drag-source-placeholder-width': currentWidth || null});
+      setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': currentWidth || null});
       unsetCssClass(this._host, 'calculating-max-viewport-width');
     }
   }
 
   /**
-   * Calculates the width for the drag source placeholder.
+   * Calculates the width for the drag image placeholder.
    *
    * - When dragging over tabs, the width is equal to the width of the drag source.
    * - When dragging to the right of the last tab, the width of the placeholder is calculated as the distance between the
    *   last tab and the position of the dragover event. Applying this width will resize the viewport, moving part actions along
    *   with the dragover event.
    */
-  private calculateDragSourcePlaceholderWidth(event: DragEvent): number {
+  private calculateDragImagePlaceholderWidth(event: DragEvent): number {
     const viewDragImageRect = this._viewTabDragImageRenderer.calculateDragImageRect(this._dragData!, event);
     const lastViewTab = this._viewTabs.filter(viewTab => viewTab !== this.dragSourceViewTab).at(-1);
-    const lastViewTabRight = lastViewTab?.host.getBoundingClientRect().right ?? this._host.getBoundingClientRect().left;
+    const lastViewTabRight = lastViewTab?.host.getBoundingClientRect().right ?? this._host.getBoundingClientRect().left + this._tabbarIndent.left;
     return Math.max(lastViewTabRight + viewDragImageRect.width, viewDragImageRect.right) - lastViewTabRight;
   }
 
@@ -377,7 +402,7 @@ export class PartBarComponent implements OnInit {
 
     const viewTabs = this._viewTabs.filter(viewTab => viewTab !== this.dragSourceViewTab);
     const dropTargetIndex = this.dropTargetViewTab === 'end' ? viewTabs.length : viewTabs.indexOf(this.dropTargetViewTab!);
-    const dragSourceWidth = `${this._dragData!.viewTabWidth}`;
+    const dragSourceWidth = this._dragData!.viewTabWidth;
 
     return viewTabs.every((viewTab, i) => {
       const viewTabTranslateX = getCssTranslation(viewTab.host).translateX;
@@ -386,7 +411,7 @@ export class PartBarComponent implements OnInit {
         return false;
       }
       // Expect drop target and tabs following the drop target to be shifted to the right.
-      if (i >= dropTargetIndex && viewTabTranslateX !== dragSourceWidth) {
+      if (i >= dropTargetIndex && Math.floor(Number(viewTabTranslateX)) !== Math.floor(dragSourceWidth)) { // compare floored numbers because `translateX` is not precise
         return false;
       }
       return true;
@@ -404,7 +429,8 @@ export class PartBarComponent implements OnInit {
     this._constrainFn = null;
 
     unsetCssClass(this._host, 'drag-over');
-    unsetCssVariable(this._host, '--drag-source-width', '--drag-source-placeholder-width');
+    unsetCssVariable(this._host, '--ɵpart-bar-drag-source-width', '--ɵpart-bar-drag-image-placeholder-width');
+    this._viewDragService.unsetTabbarDragover(this._part.id);
   }
 
   private get _viewTabs(): ViewTabComponent[] {
@@ -422,7 +448,10 @@ export class PartBarComponent implements OnInit {
       )
       .subscribe(() => {
         // There may be no active view in the tabbar, e.g., when dragging the last view out of the tabbar.
-        this._viewTabs.find(viewTab => viewTab.active)?.scrollIntoView();
+        const activeViewTab = this._viewTabs.find(viewTab => viewTab.active);
+        if (activeViewTab && !this._viewportComponent.isElementInView(activeViewTab.host, 'full')) {
+          this._viewportComponent.scrollIntoView(activeViewTab.host);
+        }
       });
   }
 
@@ -432,11 +461,13 @@ export class PartBarComponent implements OnInit {
   private installScrolledIntoViewUpdater(): void {
     this._viewportChange$
       .pipe(
-        mergeMap(() => from(this._viewTabs)),
+        map(() => this._viewTabs),
+        filterArray(viewTab => viewTab !== this.dragSourceViewTab), // skip drag source as always scrolled out of view
+        mergeMap(viewTabs => from(viewTabs)),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(viewTab => {
-        viewTab.view.scrolledIntoView = (viewTab.isScrolledIntoView() || viewTab.isDragSource());
+        viewTab.view.scrolledIntoView = this._viewportComponent.isElementInView(viewTab.host, 'full');
       });
   }
 
@@ -458,6 +489,29 @@ export class PartBarComponent implements OnInit {
             this.onTabbarDrop();
             break;
         }
+      });
+  }
+
+  private installViewportClientSizeDetector(): void {
+    fromDimension$(this._viewportComponent.viewportClientElement)
+      .pipe(
+        subscribeInside(fn => this._zone.run(fn)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this._viewportChange$.next());
+  }
+
+  private installTabbarIndentSizeDetector(): void {
+    combineLatest([fromDimension$(this._tabCornerRadiusElement.nativeElement), fromDimension$(this._paddingInlineElement.nativeElement)])
+      .pipe(
+        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        mapArray(dimension => dimension.clientWidth),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(([tabCornerRadius, paddingInline]) => {
+        this._tabbarIndent = {left: tabCornerRadius + paddingInline, right: tabCornerRadius + paddingInline};
+        setCssVariable(this._host, {'--ɵpart-bar-indent-left': `${this._tabbarIndent.left}px`});
+        setCssVariable(this._host, {'--ɵpart-bar-indent-right': `${this._tabbarIndent.right}px`});
       });
   }
 }

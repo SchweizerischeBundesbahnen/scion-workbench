@@ -29,10 +29,10 @@
     "@angular/animations": "^16.0.0",
     "@angular/forms": "^16.0.0",
     "@angular/router": "^16.0.0",
-    "@scion/components": "^16.0.0",
+    "@scion/components": "^16.2.0",
     "@scion/toolkit": "^1.4.0",
     "@scion/microfrontend-platform": "^1.0.0",
-    "@scion/workbench-client": "^1.0.0-beta.18",
+    "@scion/workbench-client": "^1.0.0-beta.19",
     "rxjs": "^7.8.0"
   },
   "peerDependenciesMeta": {

@@ -1,18 +1,29 @@
 :host {
   display: flex;
-  place-content: flex-end;
-  background: #333333;
+  align-items: center;
   padding: .5em;
 
-  > div.toggle-buttons {
+  > div.theme-switcher {
+    flex: auto;
     display: flex;
-    border-radius: .25em;
+    gap: .25em;
+    align-items: center;
+    user-select: none;
+  }
+
+  > div.toggle-buttons {
+    flex: none;
+    display: flex;
+    border-radius: var(--sci-corner);
+    border: 1px solid var(--sci-color-border);
     overflow: hidden;
 
     > button {
       border: none;
       border-radius: 0;
       user-select: none;
+      background-color: var(--sci-color-background-primary);
+      color: var(--sci-color-text);
 
       &:active, &:focus {
         box-shadow: none;
@@ -20,21 +31,13 @@
       }
     }
 
-    > button:not(:first-child):not(.active) {
-      border-left: 1px solid var(--sci-color-primary-darker);
-    }
-
-    > button.active + button {
-      border-left: none;
+    > button:not(:first-child) {
+      border-left: 1px solid var(--sci-color-border);
     }
 
     > button.active {
-      background-color: var(--sci-color-accent-lighter);
-      color: var(--sci-color-background);
+      background-color: var(--sci-color-accent);
+      color: var(--sci-color-accent-inverse);
     }
-  }
-
-  > button.menu-button {
-    color: var(--sci-color-background);
   }
 }

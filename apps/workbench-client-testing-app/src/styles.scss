@@ -1,38 +1,42 @@
-@use '@scion/components.internal/theme' with (
-    $theme: (
-      accent: (
-        50: #E8F5E9,
-        100: #C8E6C9,
-        200: #A5D6A7,
-        300: #81C784,
-        400: #66BB6A,
-        500: #4CAF50,
-        600: #43A047,
-        700: #388E3C,
-        800: #2E7D32,
-        900: #1B5E20,
-        default: 800,
-        lighter: #60bf4cff,
-        darker: #327f1fff,
-      ),
-   )
- );
+@use '@angular/cdk';
+@use '@scion/components';
+@use '@scion/components.internal/design' as sci-design;
 
-* {
-  box-sizing: border-box;
-}
+@import url('https://fonts.googleapis.com/css?family=Roboto:normal,bold,italic,bolditalic|Roboto+Mono');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
 
 html {
+  all: unset;
   font-size: 14px; // defines 1rem as 14px
   width: 100vw;
   height: 100vh;
 }
 
 body {
+  all: unset;
   font-family: Roboto, Arial, sans-serif;
-  color: var(--sci-color-foreground);
-  background-color: var(--sci-color-background);
-  margin: 0;
+  color: var(--sci-color-text);
+  background-color: unset; // Do not set the background color in microfrontends to inherit it from the embedding context of the workbench, such as view or dialog.
   width: 100vw;
   height: 100vh;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  @include sci-design.style-link();
+}
+
+button[class*="material-icons"], button[class*="material-symbols"] {
+  @include sci-design.style-mat-icon-button();
+}
+
+button:not([class*="material-icons"]):not([class*="material-symbols"]) {
+  @include sci-design.style-button();
+}
+
+// Install Angular CDK styles
+@include cdk.a11y-visually-hidden();
+@include cdk.overlay();
