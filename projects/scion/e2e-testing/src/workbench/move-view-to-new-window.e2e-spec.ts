@@ -36,7 +36,7 @@ test.describe('Workbench View', () => {
     const contextMenuPO = await appPO.view({viewId: 'testee'}).viewTab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenuPO.clickMoveToNewWindow(),
+      contextMenuPO.menuItems.moveToNewWindow.click(),
     ]);
     const newWindow = {
       appPO: newAppPO,
@@ -107,7 +107,7 @@ test.describe('Workbench View', () => {
     const contextMenuPO = await appPO.view({viewId: testViewId}).viewTab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenuPO.clickMoveToNewWindow(),
+      contextMenuPO.menuItems.moveToNewWindow.click(),
     ]);
     const newWindow = {
       appPO: newAppPO,
@@ -165,7 +165,7 @@ test.describe('Workbench View', () => {
     const contextMenuPO = await appPO.view({viewId: 'testee'}).viewTab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenuPO.clickMoveToNewWindow(),
+      contextMenuPO.menuItems.moveToNewWindow.click(),
     ]);
     const newWindow = {
       appPO: newAppPO,
@@ -223,7 +223,7 @@ test.describe('Workbench View', () => {
     const contextMenuPO = await testViewPagePO.viewTab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenuPO.clickMoveToNewWindow(),
+      contextMenuPO.menuItems.moveToNewWindow.click(),
     ]);
     const newWindow = {
       appPO: newAppPO,
@@ -274,7 +274,7 @@ test.describe('Workbench View', () => {
     const contextMenuPO = await testViewPagePO.viewTab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenuPO.clickMoveToNewWindow(),
+      contextMenuPO.menuItems.moveToNewWindow.click(),
     ]);
     const newWindow = {
       appPO: newAppPO,
@@ -386,7 +386,7 @@ test.describe('Workbench View', () => {
     const contextMenuPO = await testViewPagePO.viewTab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenuPO.clickMoveToNewWindow(),
+      contextMenuPO.menuItems.moveToNewWindow.click(),
     ]);
     const newWindow = {
       appPO: newAppPO,

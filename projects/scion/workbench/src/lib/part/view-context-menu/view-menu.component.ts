@@ -17,6 +17,7 @@ import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {AsyncPipe, KeyValuePipe, NgClass, NgFor} from '@angular/common';
 import {PortalModule} from '@angular/cdk/portal';
 import {WbFormatAcceleratorPipe} from './accelerator-format.pipe';
+import {MapCoercePipe} from '../../common/map-coerce.pipe';
 
 declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
 
@@ -35,6 +36,7 @@ declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
     KeyValuePipe,
     PortalModule,
     WbFormatAcceleratorPipe,
+    MapCoercePipe,
   ],
 })
 export class ViewMenuComponent {
@@ -47,7 +49,7 @@ export class ViewMenuComponent {
   }
 
   public onMenuItemClick(menuItem: WorkbenchMenuItem): void {
-    if (menuItem.isDisabled && menuItem.isDisabled()) {
+    if (menuItem.isDisabled?.()) {
       return;
     }
     menuItem.onAction();

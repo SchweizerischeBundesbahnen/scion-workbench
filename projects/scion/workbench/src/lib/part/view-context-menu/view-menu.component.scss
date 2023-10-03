@@ -44,7 +44,7 @@
         box-shadow: 0 0 0 1px colors.$viewlistitem-border-color;
       }
 
-      &.disabled {
+      &:disabled {
         opacity: .5;
         pointer-events: none;
       }

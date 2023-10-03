@@ -1,8 +1,8 @@
-<div class="menu-item-group" *ngFor="let menuItemGroup of menuItemGroups$ | async | keyvalue">
+<div class="menu-item-group" *ngFor="let menuItemGroup of menuItemGroups$ | async | wbCoerceMap | keyvalue">
   <button *ngFor="let menuItem of menuItemGroup.value"
           class="menu-item"
           [ngClass]="menuItem.cssClass"
-          [class.disabled]="menuItem.isDisabled && menuItem.isDisabled()"
+          [disabled]="menuItem.isDisabled?.()"
           (click)="onMenuItemClick(menuItem)">
     <div class="text">
       <ng-container *cdkPortalOutlet="menuItem.portal"></ng-container>

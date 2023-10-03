@@ -133,7 +133,7 @@ export class ViewMenuService {
   }
 
   private registerCloseViewMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close tab', group: 'close', accelerator: ['ctrl', 'k']};
+    const defaults: MenuItemConfig = {visible: true, text: 'Close tab', group: 'close', accelerator: ['ctrl', 'k'], cssClass: 'e2e-close-tab'};
     const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.close;
     const config = {...defaults, ...appConfig};
 
@@ -147,7 +147,8 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        onAction: (): void => void view.close('self').then(),
+        isDisabled: (): boolean => !view.closable,
+        onAction: (): void => void view.close().then(),
       });
     });
   }
