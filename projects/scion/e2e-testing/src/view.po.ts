@@ -50,7 +50,7 @@ export class ViewPO {
     return await isPresent(this._locator) && await this.viewTab.isActive();
   }
 
-  public waitUntilPresent(): Promise<void> {
+  public waitUntilAttached(): Promise<void> {
     return this._locator.waitFor({state: 'attached'});
   }
 

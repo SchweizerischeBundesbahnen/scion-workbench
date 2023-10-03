@@ -9,8 +9,6 @@
  */
 
 import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs';
-import {filter} from 'rxjs/operators';
 import {Application, ManifestService, MessageClient, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
@@ -31,7 +29,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
-  private _focusWithin$ = new Subject<boolean>();
   private _popupContext: ɵPopupContext;
 
   public popupCapability: WorkbenchPopupCapability;
@@ -40,6 +37,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
   constructor(public popup: Popup<ɵPopupContext>,
+              private _host: ElementRef<HTMLElement>,
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
               private _messageClient: MessageClient,
@@ -70,18 +68,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Close the popup on focus loss.
-    if (this._popupContext.closeOnFocusLost) {
-      this._focusWithin$
-        .pipe(
-          filter(focusWithin => !focusWithin),
-          takeUntilDestroyed(this._destroyRef),
-        )
-        .subscribe(() => {
-          this.popup.close();
-        });
-    }
-
     // Make the popup context available to embedded content.
     this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
 
@@ -96,7 +82,16 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   public onFocusWithin(event: Event): void {
-    this._focusWithin$.next((event as CustomEvent<boolean>).detail);
+    const {detail: focusWithin} = event as CustomEvent<boolean>;
+
+    // Close the popup on focus loss.
+    if (this._popupContext.closeOnFocusLost && !focusWithin) {
+      this.popup.close();
+    }
+
+    if (focusWithin) {
+      this._host.nativeElement.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
+    }
   }
 
   /**

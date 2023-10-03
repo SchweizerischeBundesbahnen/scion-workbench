@@ -614,7 +614,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPO.isVisible()).toBe(false);
 
       // Expect focus to remain in the input field that caused focus loss of the popup.
-      await expect(await inputFieldPagePO.isActiveElement()).toBe(true);
+      await expect(await inputFieldPagePO.isInputFieldActiveElement()).toBe(true);
     });
   });
 

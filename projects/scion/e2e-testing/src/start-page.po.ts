@@ -43,7 +43,7 @@ export class StartPagePO {
   public async openWorkbenchView(viewCssClass: string): Promise<void> {
     await this._tabbarPO.selectTab('e2e-workbench-views');
     await this._tabbarLocator.locator(`.e2e-workbench-view-tiles a.${viewCssClass}`).click();
-    await this._appPO.view({viewId: this.viewId, cssClass: viewCssClass}).waitUntilPresent();
+    await this._appPO.view({viewId: this.viewId, cssClass: viewCssClass}).waitUntilAttached();
   }
 
   /**
@@ -52,7 +52,7 @@ export class StartPagePO {
   public async openMicrofrontendView(viewCssClass: string, app: string): Promise<void> {
     await this._tabbarPO.selectTab('e2e-microfrontend-views');
     await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles a.${viewCssClass}.workbench-client-testing-${app}`).click();
-    await this._appPO.view({viewId: this.viewId, cssClass: viewCssClass}).waitUntilPresent();
+    await this._appPO.view({viewId: this.viewId, cssClass: viewCssClass}).waitUntilAttached();
 
     // Wait for microfrontend to be loaded.
     const frameLocator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(this.viewId!));
