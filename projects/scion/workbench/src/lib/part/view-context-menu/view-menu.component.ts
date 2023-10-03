@@ -8,16 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, HostListener, OnInit} from '@angular/core';
+import {Component, HostBinding, HostListener} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
-import {fromEvent, Observable, OperatorFunction} from 'rxjs';
+import {Observable, OperatorFunction} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {AsyncPipe, KeyValuePipe, NgClass, NgFor} from '@angular/common';
 import {PortalModule} from '@angular/cdk/portal';
 import {WbFormatAcceleratorPipe} from './accelerator-format.pipe';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
 
@@ -38,20 +37,13 @@ declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
     WbFormatAcceleratorPipe,
   ],
 })
-export class ViewMenuComponent implements OnInit {
+export class ViewMenuComponent {
 
   public menuItemGroups$: Observable<MenuItemGroups>;
 
   constructor(private _overlayRef: OverlayRef,
-              private _destroyRef: DestroyRef,
               private _view: ɵWorkbenchView) {
     this.menuItemGroups$ = this._view.menuItems$.pipe(groupMenuItems());
-  }
-
-  public ngOnInit(): void {
-    fromEvent(this._overlayRef.backdropElement!, 'mousedown')
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(() => this.closeContextMenu());
   }
 
   public onMenuItemClick(menuItem: WorkbenchMenuItem): void {
@@ -59,15 +51,28 @@ export class ViewMenuComponent implements OnInit {
       return;
     }
     menuItem.onAction();
-    this.closeContextMenu();
+    this._overlayRef.dispose();
+  }
+
+  @HostBinding('attr.data-viewid')
+  public get viewId(): string {
+    return this._view.id;
   }
 
   @HostListener('document:keydown.escape')
   public onEscape(): void {
-    this.closeContextMenu();
+    this._overlayRef.dispose();
   }
 
-  private closeContextMenu(): void {
+  @HostListener('mousedown', ['$event'])
+  @HostListener('sci-microfrontend-focusin', ['$event'])
+  public onHostCloseEvent(event: Event): void {
+    event.stopPropagation(); // Prevent closing this overlay if emitted from a child of this overlay.
+  }
+
+  @HostListener('document:mousedown')
+  @HostListener('document:sci-microfrontend-focusin')
+  public onDocumentCloseEvent(): void {
     this._overlayRef.dispose();
   }
 }
