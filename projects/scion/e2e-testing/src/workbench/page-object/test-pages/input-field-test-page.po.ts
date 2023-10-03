@@ -41,7 +41,7 @@ export class InputFieldTestPagePO {
     await routerPagePO.enterCssClass(cssClass);
     await routerPagePO.clickNavigate();
 
-    const view = await appPO.view({cssClass});
+    const view = await appPO.view({cssClass, viewId: routerPagePO.viewId});
     await view.waitUntilPresent();
     return new InputFieldTestPagePO(appPO, await view.getViewId());
   }

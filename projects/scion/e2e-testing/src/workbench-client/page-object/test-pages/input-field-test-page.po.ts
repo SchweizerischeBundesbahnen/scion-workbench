@@ -54,7 +54,7 @@ export class InputFieldTestPagePO {
     await startPagePO.clickTestCapability('e2e-test-input-field', 'app1');
 
     // Create the page object.
-    const view = await appPO.view({cssClass: 'e2e-test-input-field'});
+    const view = await appPO.view({cssClass: 'e2e-test-input-field', viewId: startPagePO.viewId});
     await view.waitUntilPresent();
     return new InputFieldTestPagePO(appPO, await view.getViewId());
   }

@@ -4,6 +4,7 @@
                      [attr.data-capabilityid]="viewCapability && viewCapability.metadata!.id"
                      [attr.data-app]="viewCapability && viewCapability.metadata!.appSymbolicName"
                      [ngClass]="viewCssClasses" class="e2e-view"
+                     (focuswithin)="onFocusWithin($event)"
                      [keystrokes]="keystrokesToBubble$ | async">
   </sci-router-outlet>
 </wb-content-as-overlay>
