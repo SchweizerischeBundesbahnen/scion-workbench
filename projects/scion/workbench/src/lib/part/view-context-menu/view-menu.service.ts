@@ -71,8 +71,6 @@ export class ViewMenuService {
     // Prepare and display the menu overlay.
     const config = new OverlayConfig({
       scrollStrategy: this._overlay.scrollStrategies.noop(),
-      hasBackdrop: true,
-      backdropClass: 'cdk-overlay-transparent-backdrop',
       disposeOnNavigation: true,
       positionStrategy: this._overlay.position()
         .flexibleConnectedTo(location)

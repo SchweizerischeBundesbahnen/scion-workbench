@@ -11,6 +11,7 @@
 import {fromRect, getCssClasses, hasCssClass, isPresent, waitUntilStable} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
+import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
 
 /**
  * Handle for interacting with a workbench view tab.
@@ -77,20 +78,13 @@ export class ViewTabPO {
     return getCssClasses(this._locator);
   }
 
+  /**
+   * Opens the context menu of this view tab.
+   */
   public async openContextMenu(): Promise<ViewTabContextMenuPO> {
     await this._locator.click({button: 'right'});
-    const contextMenuLocator = this._locator.page().locator('wb-view-menu');
-
-    return new class implements ViewTabContextMenuPO {
-
-      public async clickCloseAllTabs(): Promise<void> {
-        await contextMenuLocator.locator('button.e2e-close-all-tabs').click();
-      }
-
-      public async clickMoveToNewWindow(): Promise<void> {
-        await contextMenuLocator.locator('button.e2e-move-to-new-window').click();
-      }
-    };
+    const viewId = await this.getViewId();
+    return new ViewTabContextMenuPO(this._locator.page().locator(`div.cdk-overlay-pane wb-view-menu[data-viewid="${viewId}"]`));
   }
 
   /**
@@ -184,11 +178,4 @@ export class ViewTabPO {
       await this._locator.page().mouse.up();
     }
   }
-}
-
-export interface ViewTabContextMenuPO {
-
-  clickCloseAllTabs(): Promise<void>;
-
-  clickMoveToNewWindow(): Promise<void>;
 }
