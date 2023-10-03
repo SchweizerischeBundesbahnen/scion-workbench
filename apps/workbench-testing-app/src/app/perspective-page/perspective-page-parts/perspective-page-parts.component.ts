@@ -16,13 +16,20 @@ import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MAIN_AREA} from '@scion/workbench';
+import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 
 @Component({
   selector: 'app-perspective-page-parts',
   templateUrl: './perspective-page-parts.component.html',
   styleUrls: ['./perspective-page-parts.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SciFormFieldComponent, SciCheckboxComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    SciFormFieldComponent,
+    SciCheckboxComponent,
+    SciMaterialIconDirective
+  ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => PerspectivePagePartsComponent)},
     {provide: NG_VALIDATORS, multi: true, useExisting: forwardRef(() => PerspectivePagePartsComponent)},

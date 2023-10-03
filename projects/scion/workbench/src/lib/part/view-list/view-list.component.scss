@@ -1,13 +1,13 @@
-@use '../../../../theme/colors';
-@use '../../../../theme/styles';
-
 :host {
   display: flex;
   flex-direction: column;
   gap: .75em;
-  width: styles.$viewtab-max-width + 75px;
-  border: 1px solid colors.$viewlistitem-border-color;
-  background-color: colors.$part_tab-active-bgcolor;
+  width: var(--sci-workbench-contextmenu-width);
+  border: 1px solid var(--sci-color-border);
+  color: var(--sci-color-text);
+  background-color: var(--sci-color-background-elevation);
+  border-radius: var(--sci-corner);
+  overflow: hidden;
 
   &.south {
     border-top: none;
@@ -22,20 +22,35 @@
     flex: auto;
     max-height: 350px;
 
-    > ul {
-      all: unset;
-      list-style: none;
+    &::part(content) {
       display: flex;
       flex-direction: column;
-      padding-top: 1px;
+      gap: 1px; // space for top/bottom borders when hovering the menu item
+      padding-top: 1px; // to visualize top border on hover
+    }
 
-      > li {
-        all: unset;
+    > wb-view-list-item {
+      position: relative; // positioning context for the separator
 
-        &.separator {
-          border-top: 1px solid colors.$viewlistitem-border-color;
-        }
+      &:hover {
+        background-color: var(--sci-color-background-elevation-hover);
+        box-shadow: 0 0 0 1px var(--sci-color-border);
       }
+
+      // separator
+      &:has(+ hr):after {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 1px;
+        background-color: var(--sci-color-border);
+        content: '';
+      }
+    }
+
+    > hr {
+      display: none; // remove from flex container to not render the gap between flex items
     }
   }
 }

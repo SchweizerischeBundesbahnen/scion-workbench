@@ -16,13 +16,7 @@ SCION Workbench enables the creation of Angular web applications that require a 
 - [**Getting Started**][link-getting-started]\
   Follow these steps to install the SCION Workbench in your project and start with a basic introduction to the SCION Workbench.
 
-- [**How To Guides**][link-howto]\
-  Get answers to the most common questions when developing an application with the SCION Workbench.
-
-#### Workbench Applications
-
-- [**SCION Workbench Demo**][link-demo-app]\
-  See a live demo of the SCION Workbench.
+#### Workbench Demo Applications
 
 - [**SCION Workbench Testing App**][link-testing-app]\
   Visit our technical testing application to explore the workbench and experiment with its features.
@@ -34,6 +28,9 @@ SCION Workbench enables the creation of Angular web applications that require a 
 
 - [**About SCION Workbench**][link-overview]\
   Learn more about the SCION Workbench.
+
+- [**How To Guides**][link-howto]\
+  Get answers to the most common questions when developing an application with the SCION Workbench.
 
 - [**Workbench and Microfrontends**][link-microfrontend-integration]\
   Consider adopting a microfrontend architecture with SCION Workbench.

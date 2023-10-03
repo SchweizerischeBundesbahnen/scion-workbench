@@ -1,4 +1,4 @@
-@use '@scion/components.internal' as sci-ɵcomponents;
+@use '@scion/components.internal/design' as sci-design;
 
 :host {
   display: flex;
@@ -10,8 +10,8 @@
     display: flex;
     flex-direction: column;
     gap: .5em;
-    border: 1px solid var(--sci-color-P400);
-    border-radius: 5px;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
     padding: 1em;
 
     > header {
@@ -26,7 +26,7 @@
     }
 
     &.part-actions input {
-      @include sci-ɵcomponents.theme-input-field();
+      @include sci-design.style-input-field();
     }
   }
 }

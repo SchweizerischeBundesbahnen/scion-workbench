@@ -166,6 +166,7 @@ test.describe('Workbench View', () => {
 
   test('should allow updating the viewtab heading', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
     const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     const viewTabPO = viewPagePO.view.viewTab;
 

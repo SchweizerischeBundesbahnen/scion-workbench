@@ -55,16 +55,16 @@ describe('ViewComponent', () => {
     const viewDebugElement = getViewDebugElement<SpecView1Component>('view.1');
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).withContext('(A)').toEqual(jasmine.objectContaining({'dirty': true}));
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).withContext('(A)').toEqual(jasmine.objectContaining({'e2e-dirty': true}));
 
     // Clear dirty flag
     viewDebugElement.view.dirty = false;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).not.withContext('(B)').toEqual(jasmine.objectContaining({'dirty': true}));
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).not.withContext('(B)').toEqual(jasmine.objectContaining({'e2e-dirty': true}));
 
     viewDebugElement.view.dirty = true;
     advance(fixture);
-    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).withContext('(C)').toEqual(jasmine.objectContaining({'dirty': true}));
+    expect(fixture.debugElement.query(By.css('wb-view-tab')).classes).withContext('(C)').toEqual(jasmine.objectContaining({'e2e-dirty': true}));
 
     discardPeriodicTasks();
   }));
@@ -89,7 +89,29 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   }));
 
-  it('should render heading', fakeAsync(() => {
+  it('should not render heading (by default)', fakeAsync(() => {
+    TestBed.inject(WorkbenchRouter).navigate(['view', {heading: 'HEADING'}]).then();
+    advance(fixture);
+    const headingElement = fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement;
+    expect(getComputedStyle(headingElement)).toEqual(jasmine.objectContaining({display: 'none'}));
+
+    discardPeriodicTasks();
+  }));
+
+  it('should not render heading if tab height < 3.5rem', fakeAsync(() => {
+    setDesignToken('--sci-workbench-tab-height', '3.4rem');
+
+    TestBed.inject(WorkbenchRouter).navigate(['view', {heading: 'HEADING'}]).then();
+    advance(fixture);
+    const headingElement = fixture.debugElement.query(By.css('wb-view-tab .heading')).nativeElement;
+    expect(getComputedStyle(headingElement)).toEqual(jasmine.objectContaining({display: 'none'}));
+
+    discardPeriodicTasks();
+  }));
+
+  it('should render heading if tab height >= 3.5rem', fakeAsync(() => {
+    setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view', {heading: 'HEADING'}]).then();
     advance(fixture);
@@ -130,6 +152,8 @@ describe('ViewComponent', () => {
   }));
 
   it('should render heading as configured on route', fakeAsync(() => {
+    setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-with-heading']).then();
     advance(fixture);
@@ -170,6 +194,8 @@ describe('ViewComponent', () => {
   }));
 
   it('should take heading from view over heading configured on route', fakeAsync(() => {
+    setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-with-heading', {heading: 'HEADING'}]).then();
     advance(fixture);
@@ -203,6 +229,8 @@ describe('ViewComponent', () => {
   }));
 
   it('should unset heading when navigating to a different route', fakeAsync(() => {
+    setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-1', {heading: 'HEADING'}]).then();
     advance(fixture);
@@ -230,6 +258,8 @@ describe('ViewComponent', () => {
   }));
 
   it('should replace heading when navigating to a different route', fakeAsync(() => {
+    setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
     // Add View
     TestBed.inject(WorkbenchRouter).navigate(['view-1', {heading: 'HEADING 1'}]).then();
     advance(fixture);
@@ -479,6 +509,11 @@ describe('ViewComponent', () => {
     const component = viewComponent.routerOutlet.component as T;
 
     return {view, viewComponent, component};
+  }
+
+  function setDesignToken(name: string, value: string): void {
+    const workbenchElement = (fixture.debugElement.nativeElement as HTMLElement);
+    workbenchElement.style.setProperty(name, value);
   }
 
   interface ViewDebugElement<T> {

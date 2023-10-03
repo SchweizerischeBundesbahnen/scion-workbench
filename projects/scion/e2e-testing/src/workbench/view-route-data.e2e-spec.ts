@@ -23,6 +23,7 @@ test.describe('View Route Data', () => {
 
     test('should resolve view properties from route data of route "feature-a"', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-a`);
@@ -38,6 +39,7 @@ test.describe('View Route Data', () => {
 
     test('should resolve view properties from route data of route "feature-b"', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-b`);
@@ -54,6 +56,7 @@ test.describe('View Route Data', () => {
 
     test('should resolve view properties from route data of route "feature-c"', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-c`);
@@ -69,6 +72,7 @@ test.describe('View Route Data', () => {
 
     test('should resolve view properties from route data of route "feature-d"', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-d`);
@@ -90,6 +94,7 @@ test.describe('View Route Data', () => {
 
     test('should resolve view properties from route data of route "feature-a"', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-a`);
@@ -105,6 +110,7 @@ test.describe('View Route Data', () => {
 
     test('should resolve view properties from route data of route "feature-b"', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-b`);
@@ -121,6 +127,7 @@ test.describe('View Route Data', () => {
 
     test('should resolve view properties from route data of route "feature-c"', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-c`);
@@ -136,6 +143,7 @@ test.describe('View Route Data', () => {
 
     test('should resolve view properties from route data of route "feature-d"', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPagePO.enterPath(`${basePath}/feature-d`);

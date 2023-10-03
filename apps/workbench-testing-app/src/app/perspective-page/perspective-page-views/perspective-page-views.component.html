@@ -9,9 +9,9 @@
 
       <div class="actions">
         <!-- add button -->
-        <button (click)="onAddView()" class="e2e-add material-icons" type="button" title="Add view">add</button>
+        <button (click)="onAddView()" class="e2e-add" title="Add view" sciMaterialIcon>add</button>
         <!-- remove button -->
-        <button (click)="onClearViews()" class="e2e-clear material-icons" type="button" title="Remove all views">clear</button>
+        <button (click)="onClearViews()" class="e2e-clear" title="Remove all views" sciMaterialIcon>clear</button>
       </div>
 
       <ng-container *ngFor="let partsGroup of form.controls.views.controls; index as i;">
@@ -26,7 +26,7 @@
         <!-- activatePart -->
         <sci-checkbox [formControl]="partsGroup.controls.activatePart" [class]="'e2e-view-activate-part'"></sci-checkbox>
         <!-- 'remove' button -->
-        <button class="material-icons e2e-remove" type="button" (click)="onRemoveView(i)" title="Remove view">remove</button>
+        <button class="e2e-remove" (click)="onRemoveView(i)" title="Remove view" sciMaterialIcon>remove</button>
       </ng-container>
     </div>
   </sci-form-field>

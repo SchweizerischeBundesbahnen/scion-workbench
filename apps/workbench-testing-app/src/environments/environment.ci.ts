@@ -23,14 +23,6 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
     {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
     {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
   ],
-  properties: {
-    'workbench-client-testing-app1': {
-      color: '#314d8c',
-    },
-    'workbench-client-testing-app2': {
-      color: '#2c78f7',
-    },
-  },
 };
 
 export const environment = {

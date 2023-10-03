@@ -9,21 +9,20 @@
  */
 
 import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone} from '@angular/core';
-import {of} from 'rxjs';
 import {take} from 'rxjs/operators';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
-import {ViewTabContentComponent} from '../part/view-tab-content/view-tab-content.component';
-import {WorkbenchMenuItem} from '../workbench.model';
-import {WorkbenchModuleConfig} from '../workbench-module-config';
-import {VIEW_TAB_CONTEXT} from '../workbench.constants';
-import {UrlSegment} from '@angular/router';
-import {Disposable} from '../common/disposable';
-import {WorkbenchView} from '../view/workbench-view.model';
-import {WorkbenchPart} from '../part/workbench-part.model';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-drag-image.component';
+import {of} from 'rxjs';
+import {UrlSegment} from '@angular/router';
+import {WorkbenchMenuItem} from '../workbench.model';
+import {WorkbenchView} from '../view/workbench-view.model';
+import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
+import {WorkbenchPart} from '../part/workbench-part.model';
+import {Disposable} from '../common/disposable';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 
@@ -40,7 +39,6 @@ export class ViewTabDragImageRenderer {
   private _constrainDragImageRectFn: ((rect: ViewDragImageRect) => ViewDragImageRect) | null = null;
 
   constructor(private _viewDragService: ViewDragService,
-              private _workbenchModuleConfig: WorkbenchModuleConfig,
               // TODO [Angular 17][https://github.com/angular/components/issues/24334] Alternative constructor (ComponentFactoryResolver is deprecated)
               private _componentFactoryResolver: ComponentFactoryResolver,
               private _applicationRef: ApplicationRef,
@@ -89,6 +87,7 @@ export class ViewTabDragImageRenderer {
     setStyle(this._viewDragImagePortalOutlet!.outletElement as HTMLElement, {
       left: `${dragPosition.x}px`,
       top: `${dragPosition.y}px`,
+      height: `${dragPosition.height}px`,
     });
   }
 
@@ -133,8 +132,13 @@ export class ViewTabDragImageRenderer {
       },
     });
     this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._componentFactoryResolver, this._applicationRef, this._injector);
-    const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(this.createViewTabContentPortal(dragData));
-    componentRef.changeDetectorRef.detectChanges();
+    this._viewDragImagePortalOutlet.attachComponentPortal(new ComponentPortal(ViewTabDragImageComponent, null, Injector.create({
+      parent: this._injector,
+      providers: [
+        {provide: WorkbenchView, useValue: new DragImageWorkbenchView(dragData)},
+        {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'drag-image' satisfies ViewTabRenderingContext},
+      ],
+    })));
   }
 
   private disposeDragImage(): void {
@@ -180,18 +184,6 @@ export class ViewTabDragImageRenderer {
             break;
         }
       });
-  }
-
-  private createViewTabContentPortal(viewDragData: ViewDragData): ComponentPortal<any> {
-    const injector = Injector.create({
-      parent: this._injector,
-      providers: [
-        {provide: WorkbenchView, useValue: new DragImageWorkbenchView(viewDragData)},
-        {provide: VIEW_TAB_CONTEXT, useValue: 'drag-image'},
-      ],
-    });
-
-    return new ComponentPortal(this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent, null, injector);
   }
 }
 
@@ -257,6 +249,10 @@ class DragImageWorkbenchView implements WorkbenchView {
     this.urlSegments = dragData.viewUrlSegments;
   }
 
+  public get part(): WorkbenchPart {
+    throw Error('[UnsupportedOperationError]');
+  }
+
   public close(): Promise<boolean> {
     throw Error('[UnsupportedOperationError]');
   }
@@ -270,10 +266,6 @@ class DragImageWorkbenchView implements WorkbenchView {
   }
 
   public registerMenuItem(menuItem: WorkbenchMenuItem): Disposable {
-    throw Error('[UnsupportedOperationError]');
-  }
-
-  public get part(): WorkbenchPart {
     throw Error('[UnsupportedOperationError]');
   }
 

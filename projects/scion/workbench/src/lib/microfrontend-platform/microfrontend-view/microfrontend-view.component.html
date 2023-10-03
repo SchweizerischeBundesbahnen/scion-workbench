@@ -4,6 +4,7 @@
                      [attr.data-capabilityid]="viewCapability && viewCapability.metadata!.id"
                      [attr.data-app]="viewCapability && viewCapability.metadata!.appSymbolicName"
                      [ngClass]="viewCssClasses" class="e2e-view"
+                     [class.workbench-drag]="isWorkbenchDrag"
                      (focuswithin)="onFocusWithin($event)"
                      [keystrokes]="keystrokesToBubble$ | async">
   </sci-router-outlet>

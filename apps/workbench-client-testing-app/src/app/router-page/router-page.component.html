@@ -43,7 +43,7 @@
     </sci-form-field>
   </section>
 
-  <button (click)="onNavigate()" class="e2e-navigate" [disabled]="form.invalid">Navigate</button>
+  <button (click)="onNavigate()" class="e2e-navigate" [disabled]="form.invalid" sci-primary>Navigate</button>
 
   <output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
     {{navigateError}}

@@ -1,41 +1,36 @@
-@use '../../../theme/colors';
-@use '../../../theme/styles';
-
-$severity-border-size: 6px;
-$border-radius: 4px;
-
 :host {
   display: grid;
-  background-color: colors.$notification-bgcolor;
-  color: colors.$notification-fgcolor;
+  background-color: var(--sci-color-background-elevation);
+  color: var(--sci-color-text);
   font-size: 1rem;
-  border-radius: $border-radius;
-  box-shadow: styles.$popup-box-shadow;
-  width: styles.$notification-width;
-  max-width: calc(100vw - #{2*styles.$notification-margin});
-  border-left: $severity-border-size solid transparent;
+  border-radius: var(--sci-corner);
+  box-shadow: var(--sci-elevation) var(--sci-static-color-black);
+  width: var(--sci-workbench-notification-width);
+  border-left: var(--sci-workbench-notification-severity-indicator-size) solid transparent;
   position: relative; // positioning context
 
   &.info {
-    border-left-color: colors.$info-color;
+    border-left-color: var(--sci-color-accent);
   }
 
   &.warn {
-    border-left-color: colors.$warn-color;
+    border-left-color: var(--sci-color-notice);
   }
 
   &.error {
-    border-left-color: colors.$error-color;
+    border-left-color: var(--sci-color-negative);
   }
 
   > div.outline {
-    border: 1px solid colors.$notification-border-color;
+    border: 1px solid var(--sci-color-border);
     border-left: none;
     padding: 1em 1.5em;
-    border-top-right-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
+    border-top-right-radius: var(--sci-corner);
+    border-bottom-right-radius: var(--sci-corner);
     font-size: .9em;
     white-space: pre-line;
+    overflow-wrap: break-word;
+    overflow: hidden;
 
     > header {
       font-weight: bold;

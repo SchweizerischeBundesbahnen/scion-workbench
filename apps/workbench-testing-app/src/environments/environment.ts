@@ -33,14 +33,6 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
     {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
     {symbolicName: 'devtools', manifestUrl: 'https://scion-microfrontend-platform-devtools-v1-0-0.vercel.app/assets/manifest.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
   ],
-  properties: {
-    'workbench-client-testing-app1': {
-      color: '#314d8c',
-    },
-    'workbench-client-testing-app2': {
-      color: '#2c78f7',
-    },
-  },
 };
 
 export const environment = {

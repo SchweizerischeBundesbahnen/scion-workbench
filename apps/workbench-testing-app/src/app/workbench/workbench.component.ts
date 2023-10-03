@@ -16,6 +16,7 @@ import {combineLatest} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 
 @Component({
   selector: 'app-workbench',
@@ -26,6 +27,7 @@ import {WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService} from 
     NgIf,
     AsyncPipe,
     WorkbenchModule,
+    SciMaterialIconDirective,
   ],
 })
 export class WorkbenchComponent implements OnDestroy {

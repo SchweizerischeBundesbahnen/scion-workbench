@@ -24,6 +24,7 @@ import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
 import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
 import {WorkbenchPartActionRegistry} from './part/workbench-part-action.registry';
+import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -36,6 +37,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly perspectives$: Observable<readonly ɵWorkbenchPerspective[]>;
   public readonly parts$: Observable<readonly ɵWorkbenchPart[]>;
   public readonly views$: Observable<readonly ɵWorkbenchView[]>;
+  public readonly theme$: Observable<string | null>;
 
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
 
@@ -44,10 +46,12 @@ export class ɵWorkbenchService implements WorkbenchService {
               private _partRegistry: WorkbenchPartRegistry,
               private _partActionRegistry: WorkbenchPartActionRegistry,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _perspectiveService: WorkbenchPerspectiveService) {
+              private _perspectiveService: WorkbenchPerspectiveService,
+              private _workbenchThemeSwitcher: WorkbenchThemeSwitcher) {
     this.perspectives$ = this._perspectiveRegistry.perspectives$;
     this.parts$ = this._partRegistry.parts$;
     this.views$ = this._viewRegistry.views$;
+    this.theme$ = this._workbenchThemeSwitcher.theme$;
   }
 
   /** @inheritDoc */
@@ -128,5 +132,10 @@ export class ɵWorkbenchService implements WorkbenchService {
         this.viewMenuItemProviders$.next(this.viewMenuItemProviders$.value.filter(it => it !== factoryFn));
       },
     };
+  }
+
+  /** @inheritDoc */
+  public switchTheme(theme: string): Promise<void> {
+    return this._workbenchThemeSwitcher.switchTheme(theme);
   }
 }

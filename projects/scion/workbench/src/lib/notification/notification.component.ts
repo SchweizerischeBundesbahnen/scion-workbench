@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, HostListener, Injector, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {asapScheduler, EMPTY, Subject, timer} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
@@ -62,6 +62,13 @@ export class NotificationComponent implements OnChanges {
     });
   }
 
+  @HostListener('mousedown', ['$event'])
+  public onMousedown(event: MouseEvent): void {
+    if (event.buttons === AUXILARY_MOUSE_BUTTON) {
+      this.closeNotification.emit();
+    }
+  }
+
   public onClose(): void {
     this.closeNotification.emit();
   }
@@ -109,5 +116,9 @@ export class NotificationComponent implements OnChanges {
         this.closeNotification.emit();
       });
   }
-
 }
+
+/**
+ * Indicates that the auxilary mouse button is pressed (usually the mouse wheel button or middle button).
+ */
+const AUXILARY_MOUSE_BUTTON = 4;

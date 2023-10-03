@@ -1,0 +1,48 @@
+:host {
+  display: flex;
+  align-items: center;
+  padding: .6em 1em;
+  position: relative; // positioning context for the active indicator
+  user-select: none;
+  cursor: pointer;
+  gap: 1em;
+
+  &.active {
+    color: var(--sci-color-accent);
+
+    &:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: var(--sci-color-accent);
+    }
+  }
+
+  > div.content {
+    flex: auto;
+    display: grid;
+    position: relative; // positioning context for the portal
+  }
+
+  > button.close {
+    all: unset;
+    flex: none;
+    cursor: pointer;
+    visibility: hidden;
+    padding: .125em;
+    border-radius: var(--sci-corner-small);
+    opacity: .75;
+
+    &:hover {
+      opacity: 1;
+      background-color: var(--sci-color-background-elevation-hover);
+    }
+  }
+
+  &:hover > button.close {
+    visibility: visible;
+  }
+}

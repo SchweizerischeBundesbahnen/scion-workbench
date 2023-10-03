@@ -1,21 +1,19 @@
-@use '../../theme/colors';
-
 :host {
   display: grid;
   position: relative; // positioning context
   overflow: hidden;
-  background-color: colors.$background-color;
+  color: var(--sci-color-text);
+  background-color: var(--sci-color-background-primary);
 
   > div.stacking-context-barrier {
     display: flex;
 
-    // Form a stacking context barrier (z-index=0) to clear nested stacking contexts so that subsequent DOM elements are rendered above elements contained in the barrier element,
-    // regardless of whether they form a stacking context. In other words, that elements overlay elements according to their DOM element ordering.
+    // Clear nested stacking contexts so that DOM elements following the workbench component are
+    // rendered on top of elements forming a stacking context.
     //
-    // The following elements form a stacking context:
+    // The following elements form a new stacking context:
     // - splitter of `<sci-sashbox>`
-    // - `wb-workbench-layout` during drag & drop
-    z-index: 0;
+    isolation: isolate;
 
     > wb-workbench-layout {
       flex: auto;
@@ -31,33 +29,11 @@
 
   > wb-message-box-stack {
     position: absolute;
-    inset: 0 0 0 0;
+    inset: 0;
   }
 
   > wb-notification-list {
     position: absolute;
-    inset: 0 0 0 0;
-  }
-
-  // For iframe-based microfrontend integration, `<wb-workbench-layout>` forms a new stacking context during a workbench drag & drop operation such
-  // as dragging a view tab, moving a part splitter, or moving a message box. The stacking context, however, is local to the workbench component.
-  //
-  // Rationale:
-  // Since we cannot add iframes directly to the view component (an iframe would reload its content if it is reparented in the DOM), we
-  // add iframes after the `<wb-workbench-layout>` element and project each iframe to its view boundaries. Alternatively, if we were to add
-  // iframes before the workbench layout, we would have to disable pointer events on the layout in order to interact with iframe content.
-  //
-  // As a consequence, the iframes now cover the view drop zones, stopping us from arranging views via drag & drop. For that reason, during drag & drop,
-  // we form a new stacking context on the `<wb-workbench-layout>` element by setting its `z-index` to `1`. In turn, during drag & drop, the layout
-  // will overlap the iframes, making drop zones functional and preventing iframes from consuming pointer events. However, the new stacking context
-  // needs to be local to the workbench component, as `<wb-workbench-layout>` would otherwise overlap subsequent DOM elements, causing, for example,
-  // drag images or message boxes to be rendered under the layout. Therefore, we add it to an element that acts as a stacking context barrier, i.e.,
-  // an element with a z-index of `0`. A `z-index` of `0` is similar to the value `auto`, which means that the element is rendered in the same layer as
-  // elements without an explicit z-index, while, in contrast to the value `auto`, still forming a stacking context.
-  //
-  // For more information about stacking contexts, refer to
-  // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context.
-  &.dragging > div.stacking-context-barrier > wb-workbench-layout {
-    z-index: 1;
+    inset: 0;
   }
 }

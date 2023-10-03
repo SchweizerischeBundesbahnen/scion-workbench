@@ -28,12 +28,41 @@ test.describe('Workbench View', () => {
 
   test('should allow updating the view tab heading', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
     const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     await viewPagePO.enterHeading('HEADING');
     await expect(await viewPagePO.viewTabPO.getHeading()).toEqual('HEADING');
 
     await viewPagePO.enterHeading('heading');
+    await expect(await viewPagePO.viewTabPO.getHeading()).toEqual('heading');
+  });
+
+  test('should not display the view tab heading (by default)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPagePO.enterHeading('heading');
+    await expect(viewPagePO.viewTabPO.headingLocator).not.toBeVisible();
+  });
+
+  test('should not display the view tab heading if the tab height < 3.5rem', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.4rem');
+
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPagePO.enterHeading('heading');
+    await expect(viewPagePO.viewTabPO.headingLocator).not.toBeVisible();
+  });
+
+  test('should display the view tab heading if the tab height >= 3.5rem', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPagePO.enterHeading('heading');
+    await expect(viewPagePO.viewTabPO.headingLocator).toBeVisible();
     await expect(await viewPagePO.viewTabPO.getHeading()).toEqual('heading');
   });
 
@@ -127,6 +156,8 @@ test.describe('Workbench View', () => {
 
   test('should not unset the heading when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
     const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
     const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
     const viewTabPO = viewPagePO.viewTabPO;

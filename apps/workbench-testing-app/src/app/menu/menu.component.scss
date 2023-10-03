@@ -1,28 +1,42 @@
 :host {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--sci-color-P400);
-  background-color: var(--sci-color-P50);
-  box-shadow: 8px 8px 9px -9px rgba(var(--sci-color-primary-rgb), .2);
+  border: 1px solid var(--sci-color-border);
+  background-color: var(--sci-color-background-elevation);
+  border-radius: var(--sci-corner);
+  gap: 1px; // space for top/bottom borders when hovering the menu item
+  overflow: hidden;
 
   > button.menu-item {
     all: unset;
     padding: .6em 1.5em;
     font-size: smaller;
     user-select: none;
+    position: relative; // positioning context for separator pseudo element
 
     &:hover {
-      background-color: rgba(var(--sci-color-primary-rgb), .0375);
-      box-shadow: 0 0 0 1px var(--sci-color-P400);
+      background-color: var(--sci-color-background-elevation-hover);
+      box-shadow: 0 0 0 1px var(--sci-color-border);
     }
 
     &.disabled {
       opacity: .5;
       pointer-events: none;
     }
+
+    // separator
+    &:has(+ hr):after {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background-color: var(--sci-color-border);
+      content: '';
+    }
   }
 
-  > div.separator {
-    border-bottom: 1px solid var(--sci-color-P400);
+  > hr {
+    display: none; // remove from flex container to not render the gap between flex items
   }
 }
