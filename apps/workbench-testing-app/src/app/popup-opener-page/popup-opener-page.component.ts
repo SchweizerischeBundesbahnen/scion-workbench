@@ -24,6 +24,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
+import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -119,6 +120,8 @@ export default class PopupOpenerPageComponent {
         return FocusTestPageComponent;
       case 'blank-test-page':
         return BlankTestPageComponent;
+      case 'input-field-test-page':
+        return InputFieldTestPageComponent;
       default:
         throw Error(`[IllegalPopupComponent] Popup component not supported: ${this.form.controls.popupComponent.value}`);
     }

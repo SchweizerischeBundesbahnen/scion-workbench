@@ -630,7 +630,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isVisible()).toBe(false);
 
       // Expect focus to remain in the input field that caused focus loss of the popup.
-      await expect(await inputFieldPagePO.isActiveElement()).toBe(true);
+      await expect(await inputFieldPagePO.isInputFieldActiveElement()).toBe(true);
     });
 
     test('should remain focus on the element that caused the popup to lose focus when focusing element on a non-microfrontend view', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
@@ -671,7 +671,7 @@ test.describe('Workbench Popup', () => {
       await expect(await popupPagePO.popupPO.isVisible()).toBe(false);
 
       // Expect focus to remain in the input field that caused focus loss of the popup.
-      await expect(await inputFieldPagePO.isActiveElement()).toBe(true);
+      await expect(await inputFieldPagePO.isInputFieldActiveElement()).toBe(true);
     });
   });
 });

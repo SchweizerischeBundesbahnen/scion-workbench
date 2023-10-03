@@ -14,6 +14,7 @@ import {ViewPO} from './view.po';
 import {ViewTabPO} from './view-tab.po';
 import {PartSashPO} from './part-sash.po';
 import {PartActionPO} from './part-action.po';
+import {ViewListMenuPO} from './view-list-menu.po';
 
 /**
  * Handle for interacting with a workbench part.
@@ -44,6 +45,15 @@ export class PartPO {
 
   public async isPresent(): Promise<boolean> {
     return isPresent(this._locator);
+  }
+
+  /**
+   * Opens the view list menu of this part.
+   */
+  public async openViewListMenu(): Promise<ViewListMenuPO> {
+    await this._locator.locator('wb-part-bar wb-view-list-button').click();
+    const partId = await this.getPartId();
+    return new ViewListMenuPO(this._locator.page().locator(`div.cdk-overlay-pane wb-view-list[data-partid="${partId}"]`));
   }
 
   /**

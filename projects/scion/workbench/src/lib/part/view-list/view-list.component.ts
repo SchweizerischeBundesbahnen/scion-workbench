@@ -65,10 +65,15 @@ export class ViewListComponent implements OnInit {
     return this.position === 'south';
   }
 
-  constructor(part: WorkbenchPart,
+  @HostBinding('attr.data-partid')
+  public get partId(): string {
+    return this._part.id;
+  }
+
+  constructor(private _part: WorkbenchPart,
               viewRegistry: WorkbenchViewRegistry,
               private _overlayRef: OverlayRef) {
-    this.views$ = part.viewIds$
+    this.views$ = this._part.viewIds$
       .pipe(
         mapArray(viewId => viewRegistry.get(viewId)),
         switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),
@@ -90,12 +95,14 @@ export class ViewListComponent implements OnInit {
   }
 
   @HostListener('mousedown', ['$event'])
-  public onHostMouseDown(event: MouseEvent): void {
-    event.stopPropagation(); // Prevent closing the overlay when clicking an element of it.
+  @HostListener('sci-microfrontend-focusin', ['$event'])
+  public onHostCloseEvent(event: Event): void {
+    event.stopPropagation(); // Prevent closing this overlay if emitted from a child of this overlay.
   }
 
   @HostListener('document:mousedown')
-  public onDocumentMouseDown(): void {
+  @HostListener('document:sci-microfrontend-focusin')
+  public onDocumentCloseEvent(): void {
     this._overlayRef.dispose();
   }
 

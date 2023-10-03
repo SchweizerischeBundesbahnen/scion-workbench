@@ -55,7 +55,7 @@ export class AngularZoneTestPagePO {
 
     // Create the page object.
     const view = await appPO.view({cssClass: 'e2e-test-angular-zone', viewId: startPagePO.viewId});
-    await view.waitUntilPresent();
+    await view.waitUntilAttached();
     return new AngularZoneTestPagePO(appPO, await view.getViewId());
   }
 }
