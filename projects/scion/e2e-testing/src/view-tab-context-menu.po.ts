@@ -16,6 +16,12 @@ import {Locator} from '@playwright/test';
  */
 export class ViewTabContextMenuPO {
 
+  public readonly menuItems = {
+    closeTab: new ContextMenuItem(this._locator.locator('button.e2e-close-tab')),
+    closeAll: new ContextMenuItem(this._locator.locator('button.e2e-close-all-tabs')),
+    moveToNewWindow: new ContextMenuItem(this._locator.locator('button.e2e-move-to-new-window')),
+  };
+
   constructor(private _locator: Locator) {
   }
 
@@ -25,12 +31,18 @@ export class ViewTabContextMenuPO {
   public isOpened(): Promise<boolean> {
     return isPresent(this._locator);
   }
+}
 
-  public async clickCloseAllTabs(): Promise<void> {
-    await this._locator.locator('button.e2e-close-all-tabs').click();
+export class ContextMenuItem {
+
+  constructor(private _locator: Locator) {
   }
 
-  public async clickMoveToNewWindow(): Promise<void> {
-    await this._locator.locator('button.e2e-move-to-new-window').click();
+  public async click(): Promise<void> {
+    await this._locator.click();
+  }
+
+  public isDisabled(): Promise<boolean> {
+    return this._locator.isDisabled();
   }
 }

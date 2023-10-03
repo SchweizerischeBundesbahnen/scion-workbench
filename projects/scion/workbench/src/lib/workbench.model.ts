@@ -68,7 +68,7 @@ export type CanMatchPartFn = (part: WorkbenchPart) => boolean;
 /**
  * Factory function to create a {@link WorkbenchMenuItem}.
  */
-export type WorkbenchMenuItemFactoryFn = (view: WorkbenchView) => WorkbenchMenuItem;
+export type WorkbenchMenuItemFactoryFn = (view: WorkbenchView) => WorkbenchMenuItem | null;
 
 /**
  * Menu item in a menu or context menu.

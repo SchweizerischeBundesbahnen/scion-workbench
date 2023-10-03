@@ -243,4 +243,40 @@ test.describe('Workbench View', () => {
     await expect(await viewPagePO.viewTabPO.isPresent()).toBe(false);
     await expect(await viewPagePO.viewPO.isPresent()).toBe(false);
   });
+
+  test(`should disable context menu 'Close tab' for 'non-closable' view`, async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view.
+    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    const contextMenuPO1 = await viewPagePO.viewPO.viewTab.openContextMenu();
+    // Expect menu item to be enabled.
+    await expect(await contextMenuPO1.menuItems.closeTab.isDisabled()).toBe(false);
+
+    await viewPagePO.checkClosable(false);
+    const contextMenuPO2 = await viewPagePO.viewPO.viewTab.openContextMenu();
+    // Expect menu item to be disabled.
+    await expect(await contextMenuPO2.menuItems.closeTab.isDisabled()).toBe(true);
+  });
+
+  test(`should not close 'non-closable' views via context menu 'Close all tabs'`, async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view 1.
+    const viewPage1PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Open test view 2.
+    const viewPage2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPage2PO.checkClosable(false);
+
+    // Open test view 3.
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Close all views via context menu
+    const contextMenuPO = await viewPage1PO.viewTabPO.openContextMenu();
+    await contextMenuPO.menuItems.closeAll.click();
+
+    await expect(await appPO.viewIds()).toEqual([viewPage2PO.viewId]);
+  });
 });

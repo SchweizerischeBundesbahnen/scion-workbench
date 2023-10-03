@@ -107,9 +107,11 @@ export class ɵWorkbenchService implements WorkbenchService {
     // });
 
     // To avoid canceling the entire navigation if some view(s) prevent(s) closing, close each view through a separate navigation.
-    const navigations = await Promise.all(viewIds.map(viewId => {
-      return this._workbenchRouter.navigate([], {target: viewId, close: true});
-    }));
+    const navigations = await Promise.all(viewIds
+      .map(viewId => this._viewRegistry.get(viewId))
+      .filter(view => view.closable)
+      .map(view => this._workbenchRouter.navigate([], {target: view.id, close: true})),
+    );
     return navigations.every(Boolean);
   }
 

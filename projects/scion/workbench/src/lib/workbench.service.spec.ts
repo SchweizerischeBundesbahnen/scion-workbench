@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2018-2023 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {TestBed} from '@angular/core/testing';
+import {RouterTestingModule} from '@angular/router/testing';
+import {WorkbenchRouter} from './routing/workbench-router.service';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from './testing/testing.util';
+import {WorkbenchTestingModule} from './testing/workbench-testing.module';
+import {TestComponent} from './testing/test.component';
+import {WorkbenchComponent} from './workbench.component';
+import {WorkbenchService} from './workbench.service';
+import {WorkbenchViewRegistry} from './view/workbench-view.registry';
+
+describe('Workbench Service', () => {
+
+  it(`should not close 'non-closable' views`, async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest(),
+        RouterTestingModule.withRoutes([
+          {path: 'view', component: TestComponent},
+        ]),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Open view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'view.1'});
+    await waitUntilStable();
+
+    // Open view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'view.2'});
+    await waitUntilStable();
+
+    // Open view.3
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'view.3'});
+    await waitUntilStable();
+
+    // Mark view.2 non-closable
+    TestBed.inject(WorkbenchViewRegistry).get('view.2').closable = false;
+
+    // Close all views.
+    await TestBed.inject(WorkbenchService).closeViews('view.1', 'view.2', 'view.3');
+    await waitUntilStable();
+
+    // Expect view.2 not to be closed.
+    expect(TestBed.inject(WorkbenchService).views.map(view => view.id)).toEqual(['view.2']);
+  });
+});
+

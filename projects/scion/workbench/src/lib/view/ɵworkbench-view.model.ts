@@ -64,8 +64,8 @@ export class ɵWorkbenchView implements WorkbenchView {
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
       .pipe(
         map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
-        mapArray<WorkbenchMenuItemFactoryFn, WorkbenchMenuItem>(menuItemFactoryFn => menuItemFactoryFn(this)),
-        filterArray<WorkbenchMenuItem>(Boolean),
+        mapArray(menuItemFactoryFn => menuItemFactoryFn(this)),
+        filterArray((menuItem: WorkbenchMenuItem | null): menuItem is WorkbenchMenuItem => menuItem !== null),
       );
     this.portal = this.createPortal(options.component);
     this.trackViewActivation();
