@@ -131,6 +131,12 @@
     //      //      "@scion/components.internal/tabbar": [
     //      //        "../scion-toolkit/projects/scion/components.internal/tabbar/src/public_api"
     //      //      ],
+    //      //      "@scion/components.internal/toggle-button": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/toggle-button/src/public_api"
+    //      //      ],
+    //      //      "@scion/components.internal/material-icon": [
+    //      //        "../scion-toolkit/projects/scion/components.internal/material-icon/src/public_api"
+    //      //      ],
     //      "@angular/*": [
     //        "./node_modules/@angular/*"
     //      ],

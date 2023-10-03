@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
-import {WorkbenchLayoutService} from './layout/workbench-layout.service';
+import {Component, inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, VIEW_MODAL_MESSAGE_BOX_HOST} from './content-projection/view-container.reference';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchModuleConfig} from './workbench-module-config';
@@ -20,7 +19,6 @@ import {AsyncPipe, NgComponentOutlet, NgIf} from '@angular/common';
 import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
 import {MessageBoxStackComponent} from './message-box/message-box-stack.component';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {combineLatest, lastValueFrom} from 'rxjs';
 import {first, map} from 'rxjs/operators';
 
@@ -66,9 +64,6 @@ export class WorkbenchComponent implements OnDestroy {
    */
   protected whenViewContainersInjected: Promise<true>;
 
-  @HostBinding('class.dragging')
-  protected dragging = false;
-
   @ViewChild('iframe_host', {read: ViewContainerRef})
   protected set injectIframeHost(vcr: ViewContainerRef) {
     vcr && this.viewContainerReferences.iframeHost.set(vcr);
@@ -85,7 +80,6 @@ export class WorkbenchComponent implements OnDestroy {
   }
 
   constructor(workbenchModuleConfig: WorkbenchModuleConfig,
-              private _workbenchLayoutService: WorkbenchLayoutService,
               private _workbenchLauncher: WorkbenchLauncher,
               private _logger: Logger,
               protected workbenchStartup: WorkbenchStartup) {
@@ -93,7 +87,6 @@ export class WorkbenchComponent implements OnDestroy {
     this.splash = workbenchModuleConfig?.startup?.splash || SplashComponent;
     this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();
     this.startWorkbench();
-    this.installViewDragDetector();
   }
 
   /**
@@ -103,17 +96,6 @@ export class WorkbenchComponent implements OnDestroy {
     if (!this.workbenchStartup.isStarted()) {
       this._workbenchLauncher.launch().catch(error => this._logger.error('Failed to start SCION Workbench', error));
     }
-  }
-
-  /**
-   * Updates {@link dragging} property when start or end dragging a view.
-   */
-  private installViewDragDetector(): void {
-    this._workbenchLayoutService.dragging$
-      .pipe(takeUntilDestroyed())
-      .subscribe(event => {
-        this.dragging = (event === 'start');
-      });
   }
 
   /**

@@ -3,8 +3,8 @@
   grid-row-gap: 1em;
 
   > sci-form-field section.input {
-    border: 1px solid var(--sci-color-P400);
-    border-radius: 5px;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
     padding: 1em;
     max-height: 200px;
 

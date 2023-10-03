@@ -1,16 +1,17 @@
-@use '../../../theme/styles';
-
 :host {
+  $padding: .5em;
   display: flex;
   flex-flow: column wrap-reverse; // to wrap to previous column (right alignment)
+  gap: .5em;
   max-height: 100%; // constrain max-height to wrap to the previous column
   align-items: flex-start; // right aligned
   align-content: flex-start;
   pointer-events: none;
+  padding: $padding;
 
   > wb-notification {
     position: relative; // for slide-in notification
     pointer-events: auto;
-    margin: styles.$notification-margin;
+    max-width: calc(100% - #{2*$padding}); // fit notification to maximal viewport width
   }
 }

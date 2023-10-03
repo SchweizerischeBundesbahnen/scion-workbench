@@ -1,45 +1,126 @@
-@use '../../../../theme/colors';
-
 :host {
+  --ɵpart-bar-indent-left: 0;
+  --ɵpart-bar-indent-right: 0;
+  --ɵpart-bar-drag-source-width: 0;
+  --ɵpart-bar-drag-image-placeholder-width: 0;
+
   display: flex;
-  background-color: colors.$part_tabbar-bgcolor;
-  color: colors.$part_tab-fgcolor;
-  --drag-source-width: 0;
-  --drag-source-placeholder-width: 0;
+  color: var(--sci-workbench-tab-text-color);
+  background-color: var(--sci-workbench-part-bar-background-color);
+  // Set border-top instead of padding-top because the viewtab containment context would otherwise displace the tab content.
+  border-top: var(--sci-workbench-part-bar-padding-top) solid transparent;
+  background-clip: border-box;
+  height: var(--sci-workbench-tab-height);
+  box-sizing: content-box;
+  // Positioning context for the bottom border pseudo element
+  position: relative;
+  // Containment context for view tabs to query their height, enabling view tabs to apply styles based on their height.
+  container-name: viewtab;
+  container-type: size;
+
+  wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+    background-color: var(--sci-workbench-part-peripheral-bar-background-color);
+  }
 
   > sci-viewport.tabbar {
     // Use 'flex: initial' instead of 'flex: auto' to not grow to absorb any extra free space in the partbar,
     // so that left-aligned actions will directly follow the viewtabs.
     flex: initial;
 
-    > div.viewport-client {
+    &::part(content) {
       display: flex;
-      flex-flow: row nowrap;
+      padding-left: var(--ɵpart-bar-indent-left);
+      padding-right: var(--ɵpart-bar-indent-right);
+    }
 
-      > wb-view-tab {
-        flex: none;
+    // Indent right is not set if the tabbar contains no "visible" tab.
+    &:not(.dragover):not(:has(wb-view-tab:not(.drag-source)))::part(content) {
+      padding-right: 0;
+    }
 
-        &.drag-source {
-          display: none;
-        }
-      }
+    > wb-view-tab {
+      flex: none;
 
-      > div.drag-image-placeholder {
-        flex: none;
-        width: var(--drag-source-placeholder-width);
-      }
-
-      // Shift drop target and subsequent tabs to the right.
-      > wb-view-tab.drop-target, wb-view-tab.drop-target ~ :is(wb-view-tab, div.drag-image-placeholder) {
-        transform: translateX(var(--drag-source-width));
+      &.drag-source {
+        display: none;
       }
     }
+
+    > div.divider {
+      flex: none;
+      display: flex;
+      position: relative; // positioning context for the :after pseudo element, which actually renders the divider as an overlay
+      width: 0; // divider must not occupy space
+
+      &:after {
+        flex: none;
+        align-self: center;
+        content: '';
+        position: absolute;
+        width: 1px;
+        left: -1px;
+        height: 65%;
+        background-color: var(--sci-workbench-part-bar-divider-color);
+      }
+    }
+
+    > div.drag-image-placeholder {
+      flex: none;
+      width: var(--ɵpart-bar-drag-image-placeholder-width);
+    }
+
+    // Shift drop target and subsequent tabs and dividers to the right.
+    > wb-view-tab.drop-target, wb-view-tab.drop-target ~ :is(wb-view-tab, div.divider), > div.divider:has(+ wb-view-tab.drop-target) {
+      transform: translateX(var(--ɵpart-bar-drag-source-width));
+    }
+
+    // Do not render divider following the active tab or drag source.
+    > wb-view-tab:is(.active, .drag-source) + div.divider {
+      display: none;
+    }
+
+    // Do not render divider preceding the active tab, but only if not the drag source.
+    > div.divider:has(+ wb-view-tab.active:not(.drag-source)) {
+      display: none;
+    }
+  }
+
+  > wb-part-action-bar {
+    flex: auto;
+  }
+
+  > wb-view-list-button {
+    flex: none;
+  }
+
+  // Pseudo element for rendering the bottom border of the tabbar.
+  // Must precede the viewport for the active tab to overlay it.
+  &:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--sci-workbench-tab-border-color);
+  }
+
+  > div.tab-corner-radius {
+    position: absolute; // out of document flow
+    visibility: hidden; // must not be `display:none` to have an effective size
+    width: var(--sci-workbench-tab-border-radius);
+  }
+
+  > div.padding-inline {
+    position: absolute; // out of document flow
+    visibility: hidden; // must not be `display:none` to have an effective size
+    width: var(--sci-workbench-part-bar-padding-inline);
   }
 
   &:not(.calculating-max-viewport-width) {
     // Animate shifting tabs during drag and drop.
     &.drag-enter, &.drag-over, &.drag-leave {
-      wb-view-tab {
+      wb-view-tab, div.divider {
         transition: transform 175ms cubic-bezier(0, 0, 0.2, 1);
       }
     }
@@ -50,13 +131,5 @@
         transition: width 175ms cubic-bezier(0, 0, 0.2, 1);
       }
     }
-  }
-
-  > wb-part-action-bar {
-    flex: auto;
-  }
-
-  > wb-view-list-button {
-    flex: none;
   }
 }

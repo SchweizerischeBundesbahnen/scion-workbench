@@ -1,50 +1,127 @@
-@use '../../../../theme/colors';
-@use '../../../../theme/styles';
+@use '../../../../design/workbench-constants';
+
+/**
+ * IMPORTANT: THIS CSS FILE IS ALSO USED BY `ViewTabDragImageComponent`
+ */
 
 :host {
-  display: grid; // stretches the portal to be full width and full height
-  position: relative; // positioning context for the portal
-  overflow: hidden;
+  display: grid;
+  align-items: center;
+  padding-left: var(--sci-workbench-tab-padding-inline);
+  padding-right: var(--sci-workbench-tab-padding-inline);
+  position: relative; // positioning context
   user-select: none;
   cursor: pointer;
-  border: none;
   box-sizing: border-box;
   outline: none;
+  border-top: 1px solid transparent;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-top-left-radius: var(--sci-workbench-tab-border-radius);
+  border-top-right-radius: var(--sci-workbench-tab-border-radius);
 
   &.active {
     cursor: default;
-    color: colors.$part_tab-active-fgcolor;
-  }
+    color: var(--sci-workbench-tab-active-text-color);
+    border-left-color: var(--sci-workbench-tab-border-color);
+    border-right-color: var(--sci-workbench-tab-border-color);
+    border-top-color: var(--sci-workbench-tab-border-color);
+    background-color: var(--sci-workbench-view-background-color);
 
-  &[context="tabbar"] {
-    border-right: 1px solid colors.$part_tabbar_separator-color;
-    min-width: styles.$viewtab-min-width;
-    max-width: styles.$viewtab-max-width;
-    height: styles.$viewtab-height;
+    wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+      background-color: var(--sci-workbench-view-peripheral-background-color);
+    }
 
-    &.active {
-      background-color: colors.$part_tab-active-bgcolor;
-      box-shadow: -7px 0 10px 0 rgba(0, 0, 0, 0.4);
+    &.part-active > div.content {
+      color: var(--sci-workbench-part-active-tab-active-text-color);
     }
   }
 
-  &[context="tabbar-dropdown"] {
-    padding: .25em 0;
-    border-left: 3px solid transparent;
+  > div.content {
+    max-width: var(--sci-workbench-tab-max-width);
+    isolation: isolate; // stacking context to overlay the positioned 'hover' overlay
+  }
 
-    &:hover {
-      background-color: rgba(239, 239, 239, .5);
-      box-shadow: 0 0 0 1px colors.$viewlistitem-border-color;
-    }
+  > button.close {
+    all: unset;
+    position: absolute;
+    cursor: pointer;
+    visibility: hidden;
+    padding: .125em;
+    border-radius: var(--sci-corner-small);
+    right: .2em;
 
-    &.active {
-      border-left-color: black;
+    &:not(:hover) {
+      opacity: .75;
     }
   }
 
-  // disable pointer events on direct children if the view is blocked (not on the host element to allow dragging the viewtab)
-  &.blocked > ::ng-deep * {
+  &.active, &:hover:not(.drag-over-tabbar) {
+    > button.close {
+      visibility: visible;
+    }
+  }
+
+  &.active > button.close:hover {
+    background-color: var(--sci-workbench-tab-hover-background-color);
+  }
+
+  // Indicator when hovering the tab
+  &:hover:not(.active):not(.drag-over-tabbar):before {
+    content: '';
+    background-color: var(--sci-workbench-tab-hover-background-color);
+    position: absolute;
+    inset: 0 0 .125em .125em;
+    border-radius: var(--sci-workbench-tab-border-radius);
     pointer-events: none;
   }
-}
 
+  > div.corner-radius {
+    height: var(--sci-workbench-tab-border-radius);
+    width: var(--sci-workbench-tab-border-radius);
+    overflow: hidden;
+    position: absolute;
+    bottom: 0;
+
+    > div.circle {
+      position: absolute;
+      top: calc(-2 * var(--sci-workbench-tab-border-radius));
+      width: calc(2 * var(--sci-workbench-tab-border-radius));
+      height: calc(2 * var(--sci-workbench-tab-border-radius));
+      border: var(--sci-workbench-tab-border-radius) solid var(--sci-workbench-view-background-color);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 1px var(--sci-workbench-tab-border-color);
+      box-sizing: content-box;
+
+      wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+        border-color: var(--sci-workbench-view-peripheral-background-color);
+      }
+    }
+
+    &.start {
+      left: calc(-1 * var(--sci-workbench-tab-border-radius));
+
+      > div.circle {
+        left: calc(-2 * var(--sci-workbench-tab-border-radius));
+      }
+    }
+
+    &.end {
+      right: calc(-1 * var(--sci-workbench-tab-border-radius));
+
+      > div.circle {
+        right: calc(-2 * var(--sci-workbench-tab-border-radius));
+      }
+    }
+  }
+
+  // @formatter:off - Disable formatting because IntelliJ adds a space between number and unit, making the condition invalid.
+  @container viewtab (height >= #{workbench-constants.$viewtab-multiline-breakpoint}) {
+    > button.close {
+      align-self: start;
+      top: .125em;
+      right: .125em;
+    }
+  }
+  // @formatter:on
+}

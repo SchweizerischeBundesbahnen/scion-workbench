@@ -14,8 +14,8 @@
       display: flex;
       flex-direction: column;
       gap: .5em;
-      border: 1px solid var(--sci-color-P400);
-      border-radius: 5px;
+      border: 1px solid var(--sci-color-border);
+      border-radius: var(--sci-corner);
       padding: 1em;
 
       > header {
@@ -32,9 +32,11 @@
 
   > output.navigate-error {
     flex: none;
-    border: 1px solid var(--sci-color-warn);
-    background-color: var(--sci-color-W100);
-    border-radius: 3px;
+    border: 1px solid var(--sci-color-negative);
+    background-color: var(--sci-color-background-negative);
+    color: var(--sci-color-negative);
+    border-radius: var(--sci-corner);
     padding: 1em;
+    font-family: monospace;
   }
 }

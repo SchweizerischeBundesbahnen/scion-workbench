@@ -1,53 +1,54 @@
-@use '../../../theme/colors';
-@use '../../../theme/styles';
-
-$severity-border-size: 6px;
-$border-radius: 4px;
-
-@mixin message-box-theme($color, $opacity: 1) {
-  border-top: $severity-border-size solid $color;
-
-  div.outline > div.button-bar > div.button-outline > button.action {
-    &:focus, &:active {
-      color: $color;
-      border-color: rgba($color, .8);
-      box-shadow: 0 0 8px 0 rgba($color, .25);
-    }
-  }
-}
-
 :host {
+  --ɵmessage-box-transform-translate-x: 0;
+  --ɵmessage-box-transform-translate-y: 0;
+  --ɵmessage-box-severity-color: 0;
+
   display: block;
   font-size: 1rem;
-  border-radius: $border-radius;
-  color: colors.$messagebox-fgcolor;
-  box-shadow: styles.$popup-box-shadow;
-  background-color: colors.$messagebox-bgcolor;
+  border-radius: var(--sci-corner);
+  color: var(--sci-color-text);
+  box-shadow: var(--sci-elevation) var(--sci-static-color-black);
+  background-color: var(--sci-color-background-elevation);
   outline: none;
+  border-top: var(--sci-workbench-messagebox-severity-indicator-size) solid var(--ɵmessage-box-severity-color);
+  transform: translateX(calc(1px * var(--ɵmessage-box-transform-translate-x))) translateY(calc(1px * var(--ɵmessage-box-transform-translate-y)));
+
+  &.info {
+    --ɵmessage-box-severity-color: var(--sci-color-accent);
+  }
+
+  &.warn {
+    --ɵmessage-box-severity-color: var(--sci-color-notice);
+  }
+
+  &.error {
+    --ɵmessage-box-severity-color: var(--sci-color-negative);
+  }
 
   > header.move-handle {
-    $size: $severity-border-size + 5px;
+    $size: calc(var(--sci-workbench-messagebox-severity-indicator-size) + 5px);
     position: absolute;
-    top: -($size);
-    height: 2*$size;
+    top: calc(-1 * $size);
+    height: calc(2 * $size);
     width: 100%;
   }
 
   > div.outline {
     display: flex;
     flex-direction: column;
-    border: 1px solid colors.$messagebox-border-color;
+    border: 1px solid var(--sci-color-border);
     border-top: none;
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: var(--sci-corner);
+    border-bottom-right-radius: var(--sci-corner);
     overflow: hidden;
 
     > div.body {
       flex: auto;
       padding: 1.5em;
-      max-width: styles.$messagebox-max-width;
+      max-width: var(--sci-workbench-messagebox-max-width);
       user-select: none;
       white-space: pre-line;
+      overflow-wrap: break-word;
 
       > header {
         font-weight: bold;
@@ -60,60 +61,50 @@ $border-radius: 4px;
       height: 3em;
       display: flex;
       margin-top: 1em;
+      background-color: var(--sci-color-background-secondary);
+      color: var(--sci-color-text);
+      border-top: 1px solid var(--sci-color-border);
 
       > div.button-outline {
         flex: 1 1 0;
         display: grid;
-        background-color: rgb(250, 250, 250);
-        border-top: 1px solid colors.$messagebox-border-color;
         min-width: 7.5em;
 
         &:not(:first-child) {
-          border-left: 1px solid colors.$messagebox-border-color;
+          border-left: 1px solid var(--sci-color-border);
         }
 
         > button.action {
-          font-family: inherit;
-          color: rgba(51, 51, 51, .8);
-          background-color: transparent;
+          all: unset;
           margin: 2px;
           border: 1px solid transparent;
-          border-radius: 2px;
-          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+          border-radius: var(--sci-corner-small);
+          transition: border-color ease-in-out .15s;
           cursor: pointer;
           user-select: none;
+          text-align: center;
 
           &:focus, &:active {
             outline: none;
+            color: var(--ɵmessage-box-severity-color);
+            border-color: var(--ɵmessage-box-severity-color);
           }
         }
       }
     }
   }
 
-  &.info {
-    @include message-box-theme(colors.$info-color);
-  }
-
-  &.warn {
-    @include message-box-theme(colors.$warn-color);
-  }
-
-  &.error {
-    @include message-box-theme(colors.$error-color);
-  }
-
   &.blinking {
-    animation-duration: .125s;
+    animation-duration: 50ms;
     animation-iteration-count: infinite;
     animation-name: blink-animation;
 
     @keyframes blink-animation {
       from {
-        box-shadow: styles.$popup-box-shadow;
+        transform: translateX(calc(calc(1px * var(--ɵmessage-box-transform-translate-x)) - 2px)) translateY(calc(calc(1px * var(--ɵmessage-box-transform-translate-y)) - 1px));
       }
       to {
-        box-shadow: none;
+        transform: translateX(calc(calc(1px * var(--ɵmessage-box-transform-translate-x)) + 2px)) translateY(calc(calc(1px * var(--ɵmessage-box-transform-translate-y)) + 1px));
       }
     }
   }

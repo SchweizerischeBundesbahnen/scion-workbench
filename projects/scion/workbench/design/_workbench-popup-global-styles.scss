@@ -1,17 +1,19 @@
+/**
+ * Styles for rendering the overlay of the Workbench popup.
+ */
+
 $diamond-height: 8;
-$border-color: rgb(174, 181, 189);
-$background-color: rgb(255, 255, 255);
-$popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
 
 /**
  * Provides SCION workbench popup styles.
  */
-@mixin popup($theme) {
+@mixin install-global-styles() {
   .wb-popup {
-    background-color: $background-color;
-    border-radius: 2px;
-    box-shadow: $popup-box-shadow, 0 0 1px $border-color;
-    border: 1px solid $border-color;
+    background-color: var(--sci-color-background-elevation);
+    color: var(--sci-color-text);
+    border-radius: var(--sci-corner);
+    box-shadow: var(--sci-elevation) var(--sci-static-color-black);
+    border: 1px solid var(--sci-color-border);
     display: grid;
 
     //::before is used as diamond-border
@@ -31,14 +33,14 @@ $popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
         bottom: -#{$diamond-height}px;
         left: calc(50% - #{$diamond-height}px);
         border-bottom-width: 0;
-        border-top-color: $border-color;
+        border-top-color: var(--sci-color-border);
       }
 
       &::after {
         bottom: -#{$diamond-height - 1}px;
         left: calc(50% - #{$diamond-height}px);
         border-bottom-width: 0;
-        border-top-color: $background-color;
+        border-top-color: var(--sci-color-background-elevation);
       }
     }
 
@@ -49,14 +51,14 @@ $popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
         top: -#{$diamond-height}px;
         left: calc(50% - #{$diamond-height}px);
         border-top-width: 0;
-        border-bottom-color: $border-color;
+        border-bottom-color: var(--sci-color-border);
       }
 
       &::after {
         top: -#{$diamond-height - 1}px;
         left: calc(50% - #{$diamond-height}px);
         border-top-width: 0;
-        border-bottom-color: $background-color;
+        border-bottom-color: var(--sci-color-background-elevation);
       }
     }
 
@@ -67,14 +69,14 @@ $popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
         left: -#{$diamond-height}px;
         top: calc(50% - #{$diamond-height}px);
         border-left-width: 0;
-        border-right-color: $border-color;
+        border-right-color: var(--sci-color-border);
       }
 
       &::after {
         left: -#{$diamond-height - 1}px;
         top: calc(50% - #{$diamond-height}px);
         border-left-width: 0;
-        border-right-color: $background-color;
+        border-right-color: var(--sci-color-background-elevation);
       }
     }
 
@@ -85,14 +87,14 @@ $popup-box-shadow: 3px 3px 20px -5px rgba(0, 0, 0, 0.5);
         right: -#{$diamond-height}px;
         top: calc(50% - #{$diamond-height}px);
         border-right-width: 0;
-        border-left-color: $border-color;
+        border-left-color: var(--sci-color-border);
       }
 
       &::after {
         right: -#{$diamond-height - 1}px;
         top: calc(50% - #{$diamond-height}px);
         border-right-width: 0;
-        border-left-color: $background-color;
+        border-left-color: var(--sci-color-background-elevation);
       }
     }
 

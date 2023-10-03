@@ -1,5 +1,3 @@
-@use '../../../../theme/colors';
-
 :host {
   display: grid;
 
@@ -19,11 +17,13 @@
     z-index: auto;
 
     --sci-sashbox-gap: 0;
-    --sci-sashbox-splitter-touch-target-size: 5px;
-    --sci-sashbox-splitter-size_hover: 9px;
-    --sci-sashbox-splitter-size: 1px;
-    --sci-sashbox-splitter-bgcolor: #{colors.$part_sash-bgcolor};
-    --sci-sashbox-splitter-opacity_active: .25;
-    --sci-sashbox-splitter-opacity_hover: .125;
+    --sci-sashbox-splitter-background-color: var(--sci-workbench-part-divider-color);
+    --sci-sashbox-splitter-background-color-hover: var(--sci-workbench-part-divider-color-hover);
+    --sci-sashbox-splitter-size: var(--sci-workbench-part-divider-size);
+    --sci-sashbox-splitter-size-hover: var(--sci-workbench-part-divider-size-hover);
+    --sci-sashbox-splitter-touch-target-size: var(--sci-workbench-part-divider-touch-target-size);
+    --sci-sashbox-splitter-border-radius: 0;
+    --sci-sashbox-splitter-opacity-active: var(--sci-workbench-part-divider-opacity-active);
+    --sci-sashbox-splitter-opacity-hover: var(--sci-workbench-part-divider-opacity-hover);
   }
 }

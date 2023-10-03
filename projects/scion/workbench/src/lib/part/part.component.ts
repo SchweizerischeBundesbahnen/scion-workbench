@@ -54,6 +54,11 @@ export class PartComponent implements OnInit, OnDestroy {
     return this.part.isInMainArea;
   }
 
+  @HostBinding('class.main-area')
+  public get isMainArea(): boolean {
+    return this.part.isInMainArea;
+  }
+
   @HostBinding('class.active')
   public get isActive(): boolean {
     return this.part.active;

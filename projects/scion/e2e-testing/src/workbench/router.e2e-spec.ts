@@ -111,7 +111,7 @@ test.describe('Workbench Router', () => {
 
     // open test view 1
     await routerPagePO.enterPath('test-pages/navigation-test-page');
-    await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1', title: 'view-1-title', heading: 'view-1-heading'});
+    await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-1', title: 'view-1-title'});
     await routerPagePO.enterTarget('blank');
     await routerPagePO.clickNavigate();
 
@@ -119,7 +119,7 @@ test.describe('Workbench Router', () => {
     await routerPagePO.viewTabPO.click();
     await routerPagePO.enterPath('test-pages/navigation-test-page');
     await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2', title: 'view-2-title', heading: 'view-2-heading'});
+    await routerPagePO.enterMatrixParams({cssClass: 'e2e-test-view-2', title: 'view-2-title'});
     await routerPagePO.clickNavigate();
 
     // reload the application
@@ -128,12 +128,10 @@ test.describe('Workbench Router', () => {
     const viewTab1 = appPO.view({cssClass: 'e2e-test-view-1'}).viewTab;
     await expect(await viewTab1.isActive()).toBe(false);
     await expect(await viewTab1.getTitle()).toEqual('view-1-title');
-    await expect(await viewTab1.getHeading()).toEqual('view-1-heading');
 
     const viewTab2 = appPO.view({cssClass: 'e2e-test-view-2'}).viewTab;
     await expect(await viewTab2.isActive()).toBe(true);
     await expect(await viewTab2.getTitle()).toEqual('view-2-title');
-    await expect(await viewTab2.getHeading()).toEqual('view-2-heading');
 
     await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
   });

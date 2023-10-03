@@ -56,8 +56,9 @@ export class ViewDropPlaceholderRenderer {
       parent: this._dropPlaceholderHost.ref().element.nativeElement,
       style: {
         'position': 'fixed',
-        'background': '#000000',
-        'opacity': .1,
+        'background-color': 'var(--sci-workbench-part-dropzone-background-color)',
+        'border': '1px var(--sci-workbench-part-dropzone-border-style) var(--sci-workbench-part-dropzone-border-color)',
+        'border-radius': 'var(--sci-workbench-part-dropzone-border-radius)',
         'pointer-events': 'none',
         'transition-duration': '125ms',
         'transition-property': 'top,left,width,height',

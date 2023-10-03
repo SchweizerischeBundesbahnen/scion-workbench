@@ -295,6 +295,14 @@ export class AppPO {
     await newAppPO.waitUntilWorkbenchStarted();
     return newAppPO;
   }
+
+  /**
+   * Sets given design token on the workbench HTML element.
+   */
+  public async setDesignToken(name: string, value: string): Promise<void> {
+    const pageFunction = (workbenchElement: HTMLElement, token: {name: string; value: string}): void => workbenchElement.style.setProperty(token.name, token.value);
+    await this.workbenchLocator.evaluate(pageFunction, {name, value});
+  }
 }
 
 /**

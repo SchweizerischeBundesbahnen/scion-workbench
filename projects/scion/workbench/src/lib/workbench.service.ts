@@ -133,4 +133,23 @@ export abstract class WorkbenchService {
    * @return handle to unregister the menu item.
    */
   public abstract registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable;
+
+  /**
+   * Switches the theme of the workbench.
+   *
+   * Themes can be registered when loading the `@scion/workbench` SCSS module in the application's `styles.scss` file.
+   * By default, SCION provides a light and a dark theme, `scion-light` and `scion-dark`.
+   *
+   * See the documentation of `@scion/workbench` SCSS module for more information.
+   *
+   * @param theme - The name of the theme to switch to.
+   */
+  public abstract switchTheme(theme: string): Promise<void>;
+
+  /**
+   * Emits the name of the current workbench theme.
+   *
+   * Upon subscription, emits the name of the current theme, and then continuously emits when switching the theme. It never completes.
+   */
+  public abstract readonly theme$: Observable<string | null>;
 }

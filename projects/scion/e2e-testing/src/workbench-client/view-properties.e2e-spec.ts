@@ -59,6 +59,7 @@ test.describe('Workbench View Properties', () => {
 
   test('should set view heading via Observable in view constructor', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
+    await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
     // Register the test page as view.
     const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');

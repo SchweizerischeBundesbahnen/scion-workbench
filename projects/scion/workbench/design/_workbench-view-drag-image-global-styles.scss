@@ -1,0 +1,14 @@
+/**
+ * Provides styles for view drag and drop.
+ */
+@mixin install-global-styles() {
+  .wb-view-tab-drag-image {
+    display: grid;
+    position: fixed;
+    user-select: none;
+    pointer-events: none;
+    container-type: size;
+    container-name: viewtab;
+  }
+}
+

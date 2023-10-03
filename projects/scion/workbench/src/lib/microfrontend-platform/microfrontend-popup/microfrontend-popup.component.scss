@@ -1,3 +1,9 @@
 :host {
   display: grid;
+
+  // Prevent the microfrontend (iframe) from consuming pointer events during a workbench drag operation. Otherwise, dragging a view tab,
+  // moving a part splitter, or moving a message box over an iframe would corrupt the drag operation because `dragover` events are not reported.
+  &.workbench-drag > sci-router-outlet {
+    pointer-events: none;
+  }
 }

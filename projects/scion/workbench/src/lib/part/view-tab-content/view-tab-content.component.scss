@@ -1,3 +1,5 @@
+@use '../../../../design/workbench-constants';
+
 @mixin show-ellipsis-on-overflow {
   text-overflow: ellipsis;
   overflow: hidden;
@@ -5,16 +7,12 @@
 }
 
 :host {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1.5em auto;
-  padding: .5em 1em;
+  display: flex;
+  flex-direction: column;
+  gap: .25em;
+  overflow: hidden; // to have ellipsis on overflow
 
-  &:not(.has-heading) {
-    grid-template-rows: 1fr;
-  }
-
-  > div.title {
+  > span.title {
     @include show-ellipsis-on-overflow;
     font-weight: 400;
     font-size: 1em;
@@ -24,94 +22,23 @@
     }
   }
 
-  > div.heading {
+  > span.heading {
     @include show-ellipsis-on-overflow;
     font-size: .9em;
     font-weight: 300;
   }
 
-  > button.close {
-    all: unset;
-    cursor: pointer;
-    visibility: hidden;
-    opacity: .75;
-
-    &:hover {
-      opacity: 1;
+  &[context="tab"], &[context="drag-image"] {
+    span.title {
+      margin-right: 1em;
     }
   }
 
-  &.active:not(.blocked):not([context="tabbar-dropdown"]), &:hover:not(.blocked) {
-    > button.close {
-      visibility: visible;
+  // @formatter:off - Disable formatting because IntelliJ adds a space between number and unit, making the condition invalid.
+  @container viewtab (height < #{workbench-constants.$viewtab-multiline-breakpoint}) {
+    > span.heading {
+      display: none;
     }
   }
-
-  &.active[context="tabbar-dropdown"] {
-    > div.title, div.heading {
-      font-weight: bold;
-    }
-  }
-
-  &:not(.scrolled-into-view)[context="tabbar-dropdown"] {
-    > div.title, div.heading {
-      opacity: .85;
-      font-style: italic;
-    }
-  }
-
-  &[context="tabbar"], &[context="drag-image"] {
-    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
-    //> div.title {
-    div.title {
-      grid-column: 1/2;
-      grid-row: 1/2;
-    }
-
-    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
-    //> div.heading {
-    div.heading {
-      grid-column: 1/3;
-      grid-row: 2/3;
-    }
-
-    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
-    //> button.close {
-    button.close {
-      grid-column: 2/3;
-      grid-row: 1/-1;
-      justify-self: end;
-      align-self: start;
-      position: relative;
-      top: -.25em;
-      right: -.75em;
-    }
-  }
-
-  &[context="tabbar-dropdown"] {
-    column-gap: 1.5em;
-
-    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
-    //> div.title {
-    div.title {
-      grid-column: 1/2;
-      grid-row: 1/2;
-    }
-
-    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
-    //> div.heading {
-    div.heading {
-      grid-column: 1/2;
-      grid-row: 2/3;
-    }
-
-    // TODO [Angular 17] Add direct child selector when resolved issue https://github.com/angular/angular/issues/49100
-    //> button.close {
-    button.close {
-      grid-column: 2/3;
-      grid-row: 1/-1;
-      justify-self: end;
-      align-self: center;
-    }
-  }
+  // @formatter:on
 }

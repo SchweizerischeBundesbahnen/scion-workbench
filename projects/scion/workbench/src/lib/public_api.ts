@@ -13,7 +13,7 @@ export {WorkbenchModule} from './workbench.module';
 export {WorkbenchService} from './workbench.service';
 export {WorkbenchViewPreDestroy, WorkbenchPartAction} from './workbench.model';
 export {WorkbenchComponent} from './workbench.component';
-export {VIEW_TAB_CONTEXT, ViewTabContext} from './workbench.constants';
+export {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from './workbench.constants';
 
 export * from './layout/public_api';
 export * from './perspective/public_api';

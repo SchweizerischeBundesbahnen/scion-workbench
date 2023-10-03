@@ -9,16 +9,12 @@
     align-self: center;
     user-select: none;
     font-size: 1.5em;
-    opacity: .75;
   }
 
   > input {
+    all: unset;
     flex: auto;
-    border: none;
-    box-shadow: none;
-    outline: none;
-    padding: 0;
-    width: 0; // allows the input to shrink past UA minimal width
+    min-width: 0; // allows the input to shrink past UA minimal width
   }
 
   > button.clear {
@@ -33,15 +29,13 @@
     }
   }
 
-  &:focus-within:not(.disabled) {
-    > label.filter-icon {
-      opacity: 1;
-    }
-  }
-
-  &.disabled, &.empty {
+  &:not(:focus-within):not(:hover), &:has(> input:disabled), &.empty {
     > button.clear {
       visibility: hidden;
     }
+  }
+
+  &:has(> input:disabled) > label.filter-icon {
+    color: var(--sci-color-text-subtlest);
   }
 }

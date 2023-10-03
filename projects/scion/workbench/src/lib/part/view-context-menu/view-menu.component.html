@@ -1,4 +1,4 @@
-<div class="menu-item-group" *ngFor="let menuItemGroup of menuItemGroups$ | async | wbCoerceMap | keyvalue">
+<ng-container *ngFor="let menuItemGroup of menuItemGroups$ | async | wbCoerceMap | keyvalue; last as isLast">
   <button *ngFor="let menuItem of menuItemGroup.value"
           class="menu-item"
           [ngClass]="menuItem.cssClass"
@@ -9,4 +9,5 @@
     </div>
     <div class="accelerator">{{menuItem.accelerator | wbFormatAccelerator}}</div>
   </button>
-</div>
+  <hr *ngIf="!isLast">
+</ng-container>

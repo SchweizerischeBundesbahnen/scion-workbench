@@ -14,10 +14,10 @@ We are working on a comprehensive guide that explains the features and concepts 
 #### Installation
 - [How to install the SCION Workbench](how-to-install-workbench.md)
 
-#### Layout and Perspective
-- [How to configure a start page](how-to-configure-start-page.md)
+#### Layout
 - [How to define an initial layout](how-to-define-initial-layout.md)
 - [How to provide a perspective](how-to-provide-perspective.md)
+- [How to configure a start page](how-to-configure-start-page.md)
 - [How to query, switch and reset perspectives](how-to-perspective.md)
 
 
@@ -29,6 +29,9 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to close a view](how-to-close-view.md)
 - [How to prevent a view from being closed](how-to-prevent-view-closing.md)
 - [How to provide a part action](how-to-provide-part-action.md)
+
+#### Theming
+- [How to theme the SCION Workbench](how-to-theme-workbench.md)
 
 #### Miscellaneous
 

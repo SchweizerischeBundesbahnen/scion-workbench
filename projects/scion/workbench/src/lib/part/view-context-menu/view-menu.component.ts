@@ -14,12 +14,12 @@ import {Observable, OperatorFunction} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {AsyncPipe, KeyValuePipe, NgClass, NgFor} from '@angular/common';
+import {AsyncPipe, KeyValuePipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {PortalModule} from '@angular/cdk/portal';
 import {WbFormatAcceleratorPipe} from './accelerator-format.pipe';
 import {MapCoercePipe} from '../../common/map-coerce.pipe';
 
-declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
+type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
 
 /**
  * Renders the menu items of a {@link WorkbenchView} grouped by their menu item group.
@@ -30,6 +30,7 @@ declare type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
   styleUrls: ['./view-menu.component.scss'],
   standalone: true,
   imports: [
+    NgIf,
     NgFor,
     NgClass,
     AsyncPipe,

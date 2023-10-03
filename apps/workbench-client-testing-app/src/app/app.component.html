@@ -3,8 +3,8 @@
     <router-outlet></router-outlet>
   </sci-viewport>
   <section class="metadata">
-    <span class="chip has-focus e2e-has-focus" *ngIf="focusMonitor.focus$ | async">has-focus</span>
-    <span class="chip app-symbolic-name">{{appSymbolicName}}</span>
+    <span class="chip has-focus e2e-has-focus" *ngIf="focusMonitor!.focus$ | async">has-focus</span>
+    <span class="chip app-symbolic-name" [class.has-focus]="focusMonitor!.focus$ | async">{{appSymbolicName}}</span>
   </section>
 </ng-container>
 

@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, Optional, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Optional, ViewChild} from '@angular/core';
 import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
-import {Capability, IntentClient, ManifestService, PlatformPropertyService} from '@scion/microfrontend-platform';
+import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
@@ -63,8 +63,6 @@ export default class StartPageComponent {
               @Optional() private _workbenchPopupService: WorkbenchPopupService, // not available when starting the workbench standalone
               @Optional() private _intentClient: IntentClient, // not available when starting the workbench standalone
               @Optional() private _manifestService: ManifestService, // not available when starting the workbench standalone
-              @Optional() private _propertyService: PlatformPropertyService, // not available when starting the workbench standalone
-              private _host: ElementRef<HTMLElement>,
               private _formBuilder: NonNullableFormBuilder,
               router: Router,
               cd: ChangeDetectorRef,
@@ -93,11 +91,6 @@ export default class StartPageComponent {
           filterArray(viewCapability => isTestCapability(viewCapability)),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );
-    }
-
-    // Set configured app colors as CSS variables.
-    if (workbenchModuleConfig.microfrontendPlatform) {
-      this.setAppColorCssVariables();
     }
 
     this.markForCheckOnUrlChange(router, cd);
@@ -145,21 +138,6 @@ export default class StartPageComponent {
       .subscribe(() => {
         cd.markForCheck();
       });
-  }
-
-  /**
-   * Sets configured app colors as CSS variables:
-   *
-   * --workbench-client-testing-app1-color
-   * --workbench-client-testing-app2-color
-   *
-   * Colors are defined in platform properties in {@link environment.microfrontendPlatformConfig}.
-   */
-  private setAppColorCssVariables(): void {
-    this._manifestService.applications.forEach(app => {
-      const appColor = this._propertyService.get<{color: string} | null>(app.symbolicName, null)?.color;
-      appColor && this._host.nativeElement.style.setProperty(`--${app.symbolicName}-color`, appColor);
-    });
   }
 
   /**

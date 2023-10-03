@@ -2,4 +2,4 @@
   <header *ngIf="notification.title$ | async | wbCoerceObservable$ | async as title" class="e2e-title">{{title}}</header>
   <ng-container *cdkPortalOutlet="portal"></ng-container>
 </div>
-<button type="button" class="close scion-workbench-icons e2e-close" (click)="onClose()">close</button>
+<button class="close scion-workbench-icons e2e-close" (click)="onClose()">close</button>

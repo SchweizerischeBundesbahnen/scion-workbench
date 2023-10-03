@@ -64,7 +64,7 @@ export class WorkbenchPerspectiveStorageService {
  */
 const storageKeys = {
   perspectiveData: (perspectiveId: string): string => `scion.workbench.perspectives.${perspectiveId}`,
-  activePerspectiveId: 'scion.workbench.activePerspective',
+  activePerspectiveId: 'scion.workbench.perspective',
 };
 
 /**
