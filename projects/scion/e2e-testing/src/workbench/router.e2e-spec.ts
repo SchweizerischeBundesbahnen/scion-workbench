@@ -1171,8 +1171,7 @@ test.describe('Workbench Router', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
 
     // Define perspective with a part on the left.
-    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
-    await perspectiveToggleButtonPO.click();
+    await appPO.switchPerspective('perspective');
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPagePO.addPart('left', {align: 'left', ratio: .25});
 
@@ -1248,8 +1247,7 @@ test.describe('Workbench Router', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
 
     // Define perspective with a part on the left.
-    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
-    await perspectiveToggleButtonPO.click();
+    await appPO.switchPerspective('perspective');
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPagePO.addPart('left', {align: 'left', ratio: .25});
 

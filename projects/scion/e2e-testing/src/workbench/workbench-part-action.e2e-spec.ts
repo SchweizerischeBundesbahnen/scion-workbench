@@ -19,8 +19,7 @@ test.describe('Workbench Part Action', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
 
     // Switch perspective
-    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
-    await perspectiveToggleButtonPO.click();
+    await appPO.switchPerspective('perspective');
 
     // Prepare layout
     // +------+-----------+-------+
@@ -51,8 +50,7 @@ test.describe('Workbench Part Action', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
 
     // Switch perspective
-    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
-    await perspectiveToggleButtonPO.click();
+    await appPO.switchPerspective('perspective');
 
     // Prepare layout
     // +------+-----------+-------+
@@ -83,8 +81,7 @@ test.describe('Workbench Part Action', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
 
     // Switch perspective
-    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
-    await perspectiveToggleButtonPO.click();
+    await appPO.switchPerspective('perspective');
 
     // Prepare layout
     // +------+-----------+-------+
@@ -149,8 +146,7 @@ test.describe('Workbench Part Action', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
 
     // Switch perspective
-    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
-    await perspectiveToggleButtonPO.click();
+    await appPO.switchPerspective('perspective');
 
     // Prepare layout
     // +------+-----------+-------+
@@ -263,8 +259,7 @@ test.describe('Workbench Part Action', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective']});
 
     // Switch perspective
-    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective'});
-    await perspectiveToggleButtonPO.click();
+    await appPO.switchPerspective('perspective');
 
     // Prepare layout
     // +------+-----------+-------+

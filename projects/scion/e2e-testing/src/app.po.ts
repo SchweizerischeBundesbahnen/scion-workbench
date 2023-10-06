@@ -241,6 +241,13 @@ export class AppPO {
   }
 
   /**
+   * Switches to the specified perspective.
+   */
+  public async switchPerspective(perspectiveId: string): Promise<void> {
+    await this.header.perspectiveToggleButton({perspectiveId}).click();
+  }
+
+  /**
    * Waits until the workbench finished startup.
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {
