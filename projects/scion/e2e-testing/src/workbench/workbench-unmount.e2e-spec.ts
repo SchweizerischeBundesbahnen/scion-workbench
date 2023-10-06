@@ -71,29 +71,29 @@ test.describe('Workbench Component', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open message box.
-    const messageBoxOpenerPagePO = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-    await messageBoxOpenerPagePO.enterCssClass('testee');
-    await messageBoxOpenerPagePO.clickOpen();
+    const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+    await messageBoxOpenerPage.enterCssClass('testee');
+    await messageBoxOpenerPage.clickOpen();
 
     // Expect the message box to display.
-    const messageBoxPO = appPO.messagebox({cssClass: 'testee'});
-    await expect(await messageBoxPO.isVisible()).toBe(true);
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect(await messageBox.isVisible()).toBe(true);
 
     // Unmount the workbench component by navigating the primary router outlet.
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
 
     // Expect the DOM not to contain workbench elements.
     await expect(await appPO.isWorkbenchComponentPresent()).toBe(false);
-    await expect(await messageBoxPO.isPresent()).toBe(false);
-    await expect(await messageBoxOpenerPagePO.isPresent()).toBe(false);
+    await expect(await messageBox.isPresent()).toBe(false);
+    await expect(await messageBoxOpenerPage.isPresent()).toBe(false);
 
     // Re-mount the workbench component by navigating the primary router.
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
 
     // Expect the message box to display.
     await expect(await appPO.isWorkbenchComponentPresent()).toBe(true);
-    await expect(await messageBoxPO.isVisible()).toBe(true);
-    await expect(await messageBoxOpenerPagePO.isPresent()).toBe(true);
+    await expect(await messageBox.isVisible()).toBe(true);
+    await expect(await messageBoxOpenerPage.isPresent()).toBe(true);
     await expect(await appPO.getMessageBoxCount()).toBe(1);
   });
 
@@ -101,8 +101,8 @@ test.describe('Workbench Component', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open view page and enter free text as the view state.
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await viewPagePO.enterFreeText('view state');
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPage.enterFreeText('view state');
 
     // Unmount the workbench component by navigating the primary router outlet.
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
@@ -111,17 +111,17 @@ test.describe('Workbench Component', () => {
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
 
     // Expect the view to display.
-    await expect(await viewPagePO.isVisible()).toBe(true);
+    await expect(await viewPage.isVisible()).toBe(true);
 
     // Expect the view to display and the free text to be preserved.
-    await expect(await viewPagePO.getFreeText()).toEqual('view state');
+    await expect(await viewPage.getFreeText()).toEqual('view state');
   });
 
   test('should attach message box to the "actual" ViewContainerRef when re-creating the workbench component', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open message box opener page
-    const messageBoxOpenerPagePO = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+    const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
 
     // Unmount the workbench component by navigating the primary router outlet.
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
@@ -130,12 +130,12 @@ test.describe('Workbench Component', () => {
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
 
     // Open message box.
-    await messageBoxOpenerPagePO.enterCssClass('testee');
-    await messageBoxOpenerPagePO.clickOpen();
+    await messageBoxOpenerPage.enterCssClass('testee');
+    await messageBoxOpenerPage.clickOpen();
 
     // Expect the message box to display.
-    const messageBoxPO = appPO.messagebox({cssClass: 'testee'});
-    await expect(await messageBoxPO.isVisible()).toBe(true);
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect(await messageBox.isVisible()).toBe(true);
     await expect(await appPO.getMessageBoxCount()).toBe(1);
   });
 
@@ -143,25 +143,25 @@ test.describe('Workbench Component', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Open view with a microfrontend.
-    const viewPagePO = await microfrontendNavigator.openInNewTab(MicrofrontendViewPagePO, 'app1');
+    const viewPage = await microfrontendNavigator.openInNewTab(MicrofrontendViewPagePO, 'app1');
 
     // Expect the view and the microfrontend to display.
-    await expect(await viewPagePO.isVisible()).toBe(true);
+    await expect(await viewPage.isVisible()).toBe(true);
 
     // Unmount the workbench component by navigating the primary router outlet.
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
 
     // Expect the DOM not to contain workbench elements.
     await expect(await appPO.isWorkbenchComponentPresent()).toBe(false);
-    await expect(await viewPagePO.isPresent()).toBe(false);
+    await expect(await viewPage.isPresent()).toBe(false);
 
     // Re-mount the workbench component by navigating the primary router.
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
 
     // Expect the view and the microfrontend to display.
     await expect(await appPO.isWorkbenchComponentPresent()).toBe(true);
-    await viewPagePO.waitUntilAttached();
-    await expect(await viewPagePO.isVisible()).toBe(true);
+    await viewPage.waitUntilAttached();
+    await expect(await viewPage.isVisible()).toBe(true);
   });
 
   test('should attach microfrontend to the "actual" ViewContainerRef when re-creating the workbench component', async ({appPO, microfrontendNavigator}) => {
@@ -174,10 +174,10 @@ test.describe('Workbench Component', () => {
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
 
     // Open view with a microfrontend.
-    const viewPagePO = await microfrontendNavigator.openInNewTab(MicrofrontendViewPagePO, 'app1');
+    const viewPage = await microfrontendNavigator.openInNewTab(MicrofrontendViewPagePO, 'app1');
 
     // Expect the view and the microfrontend to display.
-    await expect(await viewPagePO.isVisible()).toBe(true);
+    await expect(await viewPage.isVisible()).toBe(true);
   });
 
   /**

@@ -26,18 +26,18 @@ test.describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
-      await popupOpenerPagePO.enterCssClass('host-popup');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterCssClass('host-popup');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new HostPopupPagePO(appPO, 'host-popup');
-      await expect(await popupPagePO.getReferrer()).toEqual({
-        viewId: popupOpenerPagePO.viewId,
-        viewCapabilityId: await popupOpenerPagePO.outlet.getCapabilityId(),
+      const popupPage = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await popupPage.getReferrer()).toEqual({
+        viewId: popupOpenerPage.viewId,
+        viewCapabilityId: await popupOpenerPage.outlet.getCapabilityId(),
       });
     });
 
@@ -48,23 +48,23 @@ test.describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
-      const startPagePO = await appPO.openNewViewTab();
-      const startPageViewId = startPagePO.viewId!;
+      const startPage = await appPO.openNewViewTab();
+      const startPageViewId = startPage.viewId!;
 
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
-      await popupOpenerPagePO.enterContextualViewId(startPageViewId);
-      await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.enterCssClass('host-popup');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterContextualViewId(startPageViewId);
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.enterCssClass('host-popup');
+      await popupOpenerPage.clickOpen();
 
-      await startPagePO.view!.viewTab.click();
+      await startPage.view!.viewTab.click();
 
-      const popupPagePO = new HostPopupPagePO(appPO, 'host-popup');
-      await expect(await popupPagePO.getReferrer()).toEqual({
+      const popupPage = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await popupPage.getReferrer()).toEqual({
         viewId: startPageViewId,
       });
     });
@@ -76,25 +76,25 @@ test.describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
-      const microfrontendPO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-      const microfrontendViewId = microfrontendPO.viewId!;
+      const microfrontendViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      const microfrontendViewId = microfrontendViewPage.viewId!;
 
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
-      await popupOpenerPagePO.enterContextualViewId(microfrontendViewId);
-      await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.enterCssClass('host-popup');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterContextualViewId(microfrontendViewId);
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.enterCssClass('host-popup');
+      await popupOpenerPage.clickOpen();
 
-      await microfrontendPO.view!.viewTab.click();
+      await microfrontendViewPage.view!.viewTab.click();
 
-      const popupPagePO = new HostPopupPagePO(appPO, 'host-popup');
-      await expect(await popupPagePO.getReferrer()).toEqual({
+      const popupPage = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await popupPage.getReferrer()).toEqual({
         viewId: microfrontendViewId,
-        viewCapabilityId: await microfrontendPO.outlet.getCapabilityId(),
+        viewCapabilityId: await microfrontendViewPage.outlet.getCapabilityId(),
       });
     });
 
@@ -105,17 +105,17 @@ test.describe('Workbench Popup', () => {
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
       // register intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
 
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'host-popup'});
-      await popupOpenerPagePO.enterContextualViewId('<null>');
-      await popupOpenerPagePO.enterCssClass('host-popup');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterContextualViewId('<null>');
+      await popupOpenerPage.enterCssClass('host-popup');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new HostPopupPagePO(appPO, 'host-popup');
-      await expect(await popupPagePO.getReferrer()).toEqual({});
+      const popupPage = new HostPopupPagePO(appPO, 'host-popup');
+      await expect(await popupPage.getReferrer()).toEqual({});
     });
   });
 });

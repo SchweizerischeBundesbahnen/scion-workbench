@@ -59,36 +59,36 @@ export class WorkbenchNavigator {
   public openInNewTab(page: Type<ViewPagePO>): Promise<ViewPagePO>;
 
   public async openInNewTab(page: Type<any>): Promise<any> {
-    const startPO = await this._appPO.openNewViewTab();
-    const viewId = startPO.viewId!;
+    const startPage = await this._appPO.openNewViewTab();
+    const viewId = startPage.viewId!;
 
     switch (page) {
       case MessageBoxOpenerPagePO: {
-        await startPO.openWorkbenchView('e2e-test-message-box-opener');
+        await startPage.openWorkbenchView('e2e-test-message-box-opener');
         return new MessageBoxOpenerPagePO(this._appPO, viewId);
       }
       case NotificationOpenerPagePO: {
-        await startPO.openWorkbenchView('e2e-test-notification-opener');
+        await startPage.openWorkbenchView('e2e-test-notification-opener');
         return new NotificationOpenerPagePO(this._appPO, viewId);
       }
       case PopupOpenerPagePO: {
-        await startPO.openWorkbenchView('e2e-test-popup-opener');
+        await startPage.openWorkbenchView('e2e-test-popup-opener');
         return new PopupOpenerPagePO(this._appPO, viewId);
       }
       case RouterPagePO: {
-        await startPO.openWorkbenchView('e2e-test-router');
+        await startPage.openWorkbenchView('e2e-test-router');
         return new RouterPagePO(this._appPO, viewId);
       }
       case LayoutPagePO: {
-        await startPO.openWorkbenchView('e2e-test-layout');
+        await startPage.openWorkbenchView('e2e-test-layout');
         return new LayoutPagePO(this._appPO, viewId);
       }
       case PerspectivePagePO: {
-        await startPO.openWorkbenchView('e2e-test-perspective');
+        await startPage.openWorkbenchView('e2e-test-perspective');
         return new PerspectivePagePO(this._appPO, viewId);
       }
       case ViewPagePO: {
-        await startPO.openWorkbenchView('e2e-test-view');
+        await startPage.openWorkbenchView('e2e-test-view');
         return new ViewPagePO(this._appPO, viewId);
       }
       default: {

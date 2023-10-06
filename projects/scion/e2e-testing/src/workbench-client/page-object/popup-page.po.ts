@@ -15,118 +15,118 @@ import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
 import {WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
-import {ElementSelectors} from '../../helper/element-selectors';
 import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
+import {SciRouterOutletPO} from './sci-router-outlet.po';
 
 /**
- * Page object to interact {@link PopupPageComponent}.
+ * Page object to interact with {@link PopupPageComponent}.
  */
 export class PopupPagePO {
 
-  private readonly _locator: Locator;
+  public readonly locator: Locator;
+  public readonly outlet: SciRouterOutletPO;
+  public readonly popup: PopupPO;
+
   private readonly _hasFocusLocator: Locator;
 
-  public readonly popupPO: PopupPO;
-
-  constructor(appPO: AppPO, cssClass: string) {
-    this.popupPO = appPO.popup({cssClass});
-
-    const frameLocator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame({cssClass: ['e2e-popup'].concat(cssClass)}));
-    this._locator = frameLocator.locator('app-popup-page');
-    this._hasFocusLocator = frameLocator.locator('app-root').locator('.e2e-has-focus');
+  constructor(appPO: AppPO, locateBy: {cssClass: string}) {
+    this.popup = appPO.popup({cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {cssClass: ['e2e-popup', locateBy.cssClass]});
+    this.locator = this.outlet.frameLocator.locator('app-popup-page');
+    this._hasFocusLocator = this.outlet.frameLocator.locator('app-root').locator('.e2e-has-focus');
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    return this._locator.locator('span.e2e-component-instance-id').innerText();
+    return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getPopupCapability(): Promise<WorkbenchPopupCapability> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-capability'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-popup-capability'));
+    await accordion.expand();
     try {
-      return JSON.parse(await accordionPO.itemLocator().locator('div.e2e-popup-capability').innerText());
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-popup-capability').innerText());
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async getPopupParams(): Promise<Params> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-params'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-popup-params'));
+    await accordion.expand();
     try {
-      return await new SciKeyValuePO(accordionPO.itemLocator().locator('sci-key-value.e2e-popup-params')).readEntries();
+      return await new SciKeyValuePO(accordion.itemLocator().locator('sci-key-value.e2e-popup-params')).readEntries();
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async getRouteParams(): Promise<Params> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-params'));
+    await accordion.expand();
     try {
-      return await new SciKeyValuePO(accordionPO.itemLocator().locator('sci-key-value.e2e-route-params')).readEntries();
+      return await new SciKeyValuePO(accordion.itemLocator().locator('sci-key-value.e2e-route-params')).readEntries();
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async getRouteQueryParams(): Promise<Params> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-query-params'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-query-params'));
+    await accordion.expand();
     try {
-      return await new SciKeyValuePO(accordionPO.itemLocator().locator('sci-key-value.e2e-route-query-params')).readEntries();
+      return await new SciKeyValuePO(accordion.itemLocator().locator('sci-key-value.e2e-route-query-params')).readEntries();
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async getRouteFragment(): Promise<string> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-fragment'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
+    await accordion.expand();
     try {
-      return accordionPO.itemLocator().locator('span.e2e-route-fragment').innerText();
+      return accordion.itemLocator().locator('span.e2e-route-fragment').innerText();
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async getReferrer(): Promise<WorkbenchPopupReferrer> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-referrer'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-referrer'));
+    await accordion.expand();
     try {
       return withoutUndefinedEntries({
-        viewId: await accordionPO.itemLocator().locator('output.e2e-view-id').innerText(),
-        viewCapabilityId: await accordionPO.itemLocator().locator('output.e2e-view-capability-id').innerText(),
+        viewId: await accordion.itemLocator().locator('output.e2e-view-id').innerText(),
+        viewCapabilityId: await accordion.itemLocator().locator('output.e2e-view-capability-id').innerText(),
       });
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async enterComponentSize(size: PopupSize): Promise<void> {
-    await this._locator.locator('input.e2e-width').fill(size.width ?? '');
-    await this._locator.locator('input.e2e-height').fill(size.height ?? '');
-    await this._locator.locator('input.e2e-min-width').fill(size.minWidth ?? '');
-    await this._locator.locator('input.e2e-max-width').fill(size.maxWidth ?? '');
-    await this._locator.locator('input.e2e-min-height').fill(size.minHeight ?? '');
-    await this._locator.locator('input.e2e-max-height').fill(size.maxHeight ?? '');
+    await this.locator.locator('input.e2e-width').fill(size.width ?? '');
+    await this.locator.locator('input.e2e-height').fill(size.height ?? '');
+    await this.locator.locator('input.e2e-min-width').fill(size.minWidth ?? '');
+    await this.locator.locator('input.e2e-max-width').fill(size.maxWidth ?? '');
+    await this.locator.locator('input.e2e-min-height').fill(size.minHeight ?? '');
+    await this.locator.locator('input.e2e-max-height').fill(size.maxHeight ?? '');
   }
 
   public async enterReturnValue(returnValue: string): Promise<void> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-return-value'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-return-value'));
+    await accordion.expand();
     try {
-      await accordionPO.itemLocator().locator('input.e2e-return-value').fill(returnValue);
+      await accordion.itemLocator().locator('input.e2e-return-value').fill(returnValue);
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
@@ -136,15 +136,15 @@ export class PopupPagePO {
     }
 
     if (options?.closeWithError === true) {
-      await this._locator.locator('button.e2e-close-with-error').click();
+      await this.locator.locator('button.e2e-close-with-error').click();
     }
     else {
-      await this._locator.locator('button.e2e-close').click();
+      await this.locator.locator('button.e2e-close').click();
     }
   }
 
   public async getSize(): Promise<Size> {
-    const {width, height} = fromRect(await this._locator.boundingBox());
+    const {width, height} = fromRect(await this.locator.boundingBox());
     return {width, height};
   }
 

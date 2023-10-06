@@ -21,110 +21,110 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view 1
-      const view1PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open view 2
-      const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the center quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await view2PO.viewTabPO.dragTo({partId, region: 'center'}, {steps: 1, performDrop: false});
+      await viewPage2.viewTab.dragTo({partId, region: 'center'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await view1PO.viewPO.isActive()).toBe(true);
-      expect(await view1PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage1.view.isActive()).toBe(true);
+      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
 
       // Expect view 2 to be deactivated
-      expect(await view2PO.viewPO.isActive()).toBe(false);
-      expect(await view2PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage2.view.isActive()).toBe(false);
+      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
     });
 
     test('should deactivate view when moving it quickly to the north', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view 1
-      const view1PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open view 2
-      const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the north quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await view2PO.viewTabPO.dragTo({partId, region: 'north'}, {steps: 1, performDrop: false});
+      await viewPage2.viewTab.dragTo({partId, region: 'north'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await view1PO.viewPO.isActive()).toBe(true);
-      expect(await view1PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage1.view.isActive()).toBe(true);
+      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
 
       // Expect view 2 to be deactivated
-      expect(await view2PO.viewPO.isActive()).toBe(false);
-      expect(await view2PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage2.view.isActive()).toBe(false);
+      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
     });
 
     test('should deactivate view when moving it quickly to the east', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view 1
-      const view1PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open view 2
-      const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the center quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await view2PO.viewTabPO.dragTo({partId, region: 'east'}, {steps: 1, performDrop: false});
+      await viewPage2.viewTab.dragTo({partId, region: 'east'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await view1PO.viewPO.isActive()).toBe(true);
-      expect(await view1PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage1.view.isActive()).toBe(true);
+      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
 
       // Expect view 2 to be deactivated
-      expect(await view2PO.viewPO.isActive()).toBe(false);
-      expect(await view2PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage2.view.isActive()).toBe(false);
+      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
     });
 
     test('should deactivate view when moving it quickly to the south', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view 1
-      const view1PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open view 2
-      const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the south quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await view2PO.viewTabPO.dragTo({partId, region: 'south'}, {steps: 1, performDrop: false});
+      await viewPage2.viewTab.dragTo({partId, region: 'south'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await view1PO.viewPO.isActive()).toBe(true);
-      expect(await view1PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage1.view.isActive()).toBe(true);
+      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
 
       // Expect view 2 to be deactivated
-      expect(await view2PO.viewPO.isActive()).toBe(false);
-      expect(await view2PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage2.view.isActive()).toBe(false);
+      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
     });
 
     test('should deactivate view when moving it quickly to the west', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view 1
-      const view1PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open view 2
-      const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Drag view 2 to the west quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await view2PO.viewTabPO.dragTo({partId, region: 'west'}, {steps: 1, performDrop: false});
+      await viewPage2.viewTab.dragTo({partId, region: 'west'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await view1PO.viewPO.isActive()).toBe(true);
-      expect(await view1PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage1.view.isActive()).toBe(true);
+      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
 
       // Expect view 2 to be deactivated
-      expect(await view2PO.viewPO.isActive()).toBe(false);
-      expect(await view2PO.viewPO.part.getPartId()).toEqual(partId);
+      expect(await viewPage2.view.isActive()).toBe(false);
+      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
     });
   });
 
@@ -140,21 +140,21 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open two views in the main area.
-      const view1PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
+      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to the center.
-      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'center'});
+      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'center'});
 
       // Expect view 2 not to be moved.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MPart({
-            id: await view1PO.part.getPartId(),
+            id: await view1.part.getPartId(),
             views: [{id: 'view.1'}, {id: 'view.2'}],
             activeViewId: 'view.2',
           }),
-          activePartId: await view1PO.part.getPartId(),
+          activePartId: await view1.part.getPartId(),
         },
       });
     });
@@ -169,11 +169,11 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open two views in the main area.
-      const view1PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
+      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the west.
-      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'west'});
+      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'west'});
 
       // Expect view 2 to be moved to a new part in the west.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -182,17 +182,17 @@ test.describe('View Drag', () => {
             direction: 'row',
             ratio: .5,
             child1: new MPart({
-              id: await view2PO.part.getPartId(),
+              id: await view2.part.getPartId(),
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
             child2: new MPart({
-              id: await view1PO.part.getPartId(),
+              id: await view1.part.getPartId(),
               views: [{id: 'view.1'}],
               activeViewId: 'view.1',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -207,11 +207,11 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open two views in the main area.
-      const view1PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
+      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the east.
-      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'east'});
+      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'east'});
 
       // Expect view 2 to be moved to a new part in the east.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -220,17 +220,17 @@ test.describe('View Drag', () => {
             direction: 'row',
             ratio: .5,
             child1: new MPart({
-              id: await view1PO.part.getPartId(),
+              id: await view1.part.getPartId(),
               views: [{id: 'view.1'}],
               activeViewId: 'view.1',
             }),
             child2: new MPart({
-              id: await view2PO.part.getPartId(),
+              id: await view2.part.getPartId(),
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -248,11 +248,11 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open two views in the main area.
-      const view1PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
+      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the north.
-      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'north'});
+      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'north'});
 
       // Expect view 2 to be moved to a new part in the north.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -261,17 +261,17 @@ test.describe('View Drag', () => {
             direction: 'column',
             ratio: .5,
             child1: new MPart({
-              id: await view2PO.part.getPartId(),
+              id: await view2.part.getPartId(),
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
             child2: new MPart({
-              id: await view1PO.part.getPartId(),
+              id: await view1.part.getPartId(),
               views: [{id: 'view.1'}],
               activeViewId: 'view.1',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -289,11 +289,11 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open two views in the main area.
-      const view1PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
+      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the south.
-      await view2PO.viewTab.dragTo({partId: await view2PO.part.getPartId(), region: 'south'});
+      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'south'});
 
       // Expect view 2 to be moved to a new part in the south.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -302,17 +302,17 @@ test.describe('View Drag', () => {
             direction: 'column',
             ratio: .5,
             child1: new MPart({
-              id: await view1PO.part.getPartId(),
+              id: await view1.part.getPartId(),
               views: [{id: 'view.1'}],
               activeViewId: 'view.1',
             }),
             child2: new MPart({
-              id: await view2PO.part.getPartId(),
+              id: await view2.part.getPartId(),
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -330,17 +330,17 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view in the initial part.
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2PO = appPO.view({viewId: 'view.2'});
-      const view3PO = appPO.view({viewId: 'view.3'});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      const view2 = appPO.view({viewId: 'view.2'});
+      const view3 = appPO.view({viewId: 'view.3'});
 
       // Open two views in another part.
-      await view1PO.addPart('xyz', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right', ratio: .5});
-      await view1PO.addView('view.2', {partId: 'xyz', activateView: true});
-      await view1PO.addView('view.3', {partId: 'xyz'});
+      await layoutPage.addPart('xyz', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
+      await layoutPage.addView('view.2', {partId: 'xyz', activateView: true});
+      await layoutPage.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to the center of the initial part.
-      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'center'});
+      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'center'});
 
       // Expect view 2 to be moved to the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -349,17 +349,17 @@ test.describe('View Drag', () => {
             direction: 'row',
             ratio: .5,
             child1: new MPart({
-              id: await view1PO.viewPO.part.getPartId(),
+              id: await layoutPage.view.part.getPartId(),
               views: [{id: 'view.1'}, {id: 'view.2'}],
               activeViewId: 'view.2',
             }),
             child2: new MPart({
-              id: await view3PO.part.getPartId(),
+              id: await view3.part.getPartId(),
               views: [{id: 'view.3'}],
               activeViewId: 'view.3',
             }),
           }),
-          activePartId: await view1PO.viewPO.part.getPartId(),
+          activePartId: await layoutPage.view.part.getPartId(),
         },
       });
     });
@@ -374,17 +374,17 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view in the initial part.
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2PO = appPO.view({viewId: 'view.2'});
-      const view3PO = appPO.view({viewId: 'view.3'});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      const view2 = appPO.view({viewId: 'view.2'});
+      const view3 = appPO.view({viewId: 'view.3'});
 
       // Open two views in another part.
-      await view1PO.addPart('xyz', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right', ratio: .5});
-      await view1PO.addView('view.2', {partId: 'xyz', activateView: true});
-      await view1PO.addView('view.3', {partId: 'xyz'});
+      await layoutPage.addPart('xyz', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
+      await layoutPage.addView('view.2', {partId: 'xyz', activateView: true});
+      await layoutPage.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the west of the initial part.
-      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'west'});
+      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'west'});
 
       // Expect view 2 to be moved to a new part in the west of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -396,23 +396,23 @@ test.describe('View Drag', () => {
               direction: 'row',
               ratio: .5,
               child1: new MPart({
-                id: await view2PO.part.getPartId(),
+                id: await view2.part.getPartId(),
                 views: [{id: 'view.2'}],
                 activeViewId: 'view.2',
               }),
               child2: new MPart({
-                id: await view1PO.viewPO.part.getPartId(),
+                id: await layoutPage.view.part.getPartId(),
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
             }),
             child2: new MPart({
-              id: await view3PO.part.getPartId(),
+              id: await view3.part.getPartId(),
               views: [{id: 'view.3'}],
               activeViewId: 'view.3',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -427,17 +427,17 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view in the initial part.
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2PO = appPO.view({viewId: 'view.2'});
-      const view3PO = appPO.view({viewId: 'view.3'});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      const view2 = appPO.view({viewId: 'view.2'});
+      const view3 = appPO.view({viewId: 'view.3'});
 
       // Open two views in another part.
-      await view1PO.addPart('xyz', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right', ratio: .5});
-      await view1PO.addView('view.2', {partId: 'xyz', activateView: true});
-      await view1PO.addView('view.3', {partId: 'xyz'});
+      await layoutPage.addPart('xyz', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
+      await layoutPage.addView('view.2', {partId: 'xyz', activateView: true});
+      await layoutPage.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the east of the initial part.
-      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'east'});
+      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'east'});
 
       // Expect view 2 to be moved to a new part in the east of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -449,23 +449,23 @@ test.describe('View Drag', () => {
               direction: 'row',
               ratio: .5,
               child1: new MPart({
-                id: await view1PO.viewPO.part.getPartId(),
+                id: await layoutPage.view.part.getPartId(),
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
               child2: new MPart({
-                id: await view2PO.part.getPartId(),
+                id: await view2.part.getPartId(),
                 views: [{id: 'view.2'}],
                 activeViewId: 'view.2',
               }),
             }),
             child2: new MPart({
-              id: await view3PO.part.getPartId(),
+              id: await view3.part.getPartId(),
               views: [{id: 'view.3'}],
               activeViewId: 'view.3',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -483,17 +483,17 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view in the initial part.
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2PO = appPO.view({viewId: 'view.2'});
-      const view3PO = appPO.view({viewId: 'view.3'});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      const view2 = appPO.view({viewId: 'view.2'});
+      const view3 = appPO.view({viewId: 'view.3'});
 
       // Open two views in another part.
-      await view1PO.addPart('xyz', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right', ratio: .5});
-      await view1PO.addView('view.2', {partId: 'xyz', activateView: true});
-      await view1PO.addView('view.3', {partId: 'xyz'});
+      await layoutPage.addPart('xyz', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
+      await layoutPage.addView('view.2', {partId: 'xyz', activateView: true});
+      await layoutPage.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the north of the initial part.
-      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'north'});
+      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'north'});
 
       // Expect view 2 to be moved to a new part in the north of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -505,23 +505,23 @@ test.describe('View Drag', () => {
               direction: 'column',
               ratio: .5,
               child1: new MPart({
-                id: await view2PO.part.getPartId(),
+                id: await view2.part.getPartId(),
                 views: [{id: 'view.2'}],
                 activeViewId: 'view.2',
               }),
               child2: new MPart({
-                id: await view1PO.viewPO.part.getPartId(),
+                id: await layoutPage.view.part.getPartId(),
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
             }),
             child2: new MPart({
-              id: await view3PO.part.getPartId(),
+              id: await view3.part.getPartId(),
               views: [{id: 'view.3'}],
               activeViewId: 'view.3',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -539,17 +539,17 @@ test.describe('View Drag', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open view in the initial part.
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2PO = appPO.view({viewId: 'view.2'});
-      const view3PO = appPO.view({viewId: 'view.3'});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      const view2 = appPO.view({viewId: 'view.2'});
+      const view3 = appPO.view({viewId: 'view.3'});
 
       // Open two views in another part.
-      await view1PO.addPart('another', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right', ratio: .5});
-      await view1PO.addView('view.2', {partId: 'another', activateView: true});
-      await view1PO.addView('view.3', {partId: 'another'});
+      await layoutPage.addPart('another', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
+      await layoutPage.addView('view.2', {partId: 'another', activateView: true});
+      await layoutPage.addView('view.3', {partId: 'another'});
 
       // Move view 2 to a new part in the south of the initial part.
-      await view2PO.viewTab.dragTo({partId: await view1PO.viewPO.part.getPartId(), region: 'south'});
+      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'south'});
 
       // Expect view 2 to be moved to a new part in the south of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -561,23 +561,23 @@ test.describe('View Drag', () => {
               direction: 'column',
               ratio: .5,
               child1: new MPart({
-                id: await view1PO.viewPO.part.getPartId(),
+                id: await layoutPage.view.part.getPartId(),
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
               child2: new MPart({
-                id: await view2PO.part.getPartId(),
+                id: await view2.part.getPartId(),
                 views: [{id: 'view.2'}],
                 activeViewId: 'view.2',
               }),
             }),
             child2: new MPart({
-              id: await view3PO.part.getPartId(),
+              id: await view3.part.getPartId(),
               views: [{id: 'view.3'}],
               activeViewId: 'view.3',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });

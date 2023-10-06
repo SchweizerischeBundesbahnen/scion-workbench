@@ -20,42 +20,42 @@ test.describe('Workbench Popup', () => {
     test('should have a view reference to the contextual view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPagePO.getReferrer()).toEqual({viewId: popupOpenerPagePO.viewId});
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await expect(await popupPage.getReferrer()).toEqual({viewId: popupOpenerPage.viewId});
     });
 
     test('should have a view reference to the specified contextual view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const startPagePO = await appPO.openNewViewTab();
-      const startPageViewId = startPagePO.viewId!;
+      const startPage = await appPO.openNewViewTab();
+      const startPageViewId = startPage.viewId!;
 
-      const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.enterContextualViewId(startPageViewId);
-      await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterContextualViewId(startPageViewId);
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.clickOpen();
 
-      await startPagePO.view!.viewTab.click();
+      await startPage.view!.viewTab.click();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPagePO.getReferrer()).toEqual({viewId: startPageViewId});
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await expect(await popupPage.getReferrer()).toEqual({viewId: startPageViewId});
     });
 
     test('should not have a view reference if opened outside of a contextual view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.enterContextualViewId('<null>');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.enterContextualViewId('<null>');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPagePO.getReferrer()).toEqual({});
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await expect(await popupPage.getReferrer()).toEqual({});
     });
   });
 });

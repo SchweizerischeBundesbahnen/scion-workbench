@@ -17,11 +17,11 @@ test.describe('Bulk Navigation', () => {
   test('should navigate to multiple views if waiting for each navigation to complete', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.openInNewTab(appPO, microfrontendNavigator);
-    await bulkNavigationTestPagePO.enterViewCount(10);
-    await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
+    const bulkNavigationTestPage = await BulkNavigationTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await bulkNavigationTestPage.enterViewCount(10);
+    await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
     // Since waiting for microfrontends to load takes some time, an interval of 500ms is used.
-    await bulkNavigationTestPagePO.clickNavigateAwait({probeInterval: 500});
+    await bulkNavigationTestPage.clickNavigateAwait({probeInterval: 500});
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
   });
@@ -29,10 +29,10 @@ test.describe('Bulk Navigation', () => {
   test('should navigate to multiple views if not waiting for each navigation to complete', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.openInNewTab(appPO, microfrontendNavigator);
-    await bulkNavigationTestPagePO.enterViewCount(10);
-    await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
-    await bulkNavigationTestPagePO.clickNavigateNoAwait();
+    const bulkNavigationTestPage = await BulkNavigationTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    await bulkNavigationTestPage.enterViewCount(10);
+    await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
+    await bulkNavigationTestPage.clickNavigateNoAwait();
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
   });

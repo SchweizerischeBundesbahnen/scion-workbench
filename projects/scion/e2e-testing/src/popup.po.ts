@@ -16,22 +16,22 @@ import {getCssClasses, hasCssClass, isPresent, isVisible, waitUntilBoundingBoxSt
  */
 export class PopupPO {
 
-  private readonly _popupLocator: Locator;
+  public readonly locator: Locator;
 
   constructor(private readonly _overlayLocator: Locator) {
-    this._popupLocator = this._overlayLocator.locator('wb-popup');
+    this.locator = this._overlayLocator.locator('wb-popup');
   }
 
   public async isPresent(): Promise<boolean> {
-    return isPresent(this._popupLocator);
+    return isPresent(this.locator);
   }
 
   public async isVisible(): Promise<boolean> {
-    return isVisible(this._popupLocator);
+    return isVisible(this.locator);
   }
 
   public async getBoundingBox(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<DOMRect> {
-    const locator = selector === 'cdk-overlay' ? this._overlayLocator : this._popupLocator;
+    const locator = selector === 'cdk-overlay' ? this._overlayLocator : this.locator;
     await locator.waitFor({state: 'visible'});
     return waitUntilBoundingBoxStable(locator);
   }
@@ -54,35 +54,35 @@ export class PopupPO {
   }
 
   public getCssClasses(): Promise<string[]> {
-    return getCssClasses(this._popupLocator);
+    return getCssClasses(this.locator);
   }
 
   public hasVerticalOverflow(): Promise<boolean> {
-    return hasCssClass(this._popupLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
   }
 
   public hasHorizontalOverflow(): Promise<boolean> {
-    return hasCssClass(this._popupLocator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
+    return hasCssClass(this.locator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
   }
 
-  public locator(selector: string): Locator {
-    return this._popupLocator.locator(selector);
+  public locate(selector: string): Locator {
+    return this.locator.locator(selector);
   }
 
   public async waitUntilClosed(): Promise<void> {
-    await this._popupLocator.waitFor({state: 'detached'});
+    await this.locator.waitFor({state: 'detached'});
   }
 
   public async waitUntilAttached(): Promise<void> {
-    await this._popupLocator.waitFor({state: 'attached'});
+    await this.locator.waitFor({state: 'attached'});
   }
 
   public async pressEscape(): Promise<void> {
-    await this._popupLocator.click();
-    await this._popupLocator.press('Escape');
+    await this.locator.click();
+    await this.locator.press('Escape');
   }
 
   public async waitUntilVisible(): Promise<void> {
-    await this._popupLocator.waitFor({state: 'visible'});
+    await this.locator.waitFor({state: 'visible'});
   }
 }

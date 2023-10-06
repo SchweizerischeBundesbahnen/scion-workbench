@@ -18,25 +18,24 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
 import {MAIN_AREA} from '../../workbench.model';
 
 /**
- * Page object to interact {@link PerspectivePageComponent}.
+ * Page object to interact with {@link PerspectivePageComponent}.
  */
 export class PerspectivePagePO {
 
-  private readonly _locator: Locator;
-
-  public readonly viewPO: ViewPO;
-  public readonly viewTabPO: ViewTabPO;
+  public readonly locator: Locator;
+  public readonly view: ViewPO;
+  public readonly viewTab: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewPO = appPO.view({viewId});
-    this.viewTabPO = this.viewPO.viewTab;
-    this._locator = this.viewPO.locator('app-perspective-page');
+    this.view = appPO.view({viewId});
+    this.viewTab = this.view.viewTab;
+    this.locator = this.view.locate('app-perspective-page');
   }
 
   public async registerPerspective(definition: PerspectiveDefinition): Promise<void> {
     // Enter perspective definition.
-    await this._locator.locator('input.e2e-id').fill(definition.id);
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-transient')).toggle(definition.transient === true);
+    await this.locator.locator('input.e2e-id').fill(definition.id);
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-transient')).toggle(definition.transient === true);
     await this.enterData(definition.data);
 
     // Enter parts.
@@ -46,23 +45,23 @@ export class PerspectivePagePO {
     await this.enterViews(definition.views);
 
     // Register perspective.
-    await this._locator.locator('button.e2e-register').click();
+    await this.locator.locator('button.e2e-register').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitUntilAttached(this._locator.locator('output.e2e-register-success')),
-      rejectWhenAttached(this._locator.locator('output.e2e-register-error')),
+      waitUntilAttached(this.locator.locator('output.e2e-register-success')),
+      rejectWhenAttached(this.locator.locator('output.e2e-register-error')),
     ]);
   }
 
   private async enterData(data: {[key: string]: any} | undefined): Promise<void> {
-    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-data'));
-    await keyValueFieldPO.clear();
-    await keyValueFieldPO.addEntries(data ?? {});
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
+    await keyValueField.clear();
+    await keyValueField.addEntries(data ?? {});
   }
 
   private async enterParts(parts: PerspectivePartDescriptor[]): Promise<void> {
-    const partsLocator = await this._locator.locator('app-perspective-page-parts');
+    const partsLocator = await this.locator.locator('app-perspective-page-parts');
     for (const [i, part] of parts.entries()) {
       await partsLocator.locator('button.e2e-add').click();
       await partsLocator.locator('input.e2e-part-id').nth(i).fill(part.id);
@@ -76,7 +75,7 @@ export class PerspectivePagePO {
   }
 
   private async enterViews(views: PerspectiveViewDescriptor[] = []): Promise<void> {
-    const viewsLocator = await this._locator.locator('app-perspective-page-views');
+    const viewsLocator = await this.locator.locator('app-perspective-page-views');
     for (const [i, view] of views.entries()) {
       await viewsLocator.locator('button.e2e-add').click();
       await viewsLocator.locator('input.e2e-view-id').nth(i).fill(view.id);

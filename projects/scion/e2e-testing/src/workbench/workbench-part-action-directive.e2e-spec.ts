@@ -16,21 +16,21 @@ test.describe('Workbench Part Action Directive', () => {
 
   test('should stick to a view if registered in the context of a view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTabPO1 = viewPagePO1.viewTabPO;
-    await viewPagePO1.addViewAction({content: 'search', cssClass: 'view-1-search-action'});
+    const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewTab1 = viewPage1.viewTab;
+    await viewPage1.addViewAction({content: 'search', cssClass: 'view-1-search-action'});
 
-    const viewPagePO2 = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTabPO2 = viewPagePO2.viewTabPO;
-    await viewPagePO2.addViewAction({content: 'settings', cssClass: 'view-2-settings-action'});
-    await viewPagePO2.addViewAction({content: 'launch', cssClass: 'view-2-launch-action'});
+    const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewTab2 = viewPage2.viewTab;
+    await viewPage2.addViewAction({content: 'settings', cssClass: 'view-2-settings-action'});
+    await viewPage2.addViewAction({content: 'launch', cssClass: 'view-2-launch-action'});
 
-    await viewTabPO1.click();
+    await viewTab1.click();
     await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'view-1-search-action'}).isPresent()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(false);
     await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(false);
 
-    await viewTabPO2.click();
+    await viewTab2.click();
     await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'view-1-search-action'}).isPresent()).toBe(false);
     await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-settings-action'}).isPresent()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-launch-action'}).isPresent()).toBe(true);

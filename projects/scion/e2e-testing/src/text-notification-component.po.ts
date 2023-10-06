@@ -13,9 +13,9 @@ import {Locator} from '@playwright/test';
 import {isPresent} from './helper/testing.util';
 
 /**
- * Page object to interact {@link TextNotificationComponent}.
+ * Page object to interact with {@link TextNotificationComponent}.
  */
-export class TextNotificationPO {
+export class TextNotificationComponentPO {
 
   private readonly _locator: Locator;
 

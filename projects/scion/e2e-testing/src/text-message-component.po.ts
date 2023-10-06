@@ -12,16 +12,16 @@ import {AppPO} from './app.po';
 import {Locator, Page} from '@playwright/test';
 
 /**
- * Page object to interact {@link TextMessageComponent}.
+ * Page object to interact with {@link TextMessageComponent}.
  */
-export class TextMessagePO {
+export class TextMessageComponentPO {
 
   private readonly _page: Page;
   private readonly _locator: Locator;
 
   constructor(appPO: AppPO, cssClass: string) {
     this._page = appPO.page;
-    this._locator = appPO.messagebox({cssClass}).locator('wb-text-message');
+    this._locator = appPO.messagebox({cssClass}).locate('wb-text-message');
   }
 
   public async isVisible(): Promise<boolean> {

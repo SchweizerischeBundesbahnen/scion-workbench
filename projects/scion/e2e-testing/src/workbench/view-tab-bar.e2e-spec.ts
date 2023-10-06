@@ -17,35 +17,35 @@ test.describe('View Tabbar', () => {
 
   test('should activate the most recent view when closing a view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
 
     // open view-1
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterCssClass('e2e-test-view-1');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.clickNavigate();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterCssClass('e2e-test-view-1');
+    await routerPage.enterTarget('blank');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-1'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(2);
 
     // open view-2
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterCssClass('e2e-test-view-2');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterCssClass('e2e-test-view-2');
+    await routerPage.enterTarget('blank');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(3);
 
     // open view-3
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterCssClass('e2e-test-view-3');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterCssClass('e2e-test-view-3');
+    await routerPage.enterTarget('blank');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({cssClass: 'e2e-test-view-3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(4);
@@ -78,33 +78,33 @@ test.describe('View Tabbar', () => {
 
   test('should insert a new view tab into the tabbar after the active view tab by default', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1']);
 
     // open view.2
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.clickNavigate();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2']);
 
     // open view.3
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.3', 'view.2']);
 
     // open view.4
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
@@ -112,36 +112,36 @@ test.describe('View Tabbar', () => {
 
   test('should insert a new view tab into the tabbar at the end', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1']);
 
     // open view.2
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex('end');
-    await routerPagePO.clickNavigate();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex('end');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2']);
 
     // open view.3
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex('end');
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex('end');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2', 'view.3']);
 
     // open view.4
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex('end');
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex('end');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
@@ -149,36 +149,36 @@ test.describe('View Tabbar', () => {
 
   test('should insert a new view tab into the tabbar at the start', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1']);
 
     // open view.2
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex('start');
-    await routerPagePO.clickNavigate();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex('start');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.2', 'view.1']);
 
     // open view.3
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex('start');
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex('start');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.3', 'view.2', 'view.1']);
 
     // open view.4
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex('start');
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex('start');
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.4', 'view.3', 'view.2', 'view.1']);
@@ -186,36 +186,36 @@ test.describe('View Tabbar', () => {
 
   test('should insert a new view tab into the tabbar at a custom position', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1']);
 
     // open view.2
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex(1);
-    await routerPagePO.clickNavigate();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex(1);
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.2'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2']);
 
     // open view.3
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex(1);
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex(1);
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.3'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.3', 'view.2']);
 
     // open view.4
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget('blank');
-    await routerPagePO.enterInsertionIndex(1);
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterInsertionIndex(1);
+    await routerPage.clickNavigate();
 
     await expect(await appPO.view({viewId: 'view.4'}).viewTab.isActive()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
@@ -223,12 +223,12 @@ test.describe('View Tabbar', () => {
 
   test('should allow to have a sticky view tab', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false, stickyStartViewTab: true});
-    const startPagePO = new StartPagePO(appPO);
+    const startPage = new StartPagePO(appPO);
 
     // expect the sticky view to be opened
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
     await expect(await appPO.view({cssClass: 'e2e-start-page'}).viewTab.isPresent()).toBe(true);
-    await expect(await startPagePO.isPresent()).toBe(true);
+    await expect(await startPage.isPresent()).toBe(true);
 
     // close the sticky view
     await appPO.view({cssClass: 'e2e-start-page'}).viewTab.close();
@@ -236,6 +236,6 @@ test.describe('View Tabbar', () => {
     // expect the sticky view to be opened
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
     await expect(await appPO.view({cssClass: 'e2e-start-page'}).viewTab.isPresent()).toBe(true);
-    await expect(await startPagePO.isPresent()).toBe(true);
+    await expect(await startPage.isPresent()).toBe(true);
   });
 });

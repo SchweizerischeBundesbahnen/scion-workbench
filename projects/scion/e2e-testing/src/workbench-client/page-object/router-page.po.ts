@@ -15,59 +15,60 @@ import {Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {ElementSelectors} from '../../helper/element-selectors';
 import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/testing.util';
+import {SciRouterOutletPO} from './sci-router-outlet.po';
 
 /**
- * Page object to interact {@link RouterPageComponent} of workbench-client testing app.
+ * Page object to interact with {@link RouterPageComponent} of workbench-client testing app.
  */
 export class RouterPagePO {
 
-  private readonly _locator: Locator;
-  private readonly _viewPO: ViewPO;
-
-  public readonly viewTabPO: ViewTabPO;
+  public readonly locator: Locator;
+  private readonly _view: ViewPO;
+  public readonly viewTab: ViewTabPO;
+  public readonly outlet: SciRouterOutletPO;
 
   constructor(private _appPO: AppPO, public viewId: string) {
-    this._viewPO = _appPO.view({viewId});
-    this.viewTabPO = this._viewPO.viewTab;
-    this._locator = _appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-router-page');
+    this._view = _appPO.view({viewId});
+    this.viewTab = this._view.viewTab;
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: viewId});
+    this.locator = this.outlet.frameLocator.locator('app-router-page');
   }
 
   public async isVisible(): Promise<boolean> {
-    return await this._viewPO.isVisible() && await this._locator.isVisible();
+    return await this._view.isVisible() && await this.locator.isVisible();
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueFieldPO.clear();
-    await keyValueFieldPO.addEntries(qualifier);
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await keyValueField.clear();
+    await keyValueField.addEntries(qualifier);
   }
 
   public async enterParams(params: Record<string, string>): Promise<void> {
-    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-params'));
-    await keyValueFieldPO.clear();
-    await keyValueFieldPO.addEntries(params);
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
+    await keyValueField.clear();
+    await keyValueField.addEntries(params);
   }
 
   public async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
-    await this._locator.locator('input.e2e-target').fill(target ?? '');
+    await this.locator.locator('input.e2e-target').fill(target ?? '');
   }
 
   public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
-    await this._locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
+    await this.locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
   }
 
   public async checkActivate(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-activate')).toggle(check);
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-activate')).toggle(check);
   }
 
   public async checkClose(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-close')).toggle(check);
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close')).toggle(check);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this._locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
+    await this.locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
   }
 
   /**
@@ -77,12 +78,12 @@ export class RouterPagePO {
    *        @property probeInternal - Time to wait in ms until navigation is stable. Useful when performing many navigations simultaneously.
    */
   public async clickNavigate(options?: {probeInterval?: number}): Promise<void> {
-    await this._locator.locator('button.e2e-navigate').click();
+    await this.locator.locator('button.e2e-navigate').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
       waitUntilStable(() => this._appPO.getCurrentNavigationId(), options),
-      rejectWhenAttached(this._locator.locator('output.e2e-navigate-error')),
+      rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
   }
 }

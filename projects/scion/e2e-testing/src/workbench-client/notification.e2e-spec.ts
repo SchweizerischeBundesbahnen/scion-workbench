@@ -10,8 +10,8 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {InspectNotificationPO} from '../inspect-notification.po';
-import {TextNotificationPO} from '../text-notification.po';
+import {InspectNotificationComponentPO} from '../inspect-notification-component.po';
+import {TextNotificationComponentPO} from '../text-notification-component.po';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 
@@ -21,92 +21,92 @@ test.describe('Workbench Notification', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.enterContent('TEXT');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.enterContent('TEXT');
+    await notificationOpenerPage.clickShow();
 
-    const textNotificationPO = new TextNotificationPO(appPO, 'testee');
-    await expect(await textNotificationPO.isVisible()).toBe(true);
-    await expect(await textNotificationPO.getText()).toEqual('TEXT');
+    const textNotificationComponent = new TextNotificationComponentPO(appPO, 'testee');
+    await expect(await textNotificationComponent.isVisible()).toBe(true);
+    await expect(await textNotificationComponent.getText()).toEqual('TEXT');
   });
 
   test('should support new lines in the notification text', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.enterContent('LINE 1\\nLINE 2');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.enterContent('LINE 1\\nLINE 2');
+    await notificationOpenerPage.clickShow();
 
-    const textNotificationPO = new TextNotificationPO(appPO, 'testee');
-    await expect(await textNotificationPO.isVisible()).toBe(true);
-    await expect(await textNotificationPO.getText()).toEqual('LINE 1\nLINE 2');
+    const textNotificationComponent = new TextNotificationComponentPO(appPO, 'testee');
+    await expect(await textNotificationComponent.isVisible()).toBe(true);
+    await expect(await textNotificationComponent.getText()).toEqual('LINE 1\nLINE 2');
   });
 
   test('should close the notification when pressing the ESC key', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.clickShow();
 
-    const notificationPO = appPO.notification({cssClass: 'testee'});
-    await expect(await notificationPO.isVisible()).toBe(true);
-    await notificationOpenerPagePO.pressEscape();
-    await expect(await notificationPO.isVisible()).toBe(false);
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expect(await notification.isVisible()).toBe(true);
+    await notificationOpenerPage.pressEscape();
+    await expect(await notification.isVisible()).toBe(false);
   });
 
   test('should close the notification when clicking the close button', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.enterContent('TEXT');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.enterContent('TEXT');
+    await notificationOpenerPage.clickShow();
 
-    const notificationPO = appPO.notification({cssClass: 'testee'});
-    await expect(await notificationPO.isVisible()).toBe(true);
-    await notificationPO.clickClose();
-    await expect(await notificationPO.isVisible()).toBe(false);
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expect(await notification.isVisible()).toBe(true);
+    await notification.clickClose();
+    await expect(await notification.isVisible()).toBe(false);
   });
 
   test('should stack multiple notifications', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
 
-    await notificationOpenerPagePO.enterCssClass('testee-1');
-    await notificationOpenerPagePO.clickShow();
+    await notificationOpenerPage.enterCssClass('testee-1');
+    await notificationOpenerPage.clickShow();
 
-    await notificationOpenerPagePO.enterCssClass('testee-2');
-    await notificationOpenerPagePO.clickShow();
+    await notificationOpenerPage.enterCssClass('testee-2');
+    await notificationOpenerPage.clickShow();
 
-    await notificationOpenerPagePO.enterCssClass('testee-3');
-    await notificationOpenerPagePO.clickShow();
+    await notificationOpenerPage.enterCssClass('testee-3');
+    await notificationOpenerPage.clickShow();
 
     await expect(await appPO.getNotificationCount()).toEqual(3);
   });
@@ -115,167 +115,167 @@ test.describe('Workbench Notification', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.enterTitle('TITLE');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.enterTitle('TITLE');
+    await notificationOpenerPage.clickShow();
 
-    const notificationPO = appPO.notification({cssClass: 'testee'});
-    await expect(await notificationPO.isVisible()).toBe(true);
-    await expect(await notificationPO.getTitle()).toEqual('TITLE');
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expect(await notification.isVisible()).toBe(true);
+    await expect(await notification.getTitle()).toEqual('TITLE');
   });
 
   test('should support new lines in the notification title', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.enterTitle('LINE 1\\nLINE 2');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.enterTitle('LINE 1\\nLINE 2');
+    await notificationOpenerPage.clickShow();
 
-    const notificationPO = appPO.notification({cssClass: 'testee'});
-    await expect(await notificationPO.isVisible()).toBe(true);
-    await expect(await notificationPO.getTitle()).toEqual('LINE 1\nLINE 2');
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expect(await notification.isVisible()).toBe(true);
+    await expect(await notification.getTitle()).toEqual('LINE 1\nLINE 2');
   });
 
   test('should, by default, show a notification with info serverity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.clickShow();
 
-    const notificationPO = appPO.notification({cssClass: 'testee'});
-    await expect(await notificationPO.isVisible()).toBe(true);
-    await expect(await notificationPO.getSeverity()).toEqual('info');
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expect(await notification.isVisible()).toBe(true);
+    await expect(await notification.getSeverity()).toEqual('info');
   });
 
   test('should show a notification with info serverity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.selectSeverity('info');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.selectSeverity('info');
+    await notificationOpenerPage.clickShow();
 
-    const notificationPO = appPO.notification({cssClass: 'testee'});
-    await expect(await notificationPO.isVisible()).toBe(true);
-    await expect(await notificationPO.getSeverity()).toEqual('info');
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expect(await notification.isVisible()).toBe(true);
+    await expect(await notification.getSeverity()).toEqual('info');
   });
 
   test('should show a notification with warn serverity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.selectSeverity('warn');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.selectSeverity('warn');
+    await notificationOpenerPage.clickShow();
 
-    const notificationPO = appPO.notification({cssClass: 'testee'});
-    await expect(await notificationPO.isVisible()).toBe(true);
-    await expect(await notificationPO.getSeverity()).toEqual('warn');
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expect(await notification.isVisible()).toBe(true);
+    await expect(await notification.getSeverity()).toEqual('warn');
   });
 
   test('should show a notification with error serverity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.selectSeverity('error');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.selectSeverity('error');
+    await notificationOpenerPage.clickShow();
 
-    const notificationPO = appPO.notification({cssClass: 'testee'});
-    await expect(await notificationPO.isVisible()).toBe(true);
-    await expect(await notificationPO.getSeverity()).toEqual('error');
+    const notification = appPO.notification({cssClass: 'testee'});
+    await expect(await notification.isVisible()).toBe(true);
+    await expect(await notification.getSeverity()).toEqual('error');
   });
 
   test('should replace notifications of the same group', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
-    const notification1PO = appPO.notification({cssClass: 'testee-1'});
-    const notification2PO = appPO.notification({cssClass: 'testee-2'});
-    const notification3PO = appPO.notification({cssClass: 'testee-3'});
-    const notification4PO = appPO.notification({cssClass: 'testee-4'});
+    const notification1 = appPO.notification({cssClass: 'testee-1'});
+    const notification2 = appPO.notification({cssClass: 'testee-2'});
+    const notification3 = appPO.notification({cssClass: 'testee-3'});
+    const notification4 = appPO.notification({cssClass: 'testee-4'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee-1');
-    await notificationOpenerPagePO.enterGroup('GROUP-1');
-    await notificationOpenerPagePO.selectSeverity('info');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee-1');
+    await notificationOpenerPage.enterGroup('GROUP-1');
+    await notificationOpenerPage.selectSeverity('info');
+    await notificationOpenerPage.clickShow();
 
-    await expect(await notification1PO.isVisible()).toBe(true);
-    await expect(await notification1PO.getSeverity()).toEqual('info');
+    await expect(await notification1.isVisible()).toBe(true);
+    await expect(await notification1.getSeverity()).toEqual('info');
     await expect(await appPO.getNotificationCount()).toEqual(1);
 
-    await notificationOpenerPagePO.enterCssClass('testee-2');
-    await notificationOpenerPagePO.enterGroup('GROUP-1');
-    await notificationOpenerPagePO.selectSeverity('warn');
-    await notificationOpenerPagePO.clickShow();
+    await notificationOpenerPage.enterCssClass('testee-2');
+    await notificationOpenerPage.enterGroup('GROUP-1');
+    await notificationOpenerPage.selectSeverity('warn');
+    await notificationOpenerPage.clickShow();
 
-    await expect(await notification1PO.isVisible()).toBe(false);
-    await expect(await notification2PO.isVisible()).toBe(true);
-    await expect(await notification2PO.getSeverity()).toEqual('warn');
+    await expect(await notification1.isVisible()).toBe(false);
+    await expect(await notification2.isVisible()).toBe(true);
+    await expect(await notification2.getSeverity()).toEqual('warn');
     await expect(await appPO.getNotificationCount()).toEqual(1);
 
-    await notificationOpenerPagePO.enterCssClass('testee-3');
-    await notificationOpenerPagePO.enterGroup('GROUP-1');
-    await notificationOpenerPagePO.selectSeverity('error');
-    await notificationOpenerPagePO.clickShow();
+    await notificationOpenerPage.enterCssClass('testee-3');
+    await notificationOpenerPage.enterGroup('GROUP-1');
+    await notificationOpenerPage.selectSeverity('error');
+    await notificationOpenerPage.clickShow();
 
-    await expect(await notification2PO.isVisible()).toBe(false);
-    await expect(await notification3PO.isVisible()).toBe(true);
-    await expect(await notification3PO.getSeverity()).toEqual('error');
+    await expect(await notification2.isVisible()).toBe(false);
+    await expect(await notification3.isVisible()).toBe(true);
+    await expect(await notification3.getSeverity()).toEqual('error');
     await expect(await appPO.getNotificationCount()).toEqual(1);
 
-    await notificationOpenerPagePO.enterCssClass('testee-4');
-    await notificationOpenerPagePO.enterGroup('GROUP-2');
-    await notificationOpenerPagePO.clickShow();
+    await notificationOpenerPage.enterCssClass('testee-4');
+    await notificationOpenerPage.enterGroup('GROUP-2');
+    await notificationOpenerPage.clickShow();
 
-    await expect(await notification3PO.isVisible()).toBe(true);
-    await expect(await notification4PO.isVisible()).toBe(true);
+    await expect(await notification3.isVisible()).toBe(true);
+    await expect(await notification4.isVisible()).toBe(true);
     await expect(await appPO.getNotificationCount()).toEqual(2);
   });
 
   test('should reject if missing the intention', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await expect(notificationOpenerPagePO.clickShow()).rejects.toThrow(/NotQualifiedError/);
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await expect(notificationOpenerPage.clickShow()).rejects.toThrow(/NotQualifiedError/);
   });
 
   test('should close the notification after the auto-close timeout', async ({appPO, microfrontendNavigator}) => {
@@ -283,20 +283,20 @@ test.describe('Workbench Notification', () => {
     const notificationDuration = 1; // 1 second
 
     // register notification intention
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'notification'});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'notification'});
 
     // display the notification
-    const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-    await notificationOpenerPagePO.enterCssClass('testee');
-    await notificationOpenerPagePO.selectDuration(notificationDuration);
-    await notificationOpenerPagePO.enterContent('Notification should close after 1s');
-    await notificationOpenerPagePO.clickShow();
+    const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+    await notificationOpenerPage.enterCssClass('testee');
+    await notificationOpenerPage.selectDuration(notificationDuration);
+    await notificationOpenerPage.enterContent('Notification should close after 1s');
+    await notificationOpenerPage.clickShow();
 
-    const textNotificationPO = new TextNotificationPO(appPO, 'testee');
-    await expect(await textNotificationPO.isVisible()).toBe(true);
-    await textNotificationPO.waitUntilClosed(notificationDuration * 1000 + 500);
-    await expect(await textNotificationPO.isPresent()).toBe(false);
+    const textNotificationComponent = new TextNotificationComponentPO(appPO, 'testee');
+    await expect(await textNotificationComponent.isVisible()).toBe(true);
+    await textNotificationComponent.waitUntilClosed(notificationDuration * 1000 + 500);
+    await expect(await textNotificationComponent.isPresent()).toBe(false);
   });
 
   test.describe('Custom Notification Provider', () => {
@@ -304,38 +304,38 @@ test.describe('Workbench Notification', () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register notification intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
 
       // display the notification
-      const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPagePO.clickShow();
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPage.enterCssClass('testee');
+      await notificationOpenerPage.enterParams({param1: 'PARAM 1'});
+      await notificationOpenerPage.clickShow();
 
-      const inspectorPO = new InspectNotificationPO(appPO, 'testee');
-      await expect(await inspectorPO.isVisible()).toBe(true);
+      const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
+      await expect(await inspectNotificationComponent.isVisible()).toBe(true);
     });
 
     test('should allow passing a custom input to the notification box', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register notification intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
 
       // display the notification
-      const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
-      await notificationOpenerPagePO.enterContent('CONTENT');
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
-      await notificationOpenerPagePO.clickShow();
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPage.enterCssClass('testee');
+      await notificationOpenerPage.enterContent('CONTENT');
+      await notificationOpenerPage.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
+      await notificationOpenerPage.clickShow();
 
-      const inspectorPO = new InspectNotificationPO(appPO, 'testee');
-      await expect(await inspectorPO.isVisible()).toBe(true);
-      await expect(await inspectorPO.getInputAsKeyValueObject()).toMatchObject({
+      const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
+      await expect(await inspectNotificationComponent.isVisible()).toBe(true);
+      await expect(await inspectNotificationComponent.getInputAsKeyValueObject()).toMatchObject({
           'component': 'inspector', // qualifier
           '$implicit': 'CONTENT', // content
           'param1': 'PARAM 1', // params
@@ -350,42 +350,42 @@ test.describe('Workbench Notification', () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register notification intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
 
       // display the notification
-      const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
-      await notificationOpenerPagePO.enterTitle('TITLE');
-      await notificationOpenerPagePO.enterContent('CONTENT');
-      await notificationOpenerPagePO.selectSeverity('warn');
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
-      await notificationOpenerPagePO.clickShow();
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPage.enterCssClass('testee');
+      await notificationOpenerPage.enterTitle('TITLE');
+      await notificationOpenerPage.enterContent('CONTENT');
+      await notificationOpenerPage.selectSeverity('warn');
+      await notificationOpenerPage.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
+      await notificationOpenerPage.clickShow();
 
-      const inspectorPO = new InspectNotificationPO(appPO, 'testee');
-      await expect(await inspectorPO.isVisible()).toBe(true);
-      await expect(await inspectorPO.notificationPO.getSeverity()).toEqual('warn');
-      await expect(await inspectorPO.notificationPO.getTitle()).toEqual('TITLE');
+      const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
+      await expect(await inspectNotificationComponent.isVisible()).toBe(true);
+      await expect(await inspectNotificationComponent.notification.getSeverity()).toEqual('warn');
+      await expect(await inspectNotificationComponent.notification.getTitle()).toEqual('TITLE');
     });
 
     test('should open separate notifications if not specifying a group', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register notification intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
 
       // display the first notification
-      const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPagePO.enterCssClass('testee-1');
-      await notificationOpenerPagePO.clickShow();
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPage.enterParams({param1: 'PARAM 1'});
+      await notificationOpenerPage.enterCssClass('testee-1');
+      await notificationOpenerPage.clickShow();
 
       // display another notification
-      await notificationOpenerPagePO.enterCssClass('testee-2');
-      await notificationOpenerPagePO.clickShow();
+      await notificationOpenerPage.enterCssClass('testee-2');
+      await notificationOpenerPage.clickShow();
 
       await expect(await appPO.getNotificationCount()).toEqual(2);
     });
@@ -394,89 +394,89 @@ test.describe('Workbench Notification', () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register notification intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
 
       // display the notification
-      const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
-      await expect(notificationOpenerPagePO.clickShow()).rejects.toThrow(/IntentParamValidationError/);
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPage.enterCssClass('testee');
+      await expect(notificationOpenerPage.clickShow()).rejects.toThrow(/IntentParamValidationError/);
     });
 
     test('should throw when passing params not specified by the notification provider', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register notification intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
 
       // display the notification
-      const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee');
-      await notificationOpenerPagePO.enterParams({xyz: 'XYZ'});
-      await expect(notificationOpenerPagePO.clickShow()).rejects.toThrow(/IntentParamValidationError/);
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPage.enterCssClass('testee');
+      await notificationOpenerPage.enterParams({xyz: 'XYZ'});
+      await expect(notificationOpenerPage.clickShow()).rejects.toThrow(/IntentParamValidationError/);
     });
 
     test('should allow reducing params of notifications in the same group', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register notification intention
-      const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPagePO.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
+      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+      await registerIntentionPage.registerIntention({type: 'notification', qualifier: {'component': 'inspector'}});
 
-      const inspectorPage1PO = new InspectNotificationPO(appPO, 'testee-1');
-      const inspectorPage2PO = new InspectNotificationPO(appPO, 'testee-2');
-      const inspectorPage3PO = new InspectNotificationPO(appPO, 'testee-3');
-      const inspectorPage4PO = new InspectNotificationPO(appPO, 'testee-4');
-      const inspectorPage5PO = new InspectNotificationPO(appPO, 'testee-5');
-      const inspectorPage6PO = new InspectNotificationPO(appPO, 'testee-6');
+      const inspectNotificationComponent1 = new InspectNotificationComponentPO(appPO, 'testee-1');
+      const inspectNotificationComponent2 = new InspectNotificationComponentPO(appPO, 'testee-2');
+      const inspectNotificationComponent3 = new InspectNotificationComponentPO(appPO, 'testee-3');
+      const inspectNotificationComponent4 = new InspectNotificationComponentPO(appPO, 'testee-4');
+      const inspectNotificationComponent5 = new InspectNotificationComponentPO(appPO, 'testee-5');
+      const inspectNotificationComponent6 = new InspectNotificationComponentPO(appPO, 'testee-6');
 
       // display the notifications of group-1
-      const notificationOpenerPagePO = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
-      await notificationOpenerPagePO.enterQualifier({'component': 'inspector'});
-      await notificationOpenerPagePO.enterCssClass('testee-1');
-      await notificationOpenerPagePO.enterParams({param1: 'PARAM 1'});
-      await notificationOpenerPagePO.enterGroup('group-1');
-      await notificationOpenerPagePO.clickShow();
+      const notificationOpenerPage = await microfrontendNavigator.openInNewTab(NotificationOpenerPagePO, 'app1');
+      await notificationOpenerPage.enterQualifier({'component': 'inspector'});
+      await notificationOpenerPage.enterCssClass('testee-1');
+      await notificationOpenerPage.enterParams({param1: 'PARAM 1'});
+      await notificationOpenerPage.enterGroup('group-1');
+      await notificationOpenerPage.clickShow();
 
-      await expect(await inspectorPage1PO.isVisible()).toBe(true);
+      await expect(await inspectNotificationComponent1.isVisible()).toBe(true);
       await expect(await appPO.getNotificationCount()).toEqual(1);
-      await expect(await inspectorPage1PO.getInputAsKeyValueObject()).not.toMatchObject({'count': expect.any(String)});
+      await expect(await inspectNotificationComponent1.getInputAsKeyValueObject()).not.toMatchObject({'count': expect.any(String)});
 
-      await notificationOpenerPagePO.enterCssClass('testee-2');
-      await notificationOpenerPagePO.clickShow();
-      await expect(await inspectorPage2PO.isVisible()).toBe(true);
+      await notificationOpenerPage.enterCssClass('testee-2');
+      await notificationOpenerPage.clickShow();
+      await expect(await inspectNotificationComponent2.isVisible()).toBe(true);
       await expect(await appPO.getNotificationCount()).toEqual(1);
-      await expect(await inspectorPage2PO.getInputAsKeyValueObject()).toMatchObject({'count': 2});
+      await expect(await inspectNotificationComponent2.getInputAsKeyValueObject()).toMatchObject({'count': 2});
 
-      await notificationOpenerPagePO.enterCssClass('testee-3');
-      await notificationOpenerPagePO.clickShow();
+      await notificationOpenerPage.enterCssClass('testee-3');
+      await notificationOpenerPage.clickShow();
       await expect(await appPO.getNotificationCount()).toEqual(1);
-      await expect(await inspectorPage3PO.isVisible()).toBe(true);
-      await expect(await inspectorPage3PO.getInputAsKeyValueObject()).toMatchObject({'count': 3});
+      await expect(await inspectNotificationComponent3.isVisible()).toBe(true);
+      await expect(await inspectNotificationComponent3.getInputAsKeyValueObject()).toMatchObject({'count': 3});
 
       // display the notifications of group-2
-      await notificationOpenerPagePO.enterGroup('group-2');
-      await notificationOpenerPagePO.enterCssClass('testee-4');
-      await notificationOpenerPagePO.clickShow();
+      await notificationOpenerPage.enterGroup('group-2');
+      await notificationOpenerPage.enterCssClass('testee-4');
+      await notificationOpenerPage.clickShow();
 
-      await expect(await inspectorPage4PO.isVisible()).toBe(true);
+      await expect(await inspectNotificationComponent4.isVisible()).toBe(true);
       await expect(await appPO.getNotificationCount()).toEqual(2);
-      await expect(await inspectorPage4PO.getInputAsKeyValueObject()).not.toMatchObject({'count': expect.any(String)});
+      await expect(await inspectNotificationComponent4.getInputAsKeyValueObject()).not.toMatchObject({'count': expect.any(String)});
 
-      await notificationOpenerPagePO.enterCssClass('testee-5');
-      await notificationOpenerPagePO.clickShow();
-      await expect(await inspectorPage5PO.isVisible()).toBe(true);
+      await notificationOpenerPage.enterCssClass('testee-5');
+      await notificationOpenerPage.clickShow();
+      await expect(await inspectNotificationComponent5.isVisible()).toBe(true);
       await expect(await appPO.getNotificationCount()).toEqual(2);
-      await expect(await inspectorPage5PO.getInputAsKeyValueObject()).toMatchObject({'count': 2});
+      await expect(await inspectNotificationComponent5.getInputAsKeyValueObject()).toMatchObject({'count': 2});
 
-      await notificationOpenerPagePO.enterCssClass('testee-6');
-      await notificationOpenerPagePO.clickShow();
+      await notificationOpenerPage.enterCssClass('testee-6');
+      await notificationOpenerPage.clickShow();
       await expect(await appPO.getNotificationCount()).toEqual(2);
-      await expect(await inspectorPage6PO.isVisible()).toBe(true);
-      await expect(await inspectorPage6PO.getInputAsKeyValueObject()).toMatchObject({'count': 3});
+      await expect(await inspectNotificationComponent6.isVisible()).toBe(true);
+      await expect(await inspectNotificationComponent6.getInputAsKeyValueObject()).toMatchObject({'count': 3});
     });
   });
 });

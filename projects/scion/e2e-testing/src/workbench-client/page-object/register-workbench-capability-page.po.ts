@@ -14,9 +14,9 @@ import {ViewTabPO} from '../../view-tab.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {ElementSelectors} from '../../helper/element-selectors';
 import {WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
 import {Capability} from '@scion/microfrontend-platform';
+import {SciRouterOutletPO} from './sci-router-outlet.po';
 
 /**
  * Playwright's test runner fails to compile when importing runtime types from `@scion/workbench` or `@scion/microfrontend-platform`, because
@@ -29,17 +29,18 @@ export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {
 export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToStartPage?: boolean}};
 
 /**
- * Page object to interact {@link RegisterWorkbenchCapabilityPageComponent}.
+ * Page object to interact with {@link RegisterWorkbenchCapabilityPageComponent}.
  */
 export class RegisterWorkbenchCapabilityPagePO {
 
-  private readonly _locator: Locator;
-
-  public readonly viewTabPO: ViewTabPO;
+  public readonly locator: Locator;
+  public readonly outlet: SciRouterOutletPO;
+  public readonly viewTab: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewTabPO = appPO.view({viewId}).viewTab;
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-register-workbench-capability-page');
+    this.viewTab = appPO.view({viewId}).viewTab;
+    this.outlet = new SciRouterOutletPO(appPO, {name: this.viewId});
+    this.locator = this.outlet.frameLocator.locator('app-register-workbench-capability-page');
   }
 
   /**
@@ -51,33 +52,33 @@ export class RegisterWorkbenchCapabilityPagePO {
    */
   public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(capability: T): Promise<Capability> {
     if (capability.type !== undefined) {
-      await this._locator.locator('select.e2e-type').selectOption(capability.type);
+      await this.locator.locator('select.e2e-type').selectOption(capability.type);
     }
     if (capability.qualifier !== undefined) {
-      const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
-      await keyValueFieldPO.clear();
-      await keyValueFieldPO.addEntries(capability.qualifier);
+      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+      await keyValueField.clear();
+      await keyValueField.addEntries(capability.qualifier);
     }
     const requiredParams = capability.params?.filter(param => param.required && !param.transient).map(param => param.name);
     const optionalParams = capability.params?.filter(param => !param.required && !param.transient).map(param => param.name);
     const transientParams = capability.params?.filter(param => param.transient).map(param => param.name);
     if (requiredParams?.length) {
-      await this._locator.locator('input.e2e-required-params').fill(requiredParams.join(','));
+      await this.locator.locator('input.e2e-required-params').fill(requiredParams.join(','));
     }
     if (optionalParams?.length) {
-      await this._locator.locator('input.e2e-optional-params').fill(optionalParams.join(','));
+      await this.locator.locator('input.e2e-optional-params').fill(optionalParams.join(','));
     }
     if (transientParams?.length) {
-      await this._locator.locator('input.e2e-transient-params').fill(transientParams.join(','));
+      await this.locator.locator('input.e2e-transient-params').fill(transientParams.join(','));
     }
     if (capability.private !== undefined) {
-      await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-private')).toggle(capability.private);
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-private')).toggle(capability.private);
     }
     if (capability.properties.path !== undefined) {
-      await this._locator.locator('input.e2e-path').fill(capability.properties.path);
+      await this.locator.locator('input.e2e-path').fill(capability.properties.path);
     }
     if (capability.properties.cssClass !== undefined) {
-      await this._locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
     }
     if (capability.type === 'view') {
       await this.enterViewCapabilityProperties(capability as WorkbenchViewCapability);
@@ -89,8 +90,8 @@ export class RegisterWorkbenchCapabilityPagePO {
     await this.clickRegister();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    const responseLocator = this._locator.locator('output.e2e-register-response');
-    const errorLocator = this._locator.locator('output.e2e-register-error');
+    const responseLocator = this.locator.locator('output.e2e-register-response');
+    const errorLocator = this.locator.locator('output.e2e-register-error');
     await Promise.race([
       responseLocator.waitFor({state: 'attached'}),
       rejectWhenAttached(errorLocator),
@@ -101,16 +102,16 @@ export class RegisterWorkbenchCapabilityPagePO {
 
   private async enterViewCapabilityProperties(capability: WorkbenchViewCapability): Promise<void> {
     if (capability.properties.title !== undefined) {
-      await this._locator.locator('input.e2e-title').fill(capability.properties.title);
+      await this.locator.locator('input.e2e-title').fill(capability.properties.title);
     }
     if (capability.properties.heading !== undefined) {
-      await this._locator.locator('input.e2e-heading').fill(capability.properties.heading);
+      await this.locator.locator('input.e2e-heading').fill(capability.properties.heading);
     }
     if (capability.properties.closable !== undefined) {
-      await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-closable')).toggle(capability.properties.closable);
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-closable')).toggle(capability.properties.closable);
     }
     if (capability.properties.pinToStartPage !== undefined) {
-      await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
     }
   }
 
@@ -118,29 +119,29 @@ export class RegisterWorkbenchCapabilityPagePO {
     const size = capability.properties.size;
 
     if (size?.width !== undefined) {
-      await this._locator.locator('input.e2e-width').fill(size.width);
+      await this.locator.locator('input.e2e-width').fill(size.width);
     }
     if (size?.height) {
-      await this._locator.locator('input.e2e-height').fill(size.height);
+      await this.locator.locator('input.e2e-height').fill(size.height);
     }
     if (size?.minWidth) {
-      await this._locator.locator('input.e2e-min-width').fill(size.minWidth);
+      await this.locator.locator('input.e2e-min-width').fill(size.minWidth);
     }
     if (size?.maxWidth) {
-      await this._locator.locator('input.e2e-max-width').fill(size.maxWidth);
+      await this.locator.locator('input.e2e-max-width').fill(size.maxWidth);
     }
     if (size?.minHeight) {
-      await this._locator.locator('input.e2e-min-height').fill(size.minHeight);
+      await this.locator.locator('input.e2e-min-height').fill(size.minHeight);
     }
     if (size?.maxHeight) {
-      await this._locator.locator('input.e2e-max-height').fill(size.maxHeight);
+      await this.locator.locator('input.e2e-max-height').fill(size.maxHeight);
     }
     if (capability.properties.pinToStartPage !== undefined) {
-      await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
     }
   }
 
   private async clickRegister(): Promise<void> {
-    await this._locator.locator('button.e2e-register').click();
+    await this.locator.locator('button.e2e-register').click();
   }
 }

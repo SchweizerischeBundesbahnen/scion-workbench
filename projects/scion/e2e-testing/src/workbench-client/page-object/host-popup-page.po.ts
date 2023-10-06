@@ -26,91 +26,90 @@ import {Locator} from '@playwright/test';
  */
 export class HostPopupPagePO {
 
-  private readonly _locator: Locator;
-
-  public readonly popupPO: PopupPO;
+  public readonly locator: Locator;
+  public readonly popup: PopupPO;
 
   constructor(appPO: AppPO, cssClass: string) {
-    this.popupPO = appPO.popup({cssClass});
-    this._locator = this.popupPO.locator('app-host-popup-page');
+    this.popup = appPO.popup({cssClass});
+    this.locator = this.popup.locate('app-host-popup-page');
   }
 
   public async isPresent(): Promise<boolean> {
-    return isPresent(this._locator);
+    return isPresent(this.locator);
   }
 
   public async isVisible(): Promise<boolean> {
-    return this._locator.isVisible();
+    return this.locator.isVisible();
   }
 
   public async getComponentInstanceId(): Promise<string> {
-    return this._locator.locator('span.e2e-component-instance-id').innerText();
+    return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
   public async getPopupCapability(): Promise<WorkbenchPopupCapability> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-capability'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-popup-capability'));
+    await accordion.expand();
     try {
-      return JSON.parse(await accordionPO.itemLocator().locator('div.e2e-popup-capability').innerText());
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-popup-capability').innerText());
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async getPopupParams(): Promise<Params> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-popup-params'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-popup-params'));
+    await accordion.expand();
     try {
-      return await new SciKeyValuePO(accordionPO.itemLocator().locator('sci-key-value.e2e-popup-params')).readEntries();
+      return await new SciKeyValuePO(accordion.itemLocator().locator('sci-key-value.e2e-popup-params')).readEntries();
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async getRouteParams(): Promise<Params> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-route-params'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-params'));
+    await accordion.expand();
     try {
-      return await new SciKeyValuePO(accordionPO.itemLocator().locator('sci-key-value.e2e-route-params')).readEntries();
+      return await new SciKeyValuePO(accordion.itemLocator().locator('sci-key-value.e2e-route-params')).readEntries();
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async getReferrer(): Promise<WorkbenchPopupReferrer> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-referrer'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-referrer'));
+    await accordion.expand();
     try {
       return withoutUndefinedEntries({
-        viewId: await accordionPO.itemLocator().locator('output.e2e-view-id').innerText(),
-        viewCapabilityId: await accordionPO.itemLocator().locator('output.e2e-view-capability-id').innerText(),
+        viewId: await accordion.itemLocator().locator('output.e2e-view-id').innerText(),
+        viewCapabilityId: await accordion.itemLocator().locator('output.e2e-view-capability-id').innerText(),
       });
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
   public async enterComponentSize(size: PopupSize): Promise<void> {
-    await this._locator.locator('input.e2e-width').fill(size.width ?? '');
-    await this._locator.locator('input.e2e-height').fill(size.height ?? '');
-    await this._locator.locator('input.e2e-min-width').fill(size.minWidth ?? '');
-    await this._locator.locator('input.e2e-max-width').fill(size.maxWidth ?? '');
-    await this._locator.locator('input.e2e-min-height').fill(size.minHeight ?? '');
-    await this._locator.locator('input.e2e-max-height').fill(size.maxHeight ?? '');
+    await this.locator.locator('input.e2e-width').fill(size.width ?? '');
+    await this.locator.locator('input.e2e-height').fill(size.height ?? '');
+    await this.locator.locator('input.e2e-min-width').fill(size.minWidth ?? '');
+    await this.locator.locator('input.e2e-max-width').fill(size.maxWidth ?? '');
+    await this.locator.locator('input.e2e-min-height').fill(size.minHeight ?? '');
+    await this.locator.locator('input.e2e-max-height').fill(size.maxHeight ?? '');
   }
 
   public async enterReturnValue(returnValue: string): Promise<void> {
-    const accordionPO = new SciAccordionPO(this._locator.locator('sci-accordion.e2e-return-value'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-return-value'));
+    await accordion.expand();
     try {
-      await accordionPO.itemLocator().locator('input.e2e-return-value').fill(returnValue);
+      await accordion.itemLocator().locator('input.e2e-return-value').fill(returnValue);
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
@@ -120,10 +119,10 @@ export class HostPopupPagePO {
     }
 
     if (options?.closeWithError === true) {
-      await this._locator.locator('button.e2e-close-with-error').click();
+      await this.locator.locator('button.e2e-close-with-error').click();
     }
     else {
-      await this._locator.locator('button.e2e-close').click();
+      await this.locator.locator('button.e2e-close').click();
     }
   }
 }

@@ -22,13 +22,13 @@ test.describe('Workbench Perspective Storage', () => {
     await appPO.switchPerspective('perspective-1');
 
     // Add part and view to the workbench grid
-    const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPagePO.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
-    await layoutPagePO.addView('view-1', {partId: 'left', activateView: true});
-    await layoutPagePO.addView('view-2', {partId: 'left', activateView: true});
+    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPage.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
+    await layoutPage.addView('view-1', {partId: 'left', activateView: true});
+    await layoutPage.addView('view-2', {partId: 'left', activateView: true});
 
-    const view1PO = appPO.view({viewId: 'view-1'});
-    const view2PO = appPO.view({viewId: 'view-2'});
+    const view1 = appPO.view({viewId: 'view-1'});
+    const view2 = appPO.view({viewId: 'view-2'});
 
     // Reopen the page
     await page.goto('about:blank');
@@ -36,18 +36,18 @@ test.describe('Workbench Perspective Storage', () => {
 
     // Expect perspective-1 to be restored from the storage
     await expect(await await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective-1'}).isActive()).toBe(true);
-    await expect(await view1PO.viewTab.isActive()).toBe(false);
-    await expect(await view2PO.viewTab.isActive()).toBe(true);
+    await expect(await view1.viewTab.isActive()).toBe(false);
+    await expect(await view2.viewTab.isActive()).toBe(true);
 
     // Close view
-    await view2PO.viewTab.close();
+    await view2.viewTab.close();
 
     // Reopen the page
     await page.goto('about:blank');
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
 
     // Expect perspective-1 to be restored from the storage
-    await expect(await view1PO.viewTab.isActive()).toBe(true);
-    await expect(await view2PO.isPresent()).toBe(false);
+    await expect(await view1.viewTab.isActive()).toBe(true);
+    await expect(await view2.isPresent()).toBe(false);
   });
 });

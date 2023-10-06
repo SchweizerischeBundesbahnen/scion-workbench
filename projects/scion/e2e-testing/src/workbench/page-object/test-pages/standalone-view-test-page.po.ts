@@ -14,15 +14,15 @@ import {ViewPO} from '../../../view.po';
 
 export class StandaloneViewTestPagePO {
 
-  private readonly _locator: Locator;
+  public readonly locator: Locator;
   public readonly view: ViewPO;
 
   constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
     this.view = appPO.view(locateBy);
-    this._locator = this.view.locator('app-standalone-view-test-page');
+    this.locator = this.view.locate('app-standalone-view-test-page');
   }
 
   public isVisible(): Promise<boolean> {
-    return this._locator.isVisible();
+    return this.locator.isVisible();
   }
 }
