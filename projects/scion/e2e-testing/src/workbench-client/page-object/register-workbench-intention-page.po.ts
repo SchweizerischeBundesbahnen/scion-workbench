@@ -13,21 +13,22 @@ import {ViewTabPO} from '../../view-tab.po';
 import {Intention, Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
-import {ElementSelectors} from '../../helper/element-selectors';
 import {rejectWhenAttached} from '../../helper/testing.util';
+import {SciRouterOutletPO} from './sci-router-outlet.po';
 
 /**
- * Page object to interact {@link RegisterWorkbenchIntentionPageComponent}.
+ * Page object to interact with {@link RegisterWorkbenchIntentionPageComponent}.
  */
 export class RegisterWorkbenchIntentionPagePO {
 
-  private readonly _locator: Locator;
-
-  public readonly viewTabPO: ViewTabPO;
+  public readonly locator: Locator;
+  public readonly outlet: SciRouterOutletPO;
+  public readonly viewTab: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewTabPO = appPO.view({viewId}).viewTab;
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-register-workbench-intention-page');
+    this.viewTab = appPO.view({viewId}).viewTab;
+    this.outlet = new SciRouterOutletPO(appPO, {name: this.viewId});
+    this.locator = this.outlet.frameLocator.locator('app-register-workbench-intention-page');
   }
 
   /**
@@ -43,8 +44,8 @@ export class RegisterWorkbenchIntentionPagePO {
     await this.clickRegister();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    const responseLocator = this._locator.locator('output.e2e-register-response');
-    const errorLocator = this._locator.locator('output.e2e-register-error');
+    const responseLocator = this.locator.locator('output.e2e-register-response');
+    const errorLocator = this.locator.locator('output.e2e-register-error');
     return Promise.race([
       responseLocator.waitFor({state: 'attached'}).then(() => responseLocator.locator('span.e2e-intention-id').innerText()),
       rejectWhenAttached(errorLocator),
@@ -52,19 +53,19 @@ export class RegisterWorkbenchIntentionPagePO {
   }
 
   public async selectType(type: 'view' | 'popup' | 'messagebox' | 'notification'): Promise<void> {
-    await this._locator.locator('select.e2e-type').selectOption(type);
+    await this.locator.locator('select.e2e-type').selectOption(type);
   }
 
   public async enterQualifier(qualifier: Qualifier | undefined): Promise<void> {
-    const keyValueFieldPO = new SciKeyValueFieldPO(this._locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueFieldPO.clear();
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await keyValueField.clear();
     if (qualifier && Object.keys(qualifier).length) {
-      await keyValueFieldPO.addEntries(qualifier);
+      await keyValueField.addEntries(qualifier);
     }
   }
 
   public async clickRegister(): Promise<void> {
-    await this._locator.locator('button.e2e-register').click();
+    await this.locator.locator('button.e2e-register').click();
   }
 }
 

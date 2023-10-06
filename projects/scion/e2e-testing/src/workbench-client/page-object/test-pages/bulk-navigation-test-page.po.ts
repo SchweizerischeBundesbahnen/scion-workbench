@@ -11,24 +11,26 @@
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {waitUntilStable} from '../../../helper/testing.util';
-import {ElementSelectors} from '../../../helper/element-selectors';
 import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {RegisterWorkbenchCapabilityPagePO} from '../register-workbench-capability-page.po';
+import {SciRouterOutletPO} from '../sci-router-outlet.po';
 
 export class BulkNavigationTestPagePO {
 
-  private readonly _locator: Locator;
+  public readonly locator: Locator;
+  public readonly outlet: SciRouterOutletPO;
 
   constructor(private _appPO: AppPO, viewId: string) {
-    this._locator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-bulk-navigation-test-page');
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: viewId});
+    this.locator = this.outlet.frameLocator.locator('app-bulk-navigation-test-page');
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {
-    await this._locator.locator('input.e2e-view-count').fill(`${viewCount}`);
+    await this.locator.locator('input.e2e-view-count').fill(`${viewCount}`);
   }
 
   public async enterCssClass(cssClass: string): Promise<void> {
-    await this._locator.locator('input.e2e-css-class').fill(cssClass);
+    await this.locator.locator('input.e2e-css-class').fill(cssClass);
   }
 
   /**
@@ -38,7 +40,7 @@ export class BulkNavigationTestPagePO {
    *        @property probeInternal - Time to wait in ms until navigation is stable. Useful when performing many navigations simultaneously.
    */
   public async clickNavigateNoAwait(options?: {probeInterval?: number}): Promise<void> {
-    await this._locator.locator('button.e2e-navigate').click();
+    await this.locator.locator('button.e2e-navigate').click();
     // Wait for the URL to become stable after navigating.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId(), options);
   }
@@ -50,15 +52,15 @@ export class BulkNavigationTestPagePO {
    *        @property probeInternal - Time to wait in ms until navigation is stable. Useful when performing many navigations simultaneously.
    */
   public async clickNavigateAwait(options?: {probeInterval?: number}): Promise<void> {
-    await this._locator.locator('button.e2e-navigate-await').click();
+    await this.locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId(), options);
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
     // Register the test page as view.
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage.registerCapability({
       type: 'view',
       qualifier: {test: 'bulk-navigation'},
       properties: {
@@ -70,11 +72,11 @@ export class BulkNavigationTestPagePO {
     });
 
     // Navigate to the view.
-    const startPagePO = await appPO.openNewViewTab();
-    await startPagePO.clickTestCapability('e2e-test-bulk-navigation', 'app1');
+    const startPage = await appPO.openNewViewTab();
+    await startPage.clickTestCapability('e2e-test-bulk-navigation', 'app1');
 
     // Create the page object.
-    const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: startPagePO.viewId});
+    const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: startPage.viewId});
     await view.waitUntilAttached();
     return new BulkNavigationTestPagePO(appPO, await view.getViewId());
   }

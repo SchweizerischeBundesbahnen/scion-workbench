@@ -17,10 +17,10 @@ test.describe('Bulk Navigation', () => {
   test('should navigate to multiple views if waiting for each navigation to complete', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.openInNewTab(appPO, workbenchNavigator);
-    await bulkNavigationTestPagePO.enterViewCount(10);
-    await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
-    await bulkNavigationTestPagePO.clickNavigateAwait();
+    const bulkNavigationTestPage = await BulkNavigationTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    await bulkNavigationTestPage.enterViewCount(10);
+    await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
+    await bulkNavigationTestPage.clickNavigateAwait();
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
   });
@@ -28,10 +28,10 @@ test.describe('Bulk Navigation', () => {
   test('should navigate to multiple views if not waiting for each navigation to complete', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const bulkNavigationTestPagePO = await BulkNavigationTestPagePO.openInNewTab(appPO, workbenchNavigator);
-    await bulkNavigationTestPagePO.enterViewCount(10);
-    await bulkNavigationTestPagePO.enterCssClass('bulk-navigation-test-target');
-    await bulkNavigationTestPagePO.clickNavigateNoAwait();
+    const bulkNavigationTestPage = await BulkNavigationTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    await bulkNavigationTestPage.enterViewCount(10);
+    await bulkNavigationTestPage.enterCssClass('bulk-navigation-test-target');
+    await bulkNavigationTestPage.clickNavigateNoAwait();
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds({cssClass: 'bulk-navigation-test-target'})).toHaveLength(10);
   });

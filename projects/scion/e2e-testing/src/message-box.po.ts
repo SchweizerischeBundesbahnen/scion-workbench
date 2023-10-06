@@ -16,30 +16,27 @@ import {fromRect, getCssClasses, isActiveElement, isPresent} from './helper/test
  */
 export class MessageBoxPO {
 
-  private readonly _contentLocator: Locator;
-
-  constructor(private readonly _locator: Locator) {
-    this._contentLocator = this._locator.locator('.e2e-body');
+  constructor(public readonly locator: Locator) {
   }
 
   public async isPresent(): Promise<boolean> {
-    return isPresent(this._contentLocator);
+    return isPresent(this.locator);
   }
 
   public async isVisible(): Promise<boolean> {
-    return this._contentLocator.isVisible();
+    return this.locator.isVisible();
   }
 
   public async getBoundingBox(): Promise<DOMRect> {
-    return fromRect(await this._locator.boundingBox());
+    return fromRect(await this.locator.boundingBox());
   }
 
   public async getTitle(): Promise<string> {
-    return this._locator.locator('header.e2e-title').innerText();
+    return this.locator.locator('header.e2e-title').innerText();
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
-    const cssClasses = await getCssClasses(this._locator);
+    const cssClasses = await getCssClasses(this.locator);
     if (cssClasses.includes('e2e-severity-info')) {
       return 'info';
     }
@@ -53,10 +50,10 @@ export class MessageBoxPO {
   }
 
   public async getModality(): Promise<'application' | 'view'> {
-    if (await isPresent(this._locator.page().locator('wb-message-box-stack.e2e-view-modal', {has: this._locator}))) {
+    if (await isPresent(this.locator.page().locator('wb-message-box-stack.e2e-view-modal', {has: this.locator}))) {
       return 'view';
     }
-    if (await isPresent(this._locator.page().locator('wb-message-box-stack.e2e-application-modal', {has: this._locator}))) {
+    if (await isPresent(this.locator.page().locator('wb-message-box-stack.e2e-application-modal', {has: this.locator}))) {
       return 'application';
     }
     throw Error('Message box not found in the view-modal nor in the application-modal message box stack.');
@@ -65,7 +62,7 @@ export class MessageBoxPO {
   public async getActions(): Promise<Record<string, string>> {
     const actions: Record<string, string> = {};
 
-    const actionsLocator = this._locator.locator('button.e2e-action');
+    const actionsLocator = this.locator.locator('button.e2e-action');
     const count = await actionsLocator.count();
     for (let i = 0; i < count; i++) {
       const action = await actionsLocator.nth(i);
@@ -78,23 +75,23 @@ export class MessageBoxPO {
   }
 
   public async clickActionButton(action: string): Promise<void> {
-    await this._locator.locator(`button.e2e-action.e2e-action-key-${action}`).click();
-    await this._locator.waitFor({state: 'detached'});
+    await this.locator.locator(`button.e2e-action.e2e-action-key-${action}`).click();
+    await this.locator.waitFor({state: 'detached'});
   }
 
   public async isActionActive(actionKey: string): Promise<boolean> {
-    return isActiveElement(this._locator.locator('.e2e-button-bar').locator(`button.e2e-action.e2e-action-key-${actionKey}`));
+    return isActiveElement(this.locator.locator('.e2e-button-bar').locator(`button.e2e-action.e2e-action-key-${actionKey}`));
   }
 
   public getCssClasses(): Promise<string[]> {
-    return getCssClasses(this._locator);
+    return getCssClasses(this.locator);
   }
 
   public async waitUntilAttached(): Promise<void> {
-    await this._locator.waitFor({state: 'attached'});
+    await this.locator.waitFor({state: 'attached'});
   }
 
-  public locator(selector: string): Locator {
-    return this._contentLocator.locator(selector);
+  public locate(selector: string): Locator {
+    return this.locator.locator('.e2e-body').locator(selector);
   }
 }

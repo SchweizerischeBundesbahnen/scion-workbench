@@ -17,7 +17,7 @@ test.describe('Workbench View Capability', () => {
   test('should assign stable identifier', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
     const capability: WorkbenchViewCapability = {
       type: 'view',
       qualifier: {component: 'testee-1'},
@@ -27,9 +27,9 @@ test.describe('Workbench View Capability', () => {
     };
 
     // Register view capability in app1.
-    const id1 = (await registerCapabilityPage1PO.registerCapability(capability)).metadata!.id;
+    const id1 = (await registerCapabilityPage1.registerCapability(capability)).metadata!.id;
     // Register the same view capability in app1 again.
-    const id2 = (await registerCapabilityPage1PO.registerCapability(capability)).metadata!.id;
+    const id2 = (await registerCapabilityPage1.registerCapability(capability)).metadata!.id;
     // Expect ids to be stable.
     expect(id1).toEqual(id2);
   });
@@ -37,8 +37,8 @@ test.describe('Workbench View Capability', () => {
   test('should error if qualifier is missing', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registerCapability = registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registerCapability = registerCapabilityPage1.registerCapability({
       type: 'view',
       qualifier: undefined!,
       properties: {
@@ -51,8 +51,8 @@ test.describe('Workbench View Capability', () => {
   test('should error if qualifier is empty', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registerCapability = registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registerCapability = registerCapabilityPage1.registerCapability({
       type: 'view',
       qualifier: {},
       properties: {
@@ -65,8 +65,8 @@ test.describe('Workbench View Capability', () => {
   test('should error if path is `undefined`', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registerCapability = registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registerCapability = registerCapabilityPage1.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
@@ -79,8 +79,8 @@ test.describe('Workbench View Capability', () => {
   test('should error if path is `null`', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registerCapability = registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registerCapability = registerCapabilityPage1.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {
@@ -93,8 +93,8 @@ test.describe('Workbench View Capability', () => {
   test('should not error if path is empty', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registeredCapability = await registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registeredCapability = await registerCapabilityPage1.registerCapability({
       type: 'view',
       qualifier: {component: 'testee-1'},
       properties: {

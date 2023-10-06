@@ -21,8 +21,8 @@ test.describe('Popup Router', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popup
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
@@ -32,22 +32,22 @@ test.describe('Popup Router', () => {
     });
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
 
     // expect popup to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isVisible()).toBe(true);
   });
 
   test('should navigate to own private popups', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popup
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: true, // PRIVATE
@@ -57,22 +57,22 @@ test.describe('Popup Router', () => {
     });
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
 
     // expect popup to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isVisible()).toBe(true);
   });
 
   test('should not navigate to private popups of other apps', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popup as private popup in app 2
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: true, // PRIVATE
@@ -82,26 +82,26 @@ test.describe('Popup Router', () => {
     });
 
     // register popup intention in app 1
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'testee'}});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'testee'}});
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await expect(popupOpenerPagePO.clickOpen()).rejects.toThrow(/NullProviderError/);
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await expect(popupOpenerPage.clickOpen()).rejects.toThrow(/NullProviderError/);
 
     // expect popup not to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isPresent()).toBe(false);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isPresent()).toBe(false);
   });
 
   test('should navigate to public popups of other apps', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popup as public popup in app 2
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
@@ -111,26 +111,26 @@ test.describe('Popup Router', () => {
     });
 
     // register popup intention in app 1
-    const registerIntentionPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPagePO.registerIntention({type: 'popup', qualifier: {component: 'testee'}});
+    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'testee'}});
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
 
     // expect popup to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isVisible()).toBe(true);
   });
 
   test('should not navigate to public popups of other apps if missing the intention', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popup as public popup in app 2
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
@@ -140,37 +140,37 @@ test.describe('Popup Router', () => {
     });
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await expect(popupOpenerPagePO.clickOpen()).rejects.toThrow(/NotQualifiedError/);
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await expect(popupOpenerPage.clickOpen()).rejects.toThrow(/NotQualifiedError/);
 
     // expect popup not to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isPresent()).toBe(false);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isPresent()).toBe(false);
   });
 
   test('should allow opening multiple popups simultaneously in different views', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popups
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee-1'},
       properties: {
         path: 'test-popup',
       },
     });
-    await registerCapabilityPage1PO.registerCapability({
+    await registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee-2'},
       properties: {
         path: 'test-popup',
       },
     });
-    const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-    await registerCapabilityPage2PO.registerCapability({
+    const registerCapabilityPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
+    await registerCapabilityPage2.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee-3'},
       private: false, // PUBLIC
@@ -180,55 +180,55 @@ test.describe('Popup Router', () => {
     });
 
     // open the first popup for app-1
-    const popupOpenerApp1aPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerApp1aPagePO.enterQualifier({component: 'testee-1'});
-    await popupOpenerApp1aPagePO.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
-    await popupOpenerApp1aPagePO.enterCssClass('testee-1');
-    await popupOpenerApp1aPagePO.clickOpen();
+    const popupOpenerApp1aPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerApp1aPage.enterQualifier({component: 'testee-1'});
+    await popupOpenerApp1aPage.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
+    await popupOpenerApp1aPage.enterCssClass('testee-1');
+    await popupOpenerApp1aPage.clickOpen();
 
     // expect popup to display
-    const popupPageApp1aPO = new PopupPagePO(appPO, 'testee-1');
-    await expect(await popupPageApp1aPO.popupPO.isVisible()).toBe(true);
+    const popupPageApp1a = new PopupPagePO(appPO, {cssClass: 'testee-1'});
+    await expect(await popupPageApp1a.popup.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPageApp1aPO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
+    await expect((await popupPageApp1a.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
 
     // open the second popup for app-1
-    const popupOpenerApp1bPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerApp1bPagePO.enterQualifier({component: 'testee-2'});
-    await popupOpenerApp1bPagePO.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
-    await popupOpenerApp1bPagePO.enterCssClass('testee-2');
-    await popupOpenerApp1bPagePO.clickOpen();
+    const popupOpenerApp1bPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerApp1bPage.enterQualifier({component: 'testee-2'});
+    await popupOpenerApp1bPage.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
+    await popupOpenerApp1bPage.enterCssClass('testee-2');
+    await popupOpenerApp1bPage.clickOpen();
 
     // expect popup to display
-    const popupPageApp1bPO = new PopupPagePO(appPO, 'testee-2');
-    await expect(await popupPageApp1bPO.popupPO.isVisible()).toBe(true);
+    const popupPageApp1b = new PopupPagePO(appPO, {cssClass: 'testee-2'});
+    await expect(await popupPageApp1b.popup.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPageApp1bPO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
+    await expect((await popupPageApp1b.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
 
     // open the popup for app-2
-    const popupOpenerApp2PagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app2');
-    await popupOpenerApp2PagePO.enterQualifier({component: 'testee-3'});
-    await popupOpenerApp2PagePO.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
-    await popupOpenerApp2PagePO.enterCssClass('testee-3');
-    await popupOpenerApp2PagePO.clickOpen();
+    const popupOpenerApp2Page = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app2');
+    await popupOpenerApp2Page.enterQualifier({component: 'testee-3'});
+    await popupOpenerApp2Page.enterCloseStrategy({closeOnFocusLost: false, closeOnEscape: false});
+    await popupOpenerApp2Page.enterCssClass('testee-3');
+    await popupOpenerApp2Page.clickOpen();
 
     // expect popup to display
-    const popupPageApp2PO = new PopupPagePO(appPO, 'testee-3');
-    await expect(await popupPageApp2PO.popupPO.isVisible()).toBe(true);
+    const popupPageApp2 = new PopupPagePO(appPO, {cssClass: 'testee-3'});
+    await expect(await popupPageApp2.popup.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPageApp2PO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app2');
+    await expect((await popupPageApp2.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app2');
   });
 
   test('should open popup with empty microfrontend path', async ({page, appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
 
     // register testee popups
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee', path: 'empty'},
       properties: {
@@ -237,13 +237,13 @@ test.describe('Popup Router', () => {
     });
 
     // open the popup with `empty` as path
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee', path: 'empty'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee', path: 'empty'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
 
     // expect popup to display
-    await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
+    await expect(await popupPage.popup.isPresent()).toBe(true);
 
     await expect(page.locator('app-root')).toBeVisible();
   });
@@ -252,16 +252,16 @@ test.describe('Popup Router', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popups
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-popup',
       },
     });
-    const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-    await registerCapabilityPage2PO.registerCapability({
+    const registerCapabilityPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
+    await registerCapabilityPage2.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: true, // PRIVATE
@@ -269,40 +269,40 @@ test.describe('Popup Router', () => {
         path: 'test-popup',
       },
     });
-    const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage2PO.registerIntention({
+    const registerIntentionPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage2.registerIntention({
       type: 'popup',
       qualifier: {component: 'testee'},
     });
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
 
     // expect popup to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPagePO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
+    await expect((await popupPage.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
   });
 
   test('should not throw if another app provides an equivalent public popup capability if not declared an intention', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popups
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-popup',
       },
     });
-    const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-    await registerCapabilityPage2PO.registerCapability({
+    const registerCapabilityPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
+    await registerCapabilityPage2.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
@@ -312,33 +312,33 @@ test.describe('Popup Router', () => {
     });
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
 
     // expect popup to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isVisible()).toBe(true);
 
     // expect the popup of this app to display
-    await expect((await popupPagePO.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
+    await expect((await popupPage.getPopupCapability()).metadata!.appSymbolicName).toEqual('workbench-client-testing-app1');
   });
 
   test('should log warning if another app provides an equivalent public popup capability', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popups
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-popup',
       },
     });
-    const registerCapabilityPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-    await registerCapabilityPage2PO.registerCapability({
+    const registerCapabilityPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
+    await registerCapabilityPage2.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: false, // PUBLIC
@@ -346,21 +346,21 @@ test.describe('Popup Router', () => {
         path: 'test-popup',
       },
     });
-    const registerIntentionPage2PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage2PO.registerIntention({
+    const registerIntentionPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
+    await registerIntentionPage2.registerIntention({
       type: 'popup',
       qualifier: {component: 'testee'},
     });
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
 
     // expect first popup to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isPresent()).toBe(true);
 
     // expect warning to be logged for the second popup
     await expect(await consoleLogs.get({severity: 'warning', filter: /Ignoring popup intent/})).not.toEqual([]);
@@ -370,15 +370,15 @@ test.describe('Popup Router', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popups
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-popup',
       },
     });
-    await registerCapabilityPagePO.registerCapability({
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -387,14 +387,14 @@ test.describe('Popup Router', () => {
     });
 
     // open the popup
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
 
     // expect first popup to display
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
-    await expect(await popupPagePO.popupPO.isPresent()).toBe(true);
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    await expect(await popupPage.popup.isPresent()).toBe(true);
 
     // expect warning to be logged for the second popup
     await expect(await consoleLogs.get({severity: 'warning', filter: /Ignoring popup intent/})).not.toEqual([]);
@@ -404,8 +404,8 @@ test.describe('Popup Router', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popup
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       private: true, // PRIVATE
@@ -415,21 +415,21 @@ test.describe('Popup Router', () => {
     });
 
     // open the popup for the first time
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCssClass('testee');
-    await popupOpenerPagePO.clickOpen();
-    const popupPagePO = new PopupPagePO(appPO, 'testee');
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCssClass('testee');
+    await popupOpenerPage.clickOpen();
+    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
 
     // expect popup to display
-    await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+    await expect(await popupPage.popup.isVisible()).toBe(true);
 
     // close the popup
-    await popupPagePO.clickClose();
-    await expect(await popupPagePO.popupPO.isVisible()).toBe(false);
+    await popupPage.clickClose();
+    await expect(await popupPage.popup.isVisible()).toBe(false);
 
     // open the popup for the second time
-    await popupOpenerPagePO.clickOpen();
-    await expect(await popupPagePO.popupPO.isVisible()).toBe(true);
+    await popupOpenerPage.clickOpen();
+    await expect(await popupPage.popup.isVisible()).toBe(true);
   });
 });

@@ -11,21 +11,22 @@
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {Locator} from '@playwright/test';
-import {ElementSelectors} from '../../helper/element-selectors';
 import {rejectWhenAttached} from '../../helper/testing.util';
+import {SciRouterOutletPO} from './sci-router-outlet.po';
 
 /**
- * Page object to interact {@link UnregisterWorkbenchCapabilityPageComponent}.
+ * Page object to interact with {@link UnregisterWorkbenchCapabilityPageComponent}.
  */
 export class UnregisterWorkbenchCapabilityPagePO {
 
-  private readonly _locator: Locator;
-
-  public readonly viewTabPO: ViewTabPO;
+  public readonly locator: Locator;
+  public readonly viewTab: ViewTabPO;
+  public readonly outlet: SciRouterOutletPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewTabPO = appPO.view({viewId}).viewTab;
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-unregister-workbench-capability-page');
+    this.viewTab = appPO.view({viewId}).viewTab;
+    this.outlet = new SciRouterOutletPO(appPO, {name: this.viewId});
+    this.locator = this.outlet.frameLocator.locator('app-unregister-workbench-capability-page');
   }
 
   /**
@@ -40,8 +41,8 @@ export class UnregisterWorkbenchCapabilityPagePO {
     await this.clickUnregister();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
-    const responseLocator = this._locator.locator('output.e2e-unregistered');
-    const errorLocator = this._locator.locator('output.e2e-unregister-error');
+    const responseLocator = this.locator.locator('output.e2e-unregistered');
+    const errorLocator = this.locator.locator('output.e2e-unregister-error');
     return Promise.race([
       responseLocator.waitFor({state: 'attached'}),
       rejectWhenAttached(errorLocator),
@@ -49,11 +50,11 @@ export class UnregisterWorkbenchCapabilityPagePO {
   }
 
   public async enterId(id: string): Promise<void> {
-    await this._locator.locator('input.e2e-id').fill(id);
+    await this.locator.locator('input.e2e-id').fill(id);
   }
 
   public async clickUnregister(): Promise<void> {
-    await this._locator.locator('button.e2e-unregister').click();
+    await this.locator.locator('button.e2e-unregister').click();
   }
 }
 

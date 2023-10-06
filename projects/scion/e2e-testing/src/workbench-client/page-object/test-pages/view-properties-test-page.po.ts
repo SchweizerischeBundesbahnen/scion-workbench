@@ -10,20 +10,22 @@
 
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {ElementSelectors} from '../../../helper/element-selectors';
 import {ViewTabPO} from '../../../view-tab.po';
+import {SciRouterOutletPO} from '../sci-router-outlet.po';
 
 export class ViewPropertiesTestPagePO {
 
-  private readonly _locator: Locator;
+  public readonly locator: Locator;
   public readonly viewTab: ViewTabPO;
+  public readonly outlet: SciRouterOutletPO;
 
   constructor(appPO: AppPO, viewId: string) {
     this.viewTab = appPO.view({viewId}).viewTab;
-    this._locator = appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-view-properties-test-page');
+    this.outlet = new SciRouterOutletPO(appPO, {name: viewId});
+    this.locator = this.outlet.frameLocator.locator('app-view-properties-test-page');
   }
 
   public async waitUntilPresent(): Promise<void> {
-    await this._locator.waitFor({state: 'attached'});
+    await this.locator.waitFor({state: 'attached'});
   }
 }

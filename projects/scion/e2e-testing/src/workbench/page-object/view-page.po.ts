@@ -19,26 +19,26 @@ import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 
 /**
- * Page object to interact {@link ViewPageComponent}.
+ * Page object to interact with {@link ViewPageComponent}.
  */
 export class ViewPagePO {
 
   public readonly locator: Locator;
-  public readonly viewPO: ViewPO;
-  public readonly viewTabPO: ViewTabPO;
+  public readonly view: ViewPO;
+  public readonly viewTab: ViewTabPO;
 
   constructor(appPO: AppPO, public viewId: string) {
-    this.viewPO = appPO.view({viewId});
-    this.viewTabPO = appPO.view({viewId}).viewTab;
-    this.locator = this.viewPO.locator('app-view-page');
+    this.view = appPO.view({viewId});
+    this.viewTab = appPO.view({viewId}).viewTab;
+    this.locator = this.view.locate('app-view-page');
   }
 
   public async isPresent(): Promise<boolean> {
-    return await this.viewTabPO.isPresent() && await isPresent(this.locator);
+    return await this.viewTab.isPresent() && await isPresent(this.locator);
   }
 
   public async isVisible(): Promise<boolean> {
-    return await this.viewPO.isVisible() && await this.locator.isVisible();
+    return await this.view.isVisible() && await this.locator.isVisible();
   }
 
   public async getViewId(): Promise<string> {
@@ -50,13 +50,13 @@ export class ViewPagePO {
   }
 
   public async getRouteParams(): Promise<Params> {
-    const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-params'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-params'));
+    await accordion.expand();
     try {
       return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-route-params')).readEntries();
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 
@@ -77,14 +77,14 @@ export class ViewPagePO {
   }
 
   public async clickClose(): Promise<void> {
-    const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-actions'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-actions'));
+    await accordion.expand();
     await this.locator.locator('button.e2e-close').click();
   }
 
   public async addViewAction(partAction: WorkbenchPartActionDescriptor, options?: {append?: boolean}): Promise<void> {
-    const accordionPO = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-part-actions'));
-    await accordionPO.expand();
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-part-actions'));
+    await accordion.expand();
     try {
       const inputLocator = this.locator.locator('input.e2e-part-actions');
       if (options?.append ?? true) {
@@ -97,7 +97,7 @@ export class ViewPagePO {
       }
     }
     finally {
-      await accordionPO.collapse();
+      await accordion.collapse();
     }
   }
 

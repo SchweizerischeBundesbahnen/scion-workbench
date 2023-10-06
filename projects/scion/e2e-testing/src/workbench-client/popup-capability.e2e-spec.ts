@@ -17,8 +17,8 @@ test.describe('Workbench Popup Capability', () => {
   test('should error if qualifier is missing', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registeredCapability = registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registeredCapability = registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: undefined!,
       properties: {
@@ -31,8 +31,8 @@ test.describe('Workbench Popup Capability', () => {
   test('should error if qualifier is empty', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registeredCapability = registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registeredCapability = registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {},
       properties: {
@@ -45,8 +45,8 @@ test.describe('Workbench Popup Capability', () => {
   test('should error if path is `undefined`', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registeredCapability = registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registeredCapability = registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -59,8 +59,8 @@ test.describe('Workbench Popup Capability', () => {
   test('should error if path is `null`', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registeredCapability = registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registeredCapability = registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee-1'},
       properties: {
@@ -73,8 +73,8 @@ test.describe('Workbench Popup Capability', () => {
   test('should not error if path is empty', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const registerCapabilityPage1PO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const registeredCapability = await registerCapabilityPage1PO.registerCapability({
+    const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    const registeredCapability = await registerCapabilityPage1.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee-1'},
       properties: {

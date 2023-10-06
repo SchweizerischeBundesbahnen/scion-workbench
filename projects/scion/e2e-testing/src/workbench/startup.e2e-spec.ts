@@ -38,8 +38,8 @@ test.describe('Startup', () => {
     await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
 
     // Expect the test view to show.
-    const testingViewPO = appPO.view({cssClass: 'e2e-test-view'});
-    await expect(await testingViewPO.isPresent()).toBe(true);
+    const testingView = appPO.view({cssClass: 'e2e-test-view'});
+    await expect(await testingView.isPresent()).toBe(true);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
   });
 });

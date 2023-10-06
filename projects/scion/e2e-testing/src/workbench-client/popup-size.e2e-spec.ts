@@ -22,8 +22,8 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {test: 'popup'},
         properties: {
@@ -36,13 +36,13 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({test: 'popup'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({test: 'popup'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 350,
         height: 450,
       }));
@@ -59,8 +59,8 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {test: 'popup'},
         properties: {
@@ -75,11 +75,11 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup directly from the start page
-      const startPagePO = await appPO.openNewViewTab();
-      await startPagePO.clickTestCapability('e2e-test-popup-size', 'app1');
+      const startPage = await appPO.openNewViewTab();
+      await startPage.clickTestCapability('e2e-test-popup-size', 'app1');
 
-      const popupPagePO = new PopupPagePO(appPO, 'e2e-test-popup-size');
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'e2e-test-popup-size'});
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 350,
         height: 450,
       }));
@@ -91,8 +91,8 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -104,35 +104,35 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'testee'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await popupPagePO.enterComponentSize({
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await popupPage.enterComponentSize({
         width: '600px',
         height: '800px',
       });
 
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 600,
         height: 400,
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         width: 600,
         height: 800,
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(true);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(true);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
     });
 
     test('should not grow beyond the preferred overlay width', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -144,35 +144,35 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'testee'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await popupPagePO.enterComponentSize({
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await popupPage.enterComponentSize({
         width: '600px',
         height: '800px',
       });
 
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
         height: 800,
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         width: 600,
         height: 800,
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(true);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(true);
     });
 
     test('should not shrink below the preferred overlay height', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -184,35 +184,35 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'testee'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await popupPagePO.enterComponentSize({
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await popupPage.enterComponentSize({
         width: '200px',
         height: '250px',
       });
 
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 200,
         height: 400,
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         width: 200,
         height: 250,
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
     });
 
     test('should not shrink below the preferred overlay width', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -224,27 +224,27 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'testee'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
-      await popupPagePO.enterComponentSize({
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await popupPage.enterComponentSize({
         width: '200px',
         height: '250px',
       });
 
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
         height: 250,
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         width: 200,
         height: 250,
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
     });
   });
 
@@ -253,8 +253,8 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -266,50 +266,50 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'testee'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
 
       // Set the component height to 300px (max overlay height is 400px)
-      await popupPagePO.enterComponentSize({
+      await popupPage.enterComponentSize({
         height: '300px',
       });
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         height: 300,
         width: expect.any(Number),
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         height: 300,
         width: expect.any(Number),
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
 
       // Set the component height to 500px (max overlay height is 400px)
-      await popupPagePO.enterComponentSize({
+      await popupPage.enterComponentSize({
         height: '500px',
       });
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         height: 400,
         width: expect.any(Number),
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         height: 500,
         width: expect.any(Number),
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(true);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(true);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
     });
 
     test('should grow to the maximum width of the overlay', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -321,43 +321,43 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'testee'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
 
       // Set the component width to 300px (max overlay width is 400px)
-      await popupPagePO.enterComponentSize({
+      await popupPage.enterComponentSize({
         width: '300px',
       });
 
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 300,
         height: expect.any(Number),
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         width: 300,
         height: expect.any(Number),
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
 
       // Set the component width to 500px (max overlay width is 400px)
-      await popupPagePO.enterComponentSize({
+      await popupPage.enterComponentSize({
         width: '500px',
       });
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
         height: expect.any(Number),
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         width: 500,
         height: expect.any(Number),
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(true);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(true);
     });
   });
 
@@ -366,8 +366,8 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -379,50 +379,50 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'testee'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
 
       // Set the component height to 300px (min overlay height is 400px)
-      await popupPagePO.enterComponentSize({
+      await popupPage.enterComponentSize({
         height: '300px',
       });
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         height: 400,
         width: expect.any(Number),
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         height: 300,
         width: expect.any(Number),
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
 
       // Set the component height to 500px (min overlay height is 400px)
-      await popupPagePO.enterComponentSize({
+      await popupPage.enterComponentSize({
         height: '500px',
       });
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         height: 500,
         width: expect.any(Number),
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         height: 500,
         width: expect.any(Number),
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
     });
 
     test('should not shrink below the minimum width of the overlay', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // register testee popup
-      const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPagePO.registerCapability({
+      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+      await registerCapabilityPage.registerCapability({
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -434,43 +434,43 @@ test.describe('Workbench Popup', () => {
       });
 
       // open the popup
-      const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPagePO.enterQualifier({component: 'testee'});
-      await popupOpenerPagePO.enterCssClass('testee');
-      await popupOpenerPagePO.clickOpen();
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.clickOpen();
 
-      const popupPagePO = new PopupPagePO(appPO, 'testee');
+      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
 
       // Set the component width to 300px (min overlay width is 400px)
-      await popupPagePO.enterComponentSize({
+      await popupPage.enterComponentSize({
         width: '300px',
       });
 
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
         height: expect.any(Number),
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         width: 300,
         height: expect.any(Number),
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
 
       // Set the component width to 500px (min overlay width is 400px)
-      await popupPagePO.enterComponentSize({
+      await popupPage.enterComponentSize({
         width: '500px',
       });
-      await expect(await popupPagePO.popupPO.getBoundingBox()).toEqual(expect.objectContaining({
+      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
         width: 500,
         height: expect.any(Number),
       }));
-      await expect(await popupPagePO.getSize()).toEqual({
+      await expect(await popupPage.getSize()).toEqual({
         width: 500,
         height: expect.any(Number),
       });
-      await expect(await popupPagePO.popupPO.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPagePO.popupPO.hasHorizontalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
+      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
     });
   });
 });

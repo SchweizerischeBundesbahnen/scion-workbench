@@ -10,34 +10,38 @@
 
 import {Locator} from '@playwright/test';
 import {AppPO} from '../../../app.po';
-import {ElementSelectors} from '../../../helper/element-selectors';
 import {SciAccordionPO} from '../../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {RegisterWorkbenchCapabilityPagePO} from '../register-workbench-capability-page.po';
+import {SciRouterOutletPO} from '../sci-router-outlet.po';
 
 export class AngularZoneTestPagePO {
 
+  public readonly locator: Locator;
+  public readonly outlet: SciRouterOutletPO;
+
   public readonly workbenchView: {
-    capabilityPO: PanelPO;
-    paramsPO: PanelPO;
-    activePO: PanelPO;
+    capabilityPanel: PanelPO;
+    paramsPanel: PanelPO;
+    activePanel: PanelPO;
   };
 
   constructor(private _appPO: AppPO, viewId: string) {
-    const locator = this._appPO.page.frameLocator(ElementSelectors.routerOutletFrame(viewId)).locator('app-angular-zone-test-page');
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: viewId});
+    this.locator = this.outlet.frameLocator.locator('app-angular-zone-test-page');
 
     this.workbenchView = {
-      capabilityPO: new PanelPO(locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-capability'),
-      paramsPO: new PanelPO(locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-params'),
-      activePO: new PanelPO(locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-active'),
+      capabilityPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-capability'),
+      paramsPanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-params'),
+      activePanel: new PanelPO(this.locator.locator('sci-accordion'), 'e2e-workbench-view.e2e-active'),
     };
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<AngularZoneTestPagePO> {
     // Register the test page as view.
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage.registerCapability({
       type: 'view',
       qualifier: {test: 'angular-zone'},
       properties: {
@@ -47,14 +51,14 @@ export class AngularZoneTestPagePO {
         pinToStartPage: true,
       },
     });
-    await registerCapabilityPagePO.viewTabPO.close();
+    await registerCapabilityPage.viewTab.close();
 
     // Navigate to the view.
-    const startPagePO = await appPO.openNewViewTab();
-    await startPagePO.clickTestCapability('e2e-test-angular-zone', 'app1');
+    const startPage = await appPO.openNewViewTab();
+    await startPage.clickTestCapability('e2e-test-angular-zone', 'app1');
 
     // Create the page object.
-    const view = await appPO.view({cssClass: 'e2e-test-angular-zone', viewId: startPagePO.viewId});
+    const view = await appPO.view({cssClass: 'e2e-test-angular-zone', viewId: startPage.viewId});
     await view.waitUntilAttached();
     return new AngularZoneTestPagePO(appPO, await view.getViewId());
   }
@@ -65,24 +69,24 @@ export class AngularZoneTestPagePO {
  */
 export class PanelPO {
 
-  private _accordionPO: SciAccordionPO;
+  private _accordion: SciAccordionPO;
 
   constructor(accordionLocator: Locator, private _accordionItemCssClass: string) {
-    this._accordionPO = new SciAccordionPO(accordionLocator);
+    this._accordion = new SciAccordionPO(accordionLocator);
   }
 
   public async expand(): Promise<void> {
-    await this._accordionPO.expand(this._accordionItemCssClass);
+    await this._accordion.expand(this._accordionItemCssClass);
   }
 
   public async subscribe(options: {subscribeInAngularZone: boolean}): Promise<void> {
-    const locator = this._accordionPO.itemLocator(this._accordionItemCssClass);
+    const locator = this._accordion.itemLocator(this._accordionItemCssClass);
     await new SciCheckboxPO(locator.locator('sci-checkbox.e2e-run-inside-angular')).toggle(options.subscribeInAngularZone);
     await locator.locator('button.e2e-subscribe').click();
   }
 
   public async isEmissionReceivedInAngularZone(emission: {nth: number}): Promise<boolean> {
-    const locator = this._accordionPO.itemLocator(this._accordionItemCssClass);
+    const locator = this._accordion.itemLocator(this._accordionItemCssClass);
     const zoneAttributeValue = await locator.locator('output.e2e-emission').nth(emission.nth).getAttribute('data-zone');
 
     switch (zoneAttributeValue) {

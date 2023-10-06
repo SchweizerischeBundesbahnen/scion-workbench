@@ -24,38 +24,38 @@ test.describe('Workbench View Tab', () => {
     await appPO.openNewViewTab();
 
     // Open test view.
-    const testPagePO = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    const testPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
 
     // Open context menu.
-    const contextMenuPO = await testPagePO.view.viewTab.openContextMenu();
-    await expect(await contextMenuPO.isOpened()).toBe(true);
+    const contextMenu = await testPage.view.viewTab.openContextMenu();
+    await expect(await contextMenu.isOpened()).toBe(true);
 
     // When focusing the view.
-    await testPagePO.clickInputField();
+    await testPage.clickInputField();
     // Expect the context menu to be closed.
-    await expect(await contextMenuPO.isOpened()).toBe(false);
+    await expect(await contextMenu.isOpened()).toBe(false);
     // Expect focus to remain in the input field that caused focus loss of the menu.
-    await expect(await testPagePO.isInputFieldActiveElement()).toBe(true);
+    await expect(await testPage.isInputFieldActiveElement()).toBe(true);
   });
 
   test('should close context menu when popup microfrontend gains focus', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Open test view.
-    const viewPagePO = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    const viewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
     // Open test popup.
-    const testPagePO = await MicrofrontendInputFieldTestPagePO.openInPopup(appPO, microfrontendNavigator, {closeOnFocusLost: false});
+    const testPage = await MicrofrontendInputFieldTestPagePO.openInPopup(appPO, microfrontendNavigator, {closeOnFocusLost: false});
 
     // Open context menu.
-    const contextMenuPO = await viewPagePO.view.viewTab.openContextMenu();
-    await expect(await contextMenuPO.isOpened()).toBe(true);
+    const contextMenu = await viewPage.view.viewTab.openContextMenu();
+    await expect(await contextMenu.isOpened()).toBe(true);
 
     // When focusing the popup.
-    await testPagePO.clickInputField();
+    await testPage.clickInputField();
     // Expect the context menu to be closed.
-    await expect(await contextMenuPO.isOpened()).toBe(false);
+    await expect(await contextMenu.isOpened()).toBe(false);
     // Expect focus to remain in the input field that caused focus loss of the menu.
-    await expect(await testPagePO.isInputFieldActiveElement()).toBe(true);
+    await expect(await testPage.isInputFieldActiveElement()).toBe(true);
   });
 });

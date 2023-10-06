@@ -32,13 +32,13 @@ test.describe('View Drag Main Area', () => {
     test('should allow dragging a view to the west in the main area', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom', ratio: .25});
-      await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('bottom', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom', ratio: .25});
+      await layoutPage.addView('view.3', {partId: 'bottom', activateView: true});
 
       // Move view 2 to the west of the main area.
-      const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragTo({grid: 'mainArea', region: 'west'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.viewTab.dragTo({grid: 'mainArea', region: 'west'});
 
       // Expect view 2 to be moved to the west of the main area.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -52,7 +52,7 @@ test.describe('View Drag Main Area', () => {
             direction: 'row',
             ratio: .2,
             child1: new MPart({
-              id: await view2PO.part.getPartId(),
+              id: await view2.part.getPartId(),
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
@@ -60,7 +60,7 @@ test.describe('View Drag Main Area', () => {
               direction: 'column',
               ratio: .75,
               child1: new MPart({
-                id: await view1PO.viewPO.part.getPartId(),
+                id: await layoutPage.view.part.getPartId(),
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
@@ -71,7 +71,7 @@ test.describe('View Drag Main Area', () => {
               }),
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -88,13 +88,13 @@ test.describe('View Drag Main Area', () => {
     test('should allow dragging a view to the east in the main area', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom', ratio: .25});
-      await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('bottom', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom', ratio: .25});
+      await layoutPage.addView('view.3', {partId: 'bottom', activateView: true});
 
       // Move view 2 to the east of the main area.
-      const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragTo({grid: 'mainArea', region: 'east'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.viewTab.dragTo({grid: 'mainArea', region: 'east'});
 
       // Expect view 2 to be moved to the east of the main area.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -111,7 +111,7 @@ test.describe('View Drag Main Area', () => {
               direction: 'column',
               ratio: .75,
               child1: new MPart({
-                id: await view1PO.viewPO.part.getPartId(),
+                id: await layoutPage.view.part.getPartId(),
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
@@ -122,12 +122,12 @@ test.describe('View Drag Main Area', () => {
               }),
             }),
             child2: new MPart({
-              id: await view2PO.part.getPartId(),
+              id: await view2.part.getPartId(),
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -144,13 +144,13 @@ test.describe('View Drag Main Area', () => {
     test('should allow dragging a view to the south in the main area', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('right', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right', ratio: .25});
-      await view1PO.addView('view.3', {partId: 'right', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('right', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .25});
+      await layoutPage.addView('view.3', {partId: 'right', activateView: true});
 
       // Move view 2 to the south of the main area.
-      const view2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewPO;
-      await view2PO.viewTab.dragTo({grid: 'mainArea', region: 'south'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.viewTab.dragTo({grid: 'mainArea', region: 'south'});
 
       // Expect view 2 to be moved to the south of the main area.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -167,7 +167,7 @@ test.describe('View Drag Main Area', () => {
               direction: 'row',
               ratio: .75,
               child1: new MPart({
-                id: await view1PO.viewPO.part.getPartId(),
+                id: await layoutPage.view.part.getPartId(),
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
@@ -178,12 +178,12 @@ test.describe('View Drag Main Area', () => {
               }),
             }),
             child2: new MPart({
-              id: await view2PO.part.getPartId(),
+              id: await view2.part.getPartId(),
               views: [{id: 'view.2'}],
               activeViewId: 'view.2',
             }),
           }),
-          activePartId: await view2PO.part.getPartId(),
+          activePartId: await view2.part.getPartId(),
         },
       });
     });
@@ -199,12 +199,12 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('right', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right'});
-      await view1PO.addView('view.3', {partId: 'right', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('right', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right'});
+      await layoutPage.addView('view.3', {partId: 'right', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
@@ -224,12 +224,12 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('bottom', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addView('view.3', {partId: 'bottom', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(false);
@@ -249,14 +249,14 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (3)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('right', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right'});
-      await view1PO.addPart('bottom-left', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addView('view.3', {partId: 'bottom-left', activateView: true});
-      await view1PO.addView('view.4', {partId: 'right', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('right', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right'});
+      await layoutPage.addPart('bottom-left', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addView('view.3', {partId: 'bottom-left', activateView: true});
+      await layoutPage.addView('view.4', {partId: 'right', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
@@ -276,14 +276,14 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (4)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('left', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'left'});
-      await view1PO.addPart('bottom-right', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addView('view.3', {partId: 'bottom-right', activateView: true});
-      await view1PO.addView('view.4', {partId: 'left', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('left', {relativeTo: await layoutPage.view.part.getPartId(), align: 'left'});
+      await layoutPage.addPart('bottom-right', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addView('view.3', {partId: 'bottom-right', activateView: true});
+      await layoutPage.addView('view.4', {partId: 'left', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
@@ -306,16 +306,16 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (5)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addPart('left', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'left'});
-      await view1PO.addPart('bottom-right', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addView('view.3', {partId: 'bottom-right', activateView: true});
-      await view1PO.addView('view.4', {partId: 'left', activateView: true});
-      await view1PO.addView('view.5', {partId: 'bottom', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('bottom', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addPart('left', {relativeTo: await layoutPage.view.part.getPartId(), align: 'left'});
+      await layoutPage.addPart('bottom-right', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addView('view.3', {partId: 'bottom-right', activateView: true});
+      await layoutPage.addView('view.4', {partId: 'left', activateView: true});
+      await layoutPage.addView('view.5', {partId: 'bottom', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(false);
@@ -338,18 +338,18 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (6)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('right', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right'});
-      await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addPart('left', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'left'});
-      await view1PO.addPart('middle', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addView('view.3', {partId: 'middle', activateView: true});
-      await view1PO.addView('view.4', {partId: 'left', activateView: true});
-      await view1PO.addView('view.5', {partId: 'bottom', activateView: true});
-      await view1PO.addView('view.6', {partId: 'right', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('right', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right'});
+      await layoutPage.addPart('bottom', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addPart('left', {relativeTo: await layoutPage.view.part.getPartId(), align: 'left'});
+      await layoutPage.addPart('middle', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addView('view.3', {partId: 'middle', activateView: true});
+      await layoutPage.addView('view.4', {partId: 'left', activateView: true});
+      await layoutPage.addView('view.5', {partId: 'bottom', activateView: true});
+      await layoutPage.addView('view.6', {partId: 'right', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
@@ -369,14 +369,14 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (7)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('left', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'left'});
-      await view1PO.addPart('right', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right'});
-      await view1PO.addPart('bottom-middle', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addView('view.3', {partId: 'bottom-middle', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('left', {relativeTo: await layoutPage.view.part.getPartId(), align: 'left'});
+      await layoutPage.addPart('right', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right'});
+      await layoutPage.addPart('bottom-middle', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addView('view.3', {partId: 'bottom-middle', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(false);
@@ -396,15 +396,15 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (8)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('left-top', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'left'});
-      await view1PO.addPart('right-top', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right'});
-      await view1PO.addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'});
-      await view1PO.addPart('right-bottom', {relativeTo: 'right-top', align: 'bottom'});
-      await view1PO.addView('view.3', {partId: 'right-bottom', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('left-top', {relativeTo: await layoutPage.view.part.getPartId(), align: 'left'});
+      await layoutPage.addPart('right-top', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right'});
+      await layoutPage.addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'});
+      await layoutPage.addPart('right-bottom', {relativeTo: 'right-top', align: 'bottom'});
+      await layoutPage.addView('view.3', {partId: 'right-bottom', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
@@ -415,13 +415,13 @@ test.describe('View Drag Main Area', () => {
     test('should NOT allow dragging a view to the north or a fully adjacent side of the main area (9)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom'});
-      await view1PO.addPart('right', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'right'});
-      await view1PO.addView('view.3', {partId: 'right', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('bottom', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom'});
+      await layoutPage.addPart('right', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right'});
+      await layoutPage.addView('view.3', {partId: 'right', activateView: true});
 
-      const viewTab2PO = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTabPO;
-      await viewTab2PO.moveTo({grid: 'mainArea'});
+      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
+      await viewTab2.moveTo({grid: 'mainArea'});
 
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'north'})).toBe(false);
       await expect(await appPO.isDropZoneActive({grid: 'mainArea', region: 'south'})).toBe(true);
@@ -441,21 +441,21 @@ test.describe('View Drag Main Area', () => {
     test('should disable drop zone when dragging a view into the tabbar', async ({page, appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom', ratio: .25});
-      await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('bottom', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom', ratio: .25});
+      await layoutPage.addView('view.3', {partId: 'bottom', activateView: true});
       const workbenchGridDropZoneSize = 50;
       const mainAreaGridDropZoneSize = 100;
 
       // Get bounding box of the tabbar of the 'bottom' part.
-      const bottomPartPO = appPO.part({partId: 'bottom'});
-      const bottomTabbarBounds = fromRect(await bottomPartPO.getPartBarBoundingBox());
+      const bottomPart = appPO.part({partId: 'bottom'});
+      const bottomTabbarBounds = fromRect(await bottomPart.getPartBarBoundingBox());
 
       // Open view in the initial part.
-      const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Press mouse button on the view tab.
-      await view2PO.viewTabPO.mousedown();
+      await viewPage2.viewTab.mousedown();
 
       // Move tab to the center of the tabbar of the 'bottom' part.
       await page.mouse.move(bottomTabbarBounds.hcenter, bottomTabbarBounds.vcenter, {steps: 100});
@@ -479,22 +479,22 @@ test.describe('View Drag Main Area', () => {
     test('should not disable drop zone when entering tabbar while dragging a view over the drop zone', async ({page, appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const view1PO = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      await view1PO.addPart('bottom', {relativeTo: await view1PO.viewPO.part.getPartId(), align: 'bottom', ratio: .25});
-      await view1PO.addView('view.3', {partId: 'bottom', activateView: true});
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      await layoutPage.addPart('bottom', {relativeTo: await layoutPage.view.part.getPartId(), align: 'bottom', ratio: .25});
+      await layoutPage.addView('view.3', {partId: 'bottom', activateView: true});
 
       // Get bounding box of the tabbar of the 'bottom' part.
-      const bottomPartPO = appPO.part({partId: 'bottom'});
-      const bottomTabbarBounds = fromRect(await bottomPartPO.getPartBarBoundingBox());
+      const bottomPart = appPO.part({partId: 'bottom'});
+      const bottomTabbarBounds = fromRect(await bottomPart.getPartBarBoundingBox());
 
       // Open view in the initial part.
-      const view2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Press mouse button on the view tab.
-      await view2PO.viewTabPO.mousedown();
+      await viewPage2.viewTab.mousedown();
 
       // Move mouse over main area to activate the drop zone.
-      await view2PO.viewTabPO.moveTo({grid: 'mainArea'});
+      await viewPage2.viewTab.moveTo({grid: 'mainArea'});
       const westDropZoneBounds = await appPO.getDropZoneBoundingBox({grid: 'mainArea', region: 'west'});
 
       // Move mouse to the right edge of the drop zone.

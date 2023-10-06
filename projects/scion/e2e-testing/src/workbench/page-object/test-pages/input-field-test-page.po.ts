@@ -19,14 +19,14 @@ import {PopupPO} from '../../../popup.po';
 
 export class InputFieldTestPagePO {
 
-  private readonly _locator: Locator;
-  private readonly _view: ViewPO | undefined;
-  private readonly _popup: PopupPO | undefined;
+  public readonly locator: Locator;
+  public readonly _view: ViewPO | undefined;
+  public readonly _popup: PopupPO | undefined;
 
   constructor(locator: Locator, pageObject: {view?: ViewPO; popup?: PopupPO}) {
     this._view = pageObject.view;
     this._popup = pageObject.popup;
-    this._locator = locator;
+    this.locator = locator;
   }
 
   public get view(): ViewPO {
@@ -38,38 +38,38 @@ export class InputFieldTestPagePO {
   }
 
   public async clickInputField(): Promise<void> {
-    await this._locator.locator('input.e2e-input').click();
+    await this.locator.locator('input.e2e-input').click();
   }
 
   public async isInputFieldActiveElement(): Promise<boolean> {
-    return isActiveElement(this._locator.locator('input.e2e-input'));
+    return isActiveElement(this.locator.locator('input.e2e-input'));
   }
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<InputFieldTestPagePO> {
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPagePO.enterPath('test-pages/input-field-test-page');
-    await routerPagePO.enterTarget(routerPagePO.viewId);
-    await routerPagePO.enterCssClass('input-field-test-page');
-    await routerPagePO.clickNavigate();
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-pages/input-field-test-page');
+    await routerPage.enterTarget(routerPage.viewId);
+    await routerPage.enterCssClass('input-field-test-page');
+    await routerPage.clickNavigate();
 
-    const view = await appPO.view({cssClass: 'input-field-test-page', viewId: routerPagePO.viewId});
+    const view = await appPO.view({cssClass: 'input-field-test-page', viewId: routerPage.viewId});
     await view.waitUntilAttached();
 
-    return new InputFieldTestPagePO(view.locator('app-input-field-test-page'), {view});
+    return new InputFieldTestPagePO(view.locate('app-input-field-test-page'), {view});
   }
 
   public static async openInPopup(appPO: AppPO, workbenchNavigator: WorkbenchNavigator, popupOptions?: {closeOnFocusLost?: boolean}): Promise<InputFieldTestPagePO> {
     // Open the popup.
-    const popupOpenerPagePO = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: popupOptions?.closeOnFocusLost});
-    await popupOpenerPagePO.enterCssClass('input-field-test-page');
-    await popupOpenerPagePO.selectPopupComponent('input-field-test-page');
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: popupOptions?.closeOnFocusLost});
+    await popupOpenerPage.enterCssClass('input-field-test-page');
+    await popupOpenerPage.selectPopupComponent('input-field-test-page');
+    await popupOpenerPage.clickOpen();
 
     // Create the page object.
     const popup = await appPO.popup({cssClass: 'input-field-test-page'});
     await popup.waitUntilAttached();
 
-    return new InputFieldTestPagePO(popup.locator('app-input-field-test-page'), {popup});
+    return new InputFieldTestPagePO(popup.locate('app-input-field-test-page'), {popup});
   }
 }

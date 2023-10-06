@@ -25,60 +25,60 @@ test.describe('Angular Zone Synchronization', () => {
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#capability$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPO = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
 
-    const capabilityPO = angularZoneTestPO.workbenchView.capabilityPO;
-    await capabilityPO.expand();
+    const capabilityPanel = angularZoneTestPage.workbenchView.capabilityPanel;
+    await capabilityPanel.expand();
 
     await test.step('subscribeInsideAngularZone', async () => {
-      await capabilityPO.subscribe({subscribeInAngularZone: true});
-      await expect(await capabilityPO.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
-      await expect(await capabilityPO.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
+      await capabilityPanel.subscribe({subscribeInAngularZone: true});
+      await expect(await capabilityPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
+      await expect(await capabilityPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
     });
     await test.step('subscribeOutsideAngularZone', async () => {
-      await capabilityPO.subscribe({subscribeInAngularZone: false});
-      await expect(await capabilityPO.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
-      await expect(await capabilityPO.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
+      await capabilityPanel.subscribe({subscribeInAngularZone: false});
+      await expect(await capabilityPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
+      await expect(await capabilityPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
     });
   });
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#params$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPO = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
 
-    const paramsPO = angularZoneTestPO.workbenchView.paramsPO;
-    await paramsPO.expand();
+    const paramsPanel = angularZoneTestPage.workbenchView.paramsPanel;
+    await paramsPanel.expand();
 
     await test.step('subscribeInsideAngularZone', async () => {
-      await paramsPO.subscribe({subscribeInAngularZone: true});
-      await expect(await paramsPO.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
-      await expect(await paramsPO.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
+      await paramsPanel.subscribe({subscribeInAngularZone: true});
+      await expect(await paramsPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
+      await expect(await paramsPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
     });
     await test.step('subscribeOutsideAngularZone', async () => {
-      await paramsPO.subscribe({subscribeInAngularZone: false});
-      await expect(await paramsPO.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
-      await expect(await paramsPO.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
+      await paramsPanel.subscribe({subscribeInAngularZone: false});
+      await expect(await paramsPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
+      await expect(await paramsPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
     });
   });
 
   test('should emit in the same Angular zone as subscribed to "WorkbenchView#active$"', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    const angularZoneTestPO = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+    const angularZoneTestPage = await AngularZoneTestPagePO.openInNewTab(appPO, microfrontendNavigator);
 
-    const activePO = angularZoneTestPO.workbenchView.activePO;
-    await activePO.expand();
+    const activePanel = angularZoneTestPage.workbenchView.activePanel;
+    await activePanel.expand();
 
     await test.step('subscribeInsideAngularZone', async () => {
-      await activePO.subscribe({subscribeInAngularZone: true});
-      await expect(await activePO.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
-      await expect(await activePO.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
+      await activePanel.subscribe({subscribeInAngularZone: true});
+      await expect(await activePanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
+      await expect(await activePanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
     });
     await test.step('subscribeOutsideAngularZone', async () => {
-      await activePO.subscribe({subscribeInAngularZone: false});
-      await expect(await activePO.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
-      await expect(await activePO.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
+      await activePanel.subscribe({subscribeInAngularZone: false});
+      await expect(await activePanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
+      await expect(await activePanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
     });
   });
 });

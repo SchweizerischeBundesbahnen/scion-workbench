@@ -32,8 +32,8 @@ test.describe('Workbench Popup Position', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register testee popup
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
+    await registerCapabilityPage.registerCapability({
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -41,7 +41,7 @@ test.describe('Workbench Popup Position', () => {
         size: {width: '50px', height: '50px'},
       },
     });
-    await registerCapabilityPagePO.viewTabPO.close();
+    await registerCapabilityPage.viewTab.close();
 
     // Open views
     northViewTab = (await appPO.openNewViewTab()).view!.viewTab;

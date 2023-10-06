@@ -23,7 +23,7 @@ export class ViewPO {
    */
   public readonly viewTab: ViewTabPO;
 
-  constructor(private readonly _locator: Locator, viewTab: ViewTabPO) {
+  constructor(public readonly locator: Locator, viewTab: ViewTabPO) {
     this.viewTab = viewTab;
   }
 
@@ -39,37 +39,37 @@ export class ViewPO {
   }
 
   public async isPresent(): Promise<boolean> {
-    return isPresent(this._locator);
+    return isPresent(this.locator);
   }
 
   public async isVisible(): Promise<boolean> {
-    return this._locator.isVisible();
+    return this.locator.isVisible();
   }
 
   public async isActive(): Promise<boolean> {
-    return await isPresent(this._locator) && await this.viewTab.isActive();
+    return await isPresent(this.locator) && await this.viewTab.isActive();
   }
 
   public waitUntilAttached(): Promise<void> {
-    return this._locator.waitFor({state: 'attached'});
+    return this.locator.waitFor({state: 'attached'});
   }
 
   public getCssClasses(): Promise<string[]> {
-    return getCssClasses(this._locator);
+    return getCssClasses(this.locator);
   }
 
   public async getBoundingBox(): Promise<DOMRect> {
-    return fromRect(await this._locator.boundingBox());
+    return fromRect(await this.locator.boundingBox());
   }
 
   /**
    * Indicates if this view is contained in the main area.
    */
   public isInMainArea(): Promise<boolean> {
-    return isPresent(this._locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this._locator}));
+    return isPresent(this.locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this.locator}));
   }
 
-  public locator(selector: string): Locator {
-    return this._locator.locator(selector);
+  public locate(selector: string): Locator {
+    return this.locator.locator(selector);
   }
 }

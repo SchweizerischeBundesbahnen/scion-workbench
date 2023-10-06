@@ -16,39 +16,39 @@ import {WorkbenchNavigator} from '../../workbench-navigator';
 
 export class BulkNavigationTestPagePO {
 
-  private readonly _locator: Locator;
+  public readonly locator: Locator;
 
   constructor(private _appPO: AppPO, viewId: string) {
-    this._locator = this._appPO.view({viewId}).locator('app-bulk-navigation-test-page');
+    this.locator = this._appPO.view({viewId}).locate('app-bulk-navigation-test-page');
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {
-    await this._locator.locator('input.e2e-view-count').fill(`${viewCount}`);
+    await this.locator.locator('input.e2e-view-count').fill(`${viewCount}`);
   }
 
   public async enterCssClass(cssClass: string): Promise<void> {
-    await this._locator.locator('input.e2e-css-class').fill(cssClass);
+    await this.locator.locator('input.e2e-css-class').fill(cssClass);
   }
 
   public async clickNavigateNoAwait(): Promise<void> {
-    await this._locator.locator('button.e2e-navigate').click();
+    await this.locator.locator('button.e2e-navigate').click();
     // Wait for the URL to become stable after navigating.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId());
   }
 
   public async clickNavigateAwait(): Promise<void> {
-    await this._locator.locator('button.e2e-navigate-await').click();
+    await this.locator.locator('button.e2e-navigate-await').click();
     // Wait for the URL to become stable after navigating.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId());
   }
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPagePO.enterPath('test-pages/bulk-navigation-test-page');
-    await routerPagePO.enterTarget(routerPagePO.viewId);
-    await routerPagePO.clickNavigate();
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-pages/bulk-navigation-test-page');
+    await routerPage.enterTarget(routerPage.viewId);
+    await routerPage.clickNavigate();
 
-    const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: routerPagePO.viewId});
+    const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: routerPage.viewId});
     await view.waitUntilAttached();
     return new BulkNavigationTestPagePO(appPO, await view.getViewId());
   }

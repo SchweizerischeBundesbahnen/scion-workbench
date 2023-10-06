@@ -11,7 +11,7 @@
 import {Locator} from '@playwright/test';
 
 /**
- * Page object to interact {@link SciAccordionComponent}.
+ * Page object to interact with {@link SciAccordionComponent}.
  */
 export class SciAccordionPO {
 

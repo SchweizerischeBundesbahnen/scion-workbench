@@ -14,52 +14,52 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 
 /**
- * Page object to interact {@link NotificationPageComponent}.
+ * Page object to interact with {@link NotificationPageComponent}.
  */
 export class NotificationOpenerPagePO {
 
-  private readonly _locator: Locator;
+  public readonly locator: Locator;
   private _cssClasses = new Array<string>();
 
   constructor(private _appPO: AppPO, public viewId: string) {
-    this._locator = this._appPO.view({viewId}).locator('app-notification-opener-page');
+    this.locator = this._appPO.view({viewId}).locate('app-notification-opener-page');
   }
 
   public async selectComponent(component: 'inspect-notification' | 'default'): Promise<void> {
-    await this._locator.locator('select.e2e-component').selectOption(component);
+    await this.locator.locator('select.e2e-component').selectOption(component);
   }
 
   public async enterContent(content: string): Promise<void> {
-    await this._locator.locator('input.e2e-content').fill(content);
+    await this.locator.locator('input.e2e-content').fill(content);
   }
 
   public async enterComponentInput(componentInput: string): Promise<void> {
-    await this._locator.locator('input.e2e-component-input').fill(componentInput);
+    await this.locator.locator('input.e2e-component-input').fill(componentInput);
   }
 
   public async enterTitle(title: string): Promise<void> {
-    await this._locator.locator('input.e2e-title').fill(title);
+    await this.locator.locator('input.e2e-title').fill(title);
   }
 
   public async selectSeverity(severity: 'info' | 'warn' | 'error'): Promise<void> {
-    await this._locator.locator('select.e2e-severity').selectOption(severity);
+    await this.locator.locator('select.e2e-severity').selectOption(severity);
   }
 
   public async selectDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number): Promise<void> {
-    await this._locator.locator('input.e2e-duration').fill(`${duration}`);
+    await this.locator.locator('input.e2e-duration').fill(`${duration}`);
   }
 
   public async enterGroup(group: string): Promise<void> {
-    await this._locator.locator('input.e2e-group').fill(group);
+    await this.locator.locator('input.e2e-group').fill(group);
   }
 
   public async checkUseGroupInputReduceFn(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this._locator.locator('sci-checkbox.e2e-use-group-input-reducer')).toggle(check);
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-use-group-input-reducer')).toggle(check);
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
     this._cssClasses = coerceArray(cssClass);
-    await this._locator.locator('input.e2e-class').fill(this._cssClasses.join(' '));
+    await this.locator.locator('input.e2e-class').fill(this._cssClasses.join(' '));
   }
 
   public async clickShow(): Promise<void> {
@@ -67,12 +67,12 @@ export class NotificationOpenerPagePO {
       throw Error('Missing required CSS class to wait for the notification to display.');
     }
 
-    await this._locator.locator('button.e2e-show').click();
+    await this.locator.locator('button.e2e-show').click();
     await this._appPO.notification({cssClass: this._cssClasses}).locator().waitFor({state: 'visible'});
   }
 
   public async pressEscape(): Promise<void> {
-    await this._locator.click();
-    await this._locator.press('Escape');
+    await this.locator.click();
+    await this.locator.press('Escape');
   }
 }

@@ -15,29 +15,29 @@ import {PopupPO} from '../../../popup.po';
 import {ViewPO} from '../../../view.po';
 
 /**
- * Page object to interact {@link FocusTestPageComponent}.
+ * Page object to interact with {@link FocusTestPageComponent}.
  */
 export class FocusTestPagePO {
 
-  private readonly _locator: Locator;
+  public readonly locator: Locator;
 
   constructor(appPO: AppPO, locateBy: ViewPO | PopupPO) {
-    this._locator = locateBy.locator('app-focus-test-page');
+    this.locator = locateBy.locate('app-focus-test-page');
   }
 
   public async isPresent(): Promise<boolean> {
-    return isPresent(this._locator);
+    return isPresent(this.locator);
   }
 
   public async isVisible(): Promise<boolean> {
-    return this._locator.isVisible();
+    return this.locator.isVisible();
   }
 
   public async isActiveElement(field: 'first-field' | 'middle-field' | 'last-field'): Promise<boolean> {
-    return isActiveElement(this._locator.locator(`input.e2e-${field}`));
+    return isActiveElement(this.locator.locator(`input.e2e-${field}`));
   }
 
   public async clickField(field: 'first-field' | 'middle-field' | 'last-field'): Promise<void> {
-    await this._locator.locator(`input.e2e-${field}`).click();
+    await this.locator.locator(`input.e2e-${field}`).click();
   }
 }

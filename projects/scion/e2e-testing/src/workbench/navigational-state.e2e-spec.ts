@@ -20,9 +20,9 @@ test.describe('Navigational State', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // navigate to the test view
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath('test-view');
-      await routerPagePO.clickNavigate();
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.enterPath('test-view');
+      await routerPage.clickNavigate();
 
       // expect ActivatedRoute.data emitted undefined as state
       const testeeViewId = await appPO.activePart({inMainArea: true}).activeView.getViewId();
@@ -35,10 +35,10 @@ test.describe('Navigational State', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // navigate to the test view
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath('test-view');
-      await routerPagePO.enterNavigationalState({'some': 'state'});
-      await routerPagePO.clickNavigate();
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.enterPath('test-view');
+      await routerPage.enterNavigationalState({'some': 'state'});
+      await routerPage.clickNavigate();
 
       // expect ActivatedRoute.data emitted the passed state
       const testeeViewId = await appPO.activePart({inMainArea: true}).activeView.getViewId();
@@ -51,10 +51,10 @@ test.describe('Navigational State', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // navigate to the test view
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPagePO.enterPath('test-view');
-      await routerPagePO.enterNavigationalState({'some': 'state'});
-      await routerPagePO.clickNavigate();
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.enterPath('test-view');
+      await routerPage.enterNavigationalState({'some': 'state'});
+      await routerPage.clickNavigate();
 
       // expect ActivatedRoute.data emitted the passed state
       const testeeViewId = await appPO.activePart({inMainArea: true}).activeView.getViewId();
@@ -72,13 +72,13 @@ test.describe('Navigational State', () => {
     test('should not emit when updating matrix params of a view ', async ({appPO, workbenchNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 
       // navigate to the test view
-      await routerPagePO.enterPath('test-view');
-      await routerPagePO.enterTarget('blank');
-      await routerPagePO.enterMatrixParams({'param': 'value 1'});
-      await routerPagePO.clickNavigate();
+      await routerPage.enterPath('test-view');
+      await routerPage.enterTarget('blank');
+      await routerPage.enterMatrixParams({'param': 'value 1'});
+      await routerPage.clickNavigate();
 
       const testeeViewId = await appPO.activePart({inMainArea: true}).activeView.getViewId();
 
@@ -88,10 +88,10 @@ test.describe('Navigational State', () => {
       ]);
 
       // update matrix param
-      await routerPagePO.viewTabPO.click();
-      await routerPagePO.enterMatrixParams({'param': 'value 2'});
-      await routerPagePO.enterTarget(testeeViewId);
-      await routerPagePO.clickNavigate();
+      await routerPage.viewTab.click();
+      await routerPage.enterMatrixParams({'param': 'value 2'});
+      await routerPage.enterTarget(testeeViewId);
+      await routerPage.clickNavigate();
 
       // expect ActivatedRoute.data not to emit
       await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([]);

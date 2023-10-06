@@ -17,193 +17,193 @@ test.describe('Workbench View', () => {
 
   test('should allow updating the view tab title', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
-    await viewPagePO.enterTitle('TITLE');
-    await expect(await viewPagePO.viewTabPO.getTitle()).toEqual('TITLE');
+    await viewPage.enterTitle('TITLE');
+    await expect(await viewPage.viewTab.getTitle()).toEqual('TITLE');
 
-    await viewPagePO.enterTitle('title');
-    await expect(await viewPagePO.viewTabPO.getTitle()).toEqual('title');
+    await viewPage.enterTitle('title');
+    await expect(await viewPage.viewTab.getTitle()).toEqual('title');
   });
 
   test('should allow updating the view tab heading', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
-    await viewPagePO.enterHeading('HEADING');
-    await expect(await viewPagePO.viewTabPO.getHeading()).toEqual('HEADING');
+    await viewPage.enterHeading('HEADING');
+    await expect(await viewPage.viewTab.getHeading()).toEqual('HEADING');
 
-    await viewPagePO.enterHeading('heading');
-    await expect(await viewPagePO.viewTabPO.getHeading()).toEqual('heading');
+    await viewPage.enterHeading('heading');
+    await expect(await viewPage.viewTab.getHeading()).toEqual('heading');
   });
 
   test('should not display the view tab heading (by default)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await viewPagePO.enterHeading('heading');
-    await expect(viewPagePO.viewTabPO.headingLocator).not.toBeVisible();
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPage.enterHeading('heading');
+    await expect(viewPage.viewTab.headingLocator).not.toBeVisible();
   });
 
   test('should not display the view tab heading if the tab height < 3.5rem', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.4rem');
 
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await viewPagePO.enterHeading('heading');
-    await expect(viewPagePO.viewTabPO.headingLocator).not.toBeVisible();
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPage.enterHeading('heading');
+    await expect(viewPage.viewTab.headingLocator).not.toBeVisible();
   });
 
   test('should display the view tab heading if the tab height >= 3.5rem', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await viewPagePO.enterHeading('heading');
-    await expect(viewPagePO.viewTabPO.headingLocator).toBeVisible();
-    await expect(await viewPagePO.viewTabPO.getHeading()).toEqual('heading');
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPage.enterHeading('heading');
+    await expect(viewPage.viewTab.headingLocator).toBeVisible();
+    await expect(await viewPage.viewTab.getHeading()).toEqual('heading');
   });
 
   test('should allow to mark the view dirty', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // View tab expected to be pristine for new views
-    await expect(await viewPagePO.viewTabPO.isDirty()).toBe(false);
+    await expect(await viewPage.viewTab.isDirty()).toBe(false);
 
     // Mark the view dirty
-    await viewPagePO.checkDirty(true);
-    await expect(await viewPagePO.viewTabPO.isDirty()).toBe(true);
+    await viewPage.checkDirty(true);
+    await expect(await viewPage.viewTab.isDirty()).toBe(true);
 
     // Mark the view pristine
-    await viewPagePO.checkDirty(false);
-    await expect(await viewPagePO.viewTabPO.isDirty()).toBe(false);
+    await viewPage.checkDirty(false);
+    await expect(await viewPage.viewTab.isDirty()).toBe(false);
   });
 
   test('should unset the dirty state when navigating to a different route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTabPO = viewPagePO.viewTabPO;
-    const viewId = await viewTabPO.getViewId();
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewTab = viewPage.viewTab;
+    const viewId = await viewTab.getViewId();
 
     // Mark the view dirty
-    await viewPagePO.checkDirty(true);
-    await expect(await viewTabPO.isDirty()).toBe(true);
+    await viewPage.checkDirty(true);
+    await expect(await viewTab.isDirty()).toBe(true);
 
     // Navigate to a different route in the same view
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-router');
-    await routerPagePO.enterTarget(viewId);
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-router');
+    await routerPage.enterTarget(viewId);
+    await routerPage.clickNavigate();
 
     // Expect the view to be pristine
-    await expect(await viewTabPO.isDirty()).toBe(false);
+    await expect(await viewTab.isDirty()).toBe(false);
   });
 
   test('should not unset the dirty state when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTabPO = viewPagePO.viewTabPO;
-    const viewId = await viewTabPO.getViewId();
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewTab = viewPage.viewTab;
+    const viewId = await viewTab.getViewId();
 
     // Mark the view dirty
-    await viewPagePO.checkDirty(true);
-    await expect(await viewTabPO.isDirty()).toBe(true);
+    await viewPage.checkDirty(true);
+    await expect(await viewTab.isDirty()).toBe(true);
 
     // Update matrix params (does not affect routing)
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget(viewId);
-    await routerPagePO.enterMatrixParams({matrixParam: 'value'});
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget(viewId);
+    await routerPage.enterMatrixParams({matrixParam: 'value'});
+    await routerPage.clickNavigate();
 
     // Expect the view to still be dirty
-    await expect(await viewTabPO.isDirty()).toBe(true);
+    await expect(await viewTab.isDirty()).toBe(true);
 
     // Verify matrix params have changed
-    await viewTabPO.click();
-    await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
+    await viewTab.click();
+    await expect(await viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should not unset the title when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTabPO = viewPagePO.viewTabPO;
-    const viewId = await viewTabPO.getViewId();
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewTab = viewPage.viewTab;
+    const viewId = await viewTab.getViewId();
 
     // Set the title
-    await viewPagePO.enterTitle('TITLE');
-    await expect(await viewTabPO.getTitle()).toEqual('TITLE');
+    await viewPage.enterTitle('TITLE');
+    await expect(await viewTab.getTitle()).toEqual('TITLE');
 
     // Update matrix params (does not affect routing)
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget(viewId);
-    await routerPagePO.enterMatrixParams({matrixParam: 'value'});
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget(viewId);
+    await routerPage.enterMatrixParams({matrixParam: 'value'});
+    await routerPage.clickNavigate();
 
     // Expect the title has not changed
-    await expect(await viewTabPO.getTitle()).toEqual('TITLE');
+    await expect(await viewTab.getTitle()).toEqual('TITLE');
     // Verify matrix params have changed
-    await viewTabPO.click();
-    await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
+    await viewTab.click();
+    await expect(await viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should not unset the heading when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
-    const routerPagePO = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTabPO = viewPagePO.viewTabPO;
-    const viewId = await viewTabPO.getViewId();
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewTab = viewPage.viewTab;
+    const viewId = await viewTab.getViewId();
 
     // Set the heading
-    await viewPagePO.enterHeading('HEADING');
-    await expect(await viewTabPO.getHeading()).toEqual('HEADING');
+    await viewPage.enterHeading('HEADING');
+    await expect(await viewTab.getHeading()).toEqual('HEADING');
 
     // Update matrix params (does not affect routing)
-    await routerPagePO.viewTabPO.click();
-    await routerPagePO.enterPath('test-view');
-    await routerPagePO.enterTarget(viewId);
-    await routerPagePO.enterMatrixParams({matrixParam: 'value'});
-    await routerPagePO.clickNavigate();
+    await routerPage.viewTab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget(viewId);
+    await routerPage.enterMatrixParams({matrixParam: 'value'});
+    await routerPage.clickNavigate();
 
     // Expect the heading has not changed
-    await expect(await viewTabPO.getHeading()).toEqual('HEADING');
+    await expect(await viewTab.getHeading()).toEqual('HEADING');
 
     // Verify matrix params have changed
-    await viewTabPO.click();
-    await expect(await viewPagePO.getRouteParams()).toEqual({matrixParam: 'value'});
+    await viewTab.click();
+    await expect(await viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should remove the closing handle from the view tab', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // View tab expected to be pristine for new views
-    await expect(await viewPagePO.viewTabPO.isClosable()).toBe(true);
+    await expect(await viewPage.viewTab.isClosable()).toBe(true);
 
     // Prevent the view from being closed
-    await viewPagePO.checkClosable(false);
-    await expect(await viewPagePO.viewTabPO.isClosable()).toBe(false);
+    await viewPage.checkClosable(false);
+    await expect(await viewPage.viewTab.isClosable()).toBe(false);
 
     // Mark the view closable
-    await viewPagePO.checkClosable(true);
-    await expect(await viewPagePO.viewTabPO.isClosable()).toBe(true);
+    await viewPage.checkClosable(true);
+    await expect(await viewPage.viewTab.isClosable()).toBe(true);
   });
 
   test('should emit when activating or deactivating a viewtab', async ({appPO, workbenchNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // navigate to testee-1 view
-    const testee1ViewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const testee1ComponentInstanceId = await testee1ViewPagePO.getComponentInstanceId();
+    const testee1ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee1ComponentInstanceId = await testee1ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
     await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
@@ -211,8 +211,8 @@ test.describe('Workbench View', () => {
     ]);
 
     // navigate to testee-2 view
-    const testee2ViewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const testee2ComponentInstanceId = await testee2ViewPagePO.getComponentInstanceId();
+    const testee2ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee2ComponentInstanceId = await testee2ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
     await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
@@ -221,8 +221,8 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-1 view
-    await testee1ViewPagePO.viewTabPO.click();
-    await testee1ViewPagePO.isPresent();
+    await testee1ViewPage.viewTab.click();
+    await testee1ViewPage.isPresent();
 
     // assert emitted view active/deactivated events
     await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
@@ -231,8 +231,8 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-2 view
-    await testee2ViewPagePO.viewTabPO.click();
-    await testee2ViewPagePO.isPresent();
+    await testee2ViewPage.viewTab.click();
+    await testee2ViewPage.isPresent();
 
     // assert emitted view active/deactivated events
     await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
@@ -241,8 +241,8 @@ test.describe('Workbench View', () => {
     ]);
 
     // navigate to testee-3 view
-    const testee3ViewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const testee3ComponentInstanceId = await testee3ViewPagePO.getComponentInstanceId();
+    const testee3ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee3ComponentInstanceId = await testee3ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
     await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
@@ -251,8 +251,8 @@ test.describe('Workbench View', () => {
     ]);
 
     // activate testee-1 view
-    await testee1ViewPagePO.viewTabPO.click();
-    await testee1ViewPagePO.isPresent();
+    await testee1ViewPage.viewTab.click();
+    await testee1ViewPage.isPresent();
 
     // assert emitted view active/deactivated events
     await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
@@ -263,51 +263,51 @@ test.describe('Workbench View', () => {
 
   test('should allow to close the view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
-    await expect(await viewPagePO.viewTabPO.isPresent()).toBe(true);
-    await expect(await viewPagePO.viewPO.isPresent()).toBe(true);
+    await expect(await viewPage.viewTab.isPresent()).toBe(true);
+    await expect(await viewPage.view.isPresent()).toBe(true);
 
-    await viewPagePO.clickClose();
+    await viewPage.clickClose();
 
     await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(0);
-    await expect(await viewPagePO.viewTabPO.isPresent()).toBe(false);
-    await expect(await viewPagePO.viewPO.isPresent()).toBe(false);
+    await expect(await viewPage.viewTab.isPresent()).toBe(false);
+    await expect(await viewPage.view.isPresent()).toBe(false);
   });
 
   test(`should disable context menu 'Close tab' for 'non-closable' view`, async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open test view.
-    const viewPagePO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
-    const contextMenuPO1 = await viewPagePO.viewPO.viewTab.openContextMenu();
+    const contextMenu1 = await viewPage.view.viewTab.openContextMenu();
     // Expect menu item to be enabled.
-    await expect(await contextMenuPO1.menuItems.closeTab.isDisabled()).toBe(false);
+    await expect(await contextMenu1.menuItems.closeTab.isDisabled()).toBe(false);
 
-    await viewPagePO.checkClosable(false);
-    const contextMenuPO2 = await viewPagePO.viewPO.viewTab.openContextMenu();
+    await viewPage.checkClosable(false);
+    const contextMenu2 = await viewPage.view.viewTab.openContextMenu();
     // Expect menu item to be disabled.
-    await expect(await contextMenuPO2.menuItems.closeTab.isDisabled()).toBe(true);
+    await expect(await contextMenu2.menuItems.closeTab.isDisabled()).toBe(true);
   });
 
   test(`should not close 'non-closable' views via context menu 'Close all tabs'`, async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open test view 1.
-    const viewPage1PO = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Open test view 2.
-    const viewPage2PO = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await viewPage2PO.checkClosable(false);
+    const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await viewPage2.checkClosable(false);
 
     // Open test view 3.
     await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Close all views via context menu
-    const contextMenuPO = await viewPage1PO.viewTabPO.openContextMenu();
-    await contextMenuPO.menuItems.closeAll.click();
+    const contextMenu = await viewPage1.viewTab.openContextMenu();
+    await contextMenu.menuItems.closeAll.click();
 
-    await expect(await appPO.viewIds()).toEqual([viewPage2PO.viewId]);
+    await expect(await appPO.viewIds()).toEqual([viewPage2.viewId]);
   });
 });
