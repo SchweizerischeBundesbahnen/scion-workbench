@@ -19,8 +19,7 @@ test.describe('Workbench Perspective Storage', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
 
     // Switch to perspective-1
-    const perspectiveToggleButtonPO = await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective-1'});
-    await perspectiveToggleButtonPO.click();
+    await appPO.switchPerspective('perspective-1');
 
     // Add part and view to the workbench grid
     const layoutPagePO = await workbenchNavigator.openInNewTab(LayoutPagePO);
@@ -36,7 +35,7 @@ test.describe('Workbench Perspective Storage', () => {
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
 
     // Expect perspective-1 to be restored from the storage
-    await expect(await perspectiveToggleButtonPO.isActive()).toBe(true);
+    await expect(await await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective-1'}).isActive()).toBe(true);
     await expect(await view1PO.viewTab.isActive()).toBe(false);
     await expect(await view2PO.viewTab.isActive()).toBe(true);
 

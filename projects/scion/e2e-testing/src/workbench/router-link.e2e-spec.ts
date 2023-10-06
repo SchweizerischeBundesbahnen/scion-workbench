@@ -371,7 +371,7 @@ test.describe('Workbench RouterLink', () => {
     await perspectivePagePO.viewTabPO.close();
 
     // Switch to the newly created perspective.
-    await appPO.header.perspectiveToggleButton({perspectiveId: 'test'}).click();
+    await appPO.switchPerspective('test');
 
     // Expect layout to match the perspective definition.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({

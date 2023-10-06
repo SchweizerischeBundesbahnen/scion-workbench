@@ -331,7 +331,7 @@ test.describe('Workbench View', () => {
     await perspectivePagePO.viewTabPO.close();
 
     // Switch to the new perspective.
-    await newWindow.appPO.header.perspectiveToggleButton({perspectiveId: 'test-blank'}).click();
+    await newWindow.appPO.switchPerspective('test-blank');
 
     // Expect the layout to be blank.
     await expect(newWindow.appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -347,7 +347,7 @@ test.describe('Workbench View', () => {
     });
 
     // Switch back to the anonymous perspective.
-    await newWindow.appPO.header.perspectiveToggleButton({perspectiveId: anonymousPerspectiveName}).click();
+    await newWindow.appPO.switchPerspective(anonymousPerspectiveName);
 
     // Expect the layout of the anonymous perspective to be restored.
     await expect(newWindow.appPO.workbenchLocator).toEqualWorkbenchLayout({
