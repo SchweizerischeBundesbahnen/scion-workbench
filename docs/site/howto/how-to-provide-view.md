@@ -6,52 +6,40 @@
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
 ### How to provide a view
-Any component can be displayed as a view. A view is a regular Angular component associated with a primary route. Depending on the route configuration, the component can be loaded lazily. Below are some examples of most common route configurations.
+Any component can be displayed as a view. A view is a regular Angular component associated with a route. Below are some examples of common route configurations.
 
-**Route for loading a component upon application startup**
-  
 ```ts
-// Register route
+// Routes
 RouterModule.forRoot([
-  {path: 'path/to/view', component: ViewComponent},
+  {path: 'path/to/view1', component: ViewComponent},
+  {path: 'path/to/view2', loadComponent: () => import('./view/view.component')}, // lazy loaded route
+  {path: 'path/to/views', loadChildren: () => import('./routes')}, // lazy loaded routes
 ]);
-
-// Open view
-inject(WorkbenchRouter).navigate(['/path/to/view']);
 ```
 
-**Route for lazy loading a standalone component upon navigation**
-    
 ```ts
-// Register route
-RouterModule.forRoot([
-  {path: 'path/to/view', loadComponent: () => import('./view/view.component')},
-]);
-
-// Open view
-inject(WorkbenchRouter).navigate(['/path/to/view']);
-```
-
-**Route for lazy loading child routes upon navigation** 
-
-```ts
-// Register route to load child routes
-RouterModule.forRoot([
-  {path: 'path/to/module', loadChildren: () => import('./module/routes')},
-]);
-
-// Open view
-inject(WorkbenchRouter).navigate(['/path/to/module/path/to/view']);
-```
-```ts
-// file: module/routes.ts
-
+// file: routes.ts
 export default [
-  {path: 'path/to/view', component: ViewComponent},
+  {path: 'view3', component: ViewComponent},
+  {path: 'view4', loadComponent: () => import('./view/view.component')},
 ] satisfies Routes;
 ```
 
-***
+Having defined the routes, views can be opened using the `WorkbenchRouter`.
+
+```ts
+// Open view 1
+inject(WorkbenchRouter).navigate(['/path/to/view1']);
+
+// Open view 2
+inject(WorkbenchRouter).navigate(['/path/to/view2']);
+
+// Open view 3
+inject(WorkbenchRouter).navigate(['/path/to/views/view3']);
+
+// Open view 4
+inject(WorkbenchRouter).navigate(['/path/to/views/view4']);
+```
 
 The workbench supports associating view-specific data with a route, such as a tile, a heading, or a CSS class. Alternatively, this data can be set in the view by injecting the view handle `WorkbenchView`.
 
