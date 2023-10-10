@@ -310,4 +310,46 @@ test.describe('Workbench View', () => {
 
     await expect(await appPO.viewIds()).toEqual([viewPage2.viewId]);
   });
+
+  test('should detach view if not active', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open two views.
+    const view1Page = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const view2Page = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Expect view 2 to be visible.
+    await expect(view1Page.locator).not.toBeAttached();
+    await expect(view2Page.locator).toBeVisible();
+
+    // Activate view 1.
+    await view1Page.viewTab.click();
+
+    // Expect view 1 to be visible.
+    await expect(view1Page.locator).toBeVisible();
+    await expect(view2Page.locator).not.toBeAttached();
+  });
+
+  test('should detach view if opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open two views in main area.
+    const view1Page = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const view2Page = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Drag view 1 into peripheral area.
+    await view1Page.viewTab.dragTo({grid: 'workbench', region: 'east'});
+    await expect(view1Page.locator).toBeVisible();
+    await expect(view2Page.locator).toBeVisible();
+
+    // Maximize the main area.
+    await view2Page.viewTab.dblclick();
+    await expect(view1Page.locator).not.toBeAttached();
+    await expect(view2Page.locator).toBeVisible();
+
+    // Restore the layout.
+    await view2Page.viewTab.dblclick();
+    await expect(view1Page.locator).toBeVisible();
+    await expect(view2Page.locator).toBeVisible();
+  });
 });

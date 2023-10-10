@@ -11,6 +11,7 @@
 import {ComponentType} from '@angular/cdk/portal';
 import {ComponentRef, createComponent, EnvironmentInjector, inject, Injector, StaticProvider, ViewContainerRef} from '@angular/core';
 import {Logger, LoggerNames} from '../logging';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 /**
  * Like the Angular CDK 'ComponentPortal' but does not destroy the component on detach.
@@ -27,6 +28,7 @@ export class WbComponentPortal<T = any> {
   private _viewContainerRef: ViewContainerRef | null | undefined;
   private _componentRef: ComponentRef<T> | null | undefined;
   private _logger = inject(Logger);
+  private _attached$ = new BehaviorSubject<boolean>(false);
 
   constructor(private _componentType: ComponentType<T>, private _options?: PortalOptions) {
     // Do not construct the component here but the time attaching it to the Angular component tree. See the comment above.
@@ -77,6 +79,7 @@ export class WbComponentPortal<T = any> {
     this._componentRef = this._componentRef || this.createComponent(this._viewContainerRef.injector);
     this._componentRef.changeDetectorRef.reattach();
     this._viewContainerRef.insert(this._componentRef.hostView);
+    this._attached$.next(true);
     this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef);
   }
 
@@ -95,6 +98,7 @@ export class WbComponentPortal<T = any> {
     const index = this._viewContainerRef!.indexOf(this._componentRef!.hostView);
     this._viewContainerRef!.detach(index);
     this._componentRef!.changeDetectorRef.detach();
+    this._attached$.next(false);
   }
 
   public get isConstructed(): boolean {
@@ -102,7 +106,7 @@ export class WbComponentPortal<T = any> {
   }
 
   private get isAttached(): boolean {
-    return this._componentRef && this._viewContainerRef && this._viewContainerRef.indexOf(this._componentRef.hostView) > -1 || false;
+    return this._attached$.value;
   }
 
   public isAttachedTo(viewContainerRef: ViewContainerRef): boolean {
@@ -123,9 +127,15 @@ export class WbComponentPortal<T = any> {
     return this._componentRef;
   }
 
+  public get attached$(): Observable<boolean> {
+    return this._attached$;
+  }
+
   private onDestroy(): void {
     this._componentRef = null;
     this._viewContainerRef = null;
+    this._attached$.next(false);
+    this._attached$.complete();
   }
 
   /**

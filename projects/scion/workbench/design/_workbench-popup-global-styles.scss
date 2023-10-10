@@ -98,11 +98,12 @@ $diamond-height: 8;
       }
     }
 
-    // Hide the popup when its contextual view is not active.
-    &.wb-view-context:not(.wb-view-active) {
-      // To hide the popup, we set its visibility to 'hidden' and not its display to 'none'. This way it retains its dimension
-      // even when not displayed. Otherwise, the popup would flicker when its contextual view is activated. Flickering is most
-      // noticeable with popups that display a microfrontend.
+    // Hide the popup when contextual view is detached, e.g., if not active, or located in the peripheral area and the main area is maximized.
+    &.wb-view-context:not(.wb-view-attached) {
+      // We use `visibility: hidden` and not `display: none` to preserve the dimension of the popup.
+      // Otherwise:
+      // - The popup would flicker when attaching the contextual view, most noticeable with popups that display a microfrontend.
+      // - The popup would not retain virtual scrollable content since `display:none` sets width and height to 0.
       visibility: hidden;
     }
   }

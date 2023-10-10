@@ -9,7 +9,7 @@
  */
 
 import {Directive, ElementRef, EmbeddedViewRef, Input, OnChanges, OnDestroy, Optional, SimpleChanges, TemplateRef, ViewContainerRef} from '@angular/core';
-import {WorkbenchView} from '../view/workbench-view.model';
+import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {Dimension, fromDimension$} from '@scion/toolkit/observable';
 import {setStyle} from '../common/dom.util';
 import {Subject} from 'rxjs';
@@ -35,7 +35,7 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
   @Input({alias: 'wbContentProjectionContent', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
   public contentTemplateRef!: TemplateRef<void>;
 
-  constructor(private _host: ElementRef<HTMLElement>, @Optional() private _view: WorkbenchView) {
+  constructor(private _host: ElementRef<HTMLElement>, @Optional() private _view: ɵWorkbenchView) {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -70,11 +70,11 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
         this.alignContentToHostBoundaries();
       });
 
-    // Hide content of inactive views.
-    this._view?.active$
+    // Hide content when contextual view is detached, e.g., if not active, or located in the peripheral area and the main area is maximized.
+    this._view?.portal.attached$
       .pipe(takeUntil(dispose$))
-      .subscribe(active => {
-        this.setVisible(active);
+      .subscribe(attached => {
+        this.setVisible(attached);
       });
   }
 
@@ -92,9 +92,10 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
   }
 
   private setVisible(visible: boolean): void {
-    // We use `visibility: hidden` over `display: none` to preserve the dimension of projected content, crucial,
-    // for example, if projected content implements virtual scrolling. This is because "display:none" sets width
-    // and height to 0.
+    // We use `visibility: hidden` and not `display: none` to preserve the dimension of projected content.
+    // Otherwise:
+    // - Projected content would flicker when attaching the contextual view, most noticeable with content that displays a microfrontend.
+    // - Projected content would not retain virtual scrollable content since `display:none` sets width and height to 0.
     this.styleContent({visibility: visible ? null : 'hidden'});
   }
 
