@@ -870,5 +870,65 @@ test.describe('Workbench View', () => {
       await expect(await viewPage3.isPresent()).toBe(false);
     });
   });
+
+  test('should detach view if not active', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Open two views.
+    const view1Page = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    const view2Page = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+
+    // Expect view 2 to be visible.
+    await expectMicrofrontendViewNotToBeVisible(view1Page);
+    await expectMicrofrontendViewToBeVisible(view2Page);
+
+    // Activate view 1.
+    await view1Page.viewTab.click();
+
+    // Expect view 1 to be visible.
+    await expectMicrofrontendViewToBeVisible(view1Page);
+    await expectMicrofrontendViewNotToBeVisible(view2Page);
+  });
+
+  test('should detach view if opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Open two views in main area.
+    const view1Page = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    const view2Page = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+
+    // Drag view 1 into peripheral area.
+    await view1Page.viewTab.dragTo({grid: 'workbench', region: 'east'});
+    await expectMicrofrontendViewToBeVisible(view1Page);
+    await expectMicrofrontendViewToBeVisible(view2Page);
+
+    // Maximize the main area.
+    await view2Page.viewTab.dblclick();
+    await expectMicrofrontendViewNotToBeVisible(view1Page);
+    await expectMicrofrontendViewToBeVisible(view2Page);
+
+    // Restore the layout.
+    await view2Page.viewTab.dblclick();
+    await expectMicrofrontendViewToBeVisible(view1Page);
+    await expectMicrofrontendViewToBeVisible(view2Page);
+  });
 });
 
+/**
+ * Expects the visibility of the workbench view, the router outlet and the microfrontend.
+ */
+async function expectMicrofrontendViewToBeVisible(viewPage: ViewPagePO): Promise<void> {
+  await expect(viewPage.view.locator).toBeVisible();
+  await expect(viewPage.outlet.locator).toBeVisible();
+  await expect(viewPage.locator).toBeVisible();
+}
+
+/**
+ * Expects the visibility of the workbench view, the router outlet and the microfrontend.
+ */
+async function expectMicrofrontendViewNotToBeVisible(viewPage: ViewPagePO): Promise<void> {
+  await expect(viewPage.view.locator).not.toBeAttached();
+  await expect(viewPage.outlet.locator).toBeAttached();
+  await expect(viewPage.outlet.locator).not.toBeVisible();
+  await expect(viewPage.locator).toBeVisible(); // iframe content is always visible, but not displayed because the outlet is hidden
+}

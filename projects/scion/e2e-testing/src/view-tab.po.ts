@@ -49,6 +49,10 @@ export class ViewTabPO {
     await this._locator.click();
   }
 
+  public async dblclick(): Promise<void> {
+    await this._locator.dblclick();
+  }
+
   /**
    * Performs a mouse down on this view tab.
    */

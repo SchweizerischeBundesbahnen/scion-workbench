@@ -161,9 +161,9 @@ export class PopupService {
     // Close the popup depending on the passed config.
     this.installPopupCloser(config, popupElement, overlayRef, popupHandle, contextualView, takeUntilClose);
 
-    // Hide the popup when deactivating the contextual view, if any.
+    // Hide the popup when detaching the contextual view, if any.
     if (contextualView) {
-      this.hidePopupOnViewDeactivate(overlayRef, contextualView, takeUntilClose);
+      this.hidePopupOnViewDetach(overlayRef, contextualView, takeUntilClose);
     }
 
     // Dispose the popup when closing it.
@@ -236,27 +236,27 @@ export class PopupService {
   }
 
   /**
-   * Hides the popup when its contextual view is deactivated, and then displays the popup again when activating it.
-   * Also restores the focus on re-activation.
+   * Hides the popup when its contextual view is detached, and displays it when it is reattached. Also restores the focus on re-activation.
+   * The contextual view is detached if not active, or located in the peripheral area and the main area is maximized.
    */
-  private hidePopupOnViewDeactivate(overlayRef: OverlayRef, contextualView: ɵWorkbenchView, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
+  private hidePopupOnViewDetach(overlayRef: OverlayRef, contextualView: ɵWorkbenchView, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
     overlayRef.overlayElement.classList.add('wb-view-context');
 
     let activeElement: HTMLElement | undefined;
 
-    contextualView.active$
+    contextualView.portal.attached$
       .pipe(takeUntilClose())
-      .subscribe(viewActive => {
-        if (viewActive) {
-          overlayRef.overlayElement.classList.add('wb-view-active');
+      .subscribe(attached => {
+        if (attached) {
+          overlayRef.overlayElement.classList.add('wb-view-attached');
           activeElement?.focus();
         }
         else {
-          overlayRef.overlayElement.classList.remove('wb-view-active');
+          overlayRef.overlayElement.classList.remove('wb-view-attached');
         }
       });
 
-    // Track the focus in the popup to restore it when activating the popup.
+    // Track the focus in the popup to restore it when attaching the popup.
     fromEvent(overlayRef.overlayElement, 'focusin')
       .pipe(
         subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),

@@ -14,7 +14,7 @@ import {MessageBoxConfig} from './message-box.config';
 import {ɵMessageBox} from './ɵmessage-box';
 import {Arrays} from '@scion/toolkit/util';
 import {filter, map} from 'rxjs/operators';
-import {WorkbenchView} from '../view/workbench-view.model';
+import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
@@ -48,11 +48,11 @@ export class MessageBoxService {
   private _messageBoxServiceHierarchy: [MessageBoxService, ...MessageBoxService[]]; // minItems: 1
 
   constructor(@Optional() @SkipSelf() private _parentMessageBoxService: MessageBoxService,
-              @Optional() private _view: WorkbenchView,
+              @Optional() private _view: ɵWorkbenchView,
               private _viewRegistry: WorkbenchViewRegistry,
               private _zone: NgZone) {
     this._messageBoxServiceHierarchy = this.computeMessageBoxServiceHierarchy();
-    this._view && this.restoreFocusOnViewActivation(this._view);
+    this._view && this.restoreFocusOnViewAttach(this._view);
   }
 
   /**
@@ -151,8 +151,8 @@ export class MessageBoxService {
     Arrays.last(this.messageBoxStack())?.focus();
   }
 
-  private restoreFocusOnViewActivation(view: WorkbenchView): void {
-    view.active$
+  private restoreFocusOnViewAttach(view: ɵWorkbenchView): void {
+    view.portal.attached$
       .pipe(
         filter(Boolean),
         takeUntilDestroyed(),
