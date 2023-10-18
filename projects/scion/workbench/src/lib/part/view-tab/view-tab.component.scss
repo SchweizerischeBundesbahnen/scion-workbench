@@ -38,6 +38,7 @@
   }
 
   > div.content {
+    min-width: var(--sci-workbench-tab-min-width);
     max-width: var(--sci-workbench-tab-max-width);
     isolation: isolate; // stacking context to overlay the positioned 'hover' overlay
   }
