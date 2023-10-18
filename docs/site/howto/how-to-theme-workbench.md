@@ -148,10 +148,12 @@ The following listings illustrate how to customize the look of the SCION Workben
   $themes: (
     scion-dark: (
       --sci-workbench-tab-height: 3.5rem,
+      --sci-workbench-tab-min-width: 5rem,
       --sci-workbench-tab-max-width: 15rem,
     ),
     scion-light: (
       --sci-workbench-tab-height: 3.5rem,
+      --sci-workbench-tab-min-width: 5rem,
       --sci-workbench-tab-max-width: 15rem,
     ),
   )
