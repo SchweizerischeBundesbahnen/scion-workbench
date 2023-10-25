@@ -48,7 +48,7 @@ export class BulkNavigationTestPagePO {
     await routerPage.enterTarget(routerPage.viewId);
     await routerPage.clickNavigate();
 
-    const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: routerPage.viewId});
+    const view = appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: routerPage.viewId});
     await view.waitUntilAttached();
     return new BulkNavigationTestPagePO(appPO, await view.getViewId());
   }

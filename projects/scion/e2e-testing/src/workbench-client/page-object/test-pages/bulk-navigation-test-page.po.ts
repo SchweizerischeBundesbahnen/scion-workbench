@@ -76,7 +76,7 @@ export class BulkNavigationTestPagePO {
     await startPage.clickTestCapability('e2e-test-bulk-navigation', 'app1');
 
     // Create the page object.
-    const view = await appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: startPage.viewId});
+    const view = appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: startPage.viewId});
     await view.waitUntilAttached();
     return new BulkNavigationTestPagePO(appPO, await view.getViewId());
   }

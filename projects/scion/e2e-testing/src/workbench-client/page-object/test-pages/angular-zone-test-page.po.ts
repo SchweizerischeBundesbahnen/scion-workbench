@@ -58,7 +58,7 @@ export class AngularZoneTestPagePO {
     await startPage.clickTestCapability('e2e-test-angular-zone', 'app1');
 
     // Create the page object.
-    const view = await appPO.view({cssClass: 'e2e-test-angular-zone', viewId: startPage.viewId});
+    const view = appPO.view({cssClass: 'e2e-test-angular-zone', viewId: startPage.viewId});
     await view.waitUntilAttached();
     return new AngularZoneTestPagePO(appPO, await view.getViewId());
   }

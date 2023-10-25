@@ -52,7 +52,7 @@ export class InputFieldTestPagePO {
     await routerPage.enterCssClass('input-field-test-page');
     await routerPage.clickNavigate();
 
-    const view = await appPO.view({cssClass: 'input-field-test-page', viewId: routerPage.viewId});
+    const view = appPO.view({cssClass: 'input-field-test-page', viewId: routerPage.viewId});
     await view.waitUntilAttached();
 
     return new InputFieldTestPagePO(view.locate('app-input-field-test-page'), {view});
@@ -67,7 +67,7 @@ export class InputFieldTestPagePO {
     await popupOpenerPage.clickOpen();
 
     // Create the page object.
-    const popup = await appPO.popup({cssClass: 'input-field-test-page'});
+    const popup = appPO.popup({cssClass: 'input-field-test-page'});
     await popup.waitUntilAttached();
 
     return new InputFieldTestPagePO(popup.locate('app-input-field-test-page'), {popup});
