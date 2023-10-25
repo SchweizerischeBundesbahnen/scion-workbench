@@ -73,6 +73,10 @@ const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'workbench-theme-test-page',
+    loadComponent: (): any => import('./workbench-theme-test-page/workbench-theme-test-page.component'),
+  },
 ];
 
 export default routes;
