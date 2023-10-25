@@ -48,7 +48,7 @@ export class AppComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(theme => {
         if (theme) {
-          documentRoot.setAttribute('sci-theme', theme);
+          documentRoot.setAttribute('sci-theme', theme.name);
         }
         else {
           documentRoot.removeAttribute('sci-theme');

@@ -11,7 +11,7 @@
 import {Observable} from 'rxjs';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ContextService} from '@scion/microfrontend-platform';
-import {WorkbenchThemeMonitor} from './workbench-theme-monitor';
+import {WorkbenchTheme, WorkbenchThemeMonitor} from './workbench-theme-monitor';
 
 /**
  * @inheritDoc
@@ -21,11 +21,11 @@ export class ɵWorkbenchThemeMonitor implements WorkbenchThemeMonitor {
   /**
    * @inheritDoc
    */
-  public theme$: Observable<string | null> = Beans.get(ContextService).observe$<string>(ɵTHEME_CONTEXT_KEY);
+  public theme$: Observable<WorkbenchTheme | null> = Beans.get(ContextService).observe$<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY);
 }
 
 /**
- * Context key to retrieve the theme for microfrontends embedded in a workbench router outlet.
+ * Context key to retrieve information about the current workbench theme.
  *
  * @docs-private Not public API, intended for internal use only.
  * @ignore

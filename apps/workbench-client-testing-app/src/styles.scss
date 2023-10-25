@@ -6,19 +6,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
 
 html {
-  all: unset;
   font-size: 14px; // defines 1rem as 14px
   width: 100vw;
   height: 100vh;
 }
 
 body {
-  all: unset;
   font-family: Roboto, Arial, sans-serif;
   color: var(--sci-color-text);
   background-color: unset; // Do not set the background color in microfrontends to inherit it from the embedding context of the workbench, such as view or dialog.
   width: 100vw;
   height: 100vh;
+  margin: 0;
 }
 
 * {

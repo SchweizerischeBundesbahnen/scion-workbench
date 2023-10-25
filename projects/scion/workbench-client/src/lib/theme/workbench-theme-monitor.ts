@@ -16,9 +16,23 @@ import {Observable} from 'rxjs';
 export abstract class WorkbenchThemeMonitor {
 
   /**
-   * Emits the name of the current workbench theme.
+   * Emits the current workbench theme.
    *
-   * Upon subscription, emits the name of the current theme, and then continuously emits when switching the theme. It never completes.
+   * Upon subscription, emits the current theme, and then continuously emits when switching the theme. It never completes.
    */
-  public abstract readonly theme$: Observable<string | null>;
+  public abstract readonly theme$: Observable<WorkbenchTheme | null>;
+}
+
+/**
+ * Information about a workbench theme.
+ */
+export interface WorkbenchTheme {
+  /**
+   * The name of the theme.
+   */
+  name: string;
+  /**
+   * The color scheme of the theme.
+   */
+  colorScheme: 'light' | 'dark';
 }
