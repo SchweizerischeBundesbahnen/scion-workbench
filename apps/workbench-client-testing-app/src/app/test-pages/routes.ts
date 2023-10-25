@@ -13,19 +13,19 @@ import {Routes} from '@angular/router';
 const routes: Routes = [
   {
     path: 'bulk-navigation-test-page',
-    loadComponent: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.component').then(m => m.BulkNavigationTestPageComponent),
+    loadComponent: (): any => import('./bulk-navigation-test-page/bulk-navigation-test-page.component'),
   },
   {
     path: 'view-properties-test-page',
-    loadComponent: (): any => import('./view-properties-test-page/view-properties-test-page.component').then(m => m.ViewPropertiesTestPageComponent),
+    loadComponent: (): any => import('./view-properties-test-page/view-properties-test-page.component'),
   },
   {
     path: 'input-field-test-page',
-    loadComponent: (): any => import('./input-field-test-page/input-field-test-page.component').then(m => m.InputFieldTestPageComponent),
+    loadComponent: (): any => import('./input-field-test-page/input-field-test-page.component'),
   },
   {
     path: 'angular-zone-test-page',
-    loadComponent: (): any => import('./angular-zone-test-page/angular-zone-test-page.component').then(m => m.AngularZoneTestPageComponent),
+    loadComponent: (): any => import('./angular-zone-test-page/angular-zone-test-page.component'),
   },
   {
     path: 'microfrontend-test-page',
