@@ -24,7 +24,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
     ReactiveFormsModule,
   ],
 })
-export class BulkNavigationTestPageComponent {
+export default class BulkNavigationTestPageComponent {
 
   public form = this._formBuilder.group({
     viewCount: this._formBuilder.control(1, Validators.required),

@@ -31,7 +31,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
     SciAccordionItemDirective,
   ],
 })
-export class AngularZoneTestPageComponent {
+export default class AngularZoneTestPageComponent {
 
   public tests = {
     workbenchView: {

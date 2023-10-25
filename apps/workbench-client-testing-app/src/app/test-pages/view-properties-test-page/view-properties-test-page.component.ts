@@ -18,7 +18,7 @@ import {coerceBooleanProperty} from '@angular/cdk/coercion';
   template: '',
   standalone: true,
 })
-export class ViewPropertiesTestPageComponent {
+export default class ViewPropertiesTestPageComponent {
 
   constructor(private _view: WorkbenchView) {
     this._view.setTitle(this.observeParam$('title'));
