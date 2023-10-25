@@ -67,7 +67,7 @@ export class InputFieldTestPagePO {
     await startPage.clickTestCapability('test-input-field', 'app1');
 
     // Create the page object.
-    const view = await appPO.view({cssClass: 'test-input-field', viewId: viewId});
+    const view = appPO.view({cssClass: 'test-input-field', viewId: viewId});
     await view.waitUntilAttached();
 
     const outlet = new SciRouterOutletPO(appPO, {name: viewId});
@@ -93,7 +93,7 @@ export class InputFieldTestPagePO {
     await popupOpenerPage.clickOpen();
 
     // Create the page object.
-    const popup = await appPO.popup({cssClass: 'test-input-field'});
+    const popup = appPO.popup({cssClass: 'test-input-field'});
     await popup.waitUntilAttached();
 
     const outlet = new SciRouterOutletPO(appPO, {cssClass: ['e2e-popup', 'test-input-field']});
