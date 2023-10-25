@@ -5,19 +5,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
 
 html {
-  all: unset;
   font-size: 14px; // defines 1rem as 14px
   width: 100vw;
   height: 100vh;
 }
 
 body {
-  all: unset;
   font-family: Roboto, Arial, sans-serif;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-primary);
   width: 100vw;
   height: 100vh;
+  margin: 0;
 }
 
 * {

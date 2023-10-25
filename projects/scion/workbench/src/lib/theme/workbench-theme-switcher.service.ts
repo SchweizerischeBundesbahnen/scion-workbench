@@ -14,6 +14,7 @@ import {DOCUMENT} from '@angular/common';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {distinctUntilChanged, map, startWith} from 'rxjs/operators';
 import {WorkbenchStorage} from '../storage/workbench-storage';
+import {WorkbenchTheme} from '../workbench.model';
 
 /**
  * Represents the key to associate the activated theme in the storage.
@@ -29,11 +30,11 @@ export class WorkbenchThemeSwitcher {
   private readonly _documentRoot = inject<Document>(DOCUMENT).documentElement;
 
   /**
-   * Emits the name of the current workbench theme.
+   * Emits the current workbench theme.
    *
-   * Upon subscription, emits the name of the current theme, and then continuously emits when switching the theme. It never completes.
+   * Upon subscription, emits the current theme, and then continuously emits when switching the theme. It never completes.
    */
-  public readonly theme$: Observable<string | null>;
+  public readonly theme$: Observable<WorkbenchTheme | null>;
 
   constructor(private _workbenchStorage: WorkbenchStorage) {
     this.theme$ = this.detectTheme$();
@@ -53,12 +54,21 @@ export class WorkbenchThemeSwitcher {
   /**
    * Detects the current workbench theme from the HTML root element.
    */
-  private detectTheme$(): Observable<string | null> {
-    return new Observable<string | null>(observer => {
+  private detectTheme$(): Observable<WorkbenchTheme | null> {
+    return new Observable<WorkbenchTheme | null>(observer => {
       const subscription = fromMutation$(this._documentRoot, {attributeFilter: ['sci-theme']})
         .pipe(
           startWith(undefined as void),
-          map(() => getComputedStyle(this._documentRoot).getPropertyValue('--sci-theme') || null),
+          map((): WorkbenchTheme | null => {
+            const activeTheme = getComputedStyle(this._documentRoot).getPropertyValue('--sci-theme') || null;
+            if (!activeTheme) {
+              return null;
+            }
+            return {
+              name: activeTheme,
+              colorScheme: getComputedStyle(this._documentRoot).colorScheme as 'light' | 'dark',
+            };
+          }),
           distinctUntilChanged(),
           share({connector: () => new ReplaySubject(1), resetOnRefCountZero: false}),
         )

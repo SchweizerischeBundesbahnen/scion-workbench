@@ -10,7 +10,7 @@
 
 import {Observable} from 'rxjs';
 import {Disposable} from './common/disposable';
-import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction} from './workbench.model';
+import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WorkbenchPart} from './part/workbench-part.model';
@@ -147,9 +147,9 @@ export abstract class WorkbenchService {
   public abstract switchTheme(theme: string): Promise<void>;
 
   /**
-   * Emits the name of the current workbench theme.
+   * Emits the current workbench theme.
    *
-   * Upon subscription, emits the name of the current theme, and then continuously emits when switching the theme. It never completes.
+   * Upon subscription, emits the current theme, and then continuously emits when switching the theme. It never completes.
    */
-  public abstract readonly theme$: Observable<string | null>;
+  public abstract readonly theme$: Observable<WorkbenchTheme | null>;
 }

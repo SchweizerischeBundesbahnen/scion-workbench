@@ -16,7 +16,7 @@ import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, 
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵTHEME_CONTEXT_KEY, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchViewPreDestroy} from '../../workbench.model';
+import {WorkbenchTheme, WorkbenchViewPreDestroy} from '../../workbench.model';
 import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
@@ -320,17 +320,19 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
   }
 
   /**
-   * Propagates the current workbench theme to the view microfrontend via router outlet context.
+   * Propagates the current theme and color scheme to embedded content.
    */
   private installThemePropagator(): void {
     this._workbenchService.theme$
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(theme => {
         if (theme) {
-          this.routerOutletElement.nativeElement.setContextValue(ɵTHEME_CONTEXT_KEY, theme);
+          this.routerOutletElement.nativeElement.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
+          this.routerOutletElement.nativeElement.setContextValue('color-scheme', theme.colorScheme);
         }
         else {
           this.routerOutletElement.nativeElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
+          this.routerOutletElement.nativeElement.removeContextValue('color-scheme');
         }
       });
   }

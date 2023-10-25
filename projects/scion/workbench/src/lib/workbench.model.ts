@@ -102,3 +102,16 @@ export interface WorkbenchMenuItem {
   cssClass?: string | string[];
 }
 
+/**
+ * Information about a workbench theme.
+ */
+export interface WorkbenchTheme {
+  /**
+   * The name of the theme.
+   */
+  name: string;
+  /**
+   * The color scheme of the theme.
+   */
+  colorScheme: 'light' | 'dark';
+}
