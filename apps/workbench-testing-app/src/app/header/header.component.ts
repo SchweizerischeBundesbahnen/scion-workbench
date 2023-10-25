@@ -168,7 +168,7 @@ export class HeaderComponent {
     this.workbenchService.theme$
       .pipe(takeUntilDestroyed())
       .subscribe(theme => {
-        this.lightThemeActiveFormControl.setValue(theme === 'scion-light', {emitEvent: false});
+        this.lightThemeActiveFormControl.setValue(theme?.colorScheme === 'light', {emitEvent: false});
       });
 
     this.lightThemeActiveFormControl.valueChanges

@@ -248,6 +248,13 @@ export class AppPO {
   }
 
   /**
+   * Changes the color scheme of the workbench.
+   */
+  public async changeColorScheme(colorScheme: 'light' | 'dark'): Promise<void> {
+    await this.header.changeColorScheme(colorScheme);
+  }
+
+  /**
    * Waits until the workbench finished startup.
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {

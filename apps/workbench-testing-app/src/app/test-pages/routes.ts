@@ -39,6 +39,11 @@ export default [
     loadComponent: () => import('./blank-test-page/blank-test-page.component'),
     data: {[WorkbenchRouteData.title]: 'Blank Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage'},
   },
+  {
+    path: 'workbench-theme-test-page',
+    loadComponent: (): any => import('./workbench-theme-test-page/workbench-theme-test-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Theme Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-workbench-theme'},
+  },
 ] satisfies Routes;
 
 /**

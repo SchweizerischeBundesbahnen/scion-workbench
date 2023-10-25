@@ -10,7 +10,7 @@
 
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction} from './workbench.model';
+import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {UUID} from '@scion/toolkit/uuid';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
@@ -37,7 +37,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly perspectives$: Observable<readonly ɵWorkbenchPerspective[]>;
   public readonly parts$: Observable<readonly ɵWorkbenchPart[]>;
   public readonly views$: Observable<readonly ɵWorkbenchView[]>;
-  public readonly theme$: Observable<string | null>;
+  public readonly theme$: Observable<WorkbenchTheme | null>;
 
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
 

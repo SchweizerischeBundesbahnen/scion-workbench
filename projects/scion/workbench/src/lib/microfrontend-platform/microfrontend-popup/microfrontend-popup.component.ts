@@ -17,6 +17,7 @@ import {NgClass} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {WorkbenchService} from '../../workbench.service';
+import {WorkbenchTheme} from '../../workbench.model';
 
 /**
  * Displays the microfrontend of a popup capability inside a workbench popup.
@@ -134,17 +135,19 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Propagates the current workbench theme to the popup microfrontend via router outlet context.
+   * Propagates the current theme and color scheme to embedded content.
    */
   private installThemePropagator(): void {
     this._workbenchService.theme$
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(theme => {
         if (theme) {
-          this.routerOutletElement.nativeElement.setContextValue(ɵTHEME_CONTEXT_KEY, theme);
+          this.routerOutletElement.nativeElement.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
+          this.routerOutletElement.nativeElement.setContextValue('color-scheme', theme.colorScheme);
         }
         else {
           this.routerOutletElement.nativeElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
+          this.routerOutletElement.nativeElement.removeContextValue('color-scheme');
         }
       });
   }

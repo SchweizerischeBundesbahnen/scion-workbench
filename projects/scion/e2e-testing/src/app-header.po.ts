@@ -10,6 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {PerspectiveTogglePO} from './perspective-toggle-button.po';
+import {SciToggleButtonPO} from './@scion/components.internal/toggle-button.po';
 
 /**
  * Handle for interacting with the header of the testing application.
@@ -27,6 +28,14 @@ export class AppHeaderPO {
    */
   public perspectiveToggleButton(locateBy: {perspectiveId: string}): PerspectiveTogglePO {
     return new PerspectiveTogglePO(this._locator.locator('div.e2e-perspective-toggles').locator(`button.e2e-perspective[data-perspectiveid="${locateBy.perspectiveId}"]`));
+  }
+
+  /**
+   * Changes the color scheme of the workbench.
+   */
+  public async changeColorScheme(colorScheme: 'light' | 'dark'): Promise<void> {
+    const toggleButton = new SciToggleButtonPO(this._locator.locator('sci-toggle-button.e2e-color-scheme'));
+    await toggleButton.toggle(colorScheme === 'light');
   }
 
   /**
