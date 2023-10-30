@@ -13,6 +13,7 @@ import {WorkbenchViewCapability} from '@scion/workbench-client';
 import {Dictionaries, Dictionary} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
+import {RouterUtils} from '../../routing/router.util';
 
 export namespace MicrofrontendViewRoutes {
 
@@ -32,10 +33,19 @@ export namespace MicrofrontendViewRoutes {
    * Note that transient parameters are not part of the URL segments and are only returned if passing a {@link ActivatedRouteSnapshot} object.
    */
   export function parseParams(route: ActivatedRouteSnapshot | UrlSegment[]): MicrofrontendRouteParams {
-    if (!isMicrofrontendRoute(route)) {
+    if (!isMicrofrontendRoute(route) && !isPerspectiveMicrofrontendRoute(route)) {
       throw Error(`[NullMicrofrontendRouteError] Given URL segments do not match a microfrontend route. [segments=${route.toString()}]`);
     }
 
+    if (isPerspectiveMicrofrontendRoute(route)) {
+      return {
+        viewCapabilityId: route.outlet,
+        urlParams: {},
+        transientParams: {},
+      };
+    }
+
+    route = route as ActivatedRouteSnapshot | UrlSegment[];
     const segments = Array.isArray(route) ? route : route.url;
     return {
       viewCapabilityId: segments[1].path,
@@ -78,4 +88,12 @@ export interface MicrofrontendRouteParams {
   viewCapabilityId: string;
   urlParams: Params;
   transientParams: Params;
+}
+
+function isPerspectiveMicrofrontendRoute(route: ActivatedRouteSnapshot | UrlSegment[]): route is ActivatedRouteSnapshot {
+  if (Array.isArray(route)) {
+    return false;
+  }
+
+  return !RouterUtils.isPrimaryRouteTarget(route.outlet);
 }

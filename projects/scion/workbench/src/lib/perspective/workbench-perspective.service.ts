@@ -88,6 +88,11 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
     this._perspectiveRegistry.register(perspective);
   }
 
+  public async unregisterPerspective(perspectiveId: string): Promise<void> {
+    this._perspectiveRegistry.get(perspectiveId).deactivate();
+    this._perspectiveRegistry.unregister(perspectiveId);
+  }
+
   /**
    * Switches to the specified perspective. The main area will not change, if any.
    */
@@ -95,6 +100,15 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
     if (this.activePerspective?.id === id) {
       return true;
     }
+    const activated = await this._perspectiveRegistry.get(id).activate();
+    if (activated) {
+      await this._workbenchPerspectiveStorageService.storeActivePerspectiveId(id);
+      window.name = generatePerspectiveWindowName(id);
+    }
+    return activated;
+  }
+
+  public async activatePerspective(id: string): Promise<boolean> {
     const activated = await this._perspectiveRegistry.get(id).activate();
     if (activated) {
       await this._workbenchPerspectiveStorageService.storeActivePerspectiveId(id);

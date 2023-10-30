@@ -1,0 +1,14 @@
+:host {
+  > form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    div.properties {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) min-content max-content;
+      gap: .5em .25em;
+      align-items: center;
+    }
+  }
+}

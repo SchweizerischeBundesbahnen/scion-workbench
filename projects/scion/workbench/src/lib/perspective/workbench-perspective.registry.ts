@@ -32,6 +32,13 @@ export class WorkbenchPerspectiveRegistry implements OnDestroy {
   }
 
   /**
+   * Unregisters given perspective.
+   */
+  public unregister(perspectiveId: string): void {
+    this._registry.unregister(perspectiveId);
+  }
+
+  /**
    * Returns the {@link ɵWorkbenchPerspective} of the given identity. If not found, by default, throws an error unless setting the `orElseNull` option.
    */
   public get(perspectiveId: string): ɵWorkbenchPerspective;

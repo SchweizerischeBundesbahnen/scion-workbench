@@ -42,6 +42,23 @@ export const workbenchManifest: Manifest = {
         path: 'test-host-popup;matrixParam1=:param1;matrixParam2=:component',
       },
     },
+    {
+      type: 'perspective-extension',
+      description: 'Contribute devtools view capability to testee-app-1 perspective',
+      properties: {
+        perspective: {
+          name: 'testee-app-1',
+        },
+        views: [
+          {
+            qualifier: {component: 'devtools', vendor: 'scion'},
+            partId: 'bottom',
+            position: 100,
+            active: true,
+          },
+        ],
+      },
+    },
   ],
   intentions: [
     // allow opening test views

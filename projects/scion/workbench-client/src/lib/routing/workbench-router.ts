@@ -112,6 +112,7 @@ export class WorkbenchRouter {
  * @category View
  */
 export interface WorkbenchNavigationExtras {
+  blankPartId?: string;
   /**
    * Allows passing additional data to the microfrontend. In contrast to the qualifier, params have no effect on the intent routing.
    * If the fulfilling capability(-ies) declare(s) mandatory parameters, be sure to include them, otherwise navigation will be rejected.

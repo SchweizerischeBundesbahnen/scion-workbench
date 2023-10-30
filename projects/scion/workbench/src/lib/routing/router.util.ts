@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlSegmentGroup} from '@angular/router';
+import {ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, Routes, UrlSegment, UrlSegmentGroup} from '@angular/router';
 import {Commands} from './workbench-router.service';
 import {VIEW_ID_PREFIX} from '../workbench.constants';
 
@@ -95,5 +95,17 @@ export namespace RouterUtils {
    */
   export function isPrimaryRouteTarget(viewId: string): boolean {
     return viewId.startsWith(VIEW_ID_PREFIX);
+  }
+
+  /**
+   * Replaces the router configuration to install or uninstall auxiliary routes.
+   */
+  export function replaceRouterConfig(router: Router, config: Routes): void {
+    // Note:
+    //   - Do not use Router.resetConfig(...) which would destroy any currently routed component because copying all routes
+    //   - Do not assign the router a new Routes object (Router.config = ...) to allow resolution of routes added during `NavigationStart` (since Angular 7.x)
+    //     (because Angular uses a reference to the Routes object during route navigation)
+    const newRoutes: Routes = [...config];
+    router.config.splice(0, router.config.length, ...newRoutes);
   }
 }

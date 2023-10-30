@@ -1,0 +1,29 @@
+<form [formGroup]="form">
+  <sci-form-field label="Path">
+    <input [formControl]="form.controls.path" class="e2e-path">
+  </sci-form-field>
+
+  <sci-form-field label="Title">
+    <input [formControl]="form.controls.title" class="e2e-title">
+  </sci-form-field>
+
+  <sci-form-field label="Heading">
+    <input [formControl]="form.controls.heading" class="e2e-heading">
+  </sci-form-field>
+
+  <sci-form-field label="Closable">
+    <sci-checkbox [formControl]="form.controls.closable" class="e2e-closable"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="Show Splash">
+    <sci-checkbox [formControl]="form.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
+  </sci-form-field>
+
+  <sci-form-field label="CSS Class(es)">
+    <input [formControl]="form.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+  </sci-form-field>
+
+  <sci-form-field label="Pin to Startpage">
+    <sci-checkbox [formControl]="form.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
+  </sci-form-field>
+</form>

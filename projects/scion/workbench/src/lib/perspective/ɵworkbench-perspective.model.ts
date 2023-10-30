@@ -112,6 +112,13 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   /**
+   * Deactivates this perspective.
+   */
+  public deactivate(): void {
+    this._activePerspectiveId$.next(undefined);
+  }
+
+  /**
    * Resets this perspective to its initial layout.
    */
   public async reset(): Promise<void> {

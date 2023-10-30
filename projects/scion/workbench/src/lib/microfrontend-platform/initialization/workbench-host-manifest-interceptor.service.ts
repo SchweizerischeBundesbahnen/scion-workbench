@@ -14,6 +14,8 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
     hostManifest.intentions = [
       ...hostManifest.intentions || [],
       provideViewIntention(),
+      providePerspectiveIntention(),
+      providePerspectiveExtensionIntention(),
     ];
     hostManifest.capabilities = [
       ...hostManifest.capabilities || [],
@@ -29,6 +31,20 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
 function provideViewIntention(): Intention {
   return {
     type: WorkbenchCapabilities.View,
+    qualifier: {'*': '*'},
+  };
+}
+
+function providePerspectiveIntention(): Intention {
+  return {
+    type: WorkbenchCapabilities.Perspective,
+    qualifier: {'*': '*'},
+  };
+}
+
+function providePerspectiveExtensionIntention(): Intention {
+  return {
+    type: WorkbenchCapabilities.PerspectiveExtension,
     qualifier: {'*': '*'},
   };
 }

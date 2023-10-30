@@ -18,6 +18,7 @@ import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands} fro
 import {merge, Subscription} from 'rxjs';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {RouterUtils} from '../../routing/router.util';
 
 /**
  * Handles commands of microfrontends loaded into workbench views, such as setting view tab properties or closing the view.
@@ -146,7 +147,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Tests whether the sender provides the microfrontend displayed in the view.
    */
   private isMicrofrontendProvider(sender: string, view: WorkbenchView): boolean {
-    const viewCapabilityId = MicrofrontendViewRoutes.parseParams(view.urlSegments).viewCapabilityId;
+    const viewCapabilityId = RouterUtils.isPrimaryRouteTarget(view.id) ? MicrofrontendViewRoutes.parseParams(view.urlSegments).viewCapabilityId : view.id;
     const viewCapability = this._viewCapabilities.get(viewCapabilityId);
     if (!viewCapability) {
       this._logger.error(`Unexpected Error: [NullCapabilityError] No view capability for '${viewCapabilityId}' found.`);

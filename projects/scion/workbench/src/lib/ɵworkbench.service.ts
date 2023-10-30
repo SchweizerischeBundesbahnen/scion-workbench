@@ -90,6 +90,11 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
+  public unregisterPerspective(perspectiveId: string): Promise<void> {
+    return this._perspectiveService.unregisterPerspective(perspectiveId);
+  }
+
+  /** @inheritDoc */
   public switchPerspective(id: string): Promise<boolean> {
     return this._perspectiveService.switchPerspective(id);
   }

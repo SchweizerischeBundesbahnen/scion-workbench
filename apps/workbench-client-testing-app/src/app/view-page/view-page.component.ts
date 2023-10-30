@@ -18,7 +18,6 @@ import {finalize, startWith, take} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {AsyncPipe, JsonPipe, Location, NgIf} from '@angular/common';
-import {convertValueFromUI} from '../common/convert-value-from-ui.util';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -27,6 +26,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {parseTypedValue} from '../common/typed-value-parser.util';
 
 @Component({
   selector: 'app-view-page',
@@ -128,7 +128,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
     const paramsHandling = selfNavigationGroup.controls.paramsHandling.value;
 
     // Convert entered params to their actual values.
-    Object.entries(params).forEach(([paramName, paramValue]) => params[paramName] = convertValueFromUI(paramValue));
+    Object.entries(params).forEach(([paramName, paramValue]) => params[paramName] = parseTypedValue(paramValue));
 
     if (selfNavigationGroup.controls.navigatePerParam.value) {
       Object.entries(params).forEach(([paramName, paramValue]) => {

@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {CanActivateFn, CanDeactivateFn, Data, PRIMARY_OUTLET, ResolveData, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
+import {RouterUtils} from './router.util';
 
 /**
  * Registers auxiliary routes for views.
@@ -39,7 +40,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
         }));
       }));
 
-    this.replaceRouterConfig([
+    RouterUtils.replaceRouterConfig(this._router, [
       ...this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)), // all registered routes, except auxiliary routes for any of the given outlets
       ...outletAuxRoutes,
     ]);
@@ -56,19 +57,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
       return;
     }
 
-    this.replaceRouterConfig(this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)));
-  }
-
-  /**
-   * Replaces the router configuration to install or uninstall auxiliary routes.
-   */
-  private replaceRouterConfig(config: Routes): void {
-    // Note:
-    //   - Do not use Router.resetConfig(...) which would destroy any currently routed component because copying all routes
-    //   - Do not assign the router a new Routes object (Router.config = ...) to allow resolution of routes added during `NavigationStart` (since Angular 7.x)
-    //     (because Angular uses a reference to the Routes object during route navigation)
-    const newRoutes: Routes = [...config];
-    this._router.config.splice(0, this._router.config.length, ...newRoutes);
+    RouterUtils.replaceRouterConfig(this._router, this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)));
   }
 }
 

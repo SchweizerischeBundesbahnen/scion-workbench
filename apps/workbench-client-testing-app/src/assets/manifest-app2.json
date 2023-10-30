@@ -13,5 +13,11 @@
     }
   ],
   "intentions": [
+    {
+      "type": "perspective",
+      "qualifier": {
+        "name": "testee-app-1"
+      }
+    }
   ]
 }

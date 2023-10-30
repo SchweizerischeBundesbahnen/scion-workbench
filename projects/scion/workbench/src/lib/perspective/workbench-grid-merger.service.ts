@@ -40,7 +40,7 @@ export class WorkbenchGridMerger {
       // If the local grid contains the part, add the view to that part.
       const part = remoteLayout.part({by: {viewId: addedView.id}});
       if (mergedLayout.hasPart(part.id)) {
-        mergedLayout = mergedLayout.addView(addedView.id, {partId: part.id});
+        mergedLayout = mergedLayout.addView(addedView.id, {partId: part.id, activateView: part.activeViewId === addedView.id});
       }
       // If the local grid does not contain the part, add the part to an existing part or create a new part.
       else {

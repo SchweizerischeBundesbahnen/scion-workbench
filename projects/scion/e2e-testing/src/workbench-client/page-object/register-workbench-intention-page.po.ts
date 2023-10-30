@@ -38,7 +38,7 @@ export class RegisterWorkbenchIntentionPagePO {
    *
    * Returns a Promise that resolves to the intention ID upon successful registration, or that rejects on registration error.
    */
-  public async registerIntention(intention: Intention & {type: 'view' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
+  public async registerIntention(intention: Intention & {type: 'view' | 'popup' | 'perspective' | 'messagebox' | 'notification'}): Promise<string> {
     await this.selectType(intention.type);
     await this.enterQualifier(intention.qualifier);
     await this.clickRegister();
@@ -52,7 +52,7 @@ export class RegisterWorkbenchIntentionPagePO {
     ]);
   }
 
-  public async selectType(type: 'view' | 'popup' | 'messagebox' | 'notification'): Promise<void> {
+  public async selectType(type: 'view' | 'popup' | 'perspective' | 'messagebox' | 'notification'): Promise<void> {
     await this.locator.locator('select.e2e-type').selectOption(type);
   }
 

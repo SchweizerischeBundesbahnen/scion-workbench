@@ -70,6 +70,7 @@ export class HeaderComponent {
     return [
       new MenuItem({
           text: 'Reset Perspective',
+          cssClass: 'e2e-reset-respective',
           disabled: !this.workbenchService.perspectives.length,
           onAction: () => this.workbenchService.resetPerspective(),
         },

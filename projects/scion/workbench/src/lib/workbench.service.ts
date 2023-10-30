@@ -50,7 +50,7 @@ export abstract class WorkbenchService {
    */
   public abstract readonly perspectives$: Observable<readonly WorkbenchPerspective[]>;
 
-  /**
+  /**orkbench.service
    * Returns a reference to the specified {@link WorkbenchPerspective}, or `null` if not found.
    */
   public abstract getPerspective(perspectiveId: string): WorkbenchPerspective | null;
@@ -62,6 +62,8 @@ export abstract class WorkbenchService {
    * @see WorkbenchPerspective
    */
   public abstract registerPerspective(perspective: WorkbenchPerspectiveDefinition): Promise<void>;
+
+  public abstract unregisterPerspective(perspectiveId: string): Promise<void>;
 
   /**
    * Switches to the specified perspective. Layout and views of the main area do not change.

@@ -12,14 +12,17 @@ import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
-import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
+import {ViewParamDefinition, WorkbenchCapabilities, WorkbenchPerspectiveCapability, WorkbenchPerspectiveExtensionCapability, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
-import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {JsonPipe, NgIf} from '@angular/common';
-import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapabilityProperties} from './perspective-capability-properties/perspective-capability-properties.component';
+import {PerspectiveExtensionCapabilityPropertiesComponent, WorkbenchPerspectiveExtensionCapabilityProperties} from './perspective-extension-capability-properties/perspective-extension-capability-properties.component';
+import {PopupCapabilityPropertiesComponent, WorkbenchPopupCapabilityProperties} from './popup-capability-properties/popup-capability-properties.component';
+import {ViewCapabilityPropertiesComponent, WorkbenchViewCapabilityProperties} from './view-capability-properties/view-capability-properties.component';
+import {stringifyError} from '../common/stringify-error.util';
 
 /**
  * Allows registering workbench capabilities.
@@ -37,40 +40,25 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
     SciViewportComponent,
+    ViewCapabilityPropertiesComponent,
+    PopupCapabilityPropertiesComponent,
+    PerspectiveCapabilityPropertiesComponent,
+    PerspectiveExtensionCapabilityPropertiesComponent,
   ],
 })
 export default class RegisterWorkbenchCapabilityPageComponent {
 
   public form = this._formBuilder.group({
-    type: this._formBuilder.control('', Validators.required),
+    type: this._formBuilder.control<WorkbenchCapabilities.View | WorkbenchCapabilities.Popup | WorkbenchCapabilities.Perspective | WorkbenchCapabilities.PerspectiveExtension>(WorkbenchCapabilities.View, Validators.required),
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     requiredParams: this._formBuilder.control(''),
     optionalParams: this._formBuilder.control(''),
     transientParams: this._formBuilder.control(''),
     private: this._formBuilder.control(true),
-    viewProperties: this._formBuilder.group({
-      path: this._formBuilder.control(''),
-      title: this._formBuilder.control(''),
-      heading: this._formBuilder.control(''),
-      closable: this._formBuilder.control(true),
-      showSplash: this._formBuilder.control(false),
-      cssClass: this._formBuilder.control(''),
-      pinToStartPage: this._formBuilder.control(false),
-    }),
-    popupProperties: this._formBuilder.group({
-      path: this._formBuilder.control(''),
-      size: this._formBuilder.group({
-        minHeight: this._formBuilder.control(''),
-        height: this._formBuilder.control(''),
-        maxHeight: this._formBuilder.control(''),
-        minWidth: this._formBuilder.control(''),
-        width: this._formBuilder.control(''),
-        maxWidth: this._formBuilder.control(''),
-      }),
-      showSplash: this._formBuilder.control(false),
-      pinToStartPage: this._formBuilder.control(false),
-      cssClass: this._formBuilder.control(''),
-    }),
+    viewProperties: this._formBuilder.control<WorkbenchViewCapabilityProperties | undefined>(undefined),
+    popupProperties: this._formBuilder.control<WorkbenchPopupCapabilityProperties | undefined>(undefined),
+    perspectiveProperties: this._formBuilder.control<WorkbenchPerspectiveCapabilityProperties | undefined>(undefined),
+    perspectiveExtensionProperties: this._formBuilder.control<WorkbenchPerspectiveExtensionCapabilityProperties | undefined>(undefined),
   });
 
   public capability: Capability | undefined;
@@ -90,6 +78,10 @@ export default class RegisterWorkbenchCapabilityPageComponent {
           return this.readViewCapabilityFromUI();
         case WorkbenchCapabilities.Popup:
           return this.readPopupCapabilityFromUI();
+        case WorkbenchCapabilities.Perspective:
+          return this.readPerspectiveCapabilityFromUI();
+        case WorkbenchCapabilities.PerspectiveExtension:
+          return this.readPerspectiveExtensionCapabilityFromUI();
         default:
           throw Error('[IllegalArgumentError] Capability expected to be a workbench capability, but was not.');
       }
@@ -120,15 +112,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         ...transientParams,
       ],
       private: this.form.controls.private.value,
-      properties: {
-        path: this.readPathFromUI(this.form.controls.viewProperties.controls.path.value)!,
-        title: this.form.controls.viewProperties.controls.title.value || undefined,
-        heading: this.form.controls.viewProperties.controls.heading.value || undefined,
-        cssClass: this.form.controls.viewProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
-        closable: this.form.controls.viewProperties.controls.closable.value,
-        showSplash: this.form.controls.viewProperties.controls.showSplash.value,
-        pinToStartPage: this.form.controls.viewProperties.controls.pinToStartPage.value,
-      },
+      properties: this.form.controls.viewProperties.value!,
     };
   }
 
@@ -143,31 +127,37 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         ...optionalParams,
       ],
       private: this.form.controls.private.value,
-      properties: {
-        path: this.readPathFromUI(this.form.controls.popupProperties.controls.path.value)!,
-        size: undefinedIfEmpty<PopupSize>({
-          width: this.form.controls.popupProperties.controls.size.controls.width.value || undefined,
-          height: this.form.controls.popupProperties.controls.size.controls.height.value || undefined,
-          minWidth: this.form.controls.popupProperties.controls.size.controls.minWidth.value || undefined,
-          maxWidth: this.form.controls.popupProperties.controls.size.controls.maxWidth.value || undefined,
-          minHeight: this.form.controls.popupProperties.controls.size.controls.minHeight.value || undefined,
-          maxHeight: this.form.controls.popupProperties.controls.size.controls.maxHeight.value || undefined,
-        }),
-        showSplash: this.form.controls.popupProperties.controls.showSplash.value,
-        pinToStartPage: this.form.controls.popupProperties.controls.pinToStartPage.value,
-        cssClass: this.form.controls.popupProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
-      },
+      properties: this.form.controls.popupProperties.value!,
     };
   }
 
-  private readPathFromUI(path: string): string | null | undefined {
-    switch (path) {
-      case '<null>':
-        return null;
-      case '<undefined>':
-        return undefined;
-      default:
-        return path;
-    }
+  private readPerspectiveCapabilityFromUI(): WorkbenchPerspectiveCapability {
+    const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
+    return {
+      type: WorkbenchCapabilities.Perspective,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
+      params: [
+        ...requiredParams,
+        ...optionalParams,
+      ],
+      private: this.form.controls.private.value,
+      properties: this.form.controls.perspectiveProperties.value!,
+    };
+  }
+
+  private readPerspectiveExtensionCapabilityFromUI(): WorkbenchPerspectiveExtensionCapability {
+    const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
+    return {
+      type: WorkbenchCapabilities.PerspectiveExtension,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
+      params: [
+        ...requiredParams,
+        ...optionalParams,
+      ],
+      private: this.form.controls.private.value,
+      properties: this.form.controls.perspectiveExtensionProperties.value!,
+    };
   }
 }

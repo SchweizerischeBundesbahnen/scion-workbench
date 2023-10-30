@@ -1,0 +1,16 @@
+- assert perspective qualifier to be unique (is it needed? if yes, same should be done for views and popups)
+- What happens if a perspective extension is registered and the perspective to extend is currently active?
+    - replace should not clear storage.
+    - no routing is performed
+    - error is thrown in grid merger when extending an already existing perspective
+      - only happens if perspective was already in storage
+- In e2e tests assert view content to display
+- Perspective has wrong layout after registering perspective which was in local storage
+    - register perspective with qualifer XYZ
+    - extend perspective with views
+    - switch to perspective
+    - press F5
+    - register perspective with qualifer XYZ but with DIFFERENT layout
+    - extend perspective with views
+    - switch to perspective
+    - perspective has wrong layout

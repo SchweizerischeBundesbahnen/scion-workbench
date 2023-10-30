@@ -29,6 +29,10 @@ import {MicrofrontendViewRoutes} from './routing/microfrontend-routes';
 import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from './microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 import {Defined} from '@scion/toolkit/util';
+import {MicrofrontendPerspectiveCapabilityInterceptor} from './microfrontend-perspective/microfrontend-perspective-capability-interceptor.service';
+import {MicrofrontendViewRoutesRegistrator} from './microfrontend-perspective/microfrontend-view-routes-registrator.service';
+import {MicrofrontendPerspectiveCapabilityRegistrator} from './microfrontend-perspective/microfrontend-perspective-capability-registrator.service';
+import {MicrofrontendPerspectiveExtensionCapabilityInterceptor} from './microfrontend-perspective/microfrontend-perspective-extension-capability-interceptor.service';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -64,12 +68,24 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       multi: true,
     },
     {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useClass: MicrofrontendPerspectiveCapabilityRegistrator,
+      multi: true,
+    },
+    {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useClass: MicrofrontendViewRoutesRegistrator,
+      multi: true,
+    },
+    {
       provide: MicrofrontendPlatformConfig,
       useFactory: () => Defined.orElseThrow(inject(MicrofrontendPlatformInitializer).config, () => Error('[MicrofrontendPlatformError] Illegal state: Microfrontend platform configuration not loaded.')),
     },
     MicrofrontendViewIntentInterceptor,
     MicrofrontendPopupIntentInterceptor,
     MicrofrontendViewCapabilityInterceptor,
+    MicrofrontendPerspectiveCapabilityInterceptor,
+    MicrofrontendPerspectiveExtensionCapabilityInterceptor,
     MicrofrontendPopupCapabilityInterceptor,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,

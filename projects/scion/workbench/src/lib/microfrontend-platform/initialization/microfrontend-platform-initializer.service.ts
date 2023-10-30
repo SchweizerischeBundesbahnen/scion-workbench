@@ -21,6 +21,8 @@ import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microf
 import {MicrofrontendViewCapabilityInterceptor} from '../routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from '../microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {MicrofrontendPerspectiveCapabilityInterceptor} from '../microfrontend-perspective/microfrontend-perspective-capability-interceptor.service';
+import {MicrofrontendPerspectiveExtensionCapabilityInterceptor} from '../microfrontend-perspective/microfrontend-perspective-extension-capability-interceptor.service';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -36,6 +38,8 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
               private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
               private _microfrontendPopupIntentInterceptor: MicrofrontendPopupIntentInterceptor,
               private _microfrontendViewCapabilityInterceptor: MicrofrontendViewCapabilityInterceptor,
+              private _microfrontendPerspectiveCapabilityInterceptor: MicrofrontendPerspectiveCapabilityInterceptor,
+              private _microfrontendPerspectiveExtensionCapabilityInterceptor: MicrofrontendPerspectiveExtensionCapabilityInterceptor,
               private _microfrontendPopupCapabilityInterceptor: MicrofrontendPopupCapabilityInterceptor,
               private _injector: Injector,
               private _zone: NgZone,
@@ -80,6 +84,12 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Register view capability interceptor to assign view capabilities a stable identifier required for persistent navigation.
     Beans.register(CapabilityInterceptor, {useValue: this._microfrontendViewCapabilityInterceptor, multi: true});
+
+    // Register perspective capability interceptor to assign perspective capabilities a stable identifier.
+    Beans.register(CapabilityInterceptor, {useValue: this._microfrontendPerspectiveCapabilityInterceptor, multi: true});
+
+    // Register perspective extension capability interceptor to assign view capabilities a stable identifier required for
+    Beans.register(CapabilityInterceptor, {useValue: this._microfrontendPerspectiveExtensionCapabilityInterceptor, multi: true});
 
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._microfrontendPopupCapabilityInterceptor, multi: true});
