@@ -1,6 +1,10 @@
-# [1.0.0-beta.19](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.18...workbench-client-1.0.0-beta.19) (2023-10-10)
+# [1.0.0-beta.20](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.19...workbench-client-1.0.0-beta.20) (2023-10-31)
 
 
 ### Features
 
-* **workbench-client:** rework tab design and styling of the SCION Workbench ([5cbd354](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/5cbd3544019192f3f01de5faf985b78f0a5ba63b)), closes [#110](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/110)
+* **workbench-client:** enable microfrontend to display a splash until loaded ([7a79065](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7a79065543da636b545672fd01cfeceb2fbab323))
+* **workbench-client:** provide workbench color scheme ([ed63b22](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ed63b225976c23b39446d4095fded734937e030a))
+
+
+
