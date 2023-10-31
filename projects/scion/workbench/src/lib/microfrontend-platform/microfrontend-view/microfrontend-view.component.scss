@@ -7,3 +7,7 @@
 sci-router-outlet.workbench-drag {
   pointer-events: none;
 }
+
+sci-router-outlet::part(splash) {
+  display: grid;
+}

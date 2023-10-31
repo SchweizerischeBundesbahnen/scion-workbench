@@ -9,3 +9,4 @@
  */
 
 export {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
+export * from './microfrontend-platform.config';

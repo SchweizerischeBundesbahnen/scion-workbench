@@ -9,7 +9,7 @@
  */
 
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
-import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-platform-initializer.service';
 import {APP_IDENTITY, IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup/workbench-initializer';
@@ -28,6 +28,7 @@ import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-vie
 import {MicrofrontendViewRoutes} from './routing/microfrontend-routes';
 import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from './microfrontend-popup/microfrontend-popup-capability-interceptor.service';
+import {Defined} from '@scion/toolkit/util';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -40,7 +41,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
   return makeEnvironmentProviders([
     {
       provide: WORKBENCH_STARTUP,
-      useClass: MicrofrontendPlatformInitializer,
+      useExisting: MicrofrontendPlatformInitializer,
       multi: true,
     },
     {
@@ -61,6 +62,10 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
       useClass: MicrofrontendNotificationIntentHandler,
       multi: true,
+    },
+    {
+      provide: MicrofrontendPlatformConfig,
+      useFactory: () => Defined.orElseThrow(inject(MicrofrontendPlatformInitializer).config, () => Error('[MicrofrontendPlatformError] Illegal state: Microfrontend platform configuration not loaded.')),
     },
     MicrofrontendViewIntentInterceptor,
     MicrofrontendPopupIntentInterceptor,

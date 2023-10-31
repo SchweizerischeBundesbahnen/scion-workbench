@@ -25,9 +25,15 @@ export class SciRouterOutletPO {
    */
   public readonly frameLocator: FrameLocator;
 
+  /**
+   * Use to locate the splash displayed for microfrontends signaling ready.
+   */
+  public readonly splash: Locator;
+
   constructor(private _appPO: AppPO, locateBy: {name?: string; cssClass?: string | string[]}) {
     this.locator = this._appPO.page.locator(this.createRouterOutletSelector(locateBy));
     this.frameLocator = this.locator.frameLocator('iframe');
+    this.splash = this.locator.locator('wb-microfrontend-splash');
   }
 
   public getCapabilityId(): Promise<string | null> {

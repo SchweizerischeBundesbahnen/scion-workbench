@@ -98,6 +98,10 @@ function provideWorkbenchPopupHandle(popupContext: ɵPopupContext): StaticProvid
         public closeWithError(error: Error | string): void {
           popup.closeWithError(error);
         }
+
+        public signalReady(): void {
+          // nothing to do since not an iframe-based microfrontend
+        }
       };
     },
   };

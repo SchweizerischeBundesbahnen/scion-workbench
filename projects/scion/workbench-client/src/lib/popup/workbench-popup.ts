@@ -10,7 +10,7 @@
 
 import {WorkbenchPopupCapability} from './workbench-popup-capability';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {ContextService, MessageClient, OUTLET_CONTEXT, OutletContext} from '@scion/microfrontend-platform';
+import {ContextService, MessageClient, MicrofrontendPlatformClient, OUTLET_CONTEXT, OutletContext} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {ɵPopupContext} from './workbench-popup-context';
 import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
@@ -43,6 +43,15 @@ export abstract class WorkbenchPopup {
    * Capability that represents the microfrontend loaded into this workbench popup.
    */
   public abstract readonly capability: WorkbenchPopupCapability;
+
+  /**
+   * Signals readiness, notifying the workbench that this popup has completed initialization.
+   *
+   * If `showSplash` is set to `true` on the popup capability, the workbench displays a splash until the popup microfrontend signals readiness.
+   *
+   * @see WorkbenchPopupCapability.properties.showSplash
+   */
+  public abstract signalReady(): void;
 
   /**
    * Provides information about the context in which this popup was opened.
@@ -79,6 +88,13 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
     this.params = coerceMap(this._context.params);
     this.referrer = this._context.referrer;
     this.requestFocus();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public signalReady(): void {
+    MicrofrontendPlatformClient.signalReady();
   }
 
   /**

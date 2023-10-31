@@ -89,7 +89,7 @@ export abstract class WorkbenchModuleConfig {
      * Note that when launching the workbench in an Angular `APP_INITIALIZER`, no splash will display since the workbench
      * will start upfront.
      */
-    splash?: ComponentType<any>;
+    splash?: ComponentType<unknown>;
   };
 
   /**

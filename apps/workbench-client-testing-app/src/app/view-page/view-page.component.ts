@@ -80,6 +80,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
     this.installViewActiveStateLogger();
     this.installObservableCompletionLogger();
     this.setInitialTitleFromParams();
+    this.view.signalReady();
 
     this.view.capability$
       .pipe(

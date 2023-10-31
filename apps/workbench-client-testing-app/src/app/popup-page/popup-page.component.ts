@@ -105,6 +105,7 @@ export default class PopupPageComponent {
     const configuredPopupSize = popup.capability.properties.size;
     this.form.controls.width.setValue(configuredPopupSize?.width ?? 'max-content');
     this.form.controls.height.setValue(configuredPopupSize?.height ?? 'max-content');
+    popup.signalReady();
   }
 
   public onClose(): void {

@@ -1,0 +1,10 @@
+:host {
+  display: grid;
+  place-items: center;
+  grid-template-rows: minmax(3em, 150px); // default iframe height is 150px
+  overflow: hidden;
+
+  > sci-throbber {
+    --sci-throbber-size: 64px;
+  }
+}

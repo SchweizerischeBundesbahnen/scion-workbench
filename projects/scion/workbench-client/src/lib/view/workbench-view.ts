@@ -33,6 +33,15 @@ export abstract class WorkbenchView {
   public abstract readonly id: string;
 
   /**
+   * Signals readiness, notifying the workbench that this view has completed initialization.
+   *
+   * If `showSplash` is set to `true` on the view capability, the workbench displays a splash until the view microfrontend signals readiness.
+   *
+   * @see WorkbenchViewCapability.properties.showSplash
+   */
+  public abstract signalReady(): void;
+
+  /**
    * Observable containing the view capability that represents the microfrontend loaded into this workbench view.
    *
    * Upon subscription, it emits the capability of the current microfrontend, and then emits continuously when navigating

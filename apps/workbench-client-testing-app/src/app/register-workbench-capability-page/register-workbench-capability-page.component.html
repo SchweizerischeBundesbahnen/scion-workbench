@@ -46,6 +46,10 @@
         <sci-checkbox [formControl]="this.form.controls.viewProperties.controls.closable" class="e2e-closable"></sci-checkbox>
       </sci-form-field>
 
+      <sci-form-field label="Show Splash">
+        <sci-checkbox [formControl]="this.form.controls.viewProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
+      </sci-form-field>
+
       <sci-form-field label="CSS Class(es)">
         <input [formControl]="this.form.controls.viewProperties.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
       </sci-form-field>
@@ -85,6 +89,10 @@
           <input [formControl]="this.form.controls.popupProperties.controls.size.controls.maxWidth" class="e2e-max-width">
         </sci-form-field>
       </ng-container>
+
+      <sci-form-field label="Show Splash">
+        <sci-checkbox [formControl]="this.form.controls.popupProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
+      </sci-form-field>
 
       <sci-form-field label="Pin to Startpage">
         <sci-checkbox [formControl]="this.form.controls.popupProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>

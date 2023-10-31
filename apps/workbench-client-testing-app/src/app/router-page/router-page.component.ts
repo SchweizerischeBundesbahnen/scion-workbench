@@ -10,7 +10,7 @@
 
 import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {WorkbenchNavigationExtras, WorkbenchRouter} from '@scion/workbench-client';
+import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {convertValueFromUI} from '../common/convert-value-from-ui.util';
@@ -44,8 +44,10 @@ export default class RouterPageComponent {
   });
   public navigateError: string | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder,
+  constructor(view: WorkbenchView,
+              private _formBuilder: NonNullableFormBuilder,
               private _router: WorkbenchRouter) {
+    view.signalReady();
   }
 
   public async onNavigate(): Promise<void> {

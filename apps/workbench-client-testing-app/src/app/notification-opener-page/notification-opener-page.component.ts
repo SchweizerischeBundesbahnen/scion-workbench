@@ -10,7 +10,7 @@
 
 import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {WorkbenchNotificationService} from '@scion/workbench-client';
+import {WorkbenchNotificationService, WorkbenchView} from '@scion/workbench-client';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -43,7 +43,10 @@ export default class NotificationOpenerPageComponent {
 
   public error: string | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder, private _notificationService: WorkbenchNotificationService) {
+  constructor(view: WorkbenchView,
+              private _formBuilder: NonNullableFormBuilder,
+              private _notificationService: WorkbenchNotificationService) {
+    view.signalReady();
   }
 
   public onNotificationShow(): void {

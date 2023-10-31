@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CloseStrategy, PopupOrigin, WorkbenchPopupService} from '@scion/workbench-client';
+import {CloseStrategy, PopupOrigin, WorkbenchPopupService, WorkbenchView} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
@@ -76,7 +76,10 @@ export default class PopupOpenerPageComponent {
   @ViewChild('open_button', {static: true})
   private _openButton!: ElementRef<HTMLButtonElement>;
 
-  constructor(private _popupService: WorkbenchPopupService, private _formBuilder: NonNullableFormBuilder) {
+  constructor(view: WorkbenchView,
+              private _popupService: WorkbenchPopupService,
+              private _formBuilder: NonNullableFormBuilder) {
+    view.signalReady();
     this._popupOrigin$ = this.observePopupOrigin$();
   }
 

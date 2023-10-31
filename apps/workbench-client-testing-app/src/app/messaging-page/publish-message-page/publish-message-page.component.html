@@ -1,0 +1,19 @@
+<form [formGroup]="form" autocomplete="off">
+  <section>
+    <sci-form-field label="Topic">
+      <input [formControl]="form.controls.topic" class="e2e-topic">
+    </sci-form-field>
+  </section>
+
+  <button (click)="onPublish()" [disabled]="form.invalid" class="e2e-publish" sci-primary>
+    Publish
+  </button>
+
+  <output class="publish-success e2e-publish-success" *ngIf="publishError === false">
+    Success
+  </output>
+
+  <output class="publish-error e2e-publish-error" *ngIf="publishError">
+    {{publishError}}
+  </output>
+</form>

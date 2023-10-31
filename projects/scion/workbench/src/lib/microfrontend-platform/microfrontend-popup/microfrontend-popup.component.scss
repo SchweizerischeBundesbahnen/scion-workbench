@@ -6,4 +6,8 @@
   &.workbench-drag > sci-router-outlet {
     pointer-events: none;
   }
+
+  > sci-router-outlet::part(splash) {
+    display: grid;
+  }
 }

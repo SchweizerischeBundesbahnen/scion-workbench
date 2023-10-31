@@ -86,6 +86,22 @@ export interface WorkbenchViewCapability extends Capability {
      */
     closable?: boolean;
     /**
+     * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the view microfrontend signals readiness.
+     *
+     * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench as follows:
+     *
+     * ```ts
+     * WorkbenchModule.forRoot({
+     *   microfrontendPlatform: {
+     *     splash: SplashComponent
+     *   }
+     * });
+     * ```
+     *
+     * @see WorkbenchView.signalReady
+     */
+    showSplash?: boolean;
+    /**
      * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
      */
     cssClass?: string | string[];
