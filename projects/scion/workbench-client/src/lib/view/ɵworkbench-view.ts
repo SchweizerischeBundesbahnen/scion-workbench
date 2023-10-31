@@ -11,7 +11,7 @@
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
 import {merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription, take} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
-import {ManifestService, mapToBody, Message, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {ManifestService, mapToBody, Message, MessageClient, MessageHeaders, MicrofrontendPlatformClient, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
@@ -88,6 +88,13 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
         this._closingListeners.clear();
         this._closingSubscription?.unsubscribe();
       });
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public signalReady(): void {
+    MicrofrontendPlatformClient.signalReady();
   }
 
   /**

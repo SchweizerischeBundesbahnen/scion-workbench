@@ -12,7 +12,7 @@ import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
-import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -53,6 +53,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       title: this._formBuilder.control(''),
       heading: this._formBuilder.control(''),
       closable: this._formBuilder.control(true),
+      showSplash: this._formBuilder.control(false),
       cssClass: this._formBuilder.control(''),
       pinToStartPage: this._formBuilder.control(false),
     }),
@@ -66,6 +67,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         width: this._formBuilder.control(''),
         maxWidth: this._formBuilder.control(''),
       }),
+      showSplash: this._formBuilder.control(false),
       pinToStartPage: this._formBuilder.control(false),
       cssClass: this._formBuilder.control(''),
     }),
@@ -75,7 +77,10 @@ export default class RegisterWorkbenchCapabilityPageComponent {
   public registerError: string | undefined;
   public WorkbenchCapabilities = WorkbenchCapabilities;
 
-  constructor(private _manifestService: ManifestService, private _formBuilder: NonNullableFormBuilder) {
+  constructor(view: WorkbenchView,
+              private _manifestService: ManifestService,
+              private _formBuilder: NonNullableFormBuilder) {
+    view.signalReady();
   }
 
   public async onRegister(): Promise<void> {
@@ -120,7 +125,8 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         title: this.form.controls.viewProperties.controls.title.value || undefined,
         heading: this.form.controls.viewProperties.controls.heading.value || undefined,
         cssClass: this.form.controls.viewProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
-        closable: this.form.controls.viewProperties.controls.closable.value ?? undefined,
+        closable: this.form.controls.viewProperties.controls.closable.value,
+        showSplash: this.form.controls.viewProperties.controls.showSplash.value,
         pinToStartPage: this.form.controls.viewProperties.controls.pinToStartPage.value,
       },
     };
@@ -147,6 +153,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
           minHeight: this.form.controls.popupProperties.controls.size.controls.minHeight.value || undefined,
           maxHeight: this.form.controls.popupProperties.controls.size.controls.maxHeight.value || undefined,
         }),
+        showSplash: this.form.controls.popupProperties.controls.showSplash.value,
         pinToStartPage: this.form.controls.popupProperties.controls.pinToStartPage.value,
         cssClass: this.form.controls.popupProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
       },

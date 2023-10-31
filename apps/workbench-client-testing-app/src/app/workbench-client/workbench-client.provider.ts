@@ -8,12 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {APP_INITIALIZER, EnvironmentProviders, inject, makeEnvironmentProviders, NgZone} from '@angular/core';
+import {APP_INITIALIZER, EnvironmentProviders, inject, Injector, makeEnvironmentProviders, NgZone, runInInjectionContext} from '@angular/core';
 import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
 import {WorkbenchClient, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {environment} from '../../environments/environment';
+import {firstValueFrom} from 'rxjs';
+import {DOCUMENT} from '@angular/common';
 
 /**
  * Registers a set of DI providers to set up SCION Workbench Client.
@@ -53,9 +55,12 @@ export function provideWorkbenchClient(): EnvironmentProviders | [] {
  */
 function connectToWorkbenchFn(): () => Promise<void> {
   const zone = inject(NgZone);
-  return (): Promise<void> => {
+  const injector = inject(Injector);
+
+  return async (): Promise<void> => {
     Beans.register(ObservableDecorator, {useValue: new NgZoneObservableDecorator(zone)});
-    return zone.runOutsideAngular(() => WorkbenchClient.connect(determineAppSymbolicName()));
+    await zone.runOutsideAngular(() => WorkbenchClient.connect(determineAppSymbolicName()));
+    await runInInjectionContext(injector, applyWorkbenchTheme);
   };
 }
 
@@ -68,4 +73,15 @@ function determineAppSymbolicName(): string {
     throw Error(`[AppError] Application served on wrong URL. Supported URLs are: ${Object.values(environment.apps).map(app => app.url)}`);
   }
   return application.symbolicName;
+}
+
+/**
+ * Applies the workbench theme.
+ */
+async function applyWorkbenchTheme(): Promise<void> {
+  const documentRoot = inject<Document>(DOCUMENT).documentElement;
+  const theme = await firstValueFrom(inject(WorkbenchThemeMonitor).theme$);
+  if (theme) {
+    documentRoot.setAttribute('sci-theme', theme.name);
+  }
 }

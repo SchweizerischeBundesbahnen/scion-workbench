@@ -32,6 +32,10 @@ const routes: Routes = [
     loadComponent: () => import('./microfrontend-test-page/microfrontend-test-page.component'),
   },
   {
+    path: 'signal-ready-test-page',
+    loadComponent: () => import('./signal-ready-test-page/signal-ready-test-page.component'),
+  },
+  {
     path: 'popup-test-page',
     children: [
       {

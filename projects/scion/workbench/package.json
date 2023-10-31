@@ -31,8 +31,8 @@
     "@angular/router": "^16.0.0",
     "@scion/components": "^16.2.0",
     "@scion/toolkit": "^1.4.0",
-    "@scion/microfrontend-platform": "^1.0.0",
-    "@scion/workbench-client": "^1.0.0-beta.19",
+    "@scion/microfrontend-platform": "^1.2.0",
+    "@scion/workbench-client": "^1.0.0-beta.20",
     "rxjs": "^7.8.0"
   },
   "peerDependenciesMeta": {

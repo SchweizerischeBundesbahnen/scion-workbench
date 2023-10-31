@@ -8,16 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Application, ManifestService, MessageClient, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Application, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵTHEME_CONTEXT_KEY, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {Popup} from '../../popup/popup.config';
-import {NgClass} from '@angular/common';
+import {NgClass, NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchTheme} from '../../workbench.model';
+import {ComponentType} from '@angular/cdk/portal';
+import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
+import '../microfrontend-platform.config';
 
 /**
  * Displays the microfrontend of a popup capability inside a workbench popup.
@@ -27,7 +30,7 @@ import {WorkbenchTheme} from '../../workbench.model';
   styleUrls: ['./microfrontend-popup.component.scss'],
   templateUrl: './microfrontend-popup.component.html',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, NgComponentOutlet],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
 export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
@@ -41,6 +44,11 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
    */
   @HostBinding('class.workbench-drag')
   public isWorkbenchDrag = false;
+
+  /**
+   * Splash to display until the microfrontend signals readiness.
+   */
+  protected splash: ComponentType<unknown>;
 
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
@@ -58,6 +66,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     this.popupCapability = this._popupContext.capability;
     this.installWorkbenchDragDetector();
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
+    this.splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   }
 
   public ngOnInit(): void {
@@ -90,6 +99,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       relativeTo: application.baseUrl,
       params: this._popupContext.params,
       pushStateToSessionHistoryStack: false,
+      showSplash: this.popupCapability.properties.showSplash,
     }).then();
 
     this.installThemePropagator();

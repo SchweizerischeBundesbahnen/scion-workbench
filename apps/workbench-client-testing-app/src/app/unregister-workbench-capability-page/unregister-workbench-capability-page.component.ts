@@ -14,6 +14,7 @@ import {ManifestService} from '@scion/microfrontend-platform';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {WorkbenchView} from '@scion/workbench-client';
 
 /**
  * Allows unregistering workbench capabilities.
@@ -37,7 +38,10 @@ export default class UnregisterWorkbenchCapabilityPageComponent {
   public unregisterError: string | undefined;
   public unregistered: boolean | undefined;
 
-  constructor(private _manifestService: ManifestService, private _formBuilder: NonNullableFormBuilder) {
+  constructor(view: WorkbenchView,
+              private _manifestService: ManifestService,
+              private _formBuilder: NonNullableFormBuilder) {
+    view.signalReady();
   }
 
   public async onUnregister(): Promise<void> {

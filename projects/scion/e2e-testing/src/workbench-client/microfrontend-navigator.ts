@@ -17,6 +17,7 @@ import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-work
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {MessagingPagePO} from './page-object/messaging-page.po';
 
 export interface Type<T> extends Function {
   new(...args: any[]): T;
@@ -62,6 +63,10 @@ export class MicrofrontendNavigator {
    * Opens the page to open popups in a new workbench tab.
    */
   public openInNewTab(page: Type<PopupOpenerPagePO>, app: 'app1' | 'app2'): Promise<PopupOpenerPagePO>;
+  /**
+   * Opens the page to exchange messages in a new workbench tab.
+   */
+  public openInNewTab(page: Type<MessagingPagePO>, app: 'app1' | 'app2'): Promise<MessagingPagePO>;
 
   public async openInNewTab(page: Type<any>, app: 'app1' | 'app2'): Promise<any> {
     const startPage = await this._appPO.openNewViewTab();
@@ -99,6 +104,10 @@ export class MicrofrontendNavigator {
       case PopupOpenerPagePO: {
         await startPage.openMicrofrontendView('e2e-test-popup-opener', app);
         return new PopupOpenerPagePO(this._appPO, viewId);
+      }
+      case MessagingPagePO: {
+        await startPage.openMicrofrontendView('e2e-messaging', app);
+        return new MessagingPagePO(this._appPO, viewId);
       }
       default: {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);

@@ -11,7 +11,7 @@
 import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchView} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
@@ -40,7 +40,10 @@ export default class RegisterWorkbenchIntentionPageComponent {
   public registerError: string | undefined;
   public WorkbenchCapabilities = WorkbenchCapabilities;
 
-  constructor(private _manifestService: ManifestService, private _formBuilder: NonNullableFormBuilder) {
+  constructor(view: WorkbenchView,
+              private _manifestService: ManifestService,
+              private _formBuilder: NonNullableFormBuilder) {
+    view.signalReady();
   }
 
   public async onRegister(): Promise<void> {

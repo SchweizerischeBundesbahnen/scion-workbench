@@ -42,6 +42,9 @@ export class AppComponent {
     this.installWorkbenchThemeSwitcher();
   }
 
+  /**
+   * Switches the workbench theme when changed in the host application.
+   */
   private installWorkbenchThemeSwitcher(): void {
     const documentRoot = inject<Document>(DOCUMENT).documentElement;
     inject(WorkbenchThemeMonitor, {optional: true})?.theme$ // only available if running in the workbench context

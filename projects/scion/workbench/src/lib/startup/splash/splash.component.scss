@@ -1,7 +1,7 @@
 :host {
-  display: flex;
-  justify-content: space-around;
-  padding: 2em;
+  display: grid;
+  justify-content: center;
+  margin-top: 3em;
 
   > sci-throbber {
     --sci-throbber-size: 80px;

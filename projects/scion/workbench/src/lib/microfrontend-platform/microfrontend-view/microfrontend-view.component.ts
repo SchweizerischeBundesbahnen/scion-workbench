@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
 import {asapScheduler, combineLatest, EMPTY, firstValueFrom, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
-import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
+import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵTHEME_CONTEXT_KEY, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
@@ -29,11 +29,14 @@ import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {WorkbenchNavigationalViewStates} from '../../routing/workbench-navigational-states';
 import {MicrofrontendNavigationalStates} from '../routing/microfrontend-navigational-states';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {AsyncPipe, NgClass} from '@angular/common';
+import {AsyncPipe, NgClass, NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {WorkbenchService} from '../../workbench.service';
+import {ComponentType} from '@angular/cdk/portal';
+import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
+import '../microfrontend-platform.config';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -47,6 +50,7 @@ import {WorkbenchService} from '../../workbench.service';
     NgClass,
     AsyncPipe,
     ContentAsOverlayComponent,
+    NgComponentOutlet,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
@@ -58,6 +62,11 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
   ];
 
   public viewCapability: WorkbenchViewCapability | undefined;
+
+  /**
+   * Splash to display until the microfrontend signals readiness.
+   */
+  protected splash: ComponentType<unknown>;
 
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
@@ -89,6 +98,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
       .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
     this.installWorkbenchDragDetector();
+    this.splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   }
 
   public ngOnInit(): void {
@@ -169,6 +179,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
       relativeTo: application.baseUrl,
       params: params,
       pushStateToSessionHistoryStack: false,
+      showSplash: prevViewCapability?.metadata!.id === viewCapability.metadata!.id ? false : viewCapability.properties.showSplash, // Show splash only if navigating to a different capability.
     });
   }
 
@@ -341,6 +352,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     // Instruct the message broker to delete retained messages to free resources.
     this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.viewId), undefined, {retain: true}).then();
     this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.viewId), undefined, {retain: true}).then();
+    this._outletRouter.navigate(null, {outlet: this.viewId}).then();
   }
 }
 

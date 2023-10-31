@@ -46,6 +46,7 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'test-view',
+        showSplash: true,
         pinToStartPage: true,
         title: 'Workbench View',
         heading,
@@ -64,6 +65,7 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'test-router',
+        showSplash: true,
         pinToStartPage: true,
         title: 'Workbench Router',
         heading,
@@ -82,6 +84,7 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'register-workbench-capability',
+        showSplash: true,
         pinToStartPage: true,
         title: 'Register Capability',
         heading,
@@ -100,6 +103,7 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'unregister-workbench-capability',
+        showSplash: true,
         pinToStartPage: true,
         title: 'Unregister Capability',
         heading,
@@ -118,6 +122,7 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'register-workbench-intention',
+        showSplash: true,
         pinToStartPage: true,
         title: 'Register Intention',
         heading,
@@ -136,6 +141,7 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'test-popup-opener',
+        showSplash: true,
         pinToStartPage: true,
         title: 'Workbench Popup',
         heading,
@@ -154,6 +160,7 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'test-popup',
+        showSplash: true,
       },
     });
 
@@ -168,6 +175,7 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'test-message-box-opener',
+        showSplash: true,
         pinToStartPage: true,
         title: 'Workbench Message Box',
         heading,
@@ -186,10 +194,30 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'test-notification-opener',
+        showSplash: true,
         pinToStartPage: true,
         title: 'Workbench Notification',
         heading,
         cssClass: 'e2e-test-notification-opener',
+      },
+    });
+
+    // Register view to exchange messages via @scion/microfrontend-platform.
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
+      type: WorkbenchCapabilities.View,
+      qualifier: {
+        component: 'messaging',
+        app,
+      },
+      description: '[e2e] Allows exchanging messages via @scion/microfrontend-platform',
+      private: false,
+      properties: {
+        path: 'messaging',
+        showSplash: true,
+        pinToStartPage: true,
+        title: 'Messaging',
+        heading,
+        cssClass: 'e2e-messaging',
       },
     });
   }

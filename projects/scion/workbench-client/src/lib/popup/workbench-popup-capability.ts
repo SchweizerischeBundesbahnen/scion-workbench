@@ -76,6 +76,22 @@ export interface WorkbenchPopupCapability extends Capability {
      */
     size?: PopupSize;
     /**
+     * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the popup microfrontend signals readiness.
+     *
+     * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench as follows:
+     *
+     * ```ts
+     * WorkbenchModule.forRoot({
+     *   microfrontendPlatform: {
+     *     splash: SplashComponent
+     *   }
+     * });
+     * ```
+     *
+     * @see WorkbenchPopup.signalReady
+     */
+    showSplash?: boolean;
+    /**
      * Specifies CSS class(es) to be added to the popup, useful in end-to-end tests for locating the popup.
      */
     cssClass?: string | string[];

@@ -110,6 +110,9 @@ export class RegisterWorkbenchCapabilityPagePO {
     if (capability.properties.closable !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-closable')).toggle(capability.properties.closable);
     }
+    if (capability.properties.showSplash !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
+    }
     if (capability.properties.pinToStartPage !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
     }
@@ -135,6 +138,9 @@ export class RegisterWorkbenchCapabilityPagePO {
     }
     if (size?.maxHeight) {
       await this.locator.locator('input.e2e-max-height').fill(size.maxHeight);
+    }
+    if (capability.properties.showSplash !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
     if (capability.properties.pinToStartPage !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);

@@ -49,7 +49,10 @@ export default class MessageBoxOpenerPageComponent {
   public openError: string | undefined;
   public closeAction: string | undefined;
 
-  constructor(private _messageBoxService: WorkbenchMessageBoxService, private _formBuilder: NonNullableFormBuilder) {
+  constructor(view: WorkbenchView,
+              private _messageBoxService: WorkbenchMessageBoxService,
+              private _formBuilder: NonNullableFormBuilder) {
+    view.signalReady();
   }
 
   public onMessageBoxOpen(): void {

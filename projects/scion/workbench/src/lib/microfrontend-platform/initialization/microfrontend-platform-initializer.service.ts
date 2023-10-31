@@ -25,8 +25,10 @@ import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
+@Injectable({providedIn: 'root'})
 export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, OnDestroy {
+
+  public config: MicrofrontendPlatformConfig | undefined;
 
   constructor(private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
               private _hostManifestInterceptor: WorkbenchHostManifestInterceptor,
@@ -44,7 +46,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     this._logger.debug('Starting SCION Microfrontend Platform...', LoggerNames.LIFECYCLE);
 
     // Load the microfrontend platform config.
-    const microfrontendPlatformConfig: Mutable<MicrofrontendPlatformConfig> = await this._microfrontendPlatformConfigLoader.load();
+    const microfrontendPlatformConfig: Mutable<MicrofrontendPlatformConfig> = this.config = await this._microfrontendPlatformConfigLoader.load();
     if (!microfrontendPlatformConfig) {
       throw Error('[WorkbenchStartupError] Missing required Microfrontend Platform configuration. Did you forget to return the config in your loader?');
     }
