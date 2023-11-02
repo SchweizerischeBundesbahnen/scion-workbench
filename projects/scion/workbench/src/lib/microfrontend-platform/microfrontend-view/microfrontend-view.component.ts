@@ -179,7 +179,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
       relativeTo: application.baseUrl,
       params: params,
       pushStateToSessionHistoryStack: false,
-      showSplash: prevViewCapability?.metadata!.id === viewCapability.metadata!.id ? false : viewCapability.properties.showSplash, // Show splash only if navigating to a different capability.
+      showSplash: viewCapability.properties.showSplash,
+      ɵcapabilityId: viewCapability.metadata!.id
     });
   }
 
