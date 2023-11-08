@@ -83,6 +83,9 @@ export class WorkbenchThemeSwitcher {
    */
   private async activateThemeFromStorage(): Promise<void> {
     const theme = await this._workbenchStorage.load(THEME_STORAGE_KEY);
+    if (this._documentRoot.hasAttribute('sci-theme')) {
+      return;
+    }
     if (theme) {
       await this.switchTheme(theme);
     }
