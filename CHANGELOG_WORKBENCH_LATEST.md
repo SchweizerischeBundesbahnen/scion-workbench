@@ -1,11 +1,10 @@
-# [16.0.0-beta.9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.8...16.0.0-beta.9) (2023-10-31)
+# [16.0.0-beta.10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/16.0.0-beta.9...16.0.0-beta.10) (2023-11-08)
 
 
-### Features
+### Bug Fixes
 
-* **workbench:** enable microfrontend to display a splash until loaded ([7a79065](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7a79065543da636b545672fd01cfeceb2fbab323))
-* **workbench:** enable customizing minimum tab width ([4052128](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/40521282642f3164941b1849cf9f92f49561678f))
-* **workbench:** propagate color scheme to embedded content ([276fcf3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/276fcf3bc922951920379111319d3c50e655de4f))
+* **workbench:** show splash if instructed by the capability, but only if not navigating to the same capability ([54095b3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/54095b3703ae36ab56479dbe4870fa890205985c))
+* **workbench:** do not render divider preceding tab dragged out of its tabbar ([390178a](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/390178a5629fee2ef5be9da81a6609f45fd914e6))
 
 
 
