@@ -10,12 +10,10 @@
 
 import {Component, inject, Inject, Optional} from '@angular/core';
 import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
-import {AsyncPipe, DOCUMENT, NgIf} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutlet} from '@angular/router';
 import {A11yModule} from '@angular/cdk/a11y';
-import {WorkbenchThemeMonitor} from '@scion/workbench-client';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -39,23 +37,5 @@ export class AppComponent {
 
   constructor(@Inject(APP_IDENTITY) @Optional() symbolicName: string) { // only available if running in the workbench context
     this.appSymbolicName = symbolicName;
-    this.installWorkbenchThemeSwitcher();
-  }
-
-  /**
-   * Switches the workbench theme when changed in the host application.
-   */
-  private installWorkbenchThemeSwitcher(): void {
-    const documentRoot = inject<Document>(DOCUMENT).documentElement;
-    inject(WorkbenchThemeMonitor, {optional: true})?.theme$ // only available if running in the workbench context
-      .pipe(takeUntilDestroyed())
-      .subscribe(theme => {
-        if (theme) {
-          documentRoot.setAttribute('sci-theme', theme.name);
-        }
-        else {
-          documentRoot.removeAttribute('sci-theme');
-        }
-      });
   }
 }
