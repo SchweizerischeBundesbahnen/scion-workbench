@@ -17,28 +17,28 @@ const runHeadless = !!process.env['HEADLESS'];
 export default {
   forbidOnly: runInCI,
   fullyParallel: true,
-  webServer: [
+  webServer: runInCI ? [
     {
-      command: runInCI ? 'npm run workbench-testing-app:http-server' : 'npm run workbench-testing-app:serve',
+      command: 'npm run workbench-testing-app:http-server',
       port: 4200,
-      reuseExistingServer: !runInCI,
+      reuseExistingServer: false,
     },
     {
-      command: runInCI ? 'npm run workbench-client-testing-app:4201:http-server' : 'npm run workbench-client-testing-app:4201:serve',
+      command: 'npm run workbench-client-testing-app:4201:http-server',
       port: 4201,
-      reuseExistingServer: !runInCI,
+      reuseExistingServer: false,
     },
     {
-      command: runInCI ? 'npm run workbench-client-testing-app:4202:http-server' : 'npm run workbench-client-testing-app:4202:serve',
+      command: 'npm run workbench-client-testing-app:4202:http-server',
       port: 4202,
-      reuseExistingServer: !runInCI,
+      reuseExistingServer: false,
     },
     {
-      command: runInCI ? 'npm run workbench-testing-app:basehref:http-server' : 'npm run workbench-testing-app:basehref:serve',
+      command: 'npm run workbench-testing-app:basehref:http-server',
       port: 4300,
-      reuseExistingServer: !runInCI,
+      reuseExistingServer: false,
     },
-  ],
+  ] : [],
   use: {
     browserName: 'chromium',
     headless: runHeadless,
