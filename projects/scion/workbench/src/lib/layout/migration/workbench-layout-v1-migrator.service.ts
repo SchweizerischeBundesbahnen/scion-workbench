@@ -14,7 +14,7 @@ import {MPart, MPartGrid, MTreeNode} from '../workbench-layout.model';
 /**
  * Migrates a workbench layout in version 1 to the latest version.
  *
- * TODO [Angular 17] Remove migrator.
+ * TODO [Angular 18] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutV1Migrator {

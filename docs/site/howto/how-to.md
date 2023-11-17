@@ -20,7 +20,6 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to configure a start page](how-to-configure-start-page.md)
 - [How to query, switch and reset perspectives](how-to-perspective.md)
 
-
 #### View
 - [How to provide a view](how-to-provide-view.md)
 - [How to open a view](how-to-open-view.md)
@@ -30,15 +29,15 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to prevent a view from being closed](how-to-prevent-view-closing.md)
 - [How to provide a part action](how-to-provide-part-action.md)
 
-#### Theming
-- [How to theme the SCION Workbench](how-to-theme-workbench.md)
-
-#### Miscellaneous
-
+#### Dialog, Popup, Messagebox, Notification
 - [How to open a dialog](how-to-open-dialog.md)
 - [How to open a popup](how-to-open-popup.md)
 - [How to show a message box](how-to-show-message-box.md)
 - [How to show a notification](how-to-show-notification.md)
+ 
+#### Theming & Icons
+- [How to theme the SCION Workbench](how-to-theme-workbench.md)
+- [How to change the workbench icons](how-to-icons.md)
 
 
 ***

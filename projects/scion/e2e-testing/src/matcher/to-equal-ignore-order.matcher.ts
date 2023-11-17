@@ -10,11 +10,14 @@
 import {ExpectationResult} from './custom-matchers.definition';
 
 /**
- * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
+ * Provides the implementation of {@link CustomMatchers#toEqualIgnoreOrder}.
  */
 export function toEqualIgnoreOrder(actual: unknown, expected: Array<any>): ExpectationResult {
   if (Array.isArray(actual) && actual.length === expected.length && includeSameElements(actual, expected)) {
-    return {pass: true};
+    return {
+      pass: true,
+      message: () => 'passed',
+    };
   }
   return {
     pass: false,

@@ -139,7 +139,9 @@ export class WorkbenchModule {
   /**
    * To manifest a dependency to the workbench module from a feature module.
    *
-   * @deprecated since version 16.0.0-beta.1; Import {@link WorkbenchModule} or standalone directives directly; API will be removed in version 17.
+   * @deprecated since version 16.0.0-beta.1; Import {@link WorkbenchModule} or standalone directives directly; API will be removed in a future release.
+   *
+   * TODO [#312]: Remove when fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/312
    */
   public static forChild(): ModuleWithProviders<WorkbenchModule> {
     return {

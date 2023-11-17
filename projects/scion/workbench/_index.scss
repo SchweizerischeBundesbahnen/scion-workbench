@@ -93,34 +93,52 @@
  *
  *
  * ## Workbench Icon Font
- * SCION Workbench requires some icons from the `scion-workbench-icons` icon font.
- *
- * Icons can be replaced with the [IcoMoon](https://icomoon.io) web application. Import the icon font definition from [scion-workbench-icons.json](https://raw.githubusercontent.com/SchweizerischeBundesbahnen/scion-workbench/master/resources/scion-workbench-icons/scion-workbench-icons.json).
- *
- * Directory and filename of the icon font can be changed as follows:
+ * The SCION Workbench requires some icons packed as icon font. The location of the icon font can be configured via the SCSS module `@scion/workbench`,
+ * required if deploying the application in a subdirectory, or to configure a custom icon font.
  *
  * ```scss
  * @use '@scion/workbench' with (
- *   icon-font: (
- *     directory: 'path/to/font', // defaults to 'assets/fonts' if omitted
- *     filename: 'icons' // defaults to 'scion-workbench-icons' if omitted
+ *   $icon-font: (
+ *      directory: '/path/to/font', // defaults to '/assets/fonts' if omitted
+ *      filename: 'scion-workbench-icons' // defaults to 'scion-workbench-icons' if omitted
+ *      version: '1.0.0' // appended to the HTTP request to load the icon font, enabling browser cache invalidation when icons change
+ *  );
+ * ```
+ *
+ * The icon font can be customized using the [IcoMoon](https://icomoon.io/app) web application by importing the icon font definition file `scion-workbench-icons.json`.
+ *
+ * If deploying the application in a subdirectory, use a relative directory path for the browser to load the icon files relative to the document base URL (as specified in the `<base>` HTML tag).
+ * Note that using a relative path requires to exclude the icon files from the application build. Depending on building the application with esbuild `@angular-devkit/build-angular:application`
+ * or webpack `@angular-devkit/build-angular:browser`, different steps are required to exclude the icons from the build.
+ *
+ * ### Using @angular-devkit/build-angular:application (esbuild)
+ * Configure the `@scion/workbench` SCSS module to load the icon font relative to the document base URL:
+ * ```scss
+ * use '@scion/workbench' with (
+ *   $icon-font: (
+ *     directory: 'path/to/font' // no leading slash, typically `assets/fonts`
  *   )
  * );
  * ```
  *
- * When loading the default icon font, the workbench appends a version query parameter to the HTTP request, enabling browser cache invalidation when icons change.
- * If using a custom icon font, we recommend incrementing the version when modifying the icon font, as follows:
+ * Add the path to the `externalDependencies` build option in the `angular.json` file:
+ * ```json
+ * "externalDependencies": [
+ *   "path/to/font/scion-workbench-icons.*"
+ * ]
+ *   ```
+ *
+ * ### Using @angular-devkit/build-angular:browser (webpack)
+ * Configure the `@scion/workbench` SCSS module to load the icon font relative to the document base URL:
  *
  * ```scss
- * @use '@scion/workbench' with (
- *   icon-font: (
- *     filename: 'custom-workbench-icons',
- *     version: '1.0.0'
+ * use '@scion/workbench' with (
+ *   $icon-font: (
+ *     directory: '^path/to/font' // no leading slash but with a caret (^), typically `^assets/fonts`
  *   )
  * );
  * ```
  */
-
 @use 'sass:map';
 @use '@scion/components/design' as sci-design;
 @use '@angular/cdk';

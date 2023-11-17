@@ -18,7 +18,7 @@ import {LayoutPagePO} from './page-object/layout-page.po';
 import {PerspectivePagePO} from './page-object/perspective-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 
-export interface Type<T> extends Function {
+export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/ban-types
   new(...args: any[]): T;
 }
 

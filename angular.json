@@ -114,11 +114,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/workbench-getting-started-app",
             "index": "apps/workbench-getting-started-app/src/index.html",
-            "main": "apps/workbench-getting-started-app/src/main.ts",
+            "browser": "apps/workbench-getting-started-app/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -164,12 +164,9 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"
@@ -178,10 +175,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "workbench-getting-started-app:build:production-ci"
+              "buildTarget": "workbench-getting-started-app:build:production-ci"
             },
             "development": {
-              "browserTarget": "workbench-getting-started-app:build:development"
+              "buildTarget": "workbench-getting-started-app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -209,11 +206,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/workbench-testing-app",
             "index": "apps/workbench-testing-app/src/index.html",
-            "main": "apps/workbench-testing-app/src/main.ts",
+            "browser": "apps/workbench-testing-app/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -313,7 +310,83 @@
               ],
               "outputHashing": "all",
               "outputPath": "dist/workbench-testing-app-basehref/subdir",
-              "baseHref": "/subdir/"
+              "baseHref": "/subdir/browser/",
+              "styles": [
+                "apps/workbench-testing-app/src/styles-base-href-esbuild.scss"
+              ],
+              "externalDependencies": [
+                "assets/fonts/scion-workbench-icons.*"
+              ]
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "development-basehref": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "baseHref": "/subdir/browser/",
+              "styles": [
+                "apps/workbench-testing-app/src/styles-base-href-esbuild.scss"
+              ],
+              "externalDependencies": [
+                "assets/fonts/scion-workbench-icons.*"
+              ]
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "build-basehref-webpack": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/workbench-testing-app-basehref-webpack/subdir",
+            "baseHref": "/subdir/",
+            "index": "apps/workbench-testing-app/src/index.html",
+            "main": "apps/workbench-testing-app/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "apps/workbench-testing-app/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "apps/workbench-testing-app/src/assets",
+              {
+                "glob": "favicon.ico",
+                "input": "resources/branding",
+                "output": "/"
+              },
+              {
+                "glob": "scion-workbench-icons.*",
+                "input": "resources/scion-workbench-icons/fonts",
+                "output": "/assets/fonts"
+              },
+              {
+                "glob": "scion-workbench-banner.svg",
+                "input": "resources/branding",
+                "output": "/assets"
+              }
+            ],
+            "styles": [
+              "apps/workbench-testing-app/src/styles-base-href-webpack.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/scion/workbench"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/workbench-testing-app/src/environments/environment.ts",
+                  "with": "apps/workbench-testing-app/src/environments/environment.ci.ts"
+                }
+              ],
+              "outputHashing": "all"
             },
             "development": {
               "buildOptimizer": false,
@@ -322,15 +395,6 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
-            },
-            "development-basehref": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true,
-              "baseHref": "/subdir/"
             }
           },
           "defaultConfiguration": "development"
@@ -339,13 +403,16 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "workbench-testing-app:build:production-ci"
+              "buildTarget": "workbench-testing-app:build:production-ci"
             },
             "development": {
-              "browserTarget": "workbench-testing-app:build:development"
+              "buildTarget": "workbench-testing-app:build:development"
             },
             "development-basehref": {
-              "browserTarget": "workbench-testing-app:build:development-basehref"
+              "buildTarget": "workbench-testing-app:build:development-basehref"
+            },
+            "development-basehref-webpack": {
+              "buildTarget": "workbench-testing-app:build-basehref-webpack:development"
             }
           },
           "defaultConfiguration": "development"
@@ -373,11 +440,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/workbench-client-testing-app",
             "index": "apps/workbench-client-testing-app/src/index.html",
-            "main": "apps/workbench-client-testing-app/src/main.ts",
+            "browser": "apps/workbench-client-testing-app/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -447,12 +514,9 @@
               "outputPath": "dist/workbench-client-testing-app-ci"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "development"
@@ -461,10 +525,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "workbench-client-testing-app:build:production-vercel"
+              "buildTarget": "workbench-client-testing-app:build:production-vercel"
             },
             "development": {
-              "browserTarget": "workbench-client-testing-app:build:development"
+              "buildTarget": "workbench-client-testing-app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -493,14 +557,6 @@
           }
         }
       }
-    }
-  },
-  "schematics": {
-    "@angular-eslint/schematics:application": {
-      "setParserOptionsProject": true
-    },
-    "@angular-eslint/schematics:library": {
-      "setParserOptionsProject": true
     }
   }
 }
