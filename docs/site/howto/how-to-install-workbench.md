@@ -83,6 +83,8 @@ The workbench requires some styles to be imported into `styles.scss`, as follows
 
 Also, download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip">GitHub</a>, unzip the font files, and place the extracted files in the `assets/fonts` folder.
 
+Deploying the application in a subdirectory requires the additional steps described [here][link-how-to-configure-icons-if-deploying-app-in-subdirectory].
+
 </details>
 
 After completing the above steps, start your application by running `ng serve`. Open a browser at http://localhost:4200. You should see a blank page.
@@ -90,6 +92,7 @@ After completing the above steps, start your application by running `ng serve`. 
 Continue with guide [How to define an initial layout][link-how-to-define-initial-layout] to define an initial layout for the workbench.
 
 [link-how-to-define-initial-layout]: /docs/site/howto/how-to-define-initial-layout.md
+[link-how-to-configure-icons-if-deploying-app-in-subdirectory]: /docs/site/howto/how-to-icons.md#deploying-the-app-in-a-subdirectory
 
 [menu-how-to]: /docs/site/howto/how-to.md
 

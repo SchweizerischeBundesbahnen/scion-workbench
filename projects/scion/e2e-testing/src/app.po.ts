@@ -80,7 +80,8 @@ export class AppPO {
     // and would therefore be lost on a reload.
     const reloadUrl = new URL(this.page.url());
     this._workbenchStartupQueryParams.forEach((value, key) => reloadUrl.searchParams.append(key, value));
-
+    // Playwright does not navigate when navigating to the same URL, so we navigate to 'about:blank' first.
+    await this.page.goto('about:blank');
     await this.page.goto(reloadUrl.toString());
     // Wait until the workbench completed startup.
     await this.waitUntilWorkbenchStarted();

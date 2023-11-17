@@ -39,7 +39,7 @@ export class ViewTabDragImageRenderer {
   private _constrainDragImageRectFn: ((rect: ViewDragImageRect) => ViewDragImageRect) | null = null;
 
   constructor(private _viewDragService: ViewDragService,
-              // TODO [Angular 17][https://github.com/angular/components/issues/24334] Alternative constructor (ComponentFactoryResolver is deprecated)
+              // TODO [Angular 18][https://github.com/angular/components/issues/24334] Alternative constructor (ComponentFactoryResolver is deprecated)
               private _componentFactoryResolver: ComponentFactoryResolver,
               private _applicationRef: ApplicationRef,
               private _injector: Injector,

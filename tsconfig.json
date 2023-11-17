@@ -2,7 +2,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -10,9 +9,9 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
@@ -26,10 +25,10 @@
     ],
     "paths": {
       "@scion/workbench": [
-        "dist/scion/workbench"
+        "./dist/scion/workbench"
       ],
       "@scion/workbench-client": [
-        "dist/scion/workbench-client"
+        "./dist/scion/workbench-client"
       ]
     }
     /*
@@ -45,22 +44,10 @@
      */
     //    "paths": {
     //      "@scion/workbench": [
-    //        "projects/scion/workbench/src/public-api"
+    //        "./projects/scion/workbench/src/public-api"
     //      ],
     //      "@scion/workbench-client": [
-    //        "projects/scion/workbench-client/src/public-api"
-    //      ],
-    //      "@scion/microfrontend-platform": [
-    //        "./node_modules/@scion/microfrontend-platform"
-    //      ],
-    //      "@scion/toolkit/*": [
-    //        "./node_modules/@scion/toolkit/*"
-    //      ],
-    //      "@scion/components/*": [
-    //        "./node_modules/@scion/components/*"
-    //      ],
-    //      "@scion/components.internal/*": [
-    //        "./node_modules/@scion/components.internal/*"
+    //        "./projects/scion/workbench-client/src/public-api"
     //      ],
     //      //      "@scion/microfrontend-platform": [
     //      //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public-api"
@@ -137,15 +124,6 @@
     //      //      "@scion/components.internal/material-icon": [
     //      //        "../scion-toolkit/projects/scion/components.internal/material-icon/src/public_api"
     //      //      ],
-    //      "@angular/*": [
-    //        "./node_modules/@angular/*"
-    //      ],
-    //      "rxjs": [
-    //        "./node_modules/rxjs"
-    //      ],
-    //      "rxjs/*": [
-    //        "./node_modules/rxjs/*"
-    //      ]
     //    }
   },
   "angularCompilerOptions": {
@@ -155,4 +133,3 @@
     "strictTemplates": true
   }
 }
-

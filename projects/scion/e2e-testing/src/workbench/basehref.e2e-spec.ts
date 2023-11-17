@@ -14,7 +14,9 @@ import {test} from '../fixtures';
 test.describe('HTML base HREF', () => {
 
   /**
-   * This test expects the application to be deployed on 'http://localhost:4300/subdir' with '/subdir/' configured as the base URL.
+   * # esbuild builder (@angular-devkit/build-angular:application)
+   *
+   * This test expects the application to be served on 'http://localhost:4300/subdir/browser' with '/subdir/browser/' configured as the base URL.
    *
    * Start the app using the following command:
    *
@@ -22,9 +24,33 @@ test.describe('HTML base HREF', () => {
    * npm run workbench-testing-app:basehref:serve
    * ```
    */
-  test('should fetch the icon font if deployed in a subdirectory', async ({page, appPO}) => {
+  test('should fetch the icon font if deployed in a subdirectory (esbuild)', async ({page, appPO}) => {
     const response = page.waitForResponse(/scion-workbench-icons\.(ttf|woff)/);
-    await appPO.navigateTo({url: 'http://localhost:4300/subdir', microfrontendSupport: false});
+    await appPO.navigateTo({url: 'http://localhost:4300/subdir/browser/', microfrontendSupport: false});
+    // The icon font is loaded when a view is opened (chevron icon in the tab bar).
+    await appPO.openNewViewTab();
+
+    // Expect the icon font to be loaded.
+    const iconFontLoaded = (await response).ok();
+    await expect(iconFontLoaded).toBe(true);
+  });
+
+  /**
+   * # webpack builder (@angular-devkit/build-angular:browser)
+   *
+   * This test expects the application to be served on 'http://localhost:4400/subdir' with '/subdir/' configured as the base URL.
+   *
+   * Start the app using the following command:
+   *
+   * ```
+   * npm run workbench-testing-app:basehref-webpack:serve
+   * ```
+   *
+   * TODO [Angular 18] remove when `@angular-devkit/build-angular:browser` builder is deprecated
+   */
+  test('should fetch the icon font if deployed in a subdirectory (webpack)', async ({page, appPO}) => {
+    const response = page.waitForResponse(/scion-workbench-icons\.(ttf|woff)/);
+    await appPO.navigateTo({url: 'http://localhost:4400/subdir/', microfrontendSupport: false});
     // The icon font is loaded when a view is opened (chevron icon in the tab bar).
     await appPO.openNewViewTab();
 

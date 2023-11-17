@@ -12,8 +12,16 @@
 $-version: 2;
 
 $-default-icon-font-config: (
-  // Path should be "root relative" to support HTML base href.
-  directory: 'assets/fonts',
+  // The font path must be root relative or excluded from the application build. Otherwise, the application build will fail
+  // because the builder cannot resolve the font files relative to "this" SASS file.
+  //
+  // Webpack allows to exclude assets from the build by prefixing their path with a leading caret (^). For esbuild, the
+  // application can register the excluded assets as `externalDependencies` in angular.json.
+  //
+  // To keep the workbench configuration minimal for Angular projects deployed in the context root, we reference font files by
+  // their root relative path. Consequently, applications deployed in a subdirectory require additional configuration depending
+  // on whether the application is built with esbuild or webpack.
+  directory: '/assets/fonts',
   filename: 'scion-workbench-icons',
   version: $-version,
 );
@@ -36,15 +44,9 @@ $-default-icon-font-config: (
 
   @font-face {
     font-family: 'scion-workbench-icons';
-    // Building the application fails if using relative URLs to reference font files because they are not relative to "this" SASS file
-    // but relative to the app root. Therefore, we instruct the bundler not to process font files by prefixing their path with a caret `^`.
-    // Note that the caret is not officially documented and should be tested with each Angular release.
-    // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-    // See https://github.com/angular/angular/issues/32811
-    // See https://github.com/angular/angular-cli/issues/14587
-    src: url('^' + $path + '.ttf?' + $version) format('truetype'),
-    url('^' + $path + '.woff?' + $version) format('woff'),
-    url('^' + $path + '.svg?' + $version + '#scion-workbench-icons') format('svg');
+    src: url($path + '.ttf?' + $version) format('truetype'),
+    url($path + '.woff?' + $version) format('woff'),
+    url($path + '.svg?' + $version + '#scion-workbench-icons') format('svg');
     font-weight: normal;
     font-style: normal;
     font-display: block;

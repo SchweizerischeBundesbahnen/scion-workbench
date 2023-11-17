@@ -19,7 +19,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {MessagingPagePO} from './page-object/messaging-page.po';
 
-export interface Type<T> extends Function {
+export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/ban-types
   new(...args: any[]): T;
 }
 

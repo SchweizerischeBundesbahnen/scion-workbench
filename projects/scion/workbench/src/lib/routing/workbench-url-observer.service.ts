@@ -111,7 +111,7 @@ export class WorkbenchUrlObserver {
     const layout = this._workbenchLayoutFactory.create({
       mainAreaGrid: (() => {
         // Read the main area grid from the query parameter.
-        const mainAreaLayout = urlTree.queryParamMap.get(MAIN_AREA_LAYOUT_QUERY_PARAM) ?? urlTree.queryParamMap.get('parts'); // TODO [Angular 17] Remove fallback to 'parts' query parameter
+        const mainAreaLayout = urlTree.queryParamMap.get(MAIN_AREA_LAYOUT_QUERY_PARAM) ?? urlTree.queryParamMap.get('parts'); // TODO [Angular 18] Remove fallback to 'parts' query parameter
         if (mainAreaLayout) {
           return mainAreaLayout;
         }

@@ -1,18 +1,18 @@
 name: Continuous Integration and Delivery
 on: [ push, pull_request ]
 env:
-  NODE_VERSION: 18.16.0
+  NODE_VERSION: 20.9.0
 jobs:
   install:
     name: 'Installing NPM modules'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Caching NPM modules if necessary'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules-cache
         with:
           path: ./node_modules
@@ -24,12 +24,12 @@ jobs:
     needs: install
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
@@ -42,8 +42,8 @@ jobs:
       workbench-version: ${{ steps.workbench-package-json.outputs.version }}
       workbench-client-version: ${{ steps.workbench-client-package-json.outputs.version }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Reading package.json version of scion/workbench'
@@ -57,28 +57,28 @@ jobs:
         with:
           path: projects/scion/workbench-client/package.json
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: 'Building @scion/workbench-client'
         run: npm run workbench-client:build
       - name: 'Uploading dist/scion/workbench-client'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Building @scion/workbench'
         run: npm run workbench:build
       - name: 'Uploading dist/scion/workbench'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Building TypeDoc for @scion/workbench-client'
         run: npm run workbench-client:typedoc
       - name: 'Uploading dist/workbench-client-api'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: workbench-client-api
           path: dist/workbench-client-api
@@ -93,6 +93,8 @@ jobs:
             cmd: npm run workbench-testing-app:ci:build
           - name: workbench-testing-app-basehref
             cmd: npm run workbench-testing-app:basehref:build
+          - name: workbench-testing-app-basehref-webpack
+            cmd: npm run workbench-testing-app:basehref-webpack:build
           - name: workbench-testing-app-vercel
             cmd: npm run workbench-testing-app:vercel:build
           - name: workbench-client-testing-app-ci
@@ -102,28 +104,28 @@ jobs:
           - name: workbench-getting-started-app
             cmd: npm run workbench-getting-started-app:build
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Building ${{ matrix.app.name }}'
         run: ${{ matrix.app.cmd }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.app.name }}
           path: dist/${{ matrix.app.name }}
@@ -132,22 +134,22 @@ jobs:
     needs: build-libs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
@@ -160,37 +162,42 @@ jobs:
       matrix:
         shard: [ 1/15, 2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15, 14/15, 15/15 ]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-dist
           path: dist/scion/workbench
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Downloading app: workbench-testing-app-ci (dist)'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-testing-app-ci
           path: dist/workbench-testing-app-ci
       - name: 'Downloading app: workbench-testing-app-basehref (dist)'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-testing-app-basehref
           path: dist/workbench-testing-app-basehref
+      - name: 'Downloading app: workbench-testing-app-basehref-webpack (dist)'
+        uses: actions/download-artifact@v3
+        with:
+          name: workbench-testing-app-basehref-webpack
+          path: dist/workbench-testing-app-basehref-webpack
       - name: 'Downloading app: workbench-client-testing-app-ci (dist)'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-client-testing-app-ci
           path: dist/workbench-client-testing-app-ci
       - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
@@ -208,7 +215,7 @@ jobs:
     outputs:
       should-release: ${{ steps.tag-release-commit.outputs.is-release-commit }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: 'If release commit present, add release tag'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/tag-release-commit@master
         id: tag-release-commit
@@ -228,7 +235,7 @@ jobs:
     outputs:
       should-release: ${{ steps.tag-release-commit.outputs.is-release-commit }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: 'If release commit present, add release tag'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/tag-release-commit@master
         id: tag-release-commit
@@ -242,26 +249,26 @@ jobs:
     needs: [ workbench-release-guard, workbench-client-release-guard ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: 'Downloading app: workbench-testing-app-vercel (dist)'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-testing-app-vercel
           path: dist/workbench-testing-app-vercel
       - name: 'Downloading app: workbench-client-testing-app-vercel (dist)'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-client-testing-app-vercel
           path: dist/workbench-client-testing-app-vercel
       - name: 'Downloading app: workbench-getting-started-app (dist)'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-getting-started-app
           path: dist/workbench-getting-started-app
       - name: 'Deploying workbench-testing-app to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
-          dist-folder: dist/workbench-testing-app-vercel
+          dist-folder: dist/workbench-testing-app-vercel/browser
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_TESTING_APP_PROJECT_ID }}
@@ -269,7 +276,7 @@ jobs:
       - name: 'Deploying workbench-client-testing-app to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
-          dist-folder: dist/workbench-client-testing-app-vercel
+          dist-folder: dist/workbench-client-testing-app-vercel/browser
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_TESTING_APP_PROJECT_ID }}
@@ -279,7 +286,7 @@ jobs:
       - name: 'Deploying workbench-getting-started-app to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
-          dist-folder: dist/workbench-getting-started-app
+          dist-folder: dist/workbench-getting-started-app/browser
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_GETTING_STARTED_APP_PROJECT_ID }}
@@ -292,9 +299,9 @@ jobs:
       - workbench-release-guard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: 'Downloading dist/scion/workbench'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-dist
           path: dist/scion/workbench
@@ -317,14 +324,14 @@ jobs:
       - workbench-client-release-guard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: 'Downloading dist/scion/workbench-client'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-client-dist
           path: dist/scion/workbench-client
       - name: 'Downloading dist/workbench-client-api'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: workbench-client-api
           path: dist/workbench-client-api

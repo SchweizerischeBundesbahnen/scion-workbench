@@ -18,7 +18,7 @@ import {MAIN_AREA} from '../workbench.model';
 export async function toEqualWorkbenchLayout(locator: Locator, expected: ExpectedWorkbenchLayout): Promise<ExpectationResult> {
   try {
     await assertWorkbenchLayout(expected, locator);
-    return {pass: true};
+    return {pass: true, message: () => 'passed'};
   }
   catch (error: unknown) {
     return {pass: false, message: () => error instanceof Error ? error.message : `${error}`};

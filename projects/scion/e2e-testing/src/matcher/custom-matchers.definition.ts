@@ -72,5 +72,5 @@ export namespace CustomMatchers {
  */
 export interface ExpectationResult {
   pass: boolean;
-  message?: () => string;
+  message: () => string;
 }
