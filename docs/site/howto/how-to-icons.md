@@ -53,7 +53,7 @@ or webpack `@angular-devkit/build-angular:browser`, different steps are required
 #### Using @angular-devkit/build-angular:application (esbuild)
 Configure the `@scion/workbench` SCSS module to load the icon font relative to the document base URL:
 ```scss
-use '@scion/workbench' with (
+@use '@scion/workbench' with (
   $icon-font: (
     directory: 'path/to/font' // no leading slash, typically `assets/fonts`
   )
@@ -70,7 +70,7 @@ Add the path to the `externalDependencies` build option in the `angular.json` fi
 #### Using @angular-devkit/build-angular:browser (webpack)
 Configure the `@scion/workbench` SCSS module to load the icon font relative to the document base URL:
 ```scss
-use '@scion/workbench' with (
+@use '@scion/workbench' with (
   $icon-font: (
     directory: '^path/to/font' // no leading slash but with a caret (^), typically `^assets/fonts`
   )
