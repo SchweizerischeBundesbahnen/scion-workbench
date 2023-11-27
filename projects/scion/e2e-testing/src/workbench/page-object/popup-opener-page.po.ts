@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, fromRect, isPresent} from '../../helper/testing.util';
+import {coerceArray, DomRect, fromRect, isPresent} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {BottomLeftPoint, BottomRightPoint, PopupOrigin, PopupSize, TopLeftPoint, TopRightPoint} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
@@ -173,7 +173,7 @@ export class PopupOpenerPagePO {
     };
   }
 
-  public async getAnchorElementClientRect(): Promise<DOMRect> {
+  public async getAnchorElementClientRect(): Promise<DomRect> {
     const buttonLocator = this.locator.locator('button.e2e-open');
     return fromRect(await buttonLocator.boundingBox());
   }

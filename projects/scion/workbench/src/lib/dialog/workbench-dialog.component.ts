@@ -12,17 +12,18 @@ import {AfterViewInit, Component, DestroyRef, ElementRef, HostBinding, HostListe
 
 import {EMPTY, fromEvent, Subject, switchMap, timer} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
-import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, DOCUMENT, NgComponentOutlet, NgIf} from '@angular/common';
 import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
-import {MoveDelta, MoveDirective} from '../message-box/move.directive';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
+import {MovableDirective, WbMoveEvent} from './movable.directive';
+import {ResizableDirective, WbResizeEvent} from './resizable.directive';
+import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
 
 /**
  * Renders the workbench dialog.
@@ -42,9 +43,11 @@ import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
     AsyncPipe,
     NgComponentOutlet,
     A11yModule,
-    MoveDirective,
+    MovableDirective,
+    ResizableDirective,
     CoerceObservablePipe,
     SciViewportComponent,
+    SciDimensionDirective,
   ],
   animations: [
     trigger('enter', provideEnterAnimation()),
@@ -55,6 +58,7 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
   private readonly _cancelBlinkTimer$ = new Subject<void>();
   private readonly _document = inject<Document>(DOCUMENT);
   private _activeElement: HTMLElement | undefined;
+  private _headerHeight: string | undefined;
 
   @ViewChild(CdkTrapFocus, {static: true})
   private _cdkTrapFocus!: CdkTrapFocus;
@@ -70,7 +74,7 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
 
   @HostBinding('style.--ɵdialog-min-height')
   protected get minHeight(): string | undefined {
-    return this.dialog.size.minHeight;
+    return this.dialog.size.minHeight || this._headerHeight;
   }
 
   @HostBinding('style.--ɵdialog-height')
@@ -85,7 +89,7 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
 
   @HostBinding('style.--ɵdialog-min-width')
   protected get minWidth(): string | undefined {
-    return this.dialog.size.minWidth;
+    return this.dialog.size.minWidth || '100px';
   }
 
   @HostBinding('style.--ɵdialog-width')
@@ -117,7 +121,6 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
 
   constructor(public dialog: ɵWorkbenchDialog,
               private _zone: NgZone,
-              private _workbenchLayoutService: WorkbenchLayoutService,
               private _workbenchDialogRegistry: WorkbenchDialogRegistry,
               private _destroyRef: DestroyRef) {
     this.setDialogOffset();
@@ -209,17 +212,24 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
     this.blink();
   }
 
-  protected onMoveStart(): void {
-    this._workbenchLayoutService.notifyDragStarting();
+  protected onMove(event: WbMoveEvent): void {
+    this.transformTranslateX = event.translateX;
+    this.transformTranslateY = event.translateY;
   }
 
-  protected onMove(delta: MoveDelta): void {
-    this.transformTranslateX += delta.deltaX;
-    this.transformTranslateY += delta.deltaY;
-  }
-
-  protected onMoveEnd(): void {
-    this._workbenchLayoutService.notifyDragEnding();
+  public onResize(event: WbResizeEvent): void {
+    if (event.height !== undefined) {
+      this.dialog.size.height = `${event.height}px`;
+    }
+    if (event.width !== undefined) {
+      this.dialog.size.width = `${event.width}px`;
+    }
+    if (event.translateX !== undefined) {
+      this.transformTranslateX = event.translateX;
+    }
+    if (event.translateY !== undefined) {
+      this.transformTranslateY = event.translateY;
+    }
   }
 
   protected onCloseClick(): void {
@@ -228,6 +238,10 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
 
   protected onCloseMouseDown(event: Event): void {
     event.stopPropagation(); // Prevent dragging with the close button.
+  }
+
+  protected onHeaderDimensionChange(dimension: SciDimension): void {
+    this._headerHeight = `${dimension.offsetHeight}px`;
   }
 }
 

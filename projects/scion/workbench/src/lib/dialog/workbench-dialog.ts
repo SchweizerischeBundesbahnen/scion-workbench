@@ -41,6 +41,11 @@ export abstract class WorkbenchDialog<R = unknown> {
   public abstract closable: boolean;
 
   /**
+   * Specifies if the user can resize the dialog. Defaults to `true`.
+   */
+  public abstract resizable: boolean;
+
+  /**
    * Specifies CSS class(es) to be added to the dialog, useful in end-to-end tests for locating the dialog.
    */
   public abstract cssClass: string | string[];

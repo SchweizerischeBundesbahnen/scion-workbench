@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {getCssClasses, hasCssClass, isPresent, isVisible, waitUntilBoundingBoxStable} from './helper/testing.util';
+import {DomRect, getCssClasses, hasCssClass, isPresent, isVisible, waitUntilBoundingBoxStable} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench popup.
@@ -30,7 +30,7 @@ export class PopupPO {
     return isVisible(this.locator);
   }
 
-  public async getBoundingBox(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<DOMRect> {
+  public async getBoundingBox(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<DomRect> {
     const locator = selector === 'cdk-overlay' ? this._overlayLocator : this.locator;
     await locator.waitFor({state: 'visible'});
     return waitUntilBoundingBoxStable(locator);

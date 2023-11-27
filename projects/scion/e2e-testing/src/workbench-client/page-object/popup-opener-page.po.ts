@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, isPresent, rejectWhenAttached, waitUntilBoundingBoxStable} from '../../helper/testing.util';
+import {coerceArray, DomRect, isPresent, rejectWhenAttached, waitUntilBoundingBoxStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
@@ -164,7 +164,7 @@ export class PopupOpenerPagePO {
     };
   }
 
-  public async getAnchorElementClientRect(): Promise<DOMRect> {
+  public async getAnchorElementClientRect(): Promise<DomRect> {
     const buttonLocator = this.locator.locator('button.e2e-open');
     return waitUntilBoundingBoxStable(buttonLocator);
   }

@@ -28,12 +28,11 @@
     margin: 2px;
   }
 
-  > section.dialog-pane {
+  > div.dialog-pane {
     display: flex;
     flex-direction: column;
     position: absolute;
     top: 3%;
-    gap: calc(1.25 * var(--ɵdialog-padding));
     border: 1px solid var(--sci-color-border);
     border-radius: var(--sci-corner);
     color: var(--sci-color-text);
@@ -47,53 +46,60 @@
     width: var(--ɵdialog-width);
     max-width: var(--ɵdialog-max-width);
 
-    > header {
-      flex: none;
-      display: flex;
-      place-content: flex-end;
-      gap: var(--ɵdialog-padding);
-      background-color: var(--sci-workbench-dialog-header-background-color);
-      border-top-left-radius: inherit;
-      border-top-right-radius: inherit;
-      border-bottom: 1px solid var(--sci-workbench-dialog-header-divider-color);
-      height: var(--sci-workbench-dialog-header-height);
-      padding-inline: var(--ɵdialog-padding);
-
-      > div.title {
-        flex: auto;
-        display: flex;
-        align-items: center;
-        position: relative; // positioning context for the title span
-
-        > span {
-          position: absolute; // out of document flow to not contribute to the dialog width
-          left: 0;
-          right: 0;
-          @include show-ellipsis-on-overflow;
-          font-family: var(--sci-workbench-dialog-title-font-family);
-          font-size: var(--sci-workbench-dialog-title-font-size);
-          font-weight: var(--sci-workbench-dialog-title-font-weight);
-          text-align: var(--sci-workbench-dialog-title-align);
-        }
-      }
-
-      > button.close {
-        all: unset;
-        flex: none;
-        cursor: pointer;
-        align-self: center;
-
-        &:not(:hover) {
-          opacity: .75;
-        }
-      }
-    }
-
-    > sci-viewport {
+    > section {
       flex: auto;
+      display: flex;
+      flex-direction: column;
+      gap: calc(1.25 * var(--ɵdialog-padding));
+      border-radius: inherit;
+      overflow: hidden; // must not be set on dialog-pane to not crop resize handles
 
-      &::part(content) {
-        padding: var(--ɵdialog-padding);
+      > header {
+        flex: none;
+        display: flex;
+        place-content: flex-end;
+        gap: var(--ɵdialog-padding);
+        background-color: var(--sci-workbench-dialog-header-background-color);
+        border-bottom: 1px solid var(--sci-workbench-dialog-header-divider-color);
+        height: var(--sci-workbench-dialog-header-height);
+        padding-inline: var(--ɵdialog-padding);
+
+        > div.title {
+          flex: auto;
+          display: flex;
+          align-items: center;
+          position: relative; // positioning context for the title span
+
+          > span {
+            position: absolute; // out of document flow to not contribute to the dialog width
+            left: 0;
+            right: 0;
+            @include show-ellipsis-on-overflow;
+            font-family: var(--sci-workbench-dialog-title-font-family);
+            font-size: var(--sci-workbench-dialog-title-font-size);
+            font-weight: var(--sci-workbench-dialog-title-font-weight);
+            text-align: var(--sci-workbench-dialog-title-align);
+          }
+        }
+
+        > button.close {
+          all: unset;
+          flex: none;
+          cursor: pointer;
+          align-self: center;
+
+          &:not(:hover) {
+            opacity: .75;
+          }
+        }
+      }
+
+      > sci-viewport {
+        flex: auto;
+
+        &::part(content) {
+          padding: var(--ɵdialog-padding);
+        }
       }
     }
 

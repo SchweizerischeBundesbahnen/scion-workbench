@@ -3,6 +3,10 @@
     <input [formControl]="form.controls.title" class="e2e-title">
   </sci-form-field>
 
+  <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
+    <input class="e2e-component-instance-id" [value]="uuid" disabled>
+  </sci-form-field>
+
   <sci-form-field label="Input" *ngIf="input">
     <input class="e2e-input" [value]="input" disabled>
   </sci-form-field>
@@ -13,46 +17,53 @@
     </ng-template>
     <ng-template #panel_size>
       <sci-form-field label="Min Height">
-        <input [formControl]="form.controls.size.controls.minHeight">
+        <input [formControl]="form.controls.size.controls.minHeight" class="e2e-min-height">
       </sci-form-field>
 
       <sci-form-field label="Height">
-        <input [formControl]="form.controls.size.controls.height">
+        <input [formControl]="form.controls.size.controls.height" class="e2e-height">
       </sci-form-field>
 
       <sci-form-field label="Max Height">
-        <input [formControl]="form.controls.size.controls.maxHeight">
+        <input [formControl]="form.controls.size.controls.maxHeight" class="e2e-max-height">
       </sci-form-field>
 
       <sci-form-field label="Min Width">
-        <input [formControl]="form.controls.size.controls.minWidth">
+        <input [formControl]="form.controls.size.controls.minWidth" class="e2e-min-width">
       </sci-form-field>
 
       <sci-form-field label="Width">
-        <input [formControl]="form.controls.size.controls.width">
+        <input [formControl]="form.controls.size.controls.width" class="e2e-width">
       </sci-form-field>
 
       <sci-form-field label="Max Width">
-        <input [formControl]="form.controls.size.controls.maxWidth">
+        <input [formControl]="form.controls.size.controls.maxWidth" class="e2e-max-width">
       </sci-form-field>
     </ng-template>
   </sci-accordion>
 
-  <sci-accordion class="e2e-miscellaneous" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_miscellaneous">
-      <header>Miscellaneous</header>
+  <sci-accordion class="e2e-behavior" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_behavior">
+      <header>Behavior</header>
     </ng-template>
-    <ng-template #panel_miscellaneous>
-      <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
-        <input class="e2e-component-instance-id" [value]="uuid" disabled>
-      </sci-form-field>
-
+    <ng-template #panel_behavior>
       <sci-form-field label="Closable">
-        <sci-checkbox [formControl]="form.controls.miscellaneous.controls.closable" class="e2e-closable"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.behavior.controls.closable" class="e2e-closable"></sci-checkbox>
       </sci-form-field>
 
+      <sci-form-field label="Resizable">
+        <sci-checkbox [formControl]="form.controls.behavior.controls.resizable" class="e2e-resizable"></sci-checkbox>
+      </sci-form-field>
+    </ng-template>
+  </sci-accordion>
+
+  <sci-accordion class="e2e-styles" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_styles">
+      <header>Styles</header>
+    </ng-template>
+    <ng-template #panel_styles>
       <sci-form-field label="Padding">
-        <input [formControl]="form.controls.miscellaneous.controls.padding">
+        <input [formControl]="form.controls.styles.controls.padding">
       </sci-form-field>
     </ng-template>
   </sci-accordion>

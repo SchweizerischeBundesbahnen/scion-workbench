@@ -44,6 +44,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
   public title: string | Observable<string | undefined> | undefined;
   public padding: string | undefined;
   public closable = true;
+  public resizable = true;
 
   /**
    * Indicates whether this dialog is attached to the DOM.

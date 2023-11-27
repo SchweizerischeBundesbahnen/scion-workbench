@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {fromRect, getCssClasses, isActiveElement, isPresent} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses, isActiveElement, isPresent} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench message box.
@@ -27,7 +27,7 @@ export class MessageBoxPO {
     return this.locator.isVisible();
   }
 
-  public async getBoundingBox(): Promise<DOMRect> {
+  public async getBoundingBox(): Promise<DomRect> {
     return fromRect(await this.locator.boundingBox());
   }
 
