@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, getCssClasses, isPresent} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses, isPresent} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabPO} from './view-tab.po';
@@ -58,7 +58,7 @@ export class ViewPO {
     return getCssClasses(this.locator);
   }
 
-  public async getBoundingBox(): Promise<DOMRect> {
+  public async getBoundingBox(): Promise<DomRect> {
     return fromRect(await this.locator.boundingBox());
   }
 

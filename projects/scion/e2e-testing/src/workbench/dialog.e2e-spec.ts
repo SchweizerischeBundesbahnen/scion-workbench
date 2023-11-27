@@ -30,7 +30,7 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect(dialog.locator).toBeVisible();
-      await expect(await dialog.getGlassPaneBoundingBox()).toEqual(await dialogOpenerPage.view.getBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await dialogOpenerPage.view.getBoundingBox());
     });
 
     test('should reject the promise when attaching the dialog to a non-existent view', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -43,10 +43,9 @@ test.describe('Workbench Dialog', () => {
       await expect(dialogOpenerPage.open('blank', {modality: 'view', contextualViewId: 'non-existent'})).rejects.toThrow('[NullViewError] View \'non-existent\' not found.');
 
       // Expect no error to be logged to the console.
-      await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
+      await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);
     });
 
-    // TODO [REVIEW] Why not moving to contextual-view.e2e-spec.ts
     test('should detach dialog when its contextual view is deactivated', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
@@ -69,10 +68,9 @@ test.describe('Workbench Dialog', () => {
       await expect(dialog.locator).toBeVisible();
 
       // Expect the component not to be constructed anew.
-      await expect(await dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
-    // TODO [REVIEW] Why not moving to contextual-view.e2e-spec.ts
     test('should detach the dialog if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
@@ -105,7 +103,7 @@ test.describe('Workbench Dialog', () => {
       await expect(dialog.locator).toBeVisible();
 
       // Expect the component not to be constructed anew.
-      await expect(await dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
     test('should allow opening a dialog in any view', async ({appPO, workbenchNavigator}) => {
@@ -120,7 +118,7 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.open('blank', {cssClass: 'testee', modality: 'view', contextualViewId: await viewTab2.getViewId()});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect(await appPO.getDialogCount()).toEqual(1);
+      await expect.poll(() => appPO.getDialogCount()).toEqual(1);
       await expect(dialog.locator).not.toBeVisible();
       await expect(dialog.locator).toBeAttached();
 
@@ -128,18 +126,18 @@ test.describe('Workbench Dialog', () => {
       await viewTab1.click();
       await expect(dialog.locator).not.toBeVisible();
       await expect(dialog.locator).toBeAttached();
-      await expect(await appPO.getDialogCount()).toEqual(1);
+      await expect.poll(() => appPO.getDialogCount()).toEqual(1);
 
       // Activate view 2.
       await viewTab2.click();
       await expect(dialog.locator).toBeVisible();
-      await expect(await appPO.getDialogCount()).toEqual(1);
+      await expect.poll(() => appPO.getDialogCount()).toEqual(1);
 
       // Activate view 3.
       await viewTab3.click();
       await expect(dialog.locator).not.toBeVisible();
       await expect(dialog.locator).toBeAttached();
-      await expect(await appPO.getDialogCount()).toEqual(1);
+      await expect.poll(() => appPO.getDialogCount()).toEqual(1);
     });
 
     test('should prevent closing a view if it displays a dialog with view modality', async ({page, appPO, workbenchNavigator}) => {
@@ -187,7 +185,7 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect(dialog.locator).toBeVisible();
-      await expect(await dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
     });
 
     test('should open an application-modal dialog if in the context of a view and application-modality selected', async ({appPO, workbenchNavigator}) => {
@@ -199,7 +197,7 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect(dialog.locator).toBeVisible();
-      await expect(await dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
     });
 
     test('should open an application-modal dialog with viewport scope when configured', async ({appPO, workbenchNavigator}) => {
@@ -212,7 +210,7 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect(dialog.locator).toBeVisible();
-      await expect(await dialog.getGlassPaneBoundingBox()).toEqual(await appPO.pageBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await appPO.pageBoundingBox());
     });
 
     test('should delay opening view-modal dialog until all application-modal dialogs are closed', async ({appPO, workbenchNavigator}) => {
@@ -265,10 +263,10 @@ test.describe('Workbench Dialog', () => {
       // Re-mount the workbench component by navigating the primary router.
       await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
       await expect(dialog.locator).toBeVisible();
-      await expect(await dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
 
       // Expect the component not to be constructed anew.
-      await expect(await dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
   });
 
@@ -512,7 +510,7 @@ test.describe('Workbench Dialog', () => {
       await expect(dialog.title).toHaveText('TITLE');
 
       // Expect no error to be thrown, e.g. ExpressionChangedAfterItHasBeenCheckedError.
-      await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
+      await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);
     });
 
     test('should not change dialog width when setting long title', async ({appPO, workbenchNavigator}) => {
@@ -528,7 +526,7 @@ test.describe('Workbench Dialog', () => {
       await dialogPage.enterTitle('Very Long Title'.repeat(100));
 
       // Expect title not to change dialog width.
-      await expect(await dialog.getDialogBoundingBox()).toEqual(dialogPaneBoundingBox);
+      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(dialogPaneBoundingBox);
     });
   });
 
@@ -697,6 +695,900 @@ test.describe('Workbench Dialog', () => {
 
       // Expect top dialog to be interactable.
       await expect(topDialog.clickHeader()).resolves.toBeUndefined();
+    });
+  });
+
+  test.describe('Moving', () => {
+
+    test('should support moving the dialog', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogBounds = await dialog.getDialogBoundingBox();
+
+      await test.step('moving dialog 50px to the right and 100px to the bottom', async () => {
+        await dialog.moveDialog({x: 50, y: 100});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x + 50,
+          y: dialogBounds.y + 100,
+          height: dialogBounds.height,
+          width: dialogBounds.width,
+        }));
+      });
+
+      await test.step('moving dialog 100px to the left', async () => {
+        await dialog.moveDialog({x: -100, y: 0});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x - 50,
+          y: dialogBounds.y + 100,
+          height: dialogBounds.height,
+          width: dialogBounds.width,
+        }));
+      });
+
+      await test.step('moving dialog 100px to the top', async () => {
+        await dialog.moveDialog({x: 0, y: -100});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x - 50,
+          y: dialogBounds.y,
+          height: dialogBounds.height,
+          width: dialogBounds.width,
+        }));
+      });
+
+      await test.step('moving dialog 50px to the right', async () => {
+        await dialog.moveDialog({x: 50, y: 0});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: dialogBounds.height,
+          width: dialogBounds.width,
+        }));
+      });
+    });
+  });
+
+  test.describe('Resizing', () => {
+
+    test('should be resizable by default', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+
+      // Expect the dialog to be resizable.
+      await expect(dialog.resizeHandles).toHaveCount(8); // top-left, top, top-right, right, bottom-right, bottom, bottom-left, left
+    });
+
+    test('should allow non-resizable dialog', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+
+      const dialogPage = new DialogPagePO(dialog);
+      await dialogPage.setResizable(false);
+
+      // Expect the dialog not to be resizable.
+      await expect(dialog.resizeHandles).toHaveCount(0);
+    });
+
+    test.describe('top handle', () => {
+
+      test('should resize the dialog when dragging the top handle', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({height: '500px', width: '500px'});
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle 10px to the top', async () => {
+          await dialog.resizeTop(-10);
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y - 10,
+            height: dialogBounds.height + 10,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle 10px to the bottom', async () => {
+          await dialog.resizeTop(10);
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+
+      test('should resize the dialog when dragging the top handle, respecting height constraints', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({
+          height: '400px',
+          width: '400px',
+          minHeight: '300px',
+          maxHeight: '500px',
+        });
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle past max-height to the top', async () => {
+          await dialog.resizeTop(-200, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y - 100,
+            height: dialogBounds.height + 100,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.hcenter, dialogBounds.top, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle past min-height to the bottom', async () => {
+          await dialog.resizeTop(200, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y + 100,
+            height: dialogBounds.height - 100,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.hcenter, dialogBounds.top, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+    });
+
+    test.describe('bottom handle', () => {
+
+      test('should resize the dialog when dragging the bottom handle', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({height: '500px', width: '500px'});
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle 10px to the bottom', async () => {
+          await dialog.resizeBottom(10);
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height + 10,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle 10px to the top', async () => {
+          await dialog.resizeBottom(-10);
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+
+      test('should resize the dialog when dragging the bottom handle, respecting height constraints', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({
+          height: '400px',
+          width: '400px',
+          minHeight: '300px',
+          maxHeight: '500px',
+        });
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle past max-height to the bottom', async () => {
+          await dialog.resizeBottom(200, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height + 100,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.hcenter, dialogBounds.bottom, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle past min-height to the top', async () => {
+          await dialog.resizeBottom(-200, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height - 100,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.hcenter, dialogBounds.bottom, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+    });
+
+    test.describe('left handle', () => {
+
+      test('should resize the dialog when dragging the left handle', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({height: '500px', width: '500px'});
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle 10px to the left', async () => {
+          await dialog.resizeLeft(-10);
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x - 10,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width + 10,
+          }));
+        });
+
+        await test.step('dragging handle 10px to the right', async () => {
+          await dialog.resizeLeft(10);
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+
+      test('should resize the dialog when dragging the left handle, respecting width constraints', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({
+          height: '400px',
+          width: '400px',
+          minWidth: '300px',
+          maxWidth: '500px',
+        });
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle past max-width to the left', async () => {
+          await dialog.resizeLeft(-200, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x - 100,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width + 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.left, dialogBounds.vcenter, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle past min-width to the right', async () => {
+          await dialog.resizeLeft(200, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x + 100,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width - 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.left, dialogBounds.vcenter, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+    });
+
+    test.describe('right handle', () => {
+
+      test('should resize the dialog when dragging the right handle', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({height: '500px', width: '500px'});
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle 10px to the right', async () => {
+          await dialog.resizeRight(10);
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width + 10,
+          }));
+        });
+
+        await test.step('dragging handle 10px to the left', async () => {
+          await dialog.resizeRight(-10);
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+
+      test('should resize the dialog when dragging the right handle, respecting width constraints', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({
+          height: '400px',
+          width: '400px',
+          minWidth: '300px',
+          maxWidth: '500px',
+        });
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle past max-width to the right', async () => {
+          await dialog.resizeRight(200, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width + 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.right, dialogBounds.vcenter, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle past min-width to the left', async () => {
+          await dialog.resizeRight(-200, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width - 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.right, dialogBounds.vcenter, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+    });
+
+    test.describe('top-left handle', () => {
+
+      test('should resize the dialog when dragging the top-left handle', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({height: '500px', width: '500px'});
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle 10px to the left and 20px to the top', async () => {
+          await dialog.resizeTopLeft({x: -10, y: -20});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x - 10,
+            y: dialogBounds.y - 20,
+            height: dialogBounds.height + 20,
+            width: dialogBounds.width + 10,
+          }));
+        });
+
+        await test.step('dragging handle 10px to the right and 20px to the bottom', async () => {
+          await dialog.resizeTopLeft({x: 10, y: 20});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+
+      test('should resize the dialog when dragging the top-left handle, respecting width constraints', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({
+          height: '400px',
+          width: '400px',
+          minWidth: '300px',
+          maxWidth: '500px',
+          minHeight: '300px',
+          maxHeight: '500px',
+        });
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle past max-size', async () => {
+          await dialog.resizeTopLeft({x: -200, y: -200}, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x - 100,
+            y: dialogBounds.y - 100,
+            height: dialogBounds.height + 100,
+            width: dialogBounds.width + 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.left, dialogBounds.top, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle past min-size', async () => {
+          await dialog.resizeTopLeft({x: 200, y: 200}, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x + 100,
+            y: dialogBounds.y + 100,
+            height: dialogBounds.height - 100,
+            width: dialogBounds.width - 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.left, dialogBounds.top, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+    });
+
+    test.describe('top-right handle', () => {
+
+      test('should resize the dialog when dragging the top-right handle', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({height: '500px', width: '500px'});
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle 10px to the right and 20px to the top', async () => {
+          await dialog.resizeTopRight({x: 10, y: -20});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y - 20,
+            height: dialogBounds.height + 20,
+            width: dialogBounds.width + 10,
+          }));
+        });
+
+        await test.step('dragging handle 10px to the left and 20px to the bottom', async () => {
+          await dialog.resizeTopRight({x: -10, y: 20});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+
+      test('should resize the dialog when dragging the top-right handle, respecting width constraints', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({
+          height: '400px',
+          width: '400px',
+          minWidth: '300px',
+          maxWidth: '500px',
+          minHeight: '300px',
+          maxHeight: '500px',
+        });
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle past max-size', async () => {
+          await dialog.resizeTopRight({x: 200, y: -200}, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y - 100,
+            height: dialogBounds.height + 100,
+            width: dialogBounds.width + 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.right, dialogBounds.top, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle past min-size', async () => {
+          await dialog.resizeTopRight({x: -200, y: 200}, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y + 100,
+            height: dialogBounds.height - 100,
+            width: dialogBounds.width - 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.right, dialogBounds.top, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+    });
+
+    test.describe('bottom-right handle', () => {
+
+      test('should resize the dialog when dragging the bottom-right handle', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({height: '500px', width: '500px'});
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle 10px to the right and 20px to the bottom', async () => {
+          await dialog.resizeBottomRight({x: 10, y: 20});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height + 20,
+            width: dialogBounds.width + 10,
+          }));
+        });
+
+        await test.step('dragging handle 10px to the left and 20px to the top', async () => {
+          await dialog.resizeBottomRight({x: -10, y: -20});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+
+      test('should resize the dialog when dragging the bottom-right handle, respecting width constraints', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({
+          height: '400px',
+          width: '400px',
+          minWidth: '300px',
+          maxWidth: '500px',
+          minHeight: '300px',
+          maxHeight: '500px',
+        });
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle past max-size', async () => {
+          await dialog.resizeBottomRight({x: 200, y: 200}, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height + 100,
+            width: dialogBounds.width + 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.right, dialogBounds.bottom, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle past min-size', async () => {
+          await dialog.resizeBottomRight({x: -200, y: -200}, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height - 100,
+            width: dialogBounds.width - 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.right, dialogBounds.bottom, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+    });
+
+    test.describe('bottom-left handle', () => {
+
+      test('should resize the dialog when dragging the bottom-left handle', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({height: '500px', width: '500px'});
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle 10px to the left and 20px to the bottom', async () => {
+          await dialog.resizeBottomLeft({x: -10, y: 20});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x - 10,
+            y: dialogBounds.y,
+            height: dialogBounds.height + 20,
+            width: dialogBounds.width + 10,
+          }));
+        });
+
+        await test.step('dragging handle 10px to the right and 20px to the top', async () => {
+          await dialog.resizeBottomLeft({x: 10, y: -20});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
+
+      test('should resize the dialog when dragging the bottom-left handle, respecting width constraints', async ({appPO, workbenchNavigator}) => {
+        await appPO.navigateTo({microfrontendSupport: false});
+
+        // Open the dialog.
+        const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+        await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+        const dialog = appPO.dialog({cssClass: 'testee'});
+        const dialogPage = new DialogPagePO(dialog);
+        await dialogPage.enterSize({
+          height: '400px',
+          width: '400px',
+          minWidth: '300px',
+          maxWidth: '500px',
+          minHeight: '300px',
+          maxHeight: '500px',
+        });
+        const dialogBounds = await dialog.getDialogBoundingBox();
+
+        // Resize the dialog.
+        await test.step('dragging handle past max-size', async () => {
+          await dialog.resizeBottomLeft({x: -200, y: 200}, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x - 100,
+            y: dialogBounds.y,
+            height: dialogBounds.height + 100,
+            width: dialogBounds.width + 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.left, dialogBounds.bottom, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+
+        await test.step('dragging handle past min-size', async () => {
+          await dialog.resizeBottomLeft({x: 200, y: -200}, {mouseup: false});
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x + 100,
+            y: dialogBounds.y,
+            height: dialogBounds.height - 100,
+            width: dialogBounds.width - 100,
+          }));
+        });
+
+        await test.step('dragging handle back to initial position', async () => {
+          const mouse = appPO.page.mouse;
+          await mouse.move(dialogBounds.left, dialogBounds.bottom, {steps: 10});
+          await mouse.up();
+          await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+            x: dialogBounds.x,
+            y: dialogBounds.y,
+            height: dialogBounds.height,
+            width: dialogBounds.width,
+          }));
+        });
+      });
     });
   });
 });

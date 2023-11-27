@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, fromRect, isPresent, waitUntilStable} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, isPresent, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
@@ -199,14 +199,14 @@ export class AppPO {
   /**
    * Returns bounding box of the 'wb-workbench' element.
    */
-  public async workbenchBoundingBox(): Promise<DOMRect> {
+  public async workbenchBoundingBox(): Promise<DomRect> {
     return fromRect(await this.workbenchLocator.boundingBox());
   }
 
   /**
    * Returns the bounding box of the browser page viewport.
    */
-  public async pageBoundingBox(): Promise<DOMRect> {
+  public async pageBoundingBox(): Promise<DomRect> {
     return fromRect(await this.page.viewportSize());
   }
 
@@ -317,7 +317,7 @@ export class AppPO {
   /**
    * Returns the bounding box of the specified drop zone.
    */
-  public async getDropZoneBoundingBox(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<DOMRect & {hcenter: number; vcenter: number}> {
+  public async getDropZoneBoundingBox(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<DomRect> {
     const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
     const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
     return fromRect(await dropZoneLocator.boundingBox());

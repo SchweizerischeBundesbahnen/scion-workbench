@@ -45,9 +45,12 @@ export class DialogPageComponent {
       width: this._formBuilder.control(''),
       maxWidth: this._formBuilder.control(''),
     }),
-    miscellaneous: new FormGroup({
+    behavior: new FormGroup({
+      closable: this._formBuilder.control(this.dialog.closable),
+      resizable: this._formBuilder.control(this.dialog.resizable),
+    }),
+    styles: new FormGroup({
       padding: this._formBuilder.control(''),
-      closable: this._formBuilder.control(true),
     }),
     result: this._formBuilder.control(''),
   });
@@ -98,11 +101,15 @@ export class DialogPageComponent {
         this.dialog.size.maxHeight = maxHeight;
       });
 
-    this.form.controls.miscellaneous.controls.closable.valueChanges
+    this.form.controls.behavior.controls.closable.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(closable => this.dialog.closable = closable);
 
-    this.form.controls.miscellaneous.controls.padding.valueChanges
+    this.form.controls.behavior.controls.resizable.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(resizable => this.dialog.resizable = resizable);
+
+    this.form.controls.styles.controls.padding.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(padding => this.dialog.padding = padding);
   }

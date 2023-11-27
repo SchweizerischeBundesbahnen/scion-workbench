@@ -9,7 +9,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {exhaustMap, filter, firstValueFrom, map, noop, pairwise, timer} from 'rxjs';
+import {exhaustMap, filter, firstValueFrom, map, pairwise, timer} from 'rxjs';
 
 /**
  * Returns if given CSS class is present on given element.
@@ -52,8 +52,8 @@ export async function isVisible(element: Locator): Promise<boolean> {
  * When an element is moved or resized, this may take some time, e.g. due to animations.
  * This function returns the bounding box if it hasn't changed for 100ms.
  */
-export async function waitUntilBoundingBoxStable(element: Locator): Promise<DOMRect> {
-  const isStable = (first: DOMRect, second: DOMRect): boolean => first.x === second.x && first.y === second.y && first.width === second.width && first.height === second.height;
+export async function waitUntilBoundingBoxStable(element: Locator): Promise<DomRect> {
+  const isStable = (first: DomRect, second: DomRect): boolean => first.x === second.x && first.y === second.y && first.width === second.width && first.height === second.height;
   return waitUntilStable(async () => fromRect(await element.boundingBox()), {isStable});
 }
 
@@ -92,11 +92,11 @@ export function rejectWhenAttached(locator: Locator): Promise<never> {
 }
 
 /**
- * Creates a {@link DOMRect} from given rectangle.
+ * Creates a {@link DomRect} from given rectangle.
  *
  * Similar to {@link DOMRect#fromRect} but can be used in e2e-tests executed in NodeJS.
  */
-export function fromRect(other: DOMRectInit | null): DOMRect & {hcenter: number; vcenter: number} {
+export function fromRect(other: DOMRectInit | null): DomRect {
   const width = other?.width ?? 0;
   const height = other?.height ?? 0;
   const x = other?.x ?? 0;
@@ -112,7 +112,6 @@ export function fromRect(other: DOMRectInit | null): DOMRect & {hcenter: number;
     right: x + width,
     hcenter: x + width / 2,
     vcenter: y + height / 2,
-    toJSON: noop,
   };
 }
 
@@ -155,4 +154,20 @@ export function orElseThrow<T>(value: T | undefined, orElseThrowFn: () => Error)
     throw orElseThrowFn();
   }
   return value;
+}
+
+/**
+ * Position and size of an element.
+ */
+export interface DomRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+  hcenter: number;
+  vcenter: number;
 }
