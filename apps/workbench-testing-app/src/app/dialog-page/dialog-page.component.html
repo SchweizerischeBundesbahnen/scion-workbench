@@ -11,33 +11,48 @@
     <input class="e2e-input" [value]="input" disabled>
   </sci-form-field>
 
-  <sci-accordion class="e2e-size" variant="solid">
+  <sci-accordion class="e2e-dialog-size" variant="solid">
     <ng-template sciAccordionItem [panel]="panel_size">
-      <header>Size</header>
+      <header>Dialog Size</header>
     </ng-template>
     <ng-template #panel_size>
       <sci-form-field label="Min Height">
-        <input [formControl]="form.controls.size.controls.minHeight" class="e2e-min-height">
+        <input [formControl]="form.controls.dialogSize.controls.minHeight" class="e2e-min-height">
       </sci-form-field>
 
       <sci-form-field label="Height">
-        <input [formControl]="form.controls.size.controls.height" class="e2e-height">
+        <input [formControl]="form.controls.dialogSize.controls.height" class="e2e-height">
       </sci-form-field>
 
       <sci-form-field label="Max Height">
-        <input [formControl]="form.controls.size.controls.maxHeight" class="e2e-max-height">
+        <input [formControl]="form.controls.dialogSize.controls.maxHeight" class="e2e-max-height">
       </sci-form-field>
 
       <sci-form-field label="Min Width">
-        <input [formControl]="form.controls.size.controls.minWidth" class="e2e-min-width">
+        <input [formControl]="form.controls.dialogSize.controls.minWidth" class="e2e-min-width">
       </sci-form-field>
 
       <sci-form-field label="Width">
-        <input [formControl]="form.controls.size.controls.width" class="e2e-width">
+        <input [formControl]="form.controls.dialogSize.controls.width" class="e2e-width">
       </sci-form-field>
 
       <sci-form-field label="Max Width">
-        <input [formControl]="form.controls.size.controls.maxWidth" class="e2e-max-width">
+        <input [formControl]="form.controls.dialogSize.controls.maxWidth" class="e2e-max-width">
+      </sci-form-field>
+    </ng-template>
+  </sci-accordion>
+
+  <sci-accordion class="e2e-content-size" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_content_size">
+      <header>Content Size</header>
+    </ng-template>
+    <ng-template #panel_content_size>
+      <sci-form-field label="Height">
+        <input [formControl]="form.controls.contentSize.controls.height" class="e2e-height">
+      </sci-form-field>
+
+      <sci-form-field label="Width">
+        <input [formControl]="form.controls.contentSize.controls.width" class="e2e-width">
       </sci-form-field>
     </ng-template>
   </sci-accordion>
@@ -63,7 +78,7 @@
     </ng-template>
     <ng-template #panel_styles>
       <sci-form-field label="Padding">
-        <input [formControl]="form.controls.styles.controls.padding">
+        <input [formControl]="form.controls.styles.controls.padding" class="e2e-padding">
       </sci-form-field>
     </ng-template>
   </sci-accordion>

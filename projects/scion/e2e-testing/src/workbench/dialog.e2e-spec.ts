@@ -752,6 +752,95 @@ test.describe('Workbench Dialog', () => {
     });
   });
 
+  test.describe('Size', () => {
+
+    test('should adapt dialog size to the content size', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      // Unset padding to facilitate size assertion.
+      await dialogPage.setPadding('0');
+
+      // Capture border and header width.
+      const dialogBorder = 2 * await dialog.getDialogBorderWidth();
+      const dialogHeaderHeight = (await dialog.getHeaderBoundingBox()).height;
+
+      // Change the size of the content.
+      await dialogPage.enterContentSize({
+        height: '500px',
+        width: '500px',
+      });
+
+      // Expect the dialog to adapt to the content size.
+      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        height: 500 + dialogBorder + dialogHeaderHeight,
+        width: 500 + dialogBorder,
+      }));
+
+      await test.step('should not grow past max-height', async () => {
+        await dialogPage.enterDialogSize({maxHeight: '300px'});
+
+        // Expect the dialog height to be max height.
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          height: 300,
+          width: 500 + dialogBorder,
+        }));
+
+        // Expect the dialog content to overflow vertically.
+        await expect(dialog.contentScrollbars.vertical).toBeVisible();
+        await expect(dialog.contentScrollbars.horizontal).not.toBeVisible();
+      });
+
+      await test.step('should not shrink past min-height', async () => {
+        await dialogPage.enterDialogSize({minHeight: '600px'});
+
+        // Expect the dialog height to be min height.
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          height: 600,
+          width: 500 + dialogBorder,
+        }));
+
+        // Expect the dialog content not to overflow vertically.
+        await expect(dialog.contentScrollbars.vertical).not.toBeVisible();
+        await expect(dialog.contentScrollbars.horizontal).not.toBeVisible();
+      });
+
+      await test.step('should not grow past max-width', async () => {
+        await dialogPage.enterDialogSize({maxWidth: '300px'});
+
+        // Expect the dialog width to be max-width.
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          height: 500 + dialogBorder + dialogHeaderHeight,
+          width: 300,
+        }));
+
+        // Expect the dialog content to overflow horizontally.
+        await expect(dialog.contentScrollbars.vertical).not.toBeVisible();
+        await expect(dialog.contentScrollbars.horizontal).toBeVisible();
+      });
+
+      await test.step('should not shrink past min-width', async () => {
+        await dialogPage.enterDialogSize({minWidth: '600px'});
+
+        // Expect the dialog width to be min-width.
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          height: 500 + dialogBorder + dialogHeaderHeight,
+          width: 600,
+        }));
+
+        // Expect the dialog content not to overflow horizontally.
+        await expect(dialog.contentScrollbars.vertical).not.toBeVisible();
+        await expect(dialog.contentScrollbars.horizontal).not.toBeVisible();
+      });
+    });
+  });
+
   test.describe('Resizing', () => {
 
     test('should be resizable by default', async ({appPO, workbenchNavigator}) => {
@@ -794,7 +883,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({height: '500px', width: '500px'});
+        await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
         // Resize the dialog.
@@ -828,7 +917,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({
+        await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
           minHeight: '300px',
@@ -894,7 +983,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({height: '500px', width: '500px'});
+        await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
         // Resize the dialog.
@@ -928,7 +1017,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({
+        await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
           minHeight: '300px',
@@ -994,7 +1083,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({height: '500px', width: '500px'});
+        await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
         // Resize the dialog.
@@ -1028,7 +1117,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({
+        await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
           minWidth: '300px',
@@ -1094,7 +1183,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({height: '500px', width: '500px'});
+        await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
         // Resize the dialog.
@@ -1128,7 +1217,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({
+        await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
           minWidth: '300px',
@@ -1194,7 +1283,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({height: '500px', width: '500px'});
+        await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
         // Resize the dialog.
@@ -1228,7 +1317,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({
+        await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
           minWidth: '300px',
@@ -1296,7 +1385,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({height: '500px', width: '500px'});
+        await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
         // Resize the dialog.
@@ -1330,7 +1419,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({
+        await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
           minWidth: '300px',
@@ -1398,7 +1487,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({height: '500px', width: '500px'});
+        await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
         // Resize the dialog.
@@ -1432,7 +1521,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({
+        await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
           minWidth: '300px',
@@ -1500,7 +1589,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({height: '500px', width: '500px'});
+        await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
         // Resize the dialog.
@@ -1534,7 +1623,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
-        await dialogPage.enterSize({
+        await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
           minWidth: '300px',

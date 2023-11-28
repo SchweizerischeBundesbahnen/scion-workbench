@@ -23,12 +23,21 @@ export class DialogPO {
   public readonly closeButton: Locator;
   public readonly resizeHandles: Locator;
 
+  public readonly contentScrollbars: {
+    vertical: Locator;
+    horizontal: Locator;
+  };
+
   constructor(public readonly locator: Locator) {
     this._dialogPane = this.locator.locator('div.e2e-dialog-pane');
     this.header = this._dialogPane.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');
     this.closeButton = this.header.locator('button.e2e-close');
     this.resizeHandles = this._dialogPane.locator('div.e2e-resize-handle');
+    this.contentScrollbars = {
+      vertical: this._dialogPane.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-vertical'),
+      horizontal: this._dialogPane.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-horizontal'),
+    };
   }
 
   public async getDialogBoundingBox(): Promise<DomRect> {
@@ -37,6 +46,14 @@ export class DialogPO {
 
   public async getGlassPaneBoundingBox(): Promise<DomRect> {
     return fromRect(await this.locator.page().locator('.cdk-overlay-pane.wb-dialog-glass-pane', {has: this.locator}).boundingBox());
+  }
+
+  public async getHeaderBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.header.boundingBox());
+  }
+
+  public async getDialogBorderWidth(): Promise<number> {
+    return this._dialogPane.evaluate((element: HTMLElement) => parseInt(getComputedStyle(element).borderWidth, 10));
   }
 
   public async close(options?: {timeout?: number}): Promise<void> {

@@ -1,8 +1,14 @@
 @use '@scion/components.internal/design' as sci-design;
 
 :host {
+  --ɵapp-dialog-page-height: initial;
+  --ɵapp-dialog-page-width: initial;
+
   display: flex;
   flex-direction: column;
+  height: var(--ɵapp-dialog-page-height);
+  width: var(--ɵapp-dialog-page-width);
+  overflow: hidden; // crop overflow when changing minimum size in end-to-end test
 
   > form {
     flex: auto;
