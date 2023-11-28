@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, HostBinding, Input} from '@angular/core';
 import {WorkbenchDialog} from '@scion/workbench';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
@@ -37,13 +37,17 @@ export class DialogPageComponent {
   public uuid = UUID.randomUUID();
   public form = this._formBuilder.group({
     title: this._formBuilder.control(''),
-    size: new FormGroup({
+    dialogSize: new FormGroup({
       minHeight: this._formBuilder.control(''),
       height: this._formBuilder.control(''),
       maxHeight: this._formBuilder.control(''),
       minWidth: this._formBuilder.control(''),
       width: this._formBuilder.control(''),
       maxWidth: this._formBuilder.control(''),
+    }),
+    contentSize: new FormGroup({
+      height: this._formBuilder.control(''),
+      width: this._formBuilder.control(''),
     }),
     behavior: new FormGroup({
       closable: this._formBuilder.control(this.dialog.closable),
@@ -57,6 +61,16 @@ export class DialogPageComponent {
 
   @Input()
   public input: string | undefined;
+
+  @HostBinding('style.--ɵapp-dialog-page-height')
+  protected get height(): string | undefined {
+    return this.form.controls.contentSize.controls.height.value || undefined;
+  }
+
+  @HostBinding('style.--ɵapp-dialog-page-width')
+  protected get width(): string | undefined {
+    return this.form.controls.contentSize.controls.width.value || undefined;
+  }
 
   constructor(public dialog: WorkbenchDialog<string>, private _formBuilder: NonNullableFormBuilder) {
     this.installPropertyUpdater();
@@ -75,30 +89,30 @@ export class DialogPageComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(title => this.dialog.title = title);
 
-    this.form.controls.size.controls.minWidth.valueChanges
+    this.form.controls.dialogSize.controls.minWidth.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(minWidth => this.dialog.size.minWidth = minWidth);
+      .subscribe(minWidth => this.dialog.size.minWidth = minWidth || undefined);
 
-    this.form.controls.size.controls.width.valueChanges
+    this.form.controls.dialogSize.controls.width.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(width => this.dialog.size.width = width);
+      .subscribe(width => this.dialog.size.width = width || undefined);
 
-    this.form.controls.size.controls.maxWidth.valueChanges
+    this.form.controls.dialogSize.controls.maxWidth.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(maxWidth => this.dialog.size.maxWidth = maxWidth);
+      .subscribe(maxWidth => this.dialog.size.maxWidth = maxWidth || undefined);
 
-    this.form.controls.size.controls.minHeight.valueChanges
+    this.form.controls.dialogSize.controls.minHeight.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(minHeight => this.dialog.size.minHeight = minHeight);
+      .subscribe(minHeight => this.dialog.size.minHeight = minHeight || undefined);
 
-    this.form.controls.size.controls.height.valueChanges
+    this.form.controls.dialogSize.controls.height.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(height => this.dialog.size.height = height);
+      .subscribe(height => this.dialog.size.height = height || undefined);
 
-    this.form.controls.size.controls.maxHeight.valueChanges
+    this.form.controls.dialogSize.controls.maxHeight.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(maxHeight => {
-        this.dialog.size.maxHeight = maxHeight;
+        this.dialog.size.maxHeight = maxHeight || undefined;
       });
 
     this.form.controls.behavior.controls.closable.valueChanges

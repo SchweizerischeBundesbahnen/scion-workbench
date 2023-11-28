@@ -15,7 +15,7 @@
       <button *ngIf="dialog.closable" class="close scion-workbench-icons e2e-close" (mousedown)="onCloseMouseDown($event)" (click)="onCloseClick()">close</button>
     </header>
 
-    <sci-viewport class="content" cdkTrapFocus>
+    <sci-viewport class="content e2e-dialog-content" cdkTrapFocus>
       <ng-container *ngComponentOutlet="dialog.component; inputs: dialog.inputs"></ng-container>
     </sci-viewport>
   </section>
