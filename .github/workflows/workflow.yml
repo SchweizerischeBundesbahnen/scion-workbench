@@ -1,5 +1,5 @@
 name: Continuous Integration and Delivery
-on: [ push, pull_request ]
+on: [push, pull_request, workflow_dispatch]
 env:
   NODE_VERSION: 20.9.0
 jobs:
