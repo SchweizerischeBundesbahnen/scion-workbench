@@ -765,11 +765,12 @@ test.describe('Workbench Dialog', () => {
       const dialogPage = new DialogPagePO(dialog);
 
       // Unset padding to facilitate size assertion.
-      await dialogPage.setPadding('0');
+      await dialogPage.setPadding(false);
 
-      // Capture border and header width.
+      // Capture border, header and footer height.
       const dialogBorder = 2 * await dialog.getDialogBorderWidth();
       const dialogHeaderHeight = (await dialog.getHeaderBoundingBox()).height;
+      const dialogFooterHeight = (await dialog.getFooterBoundingBox()).height;
 
       // Change the size of the content.
       await dialogPage.enterContentSize({
@@ -779,7 +780,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect the dialog to adapt to the content size.
       await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
-        height: 500 + dialogBorder + dialogHeaderHeight,
+        height: 500 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
         width: 500 + dialogBorder,
       }));
 
@@ -816,7 +817,7 @@ test.describe('Workbench Dialog', () => {
 
         // Expect the dialog width to be max-width.
         await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
-          height: 500 + dialogBorder + dialogHeaderHeight,
+          height: 500 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
           width: 300,
         }));
 
@@ -830,7 +831,7 @@ test.describe('Workbench Dialog', () => {
 
         // Expect the dialog width to be min-width.
         await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
-          height: 500 + dialogBorder + dialogHeaderHeight,
+          height: 500 + dialogBorder + dialogHeaderHeight + dialogFooterHeight,
           width: 600,
         }));
 

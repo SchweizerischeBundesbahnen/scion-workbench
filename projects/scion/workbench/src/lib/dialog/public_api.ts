@@ -11,3 +11,6 @@
 export {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
 export {WorkbenchDialogOptions} from './workbench-dialog.options';
 export {WorkbenchDialogService} from './workbench-dialog.service';
+export {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
+export {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-footer.directive';
+export {WorkbenchDialogHeaderDirective} from './dialog-header/workbench-dialog-header.directive';

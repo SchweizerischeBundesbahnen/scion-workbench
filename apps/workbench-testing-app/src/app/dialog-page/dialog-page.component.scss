@@ -1,11 +1,9 @@
 @use '@scion/components.internal/design' as sci-design;
 
 :host {
+  display: block;
   --ɵapp-dialog-page-height: initial;
   --ɵapp-dialog-page-width: initial;
-
-  display: flex;
-  flex-direction: column;
   height: var(--ɵapp-dialog-page-height);
   width: var(--ɵapp-dialog-page-width);
   overflow: hidden; // crop overflow when changing minimum size in end-to-end test
@@ -26,12 +24,10 @@
       }
     }
   }
+}
 
-  > div.buttons {
-    flex: none;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: .25em;
-    margin-top: 1em;
-  }
+label {
+  display: flex;
+  align-items: center;
+  gap: .5em;
 }

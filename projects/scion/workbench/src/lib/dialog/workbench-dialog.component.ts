@@ -13,8 +13,7 @@ import {AfterViewInit, Component, DestroyRef, ElementRef, HostBinding, HostListe
 import {EMPTY, fromEvent, Subject, switchMap, timer} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
-import {AsyncPipe, DOCUMENT, NgComponentOutlet, NgIf} from '@angular/common';
-import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
+import {DOCUMENT, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -24,6 +23,8 @@ import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {MovableDirective, WbMoveEvent} from './movable.directive';
 import {ResizableDirective, WbResizeEvent} from './resizable.directive';
 import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
+import {DialogHeaderComponent} from './dialog-header/dialog-header.component';
+import {DialogFooterComponent} from './dialog-footer/dialog-footer.component';
 
 /**
  * Renders the workbench dialog.
@@ -39,15 +40,15 @@ import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
   styleUrls: ['./workbench-dialog.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
-    AsyncPipe,
     NgComponentOutlet,
+    NgTemplateOutlet,
     A11yModule,
     MovableDirective,
     ResizableDirective,
-    CoerceObservablePipe,
     SciViewportComponent,
     SciDimensionDirective,
+    DialogHeaderComponent,
+    DialogFooterComponent,
   ],
   animations: [
     trigger('enter', provideEnterAnimation()),
@@ -63,8 +64,8 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
   @ViewChild(CdkTrapFocus, {static: true})
   private _cdkTrapFocus!: CdkTrapFocus;
 
-  @ViewChild('dialog_pane', {static: true})
-  private _dialogPane!: ElementRef<HTMLElement>;
+  @ViewChild('dialog_element', {static: true})
+  private _dialogElement!: ElementRef<HTMLElement>;
 
   @HostBinding('style.--ɵdialog-transform-translate-x')
   protected transformTranslateX = 0;
@@ -102,9 +103,9 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
     return this.dialog.size.maxWidth;
   }
 
-  @HostBinding('style.--ɵdialog-padding')
-  protected get padding(): string | undefined {
-    return this.dialog.padding;
+  @HostBinding('class.justified')
+  protected get justified(): boolean {
+    return !this.dialog.padding;
   }
 
   @HostBinding('attr.class')
@@ -143,7 +144,7 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
       this._activeElement.focus();
     }
     else if (!this._cdkTrapFocus.focusTrap.focusFirstTabbableElement()) {
-      this._dialogPane.nativeElement.focus();
+      this._dialogElement.nativeElement.focus();
     }
   }
 
@@ -157,7 +158,7 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
    * Tracks the focus of the dialog.
    */
   private trackFocus(): void {
-    fromEvent(this._dialogPane.nativeElement, 'focusin')
+    fromEvent(this._dialogElement.nativeElement, 'focusin')
       .pipe(
         subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
         takeUntilDestroyed(this._destroyRef),
@@ -173,7 +174,7 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
   private preventFocusIfBlocked(): void {
     this.dialog.blocked$
       .pipe(
-        switchMap(blocked => blocked ? fromEvent(this._dialogPane.nativeElement, 'focusin') : EMPTY),
+        switchMap(blocked => blocked ? fromEvent(this._dialogElement.nativeElement, 'focusin') : EMPTY),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => {
@@ -230,14 +231,6 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
     if (event.translateY !== undefined) {
       this.transformTranslateY = event.translateY;
     }
-  }
-
-  protected onCloseClick(): void {
-    this.dialog.close();
-  }
-
-  protected onCloseMouseDown(event: Event): void {
-    event.stopPropagation(); // Prevent dragging with the close button.
   }
 
   protected onHeaderDimensionChange(dimension: SciDimension): void {

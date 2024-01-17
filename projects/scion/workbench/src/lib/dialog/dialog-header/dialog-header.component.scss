@@ -1,0 +1,40 @@
+@use '../../common/workbench-mixins';
+
+:host {
+  display: flex;
+  gap: var(--sci-workbench-dialog-padding);
+  place-content: flex-end;
+  padding-inline: var(--sci-workbench-dialog-padding);
+  background-color: var(--sci-workbench-dialog-header-background-color);
+  user-select: none;
+  height: var(--sci-workbench-dialog-header-height);
+
+  > div.title {
+    flex: auto;
+    display: flex;
+    align-items: center;
+    position: relative; // positioning context for the title span
+
+    > span {
+      position: absolute; // out of document flow to not contribute to the dialog width
+      left: 0;
+      right: 0;
+      @include workbench-mixins.ellipsis-on-overflow();
+      font-family: var(--sci-workbench-dialog-title-font-family);
+      font-size: var(--sci-workbench-dialog-title-font-size);
+      font-weight: var(--sci-workbench-dialog-title-font-weight);
+      text-align: var(--sci-workbench-dialog-title-align);
+    }
+  }
+
+  > button.close {
+    all: unset;
+    flex: none;
+    cursor: pointer;
+    align-self: center;
+
+    &:not(:hover) {
+      opacity: .75;
+    }
+  }
+}

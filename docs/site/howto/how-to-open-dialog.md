@@ -18,7 +18,7 @@ const dialogService = inject(WorkbenchDialogService);
 dialogService.open(MyDialogComponent);
 ```
 
-### How to control the modality of a dialog
+### How to set the modality of a dialog
 A dialog can be view-modal or application-modal. A view-modal dialog blocks only a specific view, allowing the user to interact with other views. An application-modal dialog blocks the workbench by default, or the browser's viewport, if set in the global workbench settings.
 
 By default, the calling context determines the modality of the dialog. If the dialog is opened from a view, only this view is blocked. To open the dialog with a different modality, specify the modality in the dialog options.
@@ -80,6 +80,37 @@ The dialog component can inject the `WorkbenchDialog` handle and set the title.
 inject(WorkbenchDialog).title = 'My dialog title';
 ```
 
+### How to contribute to the dialog footer
+A dialog has a default footer that displays actions defined in the HTML of the dialog component. An action is an Angular template decorated with the `wbDialogAction` directive. Multiple actions are supported, rendered in modeling order, and can be left- or right-aligned.
+
+```html
+<!-- Checkbox -->
+<ng-template wbDialogAction align="start">
+  <label>
+    <input type="checkbox"/>
+    Do not ask me again
+  </label>
+</ng-template>
+
+<!-- OK Button -->
+<ng-template wbDialogAction align="end">
+  <button (click)="...">OK</button>
+</ng-template>
+
+<!-- Cancel Button -->
+<ng-template wbDialogAction align="end">
+  <button (click)="...">Cancel</button>
+</ng-template>
+```
+
+Alternatively, the dialog supports the use of a custom footer. To provide a custom footer, add an Angular template to the HTML of the dialog component and decorate it with the `wbDialogFooter` directive.
+
+```html
+<ng-template wbDialogFooter>
+  <app-dialog-footer/>
+</ng-template>
+```
+
 ### How to close the dialog 
 The dialog component can inject the `WorkbenchDialog` handle and close the dialog, optionally passing a result to the dialog opener.
 
@@ -115,6 +146,35 @@ inject(WorkbenchDialog).size.minWidth = '200px';
 inject(WorkbenchDialog).size.maxHeight = '900px';
 inject(WorkbenchDialog).size.maxWidth = '700px';
 ```
+
+### How to use a custom dialog header
+By default, the dialog displays the title and a close button in the header. Alternatively, the dialog supports the use of a custom header. To provide a custom header, add an Angular template to the HTML of the dialog component and decorate it with the `wbDialogHeader` directive.
+```html
+<ng-template wbDialogHeader>
+  <app-dialog-header/>
+</ng-template>
+```
+
+### How to change the default dialog settings
+The dialog component can inject the dialog handle `WorkbenchDialog` to interact with the dialog and change its default settings, such as making it non-closable, non-resizable, removing padding, and more.
+
+```ts
+const dialog = inject(WorkbenchDialog);
+dialog.closable = false;
+dialog.resizable = false;
+dialog.padding = false;
+```
+
+### How to change the default look of a dialog
+The following CSS variables can be set to customize the default look of a dialog.
+
+- `--sci-workbench-dialog-padding`
+- `--sci-workbench-dialog-header-height`
+- `--sci-workbench-dialog-header-background-color`
+- `--sci-workbench-dialog-title-font-family`
+- `--sci-workbench-dialog-title-font-weight`
+- `--sci-workbench-dialog-title-font-size`
+- `--sci-workbench-dialog-title-align`
 
 [menu-how-to]: /docs/site/howto/how-to.md
 

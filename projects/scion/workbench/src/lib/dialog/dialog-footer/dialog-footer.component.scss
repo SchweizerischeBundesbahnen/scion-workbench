@@ -1,0 +1,20 @@
+:host {
+  display: flex;
+  padding: calc(.75 * var(--sci-workbench-dialog-padding)) var(--sci-workbench-dialog-padding);
+  gap: calc(2 * var(--sci-workbench-dialog-padding));
+
+  > div.actions {
+    flex: auto;
+    display: flex;
+    align-items: center;
+    gap: calc(.5 * var(--sci-workbench-dialog-padding));
+
+    &.start {
+      place-content: flex-start;
+    }
+
+    &.end {
+      place-content: flex-end;
+    }
+  }
+}

@@ -18,9 +18,10 @@ export interface WorkbenchDialogOptions {
   /**
    * Optional data to pass to the dialog component. Inputs are available as input properties in the dialog component.
    *
+   * **Example:**
    * ```ts
    * @Input()
-   * public myInputName: string;
+   * public someInput: string;
    * ```
    */
   inputs?: {[name: string]: unknown};
@@ -42,6 +43,7 @@ export interface WorkbenchDialogOptions {
    * for injection into the dialog component. If not specified, uses the application's root injector, or the view's
    * injector if opened in the context of a view.
    *
+   * **Example:**
    * ```ts
    * Injector.create({
    *   parent: ...,

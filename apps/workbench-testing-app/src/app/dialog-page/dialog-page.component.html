@@ -78,7 +78,7 @@
     </ng-template>
     <ng-template #panel_styles>
       <sci-form-field label="Padding">
-        <input [formControl]="form.controls.styles.controls.padding" class="e2e-padding">
+        <sci-checkbox [formControl]="form.controls.styles.controls.padding" class="e2e-padding"></sci-checkbox>
       </sci-form-field>
     </ng-template>
   </sci-accordion>
@@ -93,7 +93,13 @@
   </sci-accordion>
 </form>
 
-<div class="buttons">
+<ng-template wbDialogAction align="start">
+  <label>
+    <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"></sci-checkbox>
+    Close with error
+  </label>
+</ng-template>
+
+<ng-template wbDialogAction align="end">
   <button (click)="onClose()" class="e2e-close" sci-primary>Close</button>
-  <button (click)="onCloseWithError()" class="e2e-close-with-error">Close (with error)</button>
-</div>
+</ng-template>

@@ -27,6 +27,10 @@ import {WORKBENCH_ELEMENT_REF} from '../content-projection/view-container.refere
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {filter} from 'rxjs/operators';
+import {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
+import {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-footer.directive';
+import {WorkbenchDialogHeaderDirective} from './dialog-header/workbench-dialog-header.directive';
+import {Disposable} from '../common/disposable';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
@@ -37,29 +41,27 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
   private readonly _zone = inject(NgZone);
   private readonly _workbenchModuleConfig = inject(WorkbenchModuleConfig);
   private readonly _destroyRef = new ɵDestroyRef();
-  private _componentRef: ComponentRef<WorkbenchDialogComponent> | undefined;
-  private _cssClass: string;
-
-  public readonly size: WorkbenchDialogSize = {};
-  public title: string | Observable<string | undefined> | undefined;
-  public padding: string | undefined;
-  public closable = true;
-  public resizable = true;
-
-  /**
-   * Indicates whether this dialog is attached to the DOM.
-   */
   private readonly _attached$: Observable<boolean>;
-
-  /**
-   * Indicates whether this dialog is blocked by other dialog(s) that overlay this dialog.
-   */
-  public readonly blocked$ = new BehaviorSubject<boolean>(false);
 
   /**
    * Contains the result to be passed to the dialog opener.
    */
   private _result: R | ɵDialogErrorResult | undefined;
+  private _componentRef: ComponentRef<WorkbenchDialogComponent> | undefined;
+  private _cssClass: string;
+
+  /**
+   * Indicates whether this dialog is blocked by other dialog(s) that overlay this dialog.
+   */
+  public readonly blocked$ = new BehaviorSubject<boolean>(false);
+  public readonly size: WorkbenchDialogSize = {};
+  public title: string | Observable<string | undefined> | undefined;
+  public closable = true;
+  public resizable = true;
+  public padding = true;
+  public header: WorkbenchDialogHeaderDirective | undefined;
+  public footer: WorkbenchDialogFooterDirective | undefined;
+  public actions = new Array<WorkbenchDialogActionDirective>();
 
   constructor(public component: ComponentType<unknown>, public _options: WorkbenchDialogOptions, public context: {view?: ɵWorkbenchView}) {
     this._overlayRef = this.createOverlay();
@@ -136,6 +138,41 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
     if (!this.blocked$.value) {
       this._componentRef?.instance.focus();
     }
+  }
+
+  public registerHeader(header: WorkbenchDialogHeaderDirective): Disposable {
+    this.header = header;
+    return {
+      dispose: () => {
+        if (this.header === header) {
+          this.header = undefined;
+        }
+      },
+    };
+  }
+
+  public registerFooter(footer: WorkbenchDialogFooterDirective): Disposable {
+    if (this.actions.length) {
+      throw Error('[DialogInitError] Custom dialog footer not supported if using dialog actions.');
+    }
+    this.footer = footer;
+    return {
+      dispose: () => {
+        if (this.footer === footer) {
+          this.footer = undefined;
+        }
+      },
+    };
+  }
+
+  public registerAction(action: WorkbenchDialogActionDirective): Disposable {
+    if (this.footer) {
+      throw Error('[DialogInitError] Dialog actions not supported if using a custom dialog footer.');
+    }
+    this.actions = this.actions.concat(action);
+    return {
+      dispose: () => this.actions = this.actions.filter(candidate => candidate !== action),
+    };
   }
 
   /**

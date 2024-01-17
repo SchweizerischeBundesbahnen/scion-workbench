@@ -30,18 +30,21 @@ export abstract class WorkbenchDialog<R = unknown> {
   public abstract readonly size: WorkbenchDialogSize;
 
   /**
-   * Specifies the padding of the dialog.
-   * By default, uses the padding as specified in `--sci-workbench-dialog-padding` CSS variable.
+   * Controls if to apply a padding to the content of the dialog. Default is `true`.
+   *
+   * This setting does not affect the padding of the dialog header and footer.
+   *
+   * The default padding can be changed via the CSS variable `--sci-workbench-dialog-padding`.
    */
-  public abstract padding: string | undefined;
+  public abstract padding: boolean;
 
   /**
-   * Specifies if to display a close button in the dialog header. Defaults to `true`.
+   * Specifies if to display a close button in the dialog header. Default is `true`.
    */
   public abstract closable: boolean;
 
   /**
-   * Specifies if the user can resize the dialog. Defaults to `true`.
+   * Specifies if the user can resize the dialog. Default is `true`.
    */
   public abstract resizable: boolean;
 
