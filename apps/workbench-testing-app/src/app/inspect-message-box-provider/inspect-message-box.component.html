@@ -1,37 +1,15 @@
-<sci-form-field label="Instance ID" title="Unique identifier of this component instance">
-  <span class="e2e-component-instance-id">{{uuid}}</span>
-</sci-form-field>
+<section>
+  <header>Inputs</header>
 
-<sci-form-field label="Input" direction="column" *ngIf="messageBox.input">
-  <section class="input">
-    <sci-viewport>
-      <output class="e2e-input">{{messageBox.input | appStringify}}</output>
-    </sci-viewport>
-  </section>
-</sci-form-field>
-
-<ng-container [formGroup]="form">
-  <sci-form-field label="Title" direction="column">
-    <input [formControl]="form.controls.title" class="e2e-title">
+  <sci-form-field label="Input">
+    <output class="e2e-input">{{ input }}</output>
   </sci-form-field>
 
-  <sci-form-field label="Severity" direction="column">
-    <select [formControl]="form.controls.severity" class="e2e-severity">
-      <option value="info">info</option>
-      <option value="warn">warn</option>
-      <option value="error">error</option>
-    </select>
+  <sci-form-field label="Param1">
+    <output class="e2e-param1">{{ param1 }}</output>
   </sci-form-field>
 
-  <sci-form-field label="CSS Class(es)" direction="column">
-    <input [formControl]="form.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+  <sci-form-field label="Param2">
+    <output class="e2e-param2">{{ param2 }}</output>
   </sci-form-field>
-
-  <sci-form-field label="Actions" direction="column">
-    <sci-key-value-field [keyValueFormArray]="form.controls.actions" [addable]="true" [removable]="true" class="e2e-actions"></sci-key-value-field>
-  </sci-form-field>
-
-  <sci-form-field label="Return Value" direction="column">
-    <input [formControl]="form.controls.returnValue" class="e2e-return-value">
-  </sci-form-field>
-</ng-container>
+</section>

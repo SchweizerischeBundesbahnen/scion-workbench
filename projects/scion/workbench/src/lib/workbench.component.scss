@@ -27,11 +27,6 @@
     position: absolute; // out of the document flow
   }
 
-  > wb-message-box-stack {
-    position: absolute;
-    inset: 0;
-  }
-
   > wb-notification-list {
     position: absolute;
     inset: 0;

@@ -1,0 +1,14 @@
+@for (action of actions | keyvalue:insertionSortOrderFn; track action.key) {
+  <button #action_button
+          (click)="onAction(action.key)"
+          (keydown.arrowLeft)="onArrowKey($index, 'left')"
+          (keydown.arrowRight)="onArrowKey($index, 'right')"
+          [attr.data-action]="action.key"
+          class="action e2e-action">
+    {{ action.value }}
+  </button>
+
+  @if (!$last) {
+    <span class="divider"></span>
+  }
+}

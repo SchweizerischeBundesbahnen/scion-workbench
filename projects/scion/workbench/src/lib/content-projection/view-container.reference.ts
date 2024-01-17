@@ -64,14 +64,6 @@ export const IFRAME_HOST = new InjectionToken<ViewContainerReference>('IFRAME_HO
 });
 
 /**
- * DI token to inject the DOM location where to attach view-modal message boxes.
- */
-export const VIEW_MODAL_MESSAGE_BOX_HOST = new InjectionToken<ViewContainerReference>('VIEW_MODAL_MESSAGE_BOX_HOST', {
-  providedIn: 'root',
-  factory: () => new ViewContainerReference(),
-});
-
-/**
  * DI token to inject the DOM location where to attach the visual placeholder when dragging a view over a valid drop zone.
  */
 export const VIEW_DROP_PLACEHOLDER_HOST = new InjectionToken<ViewContainerReference>('VIEW_DROP_PLACEHOLDER_HOST', {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms from the Eclipse Public License 2.0
@@ -8,13 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, isPresent, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
+import {DialogOpenerPageOptions} from './dialog-opener-page.po';
+import {WorkbenchMessageBoxOptions} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.
@@ -22,88 +24,83 @@ import {ViewPO} from '../../view.po';
 export class MessageBoxOpenerPagePO {
 
   public readonly locator: Locator;
+  public readonly closeAction: Locator;
+  public readonly error: Locator;
   public readonly view: ViewPO;
   public readonly viewTab: ViewTabPO;
+  private readonly _openButton: Locator;
 
   constructor(private _appPO: AppPO, public viewId: string) {
     this.view = this._appPO.view({viewId});
     this.viewTab = this.view.viewTab;
     this.locator = this.view.locate('app-message-box-opener-page');
+    this.closeAction = this.locator.locator('output.e2e-close-action');
+    this.error = this.locator.locator('output.e2e-message-box-error');
+    this._openButton = this.locator.locator('button.e2e-open');
   }
 
-  public async selectComponent(component: 'inspect-message-box' | 'default'): Promise<void> {
-    await this.locator.locator('select.e2e-component').selectOption(component);
-  }
+  public async open(message: string, options?: WorkbenchMessageBoxOptions): Promise<void>;
+  public async open(component: 'component:inspect-message-box', options?: WorkbenchMessageBoxOptions): Promise<void>;
+  public async open(content: string | 'component:inspect-message-box', options?: WorkbenchMessageBoxOptions): Promise<void> {
+    if (options?.injector) {
+      throw Error('[PageObjectError] PageObject does not support the option `injector`.');
+    }
+    if (options?.context) {
+      throw Error('[PageObjectError] PageObject does not support the option `context`.');
+    }
 
-  public async enterContent(content: string): Promise<void> {
-    await this.locator.locator('input.e2e-content').fill(content);
-  }
+    const componentMatch = content.match(/^component:(?<component>.+)$/);
+    if (componentMatch) {
+      await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!['component']!);
+    }
+    else {
+      await this.locator.locator('input.e2e-message').fill(content);
+    }
 
-  public async enterComponentInput(componentInput: string): Promise<void> {
-    await this.locator.locator('input.e2e-component-input').fill(componentInput);
-  }
+    if (options?.inputs) {
+      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-inputs'));
+      await keyValueField.clear();
+      await keyValueField.addEntries(options.inputs);
+    }
 
-  public async enterTitle(title: string): Promise<void> {
-    await this.locator.locator('input.e2e-title').fill(title);
-  }
+    if (options?.title) {
+      await this.locator.locator('input.e2e-title').fill(options.title);
+    }
 
-  public async clickTitle(): Promise<void> {
-    await this.locator.locator('input.e2e-title').click({timeout: 1000});
-  }
+    if (options?.actions) {
+      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
+      await keyValueField.clear();
+      await keyValueField.addEntries(options.actions);
+    }
 
-  public async selectSeverity(severity: 'info' | 'warn' | 'error'): Promise<void> {
-    await this.locator.locator('select.e2e-severity').selectOption(severity);
-  }
+    if (options?.severity) {
+      await this.locator.locator('select.e2e-severity').selectOption(options.severity);
+    }
 
-  public async selectModality(modality: 'view' | 'application'): Promise<void> {
-    await this.locator.locator('select.e2e-modality').selectOption(modality);
-  }
+    if (options?.modality) {
+      await this.locator.locator('select.e2e-modality').selectOption(options.modality);
+    }
 
-  public async enterContextualViewId(contextualViewId: string): Promise<void> {
-    await this.locator.locator('input.e2e-contextual-view-id').fill(contextualViewId);
-  }
+    if (options?.contentSelectable) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(options.contentSelectable);
+    }
 
-  public async checkContentSelectable(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(check);
-  }
+    if (options?.cssClass) {
+      await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));
+    }
 
-  public async checkViewContextActive(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-view-context')).toggle(check);
-  }
-
-  public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
-  }
-
-  public async enterCount(count: number): Promise<void> {
-    await this.locator.locator('input.e2e-count').fill(`${count}`);
-  }
-
-  public async enterActions(actions: Record<string, string>): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(actions);
-  }
-
-  public async clickOpen(): Promise<void> {
-    const count = Number(await this.locator.locator('input.e2e-count').inputValue() || 1);
-    const cssClasses = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-
-    await this.locator.locator('button.e2e-open').click();
+    await this._openButton.click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      Promise.all(Array.from(Array(count).keys()).map(i => this._appPO.messagebox({cssClass: [`index-${i}`].concat(cssClasses)}).waitUntilAttached())),
-      rejectWhenAttached(this.locator.locator('output.e2e-open-error')),
+      this.waitUntilMessageBoxAttached(options),
+      rejectWhenAttached(this.error),
     ]);
   }
 
-  public async getMessageBoxCloseAction(): Promise<string> {
-    return this.locator.locator('output.e2e-close-action').innerText();
-  }
-
-  public async isPresent(): Promise<boolean> {
-    return await this.viewTab.isPresent() && await isPresent(this.locator);
+  private async waitUntilMessageBoxAttached(options?: DialogOpenerPageOptions): Promise<void> {
+    const cssClasses = coerceArray(options?.cssClass).filter(Boolean);
+    const messagebox = this._appPO.messagebox({cssClass: cssClasses});
+    await messagebox.locator.waitFor({state: 'attached'});
   }
 }
-

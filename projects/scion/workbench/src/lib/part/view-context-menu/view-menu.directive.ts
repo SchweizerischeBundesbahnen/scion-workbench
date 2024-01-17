@@ -8,7 +8,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 /**
  * Use this directive to model a menu item added to the context menu of a view.
  *
- * The host element of this modelling directive must be a <ng-template>.
+ * The host element of this modeling directive must be a <ng-template>.
  * A menu item shares the lifecycle of the host element.
  *
  * This directive is scope aware, that is, if in the context of a view, the menu item is added to the containing view.

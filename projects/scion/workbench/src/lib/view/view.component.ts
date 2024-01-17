@@ -8,29 +8,27 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostBinding, OnDestroy, ViewChild} from '@angular/core';
 import {AsyncSubject, combineLatest, EMPTY, fromEvent, switchMap} from 'rxjs';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {MessageBoxService} from '../message-box/message-box.service';
+import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
-import {VIEW_MODAL_MESSAGE_BOX_HOST, ViewContainerReference} from '../content-projection/view-container.reference';
 import {PopupService} from '../popup/popup.service';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {WorkbenchNavigationalViewStates} from '../routing/workbench-navigational-states';
 import {RouterUtils} from '../routing/router.util';
 import {A11yModule} from '@angular/cdk/a11y';
-import {ContentProjectionDirective} from '../content-projection/content-projection.directive';
-import {MessageBoxStackComponent} from '../message-box/message-box-stack.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe} from '@angular/common';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {ɵWorkbenchDialogService} from '../dialog/ɵworkbench-dialog.service';
+import {ɵWorkbenchMessageBoxService} from '../message-box/ɵworkbench-message-box.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -46,18 +44,17 @@ import {ɵWorkbenchDialogService} from '../dialog/ɵworkbench-dialog.service';
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
   providers: [
-    MessageBoxService,
     PopupService,
     ɵWorkbenchDialogService,
     {provide: WorkbenchDialogService, useExisting: ɵWorkbenchDialogService},
+    ɵWorkbenchMessageBoxService,
+    {provide: WorkbenchMessageBoxService, useExisting: ɵWorkbenchMessageBoxService},
   ],
   standalone: true,
   imports: [
     RouterOutlet,
     A11yModule,
     SciViewportComponent,
-    ContentProjectionDirective,
-    MessageBoxStackComponent,
     AsyncPipe,
   ],
 })
@@ -102,14 +99,8 @@ export class ViewComponent implements OnDestroy {
               private _cd: ChangeDetectorRef,
               private _viewDragService: ViewDragService,
               private _workbenchDialogRegistry: WorkbenchDialogRegistry,
-              private _messageBoxService: MessageBoxService,
-              viewContextMenuService: ViewMenuService,
-              @Inject(VIEW_MODAL_MESSAGE_BOX_HOST) protected viewModalMessageBoxHostRef: ViewContainerReference) {
+              viewContextMenuService: ViewMenuService) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
-
-    this._messageBoxService.messageBoxes$({includeParents: true})
-      .pipe(takeUntilDestroyed())
-      .subscribe(messageBoxes => this._view.blocked = messageBoxes.length > 0);
 
     viewContextMenuService.installMenuItemAccelerators$(this._host, this._view)
       .pipe(takeUntilDestroyed())
@@ -133,7 +124,6 @@ export class ViewComponent implements OnDestroy {
       )
       .subscribe(() => {
         this._workbenchDialogRegistry.top({viewId: this._view.id})!.focus();
-        this._messageBoxService.focusTop();
       });
   }
 

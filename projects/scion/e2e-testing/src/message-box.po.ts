@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,90 +8,68 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Locator} from '@playwright/test';
-import {DomRect, fromRect, getCssClasses, isActiveElement, isPresent} from './helper/testing.util';
+import {Locator, Page} from '@playwright/test';
+import {DialogPO} from './dialog.po';
+import {DomRect, fromRect} from './helper/testing.util';
 
 /**
- * Handle for interacting with a workbench message box.
+ * PO for interacting with a workbench message box.
  */
 export class MessageBoxPO {
+  public readonly locator: Locator;
+  public readonly title: Locator;
+  public readonly message: Locator;
+  public readonly actions: Locator;
 
-  constructor(public readonly locator: Locator) {
-  }
+  private readonly _header: Locator;
+  private readonly _footer: Locator;
 
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this.locator);
-  }
-
-  public async isVisible(): Promise<boolean> {
-    return this.locator.isVisible();
-  }
-
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
-  }
-
-  public async getTitle(): Promise<string> {
-    return this.locator.locator('header.e2e-title').innerText();
+  constructor(private _dialog: DialogPO, private _page: Page) {
+    this.locator = this._dialog.locator.locator('wb-message-box');
+    this._header = this._dialog.header.locator('wb-message-box-header');
+    this._footer = this._dialog.footer.locator('wb-message-box-footer');
+    this.title = this._header.locator('span.e2e-title');
+    this.actions = this._footer.locator('button.e2e-action');
+    this.message = this.locator.locator('div.e2e-message');
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
-    const cssClasses = await getCssClasses(this.locator);
-    if (cssClasses.includes('e2e-severity-info')) {
-      return 'info';
-    }
-    else if (cssClasses.includes('e2e-severity-warn')) {
-      return 'warn';
-    }
-    else if (cssClasses.includes('e2e-severity-error')) {
-      return 'error';
-    }
-    throw Error('Expected severity CSS class to be present, but was not.');
+    return await this._header.getAttribute('data-severity') as 'info' | 'warn' | 'error';
   }
 
-  public async getModality(): Promise<'application' | 'view'> {
-    if (await isPresent(this.locator.page().locator('wb-message-box-stack.e2e-view-modal', {has: this.locator}))) {
-      return 'view';
+  public async getActions(): Promise<{[key: string]: string}> {
+    const actions = new Map<string, string>();
+    for (const locator of await this.actions.all()) {
+      const action = await locator.getAttribute('data-action') || '?';
+      const label = await locator.innerText();
+      actions.set(action, label);
     }
-    if (await isPresent(this.locator.page().locator('wb-message-box-stack.e2e-application-modal', {has: this.locator}))) {
-      return 'application';
-    }
-    throw Error('Message box not found in the view-modal nor in the application-modal message box stack.');
-  }
-
-  public async getActions(): Promise<Record<string, string>> {
-    const actions: Record<string, string> = {};
-
-    const actionsLocator = this.locator.locator('button.e2e-action');
-    const count = await actionsLocator.count();
-    for (let i = 0; i < count; i++) {
-      const action = await actionsLocator.nth(i);
-      const cssClasses = await getCssClasses(action);
-      const actionKey = cssClasses.find(candidate => candidate.startsWith('e2e-action-key-'))!;
-      actions[actionKey.substring('e2e-action-key-'.length)] = await action.innerText();
-    }
-
-    return actions;
+    return Object.fromEntries(actions);
   }
 
   public async clickActionButton(action: string): Promise<void> {
-    await this.locator.locator(`button.e2e-action.e2e-action-key-${action}`).click();
+    await this.actions.locator(`:scope[data-action="${action}"]`).click();
     await this.locator.waitFor({state: 'detached'});
   }
 
-  public async isActionActive(actionKey: string): Promise<boolean> {
-    return isActiveElement(this.locator.locator('.e2e-button-bar').locator(`button.e2e-action.e2e-action-key-${actionKey}`));
+  public async isContentSelectable(): Promise<boolean> {
+    const text = await this.message.innerText();
+
+    await this.message.dblclick();
+    const selection: string | undefined = await this._page.evaluate(() => window.getSelection()?.toString());
+
+    return selection?.length && text.includes(selection) || false;
   }
 
-  public getCssClasses(): Promise<string[]> {
-    return getCssClasses(this.locator);
+  public async getMessageBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.message.boundingBox());
+  }
+
+  public async getMessageBoxBoundingBox(): Promise<DomRect> {
+    return fromRect(await this._dialog.getDialogBoundingBox());
   }
 
   public async waitUntilAttached(): Promise<void> {
     await this.locator.waitFor({state: 'attached'});
-  }
-
-  public locate(selector: string): Locator {
-    return this.locator.locator('.e2e-body').locator(selector);
   }
 }

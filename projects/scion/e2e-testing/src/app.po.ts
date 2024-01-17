@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -223,9 +223,7 @@ export class AppPO {
    * Handle to the specified message box.
    */
   public messagebox(locateBy?: {cssClass?: string | string[]; nth?: number}): MessageBoxPO {
-    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
-    const locator = this.page.locator(['wb-message-box'].concat(cssClasses).join('.'));
-    return new MessageBoxPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
+    return new MessageBoxPO(this.dialog(locateBy), this.page);
   }
 
   /**
@@ -235,13 +233,6 @@ export class AppPO {
     const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
     const locator = this.page.locator(['wb-dialog'].concat(cssClasses).join('.'));
     return new DialogPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
-  }
-
-  /**
-   * Returns the number of opened message boxes.
-   */
-  public getMessageBoxCount(): Promise<number> {
-    return this.page.locator('wb-message-box').count();
   }
 
   /**

@@ -9,7 +9,7 @@
  */
 
 import {Component, ElementRef, inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
-import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, VIEW_MODAL_MESSAGE_BOX_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/view-container.reference';
+import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/view-container.reference';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchModuleConfig} from './workbench-module-config';
 import {ComponentType} from '@angular/cdk/portal';
@@ -18,7 +18,6 @@ import {Logger, LoggerNames} from './logging';
 import {AsyncPipe, NgComponentOutlet, NgIf} from '@angular/common';
 import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
-import {MessageBoxStackComponent} from './message-box/message-box-stack.component';
 import {combineLatest, EMPTY, fromEvent, lastValueFrom, switchMap} from 'rxjs';
 import {first, map} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -37,7 +36,6 @@ import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
     NgComponentOutlet,
     WorkbenchLayoutComponent,
     NotificationListComponent,
-    MessageBoxStackComponent,
     AsyncPipe,
   ],
 })
@@ -49,7 +47,6 @@ export class WorkbenchComponent implements OnDestroy {
   private viewContainerReferences = {
     workbenchElement: inject(WORKBENCH_ELEMENT_REF),
     iframeHost: inject(IFRAME_HOST),
-    viewModalMessageBoxHost: inject(VIEW_MODAL_MESSAGE_BOX_HOST),
     viewDropPlaceholderHost: inject(VIEW_DROP_PLACEHOLDER_HOST),
   };
 
@@ -70,11 +67,6 @@ export class WorkbenchComponent implements OnDestroy {
   @ViewChild('iframe_host', {read: ViewContainerRef})
   protected set injectIframeHost(vcr: ViewContainerRef) {
     vcr && this.viewContainerReferences.iframeHost.set(vcr);
-  }
-
-  @ViewChild('view_modal_messagebox_host', {read: ViewContainerRef})
-  protected set injectViewModalMessageBoxHost(vcr: ViewContainerRef) {
-    vcr && this.viewContainerReferences.viewModalMessageBoxHost.set(vcr);
   }
 
   @ViewChild('view_drop_placeholder_host', {read: ViewContainerRef})

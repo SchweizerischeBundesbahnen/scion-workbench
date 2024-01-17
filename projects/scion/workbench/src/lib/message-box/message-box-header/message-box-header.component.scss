@@ -1,0 +1,33 @@
+@use '../../common/workbench-mixins';
+
+:host {
+  --ɵmessage-box-severity-color: initial;
+  display: grid;
+  border-top: var(--sci-workbench-messagebox-severity-indicator-size) solid var(--ɵmessage-box-severity-color);
+  padding-inline: var(--sci-workbench-messagebox-padding);
+  padding-top: var(--sci-workbench-messagebox-padding);
+  user-select: none;
+
+  &[data-severity="info"] {
+    --ɵmessage-box-severity-color: var(--sci-color-accent);
+  }
+
+  &[data-severity="warn"] {
+    --ɵmessage-box-severity-color: var(--sci-color-notice);
+  }
+
+  &[data-severity="error"] {
+    --ɵmessage-box-severity-color: var(--sci-color-negative);
+  }
+
+  > span.title {
+    overflow-wrap: break-word;
+    white-space: pre-line;
+    padding-top: var(--sci-workbench-messagebox-padding);
+    @include workbench-mixins.ellipsis-on-overflow();
+    font-family: var(--sci-workbench-messagebox-title-font-family);
+    font-size: var(--sci-workbench-messagebox-title-font-size);
+    font-weight: var(--sci-workbench-messagebox-title-font-weight);
+    text-align: var(--sci-workbench-messagebox-text-align);
+  }
+}

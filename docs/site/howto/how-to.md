@@ -32,7 +32,7 @@ We are working on a comprehensive guide that explains the features and concepts 
 #### Dialog, Popup, Messagebox, Notification
 - [How to open a dialog](how-to-open-dialog.md)
 - [How to open a popup](how-to-open-popup.md)
-- [How to show a message box](how-to-show-message-box.md)
+- [How to open a message box](how-to-open-message-box.md)
 - [How to show a notification](how-to-show-notification.md)
  
 #### Theming & Icons

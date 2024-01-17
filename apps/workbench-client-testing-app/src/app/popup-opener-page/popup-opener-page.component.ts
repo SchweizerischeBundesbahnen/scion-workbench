@@ -49,10 +49,10 @@ export default class PopupOpenerPageComponent {
         value: this._formBuilder.control('popup'),
       }),
       this._formBuilder.group({
-          key: this._formBuilder.control('app'),
-          value: this._formBuilder.control('app1'),
-        },
-      )], Validators.required),
+        key: this._formBuilder.control('app'),
+        value: this._formBuilder.control('app1'),
+      }),
+    ], Validators.required),
     params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     anchor: this._formBuilder.group({
       position: this._formBuilder.control<Position | 'element'>('element', Validators.required),

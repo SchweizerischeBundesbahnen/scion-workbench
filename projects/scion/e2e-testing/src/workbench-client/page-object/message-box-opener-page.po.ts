@@ -25,11 +25,13 @@ export class MessageBoxOpenerPagePO {
   public readonly locator: Locator;
   public readonly viewTab: ViewTabPO;
   public readonly outlet: SciRouterOutletPO;
+  public readonly closeAction: Locator;
 
   constructor(private _appPO: AppPO, public viewId: string) {
     this.viewTab = _appPO.view({viewId}).viewTab;
     this.outlet = new SciRouterOutletPO(this._appPO, {name: this.viewId});
     this.locator = this.outlet.frameLocator.locator('app-message-box-opener-page');
+    this.closeAction = this.locator.locator('output.e2e-close-action');
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
@@ -70,10 +72,6 @@ export class MessageBoxOpenerPagePO {
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(check);
   }
 
-  public async checkViewContextActive(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-view-context')).toggle(check);
-  }
-
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
     await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
@@ -87,9 +85,5 @@ export class MessageBoxOpenerPagePO {
       this._appPO.messagebox({cssClass: cssClasses}).waitUntilAttached(),
       rejectWhenAttached(this.locator.locator('output.e2e-open-error')),
     ]);
-  }
-
-  public async getMessageBoxCloseAction(): Promise<string> {
-    return this.locator.locator('output.e2e-close-action').innerText();
   }
 }
