@@ -1,10 +1,5 @@
 @use '../../../../design/workbench-constants';
-
-@mixin show-ellipsis-on-overflow {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
+@use '../../common/workbench-mixins';
 
 :host {
   display: flex;
@@ -13,7 +8,7 @@
   overflow: hidden; // to have ellipsis on overflow
 
   > span.title {
-    @include show-ellipsis-on-overflow;
+    @include workbench-mixins.ellipsis-on-overflow();
     font-weight: 400;
     font-size: 1em;
 
@@ -23,7 +18,7 @@
   }
 
   > span.heading {
-    @include show-ellipsis-on-overflow;
+    @include workbench-mixins.ellipsis-on-overflow();
     font-size: .9em;
     font-weight: 300;
   }

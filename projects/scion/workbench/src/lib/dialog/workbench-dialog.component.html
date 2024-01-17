@@ -1,22 +1,36 @@
-<div class="dialog-pane e2e-dialog-pane"
+<div class="dialog e2e-dialog"
      [class.blinking]="blinking"
-     tabindex="-1"
-     wbMovable [wbHandle]="move_handle" (wbMovableMove)="onMove($event)"
+     [tabindex]="-1"
+     wbMovable [wbHandle]="header" (wbMovableMove)="onMove($event)"
      wbResizable [wbResizableEnabled]="dialog.resizable" (wbResizableResize)="onResize($event)"
      (mousedown)="$event.stopPropagation()"
      @enter
      [@.disabled]="!dialog.animate"
-     #dialog_pane>
-  <section>
-    <header #move_handle class="e2e-dialog-header" sciDimension (sciDimensionChange)="onHeaderDimensionChange($event)">
-      <div *ngIf="dialog.title | wbCoerceObservable$ | async as title" class="title e2e-title">
-        <span>{{title}}</span>
-      </div>
-      <button *ngIf="dialog.closable" class="close scion-workbench-icons e2e-close" (mousedown)="onCloseMouseDown($event)" (click)="onCloseClick()">close</button>
+     #dialog_element>
+  <div class="dialog-box e2e-dialog-box" cdkTrapFocus>
+    <header #header
+            class="e2e-dialog-header"
+            [class.divider]="dialog.header?.divider ?? true"
+            sciDimension (sciDimensionChange)="onHeaderDimensionChange($event)">
+      <ng-container *ngTemplateOutlet="dialog.header?.template ?? default_dialog_header"/>
     </header>
 
-    <sci-viewport class="content e2e-dialog-content" cdkTrapFocus>
-      <ng-container *ngComponentOutlet="dialog.component; inputs: dialog.inputs"></ng-container>
+    <sci-viewport class="content e2e-dialog-content">
+      <ng-container *ngComponentOutlet="dialog.component; inputs: dialog.inputs"/>
     </sci-viewport>
-  </section>
+
+    @if (dialog.footer || dialog.actions.length) {
+      <footer class="e2e-dialog-footer" [class.divider]="dialog.footer?.divider ?? true">
+        <ng-container *ngTemplateOutlet="dialog.footer?.template ?? default_dialog_footer"/>
+      </footer>
+    }
+  </div>
 </div>
+
+<ng-template #default_dialog_header>
+  <wb-dialog-header/>
+</ng-template>
+
+<ng-template #default_dialog_footer>
+  <wb-dialog-footer/>
+</ng-template>

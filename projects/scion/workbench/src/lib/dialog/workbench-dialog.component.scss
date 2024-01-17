@@ -1,9 +1,3 @@
-@mixin show-ellipsis-on-overflow {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 :host {
   --ɵdialog-transform-translate-x: 0;
   --ɵdialog-transform-translate-y: 0;
@@ -14,6 +8,10 @@
   --ɵdialog-width: initial;
   --ɵdialog-max-width: initial;
   --ɵdialog-padding: var(--sci-workbench-dialog-padding);
+
+  &.justified {
+    --ɵdialog-padding: 0;
+  }
 
   display: flex;
   flex-direction: column;
@@ -28,16 +26,12 @@
     margin: 2px;
   }
 
-  > div.dialog-pane {
+  > div.dialog {
     display: flex;
     flex-direction: column;
     position: absolute;
     top: 3%;
-    border: 1px solid var(--sci-color-border);
-    border-radius: var(--sci-corner);
     color: var(--sci-color-text);
-    background-color: var(--sci-color-background-elevation);
-    box-shadow: var(--sci-elevation) var(--sci-static-color-black);
     transform: translateX(calc(1px * var(--ɵdialog-transform-translate-x))) translateY(calc(1px * var(--ɵdialog-transform-translate-y)));
     min-height: var(--ɵdialog-min-height);
     height: var(--ɵdialog-height);
@@ -45,52 +39,27 @@
     min-width: var(--ɵdialog-min-width);
     width: var(--ɵdialog-width);
     max-width: var(--ɵdialog-max-width);
+    outline: none;
 
-    > section {
+    > div.dialog-box {
       flex: auto;
       display: flex;
       flex-direction: column;
       gap: calc(1.25 * var(--ɵdialog-padding));
-      border-radius: inherit;
-      overflow: hidden; // must not be set on dialog-pane to not crop resize handles
+      // An element with rounded corners must hide content overflow so that the content does not overlap the corners.
+      // However, the resize handles should still overlap for better accessibility. Therefore, we use this extra DIV to
+      // set the border and overflow properties.
+      border: 1px solid var(--sci-color-border);
+      border-radius: var(--sci-corner);
+      background-color: var(--sci-color-background-elevation);
+      box-shadow: var(--sci-elevation) var(--sci-static-color-black);
+      overflow: hidden;
 
       > header {
         flex: none;
-        display: flex;
-        place-content: flex-end;
-        gap: var(--ɵdialog-padding);
-        background-color: var(--sci-workbench-dialog-header-background-color);
-        border-bottom: 1px solid var(--sci-workbench-dialog-header-divider-color);
-        height: var(--sci-workbench-dialog-header-height);
-        padding-inline: var(--ɵdialog-padding);
 
-        > div.title {
-          flex: auto;
-          display: flex;
-          align-items: center;
-          position: relative; // positioning context for the title span
-
-          > span {
-            position: absolute; // out of document flow to not contribute to the dialog width
-            left: 0;
-            right: 0;
-            @include show-ellipsis-on-overflow;
-            font-family: var(--sci-workbench-dialog-title-font-family);
-            font-size: var(--sci-workbench-dialog-title-font-size);
-            font-weight: var(--sci-workbench-dialog-title-font-weight);
-            text-align: var(--sci-workbench-dialog-title-align);
-          }
-        }
-
-        > button.close {
-          all: unset;
-          flex: none;
-          cursor: pointer;
-          align-self: center;
-
-          &:not(:hover) {
-            opacity: .75;
-          }
+        &.divider {
+          border-bottom: 1px solid var(--sci-color-border);
         }
       }
 
@@ -98,7 +67,15 @@
         flex: auto;
 
         &::part(content) {
-          padding: var(--ɵdialog-padding);
+          padding-inline: var(--ɵdialog-padding);
+        }
+      }
+
+      > footer {
+        flex: none;
+
+        &.divider {
+          border-top: 1px solid var(--sci-color-border);
         }
       }
     }

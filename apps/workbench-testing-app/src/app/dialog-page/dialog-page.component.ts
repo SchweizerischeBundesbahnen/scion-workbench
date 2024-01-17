@@ -9,7 +9,7 @@
  */
 
 import {Component, HostBinding, Input} from '@angular/core';
-import {WorkbenchDialog} from '@scion/workbench';
+import {WorkbenchDialog, WorkbenchDialogActionDirective} from '@scion/workbench';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 import {NgIf} from '@angular/common';
@@ -30,6 +30,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciAccordionComponent,
     SciAccordionItemDirective,
     SciCheckboxComponent,
+    WorkbenchDialogActionDirective,
   ],
 })
 export class DialogPageComponent {
@@ -54,8 +55,9 @@ export class DialogPageComponent {
       resizable: this._formBuilder.control(this.dialog.resizable),
     }),
     styles: new FormGroup({
-      padding: this._formBuilder.control(''),
+      padding: this._formBuilder.control(this.dialog.padding),
     }),
+    closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),
   });
 
@@ -77,11 +79,12 @@ export class DialogPageComponent {
   }
 
   public onClose(): void {
-    this.dialog.close(this.form.controls.result.value);
-  }
-
-  public onCloseWithError(): void {
-    this.dialog.closeWithError(this.form.controls.result.value);
+    if (this.form.controls.closeWithError.value) {
+      this.dialog.closeWithError(this.form.controls.result.value);
+    }
+    else {
+      this.dialog.close(this.form.controls.result.value);
+    }
   }
 
   private installPropertyUpdater(): void {

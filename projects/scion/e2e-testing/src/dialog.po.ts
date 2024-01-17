@@ -16,12 +16,13 @@ import {DomRect, fromRect} from './helper/testing.util';
  */
 export class DialogPO {
 
-  private readonly _dialogPane: Locator;
+  private readonly _dialog: Locator;
 
   public readonly header: Locator;
   public readonly title: Locator;
   public readonly closeButton: Locator;
   public readonly resizeHandles: Locator;
+  public readonly footer: Locator;
 
   public readonly contentScrollbars: {
     vertical: Locator;
@@ -29,19 +30,20 @@ export class DialogPO {
   };
 
   constructor(public readonly locator: Locator) {
-    this._dialogPane = this.locator.locator('div.e2e-dialog-pane');
-    this.header = this._dialogPane.locator('header.e2e-dialog-header');
+    this._dialog = this.locator.locator('div.e2e-dialog');
+    this.header = this._dialog.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');
     this.closeButton = this.header.locator('button.e2e-close');
-    this.resizeHandles = this._dialogPane.locator('div.e2e-resize-handle');
+    this.footer = this._dialog.locator('footer.e2e-dialog-footer');
+    this.resizeHandles = this._dialog.locator('div.e2e-resize-handle');
     this.contentScrollbars = {
-      vertical: this._dialogPane.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-vertical'),
-      horizontal: this._dialogPane.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-horizontal'),
+      vertical: this._dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-vertical'),
+      horizontal: this._dialog.locator('sci-viewport.e2e-dialog-content sci-scrollbar.e2e-horizontal'),
     };
   }
 
   public async getDialogBoundingBox(): Promise<DomRect> {
-    return fromRect(await this._dialogPane.boundingBox());
+    return fromRect(await this._dialog.boundingBox());
   }
 
   public async getGlassPaneBoundingBox(): Promise<DomRect> {
@@ -52,8 +54,12 @@ export class DialogPO {
     return fromRect(await this.header.boundingBox());
   }
 
+  public async getFooterBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.footer.boundingBox());
+  }
+
   public async getDialogBorderWidth(): Promise<number> {
-    return this._dialogPane.evaluate((element: HTMLElement) => parseInt(getComputedStyle(element).borderWidth, 10));
+    return this._dialog.locator('div.e2e-dialog-box').evaluate((element: HTMLElement) => parseInt(getComputedStyle(element).borderWidth, 10));
   }
 
   public async close(options?: {timeout?: number}): Promise<void> {

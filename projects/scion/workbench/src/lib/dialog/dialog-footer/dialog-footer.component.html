@@ -1,0 +1,17 @@
+<!-- Start Actions -->
+@if (dialog.actions | wbDialogActionFilter:'start' | wbNullIfEmpty; as actions) {
+  <div class="actions start">
+    @for (action of actions; track action) {
+      <ng-container *ngTemplateOutlet="action.template"/>
+    }
+  </div>
+}
+
+<!-- End Actions -->
+@if (dialog.actions | wbDialogActionFilter:'end' | wbNullIfEmpty; as actions) {
+  <div class="actions end">
+    @for (action of actions; track action) {
+      <ng-container *ngTemplateOutlet="action.template"/>
+    }
+  </div>
+}
