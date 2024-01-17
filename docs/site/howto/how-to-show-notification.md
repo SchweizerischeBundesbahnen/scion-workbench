@@ -3,7 +3,7 @@
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
 | --- | --- | --- | --- | --- |
 
-## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Miscellaneous
+## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Notification
 
 A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds. It informs the user of a system event, e.g., that a task has been completed or an error has occurred. Multiple notifications are stacked vertically. Notifications can be grouped. For each group, only the last notification is displayed.
 

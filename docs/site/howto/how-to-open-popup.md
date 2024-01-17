@@ -3,7 +3,7 @@
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
 | --- | --- | --- | --- | --- |
 
-## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Miscellaneous
+## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Popup
 
 A popup is a visual workbench component for displaying content above other content. It is positioned relative to an anchor,
 which can be either a coordinate or an HTML element. The popup moves when the anchor moves. By default, the popup closes on focus loss, or when the user hits the escape key. If opening a popup in the context of a view, the popup is bound to the lifecycle of the view, that is, the popup is displayed only if the view is active and is closed when the view is closed.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {InspectMessageBoxComponentPO} from '../inspect-message-box-component.po';
-import {TextMessageComponentPO} from '../text-message-component.po';
-import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
+import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
+import {expect} from '@playwright/test';
+import {InspectMessageBoxComponentPO} from '../inspect-message-box-component.po';
 
 test.describe('Workbench Message Box', () => {
 
@@ -30,9 +29,8 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.enterContent('TEXT');
     await msgboxOpenerPage.clickOpen();
 
-    const textMessageComponent = new TextMessageComponentPO(appPO, 'testee');
-    await expect(await textMessageComponent.isVisible()).toBe(true);
-    await expect(await textMessageComponent.getText()).toEqual('TEXT');
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect(messageBox.message).toHaveText('TEXT');
   });
 
   test('should support new lines in the message text', async ({appPO, microfrontendNavigator}) => {
@@ -48,9 +46,8 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.enterContent('LINE 1\\nLINE 2');
     await msgboxOpenerPage.clickOpen();
 
-    const textMessageComponent = new TextMessageComponentPO(appPO, 'testee');
-    await expect(await textMessageComponent.isVisible()).toBe(true);
-    await expect(await textMessageComponent.getText()).toEqual('LINE 1\nLINE 2');
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect(messageBox.message).toHaveText('LINE 1\nLINE 2');
   });
 
   test('should open a message box with the specified title', async ({appPO, microfrontendNavigator}) => {
@@ -66,9 +63,8 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.enterTitle('TITLE');
     await msgboxOpenerPage.clickOpen();
 
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getTitle()).toEqual('TITLE');
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect(messageBox.title).toHaveText('TITLE');
   });
 
   test('should support new lines in the message box title', async ({appPO, microfrontendNavigator}) => {
@@ -84,12 +80,11 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.enterTitle('LINE 1\\nLINE 2');
     await msgboxOpenerPage.clickOpen();
 
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getTitle()).toEqual('LINE 1\nLINE 2');
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect(messageBox.title).toHaveText('LINE 1\nLINE 2');
   });
 
-  test('should, by default, open a message box with info serverity', async ({appPO, microfrontendNavigator}) => {
+  test('should, by default, open a message box with info severity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register message box intention
@@ -101,12 +96,11 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.enterCssClass('testee');
     await msgboxOpenerPage.clickOpen();
 
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getSeverity()).toEqual('info');
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect.poll(() => messageBox.getSeverity()).toEqual('info');
   });
 
-  test('should open a message box with info serverity', async ({appPO, microfrontendNavigator}) => {
+  test('should open a message box with info severity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register message box intention
@@ -119,12 +113,11 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.selectSeverity('info');
     await msgboxOpenerPage.clickOpen();
 
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getSeverity()).toEqual('info');
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect.poll(() => messageBox.getSeverity()).toEqual('info');
   });
 
-  test('should open a message box with warn serverity', async ({appPO, microfrontendNavigator}) => {
+  test('should open a message box with warn severity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register message box intention
@@ -137,12 +130,11 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.selectSeverity('warn');
     await msgboxOpenerPage.clickOpen();
 
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getSeverity()).toEqual('warn');
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect.poll(() => messageBox.getSeverity()).toEqual('warn');
   });
 
-  test('should open a message box with error serverity', async ({appPO, microfrontendNavigator}) => {
+  test('should open a message box with error severity', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // register message box intention
@@ -155,62 +147,8 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.selectSeverity('error');
     await msgboxOpenerPage.clickOpen();
 
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getSeverity()).toEqual('error');
-  });
-
-  test('should, by default and if in the context of a view, open a message box \'view-modal\'', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register message box intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'messagebox'});
-
-    // open the message box
-    const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-    await msgboxOpenerPage.enterCssClass('testee');
-    await msgboxOpenerPage.clickOpen();
-
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getModality()).toEqual('view');
-  });
-
-  test('should open a message box \'application-modal\' if not in the context of a view', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register message box intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'messagebox'});
-
-    // open the message box
-    const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-    await msgboxOpenerPage.enterCssClass('testee');
-    await msgboxOpenerPage.checkViewContextActive(false);
-    await msgboxOpenerPage.clickOpen();
-
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getModality()).toEqual('application');
-  });
-
-  test('should allow opening a message box \'application-modal\' even if in the context of a view', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register message box intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'messagebox'});
-
-    // open the message box
-    const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-    await msgboxOpenerPage.enterCssClass('testee');
-    await msgboxOpenerPage.selectModality('application');
-    await msgboxOpenerPage.clickOpen();
-
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getModality()).toEqual('application');
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect.poll(() => messageBox.getSeverity()).toEqual('error');
   });
 
   test('should display configured actions', async ({appPO, microfrontendNavigator}) => {
@@ -230,13 +168,18 @@ test.describe('Workbench Message Box', () => {
     });
     await msgboxOpenerPage.clickOpen();
 
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isVisible()).toBe(true);
-    await expect(await msgbox.getActions()).toEqual({
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+
+    await expect.poll(() => messageBox.getActions()).toEqual({
       yes: 'Yes',
       no: 'No',
       cancel: 'Cancel',
     });
+
+    // Assert order of action buttons
+    await expect.poll(async () => Object.keys(await messageBox.getActions())).toEqual([
+      'yes', 'no', 'cancel',
+    ]);
   });
 
   test('should return the close action to the message box opener', async ({appPO, microfrontendNavigator}) => {
@@ -258,15 +201,15 @@ test.describe('Workbench Message Box', () => {
 
     const msgbox = appPO.messagebox({cssClass: 'testee'});
     await msgbox.clickActionButton('yes');
-    await expect(await msgboxOpenerPage.getMessageBoxCloseAction()).toEqual('yes');
+    await expect(msgboxOpenerPage.closeAction).toHaveText('yes');
 
     await msgboxOpenerPage.clickOpen();
     await msgbox.clickActionButton('no');
-    await expect(await msgboxOpenerPage.getMessageBoxCloseAction()).toEqual('no');
+    await expect(msgboxOpenerPage.closeAction).toHaveText('no');
 
     await msgboxOpenerPage.clickOpen();
     await msgbox.clickActionButton('cancel');
-    await expect(await msgboxOpenerPage.getMessageBoxCloseAction()).toEqual('cancel');
+    await expect(msgboxOpenerPage.closeAction).toHaveText('cancel');
   });
 
   test('should allow selecting text', async ({appPO, microfrontendNavigator}) => {
@@ -283,36 +226,8 @@ test.describe('Workbench Message Box', () => {
     await msgboxOpenerPage.checkContentSelectable(true);
     await msgboxOpenerPage.clickOpen();
 
-    const textMessageComponent = new TextMessageComponentPO(appPO, 'testee');
-    await expect(await textMessageComponent.isVisible()).toBe(true);
-    await expect(await textMessageComponent.isContentSelectable()).toBe(true);
-  });
-
-  test('should hide a \'view-modal\' message box when activating another view of the part', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    // register message box intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'messagebox'});
-
-    // open the message box
-    const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-    await msgboxOpenerPage.enterCssClass('testee');
-    await msgboxOpenerPage.clickOpen();
-
-    const msgbox = appPO.messagebox({cssClass: 'testee'});
-    await expect(await msgbox.isPresent()).toBe(true);
-    await expect(await msgbox.isVisible()).toBe(true);
-
-    // open a new view
-    await appPO.openNewViewTab();
-    await expect(await msgbox.isPresent()).toBe(true);
-    await expect(await msgbox.isVisible()).toBe(false);
-
-    // expect the message box to display when activating the view again
-    await msgboxOpenerPage.viewTab.click();
-    await expect(await msgbox.isPresent()).toBe(true);
-    await expect(await msgbox.isVisible()).toBe(true);
+    const messageBox = appPO.messagebox({cssClass: 'testee'});
+    await expect.poll(() => messageBox.isContentSelectable()).toBe(true);
   });
 
   test('should reject if missing the intention', async ({appPO, microfrontendNavigator}) => {
@@ -335,80 +250,12 @@ test.describe('Workbench Message Box', () => {
       const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
       await msgboxOpenerPage.enterQualifier({'component': 'inspector'});
       await msgboxOpenerPage.enterCssClass('testee');
-      await msgboxOpenerPage.enterParams({param1: 'PARAM 1'});
+      await msgboxOpenerPage.enterParams({param1: 'REQUIRED PARAM'});
       await msgboxOpenerPage.clickOpen();
 
-      const inspectMessageBoxComponent = new InspectMessageBoxComponentPO(appPO, 'testee');
-      await expect(await inspectMessageBoxComponent.isVisible()).toBe(true);
-    });
-
-    test('should hide a \'view-modal\' message box when activating another view of the part', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register message box intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
-
-      // open the message box
-      const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await msgboxOpenerPage.enterQualifier({'component': 'inspector'});
-      await msgboxOpenerPage.enterCssClass('testee');
-      await msgboxOpenerPage.enterParams({param1: 'PARAM 1'});
-      await msgboxOpenerPage.clickOpen();
-
-      const msgbox = appPO.messagebox({cssClass: 'testee'});
-      await expect(await msgbox.isPresent()).toBe(true);
-      await expect(await msgbox.isVisible()).toBe(true);
-
-      // open a new view
-      await appPO.openNewViewTab();
-      await expect(await msgbox.isPresent()).toBe(true);
-      await expect(await msgbox.isVisible()).toBe(false);
-
-      // expect the message box to display when activating the view again
-      await msgboxOpenerPage.viewTab.click();
-      await expect(await msgbox.isPresent()).toBe(true);
-      await expect(await msgbox.isVisible()).toBe(true);
-    });
-
-    test('should open a message box \'application-modal\' if not in the context of a view', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register message box intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
-
-      // open the message box
-      const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await msgboxOpenerPage.enterQualifier({'component': 'inspector'});
-      await msgboxOpenerPage.enterCssClass('testee');
-      await msgboxOpenerPage.enterParams({param1: 'PARAM 1'});
-      await msgboxOpenerPage.checkViewContextActive(false);
-      await msgboxOpenerPage.clickOpen();
-
-      const msgbox = appPO.messagebox({cssClass: 'testee'});
-      await expect(await msgbox.isVisible()).toBe(true);
-      await expect(await msgbox.getModality()).toEqual('application');
-    });
-
-    test('should allow opening a message box \'application-modal\' even if in the context of a view', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register message box intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
-
-      // open the message box
-      const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await msgboxOpenerPage.enterQualifier({'component': 'inspector'});
-      await msgboxOpenerPage.enterCssClass('testee');
-      await msgboxOpenerPage.enterParams({param1: 'PARAM 1'});
-      await msgboxOpenerPage.selectModality('application');
-      await msgboxOpenerPage.clickOpen();
-
-      const msgbox = appPO.messagebox({cssClass: 'testee'});
-      await expect(await msgbox.isVisible()).toBe(true);
-      await expect(await msgbox.getModality()).toEqual('application');
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const inspectMessageBoxComponent = new InspectMessageBoxComponentPO(messageBox);
+      await expect(inspectMessageBoxComponent.locator).toBeVisible();
     });
 
     test('should allow passing a custom input to the message box', async ({appPO, microfrontendNavigator}) => {
@@ -422,44 +269,15 @@ test.describe('Workbench Message Box', () => {
       const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
       await msgboxOpenerPage.enterQualifier({'component': 'inspector'});
       await msgboxOpenerPage.enterCssClass('testee');
-      await msgboxOpenerPage.enterParams({param1: 'PARAM 1', param2: 'PARAM 2'});
+      await msgboxOpenerPage.enterParams({param1: 'REQUIRED PARAM', param2: 'OPTIONAL PARAM'});
       await msgboxOpenerPage.enterContent('CONTENT');
       await msgboxOpenerPage.clickOpen();
 
-      const inspectMessageBoxComponent = new InspectMessageBoxComponentPO(appPO, 'testee');
-      await expect(await inspectMessageBoxComponent.isVisible()).toBe(true);
-      await expect(await inspectMessageBoxComponent.getInputAsKeyValueObject()).toMatchObject({
-        'component': 'inspector', // qualifier
-        '$implicit': 'CONTENT', // content
-        'param1': 'PARAM 1', // params
-        'param2': 'PARAM 2', // params
-        'ɵAPP_SYMBOLIC_NAME': 'workbench-client-testing-app1', // headers
-        'ɵREPLY_TO': expect.any(String),
-      });
-    });
-
-    test('should allow controlling message box settings', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      // register message box intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'messagebox', qualifier: {'component': 'inspector'}});
-
-      // open the message box
-      const msgboxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-      await msgboxOpenerPage.enterQualifier({'component': 'inspector'});
-      await msgboxOpenerPage.enterCssClass('testee');
-      await msgboxOpenerPage.enterParams({param1: 'PARAM 1'});
-      await msgboxOpenerPage.selectSeverity('warn');
-      await msgboxOpenerPage.enterTitle('TITLE');
-      await msgboxOpenerPage.enterActions({yes: 'Yes', no: 'No'});
-      await msgboxOpenerPage.clickOpen();
-
-      const inspectMessageBoxComponent = new InspectMessageBoxComponentPO(appPO, 'testee');
-      await expect(await inspectMessageBoxComponent.isVisible()).toBe(true);
-      await expect(await inspectMessageBoxComponent.msgbox.getSeverity()).toEqual('warn');
-      await expect(await inspectMessageBoxComponent.msgbox.getTitle()).toEqual('TITLE');
-      await expect(await inspectMessageBoxComponent.msgbox.getActions()).toEqual({yes: 'Yes', no: 'No'});
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const inspectMessageBoxComponent = new InspectMessageBoxComponentPO(messageBox);
+      await expect(inspectMessageBoxComponent.input).toHaveText('CONTENT');
+      await expect(inspectMessageBoxComponent.param1).toHaveText('REQUIRED PARAM');
+      await expect(inspectMessageBoxComponent.param2).toHaveText('OPTIONAL PARAM');
     });
 
     test('should throw when not passing params required by the message box provider', async ({appPO, microfrontendNavigator}) => {

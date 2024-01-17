@@ -1,0 +1,18 @@
+<ng-template wbDialogHeader [divider]="false">
+  <wb-message-box-header [title]="options?.title" [severity]="options?.severity ?? 'info'"/>
+</ng-template>
+
+@if (message | wbTypeof:'string') {
+  <div class="message e2e-message">{{ message }}</div>
+}
+@else {
+  <ng-container *ngComponentOutlet="message; inputs: options?.inputs"/>
+}
+
+<ng-template wbDialogFooter>
+  <wb-message-box-footer [actions]="options?.actions ?? {ok: 'OK'}"
+                         [severity]="options?.severity ?? 'info'"
+                         (action)="onAction($event)"
+                         (keydown.escape)="onEscape()"
+                         (preferredSizeChange)="onFooterPreferredSizeChange($event)"/>
+</ng-template>

@@ -1,0 +1,51 @@
+@use '../../common/workbench-mixins';
+
+:host {
+  --ɵmessage-box-severity-color: initial;
+  display: flex;
+  height: 3em;
+  background-color: var(--sci-color-background-secondary);
+  color: var(--sci-color-text);
+
+  &[data-severity="info"] {
+    --ɵmessage-box-severity-color: var(--sci-color-accent);
+  }
+
+  &[data-severity="warn"] {
+    --ɵmessage-box-severity-color: var(--sci-color-notice);
+  }
+
+  &[data-severity="error"] {
+    --ɵmessage-box-severity-color: var(--sci-color-negative);
+  }
+
+  &.calculating-min-width {
+    position: absolute; // out of document flow in order to calculate the minimal width
+  }
+
+  > button.action {
+    all: unset;
+    flex: 1;
+    margin: 2px;
+    border: 1px solid transparent;
+    border-radius: var(--sci-corner-small);
+    transition: border-color ease-in-out .15s;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+    min-width: 7.5em;
+    padding-inline: .5em;
+    @include workbench-mixins.ellipsis-on-overflow();
+
+    &:focus, &:active {
+      outline: none;
+      color: var(--ɵmessage-box-severity-color);
+      border-color: var(--ɵmessage-box-severity-color);
+    }
+  }
+
+  > span.divider {
+    width: 1px;
+    background-color: var(--sci-color-border);
+  }
+}

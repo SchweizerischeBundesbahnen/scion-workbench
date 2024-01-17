@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2023 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -419,11 +419,12 @@ test.describe('Workbench View', () => {
 
     // switch to view 1, should not ask for confirmation
     await viewTab1.click();
-    expect(await appPO.messagebox({cssClass: 'e2e-close-view'}).isPresent()).toBe(false);
+    const messageBox = appPO.messagebox({cssClass: 'e2e-close-view'});
+    await expect(await messageBox.locator).not.toBeAttached();
 
     // switch to view 2, should not ask for confirmation
     await viewTab2.click();
-    expect(await appPO.messagebox({cssClass: 'e2e-close-view'}).isPresent()).toBe(false);
+    await expect(await messageBox.locator).not.toBeAttached();
   });
 
   test('should emit when activating or deactivating a viewtab', async ({appPO, microfrontendNavigator, consoleLogs}) => {

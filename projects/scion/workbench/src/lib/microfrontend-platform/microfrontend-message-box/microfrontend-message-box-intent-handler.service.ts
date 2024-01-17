@@ -12,7 +12,7 @@ import {Injectable} from '@angular/core';
 import {IntentClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchMessageBoxConfig} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
-import {MessageBoxService} from '../../message-box/message-box.service';
+import {WorkbenchMessageBoxService} from '../../message-box/workbench-message-box.service';
 
 /**
  * Handles intents that refer to the built-in message box capability, allowing microfrontends to display simple message boxes.
@@ -25,12 +25,11 @@ import {MessageBoxService} from '../../message-box/message-box.service';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class MicrofrontendMessageBoxIntentHandler {
 
-  constructor(intentClient: IntentClient, messageBoxService: MessageBoxService, logger: Logger) {
+  constructor(intentClient: IntentClient, messageBoxService: WorkbenchMessageBoxService, logger: Logger) {
     intentClient.onIntent<WorkbenchMessageBoxConfig, string>({type: WorkbenchCapabilities.MessageBox, qualifier: {}}, ({body: config}) => {
       logger.debug(() => 'Opening message box', LoggerNames.MICROFRONTEND, config);
-      return messageBoxService.open({
+      return messageBoxService.open(config?.content, {
         title: config?.title,
-        content: config?.content,
         actions: config?.actions,
         severity: config?.severity,
         modality: config?.modality,

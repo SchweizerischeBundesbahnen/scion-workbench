@@ -8,17 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, Component, Type} from '@angular/core';
+import {Component, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {MessageBoxService} from '@scion/workbench';
-import {InspectMessageBoxComponent} from '../inspect-message-box-provider/inspect-message-box.component';
-import {startWith} from 'rxjs/operators';
+import {WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
 import {NgIf} from '@angular/common';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {InspectMessageBoxComponent} from '../inspect-message-box-provider/inspect-message-box.component';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -36,59 +34,52 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 export default class MessageBoxOpenerPageComponent {
 
   public form = this._formBuilder.group({
-    title: this._formBuilder.control(''),
-    content: this._formBuilder.control(''),
     component: this._formBuilder.control(''),
-    componentInput: this._formBuilder.control(''),
-    severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
-    modality: this._formBuilder.control<'application' | 'view' | ''>(''),
-    contextualViewId: this._formBuilder.control(''),
-    contentSelectable: this._formBuilder.control(false),
-    cssClass: this._formBuilder.control(''),
-    count: this._formBuilder.control(''),
-    actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    viewContext: this._formBuilder.control(true),
+    message: this._formBuilder.control(''),
+    options: this._formBuilder.group({
+      title: this._formBuilder.control(''),
+      actions: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+      severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
+      modality: this._formBuilder.control<'application' | 'view' | ''>(''),
+      contentSelectable: this._formBuilder.control(false),
+      inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+      cssClass: this._formBuilder.control(''),
+    }),
   });
-  public openError: string | undefined;
+
+  public messageBoxError: string | undefined;
   public closeAction: string | undefined;
 
   constructor(private _formBuilder: NonNullableFormBuilder,
-              private _messageBoxService: MessageBoxService,
-              private _appRef: ApplicationRef) {
-    this.installContextualViewIdEnabler();
+              private _messageBoxService: WorkbenchMessageBoxService) {
   }
 
   public async onMessageBoxOpen(): Promise<void> {
-    const unsetViewContext = !this.form.controls.viewContext.value;
-
-    this.openError = undefined;
+    this.messageBoxError = undefined;
     this.closeAction = undefined;
 
-    const messageBoxService = unsetViewContext ? this._appRef.injector.get(MessageBoxService) : this._messageBoxService;
-
-    const messageBoxes = [];
-    for (let index = 0; index < Number(this.form.controls.count.value || 1); index++) {
-      messageBoxes.push(this.openMessageBox(messageBoxService, index));
-    }
-    await Promise.all(messageBoxes);
+    await this.openMessageBox()
+      .then(closeAction => this.closeAction = closeAction)
+      .catch(error => this.messageBoxError = stringifyError(error));
   }
 
-  private openMessageBox(messageBoxService: MessageBoxService, index: number): Promise<any> {
-    return messageBoxService.open({
-      title: this.restoreLineBreaks(this.form.controls.title.value) || undefined,
-      content: this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.controls.content.value),
-      componentInput: (this.isUseComponent() ? this.form.controls.componentInput.value : undefined) || undefined,
-      severity: this.form.controls.severity.value || undefined,
-      modality: this.form.controls.modality.value || undefined,
-      context: {
-        viewId: this.form.controls.contextualViewId.value || undefined,
-      },
-      contentSelectable: this.form.controls.contentSelectable.value || undefined,
-      cssClass: [`index-${index}`].concat(this.form.controls.cssClass.value.split(/\s+/).filter(Boolean) || []),
-      actions: SciKeyValueFieldComponent.toDictionary(this.form.controls.actions) || undefined,
-    })
-      .then(closeAction => this.closeAction = closeAction)
-      .catch(error => this.openError = stringifyError(error));
+  private openMessageBox(): Promise<string> {
+    const options: WorkbenchMessageBoxOptions = {
+      title: this.restoreLineBreaks(this.form.controls.options.controls.title.value) || undefined,
+      actions: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.actions) || undefined,
+      severity: this.form.controls.options.controls.severity.value || undefined,
+      modality: this.form.controls.options.controls.modality.value || undefined,
+      contentSelectable: this.form.controls.options.controls.contentSelectable.value || undefined,
+      inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
+      cssClass: this.form.controls.options.controls.cssClass.value.split(/\s+/).filter(Boolean),
+    };
+
+    if (this.isUseComponent()) {
+      return this._messageBoxService.open(this.parseComponentFromUI(), options);
+    }
+    else {
+      return this._messageBoxService.open(this.restoreLineBreaks(this.form.controls.message.value), options);
+    }
   }
 
   private parseComponentFromUI(): Type<InspectMessageBoxComponent> {
@@ -109,25 +100,5 @@ export default class MessageBoxOpenerPageComponent {
    */
   private restoreLineBreaks(value: string): string {
     return value.replace(/\\n/g, '\n');
-  }
-
-  /**
-   * Enables the field for setting a contextual view reference when choosing view modality.
-   */
-  private installContextualViewIdEnabler(): void {
-    this.form.controls.modality.valueChanges
-      .pipe(
-        startWith(this.form.controls.modality.value),
-        takeUntilDestroyed(),
-      )
-      .subscribe(modality => {
-        if (modality === 'view') {
-          this.form.controls.contextualViewId.enable();
-        }
-        else {
-          this.form.controls.contextualViewId.setValue('');
-          this.form.controls.contextualViewId.disable();
-        }
-      });
   }
 }

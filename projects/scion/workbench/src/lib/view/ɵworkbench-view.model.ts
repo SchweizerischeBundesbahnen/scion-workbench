@@ -243,13 +243,6 @@ export class ɵWorkbenchView implements WorkbenchView {
     return this.blocked$.value;
   }
 
-  /**
-   * TODO [#488] Remove when migrating message box to dialog.
-   */
-  public set blocked(blocked: boolean) {
-    this.blocked$.next(blocked);
-  }
-
   public get destroyed(): boolean {
     return this.portal.isDestroyed;
   }

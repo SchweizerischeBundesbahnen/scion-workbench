@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  overflow: hidden; // wrap text at message box bounds
+  padding-inline: var(--sci-workbench-messagebox-padding);
+  padding-bottom: calc(2 * var(--sci-workbench-messagebox-padding));
+  outline: none;
+
+  &:not(:empty) {
+    padding-top: var(--sci-workbench-messagebox-padding);
+  }
+
+  &:not(.content-selectable) {
+    user-select: none;
+  }
+
+  > div.message {
+    overflow-wrap: break-word;
+    white-space: pre-line;
+    text-align: var(--sci-workbench-messagebox-text-align);
+  }
+}
