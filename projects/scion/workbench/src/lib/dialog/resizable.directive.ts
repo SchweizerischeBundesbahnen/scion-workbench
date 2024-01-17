@@ -174,6 +174,12 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
     this.maxHeight = toPixel(maxHeight, {parentSize: parent.clientHeight});
     this.minWidth = toPixel(minWidth, {parentSize: parent.clientWidth});
     this.maxWidth = toPixel(maxWidth, {parentSize: parent.clientWidth});
+    if (this.maxWidth !== undefined && this.minWidth !== undefined && this.minWidth > this.maxWidth) {
+      this.maxWidth = this.minWidth; // prefer min-width over max-width (as in CSS)
+    }
+    if (this.maxHeight !== undefined && this.minHeight !== undefined && this.minHeight > this.maxHeight) {
+      this.maxHeight = this.minHeight; // prefer min-height over max-height (as in CSS)
+    }
     this._workbenchLayoutService.notifyDragStarting();
   }
 

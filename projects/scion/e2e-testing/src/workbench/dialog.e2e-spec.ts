@@ -872,6 +872,178 @@ test.describe('Workbench Dialog', () => {
       await expect(dialog.resizeHandles).toHaveCount(0);
     });
 
+    test('should prefer minimal size over maximal size ', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+
+      const dialogPage = new DialogPagePO(dialog);
+      await dialogPage.enterDialogSize({
+        minWidth: '500px',
+        maxWidth: '400px',
+        minHeight: '500px',
+        maxHeight: '400px',
+      });
+
+      const dialogBounds = await dialog.getDialogBoundingBox();
+
+      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+        x: dialogBounds.x,
+        y: dialogBounds.y,
+        height: 500,
+        width: 500,
+      }));
+
+      // Trying to resize the dialog ...
+      await test.step('resizing dialog via top handle', async () => {
+        await dialog.resizeTop(-10);
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+
+        await dialog.resizeTop(10);
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+      });
+
+      await test.step('resizing dialog via right handle', async () => {
+        await dialog.resizeRight(-10);
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+
+        await dialog.resizeRight(10);
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+      });
+
+      await test.step('resizing dialog via bottom handle', async () => {
+        await dialog.resizeBottom(-10);
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+
+        await dialog.resizeBottom(10);
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+      });
+
+      await test.step('resizing dialog via left handle', async () => {
+        await dialog.resizeLeft(-10);
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+
+        await dialog.resizeLeft(10);
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+      });
+
+      await test.step('resizing dialog via top-right handle', async () => {
+        await dialog.resizeTopRight({x: -10, y: -10});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+
+        await dialog.resizeTopRight({x: 10, y: 10});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+      });
+
+      await test.step('resizing dialog via bottom-right handle', async () => {
+        await dialog.resizeBottomRight({x: -10, y: -10});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+
+        await dialog.resizeBottomRight({x: 10, y: 10});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+      });
+
+      await test.step('resizing dialog via bottom-left handle', async () => {
+        await dialog.resizeBottomLeft({x: -10, y: -10});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+
+        await dialog.resizeBottomLeft({x: 10, y: 10});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+      });
+
+      await test.step('resizing dialog via top-left handle', async () => {
+        await dialog.resizeTopLeft({x: -10, y: -10});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+
+        await dialog.resizeTopLeft({x: 10, y: 10});
+        await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+          x: dialogBounds.x,
+          y: dialogBounds.y,
+          height: 500,
+          width: 500,
+        }));
+      });
+    });
+
     test.describe('top handle', () => {
 
       test('should resize the dialog when dragging the top handle', async ({appPO, workbenchNavigator}) => {
