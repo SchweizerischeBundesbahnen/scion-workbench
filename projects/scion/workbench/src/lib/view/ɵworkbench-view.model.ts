@@ -15,6 +15,7 @@ import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Arrays, Defined} from '@scion/toolkit/util';
 import {Disposable} from '../common/disposable';
+import {throwError} from '../common/throw-error.util';
 import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
 import {WorkbenchView} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
@@ -90,8 +91,8 @@ export class ɵWorkbenchView implements WorkbenchView {
         // Therefore, we instruct the view's router outlet to act as a top-level outlet to be the target of the registered top-level view routes.
         {provide: ChildrenOutletContexts, useValue: inject(ChildrenOutletContexts)},
         // Prevent injecting this part into the view because the view may be dragged to a different part.
-        {provide: WorkbenchPart, useValue: null},
-        {provide: ɵWorkbenchPart, useValue: null},
+        {provide: WorkbenchPart, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchPart'`)},
+        {provide: ɵWorkbenchPart, useFactory: () => throwError(`[NullInjectorError] No provider for 'ɵWorkbenchPart'`)},
       ],
     });
   }

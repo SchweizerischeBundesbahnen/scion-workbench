@@ -18,6 +18,7 @@ import {MessageBoxHeaderComponent} from './message-box-header/message-box-header
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchDialog} from '../dialog/workbench-dialog';
 import {TypeofPipe} from '../common/typeof.pipe';
+import {throwError} from '../common/throw-error.util';
 
 /**
  * Renders the workbench message box.
@@ -38,8 +39,8 @@ import {TypeofPipe} from '../common/typeof.pipe';
     TypeofPipe,
   ],
   providers: [
-    // Prevent injecting the dialog handle in message component.
-    {provide: WorkbenchDialog, useValue: undefined}],
+    // Prevent injecting the dialog handle in message box context.
+    {provide: WorkbenchDialog, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchDialog'`)}],
 })
 export class WorkbenchMessageBoxComponent {
 
