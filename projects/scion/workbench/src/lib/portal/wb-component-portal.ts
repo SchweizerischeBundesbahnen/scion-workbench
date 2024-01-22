@@ -9,7 +9,7 @@
  */
 
 import {ComponentType} from '@angular/cdk/portal';
-import {ComponentRef, createComponent, EnvironmentInjector, inject, Injector, StaticProvider, ViewContainerRef} from '@angular/core';
+import {ComponentRef, createComponent, EnvironmentInjector, inject, Injector, Provider, ViewContainerRef} from '@angular/core';
 import {Logger, LoggerNames} from '../logging';
 import {BehaviorSubject, Observable} from 'rxjs';
 
@@ -153,5 +153,5 @@ export interface PortalOptions {
   /**
    * Providers registered with the injector for the instantiation of the component.
    */
-  providers?: StaticProvider[];
+  providers?: Provider[];
 }

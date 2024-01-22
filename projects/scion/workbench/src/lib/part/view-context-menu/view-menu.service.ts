@@ -24,6 +24,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {filterArray} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WorkbenchView} from '../../view/workbench-view.model';
+import {provideViewContext} from '../../view/view-context-provider';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -83,8 +84,7 @@ export class ViewMenuService {
       parent: this._injector,
       providers: [
         {provide: OverlayRef, useValue: overlayRef},
-        {provide: WorkbenchView, useValue: view},
-        {provide: ɵWorkbenchView, useValue: view},
+        provideViewContext(view),
       ],
     });
     overlayRef.attach(new ComponentPortal(ViewMenuComponent, null, injector));

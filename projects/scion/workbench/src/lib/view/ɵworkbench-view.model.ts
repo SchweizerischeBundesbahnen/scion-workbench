@@ -32,6 +32,7 @@ import {bufferLatestUntilLayoutChange} from '../common/operators';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {provideViewContext} from './view-context-provider';
 
 export class ɵWorkbenchView implements WorkbenchView {
 
@@ -83,8 +84,7 @@ export class ɵWorkbenchView implements WorkbenchView {
   private createPortal(viewComponent: ComponentType<ViewComponent>): WbComponentPortal {
     return new WbComponentPortal(viewComponent, {
       providers: [
-        {provide: ɵWorkbenchView, useValue: this},
-        {provide: WorkbenchView, useExisting: ɵWorkbenchView},
+        provideViewContext(this),
         // For each primary top-level route, the workbench registers corresponding secondary top-level view routes.
         // However, if the workbench component is displayed in a router outlet, view outlets are not top-level outlets anymore.
         // Therefore, we instruct the view's router outlet to act as a top-level outlet to be the target of the registered top-level view routes.

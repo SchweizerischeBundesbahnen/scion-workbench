@@ -19,6 +19,7 @@ import {filter} from 'rxjs/operators';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchDialogService} from './workbench-dialog.service';
 import {DOCUMENT} from '@angular/common';
+import {provideViewContext} from '../view/view-context-provider';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -49,8 +50,15 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
       await this.waitUntilApplicationModalDialogsClosed();
     }
 
-    const injector = options?.injector ?? this._injector;
-    const dialog = runInInjectionContext(injector, () => new ɵWorkbenchDialog<R>(component, options ?? {}, {view: contextualView}));
+    // Propagate view context.
+    const injector = Injector.create({
+      parent: options?.injector ?? this._injector,
+      providers: [
+        provideViewContext(contextualView),
+      ],
+    });
+
+    const dialog = runInInjectionContext(injector, () => new ɵWorkbenchDialog<R>(component, options ?? {}));
     this._dialogRegistry.register(dialog);
 
     // Capture focused element to restore focus when closing the dialog.
@@ -71,9 +79,9 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
   /**
    * Resolves the contextual view to stick the dialog to.
    */
-  private resolveContextualView(options?: WorkbenchDialogOptions): ɵWorkbenchView | undefined {
+  private resolveContextualView(options?: WorkbenchDialogOptions): ɵWorkbenchView | null {
     if (options?.modality === 'application') {
-      return undefined;
+      return null;
     }
     if (options?.context?.viewId) {
       return this._viewRegistry.get(options.context.viewId);
@@ -81,7 +89,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
     else if (this._view) {
       return this._view;
     }
-    return undefined;
+    return null;
   }
 
   /**

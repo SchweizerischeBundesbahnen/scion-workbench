@@ -172,6 +172,45 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.viewTab.close();
       await expect(dialogOpenerPage.viewTab.locator).not.toBeAttached();
     });
+
+    test('should propagate view context', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open target view.
+      const dialogTargetViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+      // Open dialog in target view.
+      const dialogOpenerPage1 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage1.open('dialog-opener-page', {cssClass: 'testee-1', modality: 'view', contextualViewId: dialogTargetViewPage.viewId});
+      const dialog1 = appPO.dialog({cssClass: 'testee-1'});
+      await expect(dialog1.locator).not.toBeVisible();
+
+      // Activate target view.
+      await dialogTargetViewPage.viewTab.click();
+      await expect(dialog1.locator).toBeVisible();
+
+      // Open another dialog from the dialog (inherit dialog's view context).
+      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO, {dialog: dialog1});
+      await dialogOpenerPage2.open('dialog-page', {cssClass: 'testee-2'});
+      const dialog2 = appPO.dialog({cssClass: 'testee-2'});
+
+      // Expect dialog 2 to have contextual view of dialog 1, i.e., is also visible.
+      await expect(dialog2.locator).toBeVisible();
+
+      // Activate target view.
+      await dialogOpenerPage1.viewTab.click();
+
+      // Expect dialog 1 and dialog 2 not to be visible because contextual view is not active.
+      await expect(dialog1.locator).not.toBeVisible();
+      await expect(dialog2.locator).not.toBeVisible();
+
+      // Activate contextual view of the dialogs.
+      await dialogTargetViewPage.viewTab.click();
+
+      // Expect dialog 1 and dialog 2 to be visible.
+      await expect(dialog1.locator).toBeVisible();
+      await expect(dialog2.locator).toBeVisible();
+    });
   });
 
   test.describe('Application Modality', () => {

@@ -21,6 +21,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {DialogPageComponent} from '../dialog-page/dialog-page.component';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import {FocusTestPageComponent} from '../test-pages/focus-test-page/focus-test-page.component';
+import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -93,6 +94,8 @@ export default class DialogOpenerPageComponent {
         return DialogPageComponent;
       case 'dialog-opener-page':
         return DialogOpenerPageComponent;
+      case 'popup-opener-page':
+        return PopupOpenerPageComponent;
       case 'focus-test-page':
         return FocusTestPageComponent;
       case 'blank':

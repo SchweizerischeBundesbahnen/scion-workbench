@@ -12,11 +12,9 @@ import {ChangeDetectorRef, Component, ElementRef, HostBinding, OnDestroy, ViewCh
 import {AsyncSubject, combineLatest, EMPTY, fromEvent, switchMap} from 'rxjs';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
-import {PopupService} from '../popup/popup.service';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {WorkbenchNavigationalViewStates} from '../routing/workbench-navigational-states';
@@ -25,10 +23,7 @@ import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe} from '@angular/common';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
-import {ɵWorkbenchDialogService} from '../dialog/ɵworkbench-dialog.service';
-import {ɵWorkbenchMessageBoxService} from '../message-box/ɵworkbench-message-box.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -43,13 +38,6 @@ import {ɵWorkbenchMessageBoxService} from '../message-box/ɵworkbench-message-b
   selector: 'wb-view',
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
-  providers: [
-    PopupService,
-    ɵWorkbenchDialogService,
-    {provide: WorkbenchDialogService, useExisting: ɵWorkbenchDialogService},
-    ɵWorkbenchMessageBoxService,
-    {provide: WorkbenchMessageBoxService, useExisting: ɵWorkbenchMessageBoxService},
-  ],
   standalone: true,
   imports: [
     RouterOutlet,
