@@ -24,6 +24,7 @@ import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, TopRightPoint} from './popup.origin';
 import {coerceElement} from '@angular/cdk/coercion';
+import {provideViewContext} from '../view/view-context-provider';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top'};
@@ -129,6 +130,7 @@ export class PopupService {
       providers: [
         {provide: ɵPopup, useValue: popupHandle},
         {provide: Popup, useExisting: ɵPopup},
+        provideViewContext(contextualView),
         ...[config.componentConstructOptions?.providers || []],
       ],
     }));

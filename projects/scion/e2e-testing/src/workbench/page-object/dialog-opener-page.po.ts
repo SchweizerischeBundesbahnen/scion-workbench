@@ -39,7 +39,7 @@ export class DialogOpenerPagePO {
       this.locator = options.dialog.locator.locator('app-dialog-opener-page');
     }
     else {
-      throw Error('[IllegalArgumentError] either viewId or dialog must be provided.');
+      throw Error('[PageObjectError] either viewId or dialog must be provided.');
     }
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');
@@ -47,11 +47,11 @@ export class DialogOpenerPagePO {
   }
 
   public get view(): ViewPO {
-    return orElseThrow(this._view, () => Error('[IllegalStateError] Test page not opened in a view.'));
+    return orElseThrow(this._view, () => Error('[PageObjectError] Test page not opened in a view.'));
   }
 
   public get viewTab(): ViewTabPO {
-    return orElseThrow(this._viewTab, () => Error('[IllegalStateError] Test page not opened in a view.'));
+    return orElseThrow(this._viewTab, () => Error('[PageObjectError] Test page not opened in a view.'));
   }
 
   public async open(component: 'blank' | 'dialog-page' | 'dialog-opener-page' | 'focus-test-page', options?: DialogOpenerPageOptions): Promise<void> {

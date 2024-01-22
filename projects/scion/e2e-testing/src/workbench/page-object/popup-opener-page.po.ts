@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, DomRect, fromRect, isPresent} from '../../helper/testing.util';
+import {coerceArray, DomRect, fromRect, isPresent, orElseThrow} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {BottomLeftPoint, BottomRightPoint, PopupOrigin, PopupSize, TopLeftPoint, TopRightPoint} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
@@ -16,6 +16,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
 import {ViewTabPO} from '../../view-tab.po';
+import {PopupPO} from '../../popup.po';
 
 /**
  * Page object to interact with {@link PopupOpenerPageComponent}.
@@ -23,16 +24,32 @@ import {ViewTabPO} from '../../view-tab.po';
 export class PopupOpenerPagePO {
 
   public readonly locator: Locator;
-  public readonly view: ViewPO;
-  public readonly viewTab: ViewTabPO;
+  private readonly _view: ViewPO | undefined;
+  private readonly _viewTab: ViewTabPO | undefined;
 
-  constructor(private _appPO: AppPO, public viewId: string) {
-    this.view = this._appPO.view({viewId});
-    this.viewTab = this.view.viewTab;
-    this.locator = this.view.locate('app-popup-opener-page');
+  constructor(private _appPO: AppPO, options: {viewId?: string; popup?: PopupPO}) {
+    if (options.viewId) {
+      this._view = this._appPO.view({viewId: options.viewId});
+      this._viewTab = this._view.viewTab;
+      this.locator = this._view.locate('app-popup-opener-page');
+    }
+    else if (options.popup) {
+      this.locator = options.popup.locator.locator('app-popup-opener-page');
+    }
+    else {
+      throw Error('[PageObjectError] either viewId or popup must be provided.');
+    }
   }
 
-  public async selectPopupComponent(component: 'popup-page' | 'focus-test-page' | 'input-field-test-page' | 'blank-test-page'): Promise<void> {
+  public get view(): ViewPO {
+    return orElseThrow(this._view, () => Error('[PageObjectError] Test page not opened in a view.'));
+  }
+
+  public get viewTab(): ViewTabPO {
+    return orElseThrow(this._viewTab, () => Error('[PageObjectError] Test page not opened in a view.'));
+  }
+
+  public async selectPopupComponent(component: 'popup-page' | 'focus-test-page' | 'input-field-test-page' | 'blank-test-page' | 'popup-opener-page' | 'dialog-opener-page'): Promise<void> {
     await this.locator.locator('select.e2e-popup-component').selectOption(component);
   }
 

@@ -82,7 +82,7 @@ export class WorkbenchNavigator {
       }
       case PopupOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-popup-opener');
-        return new PopupOpenerPagePO(this._appPO, viewId);
+        return new PopupOpenerPagePO(this._appPO, {viewId});
       }
       case RouterPagePO: {
         await startPage.openWorkbenchView('e2e-test-router');

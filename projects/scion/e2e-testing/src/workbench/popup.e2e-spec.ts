@@ -541,6 +541,55 @@ test.describe('Workbench Popup', () => {
       await expect(await popup.isPresent()).toBe(true);
       await expect(await popup.isVisible()).toBe(true);
     });
+
+    test('should propagate view context', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open target view.
+      const popupTargetViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+      // Open popup in target view.
+      const popupOpenerPage1 = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage1.selectPopupComponent('popup-opener-page')
+      await popupOpenerPage1.enterCssClass('testee-1');
+      await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage1.enterContextualViewId(popupTargetViewPage.viewId);
+      await popupOpenerPage1.enterPosition({left: 300, top: 300});
+      await popupOpenerPage1.clickOpen();
+
+      const popup1 = appPO.popup({cssClass: 'testee-1'});
+      await expect(popup1.locator).not.toBeVisible();
+
+      // Activate target view.
+      await popupTargetViewPage.viewTab.click();
+      await expect(popup1.locator).toBeVisible();
+
+      // Open another popup from the popup (inherit popup's view context).
+      const popupOpenerPage2 = new PopupOpenerPagePO(appPO, {popup: popup1});
+      await popupOpenerPage2.selectPopupComponent('popup-page')
+      await popupOpenerPage2.enterCssClass('testee-2');
+      await popupOpenerPage2.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage2.enterPosition({left: 300, top: 300});
+      await popupOpenerPage2.clickOpen();
+      const popup2 = appPO.popup({cssClass: 'testee-2'});
+
+      // Expect popup 2 to have contextual view of popup 1, i.e., is also visible.
+      await expect(popup2.locator).toBeVisible();
+
+      // Activate target view.
+      await popupOpenerPage1.viewTab.click();
+
+      // Expect popup 1 and popup 2 not to be visible because contextual view is not active.
+      await expect(popup1.locator).not.toBeVisible();
+      await expect(popup2.locator).not.toBeVisible();
+
+      // Activate contextual view of the popups.
+      await popupTargetViewPage.viewTab.click();
+
+      // Expect popup 1 and popup 2 to be visible.
+      await expect(popup1.locator).toBeVisible();
+      await expect(popup2.locator).toBeVisible();
+    });
   });
 
   test.describe('popup closing', () => {
