@@ -25,7 +25,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.clickOpen();
 
       const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.getReferrer()).toEqual({viewId: popupOpenerPage.viewId});
+      await expect.poll(() => popupPage.getReferrer()).toEqual({viewId: await popupOpenerPage.view.getViewId()});
     });
 
     test('should have a view reference to the specified contextual view', async ({appPO, workbenchNavigator}) => {
@@ -43,7 +43,7 @@ test.describe('Workbench Popup', () => {
       await startPage.view!.viewTab.click();
 
       const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.getReferrer()).toEqual({viewId: startPageViewId});
+      await expect.poll(() => popupPage.getReferrer()).toEqual({viewId: startPageViewId});
     });
 
     test('should not have a view reference if opened outside of a contextual view', async ({appPO, workbenchNavigator}) => {
@@ -55,7 +55,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.clickOpen();
 
       const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.getReferrer()).toEqual({});
+      await expect.poll(() => popupPage.getReferrer()).toEqual({});
     });
   });
 });
