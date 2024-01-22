@@ -62,8 +62,11 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
   public header: WorkbenchDialogHeaderDirective | undefined;
   public footer: WorkbenchDialogFooterDirective | undefined;
   public actions = new Array<WorkbenchDialogActionDirective>();
+  public context = {
+    view: inject(ɵWorkbenchView, {optional: true}),
+  };
 
-  constructor(public component: ComponentType<unknown>, public _options: WorkbenchDialogOptions, public context: {view?: ɵWorkbenchView}) {
+  constructor(public component: ComponentType<unknown>, public _options: WorkbenchDialogOptions) {
     this._overlayRef = this.createOverlay();
     this._portal = this.createPortal();
     this._cssClass = Arrays.coerce(this._options.cssClass).join(' ');
