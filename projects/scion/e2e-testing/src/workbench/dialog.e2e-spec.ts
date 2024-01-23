@@ -14,8 +14,8 @@ import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {DialogPagePO} from '../dialog-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
-import {PopupPagePO} from '../workbench-client/page-object/popup-page.po';
 import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -30,7 +30,7 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect(dialog.locator).toBeVisible();
-      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await dialogOpenerPage.view.getBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.view.getBoundingBox()]));
     });
 
     test('should reject the promise when attaching the dialog to a non-existent view', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -197,7 +197,7 @@ test.describe('Workbench Dialog', () => {
       // Expect dialog 2 to have contextual view of dialog 1, i.e., is also visible.
       await expect(dialog2.locator).toBeVisible();
 
-      // Activate target view.
+      // Activate other view.
       await dialogOpenerPage1.viewTab.click();
 
       // Expect dialog 1 and dialog 2 not to be visible because contextual view is not active.
@@ -224,7 +224,10 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect(dialog.locator).toBeVisible();
-      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(),
+        await dialogOpenerPage.view.getBoundingBox(),
+      ]));
     });
 
     test('should open an application-modal dialog if in the context of a view and application-modality selected', async ({appPO, workbenchNavigator}) => {
@@ -236,7 +239,10 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect(dialog.locator).toBeVisible();
-      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(),
+        await dialogOpenerPage.view.getBoundingBox(),
+      ]));
     });
 
     test('should open an application-modal dialog with viewport scope when configured', async ({appPO, workbenchNavigator}) => {
@@ -249,7 +255,10 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect(dialog.locator).toBeVisible();
-      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await appPO.pageBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        appPO.viewportBoundingBox(),
+        await dialogOpenerPage.view.getBoundingBox(),
+      ]));
     });
 
     test('should delay opening view-modal dialog until all application-modal dialogs are closed', async ({appPO, workbenchNavigator}) => {
@@ -302,14 +311,17 @@ test.describe('Workbench Dialog', () => {
       // Re-mount the workbench component by navigating the primary router.
       await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
       await expect(dialog.locator).toBeVisible();
-      await expect.poll(() => dialog.getGlassPaneBoundingBox()).toEqual(await appPO.workbenchBoundingBox());
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(),
+        await dialogOpenerPage.view.getBoundingBox(),
+      ]));
 
       // Expect the component not to be constructed anew.
       await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
   });
 
-  test.describe('Focus Trap', () => {
+  test.describe('Focus', () => {
 
     test('should focus first element when opened', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -320,46 +332,6 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const focusTestPage = new FocusTestPagePO(dialog);
-      await expect(focusTestPage.firstField).toBeFocused();
-    });
-
-    test('should not focus elements under the glass pane', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      // Open the dialog.
-      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
-
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const focusTestPage = new FocusTestPagePO(dialog);
-
-      await expect(dialogOpenerPage.click({timeout: 1000})).rejects.toThrowError();
-      await expect(focusTestPage.firstField).toBeFocused();
-    });
-
-    test('should not focus popup under the glass pane', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      // Open a global popup.
-      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPosition({bottom: 100, right: 100});
-      await popupOpenerPage.enterContextualViewId('<null>');
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
-
-      const popup = appPO.popup({cssClass: 'testee'});
-      await expect(popup.locator).toBeVisible();
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-
-      // Open a dialog.
-      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
-
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const focusTestPage = new FocusTestPagePO(dialog);
-
-      await expect(popupPage.clickClose({timeout: 1000})).rejects.toThrowError();
       await expect(focusTestPage.firstField).toBeFocused();
     });
 
@@ -1890,6 +1862,211 @@ test.describe('Workbench Dialog', () => {
           }));
         });
       });
+    });
+  });
+
+  test.describe('Blocking', () => {
+
+    test('should block interaction with contextual view', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogRect = await dialog.getDialogBoundingBox();
+      // Move dialog to the bottom right corner.
+      await dialog.moveDialog({x: appPO.viewportBoundingBox().right - dialogRect.right, y: appPO.viewportBoundingBox().bottom - dialogRect.bottom});
+
+      // Expect interaction with contextual view to be blocked.
+      await expect(dialogOpenerPage.click({timeout: 1000})).rejects.toThrowError();
+      await expect(new FocusTestPagePO(dialog).firstField).toBeFocused();
+
+      // Expect glass pane
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await dialogOpenerPage.view.getBoundingBox(),
+      ]));
+    });
+
+    test('should block interaction with contextual dialog', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open dialog 1.
+      const dialogOpenerViewPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerViewPage.open('dialog-opener-page', {cssClass: 'testee-1'});
+      const dialog1 = appPO.dialog({cssClass: 'testee-1'});
+      const dialog1Rect = await dialog1.getDialogBoundingBox();
+      // Move dialog to the bottom left corner.
+      await dialog1.moveDialog({x: appPO.viewportBoundingBox().left - dialog1Rect.left, y: appPO.viewportBoundingBox().bottom - dialog1Rect.bottom});
+
+      // Open dialog 2 from dialog 1.
+      const dialogOpenerDialogPage = new DialogOpenerPagePO(appPO, {dialog: dialog1});
+      await dialogOpenerDialogPage.open('focus-test-page', {cssClass: 'testee-2'});
+      const dialog2 = appPO.dialog({cssClass: 'testee-2'});
+      const dialog2Rect = await dialog2.getDialogBoundingBox();
+      // Move dialog to the bottom right corner.
+      await dialog2.moveDialog({x: appPO.viewportBoundingBox().right - dialog2Rect.right, y: appPO.viewportBoundingBox().bottom - dialog2Rect.bottom});
+
+      // Expect interaction with contextual view to be blocked.
+      await expect(dialogOpenerViewPage.click({timeout: 1000})).rejects.toThrowError();
+
+      // Expect interaction with contextual dialog to be blocked.
+      await expect(dialogOpenerDialogPage.click({timeout: 1000})).rejects.toThrowError();
+
+      // Expect dialog 2 to be interactable
+      const focusTestPage = new FocusTestPagePO(dialog2);
+      await expect(focusTestPage.firstField).toBeFocused();
+      await focusTestPage.clickField('middle-field');
+      await expect(focusTestPage.middleField).toBeFocused();
+
+      // Expect glass panes
+      await expect.poll(() => dialog1.getGlassPaneBoundingBoxes()).toEqual(new Set([]));
+      await expect.poll(() => dialog2.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await dialogOpenerViewPage.view.getBoundingBox(),
+        await dialog1.getDialogBoundingBox(),
+      ]));
+    });
+
+    test('should block interaction with contextual popup', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open popup
+      const popupOpenerViewPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerViewPage.selectPopupComponent('dialog-opener-page');
+      await popupOpenerViewPage.enterCssClass('testee');
+      await popupOpenerViewPage.enterPosition({bottom: 0, left: 0});
+      await popupOpenerViewPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerViewPage.clickOpen();
+      const popup = appPO.popup({cssClass: 'testee'});
+
+      // Open dialog from popup.
+      const dialogOpenerPopupPage = new DialogOpenerPagePO(appPO, {popup});
+      await dialogOpenerPopupPage.open('focus-test-page', {cssClass: 'testee'});
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogRect = await dialog.getDialogBoundingBox();
+      // Move dialog to the bottom right corner.
+      await dialog.moveDialog({x: appPO.viewportBoundingBox().right - dialogRect.right, y: appPO.viewportBoundingBox().bottom - dialogRect.bottom});
+
+      // Expect interaction with contextual view to be blocked.
+      await expect(popupOpenerViewPage.click({timeout: 1000})).rejects.toThrowError();
+
+      // Expect interaction with contextual popup to be blocked.
+      await expect(dialogOpenerPopupPage.click({timeout: 1000})).rejects.toThrowError();
+
+      // Expect dialog to be interactable
+      const focusTestPage = new FocusTestPagePO(dialog);
+      await expect(focusTestPage.firstField).toBeFocused();
+      await focusTestPage.clickField('middle-field');
+      await expect(focusTestPage.middleField).toBeFocused();
+
+      // Expect glass panes
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await popupOpenerViewPage.view.getBoundingBox(),
+        await popup.getBoundingBox('wb-popup'),
+      ]));
+    });
+
+    test('should not block dialogs of other views', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open two dialog opener views side by side.
+      const dialogOpenerViewPage1 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      const dialogOpenerViewPage2 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerViewPage2.viewTab.dragTo({partId: await dialogOpenerViewPage2.viewTab.part.getPartId(), region: 'east'});
+
+      // Open dialog 1.
+      await dialogOpenerViewPage1.open('focus-test-page', {cssClass: 'testee-1'});
+      const dialog1 = appPO.dialog({cssClass: 'testee-1'});
+      const dialog1Rect = await dialog1.getDialogBoundingBox();
+
+      // Open dialog 2.
+      await dialogOpenerViewPage2.open('focus-test-page', {cssClass: 'testee-2'});
+      const dialog2 = appPO.dialog({cssClass: 'testee-2'});
+      const dialog2Rect = await dialog2.getDialogBoundingBox();
+
+      // Move dialog 1 to the top right corner.
+      await dialog1.moveDialog({x: appPO.viewportBoundingBox().right - dialog1Rect.right, y: appPO.viewportBoundingBox().top - dialog1Rect.top});
+
+      // Move dialog 2 to the bottom right corner.
+      await dialog2.moveDialog({x: appPO.viewportBoundingBox().right - dialog2Rect.right, y: appPO.viewportBoundingBox().bottom - dialog2Rect.bottom});
+
+      // Expect interaction with contextual view of dialog 1 to be blocked.
+      await expect(dialogOpenerViewPage1.click({timeout: 1000})).rejects.toThrowError();
+      await expect.poll(() => dialog1.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await dialogOpenerViewPage1.view.getBoundingBox(),
+      ]));
+
+      // Expect interaction with contextual view of dialog 2 to be blocked.
+      await expect(dialogOpenerViewPage2.click({timeout: 1000})).rejects.toThrowError();
+      await expect.poll(() => dialog2.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await dialogOpenerViewPage2.view.getBoundingBox(),
+      ]));
+
+      // Expect dialog 1 to be interactable
+      const focusDialog1TestPage = new FocusTestPagePO(dialog1);
+      await focusDialog1TestPage.clickField('middle-field');
+      await expect(focusDialog1TestPage.middleField).toBeFocused();
+
+      // Expect dialog 2 to be interactable
+      const focusDialog2TestPage = new FocusTestPagePO(dialog2);
+      await focusDialog2TestPage.clickField('middle-field');
+      await expect(focusDialog2TestPage.middleField).toBeFocused();
+    });
+
+    test('should block workbench', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open router view and dialog opener view side by side.
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.viewTab.dragTo({partId: await dialogOpenerPage.viewTab.part.getPartId(), region: 'east'});
+
+      // Navigate to FocusTestPageComponent
+      await routerPage.enterPath('/test-pages/focus-test-page');
+      await routerPage.clickNavigateViaRouterLink();
+      const focusTestPage = new FocusTestPagePO(routerPage.view);
+
+      // Open application-modal dialog.
+      await dialogOpenerPage.open('dialog-page', {modality: 'application', cssClass: 'testee'});
+      const dialog = appPO.dialog({cssClass: 'testee'});
+
+      // Expect interaction with FocusTestPageComponent to be blocked.
+      await expect(focusTestPage.clickField('middle-field', {timeout: 1000})).rejects.toThrowError();
+
+      // Expect glass panes.
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        await appPO.workbenchBoundingBox(),
+        await dialogOpenerPage.view.getBoundingBox(),
+        await routerPage.view.getBoundingBox(),
+      ]));
+    });
+
+    test('should block viewport', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, dialogModalityScope: 'viewport'});
+
+      // Open router view and dialog opener view side by side.
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.viewTab.dragTo({partId: await dialogOpenerPage.viewTab.part.getPartId(), region: 'east'});
+
+      // Navigate to FocusTestPageComponent
+      await routerPage.enterPath('/test-pages/focus-test-page');
+      await routerPage.clickNavigateViaRouterLink();
+      const focusTestPage = new FocusTestPagePO(routerPage.view);
+
+      // Open application-modal dialog.
+      await dialogOpenerPage.open('dialog-page', {modality: 'application', cssClass: 'testee'});
+      const dialog = appPO.dialog({cssClass: 'testee'});
+
+      // Expect interaction with FocusTestPageComponent to be blocked.
+      await expect(focusTestPage.clickField('middle-field', {timeout: 1000})).rejects.toThrowError();
+
+      // Expect glass panes.
+      await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
+        appPO.viewportBoundingBox(),
+        await dialogOpenerPage.view.getBoundingBox(),
+        await routerPage.view.getBoundingBox(),
+      ]));
     });
   });
 });

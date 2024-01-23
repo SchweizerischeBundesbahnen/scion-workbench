@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, Inject, Injectable, Injector, NgZone, Optional} from '@angular/core';
+import {ElementRef, Inject, Injectable, Injector, NgZone, Optional, runInInjectionContext} from '@angular/core';
 import {ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
-import {combineLatestWith, firstValueFrom, from, fromEvent, identity, MonoTypeOperatorFunction, Observable} from 'rxjs';
-import {distinctUntilChanged, filter, map, shareReplay, startWith, takeUntil} from 'rxjs/operators';
+import {combineLatestWith, firstValueFrom, fromEvent, identity, MonoTypeOperatorFunction, Observable} from 'rxjs';
+import {distinctUntilChanged, filter, map, shareReplay, startWith} from 'rxjs/operators';
 import {ComponentPortal} from '@angular/cdk/portal';
-import {Popup, PopupConfig, PopupReferrer, ɵPopup, ɵPopupError} from './popup.config';
+import {Popup, PopupConfig, PopupReferrer, ɵPopup, ɵPopupErrorResult} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {Arrays, Dictionaries, Objects, Observables} from '@scion/toolkit/util';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
@@ -24,6 +24,7 @@ import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, TopRightPoint} from './popup.origin';
 import {coerceElement} from '@angular/cdk/coercion';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {provideViewContext} from '../view/view-context-provider';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};
@@ -124,11 +125,11 @@ export class PopupService {
 
     // Construct the popup component and attach it to the DOM.
     const overlayRef = this._overlay.create(overlayConfig);
-    const popupHandle = new ɵPopup(config, referrer);
+    const popup = runInInjectionContext(this._injector, () => new ɵPopup<R>(config, referrer));
     const popupPortal = new ComponentPortal(PopupComponent, null, Injector.create({
       parent: config.componentConstructOptions?.injector || this._injector,
       providers: [
-        {provide: ɵPopup, useValue: popupHandle},
+        {provide: ɵPopup, useValue: popup},
         {provide: Popup, useExisting: ɵPopup},
         provideViewContext(contextualView),
         ...[config.componentConstructOptions?.providers || []],
@@ -136,7 +137,6 @@ export class PopupService {
     }));
     const componentRef = overlayRef.attach(popupPortal);
     const popupElement: HTMLElement = componentRef.location.nativeElement;
-    const takeUntilClose = <T>(): MonoTypeOperatorFunction<T> => takeUntil<T>(from(popupHandle.whenClose));
 
     // Make the popup focusable and request the focus.
     popupElement.setAttribute('tabindex', '-1');
@@ -144,12 +144,12 @@ export class PopupService {
 
     // Synchronize the CSS class that indicates where the popup docks to the anchor; is one of 'wb-north', 'wb-south', 'wb-east', or 'wb-west'.
     overlayPositionStrategy.positionChanges
-      .pipe(takeUntilClose())
+      .pipe(takeUntilDestroyed(popup.destroyRef))
       .subscribe(change => this.setPopupAlignCssClass(overlayRef, change));
 
     // Re-position the popup when the origin moves.
     popupOrigin$
-      .pipe(takeUntilClose())
+      .pipe(takeUntilDestroyed(popup.destroyRef))
       .subscribe((origin: FlexibleConnectedPositionStrategyOrigin) => {
         overlayPositionStrategy.setOrigin(origin);
         overlayRef.updatePosition();
@@ -157,27 +157,31 @@ export class PopupService {
 
     // Reposition the popup when its size changes (if necessary).
     fromDimension$(overlayRef.overlayElement)
-      .pipe(takeUntilClose())
+      .pipe(takeUntilDestroyed(popup.destroyRef))
       .subscribe(() => overlayRef.updatePosition());
 
     // Close the popup depending on the passed config.
-    this.installPopupCloser(config, popupElement, overlayRef, popupHandle, contextualView, takeUntilClose);
+    this.installPopupCloser(config, popupElement, popup, contextualView);
 
     // Hide the popup when detaching the contextual view, if any.
     if (contextualView) {
-      this.hidePopupOnViewDetach(overlayRef, contextualView, takeUntilClose);
+      this.hidePopupOnViewDetach(overlayRef, contextualView, popup);
     }
 
     // Dispose the popup when closing it.
-    popupHandle.whenClose.then(() => {
+    popup.destroyRef.onDestroy(() => {
       overlayRef.dispose();
     });
 
-    return popupHandle.whenClose.then((result: R | ɵPopupError): R => {
-      if (result instanceof ɵPopupError) {
-        throw (result.error instanceof Error ? result.error : Error(result.error));
-      }
-      return result;
+    return new Promise<R>((resolve, reject) => {
+      popup.destroyRef.onDestroy(() => {
+        if (popup.result instanceof ɵPopupErrorResult) {
+          reject(popup.result.error);
+        }
+        else {
+          resolve(popup.result!);
+        }
+      });
     });
   }
 
@@ -202,7 +206,7 @@ export class PopupService {
   /**
    * Closes the popup depending on the configured popup closing strategy.
    */
-  private installPopupCloser(config: PopupConfig, popupElement: HTMLElement, overlayRef: OverlayRef, popupHandle: Popup, contextualView: ɵWorkbenchView | null, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
+  private installPopupCloser(config: PopupConfig, popupElement: HTMLElement, popup: ɵPopup, contextualView: ɵWorkbenchView | null): void {
     // Close the popup on escape keystroke.
     if (config.closeStrategy?.onEscape ?? true) {
       fromEvent<KeyboardEvent>(popupElement, 'keydown')
@@ -210,9 +214,9 @@ export class PopupService {
           filter((event: KeyboardEvent) => event.key === 'Escape'),
           subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
           observeInside(continueFn => this._zone.run(continueFn)),
-          takeUntilClose(),
+          takeUntilDestroyed(popup.destroyRef),
         )
-        .subscribe(() => popupHandle.close());
+        .subscribe(() => popup.close());
     }
 
     // Close the popup on focus loss.
@@ -220,18 +224,18 @@ export class PopupService {
       this._focusManager.monitor(popupElement, true)
         .pipe(
           filter((focusOrigin: FocusOrigin) => !focusOrigin),
-          takeUntilClose(),
+          takeUntilDestroyed(popup.destroyRef),
         )
-        .subscribe(() => popupHandle.close());
+        .subscribe(() => popup.close());
     }
 
     // Close the popup when closing the view.
     if (contextualView) {
       this._viewRegistry.views$
-        .pipe(takeUntilClose())
+        .pipe(takeUntilDestroyed(popup.destroyRef))
         .subscribe(views => {
           if (!views.some(view => view.id === contextualView.id)) {
-            popupHandle.close();
+            popup.close();
           }
         });
     }
@@ -241,13 +245,13 @@ export class PopupService {
    * Hides the popup when its contextual view is detached, and displays it when it is reattached. Also restores the focus on re-activation.
    * The contextual view is detached if not active, or located in the peripheral area and the main area is maximized.
    */
-  private hidePopupOnViewDetach(overlayRef: OverlayRef, contextualView: ɵWorkbenchView, takeUntilClose: <T>() => MonoTypeOperatorFunction<T>): void {
+  private hidePopupOnViewDetach(overlayRef: OverlayRef, contextualView: ɵWorkbenchView, popup: ɵPopup): void {
     overlayRef.overlayElement.classList.add('wb-view-context');
 
     let activeElement: HTMLElement | undefined;
 
     contextualView.portal.attached$
-      .pipe(takeUntilClose())
+      .pipe(takeUntilDestroyed(popup.destroyRef))
       .subscribe(attached => {
         if (attached) {
           overlayRef.overlayElement.classList.add('wb-view-attached');
@@ -262,7 +266,7 @@ export class PopupService {
     fromEvent(overlayRef.overlayElement, 'focusin')
       .pipe(
         subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
-        takeUntilClose(),
+        takeUntilDestroyed(popup.destroyRef),
       )
       .subscribe(() => {
         activeElement = this._document.activeElement instanceof HTMLElement ? this._document.activeElement : undefined;
@@ -321,7 +325,7 @@ export class PopupService {
     if (config.context?.viewId) {
       return this._viewRegistry.get(config.context.viewId);
     }
-    if (config.context?.viewId === undefined) { // `null` means to open the popup outside of the contextual view
+    if (config.context?.viewId === undefined) { // `null` means to open the popup outside the contextual view
       return this._view ?? null;
     }
     return null;

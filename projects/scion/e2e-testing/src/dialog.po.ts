@@ -46,8 +46,15 @@ export class DialogPO {
     return fromRect(await this._dialog.boundingBox());
   }
 
-  public async getGlassPaneBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.page().locator('.cdk-overlay-pane.wb-dialog-glass-pane', {has: this.locator}).boundingBox());
+  public async getGlassPaneBoundingBoxes(): Promise<Set<DomRect>> {
+    const dialogId = await this.locator.getAttribute('data-dialogid');
+    const glassPaneLocators = await this.locator.page().locator(`div.e2e-glasspane[data-owner="${dialogId}"]`).all();
+
+    const boundingBoxes = new Set<DomRect>();
+    for (const glassPaneLocator of glassPaneLocators) {
+      boundingBoxes.add(fromRect(await glassPaneLocator.boundingBox()));
+    }
+    return boundingBoxes;
   }
 
   public async getHeaderBoundingBox(): Promise<DomRect> {

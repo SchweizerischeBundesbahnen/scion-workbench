@@ -31,16 +31,16 @@ export class FocusTestPagePO {
     this.lastField = this.locator.locator('input.e2e-last-field');
   }
 
-  public clickField(field: 'first-field' | 'middle-field' | 'last-field'): Promise<void> {
+  public clickField(field: 'first-field' | 'middle-field' | 'last-field', options?: {timeout?: number}): Promise<void> {
     switch (field) {
       case 'first-field': {
-        return this.firstField.click();
+        return this.firstField.click({timeout: options?.timeout});
       }
       case 'middle-field': {
-        return this.middleField.click();
+        return this.middleField.click({timeout: options?.timeout});
       }
       case 'last-field': {
-        return this.lastField.click();
+        return this.lastField.click({timeout: options?.timeout});
       }
       default: {
         throw Error(`[IllegalArgumentError] Specified field not found: ${field}`);

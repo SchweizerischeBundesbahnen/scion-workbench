@@ -12,7 +12,7 @@ import {Component, ElementRef, Type, ViewChild} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {PopupService, PopupSize} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
-import {FocusTestPageComponent} from '../test-pages/focus-test-page/focus-test-page.component';
+import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
@@ -110,7 +110,7 @@ export default class PopupOpenerPageComponent {
       },
     })
       .then(result => this.returnValue = result)
-      .catch(error => this.popupError = stringifyError(error.message) || 'Popup was closed with an error');
+      .catch(error => this.popupError = stringifyError(error) || 'Popup was closed with an error');
   }
 
   private parsePopupComponentInput(): Type<PopupPageComponent | FocusTestPageComponent | BlankTestPageComponent> {

@@ -3,12 +3,13 @@ import {ElementRef} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 
 /**
- * Creates a HTML element and optionally adds it to the DOM.
+ * Creates an HTML element and optionally adds it to the DOM.
  */
 export function createElement(tag: string, options: ElementCreateOptions): HTMLElement {
   const element = document.createElement(tag);
   options.style && setStyle(element, options.style);
   options.cssClass && element.classList.add(...Arrays.coerce(options.cssClass));
+  options.attributes && setAttribute(element, options.attributes);
   options.text && (element.innerText = options.text);
   options.parent && options.parent.appendChild(element);
   return element;
@@ -20,7 +21,7 @@ export function createElement(tag: string, options: ElementCreateOptions): HTMLE
  * Specify styles to be modified by passing a dictionary containing CSS property names (hyphen case).
  * To remove a style, set its value to `null`.
  */
-export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, styles: {[style: string]: any | null}): void {
+export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, styles: {[style: string]: string | null}): void {
   const target = coerceElement(element);
   Object.entries(styles).forEach(([name, value]) => {
     if (value === null) {
@@ -33,11 +34,27 @@ export function setStyle(element: HTMLElement | ElementRef<HTMLElement>, styles:
 }
 
 /**
+ * Sets the given attribute(s) on the given element.
+ * To remove an attribute, set its value to `null`.
+ */
+export function setAttribute(element: HTMLElement | ElementRef<HTMLElement>, attributes: {[name: string]: string | null}): void {
+  const target = coerceElement(element);
+  Object.entries(attributes).forEach(([name, value]) => {
+    if (value === null) {
+      target.removeAttribute(name);
+    }
+    else {
+      target.setAttribute(name, value);
+    }
+  });
+}
+
+/**
  * Sets specified CSS variable(s) to the given element.
  *
  * To remove a CSS variable, set its value to `null`, or use {@link unsetCssVariable}.
  */
-export function setCssVariable(element: HTMLElement | ElementRef<HTMLElement>, variables: {[name: string]: any | null}): void {
+export function setCssVariable(element: HTMLElement | ElementRef<HTMLElement>, variables: {[name: string]: string | null}): void {
   const target = coerceElement(element);
   Object.entries(variables).forEach(([name, value]) => {
     if (value === null) {
@@ -102,5 +119,6 @@ export interface ElementCreateOptions {
   parent?: Node;
   cssClass?: string | string[];
   style?: {[style: string]: any};
+  attributes?: {[name: string]: any};
   text?: string;
 }

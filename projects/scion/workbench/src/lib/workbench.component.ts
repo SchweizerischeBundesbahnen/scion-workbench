@@ -8,20 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, ElementRef, inject, OnDestroy, Provider, ViewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/view-container.reference';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchModuleConfig} from './workbench-module-config';
 import {ComponentType} from '@angular/cdk/portal';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
-import {AsyncPipe, NgComponentOutlet, NgIf} from '@angular/common';
+import {AsyncPipe, DOCUMENT, NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
-import {combineLatest, EMPTY, fromEvent, lastValueFrom, switchMap} from 'rxjs';
+import {combineLatest, lastValueFrom} from 'rxjs';
 import {first, map} from 'rxjs/operators';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
+import {Blockable} from './glass-pane/blockable';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -32,11 +33,14 @@ import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
   styleUrls: ['./workbench.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
+    AsyncPipe,
     NgComponentOutlet,
     WorkbenchLayoutComponent,
     NotificationListComponent,
-    AsyncPipe,
+    GlassPaneDirective,
+  ],
+  viewProviders: [
+    configureWorkbenchGlassPane(),
   ],
 })
 export class WorkbenchComponent implements OnDestroy {
@@ -75,16 +79,13 @@ export class WorkbenchComponent implements OnDestroy {
   }
 
   constructor(workbenchModuleConfig: WorkbenchModuleConfig,
-              private _host: ElementRef<HTMLElement>,
               private _workbenchLauncher: WorkbenchLauncher,
-              private _workbenchDialogRegistry: WorkbenchDialogRegistry,
               private _logger: Logger,
               protected workbenchStartup: WorkbenchStartup) {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
     this.viewContainerReferences.workbenchElement.set(inject(ViewContainerRef));
     this.splash = workbenchModuleConfig?.startup?.splash || SplashComponent;
     this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();
-    this.preventFocusIfBlocked();
     this.startWorkbench();
   }
 
@@ -110,20 +111,6 @@ export class WorkbenchComponent implements OnDestroy {
   }
 
   /**
-   * Prevent parts of the workbench from gaining focus via sequential keyboard navigation when a dialog overlays it.
-   */
-  private preventFocusIfBlocked(): void {
-    this._workbenchDialogRegistry.top$()
-      .pipe(
-        switchMap(dialog => dialog ? fromEvent(this._host.nativeElement, 'focusin') : EMPTY),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        this._workbenchDialogRegistry.top()!.focus();
-      });
-  }
-
-  /**
    * Unsets view container references when this component is destroyed.
    */
   private unsetViewContainerReferences(): void {
@@ -133,4 +120,29 @@ export class WorkbenchComponent implements OnDestroy {
   public ngOnDestroy(): void {
     this.unsetViewContainerReferences();
   }
+}
+
+/**
+ * Blocks the workbench or the browser's viewport when opening an application-modal dialog.
+ */
+function configureWorkbenchGlassPane(): Provider[] {
+  return [
+    {
+      provide: GLASS_PANE_BLOCKABLE,
+      useFactory: (): Blockable => ({
+        blockedBy$: inject(WorkbenchDialogRegistry).top$(),
+      }),
+    },
+    {
+      provide: GLASS_PANE_TARGET_ELEMENT,
+      useFactory: () => {
+        if (inject(WorkbenchModuleConfig).dialog?.modalityScope === 'viewport') {
+          return inject(DOCUMENT).body;
+        }
+        else {
+          return inject(ElementRef);
+        }
+      },
+    },
+  ];
 }

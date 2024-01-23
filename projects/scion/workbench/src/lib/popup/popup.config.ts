@@ -8,10 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
-import {Observable} from 'rxjs';
+import {ElementRef, inject, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {PopupOrigin} from './popup.origin';
 import {Arrays} from '@scion/toolkit/util';
+import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs/operators';
+import {ɵDestroyRef} from '../common/ɵdestroy-ref';
+import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
+import {Blockable} from '../glass-pane/blockable';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -202,29 +208,54 @@ export abstract class Popup<T = any> {
   public abstract closeWithError(error: Error | string): void;
 }
 
-export class ɵPopup<T = any> implements Popup<T> {
+/**
+ * @internal
+ */
+export class ɵPopup<R = unknown> implements Popup, Blockable {
 
-  private _closeResolveFn!: (result: any | undefined) => void;
-
-  public readonly whenClose = new Promise<any | undefined>(resolve => this._closeResolveFn = resolve);
+  public readonly destroyRef = new ɵDestroyRef();
   public readonly cssClasses: string[];
+
+  /**
+   * Indicates whether this popup is blocked by dialog(s) that overlay it.
+   */
+  public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
+  public result: R | ɵPopupErrorResult | undefined;
 
   constructor(private _config: PopupConfig, public readonly referrer: PopupReferrer) {
     this.cssClasses = Arrays.coerce(this._config.cssClass);
+    this.blockWhenDialogOpened();
+  }
+
+  /**
+   * Blocks this popup when a dialog overlays it.
+   */
+  private blockWhenDialogOpened(): void {
+    const workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
+    const initialTop = workbenchDialogRegistry.top({viewId: this.referrer.viewId});
+
+    workbenchDialogRegistry.top$({viewId: this.referrer.viewId})
+      .pipe(
+        map(top => top === initialTop ? null : top),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(this.blockedBy$);
   }
 
   /** @inheritDoc */
-  public close<R = any>(result?: R | undefined): void {
-    this._closeResolveFn(result);
+  public close(result?: unknown | undefined): void {
+    this.result = result as R;
+    this.destroy();
   }
 
   /** @inheritDoc */
   public closeWithError(error: Error | string): void {
-    this._closeResolveFn(new ɵPopupError(error));
+    this.result = new ɵPopupErrorResult(error);
+    this.destroy();
   }
 
   /** @inheritDoc */
-  public get input(): T | undefined {
+  public get input(): unknown | undefined {
     return this._config.input;
   }
 
@@ -240,12 +271,19 @@ export class ɵPopup<T = any> implements Popup<T> {
   public get viewContainerRef(): ViewContainerRef | undefined {
     return this._config.componentConstructOptions?.viewContainerRef;
   }
+
+  /**
+   * Destroys this dialog and associated resources.
+   */
+  public destroy(): void {
+    this.destroyRef.destroy();
+  }
 }
 
 /**
  * @internal
  */
-export class ɵPopupError {
+export class ɵPopupErrorResult {
 
   constructor(public error: string | Error) {
   }

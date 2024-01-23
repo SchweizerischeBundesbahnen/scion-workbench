@@ -1,21 +1,18 @@
-<ng-container *ngIf="workbenchStartup.whenStarted | async; then workbench_template; else splash_template;"></ng-container>
-
-<!-- splash that is rendered during workbench startup -->
-<ng-template #splash_template>
-  <ng-container *ngComponentOutlet="splash"></ng-container>
-</ng-template>
-
-<!-- workbench that is rendered after workbench startup completed -->
-<ng-template #workbench_template>
-  <div class="stacking-context-barrier">
-    <wb-workbench-layout *ngIf="whenViewContainersInjected | async"></wb-workbench-layout>
-    <!-- anchor to attach iframes of embedded microfrontends -->
-    <ng-container #iframe_host></ng-container>
+@if (workbenchStartup.whenStarted | async) {
+  <div class="stacking-context-barrier" wbGlassPane>
+    @if (whenViewContainersInjected | async) {
+      <wb-workbench-layout/>
+    }
+    <!-- Achor to attach iframes of embedded microfrontends -->
+    <ng-container #iframe_host/>
   </div>
 
-  <!-- anchor to attach the visual placeholder when dragging a view over a valid drop zone -->
+  <!-- Anchor to attach the visual placeholder when dragging a view over a valid drop zone -->
   <div #view_drop_placeholder_host class="view-drop-placeholder-host"></div>
 
-  <!-- notifications -->
-  <wb-notification-list></wb-notification-list>
-</ng-template>
+  <!-- Notifications -->
+  <wb-notification-list/>
+}
+@else {
+  <ng-container *ngComponentOutlet="splash"/>
+}

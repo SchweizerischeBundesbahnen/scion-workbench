@@ -34,8 +34,10 @@ import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {provideViewContext} from './view-context-provider';
+import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
+import {Blockable} from '../glass-pane/blockable';
 
-export class ɵWorkbenchView implements WorkbenchView {
+export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   private readonly _workbenchService = inject(ɵWorkbenchService);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
@@ -63,10 +65,7 @@ export class ɵWorkbenchView implements WorkbenchView {
   public readonly active$ = new BehaviorSubject<boolean>(false);
   public readonly cssClasses$ = new BehaviorSubject<string[]>([]);
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
-  /**
-   * Indicates whether this view is blocked by dialog(s) that overlay this view.
-   */
-  public readonly blocked$ = new BehaviorSubject(false);
+  public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public readonly portal: WbComponentPortal;
 
   constructor(public readonly id: string, options: {component: ComponentType<ViewComponent>}) {
@@ -134,7 +133,7 @@ export class ɵWorkbenchView implements WorkbenchView {
   }
 
   public get closable(): boolean {
-    return this._closable && !this.blocked;
+    return this._closable && !this.blockedBy$.value;
   }
 
   public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
@@ -240,10 +239,6 @@ export class ɵWorkbenchView implements WorkbenchView {
     };
   }
 
-  public get blocked(): boolean {
-    return this.blocked$.value;
-  }
-
   public get destroyed(): boolean {
     return this.portal.isDestroyed;
   }
@@ -282,11 +277,8 @@ export class ɵWorkbenchView implements WorkbenchView {
    */
   private blockWhenDialogOpened(): void {
     this._workbenchDialogRegistry.top$({viewId: this.id})
-      .pipe(
-        map(top => !!top),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(this.blocked$);
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(this.blockedBy$);
   }
 
   public destroy(): void {

@@ -16,6 +16,7 @@ import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {DialogPO} from '../../dialog.po';
+import {PopupPO} from '../../popup.po';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
@@ -29,7 +30,7 @@ export class DialogOpenerPagePO {
   private readonly _view: ViewPO | undefined;
   private readonly _viewTab: ViewTabPO | undefined;
 
-  constructor(private _appPO: AppPO, options: {viewId?: string; dialog?: DialogPO}) {
+  constructor(private _appPO: AppPO, options: {viewId?: string; dialog?: DialogPO; popup?: PopupPO}) {
     if (options.viewId) {
       this._view = this._appPO.view({viewId: options.viewId});
       this._viewTab = this.view.viewTab;
@@ -38,8 +39,11 @@ export class DialogOpenerPagePO {
     else if (options.dialog) {
       this.locator = options.dialog.locator.locator('app-dialog-opener-page');
     }
+    else if (options.popup) {
+      this.locator = options.popup.locator.locator('app-dialog-opener-page');
+    }
     else {
-      throw Error('[PageObjectError] either viewId or dialog must be provided.');
+      throw Error('[PageObjectError] either viewId, dialog or popup must be provided.');
     }
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');

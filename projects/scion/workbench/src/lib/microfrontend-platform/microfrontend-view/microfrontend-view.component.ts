@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Inject, OnDestroy, OnInit, Provider, ViewChild} from '@angular/core';
 import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
 import {asapScheduler, combineLatest, EMPTY, firstValueFrom, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
@@ -37,6 +37,7 @@ import {WorkbenchService} from '../../workbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import '../microfrontend-platform.config';
+import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../../glass-pane/glass-pane.directive';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -51,6 +52,10 @@ import '../microfrontend-platform.config';
     AsyncPipe,
     ContentAsOverlayComponent,
     NgComponentOutlet,
+    GlassPaneDirective,
+  ],
+  viewProviders: [
+    configureMicrofrontendGlassPane(),
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
@@ -180,7 +185,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
       params: params,
       pushStateToSessionHistoryStack: false,
       showSplash: viewCapability.properties.showSplash,
-      ɵcapabilityId: viewCapability.metadata!.id
+      ɵcapabilityId: viewCapability.metadata!.id,
     });
   }
 
@@ -390,4 +395,14 @@ interface ActivatedMicrofrontendRouteSnapshot {
  */
 function substituteNamedParameters(value: string | null | undefined, params: Params): string | null {
   return value?.replace(/:(\w+)/g, (match, paramName) => params[paramName] ?? match) || null;
+}
+
+/**
+ * Blocks the microfrontend outlet when dialog(s) overlay this view.
+ */
+function configureMicrofrontendGlassPane(): Provider {
+  return {
+    provide: GLASS_PANE_BLOCKABLE,
+    useExisting: ɵWorkbenchView,
+  };
 }

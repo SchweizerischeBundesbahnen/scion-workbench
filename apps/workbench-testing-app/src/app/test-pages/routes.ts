@@ -41,8 +41,13 @@ export default [
   },
   {
     path: 'workbench-theme-test-page',
-    loadComponent: (): any => import('./workbench-theme-test-page/workbench-theme-test-page.component'),
+    loadComponent: () => import('./workbench-theme-test-page/workbench-theme-test-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench Theme Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-workbench-theme'},
+  },
+  {
+    path: 'focus-test-page',
+    loadComponent: () => import('./focus-test-page/focus-test-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Focus Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-focus-test-page'},
   },
 ] satisfies Routes;
 
