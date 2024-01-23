@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, EMPTY, firstValueFrom, map, merge, Observable, of, switchMap} from 'rxjs';
+import {BehaviorSubject, combineLatest, concatWith, delay, EMPTY, firstValueFrom, map, merge, Observable, of, Subject, switchMap} from 'rxjs';
 import {ComponentRef, inject, Injector, NgZone} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
@@ -26,14 +26,17 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WORKBENCH_ELEMENT_REF} from '../content-projection/view-container.reference';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
-import {filter} from 'rxjs/operators';
+import {distinctUntilChanged, filter} from 'rxjs/operators';
 import {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
 import {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-footer.directive';
 import {WorkbenchDialogHeaderDirective} from './dialog-header/workbench-dialog-header.directive';
 import {Disposable} from '../common/disposable';
+import {Blockable} from '../glass-pane/blockable';
+import {Blocking} from '../glass-pane/blocking';
+import {UUID} from '@scion/toolkit/uuid';
 
 /** @inheritDoc */
-export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
+export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
 
   private readonly _overlayRef: OverlayRef;
   private readonly _portal: ComponentPortal<WorkbenchDialogComponent>;
@@ -42,6 +45,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
   private readonly _workbenchModuleConfig = inject(WorkbenchModuleConfig);
   private readonly _destroyRef = new ɵDestroyRef();
   private readonly _attached$: Observable<boolean>;
+  private _blink$ = new Subject<void>();
 
   /**
    * Contains the result to be passed to the dialog opener.
@@ -51,9 +55,13 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
   private _cssClass: string;
 
   /**
+   * Unique identity of this dialog.
+   */
+  public readonly id = UUID.randomUUID();
+  /**
    * Indicates whether this dialog is blocked by other dialog(s) that overlay this dialog.
    */
-  public readonly blocked$ = new BehaviorSubject<boolean>(false);
+  public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public readonly size: WorkbenchDialogSize = {};
   public title: string | Observable<string | undefined> | undefined;
   public closable = true;
@@ -62,6 +70,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
   public header: WorkbenchDialogHeaderDirective | undefined;
   public footer: WorkbenchDialogFooterDirective | undefined;
   public actions = new Array<WorkbenchDialogActionDirective>();
+  public blinking$ = new BehaviorSubject(false);
   public context = {
     view: inject(ɵWorkbenchView, {optional: true}),
   };
@@ -77,6 +86,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
     this.blockWhenNotOnTop();
     this.restoreFocusOnAttach();
     this.restoreFocusOnUnblock();
+    this.blinkOnRequest();
   }
 
   public async open(): Promise<R | undefined> {
@@ -134,11 +144,9 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
     return this._options.animate ?? false;
   }
 
-  /**
-   * Focuses the dialog.
-   */
+  /** @inheritDoc */
   public focus(): void {
-    if (!this.blocked$.value) {
+    if (!this.blockedBy$.value) {
       this._componentRef?.instance.focus();
     }
   }
@@ -185,12 +193,19 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
     return this._workbenchDialogRegistry.indexOf(this);
   }
 
+  /** @inheritDoc */
   public set cssClass(cssClass: string | string[]) {
     this._cssClass = new Array<string>().concat(this._options.cssClass ?? []).concat(cssClass).join(' ');
   }
 
+  /** @inheritDoc */
   public get cssClass(): string {
     return this._cssClass;
+  }
+
+  /** @inheritDoc */
+  public blink(): void {
+    this._blink$.next();
   }
 
   private createPortal(): ComponentPortal<WorkbenchDialogComponent> {
@@ -210,7 +225,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
     const overlay = inject(Overlay);
     return overlay.create({
       disposeOnNavigation: true, // dispose dialog on browser back/forward navigation
-      panelClass: ['wb-dialog-glass-pane'],
+      panelClass: ['wb-dialog-modality-context'],
       positionStrategy: overlay.position().global(),
       scrollStrategy: overlay.scrollStrategies.noop(),
     });
@@ -234,9 +249,9 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
    * Restores focus when unblocking this dialog.
    */
   private restoreFocusOnUnblock(): void {
-    this.blocked$
+    this.blockedBy$
       .pipe(
-        filter(blocked => !blocked),
+        filter(blockedBy => !blockedBy),
         takeUntilDestroyed(),
       )
       .subscribe(() => {
@@ -286,7 +301,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
    */
   private stickToHostElement(): void {
     if (this._options.modality === 'application' && this._workbenchModuleConfig.dialog?.modalityScope === 'viewport') {
-      setStyle(this._overlayRef.hostElement, {inset: 0});
+      setStyle(this._overlayRef.hostElement, {inset: '0'});
     }
     else {
       const workbenchViewElement$ = (view: ɵWorkbenchView): Observable<HTMLElement> => of(view.portal.componentRef.location.nativeElement);
@@ -317,10 +332,20 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R> {
   private blockWhenNotOnTop(): void {
     this._workbenchDialogRegistry.top$({viewId: this.context.view?.id})
       .pipe(
-        map(top => top !== this),
+        map(top => top === this ? null : top),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe(this.blocked$);
+      .subscribe(this.blockedBy$);
+  }
+
+  private blinkOnRequest(): void {
+    this._blink$
+      .pipe(
+        switchMap(() => of(true).pipe(concatWith(of(false).pipe(delay(300))))),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(this.blinking$);
   }
 
   /**

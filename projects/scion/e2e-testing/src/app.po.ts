@@ -187,16 +187,6 @@ export class AppPO {
   }
 
   /**
-   * Returns the size of the page viewport.
-   */
-  public size(): {width: number; height: number} {
-    return {
-      width: this.page.viewportSize()?.width ?? 0,
-      height: this.page.viewportSize()?.height ?? 0,
-    };
-  }
-
-  /**
    * Returns bounding box of the 'wb-workbench' element.
    */
   public async workbenchBoundingBox(): Promise<DomRect> {
@@ -206,8 +196,8 @@ export class AppPO {
   /**
    * Returns the bounding box of the browser page viewport.
    */
-  public async pageBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.page.viewportSize());
+  public viewportBoundingBox(): DomRect {
+    return fromRect(this.page.viewportSize());
   }
 
   /**

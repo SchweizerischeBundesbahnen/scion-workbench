@@ -17,14 +17,6 @@
   flex-direction: column;
   align-items: center;
   position: relative; // positioning context for the dialog pane
-  // Enable pointer events because disabled on CDK overlay (div.cdk-overlay-pane.wb-dialog-glass-pane).
-  pointer-events: auto;
-
-  &[data-viewid] {
-    // The overlay of view-modal dialogs covers the touch area of adjacent part dividers since rendered on top of the workbench layout.
-    // To improve usability, we shrink the overlay by a few pixels to make it easier for the user to grab the divider.
-    margin: 2px;
-  }
 
   > div.dialog {
     display: flex;
@@ -40,6 +32,8 @@
     width: var(--ɵdialog-width);
     max-width: var(--ɵdialog-max-width);
     outline: none;
+    // Enable pointer events because disabled on CDK overlay (div.cdk-overlay-pane.wb-dialog-modality-context).
+    pointer-events: auto;
 
     > div.dialog-box {
       flex: auto;

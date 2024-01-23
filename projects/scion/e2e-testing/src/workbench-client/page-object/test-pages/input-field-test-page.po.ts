@@ -38,8 +38,8 @@ export class InputFieldTestPagePO {
     return orElseThrow(this._popup, () => Error('[IllegalStateError] Test page not opened in a popup.'));
   }
 
-  public async clickInputField(): Promise<void> {
-    await this.locator.locator('input.e2e-input').click();
+  public async clickInputField(options?: {timeout?: number}): Promise<void> {
+    await this.locator.locator('input.e2e-input').click({timeout: options?.timeout});
   }
 
   public async isInputFieldActiveElement(): Promise<boolean> {

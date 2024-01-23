@@ -2,7 +2,7 @@
  * Provides styles for the workbench dialog.
  */
 @mixin install-global-styles() {
-  .cdk-overlay-pane.wb-dialog-glass-pane {
+  .cdk-overlay-pane.wb-dialog-modality-context {
     width: 100%;
     height: 100%;
     display: grid;

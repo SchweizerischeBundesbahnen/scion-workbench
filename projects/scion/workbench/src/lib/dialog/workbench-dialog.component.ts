@@ -8,31 +8,28 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AfterViewInit, Component, DestroyRef, ElementRef, HostBinding, HostListener, inject, NgZone, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, DestroyRef, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, OnInit, Provider, ViewChild} from '@angular/core';
 
-import {EMPTY, fromEvent, Subject, switchMap, timer} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {fromEvent} from 'rxjs';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
-import {DOCUMENT, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
+import {AsyncPipe, DOCUMENT, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
 import {subscribeInside} from '@scion/toolkit/operators';
-import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {MovableDirective, WbMoveEvent} from './movable.directive';
 import {ResizableDirective, WbResizeEvent} from './resizable.directive';
 import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
 import {DialogHeaderComponent} from './dialog-header/dialog-header.component';
 import {DialogFooterComponent} from './dialog-footer/dialog-footer.component';
+import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../glass-pane/glass-pane.directive';
 
 /**
  * Renders the workbench dialog.
  *
- * This component is added to a CDK overlay that is aligned with the modality area defined by the dialog.
- * The host element `wb-dialog` acts as the glass pane for the dialog, with the actual dialog rendered in the center of the glass pane.
- * The dialog component is added to a viewport and a focus trap is installed. Upon creation, this component focuses the first focusable
- * element and then tracks the focus in order to restore it when the dialog is re-attached.
+ * This component is added to a CDK overlay aligned to the modality context defined by the dialog.
+ * The dialog itself is rendered in the center of its modality context.
  */
 @Component({
   selector: 'wb-dialog',
@@ -43,20 +40,24 @@ import {DialogFooterComponent} from './dialog-footer/dialog-footer.component';
     NgComponentOutlet,
     NgTemplateOutlet,
     A11yModule,
+    AsyncPipe,
     MovableDirective,
     ResizableDirective,
     SciViewportComponent,
     SciDimensionDirective,
     DialogHeaderComponent,
     DialogFooterComponent,
+    GlassPaneDirective,
   ],
   animations: [
     trigger('enter', provideEnterAnimation()),
   ],
+  viewProviders: [
+    configureDialogGlassPane(),
+  ],
 })
 export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
 
-  private readonly _cancelBlinkTimer$ = new Subject<void>();
   private readonly _document = inject<Document>(DOCUMENT);
   private _activeElement: HTMLElement | undefined;
   private _headerHeight: string | undefined;
@@ -113,23 +114,19 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
     return this.dialog.cssClass;
   }
 
-  @HostBinding('attr.data-viewid')
-  protected get viewId(): string | undefined {
-    return this.dialog.context.view?.id;
+  @HostBinding('attr.data-dialogid')
+  public get id(): string {
+    return this.dialog.id;
   }
-
-  public blinking = false;
 
   constructor(public dialog: ɵWorkbenchDialog,
               private _zone: NgZone,
-              private _workbenchDialogRegistry: WorkbenchDialogRegistry,
               private _destroyRef: DestroyRef) {
     this.setDialogOffset();
   }
 
   public ngOnInit(): void {
     this.trackFocus();
-    this.preventFocusIfBlocked();
   }
 
   public ngAfterViewInit(): void {
@@ -168,49 +165,12 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
       });
   }
 
-  /**
-   * Prevent dialog from gaining focus via sequential keyboard navigation when another dialog overlays it.
-   */
-  private preventFocusIfBlocked(): void {
-    this.dialog.blocked$
-      .pipe(
-        switchMap(blocked => blocked ? fromEvent(this._dialogElement.nativeElement, 'focusin') : EMPTY),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(() => {
-        this._workbenchDialogRegistry.top({viewId: this.dialog.context.view?.id})!.focus();
-      });
-  }
-
-  /**
-   * Makes the dialog blink for some short time.
-   */
-  private blink(): void {
-    this._cancelBlinkTimer$.next();
-    this.blinking = true;
-
-    timer(300)
-      .pipe(
-        takeUntil(this._cancelBlinkTimer$),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(() => {
-        this.blinking = false;
-      });
-  }
-
   @HostListener('keydown.escape', ['$event'])
   protected onEscape(event: Event): void {
     if (this.dialog.closable) {
       this.dialog.close();
       event.stopPropagation();
     }
-  }
-
-  @HostListener('mousedown', ['$event'])
-  protected onGlassPaneClick(event: MouseEvent): void {
-    event.preventDefault(); // to not lose focus
-    this.blink();
   }
 
   protected onMove(event: WbMoveEvent): void {
@@ -249,3 +209,14 @@ function provideEnterAnimation(): AnimationMetadata[] {
     ]),
   ];
 }
+
+/**
+ * Blocks this dialog when other dialog(s) overlay it.
+ */
+function configureDialogGlassPane(): Provider {
+  return {
+    provide: GLASS_PANE_BLOCKABLE,
+    useExisting: forwardRef(() => ɵWorkbenchDialog), // resolve {@link ɵWorkbenchDialog} via forwardRef because not defined yet, i.e., {@link ɵWorkbenchDialog} constructs {@link WorkbenchDialogComponent} in its constructor.
+  };
+}
+

@@ -2,12 +2,16 @@
   display: grid;
 }
 
-// Prevent the microfrontend (iframe) from consuming pointer events during a workbench drag operation. Otherwise, dragging a view tab,
-// moving a part splitter, or moving a message box over an iframe would corrupt the drag operation because `dragover` events are not reported.
-sci-router-outlet.workbench-drag {
-  pointer-events: none;
-}
-
-sci-router-outlet::part(splash) {
+// Extra DIV required because the glass pane cannot be installed on the router outlet as the outlet uses its content as splash.
+div.microfrontend-view {
   display: grid;
+
+  // Disable pointer events during workbench drag operation for the workbench to consume drag events.
+  &.workbench-drag {
+    pointer-events: none;
+  }
+
+  > sci-router-outlet::part(splash) {
+    display: grid;
+  }
 }

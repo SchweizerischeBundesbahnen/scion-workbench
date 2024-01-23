@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, HostBinding, OnDestroy, ViewChild} from '@angular/core';
-import {AsyncSubject, combineLatest, EMPTY, fromEvent, switchMap} from 'rxjs';
+import {ChangeDetectorRef, Component, ElementRef, HostBinding, OnDestroy, Provider, ViewChild} from '@angular/core';
+import {AsyncSubject, combineLatest} from 'rxjs';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -23,7 +23,7 @@ import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe} from '@angular/common';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
+import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../glass-pane/glass-pane.directive';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -44,6 +44,12 @@ import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
     A11yModule,
     SciViewportComponent,
     AsyncPipe,
+  ],
+  hostDirectives: [
+    GlassPaneDirective,
+  ],
+  providers: [
+    configureViewGlassPane(),
   ],
 })
 export class ViewComponent implements OnDestroy {
@@ -71,11 +77,6 @@ export class ViewComponent implements OnDestroy {
     return this._view.cssClasses.join(' ');
   }
 
-  @HostBinding('class.blocked')
-  public get blocked(): boolean {
-    return this._view.blocked;
-  }
-
   @HostBinding('class.view-drag')
   public get isViewDragActive(): boolean {
     return this._viewDragService.viewDragData !== null;
@@ -86,7 +87,6 @@ export class ViewComponent implements OnDestroy {
               private _host: ElementRef<HTMLElement>,
               private _cd: ChangeDetectorRef,
               private _viewDragService: ViewDragService,
-              private _workbenchDialogRegistry: WorkbenchDialogRegistry,
               viewContextMenuService: ViewMenuService) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
 
@@ -97,22 +97,6 @@ export class ViewComponent implements OnDestroy {
     combineLatest([this._view.active$, this._viewport$])
       .pipe(takeUntilDestroyed())
       .subscribe(([active, viewport]) => active ? this.onActivateView(viewport) : this.onDeactivateView(viewport));
-
-    this.preventFocusIfBlocked();
-  }
-
-  /**
-   * Prevent view from gaining focus via sequential keyboard navigation when a dialog overlays it.
-   */
-  private preventFocusIfBlocked(): void {
-    this._view.blocked$
-      .pipe(
-        switchMap(blocked => blocked ? fromEvent(this._host.nativeElement, 'focusin') : EMPTY),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        this._workbenchDialogRegistry.top({viewId: this._view.id})!.focus();
-      });
   }
 
   private onActivateView(viewport: SciViewportComponent): void {
@@ -150,3 +134,14 @@ export class ViewComponent implements OnDestroy {
     this._logger.debug(() => `Destroying ViewComponent [viewId=${this.viewId}]'`, LoggerNames.LIFECYCLE);
   }
 }
+
+/**
+ * Blocks this view when dialog(s) overlay it.
+ */
+function configureViewGlassPane(): Provider {
+  return {
+    provide: GLASS_PANE_BLOCKABLE,
+    useExisting: ɵWorkbenchView,
+  };
+}
+

@@ -10,6 +10,7 @@
 
 import {AppPO} from '../../app.po';
 import {FrameLocator, Locator} from '@playwright/test';
+import {DomRect, fromRect} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link SciRouterOutletElement}.
@@ -42,6 +43,10 @@ export class SciRouterOutletPO {
 
   public getAppSymbolicName(): Promise<string | null> {
     return this.locator.getAttribute('data-app');
+  }
+
+  public async getBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.locator.boundingBox());
   }
 
   private createRouterOutletSelector(locateBy: {name?: string; cssClass?: string | string[]}): string {

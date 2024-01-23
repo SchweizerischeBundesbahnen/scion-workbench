@@ -454,7 +454,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterContextualViewId(startPage.viewId!);
-      await popupOpenerPage.enterPosition({left: appPO.size().width / 2, top: appPO.size().height / 2});
+      await popupOpenerPage.enterPosition({left: appPO.viewportBoundingBox().hcenter, top: appPO.viewportBoundingBox().vcenter});
       await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.clickOpen();
@@ -550,7 +550,7 @@ test.describe('Workbench Popup', () => {
 
       // Open popup in target view.
       const popupOpenerPage1 = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage1.selectPopupComponent('popup-opener-page')
+      await popupOpenerPage1.selectPopupComponent('popup-opener-page');
       await popupOpenerPage1.enterCssClass('testee-1');
       await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage1.enterContextualViewId(popupTargetViewPage.viewId);
@@ -566,7 +566,7 @@ test.describe('Workbench Popup', () => {
 
       // Open another popup from the popup (inherit popup's view context).
       const popupOpenerPage2 = new PopupOpenerPagePO(appPO, {popup: popup1});
-      await popupOpenerPage2.selectPopupComponent('popup-page')
+      await popupOpenerPage2.selectPopupComponent('popup-page');
       await popupOpenerPage2.enterCssClass('testee-2');
       await popupOpenerPage2.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage2.enterPosition({left: 300, top: 300});

@@ -18,5 +18,5 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
   standalone: true,
   imports: [SciFormFieldComponent],
 })
-export class FocusTestPageComponent {
+export default class FocusTestPageComponent {
 }

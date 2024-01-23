@@ -194,6 +194,10 @@ export class PopupOpenerPagePO {
     const buttonLocator = this.locator.locator('button.e2e-open');
     return fromRect(await buttonLocator.boundingBox());
   }
+
+  public async click(options?: {timeout?: number}): Promise<void> {
+    await this.locator.click(options);
+  }
 }
 
 export interface PopupCloseAction {

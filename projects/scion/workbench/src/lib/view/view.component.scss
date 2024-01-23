@@ -8,7 +8,7 @@
     background-color: var(--sci-workbench-view-peripheral-background-color);
   }
 
-  &.blocked, &.view-drag {
+  &.view-drag {
     pointer-events: none;
   }
 

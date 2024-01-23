@@ -11,7 +11,7 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {distinctUntilChanged, map} from 'rxjs/operators';
 
 /**
  * Registry for {@link ɵWorkbenchDialog} objects.
@@ -52,8 +52,12 @@ export class WorkbenchDialogRegistry implements OnDestroy {
    * This can be either a view-modal or an application-modal dialog. Otherwise, returns
    * the topmost application-modal dialog.
    */
-  public top$(context?: {viewId?: string}): Observable<ɵWorkbenchDialog | undefined> {
-    return this._dialogs$.pipe(map(() => this.top(context)));
+  public top$(context?: {viewId?: string}): Observable<ɵWorkbenchDialog | null> {
+    return this._dialogs$
+      .pipe(
+        map(() => this.top(context)),
+        distinctUntilChanged(),
+      );
   }
 
   /**
@@ -63,8 +67,8 @@ export class WorkbenchDialogRegistry implements OnDestroy {
    * This can be either a view-modal or an application-modal dialog. Otherwise, returns
    * the topmost application-modal dialog.
    */
-  public top(context?: {viewId?: string}): ɵWorkbenchDialog | undefined {
-    return this.dialogs(dialog => !dialog.context.view || dialog.context.view.id === context?.viewId).at(-1);
+  public top(context?: {viewId?: string}): ɵWorkbenchDialog | null {
+    return this.dialogs(dialog => !dialog.context.view || dialog.context.view.id === context?.viewId).at(-1) ?? null;
   }
 
   public ngOnDestroy(): void {
