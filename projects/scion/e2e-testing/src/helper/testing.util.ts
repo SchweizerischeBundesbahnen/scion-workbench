@@ -147,16 +147,6 @@ export async function getPerspectiveId(page: Page): Promise<string> {
 }
 
 /**
- * Returns the value if not undefined, otherwise throws the error created by the passed factory function.
- */
-export function orElseThrow<T>(value: T | undefined, orElseThrowFn: () => Error): T {
-  if (!value) {
-    throw orElseThrowFn();
-  }
-  return value;
-}
-
-/**
  * Position and size of an element.
  */
 export interface DomRect {
