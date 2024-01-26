@@ -16,6 +16,7 @@ import {ViewPO} from '../../view.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {DialogPO} from '../../dialog.po';
 import {PopupPO} from '../../popup.po';
+import {WorkbenchDialogOptions} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
@@ -61,7 +62,11 @@ export class DialogOpenerPagePO {
     }
   }
 
-  public async open(component: 'blank' | 'dialog-page' | 'dialog-opener-page' | 'focus-test-page', options?: DialogOpenerPageOptions): Promise<void> {
+  public async open(component: 'dialog-page' | 'dialog-opener-page' | 'popup-opener-page' | 'focus-test-page' | 'input-field-test-page' | 'blank', options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
+    if (options?.injector) {
+      throw Error('[PageObjectError] PageObject does not support the option `injector`.');
+    }
+
     await this.locator.locator('select.e2e-component').selectOption(component);
 
     if (options?.inputs) {
@@ -74,12 +79,16 @@ export class DialogOpenerPagePO {
       await this.locator.locator('select.e2e-modality').selectOption(options.modality);
     }
 
-    if (options?.contextualViewId) {
-      await this.locator.locator('input.e2e-contextual-view-id').fill(options.contextualViewId);
+    if (options?.context?.viewId) {
+      await this.locator.locator('input.e2e-contextual-view-id').fill(options.context.viewId);
     }
 
     if (options?.cssClass) {
       await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));
+    }
+
+    if (options?.animate !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-animate')).toggle(options.animate);
     }
 
     if (options?.count) {
@@ -105,7 +114,7 @@ export class DialogOpenerPagePO {
     await this.locator.click(options);
   }
 
-  private async waitUntilDialogsAttached(options?: DialogOpenerPageOptions): Promise<void> {
+  private async waitUntilDialogsAttached(options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
     const cssClasses = coerceArray(options?.cssClass).filter(Boolean);
 
     for (let i = 0; i < (options?.count ?? 1); i++) {
@@ -116,10 +125,6 @@ export class DialogOpenerPagePO {
 }
 
 export interface DialogOpenerPageOptions {
-  inputs?: {[name: string]: unknown};
-  modality?: 'view' | 'application';
-  contextualViewId?: string;
-  cssClass?: string | string[];
   count?: number;
   viewContextActive?: boolean;
   waitUntilOpened?: boolean;

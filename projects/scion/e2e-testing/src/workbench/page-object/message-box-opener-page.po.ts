@@ -15,7 +15,6 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
-import {DialogOpenerPageOptions} from './dialog-opener-page.po';
 import {WorkbenchMessageBoxOptions} from '@scion/workbench';
 
 /**
@@ -98,7 +97,7 @@ export class MessageBoxOpenerPagePO {
     ]);
   }
 
-  private async waitUntilMessageBoxAttached(options?: DialogOpenerPageOptions): Promise<void> {
+  private async waitUntilMessageBoxAttached(options?: WorkbenchMessageBoxOptions): Promise<void> {
     const cssClasses = coerceArray(options?.cssClass).filter(Boolean);
     const messagebox = this._appPO.messagebox({cssClass: cssClasses});
     await messagebox.locator.waitFor({state: 'attached'});

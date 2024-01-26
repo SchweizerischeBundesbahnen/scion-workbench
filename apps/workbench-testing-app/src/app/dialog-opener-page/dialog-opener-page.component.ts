@@ -22,6 +22,7 @@ import {DialogPageComponent} from '../dialog-page/dialog-page.component';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
+import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -48,7 +49,7 @@ export default class DialogOpenerPageComponent {
       animate: this._formBuilder.control(undefined),
     }),
     count: this._formBuilder.control(''),
-    viewContext: this._formBuilder.control(true),
+    viewContextActive: this._formBuilder.control(true),
   });
   public dialogError: string | undefined;
   public returnValue: string | undefined;
@@ -63,7 +64,7 @@ export default class DialogOpenerPageComponent {
     this.dialogError = undefined;
     this.returnValue = undefined;
 
-    const unsetViewContext = !this.form.controls.viewContext.value;
+    const unsetViewContext = !this.form.controls.viewContextActive.value;
     const dialogService = unsetViewContext ? this._appRef.injector.get(WorkbenchDialogService) : this._dialogService;
 
     const dialogs = [];
@@ -98,6 +99,8 @@ export default class DialogOpenerPageComponent {
         return PopupOpenerPageComponent;
       case 'focus-test-page':
         return FocusTestPageComponent;
+      case 'input-field-test-page':
+        return InputFieldTestPageComponent;
       case 'blank':
         return BlankTestPageComponent;
       default:

@@ -40,7 +40,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
 
       // Expect to error when opening the dialog.
-      await expect(dialogOpenerPage.open('blank', {modality: 'view', contextualViewId: 'non-existent'})).rejects.toThrow('[NullViewError] View \'non-existent\' not found.');
+      await expect(dialogOpenerPage.open('blank', {modality: 'view', context: {viewId: 'non-existent'}})).rejects.toThrow('[NullViewError] View \'non-existent\' not found.');
 
       // Expect no error to be logged to the console.
       await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);
@@ -115,7 +115,7 @@ test.describe('Workbench Dialog', () => {
 
       // Open the dialog in view 2.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee', modality: 'view', contextualViewId: await viewTab2.getViewId()});
+      await dialogOpenerPage.open('blank', {cssClass: 'testee', modality: 'view', context: {viewId: await viewTab2.getViewId()}});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       await expect.poll(() => appPO.getDialogCount()).toEqual(1);
@@ -181,7 +181,7 @@ test.describe('Workbench Dialog', () => {
 
       // Open dialog in target view.
       const dialogOpenerPage1 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage1.open('dialog-opener-page', {cssClass: 'testee-1', modality: 'view', contextualViewId: dialogTargetViewPage.viewId});
+      await dialogOpenerPage1.open('dialog-opener-page', {cssClass: 'testee-1', modality: 'view', context: {viewId: dialogTargetViewPage.viewId}});
       const dialog1 = appPO.dialog({cssClass: 'testee-1'});
       await expect(dialog1.locator).not.toBeVisible();
 
@@ -279,7 +279,7 @@ test.describe('Workbench Dialog', () => {
 
       // Open view-modal dialog.
       // Expect view-modal dialog to be attached only after all application-modal dialogs are closed.
-      await dialogOpenerDialogPage.open('dialog-page', {cssClass: 'testee', modality: 'view', contextualViewId, waitUntilOpened: false});
+      await dialogOpenerDialogPage.open('dialog-page', {cssClass: 'testee', modality: 'view', context: {viewId: contextualViewId}, waitUntilOpened: false});
 
       const testeeDialog = appPO.dialog({cssClass: 'testee'});
       await expect(testeeDialog.locator).not.toBeAttached();
