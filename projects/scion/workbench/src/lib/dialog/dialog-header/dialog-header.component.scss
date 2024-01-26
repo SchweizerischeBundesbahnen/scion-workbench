@@ -19,6 +19,7 @@
       position: absolute; // out of document flow to not contribute to the dialog width
       left: 0;
       right: 0;
+      line-height: 1.5;
       @include workbench-mixins.ellipsis-on-overflow();
       font-family: var(--sci-workbench-dialog-title-font-family);
       font-size: var(--sci-workbench-dialog-title-font-size);
