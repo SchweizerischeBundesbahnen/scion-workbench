@@ -4,6 +4,7 @@
       <select [formControl]="form.controls.component" class="e2e-component">
         <option value="dialog-page">DialogPageComponent</option>
         <option value="focus-test-page">FocusTestPageComponent</option>
+        <option value="input-field-test-page">InputFieldTestPageComponent</option>
         <option value="dialog-opener-page">DialogOpenerPageComponent</option>
         <option value="popup-opener-page">PopupOpenerPageComponent</option>
         <option value="blank">BlankTestPageComponent</option>
@@ -29,7 +30,7 @@
     </sci-form-field>
 
     <sci-form-field label="Animate">
-      <sci-checkbox [formControl]="form.controls.options.controls.animate"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.options.controls.animate" class="e2e-animate"></sci-checkbox>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
@@ -39,7 +40,7 @@
 
   <section>
     <sci-form-field label="View Context Active">
-      <sci-checkbox [formControl]="form.controls.viewContext" class="e2e-view-context"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.viewContextActive" class="e2e-view-context"></sci-checkbox>
     </sci-form-field>
 
     <sci-form-field label="Count">
