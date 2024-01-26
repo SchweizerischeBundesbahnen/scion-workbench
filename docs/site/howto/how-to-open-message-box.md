@@ -99,6 +99,7 @@ The following CSS variables can be set to customize the default look of a messag
 - `--sci-workbench-messagebox-severity-indicator-size`
 - `--sci-workbench-messagebox-padding`
 - `--sci-workbench-messagebox-text-align`
+- `--sci-workbench-messagebox-title-align`
 - `--sci-workbench-messagebox-title-font-family`
 - `--sci-workbench-messagebox-title-font-weight`
 - `--sci-workbench-messagebox-title-font-size`
