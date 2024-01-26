@@ -921,6 +921,35 @@ test.describe('Workbench Dialog', () => {
       await expect(dialog.resizeHandles).toHaveCount(0);
     });
 
+    test('should not be resizable if blocked', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open the dialog.
+      const dialogOpenerViewPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerViewPage.open('dialog-opener-page', {cssClass: 'testee'});
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogBoundingBox = await dialog.getDialogBoundingBox();
+
+      // Block the dialog by opening another dialog.
+      const dialogOpenerDialogPage = new DialogOpenerPagePO(appPO, dialog);
+      await dialogOpenerDialogPage.open('dialog-page', {cssClass: 'top-dialog'});
+      const topDialog = appPO.dialog({cssClass: 'top-dialog'});
+      await topDialog.moveDialog('bottom-right-corner');
+
+      // Try resizing the blocked dialog.
+      await dialog.resizeTop(10);
+      await dialog.resizeRight(10);
+      await dialog.resizeBottom(10);
+      await dialog.resizeLeft(10);
+      await dialog.resizeTopLeft({x: 10, y: 10});
+      await dialog.resizeTopRight({x: 10, y: 10});
+      await dialog.resizeBottomRight({x: 10, y: 10});
+      await dialog.resizeBottomLeft({x: 10, y: 10});
+
+      // Expect the dialog not to be resized.
+      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(dialogBoundingBox);
+    });
+
     test('should prefer minimal size over maximal size ', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
