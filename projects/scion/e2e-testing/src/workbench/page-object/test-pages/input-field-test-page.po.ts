@@ -21,9 +21,11 @@ import {DialogPO} from '../../../dialog.po';
 export class InputFieldTestPagePO {
 
   public readonly locator: Locator;
+  public readonly checkbox: Locator;
 
   constructor(private _locateBy: ViewPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-input-field-test-page');
+    this.checkbox = this.locator.locator('input.e2e-checkbox');
   }
 
   public get view(): ViewPO {

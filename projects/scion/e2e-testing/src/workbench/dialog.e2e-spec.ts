@@ -16,6 +16,7 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
+import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -682,12 +683,12 @@ test.describe('Workbench Dialog', () => {
       expect(dialog3Bounds.top - dialog2Bounds.top).toEqual(10);
     });
 
-    test('should allow interaction only with top dialog from the stack', async ({appPO, workbenchNavigator}) => {
+    test('should allow interaction only with top dialog from the stack [animate=false]', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Open 3 dialogs.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee', count: 3});
+      await dialogOpenerPage.open('input-field-test-page', {cssClass: 'testee', count: 3, animate: false});
 
       const firstDialog = appPO.dialog({cssClass: 'testee', nth: 0});
       await expect(firstDialog.locator).toBeVisible();
@@ -697,15 +698,51 @@ test.describe('Workbench Dialog', () => {
 
       const topDialog = appPO.dialog({cssClass: 'testee', nth: 2});
       await expect(topDialog.locator).toBeVisible();
+      await topDialog.moveDialog('bottom-right-corner');
 
       // Expect first dialog not to be interactable.
       await expect(firstDialog.clickHeader({timeout: 1000})).rejects.toThrowError();
 
       // Expect middle dialog not to be interactable.
       await expect(middleDialog.clickHeader({timeout: 1000})).rejects.toThrowError();
+      await expect(new InputFieldTestPagePO(middleDialog).checkbox.check({timeout: 1000})).rejects.toThrowError();
+      await expect(new InputFieldTestPagePO(middleDialog).checkbox).not.toBeChecked();
 
       // Expect top dialog to be interactable.
       await expect(topDialog.clickHeader()).resolves.toBeUndefined();
+      await new InputFieldTestPagePO(topDialog).checkbox.check();
+      await expect(new InputFieldTestPagePO(topDialog).checkbox).toBeChecked();
+    });
+
+    test('should allow interaction only with top dialog from the stack [animate=true]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open 3 dialogs.
+      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
+      await dialogOpenerPage.open('input-field-test-page', {cssClass: 'testee', count: 3, animate: true});
+
+      const firstDialog = appPO.dialog({cssClass: 'testee', nth: 0});
+      await expect(firstDialog.locator).toBeVisible();
+
+      const middleDialog = appPO.dialog({cssClass: 'testee', nth: 1});
+      await expect(middleDialog.locator).toBeVisible();
+
+      const topDialog = appPO.dialog({cssClass: 'testee', nth: 2});
+      await expect(topDialog.locator).toBeVisible();
+      await topDialog.moveDialog('bottom-right-corner');
+
+      // Expect first dialog not to be interactable.
+      await expect(firstDialog.clickHeader({timeout: 1000})).rejects.toThrowError();
+
+      // Expect middle dialog not to be interactable.
+      await expect(middleDialog.clickHeader({timeout: 1000})).rejects.toThrowError();
+      await expect(new InputFieldTestPagePO(middleDialog).checkbox.check({timeout: 1000})).rejects.toThrowError();
+      await expect(new InputFieldTestPagePO(middleDialog).checkbox).not.toBeChecked();
+
+      // Expect top dialog to be interactable.
+      await expect(topDialog.clickHeader()).resolves.toBeUndefined();
+      await new InputFieldTestPagePO(topDialog).checkbox.check();
+      await expect(new InputFieldTestPagePO(topDialog).checkbox).toBeChecked();
     });
   });
 
@@ -1874,9 +1911,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
       const dialog = appPO.dialog({cssClass: 'testee'});
-      const dialogRect = await dialog.getDialogBoundingBox();
-      // Move dialog to the bottom right corner.
-      await dialog.moveDialog({x: appPO.viewportBoundingBox().right - dialogRect.right, y: appPO.viewportBoundingBox().bottom - dialogRect.bottom});
+      await dialog.moveDialog('bottom-right-corner');
 
       // Expect interaction with contextual view to be blocked.
       await expect(dialogOpenerPage.click({timeout: 1000})).rejects.toThrowError();
@@ -1895,17 +1930,13 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerViewPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerViewPage.open('dialog-opener-page', {cssClass: 'testee-1'});
       const dialog1 = appPO.dialog({cssClass: 'testee-1'});
-      const dialog1Rect = await dialog1.getDialogBoundingBox();
-      // Move dialog to the bottom left corner.
-      await dialog1.moveDialog({x: appPO.viewportBoundingBox().left - dialog1Rect.left, y: appPO.viewportBoundingBox().bottom - dialog1Rect.bottom});
+      await dialog1.moveDialog('bottom-left-corner');
 
       // Open dialog 2 from dialog 1.
       const dialogOpenerDialogPage = new DialogOpenerPagePO(appPO, dialog1);
       await dialogOpenerDialogPage.open('focus-test-page', {cssClass: 'testee-2'});
       const dialog2 = appPO.dialog({cssClass: 'testee-2'});
-      const dialog2Rect = await dialog2.getDialogBoundingBox();
-      // Move dialog to the bottom right corner.
-      await dialog2.moveDialog({x: appPO.viewportBoundingBox().right - dialog2Rect.right, y: appPO.viewportBoundingBox().bottom - dialog2Rect.bottom});
+      await dialog2.moveDialog('bottom-right-corner');
 
       // Expect interaction with contextual view to be blocked.
       await expect(dialogOpenerViewPage.click({timeout: 1000})).rejects.toThrowError();
@@ -1943,9 +1974,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPopupPage = new DialogOpenerPagePO(appPO, popup);
       await dialogOpenerPopupPage.open('focus-test-page', {cssClass: 'testee'});
       const dialog = appPO.dialog({cssClass: 'testee'});
-      const dialogRect = await dialog.getDialogBoundingBox();
-      // Move dialog to the bottom right corner.
-      await dialog.moveDialog({x: appPO.viewportBoundingBox().right - dialogRect.right, y: appPO.viewportBoundingBox().bottom - dialogRect.bottom});
+      await dialog.moveDialog('bottom-right-corner');
 
       // Expect interaction with contextual view to be blocked.
       await expect(popupOpenerViewPage.click({timeout: 1000})).rejects.toThrowError();
@@ -1977,18 +2006,13 @@ test.describe('Workbench Dialog', () => {
       // Open dialog 1.
       await dialogOpenerViewPage1.open('focus-test-page', {cssClass: 'testee-1'});
       const dialog1 = appPO.dialog({cssClass: 'testee-1'});
-      const dialog1Rect = await dialog1.getDialogBoundingBox();
 
       // Open dialog 2.
       await dialogOpenerViewPage2.open('focus-test-page', {cssClass: 'testee-2'});
       const dialog2 = appPO.dialog({cssClass: 'testee-2'});
-      const dialog2Rect = await dialog2.getDialogBoundingBox();
 
-      // Move dialog 1 to the top right corner.
-      await dialog1.moveDialog({x: appPO.viewportBoundingBox().right - dialog1Rect.right, y: appPO.viewportBoundingBox().top - dialog1Rect.top});
-
-      // Move dialog 2 to the bottom right corner.
-      await dialog2.moveDialog({x: appPO.viewportBoundingBox().right - dialog2Rect.right, y: appPO.viewportBoundingBox().bottom - dialog2Rect.bottom});
+      await dialog1.moveDialog('top-right-corner');
+      await dialog2.moveDialog('bottom-right-corner');
 
       // Expect interaction with contextual view of dialog 1 to be blocked.
       await expect(dialogOpenerViewPage1.click({timeout: 1000})).rejects.toThrowError();

@@ -222,7 +222,7 @@ export class AppPO {
   public dialog(locateBy?: {cssClass?: string | string[]; nth?: number}): DialogPO {
     const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
     const locator = this.page.locator(['wb-dialog'].concat(cssClasses).join('.'));
-    return new DialogPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
+    return new DialogPO(this, locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }
 
   /**

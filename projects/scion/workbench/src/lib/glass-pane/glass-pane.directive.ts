@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, ElementRef, inject, InjectionToken, OnDestroy} from '@angular/core';
+import {AfterViewInit, Directive, ElementRef, inject, InjectionToken, Injector, OnDestroy, runInInjectionContext} from '@angular/core';
 import {createElement, setStyle} from '../common/dom.util';
 import {fromEvent} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -25,15 +25,21 @@ import {Blockable} from './blockable';
  * - {@link GLASS_PANE_TARGET_ELEMENT}: Controls the HTML element to block. Defaults to the directive's host element if not set.
  */
 @Directive({selector: '[wbGlassPane]', standalone: true})
-export class GlassPaneDirective implements OnDestroy {
+export class GlassPaneDirective implements OnDestroy, AfterViewInit {
 
   private readonly _targetElement: HTMLElement;
   private _glassPane: GlassPane | null = null;
 
-  constructor() {
+  constructor(private _injector: Injector) {
     this._targetElement = coerceElement(inject(GLASS_PANE_TARGET_ELEMENT, {optional: true, host: true}) ?? inject(ElementRef));
-    this.installGlassPane();
     this.ensureHostElementPositioned();
+  }
+
+  public ngAfterViewInit(): void {
+    // Install the glass pane after Angular has finished initializing the component's view, critical
+    // if the component is already blocked at construction time, so that the glass pane is added after
+    // the view children.
+    runInInjectionContext(this._injector, () => this.installGlassPane());
   }
 
   private installGlassPane(): void {
