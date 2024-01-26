@@ -79,6 +79,7 @@ class GlassPane {
       style: {
         position: 'absolute',
         inset: 0,
+        'pointer-events': 'auto',
       },
     });
 
@@ -97,8 +98,13 @@ class GlassPane {
         blockedBy.focus();
       });
 
+    // Ignore pointer events to block elements overlapping the glass pane, e.g., resize handles of a dialog.
+    const currentPointerEvents = targetElement.style.pointerEvents || null;
+    setStyle(targetElement, {'pointer-events': 'none'});
+
     this._destroyRef.onDestroy(() => {
       glassPaneElement.remove();
+      setStyle(targetElement, {'pointer-events': currentPointerEvents});
     });
   }
 
