@@ -10,31 +10,47 @@
 
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {isActiveElement, orElseThrow} from '../../../helper/testing.util';
+import {isActiveElement} from '../../../helper/testing.util';
 import {WorkbenchNavigator} from '../../workbench-navigator';
 import {RouterPagePO} from '../router-page.po';
 import {ViewPO} from '../../../view.po';
 import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {PopupPO} from '../../../popup.po';
+import {DialogPO} from '../../../dialog.po';
 
 export class InputFieldTestPagePO {
 
   public readonly locator: Locator;
-  public readonly _view: ViewPO | undefined;
-  public readonly _popup: PopupPO | undefined;
 
-  constructor(locator: Locator, pageObject: {view?: ViewPO; popup?: PopupPO}) {
-    this._view = pageObject.view;
-    this._popup = pageObject.popup;
-    this.locator = locator;
+  constructor(private _locateBy: ViewPO | PopupPO | DialogPO) {
+    this.locator = this._locateBy.locator.locator('app-input-field-test-page');
   }
 
   public get view(): ViewPO {
-    return orElseThrow(this._view, () => Error('[IllegalStateError] Test page not opened in a view.'));
+    if (this._locateBy instanceof ViewPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a view.');
+    }
   }
 
   public get popup(): PopupPO {
-    return orElseThrow(this._popup, () => Error('[IllegalStateError] Test page not opened in a popup.'));
+    if (this._locateBy instanceof PopupPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a popup.');
+    }
+  }
+
+  public get dialog(): DialogPO {
+    if (this._locateBy instanceof DialogPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a dialog.');
+    }
   }
 
   public async clickInputField(): Promise<void> {
@@ -54,8 +70,7 @@ export class InputFieldTestPagePO {
 
     const view = appPO.view({cssClass: 'input-field-test-page', viewId: routerPage.viewId});
     await view.waitUntilAttached();
-
-    return new InputFieldTestPagePO(view.locate('app-input-field-test-page'), {view});
+    return new InputFieldTestPagePO(view);
   }
 
   public static async openInPopup(appPO: AppPO, workbenchNavigator: WorkbenchNavigator, popupOptions?: {closeOnFocusLost?: boolean}): Promise<InputFieldTestPagePO> {
@@ -69,7 +84,6 @@ export class InputFieldTestPagePO {
     // Create the page object.
     const popup = appPO.popup({cssClass: 'input-field-test-page'});
     await popup.waitUntilAttached();
-
-    return new InputFieldTestPagePO(popup.locate('app-input-field-test-page'), {popup});
+    return new InputFieldTestPagePO(popup);
   }
 }

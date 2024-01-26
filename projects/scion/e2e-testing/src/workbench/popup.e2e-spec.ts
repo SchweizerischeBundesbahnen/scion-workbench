@@ -396,7 +396,7 @@ test.describe('Workbench Popup', () => {
       const popupOpenerView = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
 
       // Drag popup opener view into peripheral area.
-      await popupOpenerView.viewTab.dragTo({grid: 'workbench', region: 'east'});
+      await popupOpenerView.view.viewTab.dragTo({grid: 'workbench', region: 'east'});
 
       // Open popup.
       await popupOpenerView.enterCssClass('testee');
@@ -565,7 +565,7 @@ test.describe('Workbench Popup', () => {
       await expect(popup1.locator).toBeVisible();
 
       // Open another popup from the popup (inherit popup's view context).
-      const popupOpenerPage2 = new PopupOpenerPagePO(appPO, {popup: popup1});
+      const popupOpenerPage2 = new PopupOpenerPagePO(appPO, popup1);
       await popupOpenerPage2.selectPopupComponent('popup-page');
       await popupOpenerPage2.enterCssClass('testee-2');
       await popupOpenerPage2.enterCloseStrategy({closeOnFocusLost: false});
@@ -577,7 +577,7 @@ test.describe('Workbench Popup', () => {
       await expect(popup2.locator).toBeVisible();
 
       // Activate target view.
-      await popupOpenerPage1.viewTab.click();
+      await popupOpenerPage1.view.viewTab.click();
 
       // Expect popup 1 and popup 2 not to be visible because contextual view is not active.
       await expect(popup1.locator).not.toBeVisible();

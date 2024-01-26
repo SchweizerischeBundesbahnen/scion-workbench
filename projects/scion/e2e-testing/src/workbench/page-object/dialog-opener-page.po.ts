@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, orElseThrow, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
@@ -27,35 +26,39 @@ export class DialogOpenerPagePO {
   public readonly returnValue: Locator;
   public readonly error: Locator;
   public readonly openButton: Locator;
-  private readonly _view: ViewPO | undefined;
-  private readonly _viewTab: ViewTabPO | undefined;
 
-  constructor(private _appPO: AppPO, options: {viewId?: string; dialog?: DialogPO; popup?: PopupPO}) {
-    if (options.viewId) {
-      this._view = this._appPO.view({viewId: options.viewId});
-      this._viewTab = this.view.viewTab;
-      this.locator = this.view.locate('app-dialog-opener-page');
-    }
-    else if (options.dialog) {
-      this.locator = options.dialog.locator.locator('app-dialog-opener-page');
-    }
-    else if (options.popup) {
-      this.locator = options.popup.locator.locator('app-dialog-opener-page');
-    }
-    else {
-      throw Error('[PageObjectError] either viewId, dialog or popup must be provided.');
-    }
+  constructor(private _appPO: AppPO, private _locateBy: ViewPO | PopupPO | DialogPO) {
+    this.locator = this._locateBy.locator.locator('app-dialog-opener-page');
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');
     this.openButton = this.locator.locator('button.e2e-open');
   }
 
   public get view(): ViewPO {
-    return orElseThrow(this._view, () => Error('[PageObjectError] Test page not opened in a view.'));
+    if (this._locateBy instanceof ViewPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a view.');
+    }
   }
 
-  public get viewTab(): ViewTabPO {
-    return orElseThrow(this._viewTab, () => Error('[PageObjectError] Test page not opened in a view.'));
+  public get popup(): PopupPO {
+    if (this._locateBy instanceof PopupPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a popup.');
+    }
+  }
+
+  public get dialog(): DialogPO {
+    if (this._locateBy instanceof DialogPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a dialog.');
+    }
   }
 
   public async open(component: 'blank' | 'dialog-page' | 'dialog-opener-page' | 'focus-test-page', options?: DialogOpenerPageOptions): Promise<void> {
