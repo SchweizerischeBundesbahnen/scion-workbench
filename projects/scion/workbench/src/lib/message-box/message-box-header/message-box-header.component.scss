@@ -1,5 +1,3 @@
-@use '../../common/workbench-mixins';
-
 :host {
   --ɵmessage-box-severity-color: initial;
   display: grid;
@@ -24,7 +22,6 @@
     overflow-wrap: break-word;
     white-space: pre-line;
     padding-top: var(--sci-workbench-messagebox-padding);
-    @include workbench-mixins.ellipsis-on-overflow();
     font-family: var(--sci-workbench-messagebox-title-font-family);
     font-size: var(--sci-workbench-messagebox-title-font-size);
     font-weight: var(--sci-workbench-messagebox-title-font-weight);
