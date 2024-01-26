@@ -376,7 +376,7 @@ test.describe('Workbench Message Box', () => {
       }));
       // Expect message to be aligned with message box bounds.
       await expect.poll(() => messageBox.getMessageBoundingBox()).toEqual(expect.objectContaining({
-        width: 984, // visual regression test
+        width: 970, // visual regression test
       }));
     });
   });

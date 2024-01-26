@@ -59,6 +59,11 @@ export class WorkbenchMessageBoxComponent {
     return this.options?.contentSelectable;
   }
 
+  @HostBinding('class.has-title')
+  protected get hasTitle(): boolean {
+    return !!this.options?.title;
+  }
+
   constructor(private _dialog: ɵWorkbenchDialog) {
     this._dialog.closable = false;
     this._dialog.resizable = false;
