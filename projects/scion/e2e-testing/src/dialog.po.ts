@@ -10,6 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {DomRect, fromRect} from './helper/testing.util';
+import {AppPO} from './app.po';
 
 /**
  * PO for interacting with a workbench dialog.
@@ -29,7 +30,7 @@ export class DialogPO {
     horizontal: Locator;
   };
 
-  constructor(public readonly locator: Locator) {
+  constructor(private _appPO: AppPO, public readonly locator: Locator) {
     this._dialog = this.locator.locator('div.e2e-dialog');
     this.header = this._dialog.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');
@@ -77,14 +78,37 @@ export class DialogPO {
     await this.header.click(options);
   }
 
-  public async moveDialog(distance: {x: number; y: number}): Promise<void> {
-    const {hcenter: x, vcenter: y} = fromRect(await this.header.boundingBox());
+  public async moveDialog(distance: {x: number; y: number} | 'top-left-corner' | 'top-right-corner' | 'bottom-right-corner' | 'bottom-left-corner'): Promise<void> {
+    const dialogBoundingBox = await this.getDialogBoundingBox();
+    const viewportBoundingBox = this._appPO.viewportBoundingBox();
 
-    const mouse = this.locator.page().mouse;
-    await mouse.move(x, y);
-    await mouse.down();
-    await mouse.move(x + distance.x, y + distance.y, {steps: 10});
-    await mouse.up();
+    switch (distance) {
+      case 'top-left-corner': {
+        await this.moveDialog({x: viewportBoundingBox.left - dialogBoundingBox.left, y: viewportBoundingBox.top - dialogBoundingBox.top});
+        break;
+      }
+      case 'top-right-corner': {
+        await this.moveDialog({x: viewportBoundingBox.right - dialogBoundingBox.right, y: viewportBoundingBox.top - dialogBoundingBox.top});
+        break;
+      }
+      case 'bottom-right-corner': {
+        await this.moveDialog({x: viewportBoundingBox.right - dialogBoundingBox.right, y: viewportBoundingBox.bottom - dialogBoundingBox.bottom});
+        break;
+      }
+      case 'bottom-left-corner': {
+        await this.moveDialog({x: viewportBoundingBox.left - dialogBoundingBox.left, y: viewportBoundingBox.bottom - dialogBoundingBox.bottom});
+        break;
+      }
+      default: {
+        const {hcenter: x, vcenter: y} = fromRect(await this.header.boundingBox());
+
+        const mouse = this.locator.page().mouse;
+        await mouse.move(x, y);
+        await mouse.down();
+        await mouse.move(x + distance.x, y + distance.y, {steps: 10});
+        await mouse.up();
+      }
+    }
   }
 
   public async resizeTop(distance: number, options?: {mouseup?: boolean}): Promise<void> {
