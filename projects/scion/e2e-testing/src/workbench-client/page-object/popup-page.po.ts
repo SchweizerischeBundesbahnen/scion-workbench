@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, withoutUndefinedEntries} from '../../helper/testing.util';
+import {withoutUndefinedEntries} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {PopupPO} from '../../popup.po';
 import {PopupSize} from '@scion/workbench';
@@ -18,21 +18,19 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
+import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
  */
-export class PopupPagePO {
+export class PopupPagePO implements MicrofrontendPopupPagePO {
 
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
-  public readonly popup: PopupPO;
-
   private readonly _hasFocusLocator: Locator;
 
-  constructor(appPO: AppPO, locateBy: {cssClass: string}) {
-    this.popup = appPO.popup({cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {cssClass: ['e2e-popup', locateBy.cssClass]});
+  constructor(appPO: AppPO, public popup: PopupPO) {
+    this.outlet = new SciRouterOutletPO(appPO, {locator: popup.locator.locator('sci-router-outlet')});
     this.locator = this.outlet.frameLocator.locator('app-popup-page');
     this._hasFocusLocator = this.outlet.frameLocator.locator('app-root').locator('.e2e-has-focus');
   }
@@ -130,33 +128,30 @@ export class PopupPagePO {
     }
   }
 
-  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean; timeout?: number}): Promise<void> {
+  public async close(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
     if (options?.returnValue !== undefined) {
       await this.enterReturnValue(options.returnValue);
     }
 
-    if (options?.closeWithError === true) {
-      await this.locator.locator('button.e2e-close-with-error').click({timeout: options?.timeout});
+    if (options?.closeWithError) {
+      await this.locator.locator('button.e2e-close-with-error').click();
     }
     else {
-      await this.locator.locator('button.e2e-close').click({timeout: options?.timeout});
+      await this.locator.locator('button.e2e-close').click();
     }
-  }
-
-  public async getSize(): Promise<Size> {
-    const {width, height} = fromRect(await this.locator.boundingBox());
-    return {width, height};
   }
 
   /**
    * Waits until this page gains focus.
    */
-  public async waitForFocus(): Promise<void> {
+  public async waitForFocusIn(): Promise<void> {
     await this._hasFocusLocator.waitFor({state: 'visible'});
   }
-}
 
-export interface Size {
-  width: number;
-  height: number;
+  /**
+   * Waits until this page loses focus.
+   */
+  public async waitForFocusOut(): Promise<void> {
+    await this._hasFocusLocator.waitFor({state: 'detached'});
+  }
 }

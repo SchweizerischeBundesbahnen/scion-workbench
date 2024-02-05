@@ -11,25 +11,23 @@
 import {rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {MAIN_AREA} from '../../workbench.model';
+import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
  * Page object to interact with {@link PerspectivePageComponent}.
  */
-export class PerspectivePagePO {
+export class PerspectivePagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
-  public readonly viewTab: ViewTabPO;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this.view = appPO.view({viewId});
-    this.viewTab = this.view.viewTab;
-    this.locator = this.view.locate('app-perspective-page');
+  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.locator = this.view.locator.locator('app-perspective-page');
   }
 
   public async registerPerspective(definition: PerspectiveDefinition): Promise<void> {

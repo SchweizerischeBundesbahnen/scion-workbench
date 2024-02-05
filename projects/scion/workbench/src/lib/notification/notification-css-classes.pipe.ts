@@ -11,13 +11,11 @@ import {ɵNotification} from './ɵnotification';
 export class NotificationCssClassesPipe implements PipeTransform {
 
   public transform(notification: ɵNotification): Observable<string[]> {
-    return combineLatest([notification.severity$, notification.duration$, notification.cssClass$])
-      .pipe(
-        map(([severity, duration, cssClasses]) => new Array<string>()
-          .concat(cssClasses)
-          .concat(severity)
-          .concat(`e2e-severity-${severity}`)
-          .concat(`e2e-duration-${duration}`)),
-      );
+    return combineLatest([notification.severity$, notification.cssClass$])
+      .pipe(map(([severity, cssClasses]) => new Array<string>()
+        .concat(cssClasses)
+        .concat(severity)
+        .concat(`e2e-severity-${severity}`),
+      ));
   }
 }

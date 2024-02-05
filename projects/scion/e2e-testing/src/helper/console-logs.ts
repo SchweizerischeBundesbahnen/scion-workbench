@@ -9,34 +9,31 @@
  */
 
 import {ConsoleMessage, Page} from '@playwright/test';
-import {BehaviorSubject, debounceTime, firstValueFrom} from 'rxjs';
 
 /**
  * Collects messages logged to the browser console.
  */
 export class ConsoleLogs {
 
-  private _messages$ = new BehaviorSubject<ConsoleMessage[]>([]);
+  private _messages = new Array<ConsoleMessage>();
 
   constructor(private _page: Page) {
     this._page.on('console', this.onConsole);
   }
 
-  public async get(options?: {severity?: Severity; filter?: RegExp; consume?: boolean; probeInterval?: number}): Promise<string[]> {
-    // Wait for log messages to become stable since received asynchronously.
-    const messages = await firstValueFrom(this._messages$.pipe(debounceTime(options?.probeInterval ?? 500)));
-
-    if (options?.consume) {
-      this._messages$.next([]);
-    }
-    return messages
-      .filter(message => options?.severity === undefined || message.type() === options.severity)
-      .map(message => message.text())
-      .filter(message => options?.filter === undefined || message.match(options.filter));
+  public contains(filter?: {severity?: Severity; message?: RegExp | string}): boolean {
+    return this.get(filter).length > 0;
   }
 
-  public async clear(): Promise<void> {
-    await this.get({consume: true});
+  public get(filter?: {severity?: Severity; message?: RegExp | string}): string[] {
+    return this._messages
+      .filter(message => filter?.severity === undefined || message.type() === filter.severity)
+      .map(message => message.text())
+      .filter(message => filter?.message === undefined || filterMessage(message, filter.message));
+  }
+
+  public clear(): void {
+    this._messages.length = 0;
   }
 
   public dispose(): void {
@@ -44,8 +41,15 @@ export class ConsoleLogs {
   }
 
   private onConsole = (message: ConsoleMessage): void => {
-    this._messages$.next([...this._messages$.value, message]);
+    this._messages.push(message);
   };
+}
+
+function filterMessage(message: string, filter: string | RegExp): boolean {
+  if (typeof filter === 'string') {
+    return message.includes(filter);
+  }
+  return message.match(filter) !== null;
 }
 
 /**

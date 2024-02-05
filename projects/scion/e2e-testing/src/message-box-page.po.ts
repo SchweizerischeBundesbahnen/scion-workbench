@@ -10,19 +10,20 @@
 
 import {MessageBoxPO} from './message-box.po';
 import {Locator} from '@playwright/test';
+import {WorkbenchMessageBoxPagePO} from './workbench/page-object/workbench-message-box-page.po';
 
 /**
- * Page object to interact with {@link InspectMessageBoxComponent}.
+ * Page object to interact with {@link MessageBoxPageComponent}.
  */
-export class InspectMessageBoxComponentPO {
+export class MessageBoxPagePO implements WorkbenchMessageBoxPagePO {
 
   public readonly locator: Locator;
   public readonly input: Locator;
   public readonly param1: Locator;
   public readonly param2: Locator;
 
-  constructor(messageBox: MessageBoxPO) {
-    this.locator = messageBox.locator.locator('app-inspect-message-box');
+  constructor(public messageBox: MessageBoxPO) {
+    this.locator = messageBox.locator.locator('app-message-box-page');
     this.input = this.locator.locator('output.e2e-input');
     this.param1 = this.locator.locator('output.e2e-param1');
     this.param2 = this.locator.locator('output.e2e-param2');

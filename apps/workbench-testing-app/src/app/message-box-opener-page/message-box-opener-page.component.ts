@@ -16,7 +16,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {InspectMessageBoxComponent} from '../inspect-message-box-provider/inspect-message-box.component';
+import {MessageBoxPageComponent} from '../message-box-page/message-box-page.component';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -82,10 +82,10 @@ export default class MessageBoxOpenerPageComponent {
     }
   }
 
-  private parseComponentFromUI(): Type<InspectMessageBoxComponent> {
+  private parseComponentFromUI(): Type<MessageBoxPageComponent> {
     switch (this.form.controls.component.value) {
-      case 'inspect-message-box':
-        return InspectMessageBoxComponent;
+      case 'message-box-page':
+        return MessageBoxPageComponent;
       default:
         throw Error(`[IllegalMessageBoxComponent] Message box component not supported: ${this.form.controls.component.value}`);
     }

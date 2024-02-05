@@ -83,14 +83,6 @@
   </ng-template>
 </sci-accordion>
 
-<section>
-  <header>Miscellaneous</header>
-
-  <sci-form-field label="Free Text">
-    <input placeholder="Text that should be preserved when the layout changes." class="e2e-free-text">
-  </sci-form-field>
-</section>
-
 <ng-template wbPartAction
              *ngFor="let action of partActions$ | async"
              [align]="action.align"

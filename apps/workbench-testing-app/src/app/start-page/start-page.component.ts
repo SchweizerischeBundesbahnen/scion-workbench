@@ -102,7 +102,7 @@ export default class StartPageComponent {
     this._workbenchClientRouter.navigate(viewCapability.qualifier, {
       target: event.ctrlKey ? 'blank' : this._view?.id,
       activate: !event.ctrlKey,
-    });
+    }).then();
   }
 
   public async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {

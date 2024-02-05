@@ -11,7 +11,6 @@
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {expect} from '@playwright/test';
-import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {MessagingPagePO} from './page-object/messaging-page.po';
 
@@ -21,14 +20,12 @@ test.describe('Workbench View', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register view capability that shows splash.
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-pages/signal-ready-test-page',
         showSplash: true,
-        cssClass: 'testee',
       },
       params: [
         {
@@ -38,36 +35,35 @@ test.describe('Workbench View', () => {
       ],
     });
 
-    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({component: 'testee'});
-    await routerPagePO.clickNavigate();
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.enterQualifier({component: 'testee'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
 
-    const testeeViewTabPO = appPO.view({cssClass: 'testee'}).viewTab;
-    const viewId = await testeeViewTabPO.getViewId();
-    const testeeViewPagePO = new ViewPagePO(appPO, viewId);
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
 
     // Expect splash to display.
-    await expect(testeeViewPagePO.outlet.splash).toBeVisible();
+    await expect(testeeViewPage.outlet.splash).toBeVisible();
 
     // Publish message to dispose splash.
-    const messageClientPagePO = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
-    await messageClientPagePO.publishMessage(`signal-ready/${testeeViewPagePO.viewId}`);
-    await messageClientPagePO.viewTab.close();
+    const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
+    await messagingPage.publishMessage('signal-ready/view.101');
+    await messagingPage.view.tab.close();
 
     // Expect splash not to display.
-    await expect(testeeViewPagePO.outlet.splash).not.toBeVisible();
+    await expect(testeeViewPage.outlet.splash).not.toBeVisible();
 
     await test.step('should not show splash if navigating to the same view again', async () => {
       // Navigate to the same view again.
-      await routerPagePO.viewTab.click();
-      await routerPagePO.enterQualifier({component: 'testee'});
-      await routerPagePO.enterTarget(viewId);
-      await routerPagePO.enterParams({param: 'test'});
-      await routerPagePO.clickNavigate();
+      await routerPage.view.tab.click();
+      await routerPage.enterQualifier({component: 'testee'});
+      await routerPage.enterTarget('view.101');
+      await routerPage.enterParams({param: 'test'});
+      await routerPage.clickNavigate();
 
       // Expect splash not to display.
-      await testeeViewPagePO.viewTab.click();
-      await expect(testeeViewPagePO.outlet.splash).not.toBeVisible();
+      await testeeViewPage.view.tab.click();
+      await expect(testeeViewPage.outlet.splash).not.toBeVisible();
     });
   });
 
@@ -75,50 +71,46 @@ test.describe('Workbench View', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register view capability that does not show splash.
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-pages/signal-ready-test-page',
         showSplash: false,
-        cssClass: 'testee',
       },
     });
 
-    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({component: 'testee'});
-    await routerPagePO.clickNavigate();
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.enterQualifier({component: 'testee'});
+    await routerPage.enterCssClass('testee');
+    await routerPage.clickNavigate();
 
-    const testeeViewTabPO = appPO.view({cssClass: 'testee'}).viewTab;
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
     // Expect splash not to display.
-    await expect(testeeViewPagePO.outlet.splash).not.toBeVisible();
+    await expect(testeeViewPage.outlet.splash).not.toBeVisible();
   });
 
   test('should not show splash if `showSplash` is not set (default)', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register view capability that does not show splash.
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-pages/signal-ready-test-page',
-        cssClass: 'testee',
       },
     });
 
-    const routerPagePO = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPagePO.enterQualifier({component: 'testee'});
-    await routerPagePO.clickNavigate();
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.enterQualifier({component: 'testee'});
+    await routerPage.enterCssClass('testee');
+    await routerPage.clickNavigate();
 
-    const testeeViewTabPO = appPO.view({cssClass: 'testee'}).viewTab;
-    const testeeViewPagePO = new ViewPagePO(appPO, await testeeViewTabPO.getViewId());
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
     // Expect splash not to display.
-    await expect(testeeViewPagePO.outlet.splash).not.toBeVisible();
+    await expect(testeeViewPage.outlet.splash).not.toBeVisible();
   });
 });

@@ -163,6 +163,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._outletRouter.navigate(null, {outlet: this.popupId});
+    this._outletRouter.navigate(null, {outlet: this.popupId}).then();
   }
 }

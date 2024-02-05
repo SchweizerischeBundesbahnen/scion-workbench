@@ -15,338 +15,289 @@ import {PopupPagePO} from './page-object/popup-page.po';
 
 test.describe('Workbench Popup', () => {
 
-  test('should pass the preferred overlay size to the popup component', async ({appPO, workbenchNavigator}) => {
+  test('should size the popup as configured', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.selectPopupComponent('popup-page');
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.enterPreferredOverlaySize({
-      width: '300px',
-      height: '301px',
-      minWidth: '302px',
-      maxWidth: '303px',
-      minHeight: '304px',
-      maxHeight: '305px',
-    });
-    await popupOpenerPage.clickOpen();
-
-    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-    await expect(await popupPage.getPreferredOverlaySize()).toEqual({
-      width: '300px',
-      height: '301px',
-      minWidth: '302px',
-      maxWidth: '303px',
-      minHeight: '304px',
-      maxHeight: '305px',
-    });
-  });
-
-  test('should size the overlay according to the passed preferred size', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-
-    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.enterPreferredOverlaySize({
+    await popupOpenerPage.enterSize({
       width: '300px',
       height: '400px',
     });
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
-    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-    await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+    const popup = appPO.popup({cssClass: 'testee'});
+
+    await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
       width: 300,
       height: 400,
     }));
   });
 
-  test.describe('overlay size constraint', () => {
-    test('should not grow beyond the preferred overlay height', async ({page, appPO, workbenchNavigator}) => {
+  test.describe('popup size constraint', () => {
+    test('should have the configured height (content > popup)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPreferredOverlaySize({
-        height: '400px',
-      });
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({height: '400px'});
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
       await popupPage.enterComponentSize({
         width: '600px',
         height: '800px',
       });
 
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the popup to have the configured height.
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         width: 600,
         height: 400,
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        width: 600,
-        height: 800,
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(true);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
+
+      // Expect the popup content to overflow vertically.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(true);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
     });
 
-    test('should not grow beyond the preferred overlay width', async ({appPO, workbenchNavigator}) => {
+    test('should have the configured width (content > popup)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPreferredOverlaySize({
-        width: '400px',
-      });
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '400px'});
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
       await popupPage.enterComponentSize({
         width: '600px',
         height: '800px',
       });
 
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the popup to have the configured width.
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         width: 400,
         height: 800,
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        width: 600,
-        height: 800,
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(true);
+
+      // Expect the popup content to overflow horizontally.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(true);
     });
 
-    test('should not shrink below the preferred overlay height', async ({appPO, workbenchNavigator}) => {
+    test('should have the configured height (content < popup)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPreferredOverlaySize({
-        height: '400px',
-      });
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({height: '400px'});
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
       await popupPage.enterComponentSize({
         width: '200px',
         height: '250px',
       });
 
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the popup to have the configured height.
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         width: 200,
         height: 400,
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        width: 200,
-        height: 250,
-      });
 
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
+      // Expect the popup content not to overflow.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
     });
 
-    test('should not shrink below the preferred overlay width', async ({appPO, workbenchNavigator}) => {
+    test('should have the configured width (content < popup)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPreferredOverlaySize({
-        width: '400px',
-      });
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '400px'});
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
       await popupPage.enterComponentSize({
         width: '200px',
         height: '250px',
       });
 
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the popup to have the configured width.
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         width: 400,
         height: 250,
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        width: 200,
-        height: 250,
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
+
+      // Expect the popup content not to overflow.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
     });
   });
 
-  test.describe('overlay maximal size constraint', () => {
-    test('should grow to the maximum height of the overlay', async ({appPO, workbenchNavigator}) => {
+  test.describe('popup max size constraint', () => {
+    test('should not grow past max-height', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPreferredOverlaySize({
-        maxHeight: '400px',
-      });
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({maxHeight: '400px'});
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      // Set the component height to 300px (max overlay height is 400px)
-      await popupPage.enterComponentSize({
-        height: '300px',
-      });
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Set the component height to 300px (maximum height is 400px).
+      await popupPage.enterComponentSize({height: '300px'});
+
+      // Expect the popup to have a height of 300px (maximum height is 400px).
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         height: 300,
-        width: expect.any(Number),
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        height: 300,
-        width: expect.any(Number),
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
 
-      // Set the component height to 500px (max overlay height is 400px)
-      await popupPage.enterComponentSize({
-        height: '500px',
-      });
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the popup content not to overflow.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
+
+      // Set the component height to 500px (maximum height is 400px).
+      await popupPage.enterComponentSize({height: '500px'});
+
+      // Expect the popup to have a height of 400px (maximum height is 400px).
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         height: 400,
-        width: expect.any(Number),
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        height: 500,
-        width: expect.any(Number),
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(true);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
+
+      // Expect the popup content to overflow vertically.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(true);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
     });
 
-    test('should grow to the maximum width of the overlay', async ({appPO, workbenchNavigator}) => {
+    test('should not grow past max-width', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPreferredOverlaySize({
-        maxWidth: '400px',
-      });
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({maxWidth: '400px'});
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      // Set the component width to 300px (max overlay width is 400px)
-      await popupPage.enterComponentSize({
-        width: '300px',
-      });
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Set the component width to 300px (maximum width is 400px).
+      await popupPage.enterComponentSize({width: '300px'});
+
+      // Expect the popup to have a width of 300px (maximum width is 400px).
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         width: 300,
-        height: expect.any(Number),
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        width: 300,
-        height: expect.any(Number),
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
 
-      // Set the component width to 500px (max overlay width is 400px)
-      await popupPage.enterComponentSize({
-        width: '500px',
-      });
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the popup content not to overflow.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
+
+      // Set the component width to 500px (maximum width is 400px).
+      await popupPage.enterComponentSize({width: '500px'});
+
+      // Expect the popup to have a width of 400px (maximum width is 400px).
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         width: 400,
-        height: expect.any(Number),
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        width: 500,
-        height: expect.any(Number),
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(true);
+
+      // Expect the popup content to overflow horizontally.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(true);
     });
   });
 
-  test.describe('overlay minimal size constraint', () => {
-    test('should not shrink below the minimum height of the overlay', async ({appPO, workbenchNavigator}) => {
+  test.describe('popup min size constraint', () => {
+    test('should not shrink past min-height', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPreferredOverlaySize({
-        minHeight: '400px',
-      });
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({minHeight: '400px'});
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      // Set the component height to 300px (min overlay height is 400px)
-      await popupPage.enterComponentSize({
-        height: '300px',
-      });
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Set the component height to 300px (minimum height is 400px).
+      await popupPage.enterComponentSize({height: '300px'});
+
+      // Expect the popup to have a height of 400px (minimum height is 400px).
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         height: 400,
-        width: expect.any(Number),
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        height: 300,
-        width: expect.any(Number),
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
 
-      // Set the component height to 500px (min overlay height is 400px)
-      await popupPage.enterComponentSize({
-        height: '500px',
-      });
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the popup content not to overflow.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
+
+      // Set the component height to 500px (minimum height is 400px).
+      await popupPage.enterComponentSize({height: '500px'});
+
+      // Expect the popup to have a height of 500px (minimum height is 400px).
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         height: 500,
-        width: expect.any(Number),
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        height: 500,
-        width: expect.any(Number),
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
+
+      // Expect the popup content not to overflow.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
     });
 
-    test('should not shrink below the minimum width of the overlay', async ({appPO, workbenchNavigator}) => {
+    test('should not shrink past min-width', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.enterPreferredOverlaySize({
-        minWidth: '400px',
-      });
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({minWidth: '400px'});
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      // Set the component width to 300px (min overlay width is 400px)
-      await popupPage.enterComponentSize({
-        width: '300px',
-      });
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Set the component width to 300px (minimum width is 400px).
+      await popupPage.enterComponentSize({width: '300px'});
+
+      // Expect the popup to have a width of 400px (minimum width is 400px).
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         width: 400,
-        height: expect.any(Number),
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        width: 300,
-        height: expect.any(Number),
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
 
-      // Set the component width to 500px (min overlay width is 400px)
-      await popupPage.enterComponentSize({
-        width: '500px',
-      });
-      await expect(await popupPage.popup.getBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the popup content not to overflow.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
+
+      // Set the component width to 500px (minimum width is 400px).
+      await popupPage.enterComponentSize({width: '500px'});
+
+      // Expect the popup to have a width of 500px (minimum width is 400px).
+      await expect.poll(() => popup.getBoundingBox({box: 'content-box'})).toEqual(expect.objectContaining({
         width: 500,
-        height: expect.any(Number),
       }));
-      await expect(await popupPage.getSize()).toEqual({
-        width: 500,
-        height: expect.any(Number),
-      });
-      await expect(await popupPage.popup.hasVerticalOverflow()).toBe(false);
-      await expect(await popupPage.popup.hasHorizontalOverflow()).toBe(false);
+
+      // Expect the popup content not to overflow.
+      await expect.poll(() => popup.hasVerticalOverflow()).toBe(false);
+      await expect.poll(() => popup.hasHorizontalOverflow()).toBe(false);
     });
   });
 });

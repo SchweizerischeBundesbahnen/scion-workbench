@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, DomRect, fromRect, isPresent, waitUntilStable} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
@@ -32,6 +32,16 @@ export class AppPO {
    * Locates the 'wb-workbench' element.
    */
   public readonly workbenchLocator = this.page.locator('wb-workbench');
+
+  /**
+   * Locates workbench notifications.
+   */
+  public readonly notifications = this.page.locator('wb-notification');
+
+  /**
+   * Locates workbench dialogs.
+   */
+  public readonly dialogs = this.page.locator('wb-dialog');
 
   constructor(public readonly page: Page) {
   }
@@ -127,26 +137,22 @@ export class AppPO {
   }
 
   /**
-   * Returns parts visible in the layout.
+   * Locates opened views.
+   *
+   * @param locateBy - Controls which views to locate.
+   * @param locateBy.inMainArea - Controls whether to locate views contained in the main area (`true`), not contained in the main area (`false`), or both (not specified).
    */
-  public async partIds(): Promise<string[]> {
-    const partLocators = await this.page.locator('wb-part').all();
-    return Promise.all(partLocators.map(async locator => (await locator.getAttribute('data-partid'))!));
-  }
-
-  /**
-   * Returns views visible in the layout.
-   */
-  public async viewIds(): Promise<string[]> {
-    const viewLocators = await this.page.locator('wb-view').all();
-    return Promise.all(viewLocators.map(async locator => (await locator.getAttribute('data-viewid'))!));
-  }
-
-  /**
-   * Returns the number of opened views.
-   */
-  public viewCount(): Promise<number> {
-    return this.page.locator('wb-view').count();
+  public views(locateBy?: {inMainArea?: boolean; cssClass?: string}): Locator {
+    const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy?.cssClass}` : ':scope';
+    if (locateBy?.inMainArea === true) {
+      return this.page.locator('wb-part.e2e-main-area wb-view-tab').locator(locateByCssClass);
+    }
+    if (locateBy?.inMainArea === false) {
+      return this.page.locator('wb-part:not(.e2e-main-area) wb-view-tab').locator(locateByCssClass);
+    }
+    else {
+      return this.page.locator('wb-view-tab').locator(locateByCssClass);
+    }
   }
 
   /**
@@ -183,7 +189,7 @@ export class AppPO {
    */
   public popup(locateBy?: {cssClass?: string | string[]}): PopupPO {
     const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
-    return new PopupPO(this.page.locator(['.wb-popup'].concat(cssClasses).join('.')));
+    return new PopupPO(this.page.locator(['wb-popup'].concat(cssClasses).join('.')));
   }
 
   /**
@@ -226,32 +232,13 @@ export class AppPO {
   }
 
   /**
-   * Returns the number of opened dialogs.
-   */
-  public getDialogCount(): Promise<number> {
-    return this.page.locator('wb-dialog').count();
-  }
-
-  /**
-   * Returns the number of displayed notifications.
-   */
-  public getNotificationCount(): Promise<number> {
-    return this.page.locator('wb-notification').count();
-  }
-
-  /**
-   * Tests whether the workbench component is present in the DOM and is displaying the workbench layout.
-   */
-  public async isWorkbenchComponentPresent(): Promise<boolean> {
-    return await isPresent(this.page.locator('wb-workbench')) && await this.page.locator('wb-workbench wb-workbench-layout').isVisible();
-  }
-
-  /**
    * Opens a new view tab.
    */
   public async openNewViewTab(): Promise<StartPagePO> {
     await this.header.clickMenuItem({cssClass: 'e2e-open-start-page'});
-    return new StartPagePO(this, await this.activePart({inMainArea: true}).activeView.getViewId());
+    // Wait until opened the start page to get its view id.
+    await waitUntilStable(() => this.getCurrentNavigationId());
+    return new StartPagePO(this, {viewId: await this.activePart({inMainArea: true}).activeView.getViewId()});
   }
 
   /**
@@ -292,7 +279,7 @@ export class AppPO {
   public async isDropZoneActive(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<boolean> {
     const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
     const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
-    return await isPresent(dropZoneLocator) && await dropZoneLocator.evaluate((element: HTMLElement) => getComputedStyle(element).pointerEvents) !== 'none';
+    return await dropZoneLocator.count() > 0 && await dropZoneLocator.evaluate((element: HTMLElement) => getComputedStyle(element).pointerEvents) !== 'none';
   }
 
   /**

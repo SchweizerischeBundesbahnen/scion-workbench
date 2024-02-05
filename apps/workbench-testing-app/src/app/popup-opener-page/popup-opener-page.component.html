@@ -85,11 +85,11 @@
     </ng-template>
   </sci-accordion>
 
-  <sci-accordion class="e2e-preferred-overlay-size" variant="solid" [formGroup]="form.controls.size">
-    <ng-template sciAccordionItem [panel]="panel_preferred_overlay_size">
-      <header>Preferred Overlay Size</header>
+  <sci-accordion class="e2e-size" variant="solid" [formGroup]="form.controls.size">
+    <ng-template sciAccordionItem [panel]="panel_size">
+      <header>Size</header>
     </ng-template>
-    <ng-template #panel_preferred_overlay_size>
+    <ng-template #panel_size>
       <sci-form-field label="Min Height">
         <input [formControl]="form.controls.size.controls.minHeight" class="e2e-min-height">
       </sci-form-field>

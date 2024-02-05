@@ -74,9 +74,6 @@ export default class ViewPageComponent {
 
     this.installViewActiveStateLogger();
     this.installNavigationalStateLogger();
-
-    // Some tests need to pass CSS classes as matrix parameters because CSS classes passed via the router are not preserved on page reload or browser back/forward navigation.
-    view.cssClass = view.cssClasses.concat(route.snapshot.paramMap.get('cssClass') ?? []);
   }
 
   private parsePartActions(): WorkbenchPartActionDescriptor[] {

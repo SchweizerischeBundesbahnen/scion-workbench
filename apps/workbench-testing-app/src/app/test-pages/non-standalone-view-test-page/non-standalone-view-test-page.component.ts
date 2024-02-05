@@ -10,7 +10,6 @@
 
 import {Component} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
-import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-non-standalone-view-test-page',
@@ -20,7 +19,6 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class NonStandaloneViewTestPageComponent {
 
-  constructor(public view: WorkbenchView, route: ActivatedRoute) {
-    view.cssClass = view.cssClasses.concat(route.snapshot.paramMap.get('cssClass') ?? []);
+  constructor(public view: WorkbenchView) {
   }
 }

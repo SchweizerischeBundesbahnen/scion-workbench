@@ -11,10 +11,11 @@
 import {Component, Type} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NotificationService} from '@scion/workbench';
-import {InspectNotificationComponent} from '../inspect-notification-provider/inspect-notification.component';
 import {NgIf} from '@angular/common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {stringifyError} from '../common/stringify-error.util';
+import {NotificationPageComponent} from '../notification-page/notification-page.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -30,10 +31,12 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 })
 export default class NotificationOpenerPageComponent {
 
+  public notificationOpenError: string | undefined;
+
   public form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     content: this._formBuilder.control(''),
-    component: this._formBuilder.control<'inspect-notification' | ''>(''),
+    component: this._formBuilder.control<'notification-page' | ''>(''),
     componentInput: this._formBuilder.control(''),
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
     duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | '' | number>(''),
@@ -46,22 +49,28 @@ export default class NotificationOpenerPageComponent {
   }
 
   public onNotificationShow(): void {
-    this._notificationService.notify({
-      title: this.restoreLineBreaks(this.form.controls.title.value) || undefined,
-      content: this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.controls.content.value),
-      componentInput: (this.isUseComponent() ? this.form.controls.componentInput.value : undefined) || undefined,
-      severity: this.form.controls.severity.value || undefined,
-      duration: this.parseDurationFromUI(),
-      group: this.form.controls.group.value || undefined,
-      groupInputReduceFn: this.isUseGroupInputReducer() ? concatInput : undefined,
-      cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
-    });
+    this.notificationOpenError = undefined;
+    try {
+      this._notificationService.notify({
+        title: this.restoreLineBreaks(this.form.controls.title.value) || undefined,
+        content: this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.controls.content.value),
+        componentInput: (this.isUseComponent() ? this.form.controls.componentInput.value : undefined) || undefined,
+        severity: this.form.controls.severity.value || undefined,
+        duration: this.parseDurationFromUI(),
+        group: this.form.controls.group.value || undefined,
+        groupInputReduceFn: this.isUseGroupInputReducer() ? concatInput : undefined,
+        cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+      });
+    }
+    catch (error) {
+      this.notificationOpenError = stringifyError(error) || 'Workbench Notification could not be opened';
+    }
   }
 
-  private parseComponentFromUI(): Type<InspectNotificationComponent> {
+  private parseComponentFromUI(): Type<NotificationPageComponent> {
     switch (this.form.controls.component.value) {
-      case 'inspect-notification':
-        return InspectNotificationComponent;
+      case 'notification-page':
+        return NotificationPageComponent;
       default:
         throw Error(`[IllegalNotificationComponent] Notification component not supported: ${this.form.controls.component.value}`);
     }

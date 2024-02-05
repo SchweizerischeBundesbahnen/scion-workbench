@@ -8,28 +8,29 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
+import {ViewPO} from '../../view.po';
+import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.
  */
-export class MessageBoxOpenerPagePO {
+export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
-  public readonly viewTab: ViewTabPO;
+  public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
   public readonly closeAction: Locator;
 
-  constructor(private _appPO: AppPO, public viewId: string) {
-    this.viewTab = _appPO.view({viewId}).viewTab;
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: this.viewId});
+  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-message-box-opener-page');
     this.closeAction = this.locator.locator('output.e2e-close-action');
   }
@@ -76,13 +77,13 @@ export class MessageBoxOpenerPagePO {
     await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
-  public async clickOpen(): Promise<void> {
+  public async open(): Promise<void> {
     await this.locator.locator('button.e2e-open').click();
-    const cssClasses = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
+    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     return Promise.race([
-      this._appPO.messagebox({cssClass: cssClasses}).waitUntilAttached(),
+      waitUntilAttached(this._appPO.messagebox({cssClass}).locator),
       rejectWhenAttached(this.locator.locator('output.e2e-open-error')),
     ]);
   }

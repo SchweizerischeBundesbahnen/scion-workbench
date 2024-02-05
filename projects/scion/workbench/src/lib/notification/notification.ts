@@ -43,7 +43,7 @@ export abstract class Notification<T = any> {
   /**
    * Specifies CSS class(es) to be added to the notification, useful in end-to-end tests for locating the notification.
    *
-   * This operation is additive, that is, it does not override CSS classes set by the notification reporter.
+   * This operation is additive, that is, it does not override CSS classes set by the notification opener.
    */
   public abstract setCssClass(cssClass: string | string[]): void;
 }

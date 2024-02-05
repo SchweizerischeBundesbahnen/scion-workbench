@@ -36,7 +36,7 @@ export default class BulkNavigationTestPageComponent {
   public onNavigate(): void {
     const viewCount = this.form.controls.viewCount.value ?? 0;
     for (let i = 0; i < viewCount; i++) {
-      this.navigateToViewPage();
+      this.navigateToViewPage().then();
     }
   }
 

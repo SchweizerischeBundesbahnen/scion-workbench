@@ -12,15 +12,15 @@ import {Component, Input} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
-  selector: 'app-inspect-message-box',
-  templateUrl: './inspect-message-box.component.html',
-  styleUrls: ['./inspect-message-box.component.scss'],
+  selector: 'app-message-box-page',
+  templateUrl: './message-box-page.component.html',
+  styleUrls: ['./message-box-page.component.scss'],
   standalone: true,
   imports: [
     SciFormFieldComponent,
   ],
 })
-export class InspectMessageBoxComponent {
+export class MessageBoxPageComponent {
 
   @Input()
   public input: string | undefined;

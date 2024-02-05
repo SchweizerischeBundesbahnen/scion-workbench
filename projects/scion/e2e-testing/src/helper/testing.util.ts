@@ -27,27 +27,6 @@ export async function getCssClasses(element: Locator): Promise<string[]> {
 }
 
 /**
- * Returns if given element is the active element.
- */
-export async function isActiveElement(element: Locator): Promise<boolean> {
-  return element.evaluate(el => el === document.activeElement);
-}
-
-/**
- * Returns true if the element is attached to the DOM.
- */
-export async function isPresent(element: Locator): Promise<boolean> {
-  return await waitUntilStable(() => element.count(), {probeInterval: 25}) > 0;
-}
-
-/**
- * Returns true if the element is visible.
- */
-export async function isVisible(element: Locator): Promise<boolean> {
-  return waitUntilStable(() => element.isVisible(), {probeInterval: 25});
-}
-
-/**
  * Waits for an element's bounding box to become stable.
  * When an element is moved or resized, this may take some time, e.g. due to animations.
  * This function returns the bounding box if it hasn't changed for 100ms.
@@ -81,6 +60,29 @@ export async function waitUntilStable<A>(value: () => Promise<A> | A, options?: 
  */
 export async function waitUntilAttached(...locators: Locator[]): Promise<void> {
   await Promise.all(locators.map(locator => locator.waitFor({state: 'attached'})));
+}
+
+/**
+ * Executes the given function, retrying execution if it throws an error. If the maximum timeout is exceeded, the error is re-thrown.
+ *
+ * @returns Promise that resolves to the result of the function.
+ */
+export async function retryOnError<T>(fn: () => Promise<T>, options?: {timeout?: number; interval?: number}): Promise<T> {
+  const timeout = options?.timeout ?? 5000;
+  const interval = options?.interval ?? 100;
+  const t0 = Date.now();
+
+  while (true) { // eslint-disable-line no-constant-condition
+    try {
+      return await fn();
+    }
+    catch (error: unknown) {
+      if (Date.now() - t0 > timeout) {
+        throw error;
+      }
+    }
+    await firstValueFrom(timer(interval));
+  }
 }
 
 /**

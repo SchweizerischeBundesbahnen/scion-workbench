@@ -16,7 +16,7 @@ test.describe('Workbench Lifecycle Hook', () => {
   test('should invoke workbench lifecycle hooks in the correct order [microfrontendSupport=enabled]', async ({appPO, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    await expect(await consoleLogs.get({severity: 'debug', filter: /WorkbenchLifecycleHookLogger/})).toEqual([
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger/})).toEqual([
       // WORKBENCH_PRE_STARTUP
       `[WorkbenchLifecycleHookLogger#construct][InjectionToken WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
       `[WorkbenchLifecycleHookLogger#init][InjectionToken WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
@@ -42,7 +42,7 @@ test.describe('Workbench Lifecycle Hook', () => {
   test('should not invoke microfrontend-related lifecycle hooks when starting the workbench with microfrontend support disabled [microfrontendSupport=disabled]', async ({appPO, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await expect(await consoleLogs.get({severity: 'debug', filter: /WorkbenchLifecycleHookLogger/})).toEqual([
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger/})).toEqual([
       // WORKBENCH_PRE_STARTUP
       `[WorkbenchLifecycleHookLogger#construct][InjectionToken WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
       `[WorkbenchLifecycleHookLogger#init][InjectionToken WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,

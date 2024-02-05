@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, getCssClasses, hasCssClass, isPresent, waitUntilStable} from './helper/testing.util';
+import {fromRect, getCssClasses, hasCssClass} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
@@ -46,10 +46,6 @@ export class ViewTabPO {
     return (await this.locator.getAttribute('data-viewid'))!;
   }
 
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this.locator);
-  }
-
   public async click(): Promise<void> {
     await this.locator.click();
   }
@@ -73,20 +69,8 @@ export class ViewTabPO {
     await this.locator.locator('.e2e-close').click();
   }
 
-  public getTitle(): Promise<string> {
-    return waitUntilStable(() => this.title.innerText());
-  }
-
-  public getHeading(): Promise<string> {
-    return waitUntilStable(() => this.heading.innerText());
-  }
-
   public isDirty(): Promise<boolean> {
-    return waitUntilStable(() => hasCssClass(this.locator, 'e2e-dirty'));
-  }
-
-  public isActive(): Promise<boolean> {
-    return hasCssClass(this.locator, 'active');
+    return hasCssClass(this.locator, 'e2e-dirty');
   }
 
   public getCssClasses(): Promise<string[]> {

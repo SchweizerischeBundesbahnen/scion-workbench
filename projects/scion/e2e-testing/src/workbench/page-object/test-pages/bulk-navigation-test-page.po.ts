@@ -13,13 +13,17 @@ import {Locator} from '@playwright/test';
 import {waitUntilStable} from '../../../helper/testing.util';
 import {RouterPagePO} from '../router-page.po';
 import {WorkbenchNavigator} from '../../workbench-navigator';
+import {WorkbenchViewPagePO} from '../workbench-view-page.po';
+import {ViewPO} from '../../../view.po';
 
-export class BulkNavigationTestPagePO {
+export class BulkNavigationTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
+  public readonly view: ViewPO;
 
-  constructor(private _appPO: AppPO, viewId: string) {
-    this.locator = this._appPO.view({viewId}).locate('app-bulk-navigation-test-page');
+  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.locator = this.view.locator.locator('app-bulk-navigation-test-page');
   }
 
   public async enterViewCount(viewCount: number): Promise<void> {
@@ -44,12 +48,14 @@ export class BulkNavigationTestPagePO {
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewId = await routerPage.view.getViewId();
+
     await routerPage.enterPath('test-pages/bulk-navigation-test-page');
-    await routerPage.enterTarget(routerPage.viewId);
+    await routerPage.enterTarget(viewId);
     await routerPage.clickNavigate();
 
-    const view = appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: routerPage.viewId});
+    const view = appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId});
     await view.waitUntilAttached();
-    return new BulkNavigationTestPagePO(appPO, await view.getViewId());
+    return new BulkNavigationTestPagePO(appPO, {viewId: await view.getViewId()});
   }
 }

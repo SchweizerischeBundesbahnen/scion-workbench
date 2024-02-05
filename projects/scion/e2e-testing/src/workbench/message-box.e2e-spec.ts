@@ -11,7 +11,9 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
-import {InspectMessageBoxComponentPO} from '../inspect-message-box-component.po';
+import {MessageBoxPagePO} from '../message-box-page.po';
+import {TextMessageBoxPagePO} from '../text-message-box-page.po';
+import {expectMessageBox} from '../matcher/message-box-matcher';
 
 test.describe('Workbench Message Box', () => {
 
@@ -20,33 +22,39 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {cssClass: 'testee'});
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {cssClass: 'testee'});
 
-      await expect(messageBox.message).toHaveText('message');
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+
+      await expect(messageBoxPage.text).toHaveText('message');
     });
 
     test('should support new lines in the message text', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('LINE 1\\nLINE 2', {cssClass: 'testee'});
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('LINE 1\\nLINE 2', {cssClass: 'testee'});
 
-      await expect(messageBox.message).toHaveText('LINE 1\nLINE 2');
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+
+      await expect(messageBoxPage.text).toHaveText('LINE 1\nLINE 2');
     });
 
     test('should allow selecting text', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('This text should be selectable!', {cssClass: 'testee', contentSelectable: true});
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('This text should be selectable!', {cssClass: 'testee', contentSelectable: true});
 
-      await expect.poll(() => messageBox.isContentSelectable()).toBe(true);
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
+
+      await expect.poll(() => messageBoxPage.isTextSelectable()).toBe(true);
     });
   });
 
@@ -55,8 +63,9 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {cssClass: 'testee', title: 'TITLE'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {cssClass: 'testee', title: 'TITLE'});
+
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
       await expect(messageBox.title).toHaveText('TITLE');
@@ -66,8 +75,9 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {cssClass: 'testee', title: 'LINE 1\\nLINE 2'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {cssClass: 'testee', title: 'LINE 1\\nLINE 2'});
+
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
       await expect(messageBox.title).toHaveText('LINE 1\nLINE 2');
@@ -79,8 +89,9 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {cssClass: 'testee'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {cssClass: 'testee'});
+
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
       await expect.poll(() => messageBox.getSeverity()).toEqual('info');
@@ -90,8 +101,9 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {cssClass: 'testee', severity: 'info'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {cssClass: 'testee', severity: 'info'});
+
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
       await expect.poll(() => messageBox.getSeverity()).toEqual('info');
@@ -101,8 +113,9 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {cssClass: 'testee', severity: 'warn'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {cssClass: 'testee', severity: 'warn'});
+
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
       await expect.poll(() => messageBox.getSeverity()).toEqual('warn');
@@ -112,8 +125,9 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {cssClass: 'testee', severity: 'error'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {cssClass: 'testee', severity: 'error'});
+
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
       await expect.poll(() => messageBox.getSeverity()).toEqual('error');
@@ -125,8 +139,9 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {cssClass: 'testee'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {cssClass: 'testee'});
+
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
       await expect.poll(() => messageBox.getActions()).toEqual({ok: 'OK'});
@@ -136,8 +151,8 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {
         cssClass: 'testee',
         actions: {
           yes: 'Yes',
@@ -163,8 +178,8 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('message', {
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('message', {
         cssClass: 'testee',
         actions: {
           yes: 'Yes',
@@ -175,17 +190,17 @@ test.describe('Workbench Message Box', () => {
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
       await messageBox.clickActionButton('yes');
-      await expect(msgBoxOpenerPage.closeAction).toHaveText('yes');
+      await expect(messageBoxOpenerPage.closeAction).toHaveText('yes');
     });
 
     test('should close the message box on escape keystroke if cancel action is present', async ({page, appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
 
       await test.step('pressing ESCAPE on message box that has a cancel action', async () => {
-        await msgBoxOpenerPage.open('message', {
+        await messageBoxOpenerPage.open('message', {
           cssClass: 'testee',
           actions: {
             ok: 'OK',
@@ -193,16 +208,18 @@ test.describe('Workbench Message Box', () => {
           },
         });
         const messageBox = appPO.messagebox({cssClass: 'testee'});
-        await expect(messageBox.locator).toBeAttached();
-        await page.keyboard.press('Escape');
+        const messageBoxPage = new TextMessageBoxPagePO(messageBox);
 
+        await expectMessageBox(messageBoxPage).toBeVisible();
+
+        await page.keyboard.press('Escape');
         // Expect message box to be closed
-        await expect(messageBox.locator).not.toBeAttached();
-        await expect(msgBoxOpenerPage.closeAction).toHaveText('cancel');
+        await expectMessageBox(messageBoxPage).not.toBeAttached();
+        await expect(messageBoxOpenerPage.closeAction).toHaveText('cancel');
       });
 
       await test.step('pressing ESCAPE on message box that has no cancel action', async () => {
-        await msgBoxOpenerPage.open('', {
+        await messageBoxOpenerPage.open('Message', {
           cssClass: 'testee',
           actions: {
             ok: 'OK',
@@ -210,11 +227,13 @@ test.describe('Workbench Message Box', () => {
           },
         });
         const messageBox = appPO.messagebox({cssClass: 'testee'});
-        await expect(messageBox.locator).toBeAttached();
-        await page.keyboard.press('Escape');
+        const messageBoxPage = new TextMessageBoxPagePO(messageBox);
 
+        await expectMessageBox(messageBoxPage).toBeVisible();
+
+        await page.keyboard.press('Escape');
         // Expect message box not to be closed
-        await expect(messageBox.locator).toBeAttached();
+        await expectMessageBox(messageBoxPage).toBeVisible();
       });
     });
   });
@@ -225,8 +244,8 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('', {
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('Message', {
         cssClass: 'testee', actions: {
           yes: 'Yes',
           no: 'No',
@@ -242,8 +261,8 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('', {
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('Message', {
         cssClass: 'testee', actions: {
           yes: 'Yes',
           no: 'No',
@@ -276,8 +295,8 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('', {
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('Message', {
         cssClass: 'testee', actions: {
           yes: 'Yes',
           no: 'No',
@@ -312,24 +331,26 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('component:inspect-message-box', {cssClass: 'testee'});
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('component:message-box-page', {cssClass: 'testee'});
 
-      const inspectMessageBoxComponent = new InspectMessageBoxComponentPO(messageBox);
-      await expect(inspectMessageBoxComponent.locator).toBeAttached();
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      await expectMessageBox(messageBoxPage).toBeVisible();
     });
 
     test('should pass the input', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('component:inspect-message-box', {cssClass: 'testee', inputs: {input: 'ABC'}});
-      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('component:message-box-page', {cssClass: 'testee', inputs: {input: 'ABC'}});
 
-      const inspectMessageBoxComponent = new InspectMessageBoxComponentPO(messageBox);
-      await expect(inspectMessageBoxComponent.input).toHaveText('ABC');
+      const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new MessageBoxPagePO(messageBox);
+
+      await expect(messageBoxPage.input).toHaveText('ABC');
     });
   });
 
@@ -338,14 +359,14 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('Lorem ipsum dolor sit amet.'.repeat(100), {
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('Lorem ipsum dolor sit amet.'.repeat(100), {
         title: 'Lorem ipsum dolor sit amet.'.repeat(100),
         cssClass: 'testee',
       });
       const messageBox = appPO.messagebox({cssClass: 'testee'});
 
-      await expect.poll(() => messageBox.getMessageBoxBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => messageBox.getBoundingBox()).toEqual(expect.objectContaining({
         width: 400,
       }));
     });
@@ -354,8 +375,8 @@ test.describe('Workbench Message Box', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // open the message box
-      const msgBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
-      await msgBoxOpenerPage.open('Lorem ipsum dolor sit amet.'.repeat(100), {
+      const messageBoxOpenerPage = await workbenchNavigator.openInNewTab(MessageBoxOpenerPagePO);
+      await messageBoxOpenerPage.open('Lorem ipsum dolor sit amet.'.repeat(100), {
         actions: {
           button1: 'Button 1',
           button2: 'Button 2',
@@ -369,13 +390,14 @@ test.describe('Workbench Message Box', () => {
         cssClass: 'testee',
       });
       const messageBox = appPO.messagebox({cssClass: 'testee'});
+      const messageBoxPage = new TextMessageBoxPagePO(messageBox);
 
       // Expect message box to exceed maximal width.
-      await expect.poll(() => messageBox.getMessageBoxBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => messageBox.getBoundingBox()).toEqual(expect.objectContaining({
         width: 1007, // visual regression test
       }));
       // Expect message to be aligned with message box bounds.
-      await expect.poll(() => messageBox.getMessageBoundingBox()).toEqual(expect.objectContaining({
+      await expect.poll(() => messageBoxPage.getTextBoundingBox()).toEqual(expect.objectContaining({
         width: 970, // visual regression test
       }));
     });

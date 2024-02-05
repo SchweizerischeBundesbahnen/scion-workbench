@@ -10,7 +10,6 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 
@@ -19,9 +18,7 @@ test.describe('Workbench Router', () => {
   test('should contain the qualifier in view params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // register testee view
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {entity: 'products'},
       properties: {
@@ -37,11 +34,10 @@ test.describe('Workbench Router', () => {
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
-    // expect qualifier to be contained in view params
-    const testeeViewId = await appPO.view({cssClass: 'products'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'products'});
 
-    await expect(await testeeViewPage.getViewParams()).toEqual(
+    // expect qualifier to be contained in view params
+    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
         entity: 'products [string]',
       }));
@@ -50,9 +46,7 @@ test.describe('Workbench Router', () => {
   test('should contain the provided params in view params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // register testee view
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {entity: 'product'},
       params: [
@@ -72,11 +66,10 @@ test.describe('Workbench Router', () => {
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
-    // expect qualifier to be contained in view params
-    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
-    await expect(await testeeViewPage.getViewParams()).toEqual(
+    // expect qualifier to be contained in view params
+    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
         entity: 'product [string]',
         id: '123 [string]',
@@ -86,9 +79,7 @@ test.describe('Workbench Router', () => {
   test('should not overwrite qualifier values with param values', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // register testee view
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {entity: 'product', mode: 'new'},
       params: [
@@ -108,11 +99,10 @@ test.describe('Workbench Router', () => {
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
-    // expect qualifier values not to be overwritten by params
-    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
-    await expect(await testeeViewPage.getViewParams()).toEqual(
+    // expect qualifier values not to be overwritten by params
+    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
         entity: 'product [string]',
         mode: 'new [string]',
@@ -122,9 +112,7 @@ test.describe('Workbench Router', () => {
   test('should substitute named URL params with values of the qualifier and params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // register testee view
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {component: 'testee', seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1'},
       params: [
@@ -147,11 +135,10 @@ test.describe('Workbench Router', () => {
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
-    // expect named params to be substituted
-    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
-    await expect(await testeeViewPage.getViewParams()).toEqual(
+    // expect named params to be substituted
+    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
         component: 'testee [string]',
         seg1: 'SEG1 [string]',
@@ -162,17 +149,15 @@ test.describe('Workbench Router', () => {
         qp2: 'QP2 [string]',
         fragment: 'FRAGMENT [string]',
       }));
-    await expect(await testeeViewPage.getRouteParams()).toEqual({segment1: 'SEG1', segment3: 'SEG3', mp1: 'MP1', mp2: 'MP2'});
-    await expect(await testeeViewPage.getRouteQueryParams()).toEqual({qp1: 'QP1', qp2: 'QP2'});
-    await expect(await testeeViewPage.getRouteFragment()).toEqual('FRAGMENT');
+    await expect.poll(() => testeeViewPage.getRouteParams()).toEqual({segment1: 'SEG1', segment3: 'SEG3', mp1: 'MP1', mp2: 'MP2'});
+    await expect.poll(() => testeeViewPage.getRouteQueryParams()).toEqual({qp1: 'QP1', qp2: 'QP2'});
+    await expect.poll(() => testeeViewPage.getRouteFragment()).toEqual('FRAGMENT');
   });
 
   test('should update view params without constructing a new view instance', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // register testee view
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {entity: 'product'},
       params: [
@@ -193,36 +178,34 @@ test.describe('Workbench Router', () => {
     await routerPage.clickNavigate();
 
     const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: testeeViewId});
 
     // capture the view's component instance id
     const testeeComponentInstanceId = await testeeViewPage.getComponentInstanceId();
 
     // navigate to update the view's params
-    await routerPage.viewTab.click();
+    await routerPage.view.tab.click();
     await routerPage.enterQualifier({entity: 'product'});
     await routerPage.enterParams({id: '456'});
-    await routerPage.enterTarget(testeeViewPage.viewId);
+    await routerPage.enterTarget(testeeViewId);
     await routerPage.clickNavigate();
 
-    await testeeViewPage.view.viewTab.click();
+    await testeeViewPage.view.tab.click();
 
     // expect the view's params to be updated
-    await expect(await testeeViewPage.getViewParams()).toEqual(
+    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
         entity: 'product [string]',
         id: '456 [string]',
       }));
     // expect no new view instance to be constructed
-    await expect(await testeeViewPage.getComponentInstanceId()).toEqual(testeeComponentInstanceId);
+    await expect.poll(() => testeeViewPage.getComponentInstanceId()).toEqual(testeeComponentInstanceId);
   });
 
   test('should contain the provided param with value `null` in view params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // register testee view
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {entity: 'product'},
       params: [
@@ -245,11 +228,10 @@ test.describe('Workbench Router', () => {
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
-    // expect the qualifier and the optional parameter with value `null` to be contained in view params
-    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
-    await expect(await testeeViewPage.getViewParams()).toEqual(
+    // expect the qualifier and the optional parameter with value `null` to be contained in view params
+    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
         entity: 'product [string]',
         id: 'null [string]',
@@ -259,9 +241,7 @@ test.describe('Workbench Router', () => {
   test('should not contain the provided param with value `undefined` in view params', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // register testee view
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {entity: 'product'},
       params: [
@@ -288,17 +268,15 @@ test.describe('Workbench Router', () => {
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
-    // expect qualifier to be contained in view params, but the optional parameter with value `undefined` should not be contained
-    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
-    const params = await testeeViewPage.getViewParams();
-    await expect(params).toEqual(
+    // expect qualifier to be contained in view params, but the optional parameter with value `undefined` should not be contained
+    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
       expect.objectContaining({
         entity: 'product [string]',
         id: '123 [string]',
       }));
-    await expect(params).not.toEqual(expect.objectContaining({param1: expect.anything()}));
+    await expect.poll(() => testeeViewPage.getViewParams()).not.toEqual(expect.objectContaining({param1: expect.anything()}));
   });
 
   test.describe('Self-Navigation', () => {
@@ -316,14 +294,14 @@ test.describe('Workbench Router', () => {
       });
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
           param3: 'PARAM 3 (a) [string]',
         }));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
 
       await viewPage.navigateSelf({
         param3: 'PARAM 3 (b)',
@@ -332,18 +310,17 @@ test.describe('Workbench Router', () => {
       });
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).toEqual(expect.objectContaining({
+      await expect.poll(() => viewPage.getViewParams()).toEqual(expect.objectContaining({
         param3: 'PARAM 3 (b) [string]',
         param4: 'PARAM 4 [string]',
         param5: 'PARAM 5 [string]',
       }));
-      await expect(params).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
-      await expect(params).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
-      await expect(params).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
 
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
     test('should replace params', async ({appPO, microfrontendNavigator}) => {
@@ -359,14 +336,14 @@ test.describe('Workbench Router', () => {
       });
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
           param3: 'PARAM 3 (a) [string]',
         }));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
 
       await viewPage.navigateSelf({
         param3: 'PARAM 3 (b)',
@@ -375,18 +352,17 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'replace'});
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param3: 'PARAM 3 (b) [string]',
           param4: 'PARAM 4 [string]',
           param5: 'PARAM 5 [string]',
         }));
-      await expect(params).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
-      await expect(params).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
-      await expect(params).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
     test('should merge params', async ({appPO, microfrontendNavigator}) => {
@@ -402,14 +378,14 @@ test.describe('Workbench Router', () => {
       });
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
           param3: 'PARAM 3 (a) [string]',
         }));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
 
       await viewPage.navigateSelf({
         param3: 'PARAM 3 (b)',
@@ -418,8 +394,7 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'merge'});
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
@@ -427,9 +402,9 @@ test.describe('Workbench Router', () => {
           param4: 'PARAM 4 [string]',
           param5: 'PARAM 5 [string]',
         }));
-      await expect(params).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
     test('should correctly merge params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
@@ -445,7 +420,7 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'merge', navigatePerParam: true});
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
@@ -468,12 +443,11 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'replace', navigatePerParam: true});
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
-      await expect(params).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
-      await expect(params).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3')}));
-      await expect(params).not.toEqual(expect.objectContaining({param4: expect.stringMatching('PARAM 4')}));
-      await expect(params).toEqual(expect.objectContaining({param5: 'PARAM 5 [string]'}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param4: expect.stringMatching('PARAM 4')}));
+      await expect.poll(() => viewPage.getViewParams()).toEqual(expect.objectContaining({param5: 'PARAM 5 [string]'}));
     });
 
     test('should remove params having `undefined` as value [paramsHandling=replace]', async ({appPO, microfrontendNavigator}) => {
@@ -487,13 +461,12 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'replace'});
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param3: 'PARAM 3 [string]',
         }));
-      await expect(params).not.toEqual(expect.objectContaining({param2: expect.anything()}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param2: expect.anything()}));
     });
 
     test('should remove params having `undefined` as their value [paramsHandling=merge]', async ({appPO, microfrontendNavigator}) => {
@@ -507,9 +480,8 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'merge'});
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).toEqual(expect.objectContaining({param1: 'PARAM 1 [string]', param3: 'PARAM 3 [string]'}));
-      await expect(params).not.toEqual(expect.objectContaining({param2: expect.anything()}));
+      await expect.poll(() => viewPage.getViewParams()).toEqual(expect.objectContaining({param1: 'PARAM 1 [string]', param3: 'PARAM 3 [string]'}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param2: expect.anything()}));
     });
 
     test('should not remove params having `null` as their value [paramsHandling=replace]', async ({appPO, microfrontendNavigator}) => {
@@ -523,7 +495,7 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'replace'});
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'null [string]',
@@ -542,7 +514,7 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'merge'});
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'null [string]',
@@ -556,9 +528,7 @@ test.describe('Workbench Router', () => {
     test('should contain the provided transient params in view params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      // register testee view
-      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPage.registerCapability({
+      await microfrontendNavigator.registerCapability('app1', {
         type: 'view',
         qualifier: {entity: 'product'},
         params: [
@@ -591,11 +561,10 @@ test.describe('Workbench Router', () => {
       await routerPage.enterTarget('blank');
       await routerPage.clickNavigate();
 
-      // expect transient param to be contained in view params
-      const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-      const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
-      await expect(await testeeViewPage.getViewParams()).toEqual(
+      // expect transient param to be contained in view params
+      await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
         expect.objectContaining({
           entity: 'product [string]',
           id: '123 [string]',
@@ -617,11 +586,10 @@ test.describe('Workbench Router', () => {
       await routerPage.enterTarget('blank');
       await routerPage.clickNavigate();
 
-      // expect transient param to be contained in view params
-      const testeeViewId = await appPO.view({cssClass: 'e2e-test-view'}).getViewId();
-      const testeeViewPage = new ViewPagePO(appPO, testeeViewId);
+      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'e2e-test-view'});
 
-      await expect(await testeeViewPage.getViewParams()).toEqual(
+      // expect transient param to be contained in view params
+      await expect.poll(() => testeeViewPage.getViewParams()).toEqual(
         expect.objectContaining({
           initialTitle: 'TITLE [string]',
           transientParam: 'TRANSIENT PARAM [string]',
@@ -629,9 +597,8 @@ test.describe('Workbench Router', () => {
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
-      const testeeViewPage2 = new ViewPagePO(appPO, testeeViewId);
-      await expect(await testeeViewPage2.getViewParams()).toEqual(expect.objectContaining({initialTitle: 'TITLE [string]'}));
-      await expect(await testeeViewPage2.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM')}));
+      await expect.poll(() => testeeViewPage.getViewParams()).toEqual(expect.objectContaining({initialTitle: 'TITLE [string]'}));
+      await expect.poll(() => testeeViewPage.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM')}));
     });
 
     test('should merge params on self-navigation', async ({appPO, microfrontendNavigator}) => {
@@ -648,7 +615,7 @@ test.describe('Workbench Router', () => {
       });
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
@@ -656,7 +623,7 @@ test.describe('Workbench Router', () => {
           transientParam: 'TRANSIENT PARAM (a) [string]',
         }));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
 
       await viewPage.navigateSelf({
         transientParam: 'TRANSIENT PARAM (b)',
@@ -666,8 +633,7 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'merge'});
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
@@ -676,15 +642,14 @@ test.describe('Workbench Router', () => {
           param5: 'PARAM 5 [string]',
           transientParam: 'TRANSIENT PARAM (b) [string]',
         }));
-      await expect(params).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
-      await expect(params).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM (a)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM (a)')}));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
-      const paramsAfterReload = await viewPage.getViewParams();
-      await expect(paramsAfterReload).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
@@ -692,7 +657,7 @@ test.describe('Workbench Router', () => {
           param4: 'PARAM 4 [string]',
           param5: 'PARAM 5 [string]',
         }));
-      await expect(paramsAfterReload).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM (b)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM (b)')}));
     });
 
     test('should replace params on self-navigation', async ({appPO, microfrontendNavigator}) => {
@@ -709,7 +674,7 @@ test.describe('Workbench Router', () => {
       });
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
@@ -717,7 +682,7 @@ test.describe('Workbench Router', () => {
           transientParam: 'TRANSIENT PARAM (a) [string]',
         }));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
 
       await viewPage.navigateSelf({
         transientParam: 'TRANSIENT PARAM (b)',
@@ -727,31 +692,29 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'replace'});
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param3: 'PARAM 3 (b) [string]',
           param4: 'PARAM 4 [string]',
           param5: 'PARAM 5 [string]',
           transientParam: 'TRANSIENT PARAM (b) [string]',
         }));
-      await expect(params).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
-      await expect(params).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
-      await expect(params).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
-      await expect(params).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM (a)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3 (a)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM (a)')}));
       // expect the component to be the same instance
-      await expect(await viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
-      const paramsAfterReload = await viewPage.getViewParams();
-      await expect(paramsAfterReload).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param3: 'PARAM 3 (b) [string]',
           param4: 'PARAM 4 [string]',
           param5: 'PARAM 5 [string]',
         }));
-      await expect(paramsAfterReload).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM (b)')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM (b)')}));
     });
 
     test('should correctly merge params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
@@ -768,7 +731,7 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'merge', navigatePerParam: true});
 
       // expect the view's params to be updated
-      await expect(await viewPage.getViewParams()).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
@@ -780,8 +743,7 @@ test.describe('Workbench Router', () => {
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
-      const paramsAfterReload = await viewPage.getViewParams();
-      await expect(paramsAfterReload).toEqual(
+      await expect.poll(() => viewPage.getViewParams()).toEqual(
         expect.objectContaining({
           param1: 'PARAM 1 [string]',
           param2: 'PARAM 2 [string]',
@@ -789,7 +751,7 @@ test.describe('Workbench Router', () => {
           param4: 'PARAM 4 [string]',
           param5: 'PARAM 5 [string]',
         }));
-      await expect(paramsAfterReload).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM')}));
     });
 
     test('should correctly replace params when performing bulk navigations', async ({appPO, microfrontendNavigator}) => {
@@ -806,26 +768,22 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'replace', navigatePerParam: true});
 
       // expect the view's params to be updated
-      const params = await viewPage.getViewParams();
-      await expect(params).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
-      await expect(params).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
-      await expect(params).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3')}));
-      await expect(params).not.toEqual(expect.objectContaining({param4: expect.stringMatching('PARAM 4')}));
-      await expect(params).not.toEqual(expect.objectContaining({param4: expect.stringMatching('PARAM 5')}));
-      await expect(params).toEqual(expect.objectContaining({transientParam: 'TRANSIENT PARAM [string]'}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param1: expect.stringMatching('PARAM 1')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param2: expect.stringMatching('PARAM 2')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param3: expect.stringMatching('PARAM 3')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param4: expect.stringMatching('PARAM 4')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({param4: expect.stringMatching('PARAM 5')}));
+      await expect.poll(() => viewPage.getViewParams()).toEqual(expect.objectContaining({transientParam: 'TRANSIENT PARAM [string]'}));
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
-      const paramsAfterReload = await viewPage.getViewParams();
-      await expect(paramsAfterReload).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM')}));
+      await expect.poll(() => viewPage.getViewParams()).not.toEqual(expect.objectContaining({transientParam: expect.stringMatching('TRANSIENT PARAM')}));
     });
 
     test('should correctly update params and transient params when a view is replaced by another view', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      // register testee view for app1
-      const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPage1.registerCapability({
+      await microfrontendNavigator.registerCapability('app1', {
         type: 'view',
         qualifier: {entity: 'product', app: 'app1'},
         params: [
@@ -846,9 +804,7 @@ test.describe('Workbench Router', () => {
         },
       });
 
-      // register testee view for app2
-      const registerCapabilityPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-      await registerCapabilityPage2.registerCapability({
+      await microfrontendNavigator.registerCapability('app2', {
         type: 'view',
         qualifier: {entity: 'product', app: 'app2'},
         params: [
@@ -876,11 +832,11 @@ test.describe('Workbench Router', () => {
       await routerPage1.enterTarget('blank');
       await routerPage1.clickNavigate();
 
+      const testeeViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee1'});
+      const testeeViewId = await testeeViewPage1.view.getViewId();
+
       // expect transient param to be contained in view params
-      const testeeView1 = appPO.view({cssClass: 'testee1'});
-      const viewId = await testeeView1.getViewId();
-      const testeeViewPage1 = new ViewPagePO(appPO, viewId);
-      await expect(await testeeViewPage1.getViewParams()).toEqual(
+      await expect.poll(() => testeeViewPage1.getViewParams()).toEqual(
         expect.objectContaining({
           entity: 'product [string]',
           app: 'app1 [string]',
@@ -892,14 +848,14 @@ test.describe('Workbench Router', () => {
       const routerPage2 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app2');
       await routerPage2.enterQualifier({entity: 'product', app: 'app2'});
       await routerPage2.enterParams({param: 'param app2', transientParam: 'transient param app2'});
-      await routerPage2.enterTarget(viewId);
+      await routerPage2.enterTarget(testeeViewId);
       await routerPage2.clickNavigate();
 
+      const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee2'});
+      await testeeViewPage2.view.tab.click();
+
       // expect transient param to be contained in view params
-      const testeeViewTab2 = appPO.view({cssClass: 'testee2'}).viewTab;
-      await testeeViewTab2.click();
-      const testeeViewPage2 = new ViewPagePO(appPO, viewId);
-      await expect(await testeeViewPage2.getViewParams()).toEqual(
+      await expect.poll(() => testeeViewPage2.getViewParams()).toEqual(
         expect.objectContaining({
           entity: 'product [string]',
           app: 'app2 [string]',
@@ -911,9 +867,7 @@ test.describe('Workbench Router', () => {
     test('should discard transient params when a view is replaced by another view', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      // register testee view for app1
-      const registerCapabilityPage1 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPage1.registerCapability({
+      await microfrontendNavigator.registerCapability('app1', {
         type: 'view',
         qualifier: {entity: 'product', app: 'app1'},
         params: [
@@ -931,8 +885,7 @@ test.describe('Workbench Router', () => {
       });
 
       // register testee view for app2
-      const registerCapabilityPage2 = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app2');
-      await registerCapabilityPage2.registerCapability({
+      await microfrontendNavigator.registerCapability('app2', {
         type: 'view',
         qualifier: {entity: 'product', app: 'app2'},
         params: [
@@ -956,11 +909,11 @@ test.describe('Workbench Router', () => {
       await routerPage1.enterTarget('blank');
       await routerPage1.clickNavigate();
 
+      const testeeViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee1'});
+
       // expect transient param to be contained in view params
-      const testeeView1 = appPO.view({cssClass: 'testee1'});
-      const viewId = await testeeView1.getViewId();
-      const testeeViewPage1 = new ViewPagePO(appPO, viewId);
-      await expect(await testeeViewPage1.getViewParams()).toEqual(
+      const testeeViewId = await testeeViewPage1.view.getViewId();
+      await expect.poll(() => testeeViewPage1.getViewParams()).toEqual(
         expect.objectContaining({
           entity: 'product [string]',
           app: 'app1 [string]',
@@ -970,14 +923,13 @@ test.describe('Workbench Router', () => {
       // self-navigate to view of app2
       const routerPage2 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app2');
       await routerPage2.enterQualifier({entity: 'product', app: 'app2'});
-      await routerPage2.enterTarget(viewId);
+      await routerPage2.enterTarget(testeeViewId);
       await routerPage2.clickNavigate();
 
       // expect transient param to be contained in view params
-      const testeeViewTab2 = appPO.view({cssClass: 'testee2'}).viewTab;
-      await testeeViewTab2.click();
-      const testeeViewPage2 = new ViewPagePO(appPO, viewId);
-      await expect(await testeeViewPage2.getViewParams()).toEqual(
+      const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee2'});
+      await testeeViewPage2.view.tab.click();
+      await expect.poll(() => testeeViewPage2.getViewParams()).toEqual(
         expect.objectContaining({
           entity: 'product [string]',
           app: 'app2 [string]',

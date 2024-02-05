@@ -15,7 +15,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
    * Registers an auxiliary route for every primary route found in the router config, allowing
    * primary routes to be used in named router outlets.
    *
-   * @param outletName(s) for which to create named auxiliary routes
+   * @param outletName - outlet names for which to create named auxiliary routes
    * @param config of the auxiliary route
    */
   public registerOutletAuxiliaryRoutes(outletName: string | string[], config: OutletAuxiliaryRouteConfig = {}): Routes {

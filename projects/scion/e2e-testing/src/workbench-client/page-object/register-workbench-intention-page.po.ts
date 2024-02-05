@@ -9,25 +9,26 @@
  */
 
 import {AppPO} from '../../app.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {Intention, Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {rejectWhenAttached} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
+import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {ViewPO} from '../../view.po';
 
 /**
  * Page object to interact with {@link RegisterWorkbenchIntentionPageComponent}.
  */
-export class RegisterWorkbenchIntentionPagePO {
+export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
-  public readonly viewTab: ViewTabPO;
+  public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this.viewTab = appPO.view({viewId}).viewTab;
-    this.outlet = new SciRouterOutletPO(appPO, {name: this.viewId});
+  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-register-workbench-intention-page');
   }
 

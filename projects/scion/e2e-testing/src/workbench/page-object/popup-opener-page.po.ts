@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, DomRect, fromRect, isPresent} from '../../helper/testing.util';
+import {coerceArray, DomRect, fromRect, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {BottomLeftPoint, BottomRightPoint, PopupOrigin, PopupSize, TopLeftPoint, TopRightPoint} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
@@ -17,16 +17,23 @@ import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
 import {PopupPO} from '../../popup.po';
 import {DialogPO} from '../../dialog.po';
+import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
  * Page object to interact with {@link PopupOpenerPageComponent}.
  */
-export class PopupOpenerPagePO {
+export class PopupOpenerPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
+  public readonly returnValue: Locator;
+  public readonly error: Locator;
+  public readonly openButton: Locator;
 
   constructor(private _appPO: AppPO, private _locateBy: ViewPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-popup-opener-page');
+    this.openButton = this.locator.locator('button.e2e-open');
+    this.returnValue = this.locator.locator('output.e2e-return-value');
+    this.error = this.locator.locator('output.e2e-popup-error');
   }
 
   public get view(): ViewPO {
@@ -133,17 +140,17 @@ export class PopupOpenerPagePO {
   }
 
   public async expandSizePanel(): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-preferred-overlay-size'));
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-size'));
     await accordion.expand();
   }
 
   public async collapseSizePanel(): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-preferred-overlay-size'));
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-size'));
     await accordion.collapse();
   }
 
-  public async enterPreferredOverlaySize(size: PopupSize): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-preferred-overlay-size'));
+  public async enterSize(size: PopupSize): Promise<void> {
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-size'));
     await accordion.expand();
     try {
       size.width && await this.locator.locator('input.e2e-width').fill(size.width);
@@ -173,42 +180,27 @@ export class PopupOpenerPagePO {
     await this.locator.locator('input.e2e-contextual-view-id').fill(viewId);
   }
 
-  public async clickOpen(): Promise<void> {
+  public async open(): Promise<void> {
     await this.locator.locator('button.e2e-open').click();
-    const cssClasses = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-    await this._appPO.popup({cssClass: cssClasses}).waitUntilAttached();
+
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    await Promise.race([
+      this.waitUntilPopupAttached(),
+      rejectWhenAttached(this.error),
+    ]);
   }
 
-  public async getPopupCloseAction(): Promise<PopupCloseAction> {
-    if (await isPresent(this.locator.locator('output.e2e-return-value'))) {
-      return {
-        type: 'closed-with-value',
-        value: await this.locator.locator('output.e2e-return-value').innerText(),
-      };
-    }
-    if (await isPresent(this.locator.locator('output.e2e-popup-error'))) {
-      return {
-        type: 'closed-with-error',
-        value: await this.locator.locator('output.e2e-popup-error').innerText(),
-      };
-    }
-    return {
-      type: 'closed',
-    };
+  private async waitUntilPopupAttached(): Promise<void> {
+    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
+    const popup = this._appPO.popup({cssClass});
+    await popup.locator.waitFor({state: 'attached'});
   }
 
-  public async getAnchorElementClientRect(): Promise<DomRect> {
-    const buttonLocator = this.locator.locator('button.e2e-open');
-    return fromRect(await buttonLocator.boundingBox());
+  public async getAnchorElementBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.openButton.boundingBox());
   }
 
   public async click(options?: {timeout?: number}): Promise<void> {
     await this.locator.click(options);
   }
 }
-
-export interface PopupCloseAction {
-  type: 'closed' | 'closed-with-value' | 'closed-with-error';
-  value?: string;
-}
-

@@ -55,7 +55,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
       )
       .subscribe((view: WorkbenchView) => {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(view.id);
-        this._messageClient.publish(commandTopic, view.active, {retain: true});
+        this._messageClient.publish(commandTopic, view.active, {retain: true}).then();
       });
   }
 

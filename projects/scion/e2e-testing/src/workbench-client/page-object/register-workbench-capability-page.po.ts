@@ -8,15 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
 import {Capability} from '@scion/microfrontend-platform';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
+import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {ViewPO} from '../../view.po';
 
 /**
  * Playwright's test runner fails to compile when importing runtime types from `@scion/workbench` or `@scion/microfrontend-platform`, because
@@ -25,21 +26,21 @@ import {SciRouterOutletPO} from './sci-router-outlet.po';
  * Unlike classes or enums, interfaces can be referenced because they do not exist at runtime.
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property (enum) with a string literal.
  */
-export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean}};
-export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToStartPage?: boolean}};
+export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
+export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
 
 /**
  * Page object to interact with {@link RegisterWorkbenchCapabilityPageComponent}.
  */
-export class RegisterWorkbenchCapabilityPagePO {
+export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
-  public readonly viewTab: ViewTabPO;
+  public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this.viewTab = appPO.view({viewId}).viewTab;
-    this.outlet = new SciRouterOutletPO(appPO, {name: this.viewId});
+  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-register-workbench-capability-page');
   }
 
@@ -50,7 +51,7 @@ export class RegisterWorkbenchCapabilityPagePO {
    *
    * Returns a Promise that resolves to the registered capability upon successful registration, or that rejects on registration error.
    */
-  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(capability: T): Promise<Capability> {
+  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(capability: T): Promise<T & Capability> {
     if (capability.type !== undefined) {
       await this.locator.locator('select.e2e-type').selectOption(capability.type);
     }
@@ -93,7 +94,7 @@ export class RegisterWorkbenchCapabilityPagePO {
     const responseLocator = this.locator.locator('output.e2e-register-response');
     const errorLocator = this.locator.locator('output.e2e-register-error');
     await Promise.race([
-      responseLocator.waitFor({state: 'attached'}),
+      waitUntilAttached(responseLocator),
       rejectWhenAttached(errorLocator),
     ]);
 

@@ -12,11 +12,14 @@ import {Locator} from '@playwright/test';
 import {PopupPO} from '../../../popup.po';
 import {ViewPO} from '../../../view.po';
 import {DialogPO} from '../../../dialog.po';
+import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
+import {WorkbenchViewPagePO} from '../workbench-view-page.po';
+import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
 
 /**
  * Page object to interact with {@link FocusTestPageComponent}.
  */
-export class FocusTestPagePO {
+export class FocusTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
 
@@ -24,8 +27,8 @@ export class FocusTestPagePO {
   public middleField: Locator;
   public lastField: Locator;
 
-  constructor(locateBy: ViewPO | PopupPO | DialogPO) {
-    this.locator = locateBy.locator.locator('app-focus-test-page');
+  constructor(private _locateBy: ViewPO | DialogPO | PopupPO) {
+    this.locator = _locateBy.locator.locator('app-focus-test-page');
     this.firstField = this.locator.locator('input.e2e-first-field');
     this.middleField = this.locator.locator('input.e2e-middle-field');
     this.lastField = this.locator.locator('input.e2e-last-field');
@@ -45,6 +48,33 @@ export class FocusTestPagePO {
       default: {
         throw Error(`[IllegalArgumentError] Specified field not found: ${field}`);
       }
+    }
+  }
+
+  public get view(): ViewPO {
+    if (this._locateBy instanceof ViewPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a view.');
+    }
+  }
+
+  public get dialog(): DialogPO {
+    if (this._locateBy instanceof DialogPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a dialog.');
+    }
+  }
+
+  public get popup(): PopupPO {
+    if (this._locateBy instanceof PopupPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a popup.');
     }
   }
 }

@@ -12,6 +12,8 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {MAIN_AREA} from '../workbench.model';
+import {ViewPagePO} from './page-object/view-page.po';
+import {expectView} from '../matcher/view-matcher';
 
 test.describe('Workbench Perspective Storage', () => {
 
@@ -24,30 +26,30 @@ test.describe('Workbench Perspective Storage', () => {
     // Add part and view to the workbench grid
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPage.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
-    await layoutPage.addView('view-1', {partId: 'left', activateView: true});
-    await layoutPage.addView('view-2', {partId: 'left', activateView: true});
+    await layoutPage.addView('outline', {partId: 'left', activateView: true});
+    await layoutPage.addView('console', {partId: 'left', activateView: true});
 
-    const view1 = appPO.view({viewId: 'view-1'});
-    const view2 = appPO.view({viewId: 'view-2'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'outline'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'console'});
 
     // Reopen the page
     await page.goto('about:blank');
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
 
     // Expect perspective-1 to be restored from the storage
-    await expect(await await appPO.header.perspectiveToggleButton({perspectiveId: 'perspective-1'}).isActive()).toBe(true);
-    await expect(await view1.viewTab.isActive()).toBe(false);
-    await expect(await view2.viewTab.isActive()).toBe(true);
+    await expect.poll(() => appPO.header.perspectiveToggleButton({perspectiveId: 'perspective-1'}).isActive()).toBe(true);
+    await expectView(testee1ViewPage).toBeInactive();
+    await expectView(testee2ViewPage).toBeActive();
 
     // Close view
-    await view2.viewTab.close();
+    await testee2ViewPage.view.tab.close();
 
     // Reopen the page
     await page.goto('about:blank');
     await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
 
     // Expect perspective-1 to be restored from the storage
-    await expect(await view1.viewTab.isActive()).toBe(true);
-    await expect(await view2.isPresent()).toBe(false);
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).not.toBeAttached();
   });
 });

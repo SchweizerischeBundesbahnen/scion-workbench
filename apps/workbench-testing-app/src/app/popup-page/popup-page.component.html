@@ -42,18 +42,6 @@
       </sci-form-field>
     </section>
 
-    <sci-accordion *ngIf="popup.size | appNullIfEmpty as preferredSize"
-                   title="Preferred Overlay Size"
-                   class="preferred-overlay-size e2e-preferred-overlay-size"
-                   variant="solid">
-      <ng-template sciAccordionItem [panel]="panel">
-        <header>Preferred Overlay Size</header>
-      </ng-template>
-      <ng-template #panel>
-        <div class="preferred-overlay-size e2e-preferred-overlay-size">{{preferredSize | json}}</div>
-      </ng-template>
-    </sci-accordion>
-
     <sci-accordion class="e2e-referrer" variant="solid">
       <ng-template sciAccordionItem [panel]="panel_referrer">
         <header>Referrer</header>

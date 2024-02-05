@@ -12,7 +12,6 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {PopupPagePO} from './page-object/popup-page.po';
-import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 
 test.describe('Workbench Popup', () => {
@@ -22,9 +21,7 @@ test.describe('Workbench Popup', () => {
     test('should have a view reference to the contextual view', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      // register testee popup
-      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPage.registerCapability({
+      await microfrontendNavigator.registerCapability('app1', {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -35,11 +32,13 @@ test.describe('Workbench Popup', () => {
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'testee'});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.getReferrer()).toEqual({
-        viewId: popupOpenerPage.viewId,
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(appPO, popup);
+
+      await expect.poll(() => popupPage.getReferrer()).toEqual({
+        viewId: await popupOpenerPage.view.getViewId(),
         viewCapabilityId: await popupOpenerPage.outlet.getCapabilityId(),
       });
     });
@@ -47,9 +46,7 @@ test.describe('Workbench Popup', () => {
     test('should have a view reference to the specified contextual view', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      // register testee popup
-      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPage.registerCapability({
+      await microfrontendNavigator.registerCapability('app1', {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -58,29 +55,27 @@ test.describe('Workbench Popup', () => {
       });
 
       const startPage = await appPO.openNewViewTab();
-      const startPageViewId = startPage.viewId!;
+      const startPageViewId = await startPage.view.getViewId();
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'testee'});
       await popupOpenerPage.enterContextualViewId(startPageViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      await startPage.view!.viewTab.click();
+      await startPage.view.tab.click();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.getReferrer()).toEqual({
-        viewId: startPageViewId,
-      });
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(appPO, popup);
+
+      await expect.poll(() => popupPage.getReferrer()).toEqual({viewId: startPageViewId});
     });
 
     test('should have a view reference to the specified contextual view and capability', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      // register testee popup
-      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPage.registerCapability({
+      await microfrontendNavigator.registerCapability('app1', {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -89,19 +84,21 @@ test.describe('Workbench Popup', () => {
       });
 
       const microfrontendPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-      const microfrontendViewId = microfrontendPage.viewId!;
+      const microfrontendViewId = await microfrontendPage.view.getViewId();
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'testee'});
       await popupOpenerPage.enterContextualViewId(microfrontendViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      await microfrontendPage.view!.viewTab.click();
+      await microfrontendPage.view.tab.click();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.getReferrer()).toEqual({
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(appPO, popup);
+
+      await expect.poll(() => popupPage.getReferrer()).toEqual({
         viewId: microfrontendViewId,
         viewCapabilityId: await microfrontendPage.outlet.getCapabilityId(),
       });
@@ -110,9 +107,7 @@ test.describe('Workbench Popup', () => {
     test('should not have a view reference if opened outside of a contextual view', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
-      // register testee popup
-      const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-      await registerCapabilityPage.registerCapability({
+      await microfrontendNavigator.registerCapability('app1', {
         type: 'popup',
         qualifier: {component: 'testee'},
         properties: {
@@ -124,10 +119,12 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.enterQualifier({component: 'testee'});
       await popupOpenerPage.enterContextualViewId('<null>');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.getReferrer()).toEqual({});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(appPO, popup);
+
+      await expect.poll(() => popupPage.getReferrer()).toEqual({});
     });
   });
 });

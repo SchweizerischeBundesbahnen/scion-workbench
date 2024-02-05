@@ -14,19 +14,24 @@ import {Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
+import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {ViewPO} from '../../view.po';
 
 /**
  * Page object to interact with {@link NotificationOpenerPageComponent}.
  */
-export class NotificationOpenerPagePO {
+export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
-  private _cssClasses = new Array<string>();
+  public readonly view: ViewPO;
+  public readonly error: Locator;
 
-  constructor(private _appPO: AppPO, public viewId: string) {
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: this.viewId});
+  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-notification-opener-page');
+    this.error = this.locator.locator('output.e2e-notification-open-error');
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
@@ -62,22 +67,23 @@ export class NotificationOpenerPagePO {
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    this._cssClasses = coerceArray(cssClass);
-    await this.locator.locator('input.e2e-class').fill(this._cssClasses.join(' '));
+    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
-  public async clickShow(): Promise<void> {
-    if (!this._cssClasses.length) {
-      throw Error('Missing required CSS class to wait for the notification to display.');
-    }
-
+  public async open(): Promise<void> {
     await this.locator.locator('button.e2e-show').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     return Promise.race([
-      this._appPO.notification({cssClass: this._cssClasses}).locator().waitFor({state: 'visible'}),
-      rejectWhenAttached(this.locator.locator('output.e2e-error')),
+      this.waitUntilNotificationAttached(),
+      rejectWhenAttached(this.error),
     ]);
+  }
+
+  private async waitUntilNotificationAttached(): Promise<void> {
+    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
+    const notification = this._appPO.notification({cssClass});
+    await notification.locator.waitFor({state: 'visible'});
   }
 
   public async pressEscape(): Promise<void> {

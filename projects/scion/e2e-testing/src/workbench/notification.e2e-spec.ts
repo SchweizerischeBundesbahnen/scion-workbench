@@ -10,9 +10,10 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {InspectNotificationComponentPO} from '../inspect-notification-component.po';
-import {TextNotificationComponentPO} from '../text-notification-component.po';
+import {NotificationPagePO} from '../notification-page.po';
+import {TextNotificationPagePO} from '../text-notification-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
+import {expectNotification} from '../matcher/notification-matcher';
 
 test.describe('Workbench Notification', () => {
 
@@ -21,12 +22,14 @@ test.describe('Workbench Notification', () => {
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
     await notificationOpenerPage.enterCssClass('testee');
-    await notificationOpenerPage.enterContent('TEXT');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.enterContent('Notification');
+    await notificationOpenerPage.open();
 
-    const textNotificationComponent = new TextNotificationComponentPO(appPO, 'testee');
-    await expect(await textNotificationComponent.isVisible()).toBe(true);
-    await expect(await textNotificationComponent.getText()).toEqual('TEXT');
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect(notificationPage.text).toHaveText('Notification');
   });
 
   test('should support new lines in the notification text', async ({appPO, workbenchNavigator}) => {
@@ -35,52 +38,57 @@ test.describe('Workbench Notification', () => {
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
     await notificationOpenerPage.enterCssClass('testee');
     await notificationOpenerPage.enterContent('LINE 1\\nLINE 2');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
-    const textNotificationComponent = new TextNotificationComponentPO(appPO, 'testee');
-    await expect(await textNotificationComponent.isVisible()).toBe(true);
-    await expect(await textNotificationComponent.getText()).toEqual('LINE 1\nLINE 2');
+    const notification = appPO.notification({cssClass: 'testee'});
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect(notificationPage.text).toHaveText('LINE 1\nLINE 2');
   });
 
   test('should close the last notification when pressing the ESC key', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const notification1 = appPO.notification({cssClass: 'testee-1'});
-    const notification2 = appPO.notification({cssClass: 'testee-2'});
-    const notification3 = appPO.notification({cssClass: 'testee-3'});
+    const notificationPage1 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
+    const notificationPage2 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
+    const notificationPage3 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee-1');
 
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee-2');
 
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee-3');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
-    await expect(await appPO.getNotificationCount()).toEqual(3);
-    await expect(await notification1.isVisible()).toBe(true);
-    await expect(await notification2.isVisible()).toBe(true);
-    await expect(await notification3.isVisible()).toBe(true);
-
-    await notificationOpenerPage.pressEscape();
-    await expect(await appPO.getNotificationCount()).toEqual(2);
-    await expect(await notification1.isVisible()).toBe(true);
-    await expect(await notification2.isVisible()).toBe(true);
-    await expect(await notification3.isPresent()).toBe(false);
+    await expect(appPO.notifications).toHaveCount(3);
+    await expectNotification(notificationPage1).toBeVisible();
+    await expectNotification(notificationPage2).toBeVisible();
+    await expectNotification(notificationPage3).toBeVisible();
 
     await notificationOpenerPage.pressEscape();
-    await expect(await appPO.getNotificationCount()).toEqual(1);
-    await expect(await notification1.isVisible()).toBe(true);
-    await expect(await notification2.isPresent()).toBe(false);
-    await expect(await notification3.isPresent()).toBe(false);
+    await expect(appPO.notifications).toHaveCount(2);
+    await expectNotification(notificationPage1).toBeVisible();
+    await expectNotification(notificationPage2).toBeVisible();
+    await expectNotification(notificationPage3).not.toBeAttached();
 
     await notificationOpenerPage.pressEscape();
-    await expect(await appPO.getNotificationCount()).toEqual(0);
-    await expect(await notification1.isPresent()).toBe(false);
-    await expect(await notification2.isPresent()).toBe(false);
-    await expect(await notification3.isPresent()).toBe(false);
+    await expect(appPO.notifications).toHaveCount(1);
+    await expectNotification(notificationPage1).toBeVisible();
+    await expectNotification(notificationPage2).not.toBeAttached();
+    await expectNotification(notificationPage3).not.toBeAttached();
+
+    await notificationOpenerPage.pressEscape();
+    await expect(appPO.notifications).toHaveCount(0);
+    await expectNotification(notificationPage1).not.toBeAttached();
+    await expectNotification(notificationPage2).not.toBeAttached();
+    await expectNotification(notificationPage3).not.toBeAttached();
   });
 
   test('should close the notification when clicking the close button', async ({appPO, workbenchNavigator}) => {
@@ -88,13 +96,15 @@ test.describe('Workbench Notification', () => {
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
     await notificationOpenerPage.enterCssClass('testee');
-    await notificationOpenerPage.enterContent('TEXT');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.enterContent('Notification');
+    await notificationOpenerPage.open();
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(await notification.isVisible()).toBe(true);
-    await notification.clickClose();
-    await expect(await notification.isVisible()).toBe(false);
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await notification.close();
+    await expectNotification(notificationPage).not.toBeAttached();
   });
 
   test('should stack multiple notifications', async ({appPO, workbenchNavigator}) => {
@@ -107,36 +117,44 @@ test.describe('Workbench Notification', () => {
     const notification3 = appPO.notification({cssClass: 'testee-3'});
 
     await notificationOpenerPage.enterCssClass('testee-1');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.enterContent('Notification');
+    await notificationOpenerPage.open();
 
     await notificationOpenerPage.enterCssClass('testee-2');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.enterContent('Notification');
+    await notificationOpenerPage.open();
 
     await notificationOpenerPage.enterCssClass('testee-3');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.enterContent('Notification');
+    await notificationOpenerPage.open();
 
-    await expect(await appPO.getNotificationCount()).toEqual(3);
-    const clientRect1 = await notification1.getBoundingBox();
-    const clientRect2 = await notification2.getBoundingBox();
-    const clientRect3 = await notification3.getBoundingBox();
+    await expect(appPO.notifications).toHaveCount(3);
+    await expect(async () => {
+      const clientRect1 = await notification1.getBoundingBox();
+      const clientRect2 = await notification2.getBoundingBox();
+      const clientRect3 = await notification3.getBoundingBox();
 
-    expect(clientRect1.bottom).toBeLessThan(clientRect2.top);
-    expect(clientRect2.bottom).toBeLessThan(clientRect3.top);
-    expect(clientRect1.left).toEqual(clientRect2.left);
-    expect(clientRect1.left).toEqual(clientRect3.left);
+      expect(clientRect1.bottom).toBeLessThan(clientRect2.top);
+      expect(clientRect2.bottom).toBeLessThan(clientRect3.top);
+      expect(clientRect1.left).toEqual(clientRect2.left);
+      expect(clientRect1.left).toEqual(clientRect3.left);
+    }).toPass();
   });
 
   test('should display a notification with the specified title', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee');
     await notificationOpenerPage.enterTitle('TITLE');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(await notification.isVisible()).toBe(true);
-    await expect(await notification.getTitle()).toEqual('TITLE');
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect(notification.title).toHaveText('TITLE');
   });
 
   test('should support new lines in the notification title', async ({appPO, workbenchNavigator}) => {
@@ -145,125 +163,145 @@ test.describe('Workbench Notification', () => {
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
     await notificationOpenerPage.enterCssClass('testee');
     await notificationOpenerPage.enterTitle('LINE 1\\nLINE 2');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.enterContent('Notification');
+    await notificationOpenerPage.open();
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(await notification.isVisible()).toBe(true);
-    await expect(await notification.getTitle()).toEqual('LINE 1\nLINE 2');
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect(notification.title).toHaveText('LINE 1\nLINE 2');
   });
 
-  test('should, by default, show a notification with info serverity', async ({appPO, workbenchNavigator}) => {
+  test('should, by default, show a notification with info severity', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(await notification.isVisible()).toBe(true);
-    await expect(await notification.getSeverity()).toEqual('info');
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect.poll(() => notification.getSeverity()).toEqual('info');
   });
 
-  test('should show a notification with info serverity', async ({appPO, workbenchNavigator}) => {
+  test('should show a notification with info severity', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee');
     await notificationOpenerPage.selectSeverity('info');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(await notification.isVisible()).toBe(true);
-    await expect(await notification.getSeverity()).toEqual('info');
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect.poll(() => notification.getSeverity()).toEqual('info');
   });
 
-  test('should show a notification with warn serverity', async ({appPO, workbenchNavigator}) => {
+  test('should show a notification with warn severity', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee');
     await notificationOpenerPage.selectSeverity('warn');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(await notification.isVisible()).toBe(true);
-    await expect(await notification.getSeverity()).toEqual('warn');
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect.poll(() => notification.getSeverity()).toEqual('warn');
   });
 
-  test('should show a notification with error serverity', async ({appPO, workbenchNavigator}) => {
+  test('should show a notification with error severity', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee');
     await notificationOpenerPage.selectSeverity('error');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
     const notification = appPO.notification({cssClass: 'testee'});
-    await expect(await notification.isVisible()).toBe(true);
-    await expect(await notification.getSeverity()).toEqual('error');
+    const notificationPage = new TextNotificationPagePO(notification);
+
+    await expectNotification(notificationPage).toBeVisible();
+    await expect.poll(() => notification.getSeverity()).toEqual('error');
   });
 
   test('should replace notifications of the same group', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const notification1 = appPO.notification({cssClass: 'testee-1'});
-    const notification2 = appPO.notification({cssClass: 'testee-2'});
-    const notification3 = appPO.notification({cssClass: 'testee-3'});
-    const notification4 = appPO.notification({cssClass: 'testee-4'});
+    const notificationPage1 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
+    const notificationPage2 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
+    const notificationPage3 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
+    const notificationPage4 = new TextNotificationPagePO(appPO.notification({cssClass: 'testee-4'}));
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+    await notificationOpenerPage.enterContent('Notification');
     await notificationOpenerPage.enterCssClass('testee-1');
     await notificationOpenerPage.enterGroup('GROUP-1');
     await notificationOpenerPage.selectSeverity('info');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
-    await expect(await notification1.isVisible()).toBe(true);
-    await expect(await notification1.getSeverity()).toEqual('info');
-    await expect(await appPO.getNotificationCount()).toEqual(1);
+    await expectNotification(notificationPage1).toBeVisible();
+    await expect.poll(() => notificationPage1.notification.getSeverity()).toEqual('info');
+    await expect(appPO.notifications).toHaveCount(1);
 
     await notificationOpenerPage.enterCssClass('testee-2');
     await notificationOpenerPage.enterGroup('GROUP-1');
     await notificationOpenerPage.selectSeverity('warn');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
-    await expect(await notification1.isVisible()).toBe(false);
-    await expect(await notification2.isVisible()).toBe(true);
-    await expect(await notification2.getSeverity()).toEqual('warn');
-    await expect(await appPO.getNotificationCount()).toEqual(1);
+    await expectNotification(notificationPage1).not.toBeAttached();
+    await expectNotification(notificationPage2).toBeVisible();
+    await expect.poll(() => notificationPage2.notification.getSeverity()).toEqual('warn');
+    await expect(appPO.notifications).toHaveCount(1);
 
     await notificationOpenerPage.enterCssClass('testee-3');
     await notificationOpenerPage.enterGroup('GROUP-1');
     await notificationOpenerPage.selectSeverity('error');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
-    await expect(await notification2.isVisible()).toBe(false);
-    await expect(await notification3.isVisible()).toBe(true);
-    await expect(await notification3.getSeverity()).toEqual('error');
-    await expect(await appPO.getNotificationCount()).toEqual(1);
+    await expectNotification(notificationPage2).not.toBeAttached();
+    await expectNotification(notificationPage3).toBeVisible();
+    await expect.poll(() => notificationPage3.notification.getSeverity()).toEqual('error');
+    await expect(appPO.notifications).toHaveCount(1);
 
     await notificationOpenerPage.enterCssClass('testee-4');
     await notificationOpenerPage.enterGroup('GROUP-2');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.open();
 
-    await expect(await notification3.isVisible()).toBe(true);
-    await expect(await notification4.isVisible()).toBe(true);
-    await expect(await appPO.getNotificationCount()).toEqual(2);
+    await expectNotification(notificationPage3).toBeVisible();
+    await expectNotification(notificationPage4).toBeVisible();
+    await expect(appPO.notifications).toHaveCount(2);
   });
 
-  test('should close the notification after the auto-close timeout', async ({appPO, workbenchNavigator}) => {
+  test('should close the notification after the auto-close timeout', async ({appPO, workbenchNavigator, page}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-    const notificationDuration = 1; // 1 second
 
     const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
     await notificationOpenerPage.enterCssClass('testee');
-    await notificationOpenerPage.selectDuration(notificationDuration);
-    await notificationOpenerPage.enterContent('Notification should close after 1s');
-    await notificationOpenerPage.clickShow();
+    await notificationOpenerPage.selectDuration(2);
+    await notificationOpenerPage.enterContent('Notification');
 
-    const textNotificationComponent = new TextNotificationComponentPO(appPO, 'testee');
-    await expect(await textNotificationComponent.isVisible()).toBe(true);
-    await textNotificationComponent.waitUntilClosed(notificationDuration * 1000 + 500);
-    await expect(await textNotificationComponent.isPresent()).toBe(false);
+    await notificationOpenerPage.open();
+
+    // Expect the notification to still display after 1.5s.
+    const notification = appPO.notification({cssClass: 'testee'});
+    await page.waitForTimeout(1500);
+    expect(await notification.locator.isVisible()).toBe(true);
+
+    // Expect the notification not to display after 2.5s.
+    await page.waitForTimeout(1000);
+    expect(await notification.locator.isVisible()).toBe(false);
   });
 
   test.describe('Custom Notification Provider', () => {
@@ -274,12 +312,13 @@ test.describe('Workbench Notification', () => {
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.enterCssClass('testee');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.selectComponent('notification-page');
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isPresent()).toBe(true);
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
+
+        await expectNotification(notificationPage).toBeVisible();
       });
 
       test('should pass the input', async ({appPO, workbenchNavigator}) => {
@@ -287,13 +326,15 @@ test.describe('Workbench Notification', () => {
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.enterCssClass('testee');
-        await notificationOpenerPage.selectComponent('inspect-notification');
+        await notificationOpenerPage.selectComponent('notification-page');
         await notificationOpenerPage.enterComponentInput('ABC');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
-        await expect(await inspectNotificationComponent.getInput()).toEqual('ABC');
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
+
+        await expectNotification(notificationPage).toBeVisible();
+        await expect(notificationPage.input).toHaveText('ABC');
       });
 
       test('should allow setting the title', async ({appPO, workbenchNavigator}) => {
@@ -301,62 +342,76 @@ test.describe('Workbench Notification', () => {
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.enterCssClass('testee');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.selectComponent('notification-page');
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
-        await inspectNotificationComponent.enterTitle('TITLE');
-        await expect(await inspectNotificationComponent.notification.getTitle()).toEqual('TITLE');
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
+
+        await expectNotification(notificationPage).toBeVisible();
+        await notificationPage.enterTitle('TITLE');
+        await expect(notification.title).toHaveText('TITLE');
       });
 
-      test('should overwrite the title if also passed by the notification reporter', async ({appPO, workbenchNavigator}) => {
+      test('should overwrite the title if also passed by the notification opener', async ({appPO, workbenchNavigator}) => {
         await appPO.navigateTo({microfrontendSupport: false});
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.enterCssClass('testee');
         await notificationOpenerPage.enterTitle('title');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.selectComponent('notification-page');
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
-        await inspectNotificationComponent.enterTitle('TITLE');
-        await expect(await inspectNotificationComponent.notification.getTitle()).toEqual('TITLE');
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
+
+        await expectNotification(notificationPage).toBeVisible();
+        await notificationPage.enterTitle('TITLE');
+        await expect(notification.title).toHaveText('TITLE');
       });
 
       test('should allow setting the severity', async ({appPO, workbenchNavigator}) => {
         await appPO.navigateTo({microfrontendSupport: false});
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
+        await notificationOpenerPage.enterContent('Notification');
         await notificationOpenerPage.enterCssClass('testee');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.selectComponent('notification-page');
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
-        await inspectNotificationComponent.selectSeverity('info');
-        await expect(await inspectNotificationComponent.notification.getSeverity()).toEqual('info');
-        await inspectNotificationComponent.selectSeverity('warn');
-        await expect(await inspectNotificationComponent.notification.getSeverity()).toEqual('warn');
-        await inspectNotificationComponent.selectSeverity('error');
-        await expect(await inspectNotificationComponent.notification.getSeverity()).toEqual('error');
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
+
+        await expectNotification(notificationPage).toBeVisible();
+
+        await notificationPage.selectSeverity('info');
+        await expect.poll(() => notification.getSeverity()).toEqual('info');
+
+        await notificationPage.selectSeverity('warn');
+        await expect.poll(() => notification.getSeverity()).toEqual('warn');
+
+        await notificationPage.selectSeverity('error');
+        await expect.poll(() => notification.getSeverity()).toEqual('error');
       });
 
-      test('should overwrite the severity if also passed by the notification reporter', async ({appPO, workbenchNavigator}) => {
+      test('should overwrite the severity if also passed by the notification opener', async ({appPO, workbenchNavigator}) => {
         await appPO.navigateTo({microfrontendSupport: false});
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.enterCssClass('testee');
         await notificationOpenerPage.selectSeverity('warn');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.selectComponent('notification-page');
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
-        await expect(await inspectNotificationComponent.notification.getSeverity()).toEqual('warn');
-        await inspectNotificationComponent.selectSeverity('error');
-        await expect(await inspectNotificationComponent.notification.getSeverity()).toEqual('error');
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
+
+        await expectNotification(notificationPage).toBeVisible();
+
+        await expect.poll(() => notification.getSeverity()).toEqual('warn');
+
+        await notificationPage.selectSeverity('error');
+        await expect.poll(() => notification.getSeverity()).toEqual('error');
       });
 
       test('should append CSS class(es)', async ({appPO, workbenchNavigator}) => {
@@ -364,176 +419,187 @@ test.describe('Workbench Notification', () => {
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.enterCssClass(['testee', 'A', 'B']);
-        await notificationOpenerPage.selectComponent('inspect-notification');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.selectComponent('notification-page');
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
-        await expect(await inspectNotificationComponent.notification.getCssClasses()).toEqual(expect.arrayContaining(['A', 'B']));
-        await inspectNotificationComponent.enterCssClass('C D');
-        await expect(await inspectNotificationComponent.notification.getCssClasses()).toEqual(expect.arrayContaining(['A', 'B', 'C', 'D']));
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
+
+        await expectNotification(notificationPage).toBeVisible();
+        await expect.poll(() => notification.getCssClasses()).toEqual(expect.arrayContaining(['A', 'B']));
+
+        await notificationPage.enterCssClass('C D');
+        await expect.poll(() => notification.getCssClasses()).toEqual(expect.arrayContaining(['A', 'B', 'C', 'D']));
       });
 
-      test('should allow setting the auto-close duration', async ({appPO, workbenchNavigator}) => {
+      test('should allow setting the auto-close duration', async ({appPO, workbenchNavigator, page}) => {
         await appPO.navigateTo({microfrontendSupport: false});
-        const notificationDuration = 1; // 1 second
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.enterCssClass('testee');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.selectComponent('notification-page');
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
-        await inspectNotificationComponent.enterTitle('Notification should close after 1s');
-        await inspectNotificationComponent.selectDuration(notificationDuration);
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
 
-        await inspectNotificationComponent.waitUntilClosed(notificationDuration * 1000 + 500);
-        await expect(await inspectNotificationComponent.isPresent()).toBe(false);
+        await notificationPage.enterTitle('Notification should close after 1s');
+        await notificationPage.selectDuration(2);
+
+        // Expect the notification to still display after 1.5s.
+        await page.waitForTimeout(1500);
+        expect(await notification.locator.isVisible()).toBe(true);
+
+        // Expect the notification not to display after 2.5s.
+        await page.waitForTimeout(1000);
+        expect(await notification.locator.isVisible()).toBe(false);
       });
 
-      test('should overwrite the auto-close duration if also passed by the notification reporter', async ({appPO, workbenchNavigator}) => {
+      test('should overwrite the auto-close duration if also passed by the notification opener', async ({appPO, workbenchNavigator, page}) => {
         await appPO.navigateTo({microfrontendSupport: false});
-        const notificationDuration = 1; // 1 second
 
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.enterCssClass('testee');
-        await notificationOpenerPage.enterTitle('Notification should close after the `long` alias expires');
         await notificationOpenerPage.selectDuration('long');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.selectComponent('notification-page');
+        await notificationOpenerPage.open();
 
-        const inspectNotificationComponent = new InspectNotificationComponentPO(appPO, 'testee');
-        await expect(await inspectNotificationComponent.isVisible()).toBe(true);
-        await inspectNotificationComponent.enterTitle('Notification should close after 1s');
-        await inspectNotificationComponent.selectDuration(notificationDuration);
+        const notification = appPO.notification({cssClass: 'testee'});
+        const notificationPage = new NotificationPagePO(notification);
 
-        await inspectNotificationComponent.waitUntilClosed(notificationDuration * 1000 + 500);
-        await expect(await inspectNotificationComponent.isPresent()).toBe(false);
+        await notificationPage.selectDuration(2);
+
+        // Expect the notification to still display after 1.5s.
+        await page.waitForTimeout(1500);
+        expect(await notification.locator.isVisible()).toBe(true);
+
+        // Expect the notification not to display after 2.5s.
+        await page.waitForTimeout(1000);
+        expect(await notification.locator.isVisible()).toBe(false);
       });
 
       test('should not reduce the input of notifications in the same group', async ({appPO, workbenchNavigator}) => {
         await appPO.navigateTo({microfrontendSupport: false});
 
-        const inspectNotificationComponent1 = new InspectNotificationComponentPO(appPO, 'testee-1');
-        const inspectNotificationComponent2 = new InspectNotificationComponentPO(appPO, 'testee-2');
-        const inspectNotificationComponent3 = new InspectNotificationComponentPO(appPO, 'testee-3');
-        const inspectNotificationComponent4 = new InspectNotificationComponentPO(appPO, 'testee-4');
-        const inspectNotificationComponent5 = new InspectNotificationComponentPO(appPO, 'testee-5');
-        const inspectNotificationComponent6 = new InspectNotificationComponentPO(appPO, 'testee-6');
+        const notificationPage1 = new NotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
+        const notificationPage2 = new NotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
+        const notificationPage3 = new NotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
+        const notificationPage4 = new NotificationPagePO(appPO.notification({cssClass: 'testee-4'}));
+        const notificationPage5 = new NotificationPagePO(appPO.notification({cssClass: 'testee-5'}));
+        const notificationPage6 = new NotificationPagePO(appPO.notification({cssClass: 'testee-6'}));
 
         // display the notifications of group-1
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.checkUseGroupInputReduceFn(false); // do not use a reducer (default)
         await notificationOpenerPage.enterGroup('group-1');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-
+        await notificationOpenerPage.selectComponent('notification-page');
         await notificationOpenerPage.enterCssClass('testee-1');
         await notificationOpenerPage.enterComponentInput('A');
-        await notificationOpenerPage.clickShow();
-        await expect(await inspectNotificationComponent1.isVisible()).toBe(true);
-        await expect(await appPO.getNotificationCount()).toEqual(1);
-        await expect(await inspectNotificationComponent1.getInput()).toEqual('A');
+        await notificationOpenerPage.open();
+
+        await expectNotification(notificationPage1).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(1);
+        await expect(notificationPage1.input).toHaveText('A');
 
         await notificationOpenerPage.enterCssClass('testee-2');
         await notificationOpenerPage.enterComponentInput('B');
-        await notificationOpenerPage.clickShow();
-        await expect(await inspectNotificationComponent2.isVisible()).toBe(true);
-        await expect(await appPO.getNotificationCount()).toEqual(1);
-        await expect(await inspectNotificationComponent2.getInput()).toEqual('B');
+        await notificationOpenerPage.open();
+        await expectNotification(notificationPage2).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(1);
+        await expect(notificationPage2.input).toHaveText('B');
 
         await notificationOpenerPage.enterCssClass('testee-3');
         await notificationOpenerPage.enterComponentInput('C');
-        await notificationOpenerPage.clickShow();
-        await expect(await appPO.getNotificationCount()).toEqual(1);
-        await expect(await inspectNotificationComponent3.isVisible()).toBe(true);
-        await expect(await inspectNotificationComponent3.getInput()).toEqual('C');
+        await notificationOpenerPage.open();
+        await expectNotification(notificationPage3).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(1);
+        await expect(notificationPage3.input).toHaveText('C');
 
         // display the notifications of group-2
         await notificationOpenerPage.enterGroup('group-2');
         await notificationOpenerPage.enterComponentInput('D');
         await notificationOpenerPage.enterCssClass('testee-4');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.open();
 
-        await expect(await inspectNotificationComponent4.isVisible()).toBe(true);
-        await expect(await appPO.getNotificationCount()).toEqual(2);
-        await expect(await inspectNotificationComponent4.getInput()).toEqual('D');
+        await expectNotification(notificationPage4).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(2);
+        await expect(notificationPage4.input).toHaveText('D');
 
         await notificationOpenerPage.enterCssClass('testee-5');
         await notificationOpenerPage.enterComponentInput('E');
-        await notificationOpenerPage.clickShow();
-        await expect(await inspectNotificationComponent5.isVisible()).toBe(true);
-        await expect(await appPO.getNotificationCount()).toEqual(2);
-        await expect(await inspectNotificationComponent5.getInput()).toEqual('E');
+        await notificationOpenerPage.open();
+        await expectNotification(notificationPage5).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(2);
+        await expect(notificationPage5.input).toHaveText('E');
 
         await notificationOpenerPage.enterCssClass('testee-6');
         await notificationOpenerPage.enterComponentInput('F');
-        await notificationOpenerPage.clickShow();
-        await expect(await appPO.getNotificationCount()).toEqual(2);
-        await expect(await inspectNotificationComponent6.isVisible()).toBe(true);
-        await expect(await inspectNotificationComponent6.getInput()).toEqual('F');
+        await notificationOpenerPage.open();
+        await expectNotification(notificationPage6).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(2);
+        await expect(notificationPage6.input).toHaveText('F');
       });
 
       test('should reduce the input of notifications in the same group', async ({appPO, workbenchNavigator}) => {
         await appPO.navigateTo({microfrontendSupport: false});
 
-        const inspectNotificationComponent1 = new InspectNotificationComponentPO(appPO, 'testee-1');
-        const inspectNotificationComponent2 = new InspectNotificationComponentPO(appPO, 'testee-2');
-        const inspectNotificationComponent3 = new InspectNotificationComponentPO(appPO, 'testee-3');
-        const inspectNotificationComponent4 = new InspectNotificationComponentPO(appPO, 'testee-4');
-        const inspectNotificationComponent5 = new InspectNotificationComponentPO(appPO, 'testee-5');
-        const inspectNotificationComponent6 = new InspectNotificationComponentPO(appPO, 'testee-6');
+        const notificationPage1 = new NotificationPagePO(appPO.notification({cssClass: 'testee-1'}));
+        const notificationPage2 = new NotificationPagePO(appPO.notification({cssClass: 'testee-2'}));
+        const notificationPage3 = new NotificationPagePO(appPO.notification({cssClass: 'testee-3'}));
+        const notificationPage4 = new NotificationPagePO(appPO.notification({cssClass: 'testee-4'}));
+        const notificationPage5 = new NotificationPagePO(appPO.notification({cssClass: 'testee-5'}));
+        const notificationPage6 = new NotificationPagePO(appPO.notification({cssClass: 'testee-6'}));
 
         // display the notifications of group-1
         const notificationOpenerPage = await workbenchNavigator.openInNewTab(NotificationOpenerPagePO);
         await notificationOpenerPage.checkUseGroupInputReduceFn(true); // Use test reducer which concatenates notification inputs
         await notificationOpenerPage.enterGroup('group-1');
-        await notificationOpenerPage.selectComponent('inspect-notification');
-
+        await notificationOpenerPage.selectComponent('notification-page');
         await notificationOpenerPage.enterCssClass('testee-1');
         await notificationOpenerPage.enterComponentInput('A');
-        await notificationOpenerPage.clickShow();
-        await expect(await inspectNotificationComponent1.isVisible()).toBe(true);
-        await expect(await appPO.getNotificationCount()).toEqual(1);
-        await expect(await inspectNotificationComponent1.getInput()).toEqual('A');
+        await notificationOpenerPage.open();
+
+        await expectNotification(notificationPage1).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(1);
+        await expect(notificationPage1.input).toHaveText('A');
 
         await notificationOpenerPage.enterCssClass('testee-2');
         await notificationOpenerPage.enterComponentInput('B');
-        await notificationOpenerPage.clickShow();
-        await expect(await inspectNotificationComponent2.isVisible()).toBe(true);
-        await expect(await appPO.getNotificationCount()).toEqual(1);
-        await expect(await inspectNotificationComponent2.getInput()).toEqual('A, B');
+        await notificationOpenerPage.open();
+        await expectNotification(notificationPage2).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(1);
+        await expect(notificationPage2.input).toHaveText('A, B');
 
         await notificationOpenerPage.enterCssClass('testee-3');
         await notificationOpenerPage.enterComponentInput('C');
-        await notificationOpenerPage.clickShow();
-        await expect(await appPO.getNotificationCount()).toEqual(1);
-        await expect(await inspectNotificationComponent3.isVisible()).toBe(true);
-        await expect(await inspectNotificationComponent3.getInput()).toEqual('A, B, C');
+        await notificationOpenerPage.open();
+        await expectNotification(notificationPage3).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(1);
+        await expect(notificationPage3.input).toHaveText('A, B, C');
 
         // display the notifications of group-2
         await notificationOpenerPage.enterGroup('group-2');
         await notificationOpenerPage.enterComponentInput('D');
         await notificationOpenerPage.enterCssClass('testee-4');
-        await notificationOpenerPage.clickShow();
+        await notificationOpenerPage.open();
 
-        await expect(await inspectNotificationComponent4.isVisible()).toBe(true);
-        await expect(await appPO.getNotificationCount()).toEqual(2);
-        await expect(await inspectNotificationComponent4.getInput()).toEqual('D');
+        await expectNotification(notificationPage4).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(2);
+        await expect(notificationPage4.input).toHaveText('D');
 
         await notificationOpenerPage.enterCssClass('testee-5');
         await notificationOpenerPage.enterComponentInput('E');
-        await notificationOpenerPage.clickShow();
-        await expect(await inspectNotificationComponent5.isVisible()).toBe(true);
-        await expect(await appPO.getNotificationCount()).toEqual(2);
-        await expect(await inspectNotificationComponent5.getInput()).toEqual('D, E');
+        await notificationOpenerPage.open();
+        await expectNotification(notificationPage5).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(2);
+        await expect(notificationPage5.input).toHaveText('D, E');
 
         await notificationOpenerPage.enterCssClass('testee-6');
         await notificationOpenerPage.enterComponentInput('F');
-        await notificationOpenerPage.clickShow();
-        await expect(await appPO.getNotificationCount()).toEqual(2);
-        await expect(await inspectNotificationComponent6.isVisible()).toBe(true);
-        await expect(await inspectNotificationComponent6.getInput()).toEqual('D, E, F');
+        await notificationOpenerPage.open();
+        await expectNotification(notificationPage6).toBeVisible();
+        await expect(appPO.notifications).toHaveCount(2);
+        await expect(notificationPage6.input).toHaveText('D, E, F');
       });
     });
   });

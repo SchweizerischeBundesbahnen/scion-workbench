@@ -32,13 +32,13 @@ test.describe('Angular Zone Synchronization', () => {
 
     await test.step('subscribeInsideAngularZone', async () => {
       await capabilityPanel.subscribe({subscribeInAngularZone: true});
-      await expect(await capabilityPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
-      await expect(await capabilityPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
+      await expect.poll(() => capabilityPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
+      await expect.poll(() => capabilityPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
     });
     await test.step('subscribeOutsideAngularZone', async () => {
       await capabilityPanel.subscribe({subscribeInAngularZone: false});
-      await expect(await capabilityPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
-      await expect(await capabilityPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
+      await expect.poll(() => capabilityPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
+      await expect.poll(() => capabilityPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
     });
   });
 
@@ -52,13 +52,13 @@ test.describe('Angular Zone Synchronization', () => {
 
     await test.step('subscribeInsideAngularZone', async () => {
       await paramsPanel.subscribe({subscribeInAngularZone: true});
-      await expect(await paramsPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
-      await expect(await paramsPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
+      await expect.poll(() => paramsPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
+      await expect.poll(() => paramsPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
     });
     await test.step('subscribeOutsideAngularZone', async () => {
       await paramsPanel.subscribe({subscribeInAngularZone: false});
-      await expect(await paramsPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
-      await expect(await paramsPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
+      await expect.poll(() => paramsPanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
+      await expect.poll(() => paramsPanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
     });
   });
 
@@ -72,13 +72,13 @@ test.describe('Angular Zone Synchronization', () => {
 
     await test.step('subscribeInsideAngularZone', async () => {
       await activePanel.subscribe({subscribeInAngularZone: true});
-      await expect(await activePanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
-      await expect(await activePanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
+      await expect.poll(() => activePanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(true);
+      await expect.poll(() => activePanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(true);
     });
     await test.step('subscribeOutsideAngularZone', async () => {
       await activePanel.subscribe({subscribeInAngularZone: false});
-      await expect(await activePanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
-      await expect(await activePanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
+      await expect.poll(() => activePanel.isEmissionReceivedInAngularZone({nth: 0})).toBe(false);
+      await expect.poll(() => activePanel.isEmissionReceivedInAngularZone({nth: 1})).toBe(false);
     });
   });
 });

@@ -12,17 +12,15 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
-import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 import {PopupPagePO} from './page-object/popup-page.po';
+import {expectPopup} from '../matcher/popup-matcher';
 
 test.describe('Contextual Workbench View', () => {
 
   test('should detach popup if contextual view is not active', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // Register popup capability.
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -30,34 +28,31 @@ test.describe('Contextual Workbench View', () => {
       },
     });
 
-    // Open popop.
+    // Open popup.
     const popupOpenerView = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerView.enterCssClass('testee');
     await popupOpenerView.enterQualifier({component: 'testee'});
     await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpenerView.clickOpen();
+    await popupOpenerView.open();
 
-    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-    await expect(popupPage.popup.locator).toBeVisible();
-    await expect(popupPage.outlet.locator).toBeVisible();
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(appPO, popup);
+
+    await expectPopup(popupPage).toBeVisible();
 
     // Open another view.
     await appPO.openNewViewTab();
-    await expect(popupPage.popup.locator).not.toBeVisible();
-    await expect(popupPage.outlet.locator).not.toBeVisible();
+    await expectPopup(popupPage).toBeHidden();
 
     // Activate popup opener view.
-    await popupOpenerView.viewTab.click();
-    await expect(popupPage.popup.locator).toBeVisible();
-    await expect(popupPage.outlet.locator).toBeVisible();
+    await popupOpenerView.view.tab.click();
+    await expectPopup(popupPage).toBeVisible();
   });
 
   test('should detach popup if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // Register popup capability.
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -72,27 +67,26 @@ test.describe('Contextual Workbench View', () => {
     const popupOpenerView = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
 
     // Drag popup opener view into peripheral area.
-    await popupOpenerView.viewTab.dragTo({grid: 'workbench', region: 'east'});
+    await popupOpenerView.view.tab.dragTo({grid: 'workbench', region: 'east'});
 
     // Open popup.
     await popupOpenerView.enterCssClass('testee');
     await popupOpenerView.enterQualifier({component: 'testee'});
     await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpenerView.clickOpen();
+    await popupOpenerView.open();
 
-    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-    await expect(popupPage.popup.locator).toBeVisible();
-    await expect(popupPage.outlet.locator).toBeVisible();
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(appPO, popup);
+
+    await expectPopup(popupPage).toBeVisible();
 
     // Maximize the main area.
-    await viewInMainArea.viewTab.dblclick();
-    await expect(popupPage.popup.locator).not.toBeVisible();
-    await expect(popupPage.outlet.locator).not.toBeVisible();
+    await viewInMainArea.view.tab.dblclick();
+    await expectPopup(popupPage).toBeHidden();
 
     // Restore the layout.
-    await viewInMainArea.viewTab.dblclick();
-    await expect(popupPage.popup.locator).toBeVisible();
-    await expect(popupPage.outlet.locator).toBeVisible();
+    await viewInMainArea.view.tab.dblclick();
+    await expectPopup(popupPage).toBeVisible();
   });
 
   // TODO [#488]: Implement test for feature #488.

@@ -2,7 +2,7 @@
   <section>
     <sci-form-field label="Component">
       <select [formControl]="form.controls.component" class="e2e-component">
-        <option value="inspect-notification">InspectNotificationComponent</option>
+        <option value="notification-page">NotificationPageComponent</option>
         <option value="">default</option>
       </select>
     </sci-form-field>
@@ -61,3 +61,6 @@
   Show notification
 </button>
 
+<output class="notification-open-error e2e-notification-open-error" *ngIf="notificationOpenError">
+  {{notificationOpenError}}
+</output>

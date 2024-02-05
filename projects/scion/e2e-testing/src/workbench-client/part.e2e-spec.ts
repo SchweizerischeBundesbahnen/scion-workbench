@@ -12,7 +12,6 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {InputFieldTestPagePO as MicrofrontendInputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
-import {waitUntilStable} from '../helper/testing.util';
 import {ViewPagePO} from './page-object/view-page.po';
 
 test.describe('Workbench Part', () => {
@@ -25,7 +24,7 @@ test.describe('Workbench Part', () => {
     // Open test view "right".
     const rightTestPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
     // Move test view to the right
-    await rightTestPage.view.viewTab.dragTo({partId: await appPO.activePart({inMainArea: true}).getPartId(), region: 'east'});
+    await rightTestPage.view.tab.dragTo({partId: await appPO.activePart({inMainArea: true}).getPartId(), region: 'east'});
 
     // Capture part and view identities.
     const leftPartId = await leftTestPage.view.part.getPartId();
@@ -56,7 +55,6 @@ test.describe('Workbench Part', () => {
 
     // When clicking left test view.
     await leftTestPage.clickInputField();
-    await waitUntilStable(() => appPO.activePart({inMainArea: true}).getPartId());
 
     // Expect left part to be activated.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -88,14 +86,14 @@ test.describe('Workbench Part', () => {
 
     // Open view list menu.
     const viewListMenu = await testPage.view.part.openViewListMenu();
-    await expect(await viewListMenu.isOpened()).toBe(true);
+    await expect(viewListMenu.locator).toBeAttached();
 
     // When focusing the view.
     await testPage.clickInputField();
     // Expect the view list menu to be closed.
-    await expect(await viewListMenu.isOpened()).toBe(false);
+    await expect(viewListMenu.locator).not.toBeAttached();
     // Expect focus to remain in the input field that caused focus loss of the menu.
-    await expect(await testPage.isInputFieldActiveElement()).toBe(true);
+    await expect(testPage.input).toBeFocused();
   });
 
   test('should close view list menu when popup microfrontend gains focus', async ({appPO, microfrontendNavigator}) => {
@@ -109,13 +107,13 @@ test.describe('Workbench Part', () => {
 
     // Open view list menu.
     const viewListMenu = await viewPage.view.part.openViewListMenu();
-    await expect(await viewListMenu.isOpened()).toBe(true);
+    await expect(viewListMenu.locator).toBeAttached();
 
     // When focusing the popup.
     await testPage.clickInputField();
     // Expect the view list menu to be closed.
-    await expect(await viewListMenu.isOpened()).toBe(false);
+    await expect(viewListMenu.locator).not.toBeAttached();
     // Expect focus to remain in the input field that caused focus loss of the menu.
-    await expect(await testPage.isInputFieldActiveElement()).toBe(true);
+    await expect(testPage.input).toBeFocused();
   });
 });

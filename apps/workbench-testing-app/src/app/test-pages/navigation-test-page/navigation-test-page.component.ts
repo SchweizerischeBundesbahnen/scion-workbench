@@ -15,7 +15,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-navigation-test-page',
-  template: '',
+  template: 'NavigationTestPageComponent',
   standalone: true,
 })
 export class NavigationTestPageComponent {
@@ -26,9 +26,6 @@ export class NavigationTestPageComponent {
       .subscribe(params => {
         if (params.has('title')) {
           view.title = params.get('title');
-        }
-        if (params.has('cssClass')) {
-          view.cssClass = params.get('cssClass')!;
         }
       });
   }

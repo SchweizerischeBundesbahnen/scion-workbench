@@ -9,23 +9,24 @@
  */
 
 import {AppPO} from '../../app.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {Locator} from '@playwright/test';
-import {rejectWhenAttached} from '../../helper/testing.util';
+import {rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
+import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {ViewPO} from '../../view.po';
 
 /**
  * Page object to interact with {@link UnregisterWorkbenchCapabilityPageComponent}.
  */
-export class UnregisterWorkbenchCapabilityPagePO {
+export class UnregisterWorkbenchCapabilityPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
-  public readonly viewTab: ViewTabPO;
+  public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this.viewTab = appPO.view({viewId}).viewTab;
-    this.outlet = new SciRouterOutletPO(appPO, {name: this.viewId});
+  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-unregister-workbench-capability-page');
   }
 
@@ -44,7 +45,7 @@ export class UnregisterWorkbenchCapabilityPagePO {
     const responseLocator = this.locator.locator('output.e2e-unregistered');
     const errorLocator = this.locator.locator('output.e2e-unregister-error');
     return Promise.race([
-      responseLocator.waitFor({state: 'attached'}),
+      waitUntilAttached(responseLocator),
       rejectWhenAttached(errorLocator),
     ]);
   }

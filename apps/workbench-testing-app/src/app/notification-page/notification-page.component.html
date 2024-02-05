@@ -1,11 +1,7 @@
-<sci-form-field label="Instance ID" title="Unique identifier of this component instance">
-  <span class="e2e-component-instance-id">{{uuid}}</span>
-</sci-form-field>
-
 <sci-form-field label="Input" direction="column" *ngIf="notification.input">
   <section class="input">
     <sci-viewport>
-      <output class="e2e-input">{{notification.input | appStringify}}</output>
+      <output class="e2e-input">{{ notification.input | appStringify }}</output>
     </sci-viewport>
   </section>
 </sci-form-field>

@@ -3,21 +3,21 @@ import {MICROFRONTEND_PLATFORM_POST_STARTUP, NotificationService} from '@scion/w
 import {WorkbenchCapabilities, WorkbenchMessageBoxConfig, WorkbenchNotificationConfig} from '@scion/workbench-client';
 import {IntentClient} from '@scion/microfrontend-platform';
 import {Maps} from '@scion/toolkit/util';
-import {InspectNotificationComponent} from './inspect-notification.component';
+import {NotificationPageComponent} from './notification-page.component';
 
 /**
- * Displays a custom notification for microfrontends to inspect notification properties.
+ * Displays a custom notification for microfrontends to interact with a notification
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
-class InspectNotificationIntentHandler {
+class NotificationPageIntentHandler {
 
   constructor(intentClient: IntentClient, notificationService: NotificationService) {
-    intentClient.onIntent<WorkbenchMessageBoxConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {component: 'inspector'}}, request => {
+    intentClient.onIntent<WorkbenchMessageBoxConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {component: 'notification-page'}}, request => {
       const config: WorkbenchNotificationConfig = request.body!;
 
       notificationService.notify({
         ...config,
-        content: InspectNotificationComponent,
+        content: NotificationPageComponent,
         componentInput: new Map([
           ...request.headers,
           ...request.intent.params ?? [],
@@ -36,13 +36,13 @@ function addNotificationCount(prevInput: Map<string, any>, currInput: Map<string
 }
 
 /**
- * Provides a set of DI providers to provide a custom notification capability for inspecting notification properties.
+ * Provides a set of DI providers to provide a custom notification capability for interacting with a notification.
  */
-export function provideNotificationInspector(): EnvironmentProviders {
+export function provideNotificationPage(): EnvironmentProviders {
   return makeEnvironmentProviders([
     {
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      useClass: InspectNotificationIntentHandler,
+      useClass: NotificationPageIntentHandler,
       multi: true,
     },
   ]);

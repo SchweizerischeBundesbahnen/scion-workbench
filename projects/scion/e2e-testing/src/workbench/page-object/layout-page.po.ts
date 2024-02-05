@@ -11,34 +11,32 @@
 import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {ReferencePart} from '@scion/workbench';
 import {SciTabbarPO} from '../../@scion/components.internal/tabbar.po';
+import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
  * Page object to interact with {@link LayoutPageComponent}.
  */
-export class LayoutPagePO {
+export class LayoutPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
-  public readonly viewTab: ViewTabPO;
 
   private readonly _tabbar: SciTabbarPO;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this.view = appPO.view({viewId});
-    this.viewTab = this.view.viewTab;
-    this.locator = this.view.locate('app-layout-page');
+  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.locator = this.view.locator.locator('app-layout-page');
     this._tabbar = new SciTabbarPO(this.locator.locator('sci-tabbar'));
   }
 
   public async addPart(partId: string, relativeTo: ReferencePart, options?: {activate?: boolean}): Promise<void> {
     const locator = this.locator.locator('app-add-part-page');
 
-    await this.view.viewTab.click();
+    await this.view.tab.click();
     await this._tabbar.selectTab('e2e-add-part');
     await locator.locator('section.e2e-part').locator('input.e2e-part-id').fill(partId);
     await new SciCheckboxPO(locator.locator('section.e2e-part').locator('sci-checkbox.e2e-activate')).toggle(options?.activate ?? false);
@@ -57,7 +55,7 @@ export class LayoutPagePO {
   public async addView(viewId: string, options: {partId: string; position?: number; activateView?: boolean; activatePart?: boolean}): Promise<void> {
     const locator = this.locator.locator('app-add-view-page');
 
-    await this.view.viewTab.click();
+    await this.view.tab.click();
     await this._tabbar.selectTab('e2e-add-view');
     await locator.locator('section.e2e-view').locator('input.e2e-view-id').fill(viewId);
     await locator.locator('section.e2e-view-options').locator('input.e2e-part-id').fill(options.partId);
@@ -76,7 +74,7 @@ export class LayoutPagePO {
   public async activateView(viewId: string, options?: {activatePart?: boolean}): Promise<void> {
     const locator = this.locator.locator('app-activate-view-page');
 
-    await this.view.viewTab.click();
+    await this.view.tab.click();
     await this._tabbar.selectTab('e2e-activate-view');
     await locator.locator('section.e2e-view').locator('input.e2e-view-id').fill(viewId);
     await new SciCheckboxPO(locator.locator('section.e2e-view-options').locator('sci-checkbox.e2e-activate-part')).toggle(options?.activatePart ?? false);
@@ -92,7 +90,7 @@ export class LayoutPagePO {
   public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: string | string[]; partId?: string | string[]; grid?: 'workbench' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
     const locator = this.locator.locator('app-register-part-action-page');
 
-    await this.view.viewTab.click();
+    await this.view.tab.click();
     await this._tabbar.selectTab('e2e-register-part-action');
     await locator.locator('section').locator('input.e2e-content').fill(content);
     await locator.locator('section').locator('select.e2e-align').selectOption(options?.align ?? '');

@@ -10,7 +10,6 @@
 
 import {test} from '../fixtures';
 import {expect} from '@playwright/test';
-import {RegisterWorkbenchCapabilityPagePO} from './page-object/register-workbench-capability-page.po';
 import {MessagingPagePO} from './page-object/messaging-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {PopupPagePO} from './page-object/popup-page.po';
@@ -21,8 +20,7 @@ test.describe('Workbench Popup', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register popup capability that shows splash.
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    const popupCapability = await registerCapabilityPagePO.registerCapability({
+    const popupCapability = await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -32,31 +30,31 @@ test.describe('Workbench Popup', () => {
       },
     });
 
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerPage.open();
 
-    const popupPagePO = new PopupPagePO(appPO, {cssClass: 'testee'});
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(appPO, popup);
 
     // Expect splash to display.
-    await expect(popupPagePO.outlet.splash).toBeVisible();
+    await expect(popupPage.outlet.splash).toBeVisible();
 
     // Publish message to dispose splash.
-    const messageClientPagePO = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
-    await messageClientPagePO.publishMessage(`signal-ready/${popupCapability.metadata!.id}`);
-    await messageClientPagePO.viewTab.close();
+    const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
+    await messagingPage.publishMessage(`signal-ready/${popupCapability.metadata!.id}`);
+    await messagingPage.view.tab.close();
 
     // Expect splash not to display.
-    await expect(popupPagePO.outlet.splash).not.toBeVisible();
+    await expect(popupPage.outlet.splash).not.toBeVisible();
   });
 
   test('should not show splash if `showSplash` is `false`', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register popup capability that does not show splash.
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -66,23 +64,23 @@ test.describe('Workbench Popup', () => {
       },
     });
 
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerPage.open();
 
-    const popupPagePO = new PopupPagePO(appPO, {cssClass: 'testee'});
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(appPO, popup);
 
     // Expect splash not to display.
-    await expect(popupPagePO.outlet.splash).not.toBeVisible();
+    await expect(popupPage.outlet.splash).not.toBeVisible();
   });
 
   test('should not show splash if `showSplash` is not set (default)', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // Register popup capability that does not show splash.
-    const registerCapabilityPagePO = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPagePO.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
       qualifier: {component: 'testee'},
       properties: {
@@ -91,14 +89,15 @@ test.describe('Workbench Popup', () => {
       },
     });
 
-    const popupOpenerPagePO = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPagePO.enterQualifier({component: 'testee'});
-    await popupOpenerPagePO.enterCloseStrategy({closeOnFocusLost: false});
-    await popupOpenerPagePO.clickOpen();
+    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+    await popupOpenerPage.enterQualifier({component: 'testee'});
+    await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerPage.open();
 
-    const popupPagePO = new PopupPagePO(appPO, {cssClass: 'testee'});
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(appPO, popup);
 
     // Expect splash not to display.
-    await expect(popupPagePO.outlet.splash).not.toBeVisible();
+    await expect(popupPage.outlet.splash).not.toBeVisible();
   });
 });

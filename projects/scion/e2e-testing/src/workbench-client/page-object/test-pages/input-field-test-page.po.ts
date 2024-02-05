@@ -10,20 +10,21 @@
 
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {isActiveElement} from '../../../helper/testing.util';
 import {MicrofrontendNavigator} from '../../microfrontend-navigator';
-import {RegisterWorkbenchCapabilityPagePO} from '../register-workbench-capability-page.po';
 import {ViewPO} from '../../../view.po';
 import {PopupPO} from '../../../popup.po';
 import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
+import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 
-export class InputFieldTestPagePO {
+export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
+  public readonly input: Locator;
 
   constructor(public outlet: SciRouterOutletPO, private _locateBy: ViewPO | PopupPO) {
     this.locator = this.outlet.frameLocator.locator('app-input-field-test-page');
+    this.input = this.locator.locator('input.e2e-input');
   }
 
   public get view(): ViewPO {
@@ -45,17 +46,11 @@ export class InputFieldTestPagePO {
   }
 
   public async clickInputField(options?: {timeout?: number}): Promise<void> {
-    await this.locator.locator('input.e2e-input').click({timeout: options?.timeout});
-  }
-
-  public async isInputFieldActiveElement(): Promise<boolean> {
-    return isActiveElement(this.locator.locator('input.e2e-input'));
+    await this.input.click({timeout: options?.timeout});
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<InputFieldTestPagePO> {
-    // Register the test page as view.
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
       qualifier: {test: 'input-field'},
       properties: {
@@ -65,11 +60,10 @@ export class InputFieldTestPagePO {
         pinToStartPage: true,
       },
     });
-    await registerCapabilityPage.viewTab.close();
 
     // Navigate to the view.
     const startPage = await appPO.openNewViewTab();
-    const viewId = startPage.viewId!;
+    const viewId = await startPage.view.getViewId();
     await startPage.clickTestCapability('test-input-field', 'app1');
 
     // Create the page object.
@@ -81,9 +75,7 @@ export class InputFieldTestPagePO {
   }
 
   public static async openInPopup(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator, popupOptions?: {closeOnFocusLost?: boolean}): Promise<InputFieldTestPagePO> {
-    // Register popup capability.
-    const registerCapabilityPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchCapabilityPagePO, 'app1');
-    await registerCapabilityPage.registerCapability({
+    await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
       qualifier: {test: 'input-field'},
       properties: {
@@ -96,11 +88,11 @@ export class InputFieldTestPagePO {
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPage.enterQualifier({test: 'input-field'});
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: popupOptions?.closeOnFocusLost});
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
     // Create the page object.
     const popup = appPO.popup({cssClass: 'test-input-field'});
-    await popup.waitUntilAttached();
+    await popup.locator.waitFor({state: 'attached'});
 
     const outlet = new SciRouterOutletPO(appPO, {cssClass: ['e2e-popup', 'test-input-field']});
     return new InputFieldTestPagePO(outlet, popup);

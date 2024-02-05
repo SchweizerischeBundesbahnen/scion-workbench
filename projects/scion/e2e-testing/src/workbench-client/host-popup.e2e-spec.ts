@@ -11,10 +11,13 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {HostPopupPagePO} from './page-object/host-popup-page.po';
-import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {expectPopup} from '../matcher/popup-matcher';
+import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 
-test.describe('Workbench Popup', () => {
+const POPUP_DIAMOND_ANCHOR_SIZE = 8;
+
+test.describe('Workbench Host Popup', () => {
 
   test('should allow opening a popup contributed by the host app', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
@@ -22,18 +25,18 @@ test.describe('Workbench Popup', () => {
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-    // register intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPage.enterQualifier({component: 'host-popup'});
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
-    const popup = await appPO.popup({cssClass: 'testee'});
-    await expect(await popup.isVisible()).toBe(true);
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new HostPopupPagePO(popup);
+
+    await expectPopup(popupPage).toBeVisible();
   });
 
   test('should allow closing the popup and returning a value to the popup opener', async ({appPO, microfrontendNavigator}) => {
@@ -42,19 +45,19 @@ test.describe('Workbench Popup', () => {
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-    // register intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPage.enterQualifier({component: 'host-popup'});
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
-    const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-    await hostPopupPage.clickClose({returnValue: 'RETURN VALUE'});
-    await expect(await popupOpenerPage.getPopupCloseAction()).toEqual({type: 'closed-with-value', value: 'RETURN VALUE'});
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new HostPopupPagePO(popup);
+
+    await popupPage.close({returnValue: 'RETURN VALUE'});
+    await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
   });
 
   test('should allow closing the popup with an error', async ({appPO, microfrontendNavigator}) => {
@@ -63,32 +66,29 @@ test.describe('Workbench Popup', () => {
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-    // register intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPage.enterQualifier({component: 'host-popup'});
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
-    const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-    await hostPopupPage.clickClose({returnValue: 'ERROR', closeWithError: true});
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new HostPopupPagePO(popup);
 
-    await expect(await popupOpenerPage.getPopupCloseAction()).toEqual({type: 'closed-with-error', value: 'ERROR'});
+    await popupPage.close({returnValue: 'ERROR', closeWithError: true});
+    await expect(popupOpenerPage.error).toHaveText('ERROR');
   });
 
-  test('should stick the popup to the HTMLElement anchor when moving the anchor element', async ({appPO, microfrontendNavigator}) => {
+  test('should stick to the popup anchor', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
     // Also consider merging this specs with popup.e2e-spec.ts.
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-    // register intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
@@ -96,43 +96,49 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
     await popupOpenerPage.selectAlign('north');
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
     // TODO [#271]: Specify the preferred size via popup capability when implemented the issue #271
     // Also consider merging this specs with popup.e2e-spec.ts.
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
-    const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-    await hostPopupPage.enterComponentSize({height: '100px', width: '100px'});
-
     const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new HostPopupPagePO(popup);
+
+    await popupPage.enterComponentSize({height: '100px', width: '100px'});
+
+    // Wait until popup is positioned and sized.
+    await waitUntilBoundingBoxStable(popup.locator);
 
     // capture current popup and anchor location
-    const anchorClientRect1 = await popupOpenerPage.getAnchorElementClientRect();
-    const popupClientRect1 = await popup.getBoundingBox();
+    const anchorBoxInitial = await popupOpenerPage.getAnchorElementBoundingBox();
+    const popupBoundsInitial = await popup.getBoundingBox();
 
     // expand a collapsed panel to move the popup anchor downward
     await popupOpenerPage.expandAnchorPanel();
+    await expect(async () => {
+      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
+      const popupBounds = await popup.getBoundingBox();
+      const xDelta = anchorBox.left - anchorBoxInitial.left;
+      const yDelta = anchorBox.top - anchorBoxInitial.top;
 
-    const anchorClientRect2 = await popupOpenerPage.getAnchorElementClientRect();
-    const popupClientRect2 = await popup.getBoundingBox();
-    const xDelta = anchorClientRect2.left - anchorClientRect1.left;
-    const yDelta = anchorClientRect2.top - anchorClientRect1.top;
+      // assert the anchor to moved downward
+      expect(anchorBox.top).toBeGreaterThan(anchorBoxInitial.top);
+      expect(anchorBox.left).toEqual(anchorBoxInitial.left);
 
-    // assert the anchor to moved downward
-    await expect(anchorClientRect2.top).toBeGreaterThan(anchorClientRect1.top);
-    await expect(anchorClientRect2.left).toEqual(anchorClientRect1.left);
-
-    // assert the popup location
-    await expect(popupClientRect2.top).toEqual(popupClientRect1.top + yDelta);
-    await expect(popupClientRect2.left).toEqual(popupClientRect1.left + xDelta);
+      // assert the popup location
+      expect(popupBounds.top).toEqual(popupBoundsInitial.top + yDelta);
+      expect(popupBounds.left).toEqual(popupBoundsInitial.left + xDelta);
+    }).toPass();
 
     // collapse the panel to move the popup anchor upward
     await popupOpenerPage.collapseAnchorPanel();
-    const popupClientRect3 = await popup.getBoundingBox();
+    await expect(async () => {
+      const popupBounds = await popup.getBoundingBox();
 
-    // assert the popup location
-    await expect(popupClientRect3.top).toEqual(popupClientRect1.top);
-    await expect(popupClientRect3.left).toEqual(popupClientRect1.left);
+      // assert the popup location
+      expect(popupBounds.top).toEqual(popupBoundsInitial.top);
+      expect(popupBounds.left).toEqual(popupBoundsInitial.left);
+    }).toPass();
   });
 
   test('should allow repositioning the popup if using a coordinate anchor', async ({appPO, microfrontendNavigator}) => {
@@ -142,9 +148,7 @@ test.describe('Workbench Popup', () => {
     // Also consider merging this specs with popup.e2e-spec.ts.
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-    // register intention
-    const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-    await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
@@ -153,32 +157,28 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.enterPosition({top: 150, left: 150});
     await popupOpenerPage.selectAlign('south');
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
     // TODO [#271]: Specify the preferred size via popup capability when implemented the issue #271
     // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
-    const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-    await hostPopupPage.enterComponentSize({height: '100px', width: '100px'});
-
     const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new HostPopupPagePO(popup);
 
-    // capture current popup and anchor location
-    const popupClientRectInitial = await popup.getBoundingBox();
+    await popupPage.enterComponentSize({height: '100px', width: '100px'});
 
-    // move the anachor
-    await popupOpenerPage.enterPosition({top: 300, left: 200});
+    const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+    await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 150);
+    await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 150);
 
-    // assert the popup location
-    await expect(await popup.getBoundingBox()).toEqual(expect.objectContaining({
-      left: popupClientRectInitial.left + 50,
-      top: popupClientRectInitial.top + 150,
-    }));
+    // move the anchor to another position
+    await popupOpenerPage.enterPosition({left: 200, top: 300});
+    await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 200);
+    await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 300);
 
-    // move the anchor to its initial position
-    await popupOpenerPage.enterPosition({top: 150, left: 150});
-
-    // assert the popup location
-    await expect(await popup.getBoundingBox()).toEqual(popupClientRectInitial);
+    // move the anchor to another position
+    await popupOpenerPage.enterPosition({left: 300, top: 400});
+    await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 300);
+    await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 400);
   });
 
   test.describe('view context', () => {
@@ -190,30 +190,27 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       // activate another view
       await appPO.openNewViewTab();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(false);
+      await expectPopup(popupPage).toBeHidden();
 
       // re-activate the view
-      await popupOpenerPage.view.viewTab.click();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should not destroy the popup when its contextual view (if any) is deactivated', async ({appPO, microfrontendNavigator}) => {
@@ -223,34 +220,31 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      const componentInstanceId = await hostPopupPage.getComponentInstanceId();
-      await expect(await hostPopupPage.isPresent()).toBe(true);
-      await expect(await hostPopupPage.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+      const componentInstanceId = await popupPage.getComponentInstanceId();
+
+      await expectPopup(popupPage).toBeVisible();
 
       // activate another view
       await appPO.openNewViewTab();
-      await expect(await hostPopupPage.isPresent()).toBe(true);
-      await expect(await hostPopupPage.isVisible()).toBe(false);
+      await expectPopup(popupPage).toBeHidden();
 
       // re-activate the view
-      await popupOpenerPage.view.viewTab.click();
-      await expect(await hostPopupPage.isPresent()).toBe(true);
-      await expect(await hostPopupPage.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
 
       // expect the component not to be constructed anew
-      await expect(await hostPopupPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
     test('should bind the popup to the current view, if opened in the context of a view', async ({appPO, microfrontendNavigator}) => {
@@ -260,39 +254,31 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       // deactivate the view
       await appPO.openNewViewTab();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(false);
+      await expectPopup(popupPage).toBeHidden();
 
       // activate the view again
-      await popupOpenerPage.view.viewTab.click();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
 
       // close the view
-      await popupOpenerPage.view.viewTab.close();
-
-      // popup should be closed when view is closed
-      await popup.waitUntilClosed();
-
-      await expect(await popup.isPresent()).toBe(false);
-      await expect(await popup.isVisible()).toBe(false);
+      await popupOpenerPage.view.tab.close();
+      await expectPopup(popupPage).not.toBeAttached();
     });
   });
 
@@ -305,28 +291,20 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: true});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      await expect(await hostPopupPage.popup.isPresent()).toBe(true);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
 
-      await popupOpenerPage.view.viewTab.click();
-
-      // popup should be closed on focus loss
-      await hostPopupPage.popup.waitUntilClosed();
-
-      await expect(await hostPopupPage.popup.isPresent()).toBe(false);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(false);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).not.toBeAttached();
     });
 
     test('should not close the popup on focus loss', async ({appPO, microfrontendNavigator}) => {
@@ -336,25 +314,22 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      await expect(await hostPopupPage.popup.isPresent()).toBe(true);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
 
-      await popupOpenerPage.view.viewTab.click();
+      await expectPopup(popupPage).toBeVisible();
 
-      await expect(await hostPopupPage.popup.isPresent()).toBe(true);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should close the popup on escape keystroke', async ({page, appPO, microfrontendNavigator}) => {
@@ -364,43 +339,34 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCloseStrategy({closeOnEscape: true});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      await expect(await hostPopupPage.popup.isPresent()).toBe(true);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       await page.keyboard.press('Escape');
-
-      // popup should be closed on escape keystroke
-      await hostPopupPage.popup.waitUntilClosed();
-
-      await expect(await hostPopupPage.popup.isPresent()).toBe(false);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(false);
+      await expectPopup(popupPage).not.toBeAttached();
 
       // open the popup
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCloseStrategy({closeOnEscape: true});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      await expect(await hostPopupPage.popup.isPresent()).toBe(true);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(true);
+      await expectPopup(popupPage).toBeVisible();
 
-      await hostPopupPage.enterReturnValue('explicitly request the focus');
+      await popupPage.enterReturnValue('explicitly request the focus');
       await page.keyboard.press('Escape');
-
-      await expect(await hostPopupPage.popup.isPresent()).toBe(false);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(false);
+      await expectPopup(popupPage).not.toBeAttached();
     });
 
     test('should not close the popup on escape keystroke', async ({page, appPO, microfrontendNavigator}) => {
@@ -410,25 +376,22 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCloseStrategy({closeOnEscape: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      await expect(await hostPopupPage.popup.isPresent()).toBe(true);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       await page.keyboard.press('Escape');
-
-      await expect(await hostPopupPage.popup.isPresent()).toBe(true);
-      await expect(await hostPopupPage.popup.isVisible()).toBe(true);
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should provide the popup\'s capability', async ({appPO, microfrontendNavigator}) => {
@@ -438,19 +401,19 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       // expect the popup of this app to display
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      await expect(await hostPopupPage.getPopupCapability()).toEqual(expect.objectContaining({
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expect.poll(() => popupPage.getPopupCapability()).toEqual(expect.objectContaining({
         qualifier: {component: 'host-popup'},
         type: 'popup',
         properties: expect.objectContaining({
@@ -466,20 +429,20 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterParams({param1: 'PARAM1'});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       // expect values to be contained in popup params
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      await expect(await hostPopupPage.getPopupParams()).toEqual(expect.objectContaining({param1: 'PARAM1'}));
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({param1: 'PARAM1'}));
     });
 
     test('should contain the qualifier in popup params', async ({appPO, microfrontendNavigator}) => {
@@ -489,19 +452,19 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       // expect qualifier to be contained in popup params
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      await expect(await hostPopupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup'}));
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup'}));
     });
 
     test('should substitute named URL params with values of the qualifier and params', async ({appPO, microfrontendNavigator}) => {
@@ -511,21 +474,21 @@ test.describe('Workbench Popup', () => {
       // Also consider merging this specs with popup.e2e-spec.ts.
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterParams({param1: 'PARAM1'});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       // expect named params to be substituted
-      const hostPopupPage = new HostPopupPagePO(appPO, 'testee');
-      await expect(await hostPopupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup', param1: 'PARAM1'}));
-      await expect(await hostPopupPage.getRouteParams()).toEqual({matrixParam1: 'PARAM1', matrixParam2: 'host-popup'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup', param1: 'PARAM1'}));
+      await expect.poll(() => popupPage.getRouteParams()).toEqual({matrixParam1: 'PARAM1', matrixParam2: 'host-popup'});
     });
   });
 });

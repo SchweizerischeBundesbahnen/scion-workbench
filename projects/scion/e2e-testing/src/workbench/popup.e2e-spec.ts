@@ -15,225 +15,236 @@ import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {PopupPagePO} from './page-object/popup-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {expectPopup} from '../matcher/popup-matcher';
+import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 
 const POPUP_DIAMOND_ANCHOR_SIZE = 8;
 
 test.describe('Workbench Popup', () => {
 
-  test.describe('overlay alignment if using HTMLElement anchor', () => {
+  test.describe('popup alignment if using HTMLElement anchor', () => {
 
     test('should, by default, open in the north of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterPosition('element');
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const anchorClientRect = await popupOpenerPage.getAnchorElementClientRect();
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(anchorClientRect.top, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(anchorClientRect.left + anchorClientRect.width / 2, 0);
-      await expect(await popup.getAlign()).toEqual('north');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('north');
+
+      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.top, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(anchorBox.hcenter, 0);
     });
 
     test('should open in the north of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectAlign('north');
       await popupOpenerPage.enterPosition('element');
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const anchorClientRect = await popupOpenerPage.getAnchorElementClientRect();
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(anchorClientRect.top, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(anchorClientRect.left + anchorClientRect.width / 2, 0);
-      await expect(await popup.getAlign()).toEqual('north');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('north');
+
+      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.top, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(anchorBox.hcenter, 0);
     });
 
     test('should open in the south of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectAlign('south');
       await popupOpenerPage.enterPosition('element');
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
-      await popupOpenerPage.clickOpen();
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const anchorClientRect = await popupOpenerPage.getAnchorElementClientRect();
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('south');
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.top - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(anchorClientRect.bottom, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(anchorClientRect.left + anchorClientRect.width / 2, 0);
-      await expect(await popup.getAlign()).toEqual('south');
+      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.bottom, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(anchorBox.hcenter, 0);
     });
 
     test('should open in the east of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectAlign('east');
       await popupOpenerPage.enterPosition('element');
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const anchorClientRect = await popupOpenerPage.getAnchorElementClientRect();
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(anchorClientRect.top + anchorClientRect.height / 2, 0);
-      await expect(popupClientRect.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(anchorClientRect.right, 0);
-      await expect(await popup.getAlign()).toEqual('east');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('east');
+
+      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(anchorBox.vcenter, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.right, 0);
     });
 
     test('should open in the west of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectAlign('west');
       await popupOpenerPage.enterPosition('element');
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const anchorClientRect = await popupOpenerPage.getAnchorElementClientRect();
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(anchorClientRect.top + anchorClientRect.height / 2, 0);
-      await expect(popupClientRect.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(anchorClientRect.left, 0);
-      await expect(await popup.getAlign()).toEqual('west');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('west');
+
+      const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(anchorBox.vcenter, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.left, 0);
     });
   });
 
-  test.describe('overlay alignment if using coordinate anchor', () => {
+  test.describe('popup alignment if using coordinate anchor', () => {
 
     test('should, by default, open in the north of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterPosition({left: 300, top: 300});
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const view = await appPO.activePart({inMainArea: true}).activeView;
-      const viewBounds = await view.getBoundingBox();
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('north');
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(viewBounds.left + 300, 0);
-      await expect(await popup.getAlign()).toEqual('north');
+      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
     });
 
     test('should open in the north of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectAlign('north');
       await popupOpenerPage.enterPosition({left: 300, top: 300});
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
-      const view = await appPO.activePart({inMainArea: true}).activeView;
-      const viewBounds = await view.getBoundingBox();
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('north');
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.bottom + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(viewBounds.left + 300, 0);
-      await expect(await popup.getAlign()).toEqual('north');
+      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
     });
 
     test('should open in the south of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectAlign('south');
       await popupOpenerPage.enterPosition({left: 300, top: 300});
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
-      const view = await appPO.activePart({inMainArea: true}).activeView;
-      const viewBounds = await view.getBoundingBox();
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('south');
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.top - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect(popupClientRect.left + popupClientRect.width / 2).toBeCloseTo(viewBounds.left + 300, 0);
-      await expect(await popup.getAlign()).toEqual('south');
+      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
     });
 
     test('should open in the east of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectAlign('east');
       await popupOpenerPage.enterPosition({left: 300, top: 300});
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
-      const view = await appPO.activePart({inMainArea: true}).activeView;
-      const viewBounds = await view.getBoundingBox();
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('east');
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect(popupClientRect.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.left + 300, 0);
-      await expect(await popup.getAlign()).toEqual('east');
+      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.left + 300, 0);
     });
 
     test('should open in the west of the anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectAlign('west');
       await popupOpenerPage.enterPosition({left: 300, top: 300});
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
-      const view = await appPO.activePart({inMainArea: true}).activeView;
-      const viewBounds = await view.getBoundingBox();
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      const popup = await appPO.popup({cssClass: 'testee'});
-      const popupClientRect = await popup.getBoundingBox('cdk-overlay');
+      await expectPopup(popupPage).toBeVisible();
+      await expect.poll(() => popup.getAlign()).toEqual('west');
 
-      await expect(await popup.isVisible()).toBe(true);
-      await expect(popupClientRect.top + popupClientRect.height / 2).toBeCloseTo(viewBounds.top + 300, 0);
-      await expect(popupClientRect.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(viewBounds.left + 300, 0);
-      await expect(await popup.getAlign()).toEqual('west');
+      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(viewBounds.top + 300, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.left + 300, 0);
     });
   });
 
@@ -241,125 +252,139 @@ test.describe('Workbench Popup', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.selectPopupComponent('popup-page');
     await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.enterPopupInput('TEST INPUT');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
-    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-    await expect(await popupPage.getInput()).toEqual('TEST INPUT');
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(popup);
+
+    await expect(popupPage.input).toHaveText('TEST INPUT');
   });
 
   test('should allow closing the popup and returning a value to the popup opener', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.selectPopupComponent('popup-page');
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
-    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-    await popupPage.clickClose({returnValue: 'RETURN VALUE'});
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(popup);
 
-    await expect(await popupOpenerPage.getPopupCloseAction()).toEqual({type: 'closed-with-value', value: 'RETURN VALUE'});
+    await popupPage.close({returnValue: 'RETURN VALUE'});
+    await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
   });
 
   test('should allow closing the popup with an error', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.selectPopupComponent('popup-page');
     await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
-    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-    await popupPage.clickClose({returnValue: 'ERROR', closeWithError: true});
+    const popup = appPO.popup({cssClass: 'testee'});
+    const popupPage = new PopupPagePO(popup);
 
-    await expect(await popupOpenerPage.getPopupCloseAction()).toEqual({type: 'closed-with-error', value: 'ERROR'});
+    await popupPage.close({returnValue: 'ERROR', closeWithError: true});
+    await expect(popupOpenerPage.error).toHaveText('ERROR');
   });
 
   test('should associate popup with specified CSS class(es) ', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerPage.selectPopupComponent('popup-page');
     await popupOpenerPage.enterCssClass(['testee', 'a', 'b']);
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
-    const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+    const popup = appPO.popup({cssClass: ['testee', 'a', 'b']});
+    const popupPage = new PopupPagePO(popup);
 
-    await expect(await popupPage.popup.getCssClasses()).toEqual(expect.arrayContaining(['testee', 'a', 'b']));
+    await expectPopup(popupPage).toBeVisible();
   });
 
   test.describe('Moving the anchor', () => {
-    test('should stick the popup to the HTMLElement anchor when moving the anchor element', async ({appPO, workbenchNavigator}) => {
+
+    test('should stick to the popup anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterPosition('element');
       await popupOpenerPage.selectAlign('north');
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
 
+      // Wait until popup is positioned and sized.
+      await waitUntilBoundingBoxStable(popup.locator);
+
       // capture current popup and anchor location
-      const anchorClientRect1 = await popupOpenerPage.getAnchorElementClientRect();
-      const popupClientRect1 = await popup.getBoundingBox();
+      const anchorBoxInitial = await popupOpenerPage.getAnchorElementBoundingBox();
+      const popupBoundsInitial = await popup.getBoundingBox();
 
       // expand a collapsed panel to move the popup anchor downward
       await popupOpenerPage.expandSizePanel();
+      await expect(async () => {
+        const anchorBox = await popupOpenerPage.getAnchorElementBoundingBox();
+        const popupBounds = await popup.getBoundingBox();
+        const xDelta = anchorBox.left - anchorBoxInitial.left;
+        const yDelta = anchorBox.top - anchorBoxInitial.top;
 
-      const anchorClientRect2 = await popupOpenerPage.getAnchorElementClientRect();
-      const popupClientRect2 = await popup.getBoundingBox();
-      const xDelta = anchorClientRect2.left - anchorClientRect1.left;
-      const yDelta = anchorClientRect2.top - anchorClientRect1.top;
+        // assert the anchor to moved downward
+        expect(anchorBox.top).toBeGreaterThan(anchorBoxInitial.top);
+        expect(anchorBox.left).toEqual(anchorBoxInitial.left);
 
-      // assert the anchor to moved downward
-      await expect(anchorClientRect2.top).toBeGreaterThan(anchorClientRect1.top);
-      await expect(anchorClientRect2.left).toEqual(anchorClientRect1.left);
-
-      // assert the popup location
-      await expect(popupClientRect2.top).toEqual(popupClientRect1.top + yDelta);
-      await expect(popupClientRect2.left).toEqual(popupClientRect1.left + xDelta);
+        // assert the popup location
+        expect(popupBounds.top).toEqual(popupBoundsInitial.top + yDelta);
+        expect(popupBounds.left).toEqual(popupBoundsInitial.left + xDelta);
+      }).toPass();
 
       // collapse the panel to move the popup anchor upward
       await popupOpenerPage.collapseSizePanel();
-      const popupClientRect3 = await popup.getBoundingBox();
+      await expect(async () => {
+        const popupBounds = await popup.getBoundingBox();
 
-      // assert the popup location
-      await expect(popupClientRect3.top).toEqual(popupClientRect1.top);
-      await expect(popupClientRect3.left).toEqual(popupClientRect1.left);
+        // assert the popup location
+        expect(popupBounds.top).toEqual(popupBoundsInitial.top);
+        expect(popupBounds.left).toEqual(popupBoundsInitial.left);
+      }).toPass();
     });
 
     test('should allow repositioning the popup if using a coordinate anchor', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterPosition({left: 150, top: 150});
       await popupOpenerPage.selectAlign('south');
-      await popupOpenerPage.enterPreferredOverlaySize({width: '100px', height: '100px'});
-      await popupOpenerPage.clickOpen();
-
-      const view = await appPO.activePart({inMainArea: true}).activeView;
-      const viewBounds = await view.getBoundingBox();
+      await popupOpenerPage.enterSize({width: '100px', height: '100px'});
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupClientRect1 = await popup.getBoundingBox('cdk-overlay');
-      await expect(popupClientRect1.left + popupClientRect1.width / 2).toEqual(viewBounds.left + 150);
-      await expect(popupClientRect1.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(viewBounds.top + 150);
+
+      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 150);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 150);
 
       // move the anchor to another position
       await popupOpenerPage.enterPosition({left: 200, top: 300});
-      const popupClientRect2 = await popup.getBoundingBox('cdk-overlay');
-      await expect(popupClientRect2.left + popupClientRect2.width / 2).toEqual(viewBounds.left + 200);
-      await expect(popupClientRect2.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(viewBounds.top + 300);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 200);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 300);
 
       // move the anchor to another position
       await popupOpenerPage.enterPosition({left: 300, top: 400});
-      const popupClientRect3 = await popup.getBoundingBox('cdk-overlay');
-      await expect(popupClientRect3.left + popupClientRect3.width / 2).toEqual(viewBounds.left + 300);
-      await expect(popupClientRect3.top - POPUP_DIAMOND_ANCHOR_SIZE).toEqual(viewBounds.top + 400);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 300);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 400);
     });
   });
 
@@ -369,21 +394,23 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      await expect(popup.locator).toBeVisible();
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       // activate another view
       await appPO.openNewViewTab();
-      await expect(popup.locator).toBeAttached();
-      await expect(popup.locator).not.toBeVisible();
+      await expectPopup(popupPage).toBeHidden();
 
       // re-activate the view
-      await popupOpenerPage.view.viewTab.click();
-      await expect(popup.locator).toBeVisible();
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should detach popup if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
@@ -396,53 +423,53 @@ test.describe('Workbench Popup', () => {
       const popupOpenerView = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
 
       // Drag popup opener view into peripheral area.
-      await popupOpenerView.view.viewTab.dragTo({grid: 'workbench', region: 'east'});
+      await popupOpenerView.view.tab.dragTo({grid: 'workbench', region: 'east'});
 
       // Open popup.
-      await popupOpenerView.enterCssClass('testee');
       await popupOpenerView.selectPopupComponent('popup-page');
+      await popupOpenerView.enterCssClass('testee');
       await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerView.clickOpen();
+      await popupOpenerView.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      await expect(popup.locator).toBeVisible();
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       // Maximize the main area.
-      await viewPageInMainArea.viewTab.dblclick();
-      await expect(popupOpenerView.view.locator).not.toBeVisible();
-      await expect(popup.locator).not.toBeVisible();
+      await viewPageInMainArea.view.tab.dblclick();
+      await expectPopup(popupPage).toBeHidden();
 
       // Restore the layout.
-      await viewPageInMainArea.viewTab.dblclick();
-      await expect(popupOpenerView.view.locator).toBeVisible();
-      await expect(popup.locator).toBeVisible();
+      await viewPageInMainArea.view.tab.dblclick();
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should not destroy the popup when its contextual view (if any) is deactivated', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
       const componentInstanceId = await popupPage.getComponentInstanceId();
-      await expect(await popupPage.isPresent()).toBe(true);
-      await expect(await popupPage.isVisible()).toBe(true);
+      await expectPopup(popupPage).toBeVisible();
 
       // activate another view
       await appPO.openNewViewTab();
-      await expect(await popupPage.isPresent()).toBe(true);
-      await expect(await popupPage.isVisible()).toBe(false);
+      await expectPopup(popupPage).toBeHidden();
 
       // re-activate the view
-      await popupOpenerPage.view.viewTab.click();
-      await expect(await popupPage.isPresent()).toBe(true);
-      await expect(await popupPage.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
 
       // expect the component not to be constructed anew
-      await expect(await popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
+      await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
     });
 
     test('should allow binding the popup to any view', async ({appPO, workbenchNavigator}) => {
@@ -452,94 +479,89 @@ test.describe('Workbench Popup', () => {
 
       // open a popup and bind it to the start page view.
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterContextualViewId(startPage.viewId!);
-      await popupOpenerPage.enterPosition({left: appPO.viewportBoundingBox().hcenter, top: appPO.viewportBoundingBox().vcenter});
       await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.enterContextualViewId(await startPage.view.getViewId());
+      await popupOpenerPage.enterPosition({left: appPO.viewportBoundingBox().hcenter, top: appPO.viewportBoundingBox().vcenter});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(false);
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeHidden();
 
       // activate the view to which the popup is bound to
-      await startPage.view!.viewTab.click();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      await startPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
 
       // activate another view
       await appPO.openNewViewTab();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(false);
+      await expectPopup(popupPage).toBeHidden();
 
       // activate another view
-      await popupOpenerPage.view.viewTab.click();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(false);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeHidden();
 
       // activate the view to which the popup is bound to
-      await startPage.view!.viewTab.click();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      await startPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should bind the popup to the current view, if opened in the context of a view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       // deactivate the view
       await appPO.openNewViewTab();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(false);
+      await expectPopup(popupPage).toBeHidden();
 
       // activate the view again
-      await popupOpenerPage.view.viewTab.click();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
 
       // close the view
-      await popupOpenerPage.view.viewTab.close();
-      await expect(await popup.isPresent()).toBe(false);
-      await expect(await popup.isVisible()).toBe(false);
+      await popupOpenerPage.view.tab.close();
+      await expectPopup(popupPage).not.toBeAttached();
     });
 
     test('should allow the popup do detach from its contextual view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterContextualViewId('<null>');
       await popupOpenerPage.enterPosition({left: 300, top: 300});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       // deactivate the view
       await appPO.openNewViewTab();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      await expectPopup(popupPage).toBeVisible();
 
       // activate the view again
-      await popupOpenerPage.view.viewTab.click();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
 
       // close the view
-      await popupOpenerPage.view.viewTab.close();
-      await expect(await popup.isPresent()).toBe(true);
-      await expect(await popup.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.close();
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should propagate view context', async ({appPO, workbenchNavigator}) => {
@@ -549,46 +571,49 @@ test.describe('Workbench Popup', () => {
       const popupTargetViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open popup in target view.
-      const popupOpenerPage1 = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage1.selectPopupComponent('popup-opener-page');
-      await popupOpenerPage1.enterCssClass('testee-1');
-      await popupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage1.enterContextualViewId(popupTargetViewPage.viewId);
-      await popupOpenerPage1.enterPosition({left: 300, top: 300});
-      await popupOpenerPage1.clickOpen();
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-opener-page');
+      await popupOpenerPage.enterCssClass('testee-1');
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerPage.enterContextualViewId(await popupTargetViewPage.view.getViewId());
+      await popupOpenerPage.enterPosition({left: 300, top: 300});
+      await popupOpenerPage.open();
 
       const popup1 = appPO.popup({cssClass: 'testee-1'});
-      await expect(popup1.locator).not.toBeVisible();
+      const popupPopupOpenerPage1 = new PopupOpenerPagePO(appPO, popup1);
+
+      await expectPopup(popupPopupOpenerPage1).toBeHidden();
 
       // Activate target view.
-      await popupTargetViewPage.viewTab.click();
-      await expect(popup1.locator).toBeVisible();
+      await popupTargetViewPage.view.tab.click();
+      await expectPopup(popupPopupOpenerPage1).toBeVisible();
 
       // Open another popup from the popup (inherit popup's view context).
-      const popupOpenerPage2 = new PopupOpenerPagePO(appPO, popup1);
-      await popupOpenerPage2.selectPopupComponent('popup-page');
-      await popupOpenerPage2.enterCssClass('testee-2');
-      await popupOpenerPage2.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage2.enterPosition({left: 300, top: 300});
-      await popupOpenerPage2.clickOpen();
+      await popupPopupOpenerPage1.selectPopupComponent('popup-page');
+      await popupPopupOpenerPage1.enterCssClass('testee-2');
+      await popupPopupOpenerPage1.enterCloseStrategy({closeOnFocusLost: false});
+      await popupPopupOpenerPage1.enterPosition({left: 300, top: 300});
+      await popupPopupOpenerPage1.open();
+
       const popup2 = appPO.popup({cssClass: 'testee-2'});
+      const popupPage2 = new PopupPagePO(popup2);
 
       // Expect popup 2 to have contextual view of popup 1, i.e., is also visible.
-      await expect(popup2.locator).toBeVisible();
+      await expectPopup(popupPage2).toBeVisible();
 
       // Activate target view.
-      await popupOpenerPage1.view.viewTab.click();
+      await popupOpenerPage.view.tab.click();
 
       // Expect popup 1 and popup 2 not to be visible because contextual view is not active.
-      await expect(popup1.locator).not.toBeVisible();
-      await expect(popup2.locator).not.toBeVisible();
+      await expectPopup(popupPopupOpenerPage1).toBeHidden();
+      await expectPopup(popupPage2).toBeHidden();
 
       // Activate contextual view of the popups.
-      await popupTargetViewPage.viewTab.click();
+      await popupTargetViewPage.view.tab.click();
 
       // Expect popup 1 and popup 2 to be visible.
-      await expect(popup1.locator).toBeVisible();
-      await expect(popup2.locator).toBeVisible();
+      await expectPopup(popupPopupOpenerPage1).toBeVisible();
+      await expectPopup(popupPage2).toBeVisible();
     });
   });
 
@@ -598,72 +623,72 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: true});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.popup.isPresent()).toBe(true);
-      await expect(await popupPage.popup.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      await popupOpenerPage.view.viewTab.click();
+      await expectPopup(popupPage).toBeVisible();
 
-      await expect(await popupPage.popup.isPresent()).toBe(false);
-      await expect(await popupPage.popup.isVisible()).toBe(false);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).not.toBeAttached();
     });
 
     test('should not close the popup on focus loss', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.popup.isPresent()).toBe(true);
-      await expect(await popupPage.popup.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      await popupOpenerPage.view.viewTab.click();
+      await expectPopup(popupPage).toBeVisible();
 
-      await expect(await popupPage.popup.isPresent()).toBe(true);
-      await expect(await popupPage.popup.isVisible()).toBe(true);
+      await popupOpenerPage.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should close the popup on escape keystroke', async ({page, appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnEscape: true});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.popup.isPresent()).toBe(true);
-      await expect(await popupPage.popup.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       await page.keyboard.press('Escape');
-
-      await expect(await popupPage.popup.isPresent()).toBe(false);
-      await expect(await popupPage.popup.isVisible()).toBe(false);
+      await expectPopup(popupPage).not.toBeAttached();
     });
 
     test('should not close the popup on escape keystroke', async ({page, appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnEscape: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
-      await expect(await popupPage.popup.isPresent()).toBe(true);
-      await expect(await popupPage.popup.isVisible()).toBe(true);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
 
       await page.keyboard.press('Escape');
-
-      await expect(await popupPage.popup.isPresent()).toBe(true);
-      await expect(await popupPage.popup.isVisible()).toBe(true);
+      await expectPopup(popupPage).toBeVisible();
     });
 
     test('should remain focus on the element that caused the popup to lose focus', async ({appPO, workbenchNavigator}) => {
@@ -674,13 +699,13 @@ test.describe('Workbench Popup', () => {
       // Open test page
       const inputFieldPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
       // Move test page to the right
-      await inputFieldPage.view.viewTab.dragTo({partId: await inputFieldPage.view.part.getPartId(), region: 'east'});
+      await inputFieldPage.view.tab.dragTo({partId: await inputFieldPage.view.part.getPartId(), region: 'east'});
 
       // Open popup
-      await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectPopupComponent('focus-test-page');
+      await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: true});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       // Expect popup to have focus.
       const popup = appPO.popup({cssClass: 'testee'});
@@ -691,10 +716,10 @@ test.describe('Workbench Popup', () => {
       await inputFieldPage.clickInputField();
 
       // Expect popup to be closed
-      await expect(await popup.isVisible()).toBe(false);
+      await expectPopup(focusTestPage).not.toBeAttached();
 
       // Expect focus to remain in the input field that caused focus loss of the popup.
-      await expect(await inputFieldPage.isInputFieldActiveElement()).toBe(true);
+      await expect(inputFieldPage.input).toBeFocused();
     });
   });
 
@@ -704,9 +729,9 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectPopupComponent('focus-test-page');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
       const focusTestPage = new FocusTestPagePO(popup);
@@ -717,9 +742,9 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectPopupComponent('focus-test-page');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
       const focusTestPage = new FocusTestPagePO(popup);
@@ -745,9 +770,9 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectPopupComponent('focus-test-page');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
       const focusTestPage = new FocusTestPagePO(popup);
@@ -776,10 +801,10 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-      await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.selectPopupComponent('focus-test-page');
+      await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
       const focusTestPage = new FocusTestPagePO(popup);
@@ -793,10 +818,9 @@ test.describe('Workbench Popup', () => {
       await expect(focusTestPage.locator).not.toBeVisible();
 
       // re-activate the view
-      await popupOpenerPage.view.viewTab.click();
+      await popupOpenerPage.view.tab.click();
       await expect(focusTestPage.locator).toBeVisible();
       await expect(focusTestPage.middleField).toBeFocused();
     });
   });
 });
-

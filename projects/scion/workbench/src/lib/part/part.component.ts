@@ -136,7 +136,7 @@ export class PartComponent implements OnInit, OnDestroy {
         takeUntilDestroyed(),
       )
       .subscribe(() => {
-        this.part.activate();
+        this.part.activate().then();
       });
   }
 

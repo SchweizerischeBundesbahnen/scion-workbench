@@ -12,10 +12,9 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
-import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
 import {HostPopupPagePO} from './page-object/host-popup-page.po';
 
-test.describe('Workbench Popup', () => {
+test.describe('Workbench Host Popup', () => {
 
   test.describe('Popup Referrer', () => {
 
@@ -25,18 +24,18 @@ test.describe('Workbench Popup', () => {
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
-      await popupOpenerPage.enterCssClass('host-popup');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-      const popupPage = new HostPopupPagePO(appPO, 'host-popup');
-      await expect(await popupPage.getReferrer()).toEqual({
-        viewId: popupOpenerPage.viewId,
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expect.poll(() => popupPage.getReferrer()).toEqual({
+        viewId: await popupOpenerPage.view.getViewId(),
         viewCapabilityId: await popupOpenerPage.outlet.getCapabilityId(),
       });
     });
@@ -47,26 +46,24 @@ test.describe('Workbench Popup', () => {
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       const startPage = await appPO.openNewViewTab();
-      const startPageViewId = startPage.viewId!;
+      const startPageViewId = await startPage.view.getViewId();
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterContextualViewId(startPageViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('host-popup');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-      await startPage.view!.viewTab.click();
+      await startPage.view.tab.click();
 
-      const popupPage = new HostPopupPagePO(appPO, 'host-popup');
-      await expect(await popupPage.getReferrer()).toEqual({
-        viewId: startPageViewId,
-      });
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expect.poll(() => popupPage.getReferrer()).toEqual({viewId: startPageViewId});
     });
 
     test('should have a view reference to the specified contextual view and capability', async ({appPO, microfrontendNavigator}) => {
@@ -75,24 +72,24 @@ test.describe('Workbench Popup', () => {
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       const microfrontendViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-      const microfrontendViewId = microfrontendViewPage.viewId!;
+      const microfrontendViewId = await microfrontendViewPage.view.getViewId();
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterContextualViewId(microfrontendViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('host-popup');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-      await microfrontendViewPage.view!.viewTab.click();
+      await microfrontendViewPage.view.tab.click();
 
-      const popupPage = new HostPopupPagePO(appPO, 'host-popup');
-      await expect(await popupPage.getReferrer()).toEqual({
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expect.poll(() => popupPage.getReferrer()).toEqual({
         viewId: microfrontendViewId,
         viewCapabilityId: await microfrontendViewPage.outlet.getCapabilityId(),
       });
@@ -104,18 +101,18 @@ test.describe('Workbench Popup', () => {
       // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
       // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-      // register intention
-      const registerIntentionPage = await microfrontendNavigator.openInNewTab(RegisterWorkbenchIntentionPagePO, 'app1');
-      await registerIntentionPage.registerIntention({type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
       await popupOpenerPage.enterContextualViewId('<null>');
-      await popupOpenerPage.enterCssClass('host-popup');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-      const popupPage = new HostPopupPagePO(appPO, 'host-popup');
-      await expect(await popupPage.getReferrer()).toEqual({});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+
+      await expect.poll(() => popupPage.getReferrer()).toEqual({});
     });
   });
 });

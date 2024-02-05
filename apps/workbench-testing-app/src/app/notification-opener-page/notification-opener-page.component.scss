@@ -18,4 +18,13 @@
       padding: 1em;
     }
   }
+
+  > output.notification-open-error {
+    border: 1px solid var(--sci-color-negative);
+    background-color: var(--sci-color-background-negative);
+    color: var(--sci-color-negative);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+    font-family: monospace;
+  }
 }

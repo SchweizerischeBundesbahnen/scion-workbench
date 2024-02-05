@@ -2,19 +2,19 @@ import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angul
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, WorkbenchMessageBoxService} from '@scion/workbench';
 import {WorkbenchCapabilities, WorkbenchMessageBoxConfig} from '@scion/workbench-client';
 import {IntentClient} from '@scion/microfrontend-platform';
-import {InspectMessageBoxComponent} from './inspect-message-box.component';
+import {MessageBoxPageComponent} from './message-box-page.component';
 
 /**
- * Displays a custom message box for microfrontends to inspect message box properties.
+ * Displays a custom message box for microfrontends to interact with a message box.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
-class InspectMessageBoxIntentHandler {
+class MessageBoxPageIntentHandler {
 
   constructor(intentClient: IntentClient, messageBoxService: WorkbenchMessageBoxService) {
-    intentClient.onIntent<WorkbenchMessageBoxConfig, string>({type: WorkbenchCapabilities.MessageBox, qualifier: {component: 'inspector'}}, request => {
+    intentClient.onIntent<WorkbenchMessageBoxConfig, string>({type: WorkbenchCapabilities.MessageBox, qualifier: {component: 'message-box-page'}}, request => {
       const config: WorkbenchMessageBoxConfig = request.body!;
       const params = request.intent.params!;
-      return messageBoxService.open(InspectMessageBoxComponent, {
+      return messageBoxService.open(MessageBoxPageComponent, {
         ...config,
         inputs: {
           input: config.content,
@@ -27,13 +27,13 @@ class InspectMessageBoxIntentHandler {
 }
 
 /**
- * Provides a set of DI providers to provide a custom message box capability for inspecting message box properties.
+ * Provides a set of DI providers to provide a custom message box capability for interacting with a message box.
  */
-export function provideMessageBoxInspector(): EnvironmentProviders {
+export function provideMessageBoxPage(): EnvironmentProviders {
   return makeEnvironmentProviders([
     {
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      useClass: InspectMessageBoxIntentHandler,
+      useClass: MessageBoxPageIntentHandler,
       multi: true,
     },
   ]);

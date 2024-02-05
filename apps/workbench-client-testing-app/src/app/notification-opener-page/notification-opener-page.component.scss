@@ -18,7 +18,7 @@
     }
   }
 
-  > output.error {
+  > output.notification-open-error {
     border: 1px solid var(--sci-color-negative);
     background-color: var(--sci-color-background-negative);
     color: var(--sci-color-negative);
